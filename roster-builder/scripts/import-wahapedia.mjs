@@ -39,10 +39,18 @@ export function parseCsv(text) {
   const header = lines[0].split('|').map((s) => s.trim());
   if (header[header.length - 1] === '') header.pop();
   const rows = [];
+  // В HTML-полях встречаются переносы строк (Abilities, Stratagems): склеиваем физические строки,
+  // пока не наберётся полная запись — header.length разделителей и завершающий "|".
+  let buf = null;
   for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
+    buf = buf === null ? lines[i] : buf + '\n' + lines[i];
+    const count = buf.split('|').length - 1;
+    const complete = count >= header.length && buf.trimEnd().endsWith('|');
+    if (!complete && i < lines.length - 1) continue;
+    const line = buf;
+    buf = null;
     if (!line.trim()) continue;
-    const parts = line.split('|');
+    const parts = line.trimEnd().split('|');
     if (parts.length > header.length && parts[parts.length - 1] === '') parts.pop();
     // если в тексте встретился "|" — склеиваем лишнее в последнее текстовое поле
     while (parts.length > header.length) {
