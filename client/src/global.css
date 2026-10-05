@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Цветовая палитра приложения.
+  Меняйте значения ниже — они применятся по всему приложению.
+
+  Акцентный цвет (#ECFE46) лучше не трогать, если не планируете
+  менять фирменный стиль кнопок и подсветки.
+*/
+
+:root {
+  --font-oswald: 'Oswald', sans-serif;
+
+  /* Акцент (RGB — нужен для opacity-классов вроде bg-accent/10) */
+  --color-accent: 236 254 70;
+  --color-accent-foreground: 16 16 16;
+
+  /* Фоны */
+  --color-bg: #111110;
+  --color-bg-elevated: #1a1a18;
+  --color-bg-surface: #222220;
+  --color-bg-muted: #2a2a27;
+  --color-bg-subtle: #181817;
+
+  /* Нижняя навигация */
+  --color-nav-bg: 24 24 23;
+
+  /* Оверлеи (для модалок и затемнений) */
+  --color-overlay: 17 17 16;
+  --color-overlay-strong: 17 17 16;
+
+  /* Скелетоны загрузки */
+  --color-skeleton-base: #222220;
+  --color-skeleton-highlight: #2e2d2a;
+
+  /* Текст */
+  --color-text-muted: #7f7f7f;
+  --color-text-subtle: #666666;
+}
+
+body {
+  font-family: 'Inter Tight', sans-serif;
+  background: var(--color-bg);
+  color: #ffffff;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-indicator {
+    box-shadow: 0 0 20px 0 rgb(var(--color-accent));
+    background: linear-gradient(
+      to left,
+      transparent 5%,
+      rgb(var(--color-accent)) 50%,
+      transparent 95%
+    );
+  }
+
+  .register-btn-glow {
+    box-shadow:
+      0 0 24px rgb(var(--color-accent) / 0.45),
+      0 0 56px rgb(var(--color-accent) / 0.28),
+      0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  .event-banner-glow {
+    box-shadow:
+      0 14px 36px rgba(255, 255, 255, 0.07),
+      0 8px 20px rgba(255, 255, 255, 0.04),
+      0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
