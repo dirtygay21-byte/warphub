@@ -19,7 +19,7 @@ export default function App() {
     <TanstackProvider>
       <TelegramInitializer />
 
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, "")}>
         <Routes>
           <Route path="/" element={<MainLayout />}>
             <Route path="reservations" element={<Reservation />} />
