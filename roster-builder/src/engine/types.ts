@@ -103,6 +103,21 @@ export interface Datasheet {
   enhancements: string[];
   group: UnitGroup;
 }
+/** Описание набора юнитов: по названию (UPPER) или по набору ключевых слов (все из набора), минус исключения. */
+export interface UnitMatcher {
+  names: string[];
+  keywords: string[][];
+  exclude: string[];
+}
+export interface DetachmentGrant extends UnitMatcher {
+  /** лимит очков [Incursion, Strike Force, Onslaught] */
+  caps: number[] | null;
+  /** модели с этим ключевым словом не могут быть Warlord */
+  noWarlord: string | null;
+  /** Warlord должен иметь это ключевое слово */
+  warlordMust: string | null;
+}
+
 export interface DetachmentAbility {
   id: string;
   name: string;
@@ -119,7 +134,16 @@ export interface Detachment {
   tag: string | null;
   chapter: string | null;
   battleline: string[];
-  grants: string[];
+  /** юниты, которые разрешает детачмент (с лимитом очков и ограничениями на Warlord) */
+  grants: DetachmentGrant[];
+  /** юниты, которые нельзя брать с этим детачментом */
+  forbid: UnitMatcher | null;
+  /** обязательные юниты: не меньше min; warlord — Warlord должен быть одним из них */
+  requires: { matcher: UnitMatcher; min: number; warlord: boolean }[];
+  /** повышенный лимит копий для перечисленных моделей */
+  limitOverride: { names: string[]; max: number } | null;
+  /** название правила армии, которое детачмент отключает (Corsairs and Travelling Players) */
+  disablesArmyRule: string | null;
   abilities: DetachmentAbility[];
 }
 export interface Enhancement {
@@ -154,6 +178,8 @@ export interface FactionData {
   name: string;
   allegiance: 'Imperium' | 'Chaos' | 'Xenos';
   primaryKeyword: string | null;
+  /** ключевые слова фракции, с которыми юнит доступен без особых правил */
+  armyKeywords: string[];
   chapters: string[];
   armyRules: string[];
   rules: Record<string, { name: string; text: string }>;

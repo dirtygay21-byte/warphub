@@ -56,7 +56,7 @@ export function UnitCard({
 
   // доступные улучшения
   const enhOptions = L.faction.enhancements.filter((e) => roster.detachmentIds.includes(e.detachment) && ds.enhancements.includes(e.id));
-  const enhBlocked = ds.epicHero ? 'Epic Hero не может получить улучшение' : ds.group.startsWith('ally:') ? 'Союзники не получают улучшения' : null;
+  const enhBlocked = ds.epicHero ? 'Epic Hero не может получить улучшение' : ds.group.startsWith('ally:') && !c.grant ? 'Союзники не получают улучшения' : null;
   const usedBy = new Map<string, number>();
   for (const u of cr.units) if (u.unit.enhancementId && u.unit.uid !== c.unit.uid) usedBy.set(u.unit.enhancementId, (usedBy.get(u.unit.enhancementId) ?? 0) + 1);
 

@@ -41,6 +41,11 @@ export function UnitPicker({
   }, [roster.units]);
 
   const chapter = cr.chapter;
+  // союзные правила, которые выбранный детачмент отключает (Reaper’s Wager → Corsairs)
+  const disabledAllies = useMemo(() => {
+    const off = new Set(cr.detachments.map((d) => d.disablesArmyRule).filter(Boolean));
+    return new Set(L.faction.allies.filter((a) => off.has(a.name)).map((a) => a.key));
+  }, [cr.detachments, L]);
   const chapters = L.faction.chapters;
 
   const list = useMemo(() => {
@@ -49,6 +54,7 @@ export function UnitPicker({
       .filter((ds) => {
         if (ds.legends && !roster.showLegends) return false;
         if (ds.group.startsWith('det:') && !roster.detachmentIds.includes(ds.group.slice(4))) return false;
+        if (ds.group.startsWith('ally:') && disabledAllies.has(ds.group.slice(5))) return false;
         // для Space Marines — скрываем юниты чужих орденов
         if (chapter && chapters.length) {
           const ch = ds.factionKeywords.find((k) => chapters.includes(k));
@@ -60,7 +66,7 @@ export function UnitPicker({
         return tab === 'all' ? true : g === tab;
       })
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [L, q, tab, roster.showLegends, roster.detachmentIds, grants, chapter, chapters]);
+  }, [L, q, tab, roster.showLegends, roster.detachmentIds, grants, chapter, chapters, disabledAllies]);
 
   const legendsCount = L.faction.datasheets.filter((d) => d.legends).length;
 

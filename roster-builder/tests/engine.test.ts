@@ -50,16 +50,22 @@ test('разбор стоимости: варианты таблиц, дубли
 });
 
 test('правила детачментов из текста', () => {
-  const r = parseDetachmentRules([
-    'This detachment has the ARMOURY tag and cannot be taken with another ARMOURY detachment.',
-    'KEYWORDS\nWRAITHBLADES and WRAITHGUARD units from your army gain the BATTLELINE keyword.',
-    'Restrictions: Your army can include SPACE WOLVES units, but it cannot include any ADEPTUS ASTARTES units drawn from any other Chapter.',
-    'You can include Plague Legions units in your army, even though they do not have the DEATH GUARD Faction keyword.',
-  ]);
+  const r = parseDetachmentRules(
+    [
+      'This detachment has the ARMOURY tag and cannot be taken with another ARMOURY detachment.',
+      'KEYWORDS\nWRAITHBLADES and WRAITHGUARD units from your army gain the BATTLELINE keyword.',
+      'Restrictions: Your army can include SPACE WOLVES units, but it cannot include any ADEPTUS ASTARTES units drawn from any other Chapter.',
+      'You can include Plague Legions units in your army, even though they do not have the DEATH GUARD Faction keyword. The combined points cost of such units you can include in your army is:\n• Incursion: Up to 500 pts\n• Strike Force: Up to 1000 pts\n• Onslaught: Up to 1500 pts\nNo PLAGUE LEGIONS models from your army can be your WARLORD.',
+    ],
+    new Set(['PLAGUE LEGIONS']),
+    new Set(),
+  );
   assert.equal(r.tag, 'ARMOURY');
   assert.deepEqual(r.battleline, ['WRAITHBLADES', 'WRAITHGUARD']);
   assert.equal(r.chapter, 'Space Wolves');
-  assert.deepEqual(r.grants, ['Plague Legions']);
+  assert.deepEqual(r.grants[0].keywords, [['PLAGUE LEGIONS']]);
+  assert.deepEqual(r.grants[0].caps, [500, 1000, 1500]);
+  assert.equal(r.grants[0].noWarlord, 'PLAGUE LEGIONS');
 });
 
 test('ступени стоимости по номеру копии', () => {

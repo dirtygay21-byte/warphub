@@ -31,7 +31,13 @@
 - Правила армии (Oath of Moment и т.п.), правила и стратагемы детачментов; в карточке юнита — **стратагемы, доступные
   именно ему** (основные + выбранных детачментов), и правила выбранных детачментов, которые на него действуют.
 - Союзники по официальному тексту правил: Assigned Agents (Retinue/Character/Requisitioned), Freeblades, Dreadblades,
-  Titanic Support, Daemonic Pact (лимит очков и правило BATTLELINE по богам).
+  Titanic Support, Daemonic Pact (лимит очков и правило BATTLELINE по богам), Corsairs and Travelling Players (Drukhari).
+- **Правила детачментов, извлечённые из их текста** (данные, а не код): какие чужие юниты разрешены
+  (Brood Brother Auxilia, Final Day, Shadow Legion, Questor Forgepact, Iconoclast Fiefdom, Tallyband Summoners,
+  Khorne Daemonkin, Changehost of Deceit, Carnival of Excess, Reaper’s Wager, Devoted of Ynnead), их **лимит очков**,
+  запрет на Warlord («No X model can be your WARLORD»), обязательный Warlord («A GENESTEALER CULTS model must be…»),
+  исключённые ключевые слова, запрещённые юниты (Shadow Legion), обязательные юниты (Devoted of Ynnead, Houndpack Lance),
+  повышенный лимит копий (Ghosts of the Webway) и отключение правила армии (Reaper’s Wager → Corsairs).
 
 ## Запуск
 
@@ -39,7 +45,7 @@
 cd roster-builder
 npm install
 npm run dev          # http://localhost:5173
-npm test             # тесты движка (node:test + tsx)
+npm test             # тесты движка и правил (node:test + tsx), 29 сценариев
 npm run build        # dist/ — статика
 ```
 
@@ -93,16 +99,17 @@ src/engine/                    чистая логика без React (можн�
   roster.ts                    операции с ростером, код WH1
 src/ui/                        экраны: список, редактор, выбор юнита, экспорт
 src/storage.ts                 CloudStorage + localStorage
-tests/engine.test.ts           тесты на реальных данных
+tests/engine.test.ts           движок: стоимость, импорт, снаряжение, экспорт
+tests/rules.test.ts            правила формирования армии — по сценарию на каждое правило
 ```
 
 ## Известные ограничения
 
-- Значения, помеченные «≈» в `src/engine/rules.ts`, взяты из вторичных источников: бюджет DP для Onslaught,
-  лимит Dedicated Transport и очковые лимиты для юнитов, разрешённых детачментом (там это **предупреждения**).
+- Значения, помеченные «≈» в `src/engine/rules.ts`, взяты из вторичных источников: бюджет DP для Onslaught
+  и лимит Dedicated Transport.
 - Варианты замены оружия в Wahapedia — свободный текст, поэтому их соблюдение не проверяется автоматически:
   число оружия задаётся вручную, а текст вариантов показан рядом. Доплата за оружие («per Thunder Hammer»)
   отмечается отдельным счётчиком.
-- Детачменты, которые разрешают юниты поимённым списком (Shadow Legion, Questor Forgepact), пока не добавляют
-  эти юниты автоматически.
+- Правила детачментов, которые меняют игру, а не состав армии (ауры, стратагемы, перебросы), только показываются
+  текстом — на ростер они не влияют.
 - Если у инфолиста Space Marines несколько таблиц цен (варианты орденов), берётся первая.

@@ -1,7 +1,7 @@
 {
  "edition": "11",
  "lastUpdate": "2026-09-28 02:38:04",
- "generatedAt": "2026-10-05T15:18:01.755Z",
+ "generatedAt": "2026-10-05T15:26:34.622Z",
  "credit": "powered by Wahapedia",
  "factions": [
   {
@@ -113,7 +113,7 @@
    "id": "QI",
    "name": "Imperial Knights",
    "allegiance": "Imperium",
-   "units": 27,
+   "units": 28,
    "detachments": 8
   },
   {

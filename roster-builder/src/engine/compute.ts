@@ -1,5 +1,5 @@
-import { ALLY_RULES, BATTLE_SIZES, LIMITS, grantedPointsCap, sizeIndex } from './rules';
-import type { CostBand, Datasheet, Detachment, Enhancement, FactionData, Roster, RosterUnit } from './types';
+import { ALLY_RULES, BATTLE_SIZES, LIMITS, sizeIndex } from './rules';
+import type { CostBand, Datasheet, Detachment, DetachmentGrant, Enhancement, FactionData, Roster, RosterUnit, UnitMatcher } from './types';
 
 export type IssueLevel = 'error' | 'warning';
 export interface Issue {
@@ -25,6 +25,8 @@ export interface ComputedUnit {
   /** снаряжение: оружие → число моделей с ним */
   loadout: Record<string, number>;
   loadoutCustom: boolean;
+  /** правило детачмента, по которому юнит попал в армию */
+  grant: { detachment: Detachment; grant: DetachmentGrant } | null;
   /** присоединённые к этому юниту персонажи */
   attached: RosterUnit[];
 }
@@ -60,6 +62,23 @@ export function makeLookup(faction: FactionData): DataLookup {
     det: new Map(faction.detachments.map((d) => [d.id, d])),
     enh: new Map(faction.enhancements.map((e) => [e.id, e])),
   };
+}
+
+/** Подходит ли инфолист под описание (названия / наборы ключевых слов / исключения). */
+export function matchesUnit(ds: Datasheet, m: UnitMatcher, fuzzy = false): boolean {
+  const kws = new Set([...ds.keywords, ...ds.factionKeywords].map((k) => k.toUpperCase()));
+  const name = ds.name.toUpperCase();
+  if (m.exclude.some((x) => kws.has(x) || kws.has(x + 'S') || name === x || name === x + 'S')) return false;
+  if (m.names.includes(name) || m.keywords.some((set) => set.every((k) => kws.has(k)))) return true;
+  if (!fuzzy) return false;
+  // «Daemon Prince with Wings» ↔ «Daemon Prince of Chaos with Wings»: слова по порядку
+  const words = name.split(/\s+/);
+  const subseq = (n: string) => {
+    let i = 0;
+    for (const w of words) if (w === n.split(/\s+/)[i]) i++;
+    return i === n.split(/\s+/).length;
+  };
+  return [...m.names, ...m.keywords.map((k) => k.join(' '))].some(subseq);
 }
 
 /**
@@ -176,6 +195,7 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
       isBattleline: ds ? isBattleline(ds, blGrants) : false,
       loadout,
       loadoutCustom: !!unit.weapons,
+      grant: null,
       attached: [],
     };
   });
@@ -220,9 +240,15 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
   }
 
   // ---------- доступность юнитов ----------
-  const detGrantKw = new Set(detachments.flatMap((d) => d.grants.map((g) => g.toUpperCase())));
-  const primary = L.faction.primaryKeyword?.toUpperCase();
-  const grantedPoints = new Map<string, number>();
+  const armyKw = new Set(L.faction.armyKeywords.map((k) => k.toUpperCase()));
+  const disabledRules = new Set(detachments.map((d) => d.disablesArmyRule).filter((x): x is string => !!x));
+  const findGrant = (ds: Datasheet, only?: string) => {
+    for (const d of detachments) {
+      if (only && d.id !== only) continue;
+      for (const g of d.grants) if (matchesUnit(ds, { ...g, exclude: [] })) return { detachment: d, grant: g };
+    }
+    return null;
+  };
   for (const c of units) {
     const { ds, unit } = c;
     if (!ds) {
@@ -241,20 +267,40 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
     if (ds.group.startsWith('det:')) {
       const detId = ds.group.slice(4);
       if (!roster.detachmentIds.includes(detId)) {
-        const name = L.det.get(detId)?.name ?? 'детачмент';
-        err('det-unit', `«${ds.name}» можно взять только с детачментом ${name}.`, [unit.uid]);
-      }
-      grantedPoints.set('det', (grantedPoints.get('det') ?? 0) + c.total);
-    } else if (ds.group === 'own' && primary && !ds.factionKeywords.some((k) => k.toUpperCase() === primary)) {
-      const ok = ds.factionKeywords.some((k) => detGrantKw.has(k.toUpperCase()));
-      if (!ok) warn('faction-kw', `У «${ds.name}» нет ключевого слова ${L.faction.primaryKeyword} — нужен детачмент, который разрешает такие юниты.`, [unit.uid]);
-      else grantedPoints.set('det', (grantedPoints.get('det') ?? 0) + c.total);
+        err('det-unit', `«${ds.name}» можно взять только с детачментом ${L.det.get(detId)?.name ?? '?'}.`, [unit.uid]);
+      } else c.grant = findGrant(ds, detId) ?? findGrant(ds);
+    } else if (ds.group.startsWith('ally:')) {
+      c.grant = findGrant(ds);
+      const ally = L.faction.allies.find((a) => 'ally:' + a.key === ds.group);
+      if (!c.grant && ally && disabledRules.has(ally.name)) err('ally-disabled', `С выбранным детачментом нельзя использовать правило ${ally.name} («${ds.name}»).`, [unit.uid]);
+    } else if (armyKw.size && !ds.factionKeywords.some((k) => armyKw.has(k.toUpperCase()))) {
+      c.grant = findGrant(ds);
+      if (!c.grant) warn('faction-kw', `У «${ds.name}» нет ключевого слова ${L.faction.armyKeywords.join(' / ')} — нужен детачмент, который разрешает такие юниты.`, [unit.uid]);
+    }
+    if (c.grant && c.grant.grant.exclude.length && !matchesUnit(ds, c.grant.grant)) {
+      err('grant-excluded', `«${ds.name}» нельзя взять по правилу детачмента ${c.grant.detachment.name}.`, [unit.uid]);
     }
   }
-  const granted = grantedPoints.get('det') ?? 0;
-  if (granted) {
-    const cap = grantedPointsCap(roster.factionId, roster.battleSize, detachments.map((d) => d.name));
-    if (granted > cap) warn('granted-cap', `Юниты, разрешённые детачментом, стоят ${fmt(granted)} очков — обычно лимит ${fmt(cap)}. Проверьте текст детачмента.`);
+  // лимиты очков и прочие условия правил детачментов
+  const si0 = sizeIndex(roster.battleSize);
+  for (const d of detachments) {
+    for (const g of d.grants) {
+      const list = units.filter((c) => c.grant?.grant === g);
+      if (g.caps && list.length) {
+        const pts = list.reduce((x, c) => x + c.total, 0);
+        if (pts > g.caps[si0]) err('grant-cap', `${d.name}: разрешённые детачментом юниты стоят ${fmt(pts)} очков, максимум ${fmt(g.caps[si0])}.`, list.map((c) => c.unit.uid));
+      }
+    }
+    if (d.forbid) {
+      const bad = units.filter((c) => c.ds && !c.grant && matchesUnit(c.ds, d.forbid!, true));
+      if (bad.length) err('det-forbid', `${d.name}: эти юниты нельзя брать с детачментом — ${bad.map((c) => c.ds!.name).join(', ')}.`, bad.map((c) => c.unit.uid));
+    }
+    for (const rq of d.requires) {
+      const list = units.filter((c) => c.ds && matchesUnit(c.ds, rq.matcher));
+      const what = [...rq.matcher.names, ...rq.matcher.keywords.map((k) => k.join(' '))].join(' / ');
+      if (list.length < rq.min) err('det-requires', `${d.name}: нужно не меньше ${rq.min} — ${what} (сейчас ${list.length}).`);
+      if (rq.warlord && roster.warlordUid && !list.some((c) => c.unit.uid === roster.warlordUid)) err('det-warlord', `${d.name}: Warlord должен быть одним из: ${what}.`);
+    }
   }
 
   // ---------- лимиты копий ----------
@@ -262,7 +308,8 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
     const ds = L.ds.get(id);
     if (!ds) continue;
     const bl = units.find((c) => c.unit.datasheetId === id)?.isBattleline ?? false;
-    const limit = copyLimit(ds, roster.battleSize, bl);
+    let limit = copyLimit(ds, roster.battleSize, bl);
+    for (const d of detachments) if (d.limitOverride?.names.includes(ds.name.toUpperCase())) limit = Math.max(limit, d.limitOverride.max);
     if (n > limit) {
       const uids = units.filter((c) => c.unit.datasheetId === id).map((c) => c.unit.uid);
       err('copies', `«${ds.name}»: ${n} шт., максимум ${limit}${ds.epicHero ? ' (Epic Hero)' : ''}.`, uids);
@@ -278,7 +325,7 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
     const name = c.ds?.name ?? '?';
     if (!roster.detachmentIds.includes(e.detachment)) err('enh-det', `Улучшение «${e.name}» из невыбранного детачмента.`, [c.unit.uid]);
     if (c.ds?.epicHero) err('enh-epic', `«${name}» — Epic Hero и не может получить улучшение.`, [c.unit.uid]);
-    if (c.ds?.group.startsWith('ally:')) err('enh-ally', `Союзный юнит «${name}» не может получить улучшение.`, [c.unit.uid]);
+    if (c.ds?.group.startsWith('ally:') && !c.grant) err('enh-ally', `Союзный юнит «${name}» не может получить улучшение.`, [c.unit.uid]);
     if (c.ds && c.ds.enhancements.length && !c.ds.enhancements.includes(e.id)) err('enh-elig', `«${name}» не может взять «${e.name}».`, [c.unit.uid]);
     if (e.upgrade && c.ds?.character) err('upg-char', `Upgrade «${e.name}» нельзя дать персонажу (${name}).`, [c.unit.uid]);
   }
@@ -298,8 +345,17 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
     else if (units.length) err('warlord', 'В армии нет персонажа, которого можно назначить Warlord.');
   } else {
     if (!wl.ds?.character) err('warlord-char', 'Warlord должен быть персонажем (CHARACTER).', [wl.unit.uid]);
-    if (wl.ds?.group.startsWith('ally:')) err('warlord-ally', 'Союзный юнит не может быть Warlord.', [wl.unit.uid]);
+    if (wl.ds?.group.startsWith('ally:') && !wl.grant) err('warlord-ally', 'Союзный юнит не может быть Warlord.', [wl.unit.uid]);
+    const kw = new Set([...(wl.ds?.keywords ?? []), ...(wl.ds?.factionKeywords ?? [])].map((k) => k.toUpperCase()));
+    if (wl.grant?.grant.noWarlord && kw.has(wl.grant.grant.noWarlord)) err('warlord-grant', `${wl.grant.detachment.name}: модель ${wl.grant.grant.noWarlord} не может быть Warlord.`, [wl.unit.uid]);
   }
+  for (const d of detachments)
+    for (const g of d.grants)
+      if (g.warlordMust && wl) {
+        const kw = new Set([...(wl.ds?.keywords ?? []), ...(wl.ds?.factionKeywords ?? [])].map((k) => k.toUpperCase()));
+        // юнит, попавший в армию по этому же правилу, не считается моделью армии (копии Brood Brothers несут ключевое слово GC)
+        if (!kw.has(g.warlordMust) || wl.grant?.grant === g) err('warlord-must', `${d.name}: Warlord должен быть моделью ${g.warlordMust}.`, [wl.unit.uid]);
+      }
 
   // ---------- Leader / Support ----------
   for (const c of units) {
@@ -331,7 +387,7 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
 
   // ---------- союзники ----------
   const si = sizeIndex(roster.battleSize);
-  const allyUnits = (key: string) => units.filter((c) => c.ds?.group === `ally:${key}`);
+  const allyUnits = (key: string) => units.filter((c) => c.ds?.group === `ally:${key}` && !c.grant);
   const hasKw = (c: ComputedUnit, k: string) => !!c.ds?.keywords.some((x) => x.toUpperCase() === k);
   const agents = allyUnits('agents');
   if (agents.length) {
@@ -356,6 +412,12 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
     if ((big && small) || big > ALLY_RULES.knights.titanic || small > ALLY_RULES.knights.small) {
       err(key, `${key === 'freeblades' ? 'Freeblades' : 'Dreadblades'}: можно 1 TITANIC рыцаря или до ${ALLY_RULES.knights.small} малых, не вместе.`, list.map((c) => c.unit.uid));
     }
+  }
+  const corsairs = allyUnits('corsairs');
+  if (corsairs.length) {
+    const pts = corsairs.reduce((s, c) => s + c.total, 0);
+    const cap = ALLY_RULES.corsairsPoints[si];
+    if (pts > cap) err('corsairs-pts', `Corsairs and Travelling Players: ${fmt(pts)} очков, максимум ${fmt(cap)} для ${size.label}.`, corsairs.map((c) => c.unit.uid));
   }
   const titans = allyUnits('titanicus');
   if (titans.length > ALLY_RULES.titanicus) err('titanicus', `Titanic Support: можно только ${ALLY_RULES.titanicus} модель ADEPTUS TITANICUS.`, titans.map((c) => c.unit.uid));

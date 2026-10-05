@@ -215,8 +215,52 @@ export function parseCosts(rows) {
 
 // ---------- правила детачментов из текста ----------
 const KW_SEP = /\s*(?:,|\band\b|\bor\b)\s*/i;
-export function parseDetachmentRules(texts) {
-  const out = { tag: null, chapter: null, battleline: [], grants: [] };
+/**
+ * Правила формирования армии из текста детачмента.
+ * vocab — все ключевые слова (UPPER), names — все названия инфолистов (UPPER).
+ */
+export function parseDetachmentRules(texts, vocab = new Set(), names = new Set()) {
+  const out = { tag: null, chapter: null, battleline: [], grants: [], forbid: null, requires: [], limitOverride: null, disablesArmyRule: null };
+  const toMatcher = (subject, excluding = '') => {
+    const m = { names: [], keywords: [], exclude: [] };
+    const items = subject.includes('/') ? subject.split('/') : [subject];
+    for (let it of items) {
+      it = it.replace(/\bunits?\b/gi, '').trim();
+      if (!it) continue;
+      const U = it.toUpperCase();
+      if (names.has(U)) m.names.push(U);
+      else if (vocab.has(U)) m.keywords.push([U]);
+      else {
+        // «Tyranids Vanguard Invader» → [TYRANIDS, VANGUARD INVADER]
+        const words = U.split(/\s+/);
+        const seq = [];
+        for (let i = 0; i < words.length; ) {
+          let j = words.length;
+          while (j > i && !vocab.has(words.slice(i, j).join(' '))) j--;
+          if (j === i) {
+            seq.length = 0;
+            break;
+          }
+          seq.push(words.slice(i, j).join(' '));
+          i = j;
+        }
+        if (seq.length) m.keywords.push(seq);
+        else if (names.has(U)) m.names.push(U);
+        else m.keywords.push([U]);
+      }
+    }
+    for (const x of excluding.split(/,|;|\band\b|\bor\b/)) {
+      const v = x.replace(/\bunits?\b/gi, '').trim().toUpperCase();
+      if (v) m.exclude.push(v);
+    }
+    return m;
+  };
+  const capsOf = (t) => {
+    const a = t.match(/Incursion:?\s*Up to (\d+)\s*pts[\s\S]*?Strike Force:?\s*Up to (\d+)\s*pts[\s\S]*?Onslaught:?\s*Up to (\d+)\s*pts/i);
+    if (a) return [+a[1], +a[2], +a[3]];
+    const b = t.match(/cannot exceed (\d+) points/i);
+    return b ? [+b[1], +b[1], +b[1]] : null;
+  };
   for (const t of texts) {
     const one = t.replace(/\n/g, ' ');
     const tag = one.match(/has the ([A-Z][A-Z'’\- ]+?) tag/);
@@ -226,17 +270,72 @@ export function parseDetachmentRules(texts) {
     for (const line of t.split('\n')) {
       const m = line.match(/(?:^|\.\s*|KEYWORDS\s*|Detachment,\s*)([A-Za-z’'\- ,]+?) (?:units|models) from your army (?:gain|have) the BATTLELINE keyword/i);
       if (m) {
-        const names = m[1].replace(/^.*Detachment,\s*/i, '').replace(/^(KEYWORDS|TRAVELLING PLAYERS)\s*/i, '').split(KW_SEP).map((s) => s.trim()).filter(Boolean);
-        out.battleline.push(...names);
+        const nm = m[1].replace(/^.*Detachment,\s*/i, '').replace(/^(KEYWORDS|TRAVELLING PLAYERS)\s*/i, '').split(KW_SEP).map((x) => x.trim()).filter(Boolean);
+        out.battleline.push(...nm);
       }
     }
-    for (const m of one.matchAll(/You can include (?:the )?([A-Za-z’' ]+?) units in your army/gi)) {
-      out.grants.push(titleKw(m[1]));
+    // юниты, которые разрешает детачмент (+ лимит очков, запреты на Warlord, исключённые ключевые слова)
+    const grantFrom = (matcher) => {
+      const nw = one.match(/No ([A-Za-z’' ]+?) models? from your army can be your WARLORD/i);
+      const wm = one.match(/An? ([A-Za-z’' ]+?) model must be your WARLORD/i);
+      const ex = one.match(/cannot include units with any of the following keywords in your army using this rule:\s*([^.]+)\./i);
+      if (ex) for (const x of ex[1].split(';')) if (x.trim()) matcher.exclude.push(x.trim().toUpperCase());
+      out.grants.push({ ...matcher, caps: capsOf(t), noWarlord: nw ? nw[1].toUpperCase() : null, warlordMust: wm ? wm[1].toUpperCase() : null });
+    };
+    for (const m of one.matchAll(/You can include (?:the )?([A-Za-z’'\/\- ]+?) units(?: \(excluding ([^)]*)\))? in your army/gi)) grantFrom(toMatcher(m[1], m[2] || ''));
+    const list = t.match(/you can include the following [A-Z’' ]+ units:\s*\n((?:\s*•[^\n]+\n?)+)/i);
+    if (list) {
+      const m = { names: [], keywords: [], exclude: [] };
+      for (const b of list[1].split('\n')) {
+        const v = b.replace(/^\s*•\s*/, '').trim();
+        if (!v) continue;
+        const sub = toMatcher(v);
+        m.names.push(...sub.names);
+        m.keywords.push(...sub.keywords);
+      }
+      grantFrom(m);
     }
+    // запреты: «you cannot include any Daemon Prince, … or Epic Hero units (excluding Be’lakor)»
+    const fb = one.match(/When mustering your army, you cannot include any (.+?) units(?: \(excluding ([^)]*)\))?/i);
+    if (fb) {
+      const m = { names: [], keywords: [], exclude: [] };
+      for (const x of fb[1].split(/,|\bor\b/)) {
+        const sub = toMatcher(x.trim());
+        m.names.push(...sub.names);
+        m.keywords.push(...sub.keywords);
+      }
+      if (fb[2]) m.exclude.push(...fb[2].split(/,|\band\b/).map((x) => x.trim().toUpperCase()).filter(Boolean));
+      out.forbid = m;
+    }
+    // обязательные юниты
+    const rq = one.match(/You must include (.+?) in your army, and one of those models must be your WARLORD/i);
+    if (rq) {
+      const m = { names: rq[1].split(/\s*(?:and\/or|,|\bor\b)\s*/).map((x) => x.trim().toUpperCase()).filter(Boolean), keywords: [], exclude: [] };
+      out.requires.push({ matcher: m, min: 1, warlord: true });
+    }
+    const mn = one.match(/Your army must include (one|two|three|four|\d+) or more ([A-Za-z’' ]+?) units/i);
+    if (mn) {
+      const n = { one: 1, two: 2, three: 3, four: 4 }[mn[1].toLowerCase()] ?? +mn[1];
+      out.requires.push({ matcher: toMatcher(mn[2]), min: n, warlord: false });
+    }
+    const lo = one.match(/You can include up to (two|three|four|\d+) of each of the following models in your army:\s*([^.•]+?)(?:\.|•|$)/i);
+    if (lo) {
+      const n = { two: 2, three: 3, four: 4 }[lo[1].toLowerCase()] ?? +lo[1];
+      out.limitOverride = { names: lo[2].split(/,|\band\b/).map((x) => x.trim().toUpperCase()).filter(Boolean), max: n };
+    }
+    const dis = one.match(/you cannot use the ([A-Za-z’' ]+?) army rule/i);
+    if (dis) out.disablesArmyRule = dis[1].trim();
   }
-  out.battleline = [...new Set(out.battleline.map((s) => s.toUpperCase()))];
-  out.grants = [...new Set(out.grants)];
+  out.battleline = [...new Set(out.battleline.map((x) => x.toUpperCase()))];
   return out;
+}
+
+/** Подходит ли инфолист под описание (названия / наборы ключевых слов / исключения). */
+export function matchesUnit(ds, m) {
+  const kws = new Set([...ds.keywords, ...ds.factionKeywords].map((k) => k.toUpperCase()));
+  const name = ds.name.toUpperCase();
+  if (m.exclude.some((x) => kws.has(x) || kws.has(x + 'S') || name === x || name === x + 'S')) return false;
+  return m.names.includes(name) || m.keywords.some((set) => set.every((k) => kws.has(k)));
 }
 function titleKw(s) {
   return s.trim().toLowerCase().replace(/(^|[\s-])(\p{L})/gu, (m, a, b) => a + b.toUpperCase());
@@ -267,12 +366,23 @@ const ALLY_GROUPS = [
     note: '1 TITANIC рыцарь или до 3 WAR DOG. Не Warlord, без улучшений.',
   },
   {
+    // Drukhari: Harlequins и Anhrathe до 250/500/750 очков; Reaper's Wager отключает это правило
+    key: 'corsairs', name: 'Corsairs and Travelling Players', rule: 'Corsairs and Travelling Players', allegiance: ['Xenos'], onlyFactions: ['DRU'],
+    pick: (ds) => ds.faction === 'AE' && (ds.factionKeywords.includes('Harlequins') || ds._kw.has('ANHRATHE')),
+    note: 'Harlequins и Anhrathe до 250/500/750 очков. Не Warlord, без улучшений.',
+  },
+  {
     // армии, где у всех моделей есть Chaos Knights или Heretic Astartes
     key: 'daemons', name: 'Daemonic Pact', rule: 'Daemonic Pact', allegiance: ['Chaos'], onlyFactions: ['CSM', 'DG', 'TS', 'WE', 'EC', 'QT'],
     pick: (ds) => ds.faction === 'CD',
     note: 'До 250/500/750 очков. Не Warlord, без улучшений. По каждому богу не-BATTLELINE юнитов не больше, чем BATTLELINE.',
   },
 ];
+
+/** Ключевые слова фракции армии, если их несколько (иначе — самое частое). */
+const ARMY_KEYWORDS = {
+  AE: ['Asuryani', 'Harlequins', 'Aeldari'],
+};
 
 // ---------- снаряжение ----------
 const normName = (s) => s.toLowerCase().replace(/[’`‘]/g, "'").replace(/[-–]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -442,10 +552,12 @@ async function main() {
 
   // --- детачменты ---
   const abilByDet = groupBy(T.Detachment_abilities, 'detachment_id');
+  const vocab = new Set([...all.values()].flatMap((d) => [...d.keywords, ...d.factionKeywords].map((k) => k.toUpperCase())));
+  const dsNames = new Set([...all.values()].map((d) => d.name.toUpperCase()));
   const chapterDp = groupBy(T.Detachments_chapter_dp, 'detachment_id');
   const detachments = T.Detachments.map((d) => {
     const abil = (abilByDet.get(d.id) || []).map((a) => ({ id: a.id, name: htmlToText(a.name), text: htmlToText(a.description) }));
-    const rules = parseDetachmentRules(abil.map((a) => a.text));
+    const rules = parseDetachmentRules(abil.map((a) => a.text), vocab, dsNames);
     return {
       id: d.id,
       faction: d.faction_id,
@@ -475,27 +587,13 @@ async function main() {
   fs.mkdirSync(path.join(OUT, 'f'), { recursive: true });
   const index = [];
   for (const f of T.Factions) {
-    const own = [...all.values()].filter((d) => d.faction === f.id && d.costs.length);
-    if (!own.length) continue;
+    const own = [...all.values()].filter((d) => d.faction === f.id);
+    if (!own.some((d) => d.costs.length)) continue;
     const dets = detachments.filter((d) => d.faction === f.id);
     const detIds = new Set(dets.map((d) => d.id));
     const enh = enhancements.filter((e) => detIds.has(e.detachment));
     const ownIds = new Set(own.map((d) => d.id));
 
-    // юниты, которые разрешают детачменты, но которых нет среди своих (кросс-фракционные)
-    const granted = [];
-    for (const det of dets) {
-      for (const g of det.grants) {
-        const G = g.toUpperCase();
-        for (const d of all.values()) {
-          if (ownIds.has(d.id) || !d.costs.length) continue;
-          if (d.factionKeywords.some((k) => k.toUpperCase() === G)) {
-            granted.push({ ...d, group: 'det:' + det.id });
-            ownIds.add(d.id);
-          }
-        }
-      }
-    }
     // союзники
     const allies = [];
     const allyUnits = [];
@@ -508,12 +606,40 @@ async function main() {
       allies.push({ key: g.key, name: g.name, note: g.note, text: ruleText ? htmlToText(ruleText.description) : '' });
       for (const u of units) {
         const costs = g.costContext ? u._ctx[g.costContext] || u.costs : u.costs;
-        allyUnits.push({ ...u, costs, group: 'ally:' + g.key, enhancements: [] });
+        allyUnits.push({ ...u, costs, group: 'ally:' + g.key, enhancements: g.key === 'corsairs' ? u.enhancements : [] });
+        ownIds.add(u.id);
+      }
+    }
+    // копии чужих юнитов внутри фракции (Brood Brothers у GC, Chaos Lord у CD…) — доступны только с детачментом
+    const baseSource = (n) => n.replace(/^Legends:\s*/i, '').replace(/\s*\((Warhammer Legends|Forge World)\)$/i, '').trim();
+    const ownGroup = new Map();
+    for (const d of own) {
+      if (baseSource(d.source) === f.name || !d.source) continue;
+      const det = dets.find((x) => x.grants.some((g) => matchesUnit(d, { ...g, exclude: [] })));
+      if (det) ownGroup.set(d.id, 'det:' + det.id);
+    }
+    // юниты других фракций, которые разрешают детачменты (Brood Brothers, Shadow Legion, Questor Forgepact…)
+    const granted = [];
+    for (const det of dets) {
+      for (const g of det.grants) {
+        const cand = [...all.values()].filter((d) => !ownIds.has(d.id) && d.costs.length && matchesUnit(d, g));
+        if (!cand.length) continue;
+        // берём юниты одной «родной» фракции (самой частой среди подходящих) и не дублируем уже доступные названия
+        const cnt = new Map();
+        for (const d of cand) cnt.set(d.faction, (cnt.get(d.faction) || 0) + 1);
+        const home = [...cnt.entries()].sort((a, b) => b[1] - a[1])[0][0];
+        const have = new Set([...own, ...allyUnits, ...granted].map((d) => d.name.toUpperCase()));
+        for (const d of cand) {
+          if (d.faction !== home || have.has(d.name.toUpperCase())) continue;
+          granted.push({ ...d, group: 'det:' + det.id });
+          ownIds.add(d.id);
+          have.add(d.name.toUpperCase());
+        }
       }
     }
 
     // общие правила (Core/Faction), на которые ссылаются инфолисты этого файла
-    const allDs = [...own.map((d) => ({ ...d, group: 'own' })), ...granted, ...allyUnits];
+    const allDs = [...own.map((d) => ({ ...d, group: ownGroup.get(d.id) ?? 'own' })), ...granted, ...allyUnits];
     const rules = {};
     for (const d of allDs) for (const a of d.abilities) if (a.ref && !rules[a.ref]) rules[a.ref] = { name: a.name, text: abilityDefs.get(a.ref)?.text || '' };
     const armyRules = uniq(own.flatMap((d) => d.abilities.filter((a) => a.type === 'faction' && a.ref).map((a) => a.ref)));
@@ -533,6 +659,8 @@ async function main() {
       name: f.name,
       allegiance: allegiance[f.id],
       primaryKeyword: primaryKeyword(own),
+      // юниты с этими ключевыми словами фракции допустимы без особых правил
+      armyKeywords: ARMY_KEYWORDS[f.id] ?? [primaryKeyword(own)].filter(Boolean),
       chapters,
       armyRules,
       rules,

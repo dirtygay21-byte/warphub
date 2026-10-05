@@ -44,18 +44,8 @@ export const ALLY_RULES = {
   knights: { titanic: 1, small: 3 }, // Freeblades / Dreadblades: 1 TITANIC или до 3 малых
   titanicus: 1, // Titanic Support: 1 модель ADEPTUS TITANICUS
   daemonsPoints: [250, 500, 750], // Daemonic Pact
+  corsairsPoints: [250, 500, 750], // Corsairs and Travelling Players (Drukhari)
   daemonGods: ['KHORNE', 'TZEENTCH', 'NURGLE', 'SLAANESH'],
 };
-
-/**
- * ≈ Лимиты очков для юнитов «чужих» ключевых слов, разрешённых детачментом
- * (Blood Legions у World Eaters, Harlequins у Drukhari и т.д.).
- */
-export function grantedPointsCap(factionId: string, size: BattleSize, detachmentNames: string[]): number {
-  if (factionId === 'DRU') {
-    return detachmentNames.includes('Reaper’s Wager') ? [500, 1000, 1500][idx(size)] : [250, 500, 750][idx(size)];
-  }
-  return [500, 1000, 1500][idx(size)];
-}
 
 export const sizeIndex = idx;
