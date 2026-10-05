@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-accent: 236 254 70;
+  --color-accent-foreground: 16 16 16;
+  --color-bg: #111110;
+  --color-bg-elevated: #1a1a18;
+  --color-bg-surface: #222220;
+  --color-bg-muted: #2a2a27;
+  --color-bg-subtle: #181817;
+  --color-danger: 248 113 113;
+  --color-warn: 251 191 36;
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: #fff;
+  font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+.font-display {
+  letter-spacing: 0.02em;
+}
+
+/* таблица характеристик */
+.stat-grid {
+  font-variant-numeric: tabular-nums;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.sheet-enter {
+  animation: sheet-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+@keyframes sheet-in {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.fade-enter {
+  animation: fade-in 0.18s ease-out;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}

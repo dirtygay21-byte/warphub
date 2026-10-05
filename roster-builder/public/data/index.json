@@ -1,0 +1,176 @@
+{
+ "edition": "11",
+ "lastUpdate": "2026-09-28 02:38:04",
+ "generatedAt": "2026-10-05T15:26:34.622Z",
+ "credit": "powered by Wahapedia",
+ "factions": [
+  {
+   "id": "AS",
+   "name": "Adepta Sororitas",
+   "allegiance": "Imperium",
+   "units": 38,
+   "detachments": 8
+  },
+  {
+   "id": "AC",
+   "name": "Adeptus Custodes",
+   "allegiance": "Imperium",
+   "units": 31,
+   "detachments": 9
+  },
+  {
+   "id": "AdM",
+   "name": "Adeptus Mechanicus",
+   "allegiance": "Imperium",
+   "units": 38,
+   "detachments": 10
+  },
+  {
+   "id": "TL",
+   "name": "Adeptus Titanicus",
+   "allegiance": "Imperium",
+   "units": 4,
+   "detachments": 0
+  },
+  {
+   "id": "AE",
+   "name": "Aeldari",
+   "allegiance": "Xenos",
+   "units": 99,
+   "detachments": 15
+  },
+  {
+   "id": "AM",
+   "name": "Astra Militarum",
+   "allegiance": "Imperium",
+   "units": 135,
+   "detachments": 11
+  },
+  {
+   "id": "CD",
+   "name": "Chaos Daemons",
+   "allegiance": "Chaos",
+   "units": 101,
+   "detachments": 9
+  },
+  {
+   "id": "QT",
+   "name": "Chaos Knights",
+   "allegiance": "Chaos",
+   "units": 37,
+   "detachments": 8
+  },
+  {
+   "id": "CSM",
+   "name": "Chaos Space Marines",
+   "allegiance": "Chaos",
+   "units": 111,
+   "detachments": 17
+  },
+  {
+   "id": "DG",
+   "name": "Death Guard",
+   "allegiance": "Chaos",
+   "units": 71,
+   "detachments": 9
+  },
+  {
+   "id": "DRU",
+   "name": "Drukhari",
+   "allegiance": "Xenos",
+   "units": 46,
+   "detachments": 9
+  },
+  {
+   "id": "EC",
+   "name": "Emperor’s Children",
+   "allegiance": "Chaos",
+   "units": 23,
+   "detachments": 10
+  },
+  {
+   "id": "GC",
+   "name": "Genestealer Cults",
+   "allegiance": "Xenos",
+   "units": 139,
+   "detachments": 9
+  },
+  {
+   "id": "GK",
+   "name": "Grey Knights",
+   "allegiance": "Imperium",
+   "units": 31,
+   "detachments": 9
+  },
+  {
+   "id": "AoI",
+   "name": "Imperial Agents",
+   "allegiance": "Imperium",
+   "units": 46,
+   "detachments": 5
+  },
+  {
+   "id": "QI",
+   "name": "Imperial Knights",
+   "allegiance": "Imperium",
+   "units": 28,
+   "detachments": 8
+  },
+  {
+   "id": "LoV",
+   "name": "Leagues of Votann",
+   "allegiance": "Xenos",
+   "units": 22,
+   "detachments": 10
+  },
+  {
+   "id": "NEC",
+   "name": "Necrons",
+   "allegiance": "Xenos",
+   "units": 64,
+   "detachments": 12
+  },
+  {
+   "id": "ORK",
+   "name": "Orks",
+   "allegiance": "Xenos",
+   "units": 67,
+   "detachments": 15
+  },
+  {
+   "id": "SM",
+   "name": "Space Marines",
+   "allegiance": "Imperium",
+   "units": 291,
+   "detachments": 53
+  },
+  {
+   "id": "TAU",
+   "name": "T’au Empire",
+   "allegiance": "Xenos",
+   "units": 62,
+   "detachments": 7
+  },
+  {
+   "id": "TS",
+   "name": "Thousand Sons",
+   "allegiance": "Chaos",
+   "units": 60,
+   "detachments": 9
+  },
+  {
+   "id": "TYR",
+   "name": "Tyranids",
+   "allegiance": "Xenos",
+   "units": 57,
+   "detachments": 10
+  },
+  {
+   "id": "WE",
+   "name": "World Eaters",
+   "allegiance": "Chaos",
+   "units": 58,
+   "detachments": 8
+  }
+ ]
+}
