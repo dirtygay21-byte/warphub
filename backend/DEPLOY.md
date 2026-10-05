@@ -129,7 +129,7 @@ table 1/2 later in the admin panel). Empty output means nothing to do.
    bun test
    ```
    - `db:migrate` should finish without red errors.
-   - `bun test` should end with `25 pass` and `0 fail`.
+   - `bun test` should end with `33 pass` and `0 fail`.
 5. Start it again and watch the log for 20–30 seconds:
    ```bash
    pm2 start <backend-process-name>
