@@ -10,6 +10,8 @@ import AdminDnd from "@/components/pages/Admin/Dnd/AdminDnd";
 import Reservation from "@/components/pages/Reservations/Reservation";
 import News from "@/components/pages/News/News";
 import Profile from "@/components/pages/Profile/Profile";
+import RosterPage from "@/components/pages/Roster/RosterPage";
+import AdminRoster from "@/components/pages/Admin/Roster/AdminRoster";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 export default function App() {
@@ -25,6 +27,8 @@ export default function App() {
             <Route path="profile" element={<Profile />} />
           </Route>
 
+          <Route path="/roster" element={<RosterPage />} />
+
           <Route
             path="/admin"
             element={
@@ -37,6 +41,7 @@ export default function App() {
             <Route path="content" element={<ContentManagment />} />
             <Route path="warhammer" element={<AdminWarhammer />} />
             <Route path="dnd" element={<AdminDnd />} />
+            <Route path="roster" element={<AdminRoster />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

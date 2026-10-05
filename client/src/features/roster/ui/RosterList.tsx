@@ -9,6 +9,7 @@ import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag, cx, fmtP
 const ALLEGIANCE_RU: Record<string, string> = { Imperium: 'Империум', Chaos: 'Хаос', Xenos: 'Ксеносы' };
 
 export function RosterList({
+  onExit,
   index,
   rosters,
   onOpen,
@@ -16,6 +17,7 @@ export function RosterList({
   onDuplicate,
   onDelete,
 }: {
+  onExit: () => void;
   index: DataIndex;
   rosters: Roster[];
   onOpen: (id: string) => void;
@@ -31,11 +33,12 @@ export function RosterList({
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5">
       <header className="mb-5 flex items-end justify-between gap-3">
-        <div>
+        <IconButton icon="back" label="Назад в WarpHub" onClick={onExit} className="mb-0.5 size-9" />
+        <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpHub · 11-я редакция</p>
           <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Ростеры</h1>
         </div>
-        <IconButton icon="upload" label="Импорт по коду" onClick={() => setImporting(true)} />
+        <IconButton icon="upload" label="Импорт ростера по коду" onClick={() => setImporting(true)} />
       </header>
 
       {rosters.length === 0 ? (
@@ -208,7 +211,7 @@ function ImportSheet({ open, onClose, onImport }: { open: boolean; onClose: () =
     <Sheet
       open={open}
       onClose={onClose}
-      title="Импорт по коду"
+      title="Импорт ростера"
       footer={
         <Button
           variant="primary"

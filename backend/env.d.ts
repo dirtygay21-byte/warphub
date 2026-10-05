@@ -15,5 +15,11 @@ declare namespace NodeJS {
     S3_BUCKET: string;
     S3_ACCESS_KEY: string;
     S3_SECRET_KEY: string;
+    /** Roster Builder: кто создаёт коды (Telegram ID через запятую; по умолчанию — все администраторы) */
+    ROSTER_ADMIN_TELEGRAM_IDS?: string;
+    /** Roster Builder: срок жизни кода в часах (по умолчанию 24) */
+    ROSTER_CODE_TTL_HOURS?: string;
+    /** Roster Builder: папка с данными Wahapedia (по умолчанию ./roster-data) */
+    ROSTER_DATA_DIR?: string;
   }
 }

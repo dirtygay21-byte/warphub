@@ -29,13 +29,16 @@ export default function Header() {
       ? "Warhammer"
       : pathname.includes("/dnd")
         ? "Dnd"
-        : "Reservations";
+        : pathname.includes("/roster")
+          ? "Roster"
+          : "Reservations";
 
   const adminTabs = [
     { id: "Reservations", label: "Записи", path: "/admin" },
     { id: "Warhammer", label: "Столы WH", path: "/admin/warhammer" },
     { id: "Dnd", label: "D&D", path: "/admin/dnd" },
     { id: "ContentManagement", label: "Контент", path: "/admin/content" },
+    { id: "Roster", label: "Ростеры", path: "/admin/roster" },
   ];
 
   // Обрабатываем нажатия на кнопку назад и чистим соответсвующий стейт

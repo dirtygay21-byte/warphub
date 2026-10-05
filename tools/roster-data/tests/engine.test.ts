@@ -3,14 +3,14 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { computeRoster, makeLookup, bandFor } from '../src/engine/compute';
-import { addUnit, newRoster, updateUnit, encodeRoster, decodeRoster } from '../src/engine/roster';
-import { exportGw } from '../src/engine/export';
-import type { FactionData, Roster } from '../src/engine/types';
+import { computeRoster, makeLookup, bandFor } from '../../../client/src/features/roster/engine/compute';
+import { addUnit, newRoster, updateUnit, encodeRoster, decodeRoster } from '../../../client/src/features/roster/engine/roster';
+import { exportGw } from '../../../client/src/features/roster/engine/export';
+import type { FactionData, Roster } from '../../../client/src/features/roster/engine/types';
 // @ts-expect-error — .mjs без типов
 import { parseCosts, parseBandHeader, parseDetachmentRules } from '../scripts/import-wahapedia.mjs';
 
-const dataDir = path.join(import.meta.dirname, '..', 'public', 'data', 'f');
+const dataDir = path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data', 'f');
 const loadFaction = (id: string): FactionData => JSON.parse(fs.readFileSync(path.join(dataDir, id + '.json'), 'utf8'));
 const SM = loadFaction('SM');
 const L = makeLookup(SM);
@@ -176,7 +176,7 @@ test('все фракции загружаются и считаются без 
 });
 
 test('стандартное снаряжение по инфолисту', async () => {
-  const { unitLoadout } = await import('../src/engine/compute');
+  const { unitLoadout } = await import('../../../client/src/features/roster/engine/compute');
   const isq = byName('Intercessor Squad');
   let r = addUnit(baseRoster(), isq);
   const u = r.units[0];

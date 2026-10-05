@@ -5,6 +5,7 @@ import { apiModule } from './modules/api';
 import { adminModule } from './modules/admin';
 import { authModule } from './modules/auth';
 import { internalModule } from './modules/internal';
+import { rosterAdminModule, rosterModule } from './modules/roster';
 import { jwtPlugin } from './plugins/jwt-plugin';
 import { protectedOpenapiPlugin } from './plugins/swagger-auth-plugin';
 import { openapiPlugin } from './plugins/openapi-plugin';
@@ -36,5 +37,7 @@ export function createApp() {
     .use(authModule)
     .use(internalModule)
     .use(adminModule)
+    .use(rosterAdminModule)
+    .use(rosterModule)
     .use(apiModule);
 }

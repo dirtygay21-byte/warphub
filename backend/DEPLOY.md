@@ -238,3 +238,43 @@ pm2 start <backend-process-name>
 
 Restoring the database removes any bookings made after the backup, so only
 do it if the new version really doesn't work.
+
+---
+
+## 10. Roster Builder (hidden section, opened by a 4-digit code)
+
+Do this together with step 5 (backend) and step 6 (client); it adds no new services.
+
+1. **Data files.** The folder `backend/roster-data/` (about 14 MB) must be on the
+   server inside `<BACKEND_DIR>`, next to `src/`. It is part of the repository, so
+   copying the backend folder brings it along. If you keep it elsewhere, set
+   `ROSTER_DATA_DIR=/full/path/to/roster-data` in `.env`.
+2. **Database.** `bun run db:migrate` from step 5 creates three new tables
+   (`roster_access_codes`, `roster_access`, `roster_code_attempts`). Without
+   drizzle-kit you can apply the file by hand:
+   ```bash
+   psql "$DATABASE_URL" -f drizzle/0011_roster_access.sql
+   ```
+3. **Who creates codes.** Add to `<BACKEND_DIR>/.env`:
+   ```
+   # Only these Telegram IDs can create codes (comma-separated).
+   # If unset, every admin can.
+   ROSTER_ADMIN_TELEGRAM_IDS=<KorenevEgor's Telegram ID>
+   # Optional: code lifetime in hours (default 24)
+   # ROSTER_CODE_TTL_HOURS=24
+   ```
+   Then `pm2 restart <backend-process-name>`.
+4. **Bot.** Open @WarpHubBot from that account and press **Start** once —
+   otherwise the bot can't send you codes (the admin page will then show the
+   code on screen instead).
+5. **Check:**
+   ```bash
+   curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:4000/roster/access
+   ```
+   `401` is correct (it requires login). `404` means the new backend isn't running.
+6. **In Telegram:** Admin → «Ростеры» → «Создать код доступа». The code arrives
+   from the bot. Another person enters it in Профиль → «Есть код доступа?» and
+   gets a «Roster Builder» button in their profile. Access stays until you press
+   «Закрыть» next to their name on the same admin page.
+
+Updating Wahapedia data later: see `tools/roster-data/README.md`.

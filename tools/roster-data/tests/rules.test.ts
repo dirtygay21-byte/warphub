@@ -4,12 +4,12 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { computeRoster, makeLookup, type DataLookup } from '../src/engine/compute';
-import { addUnit, newRoster, updateUnit } from '../src/engine/roster';
-import { BATTLE_SIZES } from '../src/engine/rules';
-import type { BattleSize, Datasheet, FactionData, Roster } from '../src/engine/types';
+import { computeRoster, makeLookup, type DataLookup } from '../../../client/src/features/roster/engine/compute';
+import { addUnit, newRoster, updateUnit } from '../../../client/src/features/roster/engine/roster';
+import { BATTLE_SIZES } from '../../../client/src/features/roster/engine/rules';
+import type { BattleSize, Datasheet, FactionData, Roster } from '../../../client/src/features/roster/engine/types';
 
-const dir = path.join(import.meta.dirname, '..', 'public', 'data', 'f');
+const dir = path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data', 'f');
 const cache = new Map<string, { F: FactionData; L: DataLookup }>();
 function fac(id: string) {
   if (!cache.has(id)) {

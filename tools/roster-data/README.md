@@ -1,10 +1,26 @@
-# WarpHub · Roster Builder
+# WarpHub · Roster Builder — данные и тесты
 
-Внутренний конструктор ростеров **Warhammer 40,000, 11-я редакция** для Telegram Mini App WarpHub.
-Отдельный модуль (Vite + React + Tailwind, тёмная тема и лаймовый акцент как в основном приложении), который
-можно открыть как самостоятельную страницу или позже перенести в `warphub-client` как раздел.
+Roster Builder — скрытый раздел Mini App WarpHub: конструктор ростеров **Warhammer 40,000, 11-я редакция**.
+Открывается по одноразовому коду из 4 цифр (Профиль → «Есть код доступа?»).
+
+Эта папка — не приложение, а инструменты вокруг него:
+импорт выгрузки Wahapedia в JSON для бэкенда и тесты движка правил.
 
 Данные: **powered by Wahapedia** (Export Data, `wh40k11ed`). Только для личного некоммерческого использования.
+
+## Где что лежит
+
+```
+client/src/features/roster/engine/   правила и расчёты без React (rules.ts — числа правил, compute.ts — проверка)
+client/src/features/roster/ui/       экраны: список, редактор, выбор юнита, экспорт
+client/src/components/pages/Roster/  страница /roster (проверка доступа)
+client/src/components/pages/Profile/AccessCodeDialog.tsx   ввод кода
+client/src/components/pages/Admin/Roster/                  админка: коды и доступы
+backend/src/modules/roster/          API: /roster/access, /roster/redeem, /roster/data/:name, /admin/roster/*
+backend/roster-data/                 index.json + f/<фракция>.json (результат импорта, отдаётся только с доступом)
+tools/roster-data/scripts/import-wahapedia.mjs   CSV → backend/roster-data
+tools/roster-data/tests/             сценарии правил (29 тестов)
+```
 
 ## Что умеет
 
@@ -39,73 +55,50 @@
   исключённые ключевые слова, запрещённые юниты (Shadow Legion), обязательные юниты (Devoted of Ynnead, Houndpack Lance),
   повышенный лимит копий (Ghosts of the Webway) и отключение правила армии (Reaper’s Wager → Corsairs).
 
-## Запуск
+## Тесты
 
 ```bash
-cd roster-builder
+cd tools/roster-data
 npm install
-npm run dev          # http://localhost:5173
-npm test             # тесты движка и правил (node:test + tsx), 29 сценариев
-npm run build        # dist/ — статика
+npm test             # движок и правила формирования армии, 29 сценариев
 ```
-
-Готовые данные уже лежат в `public/data/` (выгрузка Wahapedia от 2026-09-28).
 
 ## Обновление данных
 
 ```bash
-# из скачанных CSV (положить в roster-builder/wahapedia-csv/)
+# из скачанных CSV (положить в tools/roster-data/wahapedia-csv/)
 npm run data
 
 # или скачать свежие с Wahapedia (только если изменился Last_update.csv)
-npm run data:fetch && npm run build
+npm run data:fetch
 ```
+
+Результат пишется в `backend/roster-data/`. Бэкенд подхватывает новые файлы сам (кеш сверяет дату изменения),
+перезапуск не нужен. Если папка данных на сервере лежит в другом месте — `ROSTER_DATA_DIR` в `.env` бэкенда.
 
 Нужные файлы: `Factions, Source, Datasheets, Datasheets_keywords, Datasheets_models, Datasheets_unit_composition,
 Datasheets_models_cost, Datasheets_enhancements, Datasheets_leader, Enhancements, Detachment_abilities, Detachments,
 Detachments_chapter_dp, Last_update, Abilities, Datasheets_abilities, Datasheets_wargear, Datasheets_options, Stratagems,
-Datasheets_stratagems, Datasheets_detachment_abilities` — то есть вся выгрузка Wahapedia. На сервере можно повесить на cron раз в сутки, например:
+Datasheets_stratagems, Datasheets_detachment_abilities` — то есть вся выгрузка Wahapedia. Можно повесить на cron:
 
 ```cron
-30 4 * * * cd /srv/warphub/roster-builder && npm run data:fetch && npm run build >> /var/log/roster-data.log 2>&1
+30 4 * * * cd /srv/warphub/tools/roster-data && npm run data:fetch >> /var/log/roster-data.log 2>&1
 ```
 
-Импортёр: `scripts/import-wahapedia.mjs` (без зависимостей). Колонки читаются по имени, а не по позиции.
+Импортёр без зависимостей, колонки читаются по имени, а не по позиции.
 
-## Деплой за Nginx (рядом с Mini App)
+## Доступ по коду
 
-```nginx
-location /roster/ {
-    alias /srv/warphub/roster-builder/dist/;
-    try_files $uri $uri/ /roster/index.html;
-    gzip on; gzip_types application/json text/css application/javascript;
-    # личный инструмент — закрыть от посторонних:
-    # auth_basic "WarpHub"; auth_basic_user_file /etc/nginx/.htpasswd-roster;
-}
-```
-
-Открыть из бота: кнопка меню / inline-кнопка `web_app` с URL `https://<домен>/roster/`.
-Мягкое ограничение по Telegram-логину: `VITE_ALLOWED_USERNAMES=KorenevEgor npm run build`
-(это клиентская проверка; настоящая защита — Nginx или проверка `initData` на бэкенде).
-
-## Структура
-
-```
-scripts/import-wahapedia.mjs   CSV → public/data/index.json + public/data/f/<фракция>.json
-src/engine/                    чистая логика без React (можно переиспользовать в бэкенде)
-  rules.ts                     числа правил (размеры боя, DP, лимиты, союзники) — правьте здесь
-  compute.ts                   стоимость и проверка ростера
-  export.ts                    текстовые форматы
-  roster.ts                    операции с ростером, код WH1
-src/ui/                        экраны: список, редактор, выбор юнита, экспорт
-src/storage.ts                 CloudStorage + localStorage
-tests/engine.test.ts           движок: стоимость, импорт, снаряжение, экспорт
-tests/rules.test.ts            правила формирования армии — по сценарию на каждое правило
-```
+- Код создаёт владелец в админке (вкладка «Ростеры» → «Создать код доступа»). Бот присылает его в Telegram.
+  Если бот не смог написать (не нажат «Старт» в @WarpHubBot) — код показывается прямо в админке.
+- Код одноразовый, действует 24 часа (`ROSTER_CODE_TTL_HOURS`). В базе хранится только его HMAC.
+- Перебор ограничен: 5 неверных попыток в час на человека и 30 в час на всех.
+- Доступ бессрочный, закрывается в админке кнопкой «Закрыть». Администраторы имеют доступ всегда.
+- Кто может создавать коды: `ROSTER_ADMIN_TELEGRAM_IDS` (через запятую), иначе — все администраторы.
 
 ## Известные ограничения
 
-- Значения, помеченные «≈» в `src/engine/rules.ts`, взяты из вторичных источников: бюджет DP для Onslaught
+- Значения, помеченные «≈» в `client/src/features/roster/engine/rules.ts`, взяты из вторичных источников: бюджет DP для Onslaught
   и лимит Dedicated Transport.
 - Варианты замены оружия в Wahapedia — свободный текст, поэтому их соблюдение не проверяется автоматически:
   число оружия задаётся вручную, а текст вариантов показан рядом. Доплата за оружие («per Thunder Hammer»)

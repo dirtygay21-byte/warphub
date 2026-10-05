@@ -25,26 +25,14 @@ interface TgWebApp {
   disableVerticalSwipes?(): void;
 }
 
-declare global {
-  interface Window {
-    Telegram?: { WebApp?: TgWebApp };
-  }
-}
+// Типы Telegram WebApp в клиенте уже объявлены (@types/telegram-web-app) — берём объект через узкий интерфейс выше.
+const webApp = (): TgWebApp | undefined => {
+  if (typeof window === 'undefined') return undefined;
+  const w = (window as unknown as { Telegram?: { WebApp?: TgWebApp } }).Telegram?.WebApp;
+  return w?.initData ? w : undefined;
+};
 
-export const tg: TgWebApp | undefined = typeof window !== 'undefined' && window.Telegram?.WebApp?.initData ? window.Telegram.WebApp : undefined;
-
-export function initTelegram() {
-  if (!tg) return;
-  tg.ready();
-  tg.expand();
-  try {
-    tg.setHeaderColor?.('#111110');
-    tg.setBackgroundColor?.('#111110');
-    if (tg.isVersionAtLeast('7.7')) tg.disableVerticalSwipes?.();
-  } catch {
-    /* старые клиенты */
-  }
-}
+export const tg: TgWebApp | undefined = webApp();
 
 export const haptic = {
   tap: () => tg?.HapticFeedback?.impactOccurred('light'),
@@ -76,16 +64,4 @@ export function shareText(text: string) {
 export function openExternal(url: string) {
   if (tg) tg.openLink(url);
   else window.open(url, '_blank', 'noopener');
-}
-
-/**
- * Мягкое ограничение доступа: VITE_ALLOWED_USERNAMES="KorenevEgor,другой".
- * Это не защита (клиентский код), а защита от случайных посетителей.
- * Настоящую закрывайте на уровне Nginx (basic auth / allow-список) или проверкой initData на бэкенде.
- */
-export function accessAllowed(): boolean {
-  const list = (import.meta.env.VITE_ALLOWED_USERNAMES as string | undefined)?.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
-  if (!list?.length) return true;
-  const name = tg?.initDataUnsafe.user?.username?.toLowerCase();
-  return !!name && list.includes(name);
 }
