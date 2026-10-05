@@ -18,7 +18,7 @@ const FILES = [
   'Datasheets_unit_composition', 'Datasheets_models_cost', 'Datasheets_enhancements',
   'Datasheets_leader', 'Enhancements', 'Detachment_abilities', 'Detachments',
   'Detachments_chapter_dp', 'Last_update', 'Abilities', 'Datasheets_abilities',
-  'Datasheets_wargear', 'Datasheets_options', 'Datasheets_stratagems', 'Stratagems',
+  'Datasheets_wargear', 'Datasheets_options', 'Datasheets_stratagems', 'Stratagems', 'Datasheets_detachment_abilities',
 ];
 const REQUIRED = new Set(['Factions', 'Datasheets', 'Datasheets_keywords', 'Datasheets_models_cost', 'Detachments', 'Enhancements']);
 
@@ -360,6 +360,8 @@ async function main() {
   const wargearBy = groupBy(T.Datasheets_wargear, 'datasheet_id');
   const optionsBy = groupBy(T.Datasheets_options, 'datasheet_id');
   const stratBy = groupBy(T.Datasheets_stratagems, 'datasheet_id');
+  const detAbilBy = groupBy(T.Datasheets_detachment_abilities, 'datasheet_id');
+  const usedStrat = new Set(T.Datasheets_stratagems.map((x) => x.stratagem_id));
   const abilityDefs = new Map(T.Abilities.map((a) => [a.id, { name: htmlToText(a.name), text: htmlToText(a.description), faction: a.faction_id }]));
 
   // --- инфолисты ---
@@ -418,6 +420,7 @@ async function main() {
       defaultLoadout: [],
       options: (optionsBy.get(d.id) || []).sort(byLine).map((o) => ({ star: o.button === '*', text: htmlToText(o.description) })),
       stratagems: uniq((stratBy.get(d.id) || []).map((x) => x.stratagem_id)),
+      detachmentAbilities: uniq((detAbilBy.get(d.id) || []).map((x) => x.detachment_ability_id)),
       enhancements: uniq((enhByDs.get(d.id) || []).map((e) => e.enhancement_id)),
     };
     rec.weapons = parseWeapons(wargearBy.get(d.id) || []);
@@ -441,7 +444,7 @@ async function main() {
   const abilByDet = groupBy(T.Detachment_abilities, 'detachment_id');
   const chapterDp = groupBy(T.Detachments_chapter_dp, 'detachment_id');
   const detachments = T.Detachments.map((d) => {
-    const abil = (abilByDet.get(d.id) || []).map((a) => ({ name: htmlToText(a.name), text: htmlToText(a.description) }));
+    const abil = (abilByDet.get(d.id) || []).map((a) => ({ id: a.id, name: htmlToText(a.name), text: htmlToText(a.description) }));
     const rules = parseDetachmentRules(abil.map((a) => a.text));
     return {
       id: d.id,
@@ -515,7 +518,9 @@ async function main() {
     for (const d of allDs) for (const a of d.abilities) if (a.ref && !rules[a.ref]) rules[a.ref] = { name: a.name, text: abilityDefs.get(a.ref)?.text || '' };
     const armyRules = uniq(own.flatMap((d) => d.abilities.filter((a) => a.type === 'faction' && a.ref).map((a) => a.ref)));
     // стратагемы детачментов (для справки)
-    const stratagems = T.Stratagems.filter((st) => detIds.has(st.detachment_id)).map((st) => ({
+    // основные стратагемы 11-й ред. — те, на которые ссылаются юниты (старые 10-й ред. остались в выгрузке без ссылок)
+    const isCore = (st) => !st.faction_id && /^Core/i.test(htmlToText(st.type)) && usedStrat.has(st.id);
+    const stratagems = T.Stratagems.filter((st) => detIds.has(st.detachment_id) || isCore(st)).map((st) => ({
       id: st.id, detachment: st.detachment_id, name: htmlToText(st.name), cp: st.cp_cost, type: htmlToText(st.type),
       turn: st.turn, phase: st.phase, text: htmlToText(st.description),
     }));

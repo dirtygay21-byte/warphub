@@ -96,11 +96,15 @@ export interface Datasheet {
   weapons: Weapon[];
   defaultLoadout: LoadoutRule[];
   options: WargearOption[];
+  /** id стратагем, доступных юниту (core + детачментов) */
   stratagems: string[];
+  /** id правил детачментов (DetachmentAbility.id), которые действуют на юнит */
+  detachmentAbilities: string[];
   enhancements: string[];
   group: UnitGroup;
 }
 export interface DetachmentAbility {
+  id: string;
   name: string;
   text: string;
 }
@@ -136,6 +140,7 @@ export interface AllyGroup {
 }
 export interface Stratagem {
   id: string;
+  /** '' — основная (Core) стратагема */
   detachment: string;
   name: string;
   cp: string;

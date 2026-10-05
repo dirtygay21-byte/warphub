@@ -216,7 +216,7 @@ export function UnitCard({
             </Field>
           )}
 
-          <Profile c={c} L={L} />
+          <Profile c={c} L={L} detachmentIds={roster.detachmentIds} />
 
           <div className="flex gap-2 pt-1">
             <Button variant="ghost" className="flex-1" onClick={onDuplicate}>
@@ -279,7 +279,7 @@ function Choice({ active, onClick, title, right, sub, dim, detail }: { active: b
   );
 }
 
-function Profile({ c, L }: { c: ComputedUnit; L: DataLookup }) {
+function Profile({ c, L, detachmentIds }: { c: ComputedUnit; L: DataLookup; detachmentIds: string[] }) {
   const ds = c.ds!;
   const tagAbilities = ds.abilities.filter((a) => a.type === 'core' || a.type === 'faction');
   const textAbilities = ds.abilities.filter((a) => a.type !== 'core' && a.type !== 'faction');
@@ -347,6 +347,7 @@ function Profile({ c, L }: { c: ComputedUnit; L: DataLookup }) {
             <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-white/70">{a.ref ? L.faction.rules[a.ref]?.text : a.text}</p>
           </div>
         ))}
+        <UnitRules c={c} L={L} detachmentIds={detachmentIds} />
         {ds.damaged && <Txt title={`Повреждён: ${ds.damaged.w} ран`} text={ds.damaged.text} />}
         {ds.composition.length > 0 && <Txt title="Состав отряда" text={ds.composition.join('\n')} />}
         {ds.loadout && <Txt title="Снаряжение" text={ds.loadout} />}
@@ -481,5 +482,40 @@ function LoadoutEditor({ c, onPatch }: { c: ComputedUnit; onPatch: (p: Partial<R
         </div>
       )}
     </Field>
+  );
+}
+
+/** Правила выбранных детачментов, действующие на юнит, и доступные ему стратагемы. */
+function UnitRules({ c, L, detachmentIds }: { c: ComputedUnit; L: DataLookup; detachmentIds: string[] }) {
+  const ds = c.ds!;
+  const detIds = new Set(detachmentIds);
+  const detRules = L.faction.detachments
+    .filter((d) => detIds.has(d.id))
+    .flatMap((d) => d.abilities.filter((a) => ds.detachmentAbilities.includes(a.id)).map((a) => ({ det: d.name, ...a })));
+  const strats = L.faction.stratagems.filter((st) => ds.stratagems.includes(st.id) && (!st.detachment || detIds.has(st.detachment)));
+  if (!detRules.length && !strats.length) return null;
+  return (
+    <div className="space-y-2">
+      {detRules.length > 0 && (
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Правила детачмента для юнита</p>
+          <div className="mt-1 flex flex-wrap gap-1">
+            {detRules.map((r) => (
+              <RuleChip key={r.id} name={r.name} text={`${r.det}\n\n${r.text}`} accent />
+            ))}
+          </div>
+        </div>
+      )}
+      {strats.length > 0 && (
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Стратагемы ({strats.length})</p>
+          <div className="mt-1 flex flex-wrap gap-1">
+            {strats.map((st) => (
+              <RuleChip key={st.id} name={`${st.name} · ${st.cp}`} text={`${st.type}${st.phase ? ' · ' + st.phase : ''}\n\n${st.text}`} accent={!!st.detachment} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

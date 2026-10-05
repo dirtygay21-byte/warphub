@@ -28,7 +28,8 @@
   способности инфолиста и снаряжения), повреждённый профиль, состав, ключевые слова, ссылка на Wahapedia.
 - **Снаряжение отряда**: по умолчанию считается из текста инфолиста (все модели / сержант / остальные / доп. модели),
   можно поменять число каждого оружия; рядом — варианты замены из инфолиста; попадает в экспорт.
-- Правила армии (Oath of Moment и т.п.), правила и стратагемы детачментов.
+- Правила армии (Oath of Moment и т.п.), правила и стратагемы детачментов; в карточке юнита — **стратагемы, доступные
+  именно ему** (основные + выбранных детачментов), и правила выбранных детачментов, которые на него действуют.
 - Союзники по официальному тексту правил: Assigned Agents (Retinue/Character/Requisitioned), Freeblades, Dreadblades,
   Titanic Support, Daemonic Pact (лимит очков и правило BATTLELINE по богам).
 
@@ -56,8 +57,8 @@ npm run data:fetch && npm run build
 
 Нужные файлы: `Factions, Source, Datasheets, Datasheets_keywords, Datasheets_models, Datasheets_unit_composition,
 Datasheets_models_cost, Datasheets_enhancements, Datasheets_leader, Enhancements, Detachment_abilities, Detachments,
-Detachments_chapter_dp, Last_update, Abilities, Datasheets_abilities, Datasheets_wargear, Datasheets_options, Stratagems`
-(+ необязательный `Datasheets_stratagems`). На сервере можно повесить на cron раз в сутки, например:
+Detachments_chapter_dp, Last_update, Abilities, Datasheets_abilities, Datasheets_wargear, Datasheets_options, Stratagems,
+Datasheets_stratagems, Datasheets_detachment_abilities` — то есть вся выгрузка Wahapedia. На сервере можно повесить на cron раз в сутки, например:
 
 ```cron
 30 4 * * * cd /srv/warphub/roster-builder && npm run data:fetch && npm run build >> /var/log/roster-data.log 2>&1
