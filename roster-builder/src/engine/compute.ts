@@ -22,6 +22,9 @@ export interface ComputedUnit {
   total: number;
   models: number;
   isBattleline: boolean;
+  /** снаряжение: оружие → число моделей с ним */
+  loadout: Record<string, number>;
+  loadoutCustom: boolean;
   /** присоединённые к этому юниту персонажи */
   attached: RosterUnit[];
 }
@@ -57,6 +60,38 @@ export function makeLookup(faction: FactionData): DataLookup {
     det: new Map(faction.detachments.map((d) => [d.id, d])),
     enh: new Map(faction.enhancements.map((e) => [e.id, e])),
   };
+}
+
+/**
+ * Снаряжение юнита. Если игрок не менял вручную — считается по правилам стандартного снаряжения:
+ * «все модели», «один (сержант)», «остальные», «N моделей», модели-добавки (+1 Invader ATV).
+ */
+export function unitLoadout(ds: Datasheet, unit: RosterUnit, models: number): Record<string, number> {
+  if (unit.weapons) return { ...unit.weapons };
+  const out: Record<string, number> = {};
+  const addonLabels = [...new Set(ds.costs.flatMap((b) => b.addons.map((a) => a.label)))];
+  const addonCount = (subject: string) => {
+    const s = subject.toLowerCase();
+    for (const label of addonLabels) {
+      const name = label.replace(/^\d+\s*/, '').toLowerCase();
+      if (name && s.includes(name)) return unit.addons[label] ?? 0;
+    }
+    return null;
+  };
+  const ones = ds.defaultLoadout.filter((r) => r.who === 'one' && addonCount(r.subject) === null).length;
+  const fixed = ds.defaultLoadout.reduce((s, r) => s + (typeof r.who === 'number' ? r.who : 0), 0);
+  for (const r of ds.defaultLoadout) {
+    const add = addonCount(r.subject);
+    let n: number;
+    if (add !== null) n = add;
+    else if (r.who === 'all') n = models;
+    else if (r.who === 'one') n = models > 0 ? 1 : 0;
+    else if (r.who === 'rest') n = Math.max(0, models - ones - fixed);
+    else n = Math.min(r.who, models);
+    for (const it of r.items) out[it.weapon] = (out[it.weapon] ?? 0) + n * it.qty;
+  }
+  for (const k of Object.keys(out)) if (!out[k]) delete out[k];
+  return out;
 }
 
 /** Сколько копий инфолиста можно взять. */
@@ -126,6 +161,7 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
     const enhancement = unit.enhancementId ? L.enh.get(unit.enhancementId) : undefined;
     const enhancementCost = enhancement?.cost ?? 0;
     const base = opt?.cost ?? 0;
+    const loadout = ds ? unitLoadout(ds, unit, opt?.models ?? 0) : {};
     return {
       unit,
       ds,
@@ -138,6 +174,8 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
       total: base + extras + enhancementCost,
       models: opt?.models ?? 0,
       isBattleline: ds ? isBattleline(ds, blGrants) : false,
+      loadout,
+      loadoutCustom: !!unit.weapons,
       attached: [],
     };
   });
@@ -194,6 +232,11 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
     if (!ds.costs.length) err('no-cost', `У «${ds.name}» нет стоимости в данных.`, [unit.uid]);
     if (ds.legends) warn('legends', `«${ds.name}» — Warhammer Legends, обычно не допускается на турнирах.`, [unit.uid]);
     if (c.band && !c.band.options.some((o) => o.label === unit.size)) err('size', `«${ds.name}»: выберите размер отряда.`, [unit.uid]);
+    if (c.loadoutCustom) {
+      const cap = c.models + Object.values(unit.addons).reduce((x, n) => x + n, 0);
+      const over = Object.entries(c.loadout).filter(([, n]) => n > cap);
+      if (over.length) warn('loadout', `«${ds.name}»: ${over.map(([w, n]) => `${w} ×${n}`).join(', ')} — больше, чем моделей в отряде (${cap}).`, [unit.uid]);
+    }
 
     if (ds.group.startsWith('det:')) {
       const detId = ds.group.slice(4);
@@ -289,14 +332,21 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
   // ---------- союзники ----------
   const si = sizeIndex(roster.battleSize);
   const allyUnits = (key: string) => units.filter((c) => c.ds?.group === `ally:${key}`);
+  const hasKw = (c: ComputedUnit, k: string) => !!c.ds?.keywords.some((x) => x.toUpperCase() === k);
   const agents = allyUnits('agents');
   if (agents.length) {
-    const ch = agents.filter((c) => c.ds?.character).length;
-    const other = agents.length - ch;
-    const lc = ALLY_RULES.agents.characters[si];
-    const lo = ALLY_RULES.agents.others[si];
-    if (ch > lc || other > lo)
-      warn('agents', `Assigned Agents: ${ch} персонаж(ей) и ${other} других юнитов — ориентировочный лимит ${lc} и ${lo}. Сверьтесь с правилом Assigned Agents.`, agents.map((c) => c.unit.uid));
+    const A = ALLY_RULES.agents;
+    const groups: [string, string, number][] = [
+      ['RETINUE', 'Retinue', A.retinue[si]],
+      ['CHARACTER', 'Character', A.character[si]],
+      ['REQUISITIONED', 'Requisitioned', A.requisitioned[si]],
+    ];
+    for (const [kw, label, lim] of groups) {
+      const list = agents.filter((c) => hasKw(c, kw));
+      if (list.length > lim) err('agents', `Assigned Agents: ${label}-юнитов ${list.length}, максимум ${lim} для ${size.label}.`, list.map((c) => c.unit.uid));
+    }
+    const tr = agents.filter((c) => c.ds?.dedicatedTransport);
+    if (tr.length) warn('agents-transport', 'Транспорт Agents of the Imperium должен начинать бой с пассажирами, иначе считается уничтоженным.', tr.map((c) => c.unit.uid));
   }
   for (const key of ['freeblades', 'dreadblades']) {
     const list = allyUnits(key);
@@ -305,6 +355,19 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
     const small = list.length - big;
     if ((big && small) || big > ALLY_RULES.knights.titanic || small > ALLY_RULES.knights.small) {
       err(key, `${key === 'freeblades' ? 'Freeblades' : 'Dreadblades'}: можно 1 TITANIC рыцаря или до ${ALLY_RULES.knights.small} малых, не вместе.`, list.map((c) => c.unit.uid));
+    }
+  }
+  const titans = allyUnits('titanicus');
+  if (titans.length > ALLY_RULES.titanicus) err('titanicus', `Titanic Support: можно только ${ALLY_RULES.titanicus} модель ADEPTUS TITANICUS.`, titans.map((c) => c.unit.uid));
+  const daemons = allyUnits('daemons');
+  if (daemons.length) {
+    const pts = daemons.reduce((s, c) => s + c.total, 0);
+    const cap = ALLY_RULES.daemonsPoints[si];
+    if (pts > cap) err('daemons-pts', `Daemonic Pact: демоны стоят ${fmt(pts)} очков, максимум ${fmt(cap)} для ${size.label}.`, daemons.map((c) => c.unit.uid));
+    for (const god of ALLY_RULES.daemonGods) {
+      const list = daemons.filter((c) => hasKw(c, god));
+      const bl = list.filter((c) => c.isBattleline).length;
+      if (list.length - bl > bl) err('daemons-ratio', `Daemonic Pact: не-BATTLELINE юнитов ${god} (${list.length - bl}) больше, чем BATTLELINE (${bl}).`, list.map((c) => c.unit.uid));
     }
   }
 

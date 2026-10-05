@@ -17,7 +17,8 @@ const FILES = [
   'Factions', 'Source', 'Datasheets', 'Datasheets_keywords', 'Datasheets_models',
   'Datasheets_unit_composition', 'Datasheets_models_cost', 'Datasheets_enhancements',
   'Datasheets_leader', 'Enhancements', 'Detachment_abilities', 'Detachments',
-  'Detachments_chapter_dp', 'Last_update',
+  'Detachments_chapter_dp', 'Last_update', 'Abilities', 'Datasheets_abilities',
+  'Datasheets_wargear', 'Datasheets_options', 'Datasheets_stratagems', 'Stratagems',
 ];
 const REQUIRED = new Set(['Factions', 'Datasheets', 'Datasheets_keywords', 'Datasheets_models_cost', 'Detachments', 'Enhancements']);
 
@@ -101,6 +102,7 @@ export function htmlToText(html) {
     .replace(/<!--.*?-->/gs, '')
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<\/(p|div|li|tr|h\d|table|ul)>/gi, '\n')
+    .replace(/<ul[^>]*>/gi, '\n')
     .replace(/<li[^>]*>/gi, '• ')
     .replace(/<[^>]+>/g, '')
     .replace(/&(#\d+|#x[0-9a-f]+|\w+);/gi, (m, e) => {
@@ -243,22 +245,103 @@ function titleKw(s) {
 // ---------- союзники (настраиваемо; значения 11-й ред. частично из вторичных источников) ----------
 const ALLY_GROUPS = [
   {
-    key: 'agents', name: 'Assigned Agents', allegiance: 'Imperium', excludeFactions: ['AoI'],
-    pick: (ds, f) => f === 'AoI' && ds._ctx.assigned,
+    // Abilities.csv «Assigned Agents»: Retinue 1/2/3, Character 1/2/3, Requisitioned 1/1/2; Dedicated Transport — как обычно
+    key: 'agents', name: 'Assigned Agents', rule: 'Assigned Agents', allegiance: ['Imperium'], excludeFactions: ['AoI'],
+    pick: (ds) => ds.faction === 'AoI' && ['RETINUE', 'CHARACTER', 'REQUISITIONED', 'DEDICATED TRANSPORT'].some((k) => ds._kw.has(k)),
     costContext: 'assigned',
-    note: 'Агенты Империума для армий ИМПЕРИУМА',
+    note: 'Retinue 1/2/3 · Character 1/2/3 · Requisitioned 1/1/2 (Incursion/Strike Force/Onslaught). Транспорт — только с пассажирами.',
   },
   {
-    key: 'freeblades', name: 'Freeblades', allegiance: 'Imperium', excludeFactions: ['QI', 'TL'],
-    pick: (ds, f) => f === 'QI' && (ds._kw.has('ARMIGER') || ds._kw.has('TITANIC')),
-    note: '1 TITANIC рыцарь или до 3 ARMIGER; не может быть Warlord, без улучшений',
+    key: 'freeblades', name: 'Freeblades', rule: 'Freeblades', allegiance: ['Imperium'], excludeFactions: ['QI'],
+    pick: (ds) => ds.faction === 'QI' && (ds._kw.has('ARMIGER') || ds._kw.has('TITANIC')),
+    note: '1 TITANIC рыцарь или до 3 ARMIGER. Не Warlord, без улучшений.',
   },
   {
-    key: 'dreadblades', name: 'Dreadblades', allegiance: 'Chaos', excludeFactions: ['QT'],
-    pick: (ds, f) => f === 'QT' && (ds._kw.has('WAR DOG') || ds._kw.has('TITANIC')),
-    note: '1 TITANIC рыцарь или до 3 WAR DOG; не может быть Warlord, без улучшений',
+    key: 'titanicus', name: 'Titanic Support', rule: 'Titanic Support', allegiance: ['Imperium'], excludeFactions: ['TL'],
+    pick: (ds) => ds.faction === 'TL',
+    note: '1 модель ADEPTUS TITANICUS в армии ИМПЕРИУМА.',
+  },
+  {
+    key: 'dreadblades', name: 'Dreadblades', rule: 'Dreadblades', allegiance: ['Chaos'], excludeFactions: ['QT'],
+    pick: (ds) => ds.faction === 'QT' && (ds._kw.has('WAR DOG') || ds._kw.has('TITANIC')),
+    note: '1 TITANIC рыцарь или до 3 WAR DOG. Не Warlord, без улучшений.',
+  },
+  {
+    // армии, где у всех моделей есть Chaos Knights или Heretic Astartes
+    key: 'daemons', name: 'Daemonic Pact', rule: 'Daemonic Pact', allegiance: ['Chaos'], onlyFactions: ['CSM', 'DG', 'TS', 'WE', 'EC', 'QT'],
+    pick: (ds) => ds.faction === 'CD',
+    note: 'До 250/500/750 очков. Не Warlord, без улучшений. По каждому богу не-BATTLELINE юнитов не больше, чем BATTLELINE.',
   },
 ];
+
+// ---------- снаряжение ----------
+const normName = (s) => s.toLowerCase().replace(/[’`‘]/g, "'").replace(/[-–]/g, ' ').replace(/\s+/g, ' ').trim();
+/** Datasheets_wargear → оружие, сгруппированное по профилям (line_in_wargear > 1 — доп. профиль). */
+export function parseWeapons(rows) {
+  const out = [];
+  for (const w of [...rows].sort(byLine)) {
+    const full = htmlToText(w.name).trim();
+    const profile = {
+      name: full, type: w.type || '', range: (w.range || '').replace(/"$/, '') ? w.range : w.range, A: w.A, skill: w.BS_WS, S: w.S, AP: w.AP, D: w.D,
+      keywords: htmlToText(w.description).replace(/\s*,\s*/g, ', '),
+    };
+    const base = full.split(/\s+[–-]\s+/)[0].trim();
+    const last = out[out.length - 1];
+    if (last && int(w.line_in_wargear) > 1 && normName(last.name) === normName(base)) last.profiles.push(profile);
+    else if (last && int(w.line_in_wargear) > 1 && last.profiles.length) last.profiles.push(profile);
+    else out.push({ name: int(w.line_in_wargear) > 1 || /\s[–-]\s/.test(full) ? base : full, profiles: [profile] });
+  }
+  // одинаковые названия (дубли у разных моделей) — объединяем
+  const merged = [];
+  for (const w of out) {
+    const same = merged.find((m) => normName(m.name) === normName(w.name));
+    if (!same) merged.push(w);
+  }
+  return merged;
+}
+
+/**
+ * Разбор «This model is equipped with: …», «Every model…», «The Sergeant is…», «Every other model…»
+ * → правила стандартного снаряжения: who = 'all' | 'one' | 'rest' | число.
+ */
+export function parseLoadout(text, weapons) {
+  const rules = [];
+  const names = weapons.map((w) => ({ w: w.name, n: normName(w.name) }));
+  const find = (item) => {
+    const n = normName(item).replace(/^the /, '');
+    return (
+      names.find((x) => x.n === n) ||
+      names.find((x) => x.n === n.replace(/s$/, '')) ||
+      names.find((x) => x.n.replace(/s$/, '') === n.replace(/s$/, ''))
+    )?.w;
+  };
+  for (const m of text.matchAll(/(^|\n|\.\s*)([^.\n:]*?)\s+(?:is|are) equipped with:\s*([^.\n]+)/gi)) {
+    const subj = m[2].trim();
+    let who;
+    if (/^(this model|this unit)$/i.test(subj)) who = 'one';
+    else if (/^(every|each|all)( model| models)?( in (this|the) unit)?$/i.test(subj) || /\band (every|each|all)\b/i.test(subj)) who = 'all';
+    else if (/^(every|each) other|^the other|^other|^every [a-z]|^all [a-z]/i.test(subj)) who = 'rest';
+    else if (/^(\d+)\s/.test(subj)) who = +subj.match(/^(\d+)/)[1];
+    else if (/^(the|a|an|1)\s/i.test(subj)) who = 'one';
+    else who = 'rest';
+    const items = [];
+    for (let raw of m[3].split(/;|,(?![^(]*\))/)) {
+      raw = raw.trim();
+      if (!raw) continue;
+      const q = raw.match(/^(\d+)\s+(.*)$/);
+      const qty = q ? +q[1] : 1;
+      const weapon = find(q ? q[2] : raw.replace(/^(an?|the)\s+/i, ''));
+      if (weapon) items.push({ weapon, qty });
+    }
+    if (items.length) rules.push({ who, subject: subj.replace(/^(the|an?|\d+)\s+/i, ''), items });
+  }
+  return rules;
+}
+
+const ABILITY_TYPE = {
+  Core: 'core', Faction: 'faction', Datasheet: 'datasheet', Wargear: 'wargear', 'Wargear profile': 'wargear',
+  Psychic: 'datasheet', Primarch: 'datasheet', 'Fortification (левая колонка)': 'datasheet', 'Special (правая колонка)': 'datasheet',
+};
 
 // ---------- main ----------
 async function main() {
@@ -273,6 +356,11 @@ async function main() {
   const compBy = groupBy(T.Datasheets_unit_composition, 'datasheet_id');
   const enhByDs = groupBy(T.Datasheets_enhancements, 'datasheet_id');
   const leadBy = groupBy(T.Datasheets_leader, 'leader_id');
+  const abilBy = groupBy(T.Datasheets_abilities, 'datasheet_id');
+  const wargearBy = groupBy(T.Datasheets_wargear, 'datasheet_id');
+  const optionsBy = groupBy(T.Datasheets_options, 'datasheet_id');
+  const stratBy = groupBy(T.Datasheets_stratagems, 'datasheet_id');
+  const abilityDefs = new Map(T.Abilities.map((a) => [a.id, { name: htmlToText(a.name), text: htmlToText(a.description), faction: a.faction_id }]));
 
   // --- инфолисты ---
   const all = new Map();
@@ -314,8 +402,26 @@ async function main() {
       })),
       loadout: htmlToText(d.loadout),
       transport: htmlToText(d.transport),
+      damaged: d.damaged_w ? { w: d.damaged_w, text: htmlToText(d.damaged_description) } : null,
+      invulnNote: uniq((modelsBy.get(d.id) || []).map((m) => htmlToText(m.inv_sv_descr)).filter(Boolean)).join('\n'),
+      abilities: (abilBy.get(d.id) || []).sort(byLine).map((a) => {
+        const def = a.ability_id ? abilityDefs.get(a.ability_id) : null;
+        return {
+          type: ABILITY_TYPE[a.type] || 'datasheet',
+          name: def?.name || htmlToText(a.name),
+          param: htmlToText(a.parameter),
+          text: def ? '' : htmlToText(a.description),
+          ref: def ? a.ability_id : undefined,
+        };
+      }).filter((a) => a.name || a.text),
+      weapons: [],
+      defaultLoadout: [],
+      options: (optionsBy.get(d.id) || []).sort(byLine).map((o) => ({ star: o.button === '*', text: htmlToText(o.description) })),
+      stratagems: uniq((stratBy.get(d.id) || []).map((x) => x.stratagem_id)),
       enhancements: uniq((enhByDs.get(d.id) || []).map((e) => e.enhancement_id)),
     };
+    rec.weapons = parseWeapons(wargearBy.get(d.id) || []);
+    rec.defaultLoadout = parseLoadout(rec.loadout, rec.weapons);
     Object.defineProperty(rec, '_kw', { value: kwSet });
     Object.defineProperty(rec, '_ctx', { value: ctx });
     all.set(d.id, rec);
@@ -328,6 +434,7 @@ async function main() {
     const imp = ds.filter((d) => d._kw.has('IMPERIUM')).length;
     const cha = ds.filter((d) => d._kw.has('CHAOS')).length;
     allegiance[f.id] = imp > ds.length / 2 ? 'Imperium' : cha > ds.length / 2 ? 'Chaos' : 'Xenos';
+    if (f.id === 'GC') allegiance[f.id] = 'Xenos'; // Brood Brothers дают IMPERIUM части юнитов, но армия — ксеносы
   }
 
   // --- детачменты ---
@@ -390,15 +497,28 @@ async function main() {
     const allies = [];
     const allyUnits = [];
     for (const g of ALLY_GROUPS) {
-      if (g.allegiance !== allegiance[f.id] || g.excludeFactions.includes(f.id)) continue;
-      const units = [...all.values()].filter((d) => g.pick(d, d.faction) && !ownIds.has(d.id));
+      if (!g.allegiance.includes(allegiance[f.id]) || g.excludeFactions?.includes(f.id)) continue;
+      if (g.onlyFactions && !g.onlyFactions.includes(f.id)) continue;
+      const units = [...all.values()].filter((d) => g.pick(d) && !ownIds.has(d.id) && (d._ctx.default || d._ctx.assigned));
       if (!units.length) continue;
-      allies.push({ key: g.key, name: g.name, note: g.note });
+      const ruleText = T.Abilities.find((a) => htmlToText(a.name) === g.rule);
+      allies.push({ key: g.key, name: g.name, note: g.note, text: ruleText ? htmlToText(ruleText.description) : '' });
       for (const u of units) {
         const costs = g.costContext ? u._ctx[g.costContext] || u.costs : u.costs;
         allyUnits.push({ ...u, costs, group: 'ally:' + g.key, enhancements: [] });
       }
     }
+
+    // общие правила (Core/Faction), на которые ссылаются инфолисты этого файла
+    const allDs = [...own.map((d) => ({ ...d, group: 'own' })), ...granted, ...allyUnits];
+    const rules = {};
+    for (const d of allDs) for (const a of d.abilities) if (a.ref && !rules[a.ref]) rules[a.ref] = { name: a.name, text: abilityDefs.get(a.ref)?.text || '' };
+    const armyRules = uniq(own.flatMap((d) => d.abilities.filter((a) => a.type === 'faction' && a.ref).map((a) => a.ref)));
+    // стратагемы детачментов (для справки)
+    const stratagems = T.Stratagems.filter((st) => detIds.has(st.detachment_id)).map((st) => ({
+      id: st.id, detachment: st.detachment_id, name: htmlToText(st.name), cp: st.cp_cost, type: htmlToText(st.type),
+      turn: st.turn, phase: st.phase, text: htmlToText(st.description),
+    }));
 
     const chapters = f.id === 'SM'
       ? uniq(own.flatMap((d) => d.factionKeywords).filter((k) => !['Adeptus Astartes', 'Imperium', 'Agents of the Imperium'].includes(k))).sort()
@@ -409,8 +529,11 @@ async function main() {
       allegiance: allegiance[f.id],
       primaryKeyword: primaryKeyword(own),
       chapters,
-      datasheets: [...own.map((d) => ({ ...d, group: 'own' })), ...granted, ...allyUnits],
+      armyRules,
+      rules,
+      datasheets: allDs,
       detachments: dets,
+      stratagems,
       enhancements: enh,
       allies,
     };

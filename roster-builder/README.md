@@ -24,7 +24,13 @@
 - Экспорт: **формат приложения GW** (ATTACHED UNITS / CHARACTERS / BATTLELINE …), короткий формат для чата,
   **код ростера** (`WH1.…`) для переноса на другое устройство; кнопка «Поделиться в Telegram».
 - Хранение: Telegram **CloudStorage** (синхронизация между устройствами, длинные ростеры режутся на куски) + localStorage.
-- Профиль юнита: характеристики, состав, снаряжение, ключевые слова, ссылка на Wahapedia.
+- Профиль юнита: характеристики, **оружие дальнего и ближнего боя** (все профили), **способности** (Core/Faction с текстом,
+  способности инфолиста и снаряжения), повреждённый профиль, состав, ключевые слова, ссылка на Wahapedia.
+- **Снаряжение отряда**: по умолчанию считается из текста инфолиста (все модели / сержант / остальные / доп. модели),
+  можно поменять число каждого оружия; рядом — варианты замены из инфолиста; попадает в экспорт.
+- Правила армии (Oath of Moment и т.п.), правила и стратагемы детачментов.
+- Союзники по официальному тексту правил: Assigned Agents (Retinue/Character/Requisitioned), Freeblades, Dreadblades,
+  Titanic Support, Daemonic Pact (лимит очков и правило BATTLELINE по богам).
 
 ## Запуск
 
@@ -50,7 +56,8 @@ npm run data:fetch && npm run build
 
 Нужные файлы: `Factions, Source, Datasheets, Datasheets_keywords, Datasheets_models, Datasheets_unit_composition,
 Datasheets_models_cost, Datasheets_enhancements, Datasheets_leader, Enhancements, Detachment_abilities, Detachments,
-Detachments_chapter_dp, Last_update`. На сервере можно повесить на cron раз в сутки, например:
+Detachments_chapter_dp, Last_update, Abilities, Datasheets_abilities, Datasheets_wargear, Datasheets_options, Stratagems`
+(+ необязательный `Datasheets_stratagems`). На сервере можно повесить на cron раз в сутки, например:
 
 ```cron
 30 4 * * * cd /srv/warphub/roster-builder && npm run data:fetch && npm run build >> /var/log/roster-data.log 2>&1
@@ -91,10 +98,10 @@ tests/engine.test.ts           тесты на реальных данных
 ## Известные ограничения
 
 - Значения, помеченные «≈» в `src/engine/rules.ts`, взяты из вторичных источников: бюджет DP для Onslaught,
-  лимит Dedicated Transport, лимиты Assigned Agents и очковые лимиты для юнитов, разрешённых детачментом
-  (там это **предупреждения**, а не ошибки).
-- Wahapedia не даёт файлов `Datasheets_wargear/options` в этой выгрузке — выбор оружия не моделируется, только
-  платное снаряжение из таблицы стоимости.
+  лимит Dedicated Transport и очковые лимиты для юнитов, разрешённых детачментом (там это **предупреждения**).
+- Варианты замены оружия в Wahapedia — свободный текст, поэтому их соблюдение не проверяется автоматически:
+  число оружия задаётся вручную, а текст вариантов показан рядом. Доплата за оружие («per Thunder Hammer»)
+  отмечается отдельным счётчиком.
 - Детачменты, которые разрешают юниты поимённым списком (Shadow Legion, Questor Forgepact), пока не добавляют
   эти юниты автоматически.
 - Если у инфолиста Space Marines несколько таблиц цен (варианты орденов), берётся первая.

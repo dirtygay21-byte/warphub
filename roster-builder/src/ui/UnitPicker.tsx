@@ -93,9 +93,12 @@ export function UnitPicker({
       {tab === 'allies' && (
         <div className="mb-3 space-y-1.5">
           {L.faction.allies.map((a) => (
-            <p key={a.key} className="rounded-lg bg-white/[0.04] px-3 py-2 text-xs text-white/55">
-              <b className="text-white/80">{a.name}:</b> {a.note}
-            </p>
+            <details key={a.key} className="group rounded-lg bg-white/[0.04] px-3 py-2 text-xs text-white/55">
+              <summary className="cursor-pointer list-none">
+                <b className="text-white/80">{a.name}:</b> {a.note}
+              </summary>
+              {a.text && <p className="mt-1.5 whitespace-pre-line leading-relaxed text-white/60">{a.text}</p>}
+            </details>
           ))}
         </div>
       )}

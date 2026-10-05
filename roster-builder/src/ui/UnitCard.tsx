@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import type { ComputedRoster, ComputedUnit, DataLookup, Issue } from '../engine/compute';
-import type { Roster, RosterUnit } from '../engine/types';
+import type { Roster, RosterUnit, Weapon } from '../engine/types';
 import { openExternal } from '../telegram';
 import { Button, Counter, Field, Icon, Segmented, Tag, cx, fmtPts } from './kit';
 
@@ -148,6 +148,8 @@ export function UnitCard({
             </Field>
           )}
 
+          {ds.weapons.length > 0 && <LoadoutEditor c={c} onPatch={onPatch} />}
+
           {ds.character && !ds.group.startsWith('ally:') && (
             <button
               type="button"
@@ -214,7 +216,7 @@ export function UnitCard({
             </Field>
           )}
 
-          <Profile c={c} />
+          <Profile c={c} L={L} />
 
           <div className="flex gap-2 pt-1">
             <Button variant="ghost" className="flex-1" onClick={onDuplicate}>
@@ -277,8 +279,12 @@ function Choice({ active, onClick, title, right, sub, dim, detail }: { active: b
   );
 }
 
-function Profile({ c }: { c: ComputedUnit }) {
+function Profile({ c, L }: { c: ComputedUnit; L: DataLookup }) {
   const ds = c.ds!;
+  const tagAbilities = ds.abilities.filter((a) => a.type === 'core' || a.type === 'faction');
+  const textAbilities = ds.abilities.filter((a) => a.type !== 'core' && a.type !== 'faction');
+  const ranged = ds.weapons.filter((w) => w.profiles.some((p) => p.type !== 'Melee'));
+  const melee = ds.weapons.filter((w) => w.profiles.every((p) => p.type === 'Melee'));
   return (
     <details className="group rounded-xl border border-white/10 bg-white/[0.02]">
       <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2.5 text-sm font-semibold text-white/75">
@@ -318,11 +324,35 @@ function Profile({ c }: { c: ComputedUnit }) {
             </table>
           </div>
         )}
+        {ds.invulnNote && <p className="text-xs text-white/50">{ds.invulnNote}</p>}
+        {ranged.length > 0 && <WeaponTable title="Дальнобойное оружие" skill="BS" weapons={ranged} loadout={c.loadout} />}
+        {melee.length > 0 && <WeaponTable title="Ближний бой" skill="WS" weapons={melee} loadout={c.loadout} />}
+        {tagAbilities.length > 0 && (
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Способности</p>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {tagAbilities.map((a, i) => (
+                <RuleChip key={i} name={a.name + (a.param ? ' ' + a.param : '')} text={a.ref ? L.faction.rules[a.ref]?.text ?? '' : a.text} accent={a.type === 'faction'} />
+              ))}
+            </div>
+          </div>
+        )}
+        {textAbilities.map((a, i) => (
+          <div key={i}>
+            <p className="text-[13px] font-semibold text-accent/90">
+              {a.name}
+              {a.param ? ` ${a.param}` : ''}
+              {a.type === 'wargear' && <span className="ml-1.5 text-[11px] font-medium uppercase text-white/35">снаряжение</span>}
+            </p>
+            <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-white/70">{a.ref ? L.faction.rules[a.ref]?.text : a.text}</p>
+          </div>
+        ))}
+        {ds.damaged && <Txt title={`Повреждён: ${ds.damaged.w} ран`} text={ds.damaged.text} />}
         {ds.composition.length > 0 && <Txt title="Состав отряда" text={ds.composition.join('\n')} />}
         {ds.loadout && <Txt title="Снаряжение" text={ds.loadout} />}
         {ds.transport && <Txt title="Транспорт" text={ds.transport} />}
         <div className="flex flex-wrap gap-1">
-          {ds.keywords.slice(0, 14).map((k) => (
+          {ds.keywords.map((k) => (
             <Tag key={k}>{k}</Tag>
           ))}
         </div>
@@ -338,5 +368,118 @@ function Txt({ title, text }: { title: string; text: string }) {
       <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{title}</p>
       <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-white/70">{text}</p>
     </div>
+  );
+}
+
+function WeaponTable({ title, skill, weapons, loadout }: { title: string; skill: string; weapons: Weapon[]; loadout: Record<string, number> }) {
+  return (
+    <div>
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{title}</p>
+      <div className="no-scrollbar -mx-1 mt-1 overflow-x-auto px-1">
+        <table className="stat-grid w-full min-w-[340px] text-center text-[12px]">
+          <thead>
+            <tr className="text-[10px] uppercase text-white/35">
+              <th className="pb-1 text-left font-semibold"> </th>
+              {['Range', 'A', skill, 'S', 'AP', 'D'].map((h) => (
+                <th key={h} className="px-1 pb-1 font-semibold">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {weapons.flatMap((w) =>
+              w.profiles.map((p, i) => (
+                <tr key={w.name + i} className={cx('align-top', i === 0 && 'border-t border-white/[0.05]', loadout[w.name] ? 'text-white' : 'text-white/45')}>
+                  <td className="max-w-[11rem] py-1.5 pr-2 text-left">
+                    <span className="block text-[12px] font-semibold leading-tight">
+                      {w.profiles.length > 1 ? p.name : w.name}
+                      {i === 0 && loadout[w.name] ? <span className="ml-1 text-accent">×{loadout[w.name]}</span> : null}
+                    </span>
+                    {p.keywords && <span className="block text-[10px] uppercase leading-tight text-accent/70">{p.keywords}</span>}
+                  </td>
+                  <td className="px-1 py-1.5">{p.type === 'Melee' ? '—' : p.range}</td>
+                  <td className="px-1 py-1.5">{p.A}</td>
+                  <td className="px-1 py-1.5">{p.skill}</td>
+                  <td className="px-1 py-1.5">{p.S}</td>
+                  <td className="px-1 py-1.5">{p.AP}</td>
+                  <td className="px-1 py-1.5">{p.D}</td>
+                </tr>
+              )),
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function RuleChip({ name, text, accent }: { name: string; text: string; accent?: boolean }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => text && setOpen((o) => !o)}
+        className={cx('rounded-md px-2 py-1 text-[11px] font-semibold uppercase tracking-wide', accent ? 'bg-accent/15 text-accent' : 'bg-white/[0.07] text-white/70', open && 'ring-1 ring-white/30')}
+      >
+        {name}
+      </button>
+      {open && <p className="w-full whitespace-pre-line rounded-lg bg-white/[0.04] px-2.5 py-2 text-[12px] leading-relaxed text-white/65">{text}</p>}
+    </>
+  );
+}
+
+/** Снаряжение: сколько моделей несут каждое оружие (по умолчанию — из инфолиста). */
+function LoadoutEditor({ c, onPatch }: { c: ComputedUnit; onPatch: (p: Partial<RosterUnit>) => void }) {
+  const ds = c.ds!;
+  const [open, setOpen] = useState(false);
+  const addonModels = Object.values(c.unit.addons).reduce((s, n) => s + n, 0);
+  const max = Math.max(1, c.models + addonModels);
+  const paid = new Map((c.band?.wargear ?? []).map((w) => [w.label.toLowerCase(), w.cost]));
+  const summary = Object.entries(c.loadout)
+    .map(([k, n]) => `${n}× ${k}`)
+    .join(', ');
+  const set = (name: string, n: number) => onPatch({ weapons: { ...c.loadout, [name]: n } });
+  return (
+    <Field label="Снаряжение" hint={c.loadoutCustom ? 'изменено' : 'по умолчанию'}>
+      <button type="button" onClick={() => setOpen((o) => !o)} className="flex w-full items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left">
+        <span className="min-w-0 flex-1 text-[13px] leading-snug text-white/75">{summary || 'Не выбрано'}</span>
+        <Icon name="down" className={cx('size-4 shrink-0 text-white/40 transition', open && 'rotate-180')} />
+      </button>
+      {open && (
+        <div className="space-y-2">
+          {ds.weapons.map((w) => {
+            const cost = paid.get(w.name.toLowerCase());
+            const hint = [w.profiles.map((p) => (p.type === 'Melee' ? 'ближ.' : p.range)).filter((v, i, a) => a.indexOf(v) === i).join('/'), cost ? `доплата ${cost} за шт. — отметьте ниже` : '']
+              .filter(Boolean)
+              .join(' · ');
+            return (
+              <Row key={w.name} label={w.name} hint={hint}>
+                <Counter value={c.loadout[w.name] ?? 0} max={max} onChange={(n) => set(w.name, n)} />
+              </Row>
+            );
+          })}
+          {ds.options.length > 0 && (
+            <div className="rounded-xl bg-white/[0.03] px-3 py-2.5">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Варианты замены по инфолисту</p>
+              <ul className="mt-1.5 space-y-1.5">
+                {ds.options.map((o, i) => (
+                  <li key={i} className="whitespace-pre-line text-[12px] leading-relaxed text-white/65">
+                    {o.star ? '* ' : '• '}
+                    {o.text}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {c.loadoutCustom && (
+            <Button variant="ghost" className="w-full" onClick={() => onPatch({ weapons: null })}>
+              Вернуть стандартное снаряжение
+            </Button>
+          )}
+        </div>
+      )}
+    </Field>
   );
 }

@@ -37,10 +37,14 @@ export const LIMITS = {
 
 export const FORCE_DISPOSITIONS = ['Take and Hold', 'Disruption', 'Purge the Foe', 'Priority Assets', 'Reconnaissance'];
 
-/** ≈ лимиты союзников по размеру боя [Incursion, Strike Force, Onslaught] */
+/** Лимиты союзников [Incursion, Strike Force, Onslaught] — по тексту правил из Abilities.csv. */
 export const ALLY_RULES = {
-  agents: { characters: [1, 2, 3], others: [2, 3, 5] },
+  // Assigned Agents: RETINUE / CHARACTER / REQUISITIONED; DEDICATED TRANSPORT — без лимита
+  agents: { retinue: [1, 2, 3], character: [1, 2, 3], requisitioned: [1, 1, 2] },
   knights: { titanic: 1, small: 3 }, // Freeblades / Dreadblades: 1 TITANIC или до 3 малых
+  titanicus: 1, // Titanic Support: 1 модель ADEPTUS TITANICUS
+  daemonsPoints: [250, 500, 750], // Daemonic Pact
+  daemonGods: ['KHORNE', 'TZEENTCH', 'NURGLE', 'SLAANESH'],
 };
 
 /**

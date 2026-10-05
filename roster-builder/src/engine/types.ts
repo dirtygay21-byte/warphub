@@ -28,6 +28,40 @@ export interface ModelStats {
   OC: string;
   base: string;
 }
+export interface WeaponProfile {
+  name: string;
+  type: string; // Ranged | Melee
+  range: string;
+  A: string;
+  skill: string; // BS/WS
+  S: string;
+  AP: string;
+  D: string;
+  keywords: string;
+}
+export interface Weapon {
+  name: string;
+  profiles: WeaponProfile[];
+}
+/** Правило стандартного снаряжения: кто (все / один / остальные / N) получает предметы. */
+export interface LoadoutRule {
+  who: 'all' | 'one' | 'rest' | number;
+  subject: string;
+  items: { weapon: string; qty: number }[];
+}
+export interface UnitAbility {
+  type: 'core' | 'faction' | 'datasheet' | 'wargear';
+  name: string;
+  param: string;
+  text: string;
+  /** ссылка на общее правило FactionData.rules */
+  ref?: string;
+}
+export interface WargearOption {
+  star: boolean;
+  text: string;
+}
+
 /** own — своя фракция; det:<id> — разрешён детачментом; ally:<key> — союзники. */
 export type UnitGroup = 'own' | `det:${string}` | `ally:${string}`;
 
@@ -56,6 +90,13 @@ export interface Datasheet {
   stats: ModelStats[];
   loadout: string;
   transport: string;
+  damaged: { w: string; text: string } | null;
+  invulnNote: string;
+  abilities: UnitAbility[];
+  weapons: Weapon[];
+  defaultLoadout: LoadoutRule[];
+  options: WargearOption[];
+  stratagems: string[];
   enhancements: string[];
   group: UnitGroup;
 }
@@ -91,6 +132,17 @@ export interface AllyGroup {
   key: string;
   name: string;
   note: string;
+  text: string;
+}
+export interface Stratagem {
+  id: string;
+  detachment: string;
+  name: string;
+  cp: string;
+  type: string;
+  turn: string;
+  phase: string;
+  text: string;
 }
 export interface FactionData {
   id: string;
@@ -98,8 +150,11 @@ export interface FactionData {
   allegiance: 'Imperium' | 'Chaos' | 'Xenos';
   primaryKeyword: string | null;
   chapters: string[];
+  armyRules: string[];
+  rules: Record<string, { name: string; text: string }>;
   datasheets: Datasheet[];
   detachments: Detachment[];
+  stratagems: Stratagem[];
   enhancements: Enhancement[];
   allies: AllyGroup[];
 }
@@ -121,6 +176,8 @@ export interface RosterUnit {
   size: string;
   addons: Record<string, number>;
   wargear: Record<string, number>;
+  /** снаряжение вручную: оружие → сколько моделей его несут; null/нет — стандартное по инфолисту */
+  weapons?: Record<string, number> | null;
   enhancementId: string | null;
   /** uid юнита-телохранителя, к которому присоединён этот персонаж */
   attachedTo: string | null;

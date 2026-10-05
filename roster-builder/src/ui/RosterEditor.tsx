@@ -224,6 +224,16 @@ function Editor({
                   </Button>
                 </div>
               </Field>
+              {L.faction.armyRules.length > 0 && (
+                <Field label="Правила армии">
+                  <div className="space-y-1.5">
+                    {L.faction.armyRules.map((id) => {
+                      const r = L.faction.rules[id];
+                      return r ? <RuleText key={id} name={r.name} text={r.text} /> : null;
+                    })}
+                  </div>
+                </Field>
+              )}
               {cr.dispositions.length > 0 && (
                 <Field label="Force Disposition">
                   <Segmented value={roster.forceDisposition} onChange={(forceDisposition) => set({ forceDisposition })} options={cr.dispositions.map((d) => ({ value: d, label: d }))} />
@@ -481,6 +491,18 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
                       <p className="mt-1 whitespace-pre-line text-white/70">{a.text}</p>
                     </div>
                   ))}
+                  {L.faction.stratagems.some((st) => st.detachment === d.id) && (
+                    <div>
+                      <p className="font-semibold text-white/85">Стратагемы</p>
+                      <div className="mt-1 space-y-1.5">
+                        {L.faction.stratagems
+                          .filter((st) => st.detachment === d.id)
+                          .map((st) => (
+                            <RuleText key={st.id} name={`${st.name} · ${st.cp} CP`} sub={[st.type, st.turn, st.phase].filter(Boolean).join(' · ')} text={st.text} />
+                          ))}
+                      </div>
+                    </div>
+                  )}
                   {enh.length > 0 && (
                     <div>
                       <p className="font-semibold text-white/85">Улучшения</p>
@@ -500,5 +522,20 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
         })}
       </ul>
     </Sheet>
+  );
+}
+
+function RuleText({ name, text, sub }: { name: string; text: string; sub?: string }) {
+  return (
+    <details className="group rounded-xl border border-white/10 bg-white/[0.03]">
+      <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2">
+        <span className="min-w-0 flex-1">
+          <span className="block text-[13px] font-semibold text-white/85">{name}</span>
+          {sub && <span className="block text-[11px] text-white/40">{sub}</span>}
+        </span>
+        <Icon name="down" className="size-4 shrink-0 text-white/35 transition group-open:rotate-180" />
+      </summary>
+      <p className="whitespace-pre-line border-t border-white/[0.06] px-3 py-2 text-[12px] leading-relaxed text-white/65">{text}</p>
+    </details>
   );
 }

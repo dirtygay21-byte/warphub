@@ -168,3 +168,37 @@ test('все фракции загружаются и считаются без 
     assert.ok(cr.points > 0, f);
   }
 });
+
+test('стандартное снаряжение по инфолисту', async () => {
+  const { unitLoadout } = await import('../src/engine/compute');
+  const isq = byName('Intercessor Squad');
+  let r = addUnit(baseRoster(), isq);
+  const u = r.units[0];
+  assert.equal(unitLoadout(isq, u, 5)['Bolt rifle'], 5);
+  assert.equal(unitLoadout(isq, u, 10)['Bolt rifle'], 10);
+  const out = byName('Outrider Squad');
+  const ou = { ...newRoster('SM').units, ...addUnit(newRoster('SM'), out).units[0] };
+  assert.equal(unitLoadout(out, ou, 3)['Onslaught gatling cannon'] ?? 0, 0);
+  assert.equal(unitLoadout(out, { ...ou, addons: { '1 Invader ATV': 1 } }, 3)['Onslaught gatling cannon'], 1);
+  r = updateUnit(r, u.uid, { weapons: { 'Bolt rifle': 4, 'Hand flamer': 1 } });
+  const cr = computeRoster(r, L);
+  assert.equal(cr.units[0].loadout['Hand flamer'], 1);
+  assert.ok(cr.units[0].loadoutCustom);
+  assert.match(exportGw(r, L, cr, null), /◦ 1x Hand flamer/);
+});
+
+test('союзники: Assigned Agents и Daemonic Pact', () => {
+  const agents = SM.datasheets.filter((d) => d.group === 'ally:agents' && d.keywords.includes('Character') && !d.epicHero);
+  let r = baseRoster();
+  for (const d of agents.slice(0, 3)) r = addUnit(r, d);
+  assert.ok(computeRoster(r, L).issues.some((i) => i.code === 'agents'), 'больше 2 персонажей-агентов в Strike Force');
+
+  const CSM = loadFaction('CSM');
+  const LC = makeLookup(CSM);
+  const det = CSM.detachments[0];
+  let c = { ...newRoster('CSM'), detachmentIds: [det.id], forceDisposition: det.forceDisposition };
+  const nonBl = CSM.datasheets.filter((d) => d.group === 'ally:daemons' && !d.battleline && d.keywords.includes('Khorne') && !d.legends);
+  c = addUnit(c, nonBl[0]);
+  const codesC = computeRoster(c, LC).issues.map((i) => i.code);
+  assert.ok(codesC.includes('daemons-ratio'));
+});
