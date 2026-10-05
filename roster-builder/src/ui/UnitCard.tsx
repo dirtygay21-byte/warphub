@@ -65,46 +65,64 @@ export function UnitCard({
     ? cr.units.filter((x) => x.unit.uid !== c.unit.uid && x.ds && ds.leads.includes(x.ds.id) && !x.unit.attachedTo)
     : [];
 
+  const role = nested ? (attachedTo ? (ds.support ? 'Support' : 'Leader') : 'Телохранители') : null;
+  const tags: { label: string; tone: 'muted' | 'accent' | 'warn' }[] = [];
+  if (ds.epicHero && !nested) tags.push({ label: 'Epic Hero', tone: 'muted' });
+  if (ds.legends) tags.push({ label: 'Legends', tone: 'warn' });
+  if (ds.group.startsWith('ally:')) tags.push({ label: L.faction.allies.find((a) => 'ally:' + a.key === ds.group)?.name ?? 'Союзник', tone: 'muted' });
+  if (ds.group.startsWith('det:')) tags.push({ label: L.det.get(ds.group.slice(4))?.name ?? 'Детачмент', tone: 'muted' });
+  if (c.isBattleline && !ds.battleline) tags.push({ label: 'Battleline от детачмента', tone: 'accent' });
+
   return (
     <div
       id={'u-' + c.unit.uid}
       className={cx(
-        'overflow-hidden rounded-xl border transition-colors',
-        nested ? 'bg-app-elevated' : 'bg-app-elevated',
-        hasErr ? 'border-danger/40' : hasWarn ? 'border-warn/30' : expanded ? 'border-white/20' : 'border-white/10',
+        'relative overflow-hidden transition-colors',
+        nested ? '' : 'rounded-2xl border bg-app-elevated',
+        !nested && (expanded ? 'border-white/20' : 'border-white/[0.08]'),
       )}
     >
-      <button type="button" onClick={onToggle} className="flex w-full items-start gap-3 px-3.5 py-3 text-left active:bg-white/[0.02]">
+      {(hasErr || hasWarn) && <span className={cx('absolute inset-y-0 left-0 w-[3px]', hasErr ? 'bg-danger' : 'bg-warn')} aria-hidden />}
+      <button type="button" onClick={onToggle} className="flex w-full items-center gap-3 px-4 py-3.5 text-left active:bg-white/[0.02]">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            {isWarlord && <Icon name="crown" className="size-4 shrink-0 text-accent" />}
-            <p className="truncate text-[15px] font-semibold leading-snug">{ds.name}</p>
-            {c.copy > 1 && <span className="shrink-0 text-xs font-semibold text-white/35">#{c.copy}</span>}
-          </div>
-          {(meta.length > 0 || attachedTo || ds.support) && (
-            <p className="mt-0.5 line-clamp-2 text-[13px] leading-snug text-white/50">
-              {attachedTo?.ds && <span className="text-accent/80">{ds.support ? 'Support' : 'Leader'} → {attachedTo.ds.name}. </span>}
-              {!attachedTo && ds.support && <span className="text-danger">Support — нужно присоединить. </span>}
-              {meta.join(' · ')}
+          {role && <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-accent/70">{role}</p>}
+          <p className="text-[15px] font-semibold leading-tight">
+            {isWarlord && <Icon name="crown" className="-mt-0.5 mr-1 inline size-[15px] text-accent" />}
+            {ds.name}
+            {c.copy > 1 && <span className="ml-1.5 text-xs font-semibold text-white/30">#{c.copy}</span>}
+          </p>
+          {(meta.length > 0 || (!attachedTo && ds.support)) && (
+            <p className="mt-1 line-clamp-2 text-[12.5px] leading-snug text-white/45">
+              {!attachedTo && ds.support && <span className="text-danger">Нужно присоединить · </span>}
+              {meta.map((m, i) => (
+                <span key={i} className={cx(c.enhancement && m === c.enhancement.name && 'text-accent/80')}>
+                  {i > 0 && ' · '}
+                  {m}
+                </span>
+              ))}
             </p>
           )}
-          {(ds.legends || ds.group !== 'own' || c.isBattleline !== ds.battleline) && (
+          {tags.length > 0 && (
             <div className="mt-1.5 flex flex-wrap gap-1">
-              {ds.legends && <Tag tone="warn">Legends</Tag>}
-              {ds.group.startsWith('ally:') && <Tag>{L.faction.allies.find((a) => 'ally:' + a.key === ds.group)?.name ?? 'Союзник'}</Tag>}
-              {ds.group.startsWith('det:') && <Tag>{L.det.get(ds.group.slice(4))?.name ?? 'Детачмент'}</Tag>}
-              {c.isBattleline && !ds.battleline && <Tag tone="accent">Battleline (детачмент)</Tag>}
+              {tags.map((t) => (
+                <Tag key={t.label} tone={t.tone}>
+                  {t.label}
+                </Tag>
+              ))}
             </div>
           )}
         </div>
-        <div className="shrink-0 text-right">
-          <p className="font-display text-lg font-semibold leading-none tabular-nums">{fmtPts(c.total)}</p>
-          {(hasErr || hasWarn) && <Icon name="alert" className={cx('ml-auto mt-1.5 size-4', hasErr ? 'text-danger' : 'text-warn')} />}
+        <div className="flex shrink-0 items-center gap-2">
+          <div className="text-right">
+            <p className="font-display text-[19px] font-semibold leading-none tabular-nums">{fmtPts(c.total)}</p>
+            <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-white/30">очк.</p>
+          </div>
+          <Icon name="down" className={cx('size-4 text-white/25 transition', expanded && 'rotate-180')} />
         </div>
       </button>
 
       {expanded && (
-        <div className="space-y-4 border-t border-white/[0.06] px-3.5 pb-3.5 pt-3.5">
+        <div className="space-y-5 border-t border-white/[0.06] bg-black/20 px-4 pb-4 pt-4">
           {issues.length > 0 && (
             <ul className="space-y-1.5">
               {issues.map((i, n) => (
@@ -154,12 +172,13 @@ export function UnitCard({
             <button
               type="button"
               onClick={onWarlord}
-              className={cx(
-                'flex w-full items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-semibold',
-                isWarlord ? 'border-accent bg-accent/10 text-accent' : 'border-white/10 bg-white/[0.03] text-white/80 active:bg-white/10',
-              )}
+              className="flex w-full items-center gap-2.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-[13.5px] font-semibold text-white/85 active:bg-white/10"
             >
-              <Icon name="crown" className="size-4" /> {isWarlord ? 'Warlord' : 'Назначить Warlord'}
+              <Icon name="crown" className={cx('size-4', isWarlord ? 'text-accent' : 'text-white/40')} />
+              <span className="flex-1 text-left">Warlord</span>
+              <span className={cx('relative h-5 w-9 rounded-full transition', isWarlord ? 'bg-accent' : 'bg-white/15')}>
+                <span className={cx('absolute top-0.5 size-4 rounded-full bg-white shadow transition-all', isWarlord ? 'left-[18px] bg-black' : 'left-0.5')} />
+              </span>
             </button>
           )}
 
@@ -168,7 +187,7 @@ export function UnitCard({
               {enhBlocked ? (
                 <p className="text-[13px] text-white/45">{enhBlocked}</p>
               ) : (
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Choice active={!c.unit.enhancementId} onClick={() => onPatch({ enhancementId: null })} title="Без улучшения" />
                   {enhOptions.map((e) => {
                     const used = usedBy.get(e.id) ?? 0;
@@ -199,7 +218,7 @@ export function UnitCard({
                   {ds.leads.length > 8 ? '…' : ''}
                 </p>
               ) : (
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Choice active={!c.unit.attachedTo} onClick={() => onPatch({ attachedTo: null })} title="Отдельно" />
                   {bodyguards.map((b) => (
                     <Choice
@@ -264,13 +283,13 @@ function Choice({ active, onClick, title, right, sub, dim, detail }: { active: b
       type="button"
       onClick={onClick}
       className={cx(
-        'w-full rounded-xl border px-3 py-2 text-left transition',
+        'w-full rounded-lg border px-3 py-[7px] text-left transition',
         active ? 'border-accent bg-accent/10' : 'border-white/10 bg-white/[0.03] active:bg-white/10',
         dim && !active && 'opacity-50',
       )}
     >
       <span className="flex items-baseline gap-2">
-        <span className={cx('flex-1 text-sm font-semibold', active ? 'text-accent' : 'text-white/85')}>{title}</span>
+        <span className={cx('flex-1 text-[13.5px] font-semibold', active ? 'text-accent' : 'text-white/85')}>{title}</span>
         {right && <span className={cx('shrink-0 text-xs font-semibold tabular-nums', active ? 'text-accent' : 'text-white/50')}>{right}</span>}
       </span>
       {sub && <span className="mt-0.5 block text-xs text-white/45">{sub}</span>}

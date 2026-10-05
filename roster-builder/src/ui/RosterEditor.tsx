@@ -7,6 +7,7 @@ import type { DataIndex, Datasheet, Detachment, FactionData, Roster } from '../e
 import { confirmAsk, haptic } from '../telegram';
 import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag, cx, fmtPts } from './kit';
 import { UnitCard } from './UnitCard';
+import { sortRosterUnits } from '../engine/sort';
 import { UnitPicker } from './UnitPicker';
 import { ExportSheet } from './ExportSheet';
 
@@ -99,7 +100,7 @@ function Editor({
     return m;
   }, [cr]);
 
-  const topLevel = cr.units.filter((c) => !c.unit.attachedTo || !cr.byUid.has(c.unit.attachedTo));
+  const topLevel = sortRosterUnits(cr.units.filter((c) => !c.unit.attachedTo || !cr.byUid.has(c.unit.attachedTo)));
   const grouped = GROUPS.map((g) => ({ ...g, list: topLevel.filter((c) => roleGroup(c) === g.key) })).filter((g) => g.list.length);
 
   const add = (ds: Datasheet) => {
@@ -225,14 +226,21 @@ function Editor({
                 </div>
               </Field>
               {L.faction.armyRules.length > 0 && (
-                <Field label="Правила армии">
-                  <div className="space-y-1.5">
+                <details className="group">
+                  <summary className="flex cursor-pointer list-none items-baseline justify-between gap-2">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-white/45">Правила армии</span>
+                    <span className="flex items-center gap-1 text-xs text-white/40">
+                      {L.faction.armyRules.length}
+                      <Icon name="down" className="size-3.5 transition group-open:rotate-180" />
+                    </span>
+                  </summary>
+                  <div className="mt-2 space-y-1.5">
                     {L.faction.armyRules.map((id) => {
                       const r = L.faction.rules[id];
                       return r ? <RuleText key={id} name={r.name} text={r.text} /> : null;
                     })}
                   </div>
-                </Field>
+                </details>
               )}
               {cr.dispositions.length > 0 && (
                 <Field label="Force Disposition">
@@ -249,11 +257,14 @@ function Editor({
         ) : (
           grouped.map((g) => (
             <section key={g.key}>
-              <div className="mb-2 flex items-baseline justify-between px-1">
-                <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-white/60">{g.title}</h2>
-                <span className="text-xs tabular-nums text-white/35">{fmtPts(g.list.reduce((s, c) => s + c.total + c.attached.reduce((a, u) => a + (cr.byUid.get(u.uid)?.total ?? 0), 0), 0))}</span>
+              <div className="mb-2.5 flex items-baseline justify-between px-1">
+                <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-white/70">
+                  {g.title}
+                  <span className="ml-2 font-sans text-xs font-semibold text-white/30">{g.list.reduce((n, c) => n + 1 + c.attached.length, 0)}</span>
+                </h2>
+                <span className="text-xs font-semibold tabular-nums text-white/40">{fmtPts(g.list.reduce((s, c) => s + c.total + c.attached.reduce((a, u) => a + (cr.byUid.get(u.uid)?.total ?? 0), 0), 0))}</span>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {g.list.map((c) => (
                   <UnitGroup
                     key={c.unit.uid}
@@ -433,16 +444,20 @@ function UnitGroup({
     />
   );
   if (!c.attached.length) return card(c, false);
+  // порядок внутри отряда: Leader → Support → телохранители
+  const chars = c.attached
+    .map((u) => cr.byUid.get(u.uid))
+    .filter((x): x is ComputedUnit => !!x)
+    .sort((a, b) => Number(!!a.ds?.support) - Number(!!b.ds?.support));
+  const total = c.total + chars.reduce((s, x) => s + x.total, 0);
   return (
-    <div className="rounded-2xl border border-accent/25 bg-accent/[0.03] p-1.5">
-      <p className="px-2 pb-1.5 pt-1 text-[11px] font-semibold uppercase tracking-wider text-accent/80">
-        Отряд · {fmtPts(c.total + c.attached.reduce((s, u) => s + (cr.byUid.get(u.uid)?.total ?? 0), 0))}
-      </p>
-      <div className="space-y-1.5">
-        {c.attached.map((u) => {
-          const x = cr.byUid.get(u.uid);
-          return x ? card(x, true) : null;
-        })}
+    <div className="overflow-hidden rounded-2xl border border-accent/25 bg-app-elevated">
+      <div className="flex items-baseline justify-between bg-accent/[0.06] px-4 py-2">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent/85">Отряд</p>
+        <p className="text-[12px] font-semibold tabular-nums text-accent/85">{fmtPts(total)} очк.</p>
+      </div>
+      <div className="divide-y divide-white/[0.06]">
+        {chars.map((x) => card(x, true))}
         {card(c, true)}
       </div>
     </div>

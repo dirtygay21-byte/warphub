@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { bandFor, battlelineGrants, copyLimit, isBattleline, type ComputedRoster, type DataLookup } from '../engine/compute';
+import { compareUnits, typeLabel, typeRank, unitType } from '../engine/sort';
 import type { Datasheet, Roster } from '../engine/types';
 import { haptic } from '../telegram';
-import { Icon, Sheet, Tag, cx } from './kit';
+import { Icon, Sheet, cx } from './kit';
 
 type Tab = 'all' | 'characters' | 'battleline' | 'transports' | 'other' | 'allies';
 const TABS: { key: Tab; label: string }[] = [
@@ -65,8 +66,36 @@ export function UnitPicker({
         const g: Tab = ds.group.startsWith('ally:') ? 'allies' : ds.character ? 'characters' : bl ? 'battleline' : ds.dedicatedTransport ? 'transports' : 'other';
         return tab === 'all' ? true : g === tab;
       })
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .sort((a, b) => compareUnits(a, b, isBattleline(a, grants), isBattleline(b, grants)));
   }, [L, q, tab, roster.showLegends, roster.detachmentIds, grants, chapter, chapters, disabledAllies]);
+
+  // секции: свои юниты по типу → юниты из детачментов → союзники → Legends
+  const sections = useMemo(() => {
+    const out: { key: string; title: string; note?: string; items: Datasheet[] }[] = [];
+    const push = (key: string, title: string, ds: Datasheet, note?: string) => {
+      let s = out.find((x) => x.key === key);
+      if (!s) out.push((s = { key, title, note, items: [] }));
+      s.items.push(ds);
+    };
+    const rank = (ds: Datasheet) => {
+      if (ds.legends) return 300;
+      if (ds.group.startsWith('ally:')) return 200 + L.faction.allies.findIndex((a) => 'ally:' + a.key === ds.group);
+      if (ds.group.startsWith('det:')) return 100;
+      return typeRank(unitType(ds, isBattleline(ds, grants)));
+    };
+    for (const ds of [...list].sort((a, b) => rank(a) - rank(b))) {
+      if (ds.legends) push('legends', 'Warhammer Legends', ds);
+      else if (ds.group.startsWith('ally:')) {
+        const a = L.faction.allies.find((x) => 'ally:' + x.key === ds.group);
+        push(ds.group, 'Союзники · ' + (a?.name ?? ''), ds);
+      } else if (ds.group.startsWith('det:')) push(ds.group, 'Детачмент · ' + (L.det.get(ds.group.slice(4))?.name ?? ''), ds);
+      else {
+        const t = unitType(ds, isBattleline(ds, grants));
+        push(t, typeLabel(t), ds);
+      }
+    }
+    return out;
+  }, [list, L, grants]);
 
   const legendsCount = L.faction.datasheets.filter((d) => d.legends).length;
 
@@ -112,48 +141,27 @@ export function UnitPicker({
       {list.length === 0 ? (
         <p className="py-10 text-center text-sm text-white/45">Ничего не найдено</p>
       ) : (
-        <ul className="space-y-1.5">
-          {list.map((ds) => {
-            const n = counts.get(ds.id) ?? 0;
-            const bl = isBattleline(ds, grants);
-            const limit = copyLimit(ds, roster.battleSize, bl);
-            const next = bandFor(ds, n + 1);
-            const price = next?.options[0]?.cost;
-            const full = n >= limit;
-            return (
-              <li key={ds.id}>
-                <button
-                  type="button"
-                  onClick={() => onAdd(ds)}
-                  className={cx('flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left transition active:bg-white/10', full && 'opacity-45')}
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold">{ds.name}</p>
-                    <div className="mt-1 flex flex-wrap items-center gap-1">
-                      {ds.epicHero ? <Tag tone="accent">Epic Hero</Tag> : ds.character && <Tag>Персонаж</Tag>}
-                      {ds.support && <Tag>Support</Tag>}
-                      {bl && <Tag>Battleline</Tag>}
-                      {ds.legends && <Tag tone="warn">Legends</Tag>}
-                      {ds.forgeWorld && <Tag>FW</Tag>}
-                      {ds.group.startsWith('det:') && <Tag tone="accent">{L.det.get(ds.group.slice(4))?.name}</Tag>}
-                      {ds.group.startsWith('ally:') && <Tag>{L.faction.allies.find((a) => 'ally:' + a.key === ds.group)?.name}</Tag>}
-                      <span className={cx('text-[11px] font-semibold tabular-nums', full ? 'text-danger' : n ? 'text-accent' : 'text-white/35')}>
-                        {n}/{limit}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="shrink-0 text-right">
-                    <p className="font-display text-base font-semibold tabular-nums">{price ?? '—'}</p>
-                    {next && next.options.length > 1 && <p className="text-[10px] text-white/35">от</p>}
-                  </div>
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent">
-                    <Icon name="plus" className="size-4" />
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="space-y-5">
+          {sections.map((sec) => (
+            <section key={sec.key}>
+              <h3 className="mb-2 flex items-baseline justify-between px-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/40">
+                <span>{sec.title}</span>
+                <span className="tabular-nums text-white/25">{sec.items.length}</span>
+              </h3>
+              <ul className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02]">
+                {sec.items.map((ds) => (
+                  <PickerRow
+                    key={ds.id}
+                    ds={ds}
+                    count={counts.get(ds.id) ?? 0}
+                    limit={copyLimit(ds, roster.battleSize, isBattleline(ds, grants))}
+                    onAdd={() => onAdd(ds)}
+                  />
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
       )}
 
       {legendsCount > 0 && (
@@ -162,5 +170,39 @@ export function UnitPicker({
         </button>
       )}
     </Sheet>
+  );
+}
+
+function PickerRow({ ds, count, limit, onAdd }: { ds: Datasheet; count: number; limit: number; onAdd: () => void }) {
+  const next = bandFor(ds, count + 1);
+  const opts = next?.options ?? [];
+  const price = opts[0]?.cost;
+  const full = count >= limit;
+  const models = [...new Set(opts.map((o) => o.models))];
+  const sub: string[] = [];
+  if (ds.leads.length) sub.push(ds.support ? 'Support' : 'Leader');
+  if (models.length && !(models.length === 1 && models[0] === 1)) sub.push(models.join(' / ') + ' мод.');
+  if (ds.forgeWorld) sub.push('Forge World');
+  return (
+    <li className="border-b border-white/[0.06] last:border-b-0">
+      <button type="button" onClick={onAdd} className={cx('flex w-full items-center gap-3 px-3.5 py-3 text-left transition active:bg-white/[0.06]', full && 'opacity-40')}>
+        <div className="min-w-0 flex-1">
+          <p className="text-[14px] font-semibold leading-snug">{ds.name}</p>
+          {sub.length > 0 && <p className="mt-0.5 text-[12px] leading-snug text-white/45">{sub.join(' · ')}</p>}
+        </div>
+        {count > 0 && (
+          <span className={cx('shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-semibold tabular-nums', full ? 'bg-danger/15 text-danger' : 'bg-accent/15 text-accent')}>
+            {count}/{limit}
+          </span>
+        )}
+        <span className="w-11 shrink-0 text-right">
+          {opts.length > 1 && <span className="block text-[10px] leading-none text-white/35">от</span>}
+          <span className="font-display text-[17px] font-semibold leading-tight tabular-nums">{price ?? '—'}</span>
+        </span>
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
+          <Icon name="plus" className="size-4" strokeWidth={2.5} />
+        </span>
+      </button>
+    </li>
   );
 }

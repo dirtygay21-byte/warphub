@@ -1,5 +1,6 @@
 import { BATTLE_SIZES } from './rules';
 import { roleGroup, type ComputedRoster, type ComputedUnit, type DataLookup } from './compute';
+import { sortRosterUnits } from './sort';
 import type { Roster } from './types';
 
 const pts = (n: number) => n.toLocaleString('en-US');
@@ -68,7 +69,7 @@ export function exportGw(roster: Roster, L: DataLookup, cr: ComputedRoster, data
     ['ALLIED UNITS', 'allies'],
   ];
   for (const [title, g] of sections) {
-    const list = valid.filter((c) => !inAttach.has(c.unit.uid) && roleGroup(c) === g);
+    const list = sortRosterUnits(valid.filter((c) => !inAttach.has(c.unit.uid) && roleGroup(c) === g));
     if (!list.length) continue;
     out.push(title);
     for (const c of list) out.push(...unitLines(c, roster), '');
