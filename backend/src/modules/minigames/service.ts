@@ -643,7 +643,10 @@ export async function diceAction(
       return { state, exchange, granted: null, earnedLabel: null };
     }
 
-    const found = diceRewardFor(settings.games.dice.tiers, state.wins, state.clutchWins, params);
+    // Поражение = награды за эту попытку нет («рискнуть или забрать»)
+    const found = state.lost
+      ? null
+      : diceRewardFor(settings.games.dice.tiers, state.wins, state.clutchWins, params);
     const granted = await grantReward(tx, {
       userId,
       game: 'dice',

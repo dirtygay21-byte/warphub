@@ -256,6 +256,20 @@ describe('mini-games: dice battle (server rolls)', () => {
     const after = await api('POST', `/minigames/sessions/${start.json.sessionId}/dice/roll`, T.vera);
     expect(after.status).toBe(409);
   });
+  test('defeat forfeits the attempt’s reward even after wins', async () => {
+    const start = await api('POST', '/minigames/dice/sessions', T.cheat);
+    const id = start.json.sessionId;
+    // как будто уже одержано 2 победы
+    sql(`update minigame_sessions set state = jsonb_set(state::jsonb, '{wins}', '2')::text where id='${id}'`);
+    let last: any = null;
+    for (let i = 0; i < 500 && !last?.battle.finished; i++) {
+      last = (await api('POST', `/minigames/sessions/${id}/dice/roll`, T.cheat)).json;
+    }
+    expect(last.battle.lost).toBe(true);
+    expect(last.battle.wins).toBeGreaterThanOrEqual(2);
+    expect(last.result.rewardOutcome).toBe('none');
+    expect(last.result.reward).toBeNull();
+  });
   test('stop before any win → no reward', async () => {
     const start = await api('POST', '/minigames/dice/sessions', T.petr);
     const r = await api('POST', `/minigames/sessions/${start.json.sessionId}/dice/stop`, T.petr);
