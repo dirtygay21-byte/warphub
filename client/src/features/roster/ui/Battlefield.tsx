@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { loadBattlefield, type BattlefieldData, type BfDeployment, type BfLayout, type Pt } from '../data';
-import { openExternal } from '../telegram';
-import { IconButton, cx } from './kit';
+import { openExternal, pushOverlay } from '../telegram';
+import { IconButton } from './kit';
+import { cx } from './util';
 
 const LETTERS = ['A', 'B', 'C'];
 const MISSIONS_URL = 'https://wahapedia.ru/wh40k11ed/the-rules/mission-deck-2026-27/';
@@ -34,7 +35,7 @@ type Guide = BfLayout['guides'][number];
 
 /** Край поля на экране (карта повёрнута): левый край поля — сверху, правый — снизу, верхний — справа, нижний — слева. */
 const SCREEN_EDGE: Record<Guide['edge'], 'top' | 'bottom' | 'right' | 'left'> = { left: 'top', right: 'bottom', top: 'right', bottom: 'left' };
-export const EDGE_RU: Record<'top' | 'bottom' | 'right' | 'left', string> = {
+const EDGE_RU: Record<'top' | 'bottom' | 'right' | 'left', string> = {
   top: 'от верхнего края',
   bottom: 'от нижнего края',
   left: 'от левого края',
@@ -42,7 +43,7 @@ export const EDGE_RU: Record<'top' | 'bottom' | 'right' | 'left', string> = {
 };
 
 /** 17.5 → «17½″», 16.25 → «16¼″», 12.34 → «12,34″». */
-export function inches(d: number): string {
+function inches(d: number): string {
   const whole = Math.floor(d + 1e-9);
   const frac = Math.round((d - whole) * 100) / 100;
   const q: Record<string, string> = { '0': '', '0.25': '¼', '0.5': '½', '0.75': '¾' };
@@ -222,6 +223,9 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
   const [showGuides, setShowGuides] = useState(true);
   const [selected, setSelected] = useState<number | null>(null);
 
+  // открытая крупная карта закрывается кнопкой «Назад» Telegram
+  useEffect(() => (zoom ? pushOverlay(() => (setZoom(false), setSelected(null))) : undefined), [zoom]);
+
   useEffect(() => {
     loadBattlefield().then((d) => {
       setData(d);
@@ -316,12 +320,13 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
               type="button"
               onClick={() => pick(l.variant)}
               className={cx(
-                'rounded-xl border px-2 py-2 text-left transition',
+                'min-w-0 rounded-xl border px-2.5 py-2 text-left transition',
                 layout?.id === l.id ? 'border-accent bg-accent/15' : 'border-white/10 bg-white/[0.03] active:bg-white/10',
               )}
             >
-              <span className="font-display block text-base font-semibold uppercase leading-none">Раскладка {LETTERS[i]}</span>
-              <span className="mt-1 block text-[11px] leading-tight text-white/55">{d?.nameRu}</span>
+              <span className="block text-[10.5px] font-semibold uppercase tracking-wider text-white/45">Раскладка</span>
+              <span className="font-display block text-2xl font-semibold leading-none">{LETTERS[i]}</span>
+              <span className="mt-1 block break-words text-[11px] leading-tight text-white/55">{d?.nameRu}</span>
             </button>
           );
         })}

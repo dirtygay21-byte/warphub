@@ -79,6 +79,22 @@ describe('коды доступа к Roster Builder', () => {
     expect(checkAttempts([], MAX_FAILED_GLOBAL, now).allowed).toBe(false);
   });
 
+  test('общий лимит по времени: точное ожидание до выпадения старой попытки', () => {
+    // 30 неудач: самая старая — 50 минут назад, значит ждать ~10 минут
+    const all = Array.from({ length: MAX_FAILED_GLOBAL }, (_, i) => minutesAgo(50 - i));
+    const v = checkAttempts([], all, now);
+    expect(v.allowed).toBe(false);
+    if (!v.allowed) {
+      expect(v.global).toBe(true);
+      expect(Math.round(v.retryAfterMs / 60000)).toBe(10);
+    }
+    expect(checkAttempts([], all.slice(1), now).allowed).toBe(true);
+    // личный лимит проверяется первым и не помечается как общий
+    const mine = Array.from({ length: MAX_FAILED_PER_USER }, (_, i) => minutesAgo(5 + i));
+    const p = checkAttempts(mine, all, now);
+    expect(!p.allowed && p.global).toBe(false);
+  });
+
   test('владельцы кодов: ROSTER_ADMIN_TELEGRAM_IDS или все администраторы', () => {
     delete process.env.ROSTER_ADMIN_TELEGRAM_IDS;
     expect(rosterOwnerIds(['1', '2'])).toEqual(['1', '2']);

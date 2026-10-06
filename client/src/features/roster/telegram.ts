@@ -65,3 +65,23 @@ export function openExternal(url: string) {
   if (tg) tg.openLink(url);
   else window.open(url, '_blank', 'noopener');
 }
+
+// ---------- кнопка «Назад» и открытые шторки ----------
+const overlays: (() => void)[] = [];
+
+/** Шторка/оверлей открыт: кнопка «Назад» Telegram сначала закроет его. Возвращает функцию снятия. */
+export function pushOverlay(close: () => void): () => void {
+  overlays.push(close);
+  return () => {
+    const i = overlays.lastIndexOf(close);
+    if (i >= 0) overlays.splice(i, 1);
+  };
+}
+
+/** Закрыть верхнюю шторку, если она есть. true — кнопка «Назад» обработана. */
+export function closeTopOverlay(): boolean {
+  const close = overlays.at(-1);
+  if (!close) return false;
+  close();
+  return true;
+}

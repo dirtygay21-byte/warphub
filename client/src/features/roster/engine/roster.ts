@@ -90,12 +90,71 @@ export function encodeRoster(r: Roster): string {
   return 'WH1.' + btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-export function decodeRoster(code: string): Roster {
-  const body = code.trim().replace(/^WH1\./, '').replace(/-/g, '+').replace(/_/g, '/');
-  const bin = atob(body + '='.repeat((4 - (body.length % 4)) % 4));
-  const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
-  const obj = JSON.parse(new TextDecoder().decode(bytes));
-  const r = obj.r as Roster;
-  if (!r || !Array.isArray(r.units) || !r.factionId) throw new Error('Неверный код ростера');
+export function decodeRoster(code: string, knownFactions?: string[]): Roster {
+  let obj: unknown;
+  try {
+    const body = code.trim().replace(/^WH1\./, '').replace(/-/g, '+').replace(/_/g, '/');
+    const bin = atob(body + '='.repeat((4 - (body.length % 4)) % 4));
+    const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+    obj = JSON.parse(new TextDecoder().decode(bytes));
+  } catch {
+    throw new Error('Неверный код ростера');
+  }
+  const r = sanitizeRoster((obj as { r?: unknown } | null)?.r);
+  if (!r) throw new Error('Неверный код ростера');
+  if (knownFactions && !knownFactions.includes(r.factionId)) throw new Error('Ростер для неизвестной фракции — обновите данные');
   return { ...r, id: uid(), updatedAt: Date.now() };
+}
+
+// ---------- проверка данных извне (код ростера, localStorage, CloudStorage) ----------
+const BATTLE_SIZE_IDS: BattleSize[] = ['incursion', 'strike', 'onslaught'];
+const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+const str = (v: unknown, def = ''): string => (typeof v === 'string' ? v : def);
+const strOrNull = (v: unknown): string | null => (typeof v === 'string' && v ? v : null);
+const num = (v: unknown, def = 0): number => (typeof v === 'number' && Number.isFinite(v) ? v : def);
+const counts = (v: unknown): Record<string, number> =>
+  isObj(v) ? Object.fromEntries(Object.entries(v).filter(([, n]) => typeof n === 'number' && Number.isFinite(n) && n >= 0)) as Record<string, number> : {};
+
+/**
+ * Приводит «чужой» ростер к ожидаемой форме: лишние поля отбрасываются, недостающие получают значения
+ * по умолчанию. null — если это вообще не ростер. Так битый код или старая запись не роняют раздел.
+ */
+export function sanitizeRoster(raw: unknown): Roster | null {
+  if (!isObj(raw) || typeof raw.factionId !== 'string' || !raw.factionId || !Array.isArray(raw.units)) return null;
+  const units: RosterUnit[] = raw.units.filter(isObj).flatMap((u) =>
+    typeof u.datasheetId === 'string' && u.datasheetId
+      ? [
+          {
+            uid: str(u.uid) || uid(),
+            datasheetId: u.datasheetId,
+            size: str(u.size),
+            addons: counts(u.addons),
+            wargear: counts(u.wargear),
+            weapons: isObj(u.weapons) ? counts(u.weapons) : null,
+            enhancementId: strOrNull(u.enhancementId),
+            attachedTo: strOrNull(u.attachedTo),
+          },
+        ]
+      : [],
+  );
+  const uids = new Set(units.map((u) => u.uid));
+  for (const u of units) if (u.attachedTo && !uids.has(u.attachedTo)) u.attachedTo = null;
+  const now = Date.now();
+  const s = raw.summary;
+  return {
+    id: str(raw.id) || uid(),
+    name: str(raw.name).slice(0, 80) || 'Ростер',
+    factionId: raw.factionId,
+    battleSize: BATTLE_SIZE_IDS.includes(raw.battleSize as BattleSize) ? (raw.battleSize as BattleSize) : 'strike',
+    detachmentIds: Array.isArray(raw.detachmentIds) ? raw.detachmentIds.filter((x): x is string => typeof x === 'string') : [],
+    forceDisposition: strOrNull(raw.forceDisposition),
+    chapter: strOrNull(raw.chapter),
+    units,
+    warlordUid: typeof raw.warlordUid === 'string' && uids.has(raw.warlordUid) ? raw.warlordUid : null,
+    showLegends: raw.showLegends === true,
+    dataVersion: strOrNull(raw.dataVersion),
+    summary: isObj(s) ? { points: num(s.points), errors: num(s.errors), warnings: num(s.warnings) } : undefined,
+    createdAt: num(raw.createdAt, now),
+    updatedAt: num(raw.updatedAt, now),
+  };
 }

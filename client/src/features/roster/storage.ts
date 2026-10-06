@@ -1,10 +1,27 @@
 // Хранение ростеров: Telegram CloudStorage (синхронизация между устройствами) + localStorage (кэш/офлайн).
 // Лимиты CloudStorage: значение ≤ 4096 символов, ключей ≤ 1024 — длинные ростеры режем на куски.
-import { cloudStorage } from './telegram';
+import { cloudStorage, tg } from './telegram';
+import { sanitizeRoster } from './engine/roster';
 import type { Roster } from './engine/types';
 
-const LS_KEY = 'warphub.rosters.v1';
-const LS_DEL = 'warphub.rosters.deleted.v1';
+// Ключи localStorage — свои у каждого аккаунта Telegram (на одном компьютере может быть несколько аккаунтов).
+const userSuffix = tg?.initDataUnsafe.user?.id ? `.${tg.initDataUnsafe.user.id}` : '';
+const LEGACY_KEY = 'warphub.rosters.v1';
+const LEGACY_DEL = 'warphub.rosters.deleted.v1';
+const LS_KEY = LEGACY_KEY + userSuffix;
+const LS_DEL = LEGACY_DEL + userSuffix;
+// перенос со старых общих ключей (до разделения по аккаунтам) — один раз
+try {
+  if (userSuffix && localStorage.getItem(LS_KEY) === null && localStorage.getItem(LEGACY_KEY) !== null) {
+    localStorage.setItem(LS_KEY, localStorage.getItem(LEGACY_KEY)!);
+    localStorage.setItem(LS_DEL, localStorage.getItem(LEGACY_DEL) ?? '[]');
+    localStorage.removeItem(LEGACY_KEY);
+    localStorage.removeItem(LEGACY_DEL);
+  }
+} catch {
+  /* приватный режим */
+}
+const clean = (list: unknown): Roster[] => (Array.isArray(list) ? list.map(sanitizeRoster).filter((r): r is Roster => !!r) : []);
 const DEL_KEY = 'rb_deleted';
 const CHUNK = 3800;
 const INDEX_KEY = 'rb_index';
@@ -15,7 +32,7 @@ type IndexEntry = { id: string; chunks: number; updatedAt: number };
 function readLocal(): Roster[] {
   try {
     const raw = localStorage.getItem(LS_KEY);
-    return raw ? (JSON.parse(raw) as Roster[]) : [];
+    return raw ? clean(JSON.parse(raw)) : [];
   } catch {
     return [];
   }
@@ -48,8 +65,12 @@ export function markDeleted(id: string) {
 }
 
 const cs = () => cloudStorage();
+/** Вызов CloudStorage как промис; если Telegram не ответил за 8 с — ошибка (дальше работаем с локальной копией). */
 const p = <T>(fn: (cb: (err: string | null, v?: T) => void) => void) =>
-  new Promise<T | undefined>((res, rej) => fn((err, v) => (err ? rej(new Error(err)) : res(v))));
+  new Promise<T | undefined>((res, rej) => {
+    const t = setTimeout(() => rej(new Error('CloudStorage: нет ответа')), 8000);
+    fn((err, v) => (clearTimeout(t), err ? rej(new Error(err)) : res(v)));
+  });
 
 async function readCloud(): Promise<Roster[] | null> {
   const c = cs();
@@ -64,7 +85,8 @@ async function readCloud(): Promise<Roster[] | null> {
   for (const e of index) {
     try {
       const json = Array.from({ length: e.chunks }, (_, i) => values[chunkKey(e.id, i)] ?? '').join('');
-      out.push(JSON.parse(json));
+      const r = sanitizeRoster(JSON.parse(json));
+      if (r) out.push(r);
     } catch {
       /* битая запись — пропускаем */
     }
@@ -127,6 +149,11 @@ export async function loadRosters(): Promise<Roster[]> {
   }
   const deleted = new Set(readDeleted());
   return local.filter((r) => !deleted.has(r.id)).sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+/** Сохраняет весь список локально (сразу, синхронно). */
+export function saveLocal(list: Roster[]) {
+  writeLocal(list);
 }
 
 /** Сохраняет весь список (локально сразу, в облако — последовательно в фоне). */

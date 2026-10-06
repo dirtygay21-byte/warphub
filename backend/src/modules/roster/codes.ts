@@ -44,17 +44,28 @@ export function hashesEqual(a: string, b: string): boolean {
   return x.length === y.length && timingSafeEqual(x, y);
 }
 
-export type AttemptVerdict = { allowed: true } | { allowed: false; retryAfterMs: number };
+export type AttemptVerdict = { allowed: true } | { allowed: false; retryAfterMs: number; global: boolean };
 
-/** Можно ли сейчас пробовать код, если известны времена недавних неудачных попыток. */
-export function checkAttempts(userFailures: Date[], globalFailures: number, now: Date = new Date()): AttemptVerdict {
+/** Сколько ждать, пока число неудач в окне станет меньше лимита: до «выпадения» нужной старой попытки. */
+function waitFor(times: Date[], limit: number, now: Date): number | null {
   const since = now.getTime() - ATTEMPT_WINDOW_MS;
-  const recent = userFailures.filter((d) => d.getTime() > since).sort((a, b) => a.getTime() - b.getTime());
-  if (recent.length >= MAX_FAILED_PER_USER) {
-    return { allowed: false, retryAfterMs: recent[recent.length - MAX_FAILED_PER_USER]!.getTime() + ATTEMPT_WINDOW_MS - now.getTime() };
+  const recent = times.filter((d) => d.getTime() > since).sort((a, b) => a.getTime() - b.getTime());
+  if (recent.length < limit) return null;
+  return Math.max(1000, recent[recent.length - limit]!.getTime() + ATTEMPT_WINDOW_MS - now.getTime());
+}
+
+/**
+ * Можно ли сейчас пробовать код. userFailures — неудачи этого человека, globalFailures — неудачи всех
+ * (времена; число — для обратной совместимости, тогда ожидание 10 минут).
+ */
+export function checkAttempts(userFailures: Date[], globalFailures: Date[] | number, now: Date = new Date()): AttemptVerdict {
+  const mine = waitFor(userFailures, MAX_FAILED_PER_USER, now);
+  if (mine !== null) return { allowed: false, retryAfterMs: mine, global: false };
+  if (typeof globalFailures === 'number') {
+    return globalFailures >= MAX_FAILED_GLOBAL ? { allowed: false, retryAfterMs: 10 * 60 * 1000, global: true } : { allowed: true };
   }
-  if (globalFailures >= MAX_FAILED_GLOBAL) return { allowed: false, retryAfterMs: 10 * 60 * 1000 };
-  return { allowed: true };
+  const all = waitFor(globalFailures, MAX_FAILED_GLOBAL, now);
+  return all === null ? { allowed: true } : { allowed: false, retryAfterMs: all, global: true };
 }
 
 export type CodeRow = { id: number; codeHash: string; expiresAt: Date; usedAt: Date | null; revokedAt: Date | null };

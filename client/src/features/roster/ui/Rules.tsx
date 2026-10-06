@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { loadFaction } from '../data';
 import type { DataIndex, FactionData, Stratagem } from '../engine/types';
 import { openExternal } from '../telegram';
-import { IconButton, Segmented, Tag, cx } from './kit';
+import { IconButton, Segmented, Tag } from './kit';
+import { cx } from './util';
 
 const CORE_URL = 'https://wahapedia.ru/wh40k11ed/the-rules/core-rules/';
 
@@ -87,8 +88,7 @@ export function Rules({
 }) {
   const [tab, setTab] = useState<'strats' | 'core'>('strats');
   const [fid, setFid] = useState(factionId ?? '');
-  const [faction, setFaction] = useState<FactionData | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState<{ id: string; faction?: FactionData; error?: string } | null>(null);
   const [det, setDet] = useState<string>(detachmentIds?.length ? 'mine' : 'all');
   const [phase, setPhase] = useState<Phase>('all');
 
@@ -96,9 +96,18 @@ export function Rules({
   const loadId = fid || index.factions[0]?.id || '';
   useEffect(() => {
     if (!loadId) return;
-    setFaction(null);
-    loadFaction(loadId).then(setFaction, (e) => setError(String(e.message ?? e)));
+    let alive = true;
+    loadFaction(loadId).then(
+      (f) => alive && setLoaded({ id: loadId, faction: f }),
+      (e) => alive && setLoaded({ id: loadId, error: String(e.message ?? e) }),
+    );
+    return () => {
+      alive = false;
+    };
   }, [loadId]);
+  // показываем только результат для текущей фракции: старый ответ или старая ошибка не «прилипают»
+  const faction = loaded?.id === loadId ? (loaded.faction ?? null) : null;
+  const error = loaded?.id === loadId ? (loaded.error ?? null) : null;
 
   const groups = useMemo(() => {
     if (!faction) return [];

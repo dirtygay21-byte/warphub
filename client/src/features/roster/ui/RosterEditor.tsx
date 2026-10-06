@@ -5,7 +5,8 @@ import { BATTLE_SIZES, BATTLE_SIZE_ORDER } from '../engine/rules';
 import { addUnit, duplicateRoster, duplicateUnit, removeUnit, touch, updateUnit } from '../engine/roster';
 import type { DataIndex, Datasheet, Detachment, FactionData, Roster } from '../engine/types';
 import { confirmAsk, haptic } from '../telegram';
-import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag, cx, fmtPts } from './kit';
+import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag } from './kit';
+import { cx, fmtPts } from './util';
 import { UnitCard } from './UnitCard';
 import { sortRosterUnits } from '../engine/sort';
 import { UnitPicker } from './UnitPicker';
@@ -56,7 +57,20 @@ export function RosterEditor({
     }
   }, [cr, roster, onChange]);
 
-  if (loadErr) return <div className="p-6 text-center text-white/60">{loadErr}</div>;
+  if (loadErr) {
+    return (
+      <div className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
+        <p className="font-display text-xl uppercase">Не удалось открыть ростер</p>
+        <p className="mt-2 text-sm text-white/50">{loadErr}</p>
+        <div className="mt-5 flex gap-2">
+          <Button onClick={onBack}>К списку</Button>
+          <Button variant="primary" onClick={() => (setLoadErr(null), loadFaction(roster.factionId).then(setFaction, (e) => setLoadErr(String(e.message ?? e))))}>
+            Повторить
+          </Button>
+        </div>
+      </div>
+    );
+  }
   if (!L || !cr || !faction) {
     return (
       <div className="flex min-h-dvh items-center justify-center">
@@ -298,10 +312,10 @@ function Editor({
       <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
         <div className="mx-auto flex max-w-lg gap-2">
           <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => setPicker(true)}>
-            <Icon name="plus" /> Добавить юнит
+            <Icon name="plus" /> <span className="whitespace-nowrap">Добавить юнит</span>
           </Button>
           <Button variant="ghost" className="h-12 px-4" onClick={() => setExporting(true)}>
-            <Icon name="share" /> Экспорт
+            <Icon name="share" /> <span className="max-[359px]:sr-only">Экспорт</span>
           </Button>
         </div>
       </div>
@@ -403,14 +417,23 @@ function Stat({ label, value, bad }: { label: string; value: string; bad?: boole
 
 function NameInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [v, setV] = useState(value);
+  const [prev, setPrev] = useState(value);
   const ref = useRef<HTMLInputElement>(null);
-  useEffect(() => setV(value), [value]);
+  // название изменилось снаружи (дублирование, импорт) — показываем новое
+  if (value !== prev) {
+    setPrev(value);
+    setV(value);
+  }
   return (
     <input
       ref={ref}
       value={v}
-      onChange={(e) => setV(e.target.value)}
-      onBlur={() => v.trim() && v !== value && onChange(v.trim())}
+      onChange={(e) => {
+        setV(e.target.value);
+        // сохраняем сразу, чтобы название не потерялось при выходе кнопкой «Назад» без потери фокуса
+        if (e.target.value.trim()) onChange(e.target.value);
+      }}
+      onBlur={() => (v.trim() ? v !== v.trim() && onChange(v.trim()) : setV(value))}
       onKeyDown={(e) => e.key === 'Enter' && ref.current?.blur()}
       aria-label="Название ростера"
       className="font-display min-w-0 flex-1 truncate rounded-lg border border-transparent bg-transparent px-1.5 py-1 text-lg font-semibold uppercase outline-none focus:border-white/10 focus:bg-white/[0.04]"

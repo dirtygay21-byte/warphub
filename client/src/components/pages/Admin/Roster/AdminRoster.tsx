@@ -8,6 +8,7 @@ import {
   type CreatedRosterCode,
   type RosterCode,
 } from "@/apiUtils/roster";
+import { confirmAsk } from "@/features/roster/telegram";
 import { formatClub } from "@/utils/clubTime";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
@@ -88,7 +89,7 @@ export default function AdminRoster() {
         )}
         <button
           type="button"
-          onClick={() => navigate("/roster")}
+          onClick={() => navigate("/roster", { state: { from: "/admin/roster" } })}
           className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/3 px-4 py-3 text-sm font-semibold text-white/85 active:bg-white/10"
         >
           <Swords className="size-4" />
@@ -96,10 +97,12 @@ export default function AdminRoster() {
         </button>
       </div>
 
-      {create.isError && (
-        <div className="mb-4 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
-          {create.error.message}
-        </div>
+      {[create, revokeCode, revokeAccess].map((m, i) =>
+        m.isError ? (
+          <div key={i} className="mb-4 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
+            {m.error.message}
+          </div>
+        ) : null,
       )}
 
       {created && (
@@ -139,6 +142,8 @@ export default function AdminRoster() {
         </h2>
         {access.isLoading ? (
           <LoaderCircle className="mx-auto size-6 animate-spin text-accent" />
+        ) : access.isError ? (
+          <LoadError message={access.error.message} onRetry={() => access.refetch()} />
         ) : !access.data?.length ? (
           <p className="rounded-xl border border-dashed border-white/10 px-4 py-6 text-center text-sm text-white/45">
             Пока ни у кого. Администраторы видят раздел всегда.
@@ -157,8 +162,8 @@ export default function AdminRoster() {
                 <button
                   type="button"
                   disabled={revokeAccess.isPending}
-                  onClick={() => {
-                    if (window.confirm(`Закрыть доступ к Roster Builder для ${u.firstName}?`)) revokeAccess.mutate(u.userId);
+                  onClick={async () => {
+                    if (await confirmAsk(`Закрыть доступ к Roster Builder для ${u.firstName}?`)) revokeAccess.mutate(u.userId);
                   }}
                   className="flex items-center gap-1.5 rounded-lg border border-red-400/30 px-2.5 py-1.5 text-xs font-semibold text-red-300 active:bg-red-400/10"
                 >
@@ -178,6 +183,8 @@ export default function AdminRoster() {
         </h2>
         {codes.isLoading ? (
           <LoaderCircle className="mx-auto size-6 animate-spin text-accent" />
+        ) : codes.isError ? (
+          <LoadError message={codes.error.message} onRetry={() => codes.refetch()} />
         ) : !codes.data?.length ? (
           <p className="rounded-xl border border-dashed border-white/10 px-4 py-6 text-center text-sm text-white/45">Кодов ещё не было.</p>
         ) : (
@@ -191,7 +198,7 @@ export default function AdminRoster() {
                       {STATUS[c.status].label}
                     </span>
                   </p>
-                  <p className="mt-0.5 truncate text-xs text-white/40">
+                  <p className="mt-0.5 text-xs leading-snug text-white/40">
                     {c.status === "used"
                       ? `${c.usedByName ?? "—"}${c.usedByUsername ? ` (@${c.usedByUsername})` : ""} · ${when(c.usedAt!)}`
                       : `создан ${when(c.createdAt)} · до ${when(c.expiresAt)}`}
@@ -212,6 +219,17 @@ export default function AdminRoster() {
           </ul>
         )}
       </section>
+    </div>
+  );
+}
+
+function LoadError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-4 text-center text-sm">
+      <p className="text-red-200">Не удалось загрузить: {message}</p>
+      <button type="button" onClick={onRetry} className="mt-2 font-semibold text-white/80 underline">
+        Повторить
+      </button>
     </div>
   );
 }

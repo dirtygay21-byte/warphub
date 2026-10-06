@@ -129,7 +129,7 @@ table 1/2 later in the admin panel). Empty output means nothing to do.
    bun test
    ```
    - `db:migrate` should finish without red errors.
-   - `bun test` should end with `33 pass` and `0 fail`.
+   - `bun test` should end with `34 pass` and `0 fail`.
 5. Start it again and watch the log for 20–30 seconds:
    ```bash
    pm2 start <backend-process-name>
@@ -245,20 +245,23 @@ do it if the new version really doesn't work.
 
 Do this together with step 5 (backend) and step 6 (client); it adds no new services.
 
-1. **Data files.** The folder `backend/roster-data/` (about 14 MB) must be on the
-   server inside `<BACKEND_DIR>`, next to `src/`. It is part of the repository, so
-   copying the backend folder brings it along. If you keep it elsewhere, set
-   `ROSTER_DATA_DIR=/full/path/to/roster-data` in `.env`.
+1. **Data files.** The folder `backend/roster-data/` (about 15 MB: `index.json`,
+   `battlefield.json` and the `f/` folder) must be on the server inside
+   `<BACKEND_DIR>`, next to `src/`. It is part of the repository, so copying the
+   backend folder brings it along. If you keep it elsewhere, set
+   `ROSTER_DATA_DIR=/full/path/to/roster-data` in `.env`. If the folder is missing,
+   the backend log shows a `[roster] Нет данных Roster Builder …` warning at start.
 2. **Database.** `bun run db:migrate` from step 5 creates three new tables
    (`roster_access_codes`, `roster_access`, `roster_code_attempts`). Without
    drizzle-kit you can apply the file by hand:
    ```bash
-   psql "$DATABASE_URL" -f drizzle/0011_roster_access.sql
+   psql "$(grep ^POSTGRES_URI= .env | cut -d= -f2-)" -f drizzle/0011_roster_access.sql
    ```
 3. **Who creates codes.** Add to `<BACKEND_DIR>/.env`:
    ```
    # Only these Telegram IDs can create codes (comma-separated).
-   # If unset, every admin can.
+   # They must ALSO be admins (built-in admins or ADMIN_TELEGRAM_IDS) —
+   # the admin page is only open to admins. If unset, every admin can.
    ROSTER_ADMIN_TELEGRAM_IDS=<KorenevEgor's Telegram ID>
    # Optional: code lifetime in hours (default 24)
    # ROSTER_CODE_TTL_HOURS=24
@@ -272,6 +275,12 @@ Do this together with step 5 (backend) and step 6 (client); it adds no new servi
    curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:4000/roster/access
    ```
    `401` is correct (it requires login). `404` means the new backend isn't running.
+   Then check the data is found:
+   ```bash
+   ls <BACKEND_DIR>/roster-data/index.json <BACKEND_DIR>/roster-data/battlefield.json
+   pm2 logs <backend-process-name> --lines 100 --nostream | grep "\[roster\]"
+   ```
+   Both files must be listed, and the second command must print nothing.
 6. **In Telegram:** Admin → «Ростеры» → «Создать код доступа». The code arrives
    from the bot. Another person enters it in Профиль → «Есть код доступа?» and
    gets a «Roster Builder» button in their profile. Access stays until you press

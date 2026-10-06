@@ -4,7 +4,8 @@ import { decodeRoster, duplicateRoster, newRoster } from '../engine/roster';
 import type { BattleSize, DataIndex, Roster } from '../engine/types';
 import { cloudEnabled } from '../storage';
 import { confirmAsk, haptic } from '../telegram';
-import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag, cx, fmtPts } from './kit';
+import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag } from './kit';
+import { cx, fmtPts } from './util';
 
 const ALLEGIANCE_RU: Record<string, string> = { Imperium: 'Империум', Chaos: 'Хаос', Xenos: 'Ксеносы' };
 
@@ -75,7 +76,7 @@ export function RosterList({
       </div>
 
       <CreateSheet open={creating} index={index} onClose={() => setCreating(false)} onCreate={(r) => (setCreating(false), onCreate(r))} />
-      <ImportSheet open={importing} onClose={() => setImporting(false)} onImport={(r) => (setImporting(false), onCreate(r))} />
+      <ImportSheet open={importing} factions={index.factions.map((f) => f.id)} onClose={() => setImporting(false)} onImport={(r) => (setImporting(false), onCreate(r))} />
 
       <Sheet open={!!menu} onClose={() => setMenu(null)} title={menu?.name ?? ''}>
         {menu && (
@@ -213,7 +214,7 @@ function CreateSheet({ open, index, onClose, onCreate }: { open: boolean; index:
   );
 }
 
-function ImportSheet({ open, onClose, onImport }: { open: boolean; onClose: () => void; onImport: (r: Roster) => void }) {
+function ImportSheet({ open, onClose, onImport, factions }: { open: boolean; onClose: () => void; onImport: (r: Roster) => void; factions: string[] }) {
   const [code, setCode] = useState('');
   const [err, setErr] = useState<string | null>(null);
   return (
@@ -228,12 +229,13 @@ function ImportSheet({ open, onClose, onImport }: { open: boolean; onClose: () =
           disabled={!code.trim()}
           onClick={() => {
             try {
-              onImport(decodeRoster(code));
+              onImport(decodeRoster(code, factions));
               setCode('');
               setErr(null);
               haptic.ok();
-            } catch {
-              setErr('Не получилось прочитать код. Скопируйте его целиком (начинается с WH1.).');
+            } catch (e) {
+              const msg = e instanceof Error && e.message.startsWith('Ростер для') ? e.message : null;
+              setErr(msg ?? 'Не получилось прочитать код. Скопируйте его целиком (начинается с WH1.).');
               haptic.error();
             }
           }}

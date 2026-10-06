@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
-import { haptic } from '../telegram';
+import { haptic, pushOverlay } from '../telegram';
+import { cx } from './util';
 
-export const cx = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(' ');
 
 const paths: Record<string, string> = {
   plus: 'M12 5v14M5 12h14',
@@ -96,9 +96,11 @@ export function Sheet({ open, onClose, title, children, footer, tall }: { open: 
     document.body.style.overflow = 'hidden';
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
     window.addEventListener('keydown', onKey);
+    const pop = pushOverlay(onClose);
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener('keydown', onKey);
+      pop();
     };
   }, [open, onClose]);
   if (!open) return null;
@@ -203,4 +205,3 @@ export function Empty({ title, children }: { title: string; children?: ReactNode
   );
 }
 
-export const fmtPts = (n: number) => n.toLocaleString('ru-RU');

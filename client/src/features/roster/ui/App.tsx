@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { loadIndex } from '../data';
-import { loadRosters, saveRosters, markDeleted } from '../storage';
-import { tg } from '../telegram';
+import { loadRosters, saveLocal, saveRosters, markDeleted } from '../storage';
+import { closeTopOverlay, tg } from '../telegram';
 import type { DataIndex, Roster } from '../engine/types';
 import { RosterList } from './RosterList';
 import { RosterEditor } from './RosterEditor';
@@ -23,12 +23,17 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   const saveTimer = useRef<number | undefined>(undefined);
   const pending = useRef<Roster[] | null>(null);
 
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     loadIndex().then(setIndex, (e) => setError(String(e.message ?? e)));
-    loadRosters().then(setRosters);
+  }, [attempt]);
+  useEffect(() => {
+    loadRosters().then(setRosters, () => setRosters([]));
   }, []);
 
+  // на устройство — сразу при каждом изменении, в облако Telegram — с задержкой 0,5 с (там лимиты на запросы)
   const persist = useCallback((list: Roster[]) => {
+    saveLocal(list);
     pending.current = list;
     window.clearTimeout(saveTimer.current);
     saveTimer.current = window.setTimeout(() => {
@@ -37,14 +42,22 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
     }, 500);
   }, []);
 
-  // при выходе из раздела сохраняем несохранённые изменения сразу
-  useEffect(
-    () => () => {
+  // при выходе из раздела или закрытии Mini App отправляем несохранённое в облако сразу
+  useEffect(() => {
+    const flush = () => {
       window.clearTimeout(saveTimer.current);
       if (pending.current) saveRosters(pending.current);
-    },
-    [],
-  );
+      pending.current = null;
+    };
+    const onHide = () => document.visibilityState === 'hidden' && flush();
+    window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', onHide);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      document.removeEventListener('visibilitychange', onHide);
+      flush();
+    };
+  }, []);
 
   const update = useCallback(
     (fn: (list: Roster[]) => Roster[]) => {
@@ -63,7 +76,11 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   // кнопка «Назад» Telegram: из ростера — к списку, из правил/поля — туда, откуда пришли, со списка — в WarpHub
   useEffect(() => {
     if (!tg) return;
-    const handler = route.screen === 'list' ? onExit : route.screen === 'editor' ? goList : goBack;
+    const nav = route.screen === 'list' ? onExit : route.screen === 'editor' ? goList : goBack;
+    // сначала закрывается открытая шторка, и только потом — экран
+    const handler = () => {
+      if (!closeTopOverlay()) nav();
+    };
     tg.BackButton.show();
     tg.BackButton.onClick(handler);
     return () => {
@@ -81,9 +98,14 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
       <Centered>
         <p className="font-display text-xl uppercase">Нет данных</p>
         <p className="mt-2 text-sm text-white/50">{error}</p>
-        <button type="button" onClick={onExit} className="mt-5 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold text-white/80">
-          Назад
-        </button>
+        <div className="mt-5 flex gap-2">
+          <button type="button" onClick={onExit} className="rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold text-white/80">
+            Назад
+          </button>
+          <button type="button" onClick={() => (setError(null), setAttempt((n) => n + 1))} className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-black">
+            Повторить
+          </button>
+        </div>
       </Centered>
     );
   }

@@ -3,7 +3,8 @@ import { bandFor, battlelineGrants, copyLimit, isBattleline, type ComputedRoster
 import { compareUnits, typeLabel, typeRank, unitType } from '../engine/sort';
 import type { Datasheet, Roster } from '../engine/types';
 import { haptic } from '../telegram';
-import { Icon, Sheet, cx } from './kit';
+import { Icon, Sheet } from './kit';
+import { cx } from './util';
 
 type Tab = 'all' | 'characters' | 'battleline' | 'transports' | 'other' | 'allies';
 const TABS: { key: Tab; label: string }[] = [

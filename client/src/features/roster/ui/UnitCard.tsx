@@ -2,7 +2,8 @@ import { useState, type ReactNode } from 'react';
 import type { ComputedRoster, ComputedUnit, DataLookup, Issue } from '../engine/compute';
 import type { Roster, RosterUnit, Weapon } from '../engine/types';
 import { openExternal } from '../telegram';
-import { Button, Counter, Field, Icon, Segmented, Tag, cx, fmtPts } from './kit';
+import { Button, Counter, Field, Icon, Segmented, Tag } from './kit';
+import { cx, fmtPts } from './util';
 
 export function UnitCard({
   c,

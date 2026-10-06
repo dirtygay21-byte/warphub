@@ -4,6 +4,7 @@ import { adminMiddleware } from '../../plugins/admin-middleware';
 import { authMiddleware } from '../../plugins/auth-middleware';
 import {
   RosterError,
+  checkRosterData,
   cleanupAttempts,
   createAccessCode,
   hasRosterAccess,
@@ -27,12 +28,13 @@ function mapRosterError(error: RosterError) {
       return status(404, { error: error.message });
     case 'FORBIDDEN':
       return status(403, { error: error.message });
-    default: {
-      const _exhaustive: never = error.code;
+    default:
+      error.code satisfies never;
       return status(500, { error: 'Unexpected roster error' });
-    }
   }
 }
+
+checkRosterData();
 
 async function guard<T>(fn: () => Promise<T>) {
   try {
