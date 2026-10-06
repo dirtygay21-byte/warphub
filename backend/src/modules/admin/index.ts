@@ -1,5 +1,13 @@
 import { Elysia, status, t } from 'elysia';
 import { apiModels } from '../../lib/api-schemas';
+import {
+  adminFindRewards,
+  adminMinigameStats,
+  getMinigameSettings,
+  redeemReward,
+  saveMinigameSettings,
+} from '../minigames/service';
+import { handleMinigame } from '../minigames/http';
 import { adminMiddleware } from '../../plugins/admin-middleware';
 import {
   BookingError,
@@ -846,5 +854,52 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       params: t.Object({
         id: t.Number({ description: 'ID ивента' }),
       }),
+    },
+  )
+  .get(
+    '/minigames/rewards',
+    async ({ query }) => adminFindRewards({ code: query.code, status: query.status }),
+    {
+      query: t.Object({
+        code: t.Optional(t.String()),
+        status: t.Optional(
+          t.Union([t.Literal('active'), t.Literal('used'), t.Literal('expired')]),
+        ),
+      }),
+      detail: {
+        tags: ['Mini-games'],
+        summary: 'Награды мини-игр: поиск по коду и статусу',
+      },
+    },
+  )
+  .post(
+    '/minigames/rewards/:id/redeem',
+    async ({ params, user }) => handleMinigame(() => redeemReward(params.id, user.id)),
+    {
+      params: t.Object({ id: t.String({ format: 'uuid' }) }),
+      detail: {
+        tags: ['Mini-games'],
+        summary: 'Отметить награду использованной',
+        description: 'Награду можно использовать один раз и только до окончания срока.',
+      },
+    },
+  )
+  .get('/minigames/stats', async () => adminMinigameStats(), {
+    detail: { tags: ['Mini-games'], summary: 'Статистика мини-игр за неделю' },
+  })
+  .get('/minigames/settings', async () => getMinigameSettings(), {
+    detail: { tags: ['Mini-games'], summary: 'Настройки мини-игр и таблицы наград' },
+  })
+  .put(
+    '/minigames/settings',
+    async ({ body, user }) => handleMinigame(() => saveMinigameSettings(body, user.id)),
+    {
+      body: t.Unknown(),
+      detail: {
+        tags: ['Mini-games'],
+        summary: 'Сохранить настройки мини-игр',
+        description:
+          'Пороговые значения и награды по уровням. Значения проверяются сервером (скидка не больше 50%, пороги не повторяются).',
+      },
     },
   );

@@ -7,3 +7,4 @@ export * from './events';
 export * from './news';
 export * from './dnd';
 export * from './roster';
+export * from './minigames';

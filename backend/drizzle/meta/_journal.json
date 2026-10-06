@@ -85,6 +85,13 @@
       "when": 1783970400000,
       "tag": "0011_roster_access",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1783974000000,
+      "tag": "0012_minigames",
+      "breakpoints": true
     }
   ]
 }
