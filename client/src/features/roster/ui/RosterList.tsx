@@ -10,6 +10,8 @@ const ALLEGIANCE_RU: Record<string, string> = { Imperium: 'Империум', Ch
 
 export function RosterList({
   onExit,
+  onRules,
+  onBattlefield,
   index,
   rosters,
   onOpen,
@@ -18,6 +20,8 @@ export function RosterList({
   onDelete,
 }: {
   onExit: () => void;
+  onRules: () => void;
+  onBattlefield: () => void;
   index: DataIndex;
   rosters: Roster[];
   onOpen: (id: string) => void;
@@ -40,6 +44,11 @@ export function RosterList({
         </div>
         <IconButton icon="upload" label="Импорт ростера по коду" onClick={() => setImporting(true)} />
       </header>
+
+      <div className="mb-5 grid grid-cols-2 gap-2">
+        <ToolTile icon="book" title="Правила" sub="Стратагемы · Core Rules" onClick={onRules} />
+        <ToolTile icon="map" title="Поле боя" sub="Деплой · террейн" onClick={onBattlefield} />
+      </div>
 
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Соберите первый ростер — очки, детачменты и правила проверяются на лету.</Empty>
@@ -243,5 +252,23 @@ function ImportSheet({ open, onClose, onImport }: { open: boolean; onClose: () =
       />
       {err && <p className="mt-2 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{err}</p>}
     </Sheet>
+  );
+}
+
+function ToolTile({ icon, title, sub, onClick }: { icon: string; title: string; sub: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => (haptic.tap(), onClick())}
+      className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 text-left transition active:bg-white/10"
+    >
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent">
+        <Icon name={icon} />
+      </span>
+      <span className="min-w-0">
+        <span className="font-display block text-base font-semibold uppercase leading-none">{title}</span>
+        <span className="mt-1 block truncate text-[11px] text-white/45">{sub}</span>
+      </span>
+    </button>
   );
 }

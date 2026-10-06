@@ -5,8 +5,14 @@ import { tg } from '../telegram';
 import type { DataIndex, Roster } from '../engine/types';
 import { RosterList } from './RosterList';
 import { RosterEditor } from './RosterEditor';
+import { Battlefield } from './Battlefield';
+import { Rules } from './Rules';
 
-type Route = { screen: 'list' } | { screen: 'editor'; id: string };
+type Route =
+  | { screen: 'list' }
+  | { screen: 'editor'; id: string }
+  | { screen: 'rules'; back: Route; factionId?: string; detachmentIds?: string[] }
+  | { screen: 'battlefield'; back: Route; disposition?: string | null };
 
 /** Roster Builder внутри WarpHub. onExit — вернуться в приложение (кнопка «Назад» на списке ростеров). */
 export function RosterBuilder({ onExit }: { onExit: () => void }) {
@@ -52,18 +58,19 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   );
 
   const goList = useCallback(() => setRoute({ screen: 'list' }), []);
+  const goBack = useCallback(() => setRoute((r) => ('back' in r ? r.back : { screen: 'list' })), []);
 
-  // кнопка «Назад» Telegram: из ростера — к списку, со списка — обратно в WarpHub
+  // кнопка «Назад» Telegram: из ростера — к списку, из правил/поля — туда, откуда пришли, со списка — в WarpHub
   useEffect(() => {
     if (!tg) return;
-    const handler = route.screen === 'list' ? onExit : goList;
+    const handler = route.screen === 'list' ? onExit : route.screen === 'editor' ? goList : goBack;
     tg.BackButton.show();
     tg.BackButton.onClick(handler);
     return () => {
       tg!.BackButton.offClick(handler);
       tg!.BackButton.hide();
     };
-  }, [route, goList, onExit]);
+  }, [route, goList, goBack, onExit]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -88,6 +95,13 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
     );
   }
 
+  if (route.screen === 'rules') {
+    return <Rules index={index} onBack={goBack} factionId={route.factionId} detachmentIds={route.detachmentIds} />;
+  }
+  if (route.screen === 'battlefield') {
+    return <Battlefield onBack={goBack} initialDisposition={route.disposition} />;
+  }
+
   if (route.screen === 'editor') {
     const roster = rosters.find((r) => r.id === route.id);
     if (roster) {
@@ -97,6 +111,8 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
           roster={roster}
           index={index}
           onBack={goList}
+          onRules={() => setRoute({ screen: 'rules', back: route, factionId: roster.factionId, detachmentIds: roster.detachmentIds })}
+          onBattlefield={() => setRoute({ screen: 'battlefield', back: route, disposition: roster.forceDisposition })}
           onChange={(r) => update((list) => list.map((x) => (x.id === r.id ? r : x)))}
           onDuplicate={(r) => {
             update((list) => [r, ...list]);
@@ -115,6 +131,8 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   return (
     <RosterList
       onExit={onExit}
+      onRules={() => setRoute({ screen: 'rules', back: route })}
+      onBattlefield={() => setRoute({ screen: 'battlefield', back: route })}
       index={index}
       rosters={rosters}
       onOpen={(id) => setRoute({ screen: 'editor', id })}

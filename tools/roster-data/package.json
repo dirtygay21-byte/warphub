@@ -7,7 +7,8 @@
   "scripts": {
     "test": "node --import tsx --test tests/*.test.ts",
     "data": "node scripts/import-wahapedia.mjs --src ./wahapedia-csv --out ../../backend/roster-data",
-    "data:fetch": "node scripts/import-wahapedia.mjs --fetch --if-changed --src ./wahapedia-csv --out ../../backend/roster-data"
+    "data:fetch": "node scripts/import-wahapedia.mjs --fetch --if-changed --src ./wahapedia-csv --out ../../backend/roster-data",
+    "battlefield": "node --import tsx scripts/import-battlefield.ts --src ./40kdc-data"
   },
   "dependencies": {},
   "devDependencies": {

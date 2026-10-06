@@ -199,10 +199,10 @@ export function rosterDataDir(): string {
 
 const gzCache = new Map<string, { mtime: number; body: Uint8Array }>();
 
-/** Файл данных (сжатый gzip, с кешем в памяти). name: 'index' или код фракции. */
+/** Файл данных (сжатый gzip, с кешем в памяти). name: 'index', 'battlefield' или код фракции. */
 export function readRosterData(name: string): { body: Uint8Array; gzip: boolean } | null {
-  if (!/^(index|[A-Za-z]{1,6})$/.test(name)) return null;
-  const file = name === 'index' ? path.join(rosterDataDir(), 'index.json') : path.join(rosterDataDir(), 'f', `${name}.json`);
+  if (!/^(index|battlefield|[A-Za-z]{1,6})$/.test(name)) return null;
+  const file = name === 'index' || name === 'battlefield' ? path.join(rosterDataDir(), `${name}.json`) : path.join(rosterDataDir(), 'f', `${name}.json`);
   let stat: fs.Stats;
   try {
     stat = fs.statSync(file);

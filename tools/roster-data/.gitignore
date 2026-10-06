@@ -3,3 +3,4 @@ dist/
 wahapedia-csv/
 *.log
 .env*
+40kdc-data/

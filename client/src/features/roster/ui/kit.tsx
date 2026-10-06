@@ -22,6 +22,8 @@ const paths: Record<string, string> = {
   info: 'M12 16v-5M12 8v.01M12 21a9 9 0 110-18 9 9 0 010 18z',
   shield: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
   upload: 'M12 16V4M7 9l5-5 5 5M4 20h16',
+  book: 'M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2V5zM4 19a2 2 0 012-2h13M8 7h7',
+  map: 'M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14',
 };
 
 export function Icon({ name, className = 'size-5', strokeWidth = 2 }: { name: keyof typeof paths | string; className?: string; strokeWidth?: number }) {

@@ -65,7 +65,7 @@ export const rosterModule = new Elysia({ prefix: '/roster', tags: ['Roster Build
       set.headers['cache-control'] = 'private, max-age=3600';
       return file.body;
     },
-    { detail: { summary: 'Данные Wahapedia (index или код фракции)', hide: true } },
+    { detail: { summary: 'Данные Roster Builder (index, battlefield или код фракции)', hide: true } },
   );
 
 /** Управление доступом — только администраторы. */

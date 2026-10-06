@@ -147,10 +147,10 @@ async function api(req, res, p) {
     const [s, body] = redeem(user, (await readBody(req)).code);
     return send(res, s, body);
   }
-  const data = /^\/roster\/data\/([A-Za-z]{1,6}|index)$/.exec(p);
+  const data = /^\/roster\/data\/([A-Za-z]{1,6}|index|battlefield)$/.exec(p);
   if (data) {
     if (!hasAccess(user)) return send(res, 403, { error: 'Нет доступа к Roster Builder' });
-    const f = data[1] === 'index' ? path.join(DATA, 'index.json') : path.join(DATA, 'f', `${data[1]}.json`);
+    const f = data[1] === 'index' || data[1] === 'battlefield' ? path.join(DATA, `${data[1]}.json`) : path.join(DATA, 'f', `${data[1]}.json`);
     if (!fs.existsSync(f)) return send(res, 404, { error: 'Нет данных' });
     return send(res, 200, fs.readFileSync(f));
   }

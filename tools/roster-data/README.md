@@ -87,6 +87,23 @@ Datasheets_stratagems, Datasheets_detachment_abilities` — то есть вся
 
 Импортёр без зависимостей, колонки читаются по имени, а не по позиции.
 
+## «Поле боя»: раскладки и деплой
+
+Карты в разделе «Поле боя» — 45 раскладок террейна Chapter Approved 2026–27 (по 3 на каждую из 15 пар типов армий)
+и 6 карт деплоя. Источник — [40kdc-data](https://github.com/wn-mitch/40kdc-data) (Alpaca Software и участники 40kdc,
+данные CC BY 4.0, геометрия раскладок — Battlemaster). Картинки GW не копируются: приложение рисует карты само по координатам.
+
+Обновить, когда в 40kdc-data выйдут новые раскладки:
+
+```bash
+cd tools/roster-data
+# положить репозиторий 40kdc-data в tools/roster-data/40kdc-data (git clone или распакованный ZIP)
+npm run battlefield      # → backend/roster-data/battlefield.json
+```
+
+Резолвер геометрии взят из 40kdc-data (`vendor/40kdc-resolve.ts`, MIT). В приложении обязательна подпись
+«Powered by 40kdc-data» со ссылкой на https://40kdc.alpacasoft.dev — она стоит внизу экрана «Поле боя».
+
 ## Доступ по коду
 
 - Код создаёт владелец в админке (вкладка «Ростеры» → «Создать код доступа»). Бот присылает его в Telegram.
