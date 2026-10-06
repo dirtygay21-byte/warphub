@@ -30,6 +30,7 @@ export function newUnit(ds: Datasheet): RosterUnit {
     wargear: {},
     enhancementId: null,
     attachedTo: null,
+    picks: null,
   };
 }
 
@@ -57,7 +58,15 @@ export function duplicateUnit(r: Roster, uidv: string): Roster {
   const i = r.units.findIndex((u) => u.uid === uidv);
   if (i < 0) return r;
   const src = r.units[i];
-  const copy: RosterUnit = { ...src, uid: uid(), enhancementId: null, attachedTo: null, addons: { ...src.addons }, wargear: { ...src.wargear } };
+  const copy: RosterUnit = {
+    ...src,
+    uid: uid(),
+    enhancementId: null,
+    attachedTo: null,
+    addons: { ...src.addons },
+    wargear: { ...src.wargear },
+    picks: src.picks ? Object.fromEntries(Object.entries(src.picks).map(([k, v]) => [k, [...v]])) : null,
+  };
   const units = [...r.units];
   units.splice(i + 1, 0, copy);
   return touch({ ...r, units });
@@ -115,6 +124,13 @@ const num = (v: unknown, def = 0): number => (typeof v === 'number' && Number.is
 const counts = (v: unknown): Record<string, number> =>
   isObj(v) ? Object.fromEntries(Object.entries(v).filter(([, n]) => typeof n === 'number' && Number.isFinite(n) && n >= 0)) as Record<string, number> : {};
 
+const picksOf = (v: Record<string, unknown>): Record<string, number[]> =>
+  Object.fromEntries(
+    Object.entries(v)
+      .filter(([k, a]) => /^\d+(?:\.\d+)?$/.test(k) && Array.isArray(a))
+      .map(([k, a]) => [k, (a as unknown[]).map((n) => (typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0))]),
+  );
+
 /**
  * Приводит «чужой» ростер к ожидаемой форме: лишние поля отбрасываются, недостающие получают значения
  * по умолчанию. null — если это вообще не ростер. Так битый код или старая запись не роняют раздел.
@@ -131,6 +147,7 @@ export function sanitizeRoster(raw: unknown): Roster | null {
             addons: counts(u.addons),
             wargear: counts(u.wargear),
             weapons: isObj(u.weapons) ? counts(u.weapons) : null,
+            picks: isObj(u.picks) ? picksOf(u.picks) : null,
             enhancementId: strOrNull(u.enhancementId),
             attachedTo: strOrNull(u.attachedTo),
           },

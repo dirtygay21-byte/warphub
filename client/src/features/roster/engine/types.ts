@@ -207,8 +207,10 @@ export interface RosterUnit {
   size: string;
   addons: Record<string, number>;
   wargear: Record<string, number>;
-  /** снаряжение вручную: оружие → сколько моделей его несут; null/нет — стандартное по инфолисту */
+  /** устаревшее: снаряжение, заданное вручную счётчиками (до появления проверки вариантов) */
   weapons?: Record<string, number> | null;
+  /** выбранные замены снаряжения: ключ варианта → сколько моделей взяли каждый вариант (см. engine/wargear.ts) */
+  picks?: Record<string, number[]> | null;
   enhancementId: string | null;
   /** uid юнита-телохранителя, к которому присоединён этот персонаж */
   attachedTo: string | null;

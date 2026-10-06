@@ -1,5 +1,5 @@
 import { BATTLE_SIZES } from './rules';
-import { roleGroup, type ComputedRoster, type ComputedUnit, type DataLookup } from './compute';
+import { paidWargear, roleGroup, type ComputedRoster, type ComputedUnit, type DataLookup } from './compute';
 import { sortRosterUnits } from './sort';
 import type { Roster } from './types';
 
@@ -20,7 +20,7 @@ function unitLines(c: ComputedUnit, roster: Roster, extra: string[] = []): strin
   for (const [label, n] of Object.entries(c.unit.addons)) if (n > 0) lines.push(`• ${n}x ${label}`);
   const weapons = Object.entries(c.loadout).filter(([, n]) => n > 0);
   for (const [label, n] of weapons) lines.push(`◦ ${n}x ${label}`);
-  for (const [label, n] of Object.entries(c.unit.wargear)) if (n > 0 && !c.loadout[label]) lines.push(`• ${n}x ${label} (paid)`);
+  for (const [label, n] of Object.entries(paidWargear(c))) if (!c.loadout[label]) lines.push(`• ${n}x ${label} (paid)`);
   if (c.enhancement) lines.push(`• Enhancement: ${c.enhancement.name}${c.enhancement.upgrade ? ' (Upgrade)' : ''}`);
   return lines;
 }
@@ -94,7 +94,7 @@ export function exportCompact(roster: Roster, L: DataLookup, cr: ComputedRoster)
       if (opt && opt.models > 1) bits.push(String(opt.models));
       if (roster.warlordUid === x.unit.uid) bits.push('Warlord');
       if (x.enhancement) bits.push(x.enhancement.name);
-      for (const [label, n] of [...Object.entries(x.unit.addons), ...Object.entries(x.unit.wargear)]) if (n > 0) bits.push(`${n}× ${label}`);
+      for (const [label, n] of [...Object.entries(x.unit.addons), ...Object.entries(paidWargear(x))]) if (n > 0) bits.push(`${n}× ${label}`);
       return `${prefix}${x.ds!.name}${bits.length ? ` (${bits.join(', ')})` : ''} — ${x.total}`;
     };
     out.push(line(c, '• '));

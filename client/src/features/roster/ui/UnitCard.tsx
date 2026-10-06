@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from 'react';
-import type { ComputedRoster, ComputedUnit, DataLookup, Issue } from '../engine/compute';
-import type { Roster, RosterUnit, Weapon } from '../engine/types';
+import { paidWargear, type ComputedRoster, type ComputedUnit, type DataLookup, type Issue } from '../engine/compute';
+import type { Datasheet, Roster, RosterUnit, Weapon } from '../engine/types';
+import { optionsOf, whoText, type ParsedOption } from '../engine/wargear';
+import { groupDetRules, groupOf, roleOf } from '../engine/group';
 import { openExternal } from '../telegram';
 import { Button, Counter, Field, Icon, Segmented, Tag } from './kit';
 import { cx, fmtPts } from './util';
@@ -53,7 +55,7 @@ export function UnitCard({
   const meta: string[] = [];
   if (opt && (c.band!.options.length > 1 || opt.models > 1)) meta.push(opt.label);
   if (c.enhancement) meta.push(c.enhancement.name);
-  for (const [l, n] of [...Object.entries(c.unit.addons), ...Object.entries(c.unit.wargear)]) if (n > 0) meta.push(`${n}× ${l}`);
+  for (const [l, n] of [...Object.entries(c.unit.addons), ...Object.entries(paidWargear(c))]) if (n > 0) meta.push(`${n}× ${l}`);
 
   // доступные улучшения
   const enhOptions = L.faction.enhancements.filter((e) => roster.detachmentIds.includes(e.detachment) && ds.enhancements.includes(e.id));
@@ -155,19 +157,31 @@ export function UnitCard({
             </Field>
           )}
 
+          {ds.weapons.length > 0 && <LoadoutEditor c={c} onPatch={onPatch} />}
+
           {!!c.band?.wargear.length && (
-            <Field label="Платное снаряжение">
+            <Field label="Платное снаряжение" hint={`цены для копии №${c.copy}`}>
               <div className="space-y-2">
-                {c.band.wargear.map((w) => (
-                  <Row key={w.label} label={w.label} hint={`+${w.cost} за шт.`}>
-                    <Counter value={c.unit.wargear[w.label] ?? 0} max={Math.max(1, c.models)} onChange={(n) => onPatch({ wargear: { ...c.unit.wargear, [w.label]: n } })} />
-                  </Row>
-                ))}
+                {c.band.wargear.map((w) =>
+                  c.paidAuto[w.label] !== undefined ? (
+                    <div key={w.label} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold">{w.label}</p>
+                        <p className="text-xs text-white/45">+{w.cost} за шт. · считается по заменам в «Снаряжении»</p>
+                      </div>
+                      <span className={cx('text-sm font-semibold tabular-nums', c.paidAuto[w.label] ? 'text-accent' : 'text-white/40')}>
+                        {c.paidAuto[w.label]} шт. · +{c.paidAuto[w.label]! * w.cost}
+                      </span>
+                    </div>
+                  ) : (
+                    <Row key={w.label} label={w.label} hint={`+${w.cost} за шт.`}>
+                      <Counter value={c.unit.wargear[w.label] ?? 0} max={Math.max(1, c.models)} onChange={(n) => onPatch({ wargear: { ...c.unit.wargear, [w.label]: n } })} />
+                    </Row>
+                  ),
+                )}
               </div>
             </Field>
           )}
-
-          {ds.weapons.length > 0 && <LoadoutEditor c={c} onPatch={onPatch} />}
 
           {ds.character && !ds.group.startsWith('ally:') && (
             <button
@@ -236,7 +250,9 @@ export function UnitCard({
             </Field>
           )}
 
-          <Profile c={c} L={L} detachmentIds={roster.detachmentIds} />
+          <CombinedUnit c={c} cr={cr} L={L} detachmentIds={roster.detachmentIds} />
+
+          <Profile c={c} cr={cr} L={L} detachmentIds={roster.detachmentIds} />
 
           <div className="flex gap-2 pt-1">
             <Button variant="ghost" className="flex-1" onClick={onDuplicate}>
@@ -299,12 +315,18 @@ function Choice({ active, onClick, title, right, sub, dim, detail }: { active: b
   );
 }
 
-function Profile({ c, L, detachmentIds }: { c: ComputedUnit; L: DataLookup; detachmentIds: string[] }) {
+function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRoster; L: DataLookup; detachmentIds: string[] }) {
   const ds = c.ds!;
+  const [allWeapons, setAllWeapons] = useState(false);
   const tagAbilities = ds.abilities.filter((a) => a.type === 'core' || a.type === 'faction');
   const textAbilities = ds.abilities.filter((a) => a.type !== 'core' && a.type !== 'faction');
-  const ranged = ds.weapons.filter((w) => w.profiles.some((p) => p.type !== 'Melee'));
-  const melee = ds.weapons.filter((w) => w.profiles.every((p) => p.type === 'Melee'));
+  // в обычном виде — только оружие, которое сейчас есть у отряда; полный список — по кнопке
+  const count = countIn(c.loadout);
+  const equipped = ds.weapons.filter((w) => count(w.name) > 0);
+  const shown = allWeapons || !equipped.length ? ds.weapons : equipped;
+  const hidden = ds.weapons.length - equipped.length;
+  const ranged = shown.filter((w) => w.profiles.some((p) => p.type !== 'Melee'));
+  const melee = shown.filter((w) => w.profiles.every((p) => p.type === 'Melee'));
   return (
     <details className="group rounded-xl border border-white/10 bg-white/[0.02]">
       <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2.5 text-sm font-semibold text-white/75">
@@ -345,8 +367,13 @@ function Profile({ c, L, detachmentIds }: { c: ComputedUnit; L: DataLookup; deta
           </div>
         )}
         {ds.invulnNote && <p className="text-xs text-white/50">{ds.invulnNote}</p>}
-        {ranged.length > 0 && <WeaponTable title="Дальнобойное оружие" skill="BS" weapons={ranged} loadout={c.loadout} />}
-        {melee.length > 0 && <WeaponTable title="Ближний бой" skill="WS" weapons={melee} loadout={c.loadout} />}
+        {ranged.length > 0 && <WeaponTable title="Дальнобойное оружие" skill="BS" weapons={ranged} count={count} />}
+        {melee.length > 0 && <WeaponTable title="Ближний бой" skill="WS" weapons={melee} count={count} />}
+        {equipped.length > 0 && hidden > 0 && (
+          <button type="button" onClick={() => setAllWeapons((v) => !v)} className="text-xs font-semibold text-accent/90">
+            {allWeapons ? 'Показать только снаряжение отряда' : `Показать все варианты оружия (+${hidden})`}
+          </button>
+        )}
         {tagAbilities.length > 0 && (
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Способности</p>
@@ -367,7 +394,7 @@ function Profile({ c, L, detachmentIds }: { c: ComputedUnit; L: DataLookup; deta
             <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-white/70">{a.ref ? L.faction.rules[a.ref]?.text : a.text}</p>
           </div>
         ))}
-        <UnitRules c={c} L={L} detachmentIds={detachmentIds} />
+        <UnitRules c={c} cr={cr} L={L} detachmentIds={detachmentIds} />
         {ds.damaged && <Txt title={`Повреждён: ${ds.damaged.w} ран`} text={ds.damaged.text} />}
         {ds.composition.length > 0 && <Txt title="Состав отряда" text={ds.composition.join('\n')} />}
         {ds.loadout && <Txt title="Снаряжение" text={ds.loadout} />}
@@ -392,7 +419,14 @@ function Txt({ title, text }: { title: string; text: string }) {
   );
 }
 
-function WeaponTable({ title, skill, weapons, loadout }: { title: string; skill: string; weapons: Weapon[]; loadout: Record<string, number> }) {
+/** Сколько штук оружия в снаряжении (без учёта регистра и апострофов). */
+function countIn(loadout: Record<string, number>) {
+  const k = (s: string) => s.toLowerCase().replace(/[’']/g, "'");
+  const m = new Map(Object.entries(loadout).map(([w, n]) => [k(w), n]));
+  return (name: string) => m.get(k(name)) ?? 0;
+}
+
+function WeaponTable({ title, skill, weapons, count }: { title: string; skill: string; weapons: Weapon[]; count: (name: string) => number }) {
   return (
     <div>
       <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{title}</p>
@@ -411,11 +445,11 @@ function WeaponTable({ title, skill, weapons, loadout }: { title: string; skill:
           <tbody>
             {weapons.flatMap((w) =>
               w.profiles.map((p, i) => (
-                <tr key={w.name + i} className={cx('align-top', i === 0 && 'border-t border-white/[0.05]', loadout[w.name] ? 'text-white' : 'text-white/45')}>
+                <tr key={w.name + i} className={cx('align-top', i === 0 && 'border-t border-white/[0.05]', count(w.name) ? 'text-white' : 'text-white/45')}>
                   <td className="max-w-[11rem] py-1.5 pr-2 text-left">
                     <span className="block text-[12px] font-semibold leading-tight">
                       {w.profiles.length > 1 ? p.name : w.name}
-                      {i === 0 && loadout[w.name] ? <span className="ml-1 text-accent">×{loadout[w.name]}</span> : null}
+                      {i === 0 && count(w.name) ? <span className="ml-1 text-accent">×{count(w.name)}</span> : null}
                     </span>
                     {p.keywords && <span className="block text-[10px] uppercase leading-tight text-accent/70">{p.keywords}</span>}
                   </td>
@@ -451,51 +485,66 @@ function RuleChip({ name, text, accent }: { name: string; text: string; accent?:
   );
 }
 
-/** Снаряжение: сколько моделей несут каждое оружие (по умолчанию — из инфолиста). */
+const wkey = (s: string) => s.toLowerCase().replace(/[’']/g, "'").replace(/e?s$/, '');
+
+/**
+ * Снаряжение: стандартное по инфолисту + замены из вариантов инфолиста. Счётчики не дают выйти за лимиты
+ * («1 на каждые 10 моделей», «только Nob») и заменить оружие, которого в отряде уже нет.
+ */
 function LoadoutEditor({ c, onPatch }: { c: ComputedUnit; onPatch: (p: Partial<RosterUnit>) => void }) {
   const ds = c.ds!;
+  const info = optionsOf(ds);
   const [open, setOpen] = useState(false);
-  const addonModels = Object.values(c.unit.addons).reduce((s, n) => s + n, 0);
-  const max = Math.max(1, c.models + addonModels);
-  const paid = new Map((c.band?.wargear ?? []).map((w) => [w.label.toLowerCase(), w.cost]));
+  const picks = c.unit.picks ?? {};
+  const legacy = !!c.unit.weapons && !c.unit.picks;
+  const custom = c.loadoutCustom || legacy;
+  const paid = new Map((c.band?.wargear ?? []).map((w) => [wkey(w.label), w.cost]));
   const summary = Object.entries(c.loadout)
     .map(([k, n]) => `${n}× ${k}`)
     .join(', ');
-  const set = (name: string, n: number) => onPatch({ weapons: { ...c.loadout, [name]: n } });
+  const setPick = (key: string, ci: number, n: number) => {
+    const cur = [...(picks[key] ?? [])];
+    while (cur.length <= ci) cur.push(0);
+    cur[ci] = n;
+    const next = { ...picks, [key]: cur };
+    if (cur.every((x) => !x)) delete next[key];
+    onPatch({ picks: Object.keys(next).length ? next : null, weapons: null });
+  };
+  const notes = [...info.unparsed, ...info.notes].sort((x, y) => x - y);
   return (
-    <Field label="Снаряжение" hint={c.loadoutCustom ? 'изменено' : 'по умолчанию'}>
+    <Field label="Снаряжение" hint={custom ? 'изменено' : 'по умолчанию'}>
       <button type="button" onClick={() => setOpen((o) => !o)} className="flex w-full items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left">
         <span className="min-w-0 flex-1 text-[13px] leading-snug text-white/75">{summary || 'Не выбрано'}</span>
         <Icon name="down" className={cx('size-4 shrink-0 text-white/40 transition', open && 'rotate-180')} />
       </button>
       {open && (
         <div className="space-y-2">
-          {ds.weapons.map((w) => {
-            const cost = paid.get(w.name.toLowerCase());
-            const hint = [w.profiles.map((p) => (p.type === 'Melee' ? 'ближ.' : p.range)).filter((v, i, a) => a.indexOf(v) === i).join('/'), cost ? `доплата ${cost} за шт. — отметьте ниже` : '']
-              .filter(Boolean)
-              .join(' · ');
-            return (
-              <Row key={w.name} label={w.name} hint={hint}>
-                <Counter value={c.loadout[w.name] ?? 0} max={max} onChange={(n) => set(w.name, n)} />
-              </Row>
-            );
-          })}
-          {ds.options.length > 0 && (
+          {legacy && (
+            <p className="rounded-lg bg-warn/10 px-2.5 py-2 text-[12.5px] text-amber-200">
+              Снаряжение было задано вручную в старой версии и не проверено. Нажмите «Вернуть стандартное» и выберите замены заново.
+            </p>
+          )}
+          {info.parsed.length === 0 && !notes.length && <p className="text-[13px] text-white/45">У этого юнита нет вариантов замены снаряжения.</p>}
+          {info.parsed.map((o) => (
+            <OptionCard key={o.key} o={o} c={c} picks={picks[o.key] ?? []} paid={paid} onPick={(ci, n) => setPick(o.key, ci, n)} />
+          ))}
+          {notes.length > 0 && (
             <div className="rounded-xl bg-white/[0.03] px-3 py-2.5">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Варианты замены по инфолисту</p>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">
+                {info.unparsed.length ? 'Не выбирается автоматически — только как пояснение' : 'Пояснения'}
+              </p>
               <ul className="mt-1.5 space-y-1.5">
-                {ds.options.map((o, i) => (
-                  <li key={i} className="whitespace-pre-line text-[12px] leading-relaxed text-white/65">
-                    {o.star ? '* ' : '• '}
-                    {o.text}
+                {notes.map((i) => (
+                  <li key={i} className="whitespace-pre-line text-[12px] leading-relaxed text-white/60">
+                    {ds.options[i]!.star ? '* ' : '• '}
+                    {ds.options[i]!.text}
                   </li>
                 ))}
               </ul>
             </div>
           )}
-          {c.loadoutCustom && (
-            <Button variant="ghost" className="w-full" onClick={() => onPatch({ weapons: null })}>
+          {custom && (
+            <Button variant="ghost" className="w-full" onClick={() => onPatch({ picks: null, weapons: null })}>
               Вернуть стандартное снаряжение
             </Button>
           )}
@@ -505,13 +554,99 @@ function LoadoutEditor({ c, onPatch }: { c: ComputedUnit; onPatch: (p: Partial<R
   );
 }
 
+function OptionCard({ o, c, picks, paid, onPick }: { o: ParsedOption; c: ComputedUnit; picks: number[]; paid: Map<string, number>; onPick: (ci: number, n: number) => void }) {
+  const limit = (c.loadoutInfo.limits[o.key] ?? 0) * o.perModel;
+  const max = c.loadoutInfo.max[o.key] ?? [];
+  const used = picks.reduce((s, n) => s + (n > 0 ? n : 0), 0);
+  const name = (items: { weapon: string; qty: number }[]) => items.map((i) => (i.qty > 1 ? `${i.qty}× ` : '') + i.weapon).join(' + ');
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3 pb-2 pt-2.5">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{whoText(o)}</p>
+        <p className={cx('shrink-0 text-[11px] font-semibold tabular-nums', limit ? 'text-white/45' : 'text-white/25')}>{limit ? `${used}/${limit}` : 'недоступно'}</p>
+      </div>
+      {o.from.length > 0 && <p className="mt-0.5 text-[12.5px] text-white/60">Заменить: {name(o.from)}</p>}
+      {o.requires.length > 0 && <p className="mt-0.5 text-[11.5px] text-white/40">Если есть: {name(o.requires)}</p>}
+      {o.forbids.length > 0 && <p className="mt-0.5 text-[11.5px] text-white/40">Если нет: {name(o.forbids)}</p>}
+      {!limit && o.minModels > 0 && <p className="mt-0.5 text-[11.5px] text-white/40">Нужно не меньше {o.minModels} моделей в отряде.</p>}
+      <div className="mt-1.5 space-y-1">
+        {o.choices.map((choice, ci) => {
+          const cost = choice.reduce((s, it) => s + (paid.get(wkey(it.weapon)) ?? 0) * it.qty, 0);
+          return (
+            <div key={ci} className="flex items-center gap-2">
+              <div className="min-w-0 flex-1">
+                <p className={cx('text-[13.5px] font-semibold leading-tight', (picks[ci] ?? 0) > 0 ? 'text-accent' : 'text-white/85')}>{name(choice)}</p>
+                {cost > 0 && <p className="text-[11px] text-white/45">+{cost} очк. за модель</p>}
+              </div>
+              <Counter value={picks[ci] ?? 0} max={Math.max(picks[ci] ?? 0, max[ci] ?? 0)} onChange={(n) => onPick(ci, n)} />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function CombinedUnit({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRoster; L: DataLookup; detachmentIds: string[] }) {
+  const members = groupOf(c, cr);
+  if (members.length < 2) return null;
+  const rules = groupDetRules(members, L, detachmentIds);
+  const text = (a: Datasheet['abilities'][number]) => (a.ref ? (L.faction.rules[a.ref]?.text ?? '') : a.text);
+  return (
+    <details className="group rounded-xl border border-accent/25 bg-accent/[0.04]" open>
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5">
+        <span className="min-w-0">
+          <span className="block text-[11px] font-semibold uppercase tracking-wider text-accent/80">Совместный отряд</span>
+          <span className="block truncate text-sm font-semibold text-white/85">{members.map((m) => m.ds!.name).join(' + ')}</span>
+        </span>
+        <Icon name="down" className="size-4 shrink-0 text-white/40 transition group-open:rotate-180" />
+      </summary>
+      <div className="space-y-3 border-t border-white/[0.06] px-3 pb-3 pt-3">
+        <p className="text-[12px] leading-relaxed text-white/50">Способности каждой части отряда. Нажмите на название, чтобы прочитать текст.</p>
+        {members.map((m) => (
+          <div key={m.unit.uid}>
+            <p className="text-[12.5px] font-semibold text-white/85">
+              {m.ds!.name}
+              <span className="ml-1.5 text-[10.5px] font-semibold uppercase tracking-wider text-accent/70">{roleOf(m)}</span>
+            </p>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {m.ds!.abilities.map((a, i) => (
+                <RuleChip key={i} name={a.name + (a.param ? ' ' + a.param : '')} text={text(a)} accent={a.type === 'faction'} />
+              ))}
+            </div>
+          </div>
+        ))}
+        {rules.length > 0 && (
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Правила детачмента для всего отряда</p>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {rules.map((r) => (
+                <RuleChip
+                  key={r.id}
+                  name={r.name + (r.via.length < members.length ? ` · через ${r.via.join(', ')}` : '')}
+                  text={`${r.det}\n\n${r.text}`}
+                  accent
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </details>
+  );
+}
+
 /** Правила выбранных детачментов, действующие на юнит, и доступные ему стратагемы. */
-function UnitRules({ c, L, detachmentIds }: { c: ComputedUnit; L: DataLookup; detachmentIds: string[] }) {
+function UnitRules({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRoster; L: DataLookup; detachmentIds: string[] }) {
   const ds = c.ds!;
   const detIds = new Set(detachmentIds);
-  const detRules = L.faction.detachments
-    .filter((d) => detIds.has(d.id))
-    .flatMap((d) => d.abilities.filter((a) => ds.detachmentAbilities.includes(a.id)).map((a) => ({ det: d.name, ...a })));
+  // правило, которое действует на любую часть совместного отряда, действует и на присоединённых персонажей
+  const members = groupOf(c, cr);
+  const detRules = groupDetRules(members.length ? members : [c], L, detachmentIds).map((r) => ({
+    ...r,
+    det: r.det,
+    own: r.via.includes(ds.name),
+  }));
   const strats = L.faction.stratagems.filter((st) => ds.stratagems.includes(st.id) && (!st.detachment || detIds.has(st.detachment)));
   if (!detRules.length && !strats.length) return null;
   return (
@@ -521,7 +656,7 @@ function UnitRules({ c, L, detachmentIds }: { c: ComputedUnit; L: DataLookup; de
           <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Правила детачмента для юнита</p>
           <div className="mt-1 flex flex-wrap gap-1">
             {detRules.map((r) => (
-              <RuleChip key={r.id} name={r.name} text={`${r.det}\n\n${r.text}`} accent />
+              <RuleChip key={r.id} name={r.name + (r.own ? '' : ` · через ${r.via.join(', ')}`)} text={`${r.det}\n\n${r.text}`} accent />
             ))}
           </div>
         </div>

@@ -1,20 +1,27 @@
 import { useMemo, useState } from 'react';
 import { bandFor, battlelineGrants, copyLimit, isBattleline, type ComputedRoster, type DataLookup } from '../engine/compute';
-import { compareUnits, typeLabel, typeRank, unitType } from '../engine/sort';
+import { compareUnits, typeLabel, typeRank, unitType, type UnitType } from '../engine/sort';
 import type { Datasheet, Roster } from '../engine/types';
 import { haptic } from '../telegram';
 import { Icon, Sheet } from './kit';
 import { cx } from './util';
 
-type Tab = 'all' | 'characters' | 'battleline' | 'transports' | 'other' | 'allies';
-const TABS: { key: Tab; label: string }[] = [
-  { key: 'all', label: 'Все' },
-  { key: 'characters', label: 'Персонажи' },
-  { key: 'battleline', label: 'Линия' },
-  { key: 'transports', label: 'Транспорт' },
-  { key: 'other', label: 'Прочие' },
-  { key: 'allies', label: 'Союзники' },
-];
+/** Короткие подписи быстрых фильтров — по одной на каждую секцию списка. */
+const CHIP: Record<UnitType, string> = {
+  epic: 'Эпики',
+  character: 'Персонажи',
+  battleline: 'Линия',
+  transport: 'Транспорт',
+  infantry: 'Пехота',
+  mounted: 'Кавалерия',
+  walker: 'Шагоходы',
+  vehicle: 'Техника',
+  monster: 'Монстры',
+  aircraft: 'Авиация',
+  titanic: 'Титаны',
+  fortification: 'Укрепления',
+  other: 'Прочие',
+};
 
 export function UnitPicker({
   open,
@@ -34,7 +41,7 @@ export function UnitPicker({
   onToggleLegends: () => void;
 }) {
   const [q, setQ] = useState('');
-  const [tab, setTab] = useState<Tab>('all');
+  const [tab, setTab] = useState<string>('all');
   const grants = useMemo(() => battlelineGrants(cr.detachments), [cr.detachments]);
   const counts = useMemo(() => {
     const m = new Map<string, number>();
@@ -62,20 +69,17 @@ export function UnitPicker({
           const ch = ds.factionKeywords.find((k) => chapters.includes(k));
           if (ch && ch !== chapter) return false;
         }
-        if (needle && !ds.name.toLowerCase().includes(needle) && !ds.keywords.some((k) => k.toLowerCase() === needle)) return false;
-        const bl = isBattleline(ds, grants);
-        const g: Tab = ds.group.startsWith('ally:') ? 'allies' : ds.character ? 'characters' : bl ? 'battleline' : ds.dedicatedTransport ? 'transports' : 'other';
-        return tab === 'all' ? true : g === tab;
+        return !needle || ds.name.toLowerCase().includes(needle) || ds.keywords.some((k) => k.toLowerCase() === needle);
       })
       .sort((a, b) => compareUnits(a, b, isBattleline(a, grants), isBattleline(b, grants)));
-  }, [L, q, tab, roster.showLegends, roster.detachmentIds, grants, chapter, chapters, disabledAllies]);
+  }, [L, q, roster.showLegends, roster.detachmentIds, grants, chapter, chapters, disabledAllies]);
 
   // секции: свои юниты по типу → юниты из детачментов → союзники → Legends
   const sections = useMemo(() => {
-    const out: { key: string; title: string; note?: string; items: Datasheet[] }[] = [];
-    const push = (key: string, title: string, ds: Datasheet, note?: string) => {
+    const out: { key: string; title: string; chip: string; items: Datasheet[] }[] = [];
+    const push = (key: string, title: string, chip: string, ds: Datasheet) => {
       let s = out.find((x) => x.key === key);
-      if (!s) out.push((s = { key, title, note, items: [] }));
+      if (!s) out.push((s = { key, title, chip, items: [] }));
       s.items.push(ds);
     };
     const rank = (ds: Datasheet) => {
@@ -85,20 +89,26 @@ export function UnitPicker({
       return typeRank(unitType(ds, isBattleline(ds, grants)));
     };
     for (const ds of [...list].sort((a, b) => rank(a) - rank(b))) {
-      if (ds.legends) push('legends', 'Warhammer Legends', ds);
+      if (ds.legends) push('legends', 'Warhammer Legends', 'Legends', ds);
       else if (ds.group.startsWith('ally:')) {
         const a = L.faction.allies.find((x) => 'ally:' + x.key === ds.group);
-        push(ds.group, 'Союзники · ' + (a?.name ?? ''), ds);
-      } else if (ds.group.startsWith('det:')) push(ds.group, 'Детачмент · ' + (L.det.get(ds.group.slice(4))?.name ?? ''), ds);
-      else {
+        push(ds.group, 'Союзники · ' + (a?.name ?? ''), a?.name ?? 'Союзники', ds);
+      } else if (ds.group.startsWith('det:')) {
+        const name = L.det.get(ds.group.slice(4))?.name ?? '';
+        push(ds.group, 'Детачмент · ' + name, name || 'Детачмент', ds);
+      } else {
         const t = unitType(ds, isBattleline(ds, grants));
-        push(t, typeLabel(t), ds);
+        push(t, typeLabel(t), CHIP[t], ds);
       }
     }
     return out;
   }, [list, L, grants]);
 
   const legendsCount = L.faction.datasheets.filter((d) => d.legends).length;
+  // фильтр показывает ровно одну секцию; если её не стало (поиск, Legends) — снова «Все»
+  const active = tab !== 'all' && sections.some((s) => s.key === tab) ? tab : 'all';
+  const visible = active === 'all' ? sections : sections.filter((s) => s.key === active);
+  const allyInfo = active.startsWith('ally:') ? L.faction.allies.filter((a) => 'ally:' + a.key === active) : [];
 
   return (
     <Sheet open={open} onClose={onClose} title="Добавить юнит" tall>
@@ -113,22 +123,23 @@ export function UnitPicker({
           )}
         </label>
         <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4">
-          {TABS.filter((t) => t.key !== 'allies' || L.faction.allies.length).map((t) => (
+          {[{ key: 'all', chip: 'Все', items: list }, ...sections].map((t) => (
             <button
               key={t.key}
               type="button"
               onClick={() => (haptic.select(), setTab(t.key))}
-              className={cx('shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition', tab === t.key ? 'bg-accent text-accent-foreground' : 'bg-white/[0.06] text-white/70')}
+              className={cx('shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition', active === t.key ? 'bg-accent text-accent-foreground' : 'bg-white/[0.06] text-white/70')}
             >
-              {t.label}
+              {t.chip}
+              <span className={cx('ml-1 tabular-nums', active === t.key ? 'text-accent-foreground/60' : 'text-white/35')}>{t.items.length}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {tab === 'allies' && (
+      {allyInfo.length > 0 && (
         <div className="mb-3 space-y-1.5">
-          {L.faction.allies.map((a) => (
+          {allyInfo.map((a) => (
             <details key={a.key} className="group rounded-lg bg-white/[0.04] px-3 py-2 text-xs text-white/55">
               <summary className="cursor-pointer list-none">
                 <b className="text-white/80">{a.name}:</b> {a.note}
@@ -143,7 +154,7 @@ export function UnitPicker({
         <p className="py-10 text-center text-sm text-white/45">Ничего не найдено</p>
       ) : (
         <div className="space-y-5">
-          {sections.map((sec) => (
+          {visible.map((sec) => (
             <section key={sec.key}>
               <h3 className="mb-2 flex items-baseline justify-between px-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/40">
                 <span>{sec.title}</span>

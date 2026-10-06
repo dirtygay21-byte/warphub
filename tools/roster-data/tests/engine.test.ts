@@ -186,9 +186,15 @@ test('стандартное снаряжение по инфолисту', asyn
   const ou = { ...newRoster('SM').units, ...addUnit(newRoster('SM'), out).units[0] };
   assert.equal(unitLoadout(out, ou, 3)['Onslaught gatling cannon'] ?? 0, 0);
   assert.equal(unitLoadout(out, { ...ou, addons: { '1 Invader ATV': 1 } }, 3)['Onslaught gatling cannon'], 1);
-  r = updateUnit(r, u.uid, { weapons: { 'Bolt rifle': 4, 'Hand flamer': 1 } });
+  // сержант меняет болтер на ручной огнемёт — через вариант инфолиста
+  const { optionsOf } = await import('../../../client/src/features/roster/engine/wargear');
+  const o = optionsOf(isq).parsed.find((x) => x.from.some((f) => f.weapon === 'Bolt rifle') && x.choices.some((ch) => ch[0]!.weapon === 'Hand flamer'))!;
+  const ci = o.choices.findIndex((ch) => ch[0]!.weapon === 'Hand flamer');
+  const picks: Record<string, number[]> = { [o.key]: o.choices.map((_, i) => (i === ci ? 1 : 0)) };
+  r = updateUnit(r, u.uid, { picks });
   const cr = computeRoster(r, L);
   assert.equal(cr.units[0].loadout['Hand flamer'], 1);
+  assert.equal(cr.units[0].loadout['Bolt rifle'], 4);
   assert.ok(cr.units[0].loadoutCustom);
   assert.match(exportGw(r, L, cr, null), /◦ 1x Hand flamer/);
 });
