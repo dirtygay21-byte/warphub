@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { loadFaction } from '../data';
 import { availableDetachments, computeRoster, makeLookup, roleGroup, type ComputedRoster, type ComputedUnit, type DataLookup } from '../engine/compute';
 import { BATTLE_SIZES, BATTLE_SIZE_ORDER } from '../engine/rules';
@@ -11,6 +11,7 @@ import { UnitCard } from './UnitCard';
 import { sortRosterUnits } from '../engine/sort';
 import { UnitPicker } from './UnitPicker';
 import { ExportSheet } from './ExportSheet';
+import { DetachmentPanel } from './DetachmentPanel';
 
 const GROUPS: { key: ReturnType<typeof roleGroup>; title: string }[] = [
   { key: 'characters', title: 'Персонажи' },
@@ -112,6 +113,14 @@ function Editor({
   const [menu, setMenu] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(roster.detachmentIds.length === 0);
   const [flash, setFlash] = useState<string | null>(null);
+  const [detInfo, setDetInfo] = useState<string | null>(null);
+  const closeDetInfo = useCallback(() => setDetInfo(null), []);
+  const shownDet = detInfo && cr.detachments.some((d) => d.id === detInfo) ? detInfo : null;
+  const toggleDetInfo = (id: string) => {
+    haptic.tap();
+    setDetInfo((cur) => (cur === id ? null : id));
+    window.setTimeout(() => document.getElementById('detachment-panel')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
+  };
   const size = BATTLE_SIZES[roster.battleSize];
 
   const set = (patch: Partial<Roster>) => onChange(touch({ ...roster, ...patch }));
@@ -223,13 +232,16 @@ function Editor({
                 <div className="space-y-1.5">
                   {cr.detachments.map((d) => (
                     <div key={d.id} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] py-1.5 pl-3 pr-1.5">
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold">{d.name}</p>
+                      <button type="button" onClick={() => toggleDetInfo(d.id)} className="min-w-0 flex-1 text-left">
+                        <p className="truncate text-sm font-semibold">
+                          {d.name}
+                          <span className="ml-1.5 text-xs font-semibold text-accent">подробнее</span>
+                        </p>
                         <p className="text-xs text-white/45">
                           {dpOf(d, cr.chapter)} DP · {d.forceDisposition ?? '—'}
                           {d.tag ? ` · ${d.tag}` : ''}
                         </p>
-                      </div>
+                      </button>
                       <IconButton
                         icon="close"
                         label="Убрать детачмент"
@@ -272,6 +284,30 @@ function Editor({
             </div>
           )}
         </section>
+
+        {/* ---- детачмент: кнопки и раскрывающаяся карточка ---- */}
+        {cr.detachments.length > 0 && (
+          <div className="-mt-3 space-y-3">
+            {!shownDet && (
+              <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4">
+                {cr.detachments.map((d) => (
+                  <button
+                    key={d.id}
+                    type="button"
+                    onClick={() => toggleDetInfo(d.id)}
+                    className="flex min-h-9 max-w-full shrink-0 items-center gap-1.5 rounded-xl border border-accent/25 bg-accent/10 px-3 py-1.5 text-left text-xs font-semibold text-accent transition active:scale-[0.98]"
+                  >
+                    <Icon name="book" className="size-3.5 shrink-0" />
+                    <span className="text-accent/70">Детачмент:</span>
+                    <span className="truncate text-white/90">{d.name}</span>
+                    <Icon name="down" className="size-3.5 shrink-0" />
+                  </button>
+                ))}
+              </div>
+            )}
+            {shownDet && <DetachmentPanel id={shownDet} cr={cr} L={L} dp={(d) => dpOf(d, cr.chapter)} onSwitch={setDetInfo} onClose={closeDetInfo} />}
+          </div>
+        )}
 
         {/* ---- юниты ---- */}
         {grouped.length === 0 ? (
