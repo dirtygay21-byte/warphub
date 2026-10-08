@@ -90,7 +90,7 @@ describe('mini-games: list', () => {
     expect((await api('GET', '/minigames')).status).toBe(401);
     const r = await api('GET', '/minigames', T.mila);
     expect(r.status).toBe(200);
-    expect(r.json.map((g: any) => g.key)).toEqual(['runner', 'dice', 'egg']);
+    expect(r.json.map((g: any) => g.key)).toEqual(['runner', 'dice', 'egg', 'cards']);
     const runner = r.json[0];
     expect(runner.title).toBe('Зелёный рывок');
     expect(runner.tiers.map((t: any) => [t.minScore, t.label])).toEqual([
@@ -302,7 +302,7 @@ describe('mini-games: admin settings', () => {
     s.games.egg.enabled = false;
     await api('PUT', '/admin/minigames/settings', T.admin, s);
     const list = await api('GET', '/minigames', T.vera);
-    expect(list.json.map((g: any) => g.key)).toEqual(['runner', 'dice']);
+    expect(list.json.map((g: any) => g.key)).toEqual(['runner', 'dice', 'cards']);
     const r = await api('POST', '/minigames/egg/sessions', T.vera);
     expect(r.status).toBe(400);
     expect(r.json.code).toBe('GAME_DISABLED');
@@ -321,7 +321,7 @@ describe('mini-games: admin settings', () => {
   test('stats for admin', async () => {
     const r = await api('GET', '/admin/minigames/stats', T.admin);
     expect(r.status).toBe(200);
-    expect(r.json.games.length).toBe(3);
+    expect(r.json.games.length).toBe(4);
     expect(r.json.rejectedLast7Days).toBeGreaterThanOrEqual(4);
   });
 });

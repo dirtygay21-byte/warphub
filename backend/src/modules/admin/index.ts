@@ -8,6 +8,7 @@ import {
   saveMinigameSettings,
 } from '../minigames/service';
 import { handleMinigame } from '../minigames/http';
+import { adminAdjustPoints, adminFindPlayers, getPointsHistory } from '../minigames/cards';
 import { adminMiddleware } from '../../plugins/admin-middleware';
 import {
   BookingError,
@@ -900,6 +901,31 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
         summary: 'Сохранить настройки мини-игр',
         description:
           'Пороговые значения и награды по уровням. Значения проверяются сервером (скидка не больше 50%, пороги не повторяются).',
+      },
+    },
+  )
+  .get('/minigames/points', async ({ query }) => adminFindPlayers(query.q ?? ''), {
+    query: t.Object({ q: t.Optional(t.String()) }),
+    detail: {
+      tags: ['Mini-games'],
+      summary: 'Очки игроков: поиск по username или Telegram ID',
+    },
+  })
+  .get('/minigames/points/:userId', async ({ params }) => getPointsHistory(params.userId, 50), {
+    params: t.Object({ userId: t.String({ format: 'uuid' }) }),
+    detail: { tags: ['Mini-games'], summary: 'Счёт и история очков игрока' },
+  })
+  .post(
+    '/minigames/points/:userId/adjust',
+    async ({ params, body, user }) =>
+      handleMinigame(() => adminAdjustPoints(user.id, params.userId, body.delta, body.note)),
+    {
+      params: t.Object({ userId: t.String({ format: 'uuid' }) }),
+      body: t.Object({ delta: t.Number(), note: t.Optional(t.String()) }),
+      detail: {
+        tags: ['Mini-games'],
+        summary: 'Списать (отрицательное число) или начислить очки',
+        description: 'Счёт не может уйти в минус. Игрок получает сообщение от бота.',
       },
     },
   );

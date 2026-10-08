@@ -4,7 +4,10 @@ import {
   ENEMY_FIGHTERS,
   PLAYER_FIGHTERS,
 } from '../src/config/minigames';
+import { CARD_CATALOG, CARD_RARITIES, DEFAULT_CARD_PARAMS } from '../src/config/cards';
 import {
+  rollPack,
+  rollRarity,
   clubWeekKey,
   diceRewardFor,
   generateRewardCode,
@@ -159,5 +162,47 @@ describe('settings validation', () => {
     expect(() => validateSettings({ games: { runner: { tiers: [{ minScore: 10, rewardType: 'free_money', value: 1 }] } } })).toThrow(SettingsValidationError);
     expect(() => validateSettings({ games: { runner: { tiers: [{ minScore: 10, rewardType: 'percent_discount', value: 90 }] } } })).toThrow(SettingsValidationError);
     expect(() => validateSettings({ games: { runner: { tiers: [{ minScore: 10, rewardType: 'percent_discount', value: 1 }, { minScore: 10, rewardType: 'percent_discount', value: 2 }] } } })).toThrow(SettingsValidationError);
+  });
+});
+
+describe('card packs', () => {
+  test('catalog: unique ids, every rarity present, legendary is worth 1000', () => {
+    expect(new Set(CARD_CATALOG.map((c) => c.id)).size).toBe(CARD_CATALOG.length);
+    for (const r of CARD_RARITIES) expect(CARD_CATALOG.some((c) => c.rarity === r)).toBe(true);
+    expect(DEFAULT_CARD_PARAMS.rarities.legendary.points).toBe(1000);
+  });
+  test('drop rates follow the weights', () => {
+    const rng = seededRandom(99);
+    const hist: Record<string, number> = {};
+    const N = 100_000;
+    for (let i = 0; i < N; i++) {
+      const r = rollRarity(DEFAULT_CARD_PARAMS, rng);
+      hist[r] = (hist[r] ?? 0) + 1;
+    }
+    expect(hist.common! / N).toBeCloseTo(0.6, 1);
+    expect(hist.uncommon! / N).toBeCloseTo(0.25, 1);
+    expect(hist.legendary! / N).toBeGreaterThan(0.007);
+    expect(hist.legendary! / N).toBeLessThan(0.013);
+  });
+  test('pack: 5 cards, points match the table, at least one uncommon+', () => {
+    const rng = seededRandom(5);
+    for (let i = 0; i < 2000; i++) {
+      const pack = rollPack(DEFAULT_CARD_PARAMS, CARD_CATALOG, rng);
+      expect(pack.length).toBe(5);
+      expect(pack.some((c) => c.rarity !== 'common')).toBe(true);
+      for (const c of pack) {
+        expect(c.points).toBe(DEFAULT_CARD_PARAMS.rarities[c.rarity].points);
+        expect(CARD_CATALOG.find((x) => x.id === c.cardId)!.rarity).toBe(c.rarity);
+      }
+    }
+  });
+  test('settings: rarity table is configurable and validated', () => {
+    const s = validateSettings({ games: { cards: { params: { cardsPerPack: 3, rarities: { legendary: { points: 2000 } } } } } });
+    expect(s.games.cards.params.cardsPerPack).toBe(3);
+    expect(s.games.cards.params.rarities.legendary.points).toBe(2000);
+    expect(s.games.cards.params.rarities.common.points).toBe(100);
+    expect(() => validateSettings({ games: { cards: { params: { cardsPerPack: 50 } } } })).toThrow(SettingsValidationError);
+    const allZero = Object.fromEntries(CARD_RARITIES.map((r) => [r, { weight: 0 }]));
+    expect(() => validateSettings({ games: { cards: { params: { rarities: allZero } } } })).toThrow(SettingsValidationError);
   });
 });

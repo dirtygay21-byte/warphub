@@ -6,11 +6,14 @@ export function mapMinigameError(error: MinigameError) {
     case 'GAME_NOT_FOUND':
     case 'SESSION_NOT_FOUND':
     case 'REWARD_NOT_FOUND':
+    case 'USER_NOT_FOUND':
       return status(404, { error: error.message, code: error.code });
     case 'SESSION_FINISHED':
     case 'REWARD_USED':
+    case 'NOT_ENOUGH_POINTS':
       return status(409, { error: error.message, code: error.code });
     case 'DAILY_LIMIT':
+    case 'PACK_LIMIT':
       return status(429, { error: error.message, code: error.code });
     case 'GAME_DISABLED':
     case 'SESSION_EXPIRED':
@@ -18,6 +21,7 @@ export function mapMinigameError(error: MinigameError) {
     case 'WRONG_GAME':
     case 'INVALID_SCORE':
     case 'INVALID_SETTINGS':
+    case 'INVALID_INPUT':
       return status(400, { error: error.message, code: error.code });
     default: {
       const _exhaustive: never = error.code;

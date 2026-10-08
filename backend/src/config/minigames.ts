@@ -6,7 +6,9 @@
  * и справочники (бойцы, существа), которые используют и сервер, и клиент.
  */
 
-export const MINIGAME_KEYS = ['runner', 'dice', 'egg'] as const;
+import { DEFAULT_CARD_PARAMS, type CardParams } from './cards';
+
+export const MINIGAME_KEYS = ['runner', 'dice', 'egg', 'cards'] as const;
 export type MinigameKey = (typeof MINIGAME_KEYS)[number];
 
 export const REWARD_TYPES = [
@@ -74,6 +76,7 @@ export type MinigameSettings = {
     runner: GameSettings<RunnerParams>;
     dice: GameSettings<DiceParams>;
     egg: GameSettings<EggParams>;
+    cards: GameSettings<CardParams>;
   };
 };
 
@@ -110,6 +113,11 @@ export const DEFAULT_MINIGAME_SETTINGS: MinigameSettings = {
       ],
       params: { durationSec: 30, maxTapsPerSec: 25 },
     },
+    cards: {
+      enabled: true,
+      tiers: [],
+      params: DEFAULT_CARD_PARAMS,
+    },
   },
 };
 
@@ -134,6 +142,12 @@ export const MINIGAME_INFO: Record<
     description:
       'В инкубаторе Роя зреет кладка. Стучите по яйцу, пока идёт время: чем больше ударов, тем опаснее тварь, что вылупится.',
     scoreUnit: 'нажатий',
+  },
+  cards: {
+    title: 'Легенды Warp Hub',
+    description:
+      'Открывайте пакеты коллекционных карт: рыцари, гномьи кланы, духи леса, нежить и древние чудища. Каждая карта приносит очки на ваш счёт, легендарная — 1000.',
+    scoreUnit: 'очков',
   },
 };
 

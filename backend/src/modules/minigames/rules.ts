@@ -2,6 +2,7 @@
  * Чистые правила мини-игр (без БД) — покрыты тестами в tests/minigames-rules.test.ts.
  */
 import { bookingConfig } from '../../config/booking';
+import { CARD_RARITIES, DEFAULT_CARD_PARAMS, type CardDef, type CardParams, type CardRarity } from '../../config/cards';
 import {
   DEFAULT_MINIGAME_SETTINGS,
   MINIGAME_KEYS,
@@ -424,6 +425,7 @@ export function validateSettings(raw: unknown): MinigameSettings {
   const runner = pick(MINIGAME_KEYS[0]);
   const dice = pick(MINIGAME_KEYS[1]);
   const egg = pick(MINIGAME_KEYS[2]);
+  const cards = pick(MINIGAME_KEYS[3]);
 
   return {
     rewardValidDays: Math.floor(num(s.rewardValidDays ?? d.rewardValidDays, 'rewardValidDays', 1, 365)),
@@ -457,6 +459,78 @@ export function validateSettings(raw: unknown): MinigameSettings {
           maxTapsPerSec: num(egg.params?.maxTapsPerSec ?? d.games.egg.params.maxTapsPerSec, 'egg.maxTapsPerSec', 5, 60),
         },
       },
+      cards: {
+        enabled: cards.enabled ?? d.games.cards.enabled,
+        tiers: [],
+        params: validateCardParams(cards.params ?? {}),
+      },
     },
   };
+}
+
+// ---------------------------------------------------------------------------
+// «Легенды Warp Hub»: пакеты карт
+// ---------------------------------------------------------------------------
+
+function validateCardParams(raw: Record<string, any>): CardParams {
+  const d = DEFAULT_CARD_PARAMS;
+  const rarities = {} as CardParams['rarities'];
+  for (const r of CARD_RARITIES) {
+    const item = (raw.rarities?.[r] ?? {}) as Record<string, unknown>;
+    rarities[r] = {
+      weight: num(item.weight ?? d.rarities[r].weight, `cards.${r}.weight`, 0, 1000),
+      points: Math.floor(num(item.points ?? d.rarities[r].points, `cards.${r}.points`, 0, 100_000)),
+    };
+  }
+  if (CARD_RARITIES.every((r) => rarities[r].weight === 0)) {
+    throw new SettingsValidationError('cards: at least one rarity must have a chance above 0');
+  }
+  return {
+    packsPerDay: Math.floor(num(raw.packsPerDay ?? d.packsPerDay, 'cards.packsPerDay', 0, 20)),
+    cardsPerPack: Math.floor(num(raw.cardsPerPack ?? d.cardsPerPack, 'cards.cardsPerPack', 1, 10)),
+    guaranteeUncommon: typeof raw.guaranteeUncommon === 'boolean' ? raw.guaranteeUncommon : d.guaranteeUncommon,
+    rarities,
+  };
+}
+
+/** Выбор редкости по весам */
+export function rollRarity(params: CardParams, rng: Rng, minIndex = 0): CardRarity {
+  const pool = CARD_RARITIES.slice(minIndex).filter((r) => params.rarities[r].weight > 0);
+  const list = pool.length ? pool : CARD_RARITIES.filter((r) => params.rarities[r].weight > 0);
+  const total = list.reduce((sum, r) => sum + params.rarities[r].weight, 0);
+  let x = rng() * total;
+  for (const r of list) {
+    x -= params.rarities[r].weight;
+    if (x < 0) return r;
+  }
+  return list[list.length - 1]!;
+}
+
+export type PackCard = { cardId: string; rarity: CardRarity; points: number };
+
+/**
+ * Содержимое пакета: редкость по весам, затем случайная карта этой редкости.
+ * Если включена гарантия, последняя карта — «Необычная» или выше, когда
+ * среди остальных такой не оказалось.
+ */
+export function rollPack(params: CardParams, catalog: CardDef[], rng: Rng): PackCard[] {
+  const byRarity = new Map<CardRarity, CardDef[]>();
+  for (const card of catalog) {
+    const list = byRarity.get(card.rarity) ?? [];
+    list.push(card);
+    byRarity.set(card.rarity, list);
+  }
+  const available = (r: CardRarity) => (byRarity.get(r)?.length ?? 0) > 0;
+  const result: PackCard[] = [];
+  for (let i = 0; i < params.cardsPerPack; i++) {
+    const last = i === params.cardsPerPack - 1;
+    const needGuarantee =
+      last && params.guaranteeUncommon && params.cardsPerPack > 1 && result.every((c) => c.rarity === 'common');
+    let rarity = rollRarity(params, rng, needGuarantee ? 1 : 0);
+    if (!available(rarity)) rarity = CARD_RARITIES.find(available)!;
+    const options = byRarity.get(rarity)!;
+    const card = options[Math.floor(rng() * options.length)]!;
+    result.push({ cardId: card.id, rarity, points: params.rarities[rarity].points });
+  }
+  return result;
 }

@@ -1,4 +1,5 @@
-import { and, count, desc, eq, gte, isNotNull, isNull, lt, max, type SQL } from 'drizzle-orm';
+import { and, count, desc, eq, gte, isNotNull, isNull, lt, max, sum, type SQL } from 'drizzle-orm';
+import { CARD_RARITIES, RARITY_LABELS } from '../../config/cards';
 import {
   ENEMY_FIGHTERS,
   MINIGAME_INFO,
@@ -11,6 +12,7 @@ import {
 } from '../../config/minigames';
 import { db } from '../../db';
 import {
+  cardPacksTable,
   minigameRewardsTable,
   minigameSessionsTable,
   minigameSettingsTable,
@@ -56,7 +58,11 @@ export type MinigameErrorCode =
   | 'REWARD_NOT_FOUND'
   | 'REWARD_USED'
   | 'REWARD_EXPIRED'
-  | 'INVALID_SETTINGS';
+  | 'INVALID_SETTINGS'
+  | 'PACK_LIMIT'
+  | 'NOT_ENOUGH_POINTS'
+  | 'USER_NOT_FOUND'
+  | 'INVALID_INPUT';
 
 export class MinigameError extends Error {
   readonly code: MinigameErrorCode;
@@ -365,8 +371,25 @@ export async function listGamesForUser(userId: string) {
       bestScore: s?.best ?? null,
       plays: Number(s?.plays ?? 0),
       weekReward: reward ? toRewardView(reward) : null,
+      ...(key === 'cards' ? { cards: cardsSummary(settings) } : {}),
     };
   });
+}
+
+/** Для карточки игры в списке: очки и шансы по редкостям */
+function cardsSummary(settings: MinigameSettings) {
+  const params = settings.games.cards.params;
+  const total = CARD_RARITIES.reduce((s, r) => s + params.rarities[r].weight, 0) || 1;
+  return {
+    packsPerDay: params.packsPerDay,
+    cardsPerPack: params.cardsPerPack,
+    rarities: CARD_RARITIES.map((r) => ({
+      rarity: r,
+      label: RARITY_LABELS[r],
+      points: params.rarities[r].points,
+      chance: Math.round((params.rarities[r].weight / total) * 1000) / 10,
+    })),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -413,6 +436,9 @@ function battleView(state: DiceBattleState, settings: MinigameSettings) {
 export async function startSession(userId: string, game: string) {
   if (!isMinigameKey(game)) {
     throw new MinigameError('GAME_NOT_FOUND', 'Game not found');
+  }
+  if (game === 'cards') {
+    throw new MinigameError('WRONG_GAME', 'Card packs are opened with /minigames/cards/open');
   }
   const settings = await getMinigameSettings();
   if (!settings.games[game].enabled) {
@@ -810,12 +836,19 @@ export async function adminMinigameStats() {
       ),
     );
 
+  const [packs] = await db
+    .select({ value: count(), points: sum(cardPacksTable.points) })
+    .from(cardPacksTable)
+    .where(gte(cardPacksTable.openedAt, new Date(Date.now() - 7 * 86_400_000)));
+
   return {
     weekKey,
+    cardPointsLast7Days: Number(packs?.points ?? 0),
     games: MINIGAME_KEYS.map((key) => ({
       key,
       title: MINIGAME_INFO[key].title,
-      playsLast7Days: Number(plays.find((p) => p.game === key)?.value ?? 0),
+      playsLast7Days:
+        key === 'cards' ? Number(packs?.value ?? 0) : Number(plays.find((p) => p.game === key)?.value ?? 0),
       rewardsThisWeek: Number(rewards.find((r) => r.game === key)?.value ?? 0),
     })),
     rejectedLast7Days: Number(rejected[0]?.value ?? 0),
