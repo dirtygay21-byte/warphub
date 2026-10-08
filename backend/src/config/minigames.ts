@@ -120,19 +120,19 @@ export const MINIGAME_INFO: Record<
   runner: {
     title: 'Зелёный рывок',
     description:
-      'Громила несётся через руины. Нажимайте на экран, чтобы прыгать через препятствия. Чем дальше — тем лучше награда.',
+      'Громила Ржавой Орды несётся через горящие руины. Нажимайте на экран, чтобы перепрыгивать заграждения. Чем дальше забег — тем лучше награда.',
     scoreUnit: 'м',
   },
   dice: {
     title: 'Кости войны',
     description:
-      'Пошаговая дуэль на кубиках: попадание, ранение, спасбросок, урон. Побеждайте противников одного за другим и вовремя забирайте награду: при поражении награда за попытку сгорает.',
+      'Воин Ордена Стальной Клятвы против Ржавой Орды и Роя. Попадание, ранение, спасбросок, урон — побеждайте врагов одного за другим и вовремя забирайте награду: при поражении она сгорает.',
     scoreUnit: 'побед',
   },
   egg: {
     title: 'Рой: инкубатор',
     description:
-      'Стучите по яйцу, пока идёт время. Чем больше нажатий — тем редче существо вылупится.',
+      'В инкубаторе Роя зреет кладка. Стучите по яйцу, пока идёт время: чем больше ударов, тем опаснее тварь, что вылупится.',
     scoreUnit: 'нажатий',
   },
 };
@@ -162,24 +162,26 @@ export type Fighter = {
   save: number;
   /** Ключ спрайта на клиенте */
   sprite: string;
+  /** Фракция: Орден Стальной Клятвы, Ржавая Орда или Рой */
+  faction: 'order' | 'horde' | 'swarm';
 };
 
 export const PLAYER_FIGHTERS: Fighter[] = [
-  { id: 'iron_captain', name: 'Капитан Ржавый Щит', wounds: 6, attacks: 4, skill: 3, strength: 4, toughness: 4, ap: 1, damage: 1, save: 3, sprite: 'iron_captain' },
-  { id: 'storm_huntress', name: 'Охотница Бури', wounds: 5, attacks: 5, skill: 3, strength: 4, toughness: 3, ap: 1, damage: 1, save: 4, sprite: 'storm_huntress' },
-  { id: 'scrap_brute', name: 'Громила Лом', wounds: 7, attacks: 4, skill: 4, strength: 6, toughness: 5, ap: 1, damage: 2, save: 5, sprite: 'scrap_brute' },
-  { id: 'gear_sage', name: 'Механик Шестерня', wounds: 5, attacks: 3, skill: 3, strength: 6, toughness: 4, ap: 2, damage: 2, save: 4, sprite: 'gear_sage' },
-  { id: 'ember_witch', name: 'Пиромантка Искра', wounds: 4, attacks: 3, skill: 2, strength: 5, toughness: 3, ap: 2, damage: 2, save: 5, sprite: 'ember_witch' },
-  { id: 'gate_warden', name: 'Страж Ворот', wounds: 7, attacks: 3, skill: 3, strength: 5, toughness: 5, ap: 1, damage: 1, save: 2, sprite: 'gate_warden' },
+  { id: 'iron_captain', name: 'Капитан Ордена', wounds: 6, attacks: 4, skill: 3, strength: 4, toughness: 4, ap: 1, damage: 1, save: 3, sprite: 'iron_captain', faction: 'order' },
+  { id: 'storm_huntress', name: 'Стрелок Ордена', wounds: 5, attacks: 5, skill: 3, strength: 4, toughness: 3, ap: 1, damage: 1, save: 4, sprite: 'storm_huntress', faction: 'order' },
+  { id: 'scrap_brute', name: 'Молотобоец Ордена', wounds: 7, attacks: 4, skill: 4, strength: 6, toughness: 5, ap: 1, damage: 2, save: 5, sprite: 'scrap_brute', faction: 'order' },
+  { id: 'gear_sage', name: 'Оружейник Ордена', wounds: 5, attacks: 3, skill: 3, strength: 6, toughness: 4, ap: 2, damage: 2, save: 4, sprite: 'gear_sage', faction: 'order' },
+  { id: 'ember_witch', name: 'Огненная провидица', wounds: 4, attacks: 3, skill: 2, strength: 5, toughness: 3, ap: 2, damage: 2, save: 5, sprite: 'ember_witch', faction: 'order' },
+  { id: 'gate_warden', name: 'Страж Врат', wounds: 7, attacks: 3, skill: 3, strength: 5, toughness: 5, ap: 1, damage: 1, save: 2, sprite: 'gate_warden', faction: 'order' },
 ];
 
 export const ENEMY_FIGHTERS: Fighter[] = [
-  { id: 'hive_reaper', name: 'Жнец Улья', wounds: 5, attacks: 5, skill: 4, strength: 4, toughness: 4, ap: 1, damage: 1, save: 5, sprite: 'hive_reaper' },
-  { id: 'fallen_knight', name: 'Падший рыцарь', wounds: 6, attacks: 4, skill: 3, strength: 5, toughness: 4, ap: 1, damage: 1, save: 3, sprite: 'fallen_knight' },
-  { id: 'war_drone', name: 'Боевой дрон', wounds: 5, attacks: 3, skill: 4, strength: 6, toughness: 5, ap: 2, damage: 2, save: 4, sprite: 'war_drone' },
-  { id: 'fang_chief', name: 'Вожак Клыков', wounds: 6, attacks: 5, skill: 4, strength: 5, toughness: 4, ap: 0, damage: 1, save: 5, sprite: 'fang_chief' },
-  { id: 'ash_cultist', name: 'Пепельный культист', wounds: 4, attacks: 4, skill: 4, strength: 3, toughness: 3, ap: 0, damage: 1, save: 6, sprite: 'ash_cultist' },
-  { id: 'plague_hulk', name: 'Чумной громила', wounds: 7, attacks: 4, skill: 4, strength: 5, toughness: 6, ap: 1, damage: 1, save: 5, sprite: 'plague_hulk' },
+  { id: 'hive_reaper', name: 'Жнец Роя', wounds: 5, attacks: 5, skill: 4, strength: 4, toughness: 4, ap: 1, damage: 1, save: 5, sprite: 'hive_reaper', faction: 'swarm' },
+  { id: 'fallen_knight', name: 'Панцирный страж Роя', wounds: 6, attacks: 4, skill: 3, strength: 5, toughness: 4, ap: 1, damage: 1, save: 3, sprite: 'fallen_knight', faction: 'swarm' },
+  { id: 'war_drone', name: 'Пилорук Орды', wounds: 5, attacks: 3, skill: 4, strength: 6, toughness: 5, ap: 2, damage: 2, save: 4, sprite: 'war_drone', faction: 'horde' },
+  { id: 'fang_chief', name: 'Вожак Ржавой Орды', wounds: 6, attacks: 5, skill: 4, strength: 5, toughness: 4, ap: 0, damage: 1, save: 5, sprite: 'fang_chief', faction: 'horde' },
+  { id: 'ash_cultist', name: 'Налётчик Орды', wounds: 4, attacks: 4, skill: 4, strength: 3, toughness: 3, ap: 0, damage: 1, save: 6, sprite: 'ash_cultist', faction: 'horde' },
+  { id: 'plague_hulk', name: 'Титан Роя', wounds: 7, attacks: 4, skill: 4, strength: 5, toughness: 6, ap: 1, damage: 1, save: 5, sprite: 'plague_hulk', faction: 'swarm' },
 ];
 
 // ---------------------------------------------------------------------------

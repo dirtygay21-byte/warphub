@@ -386,6 +386,7 @@ function fighterView(fighter: (typeof PLAYER_FIGHTERS)[number]) {
     damage: fighter.damage,
     save: fighter.save,
     sprite: fighter.sprite,
+    faction: fighter.faction,
   };
 }
 
