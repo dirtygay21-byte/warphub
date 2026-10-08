@@ -10,5 +10,5 @@
     "allowImportingTsExtensions": true,
     "types": ["node"]
   },
-  "include": ["tests", "../../client/src/features/roster/engine"]
+  "include": ["tests", "../../client/src/features/roster/engine", "../../client/src/features/roster/aos"]
 }

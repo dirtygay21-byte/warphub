@@ -1,5 +1,6 @@
 import { apiRequest } from '@/apiUtils/general';
 import type { DataIndex, FactionData } from './engine/types';
+import type { AosFactionData, AosIndex } from './aos/types';
 
 // Данные Wahapedia отдаёт backend (GET /roster/data/:name) — только пользователям с доступом.
 let indexPromise: Promise<DataIndex> | null = null;
@@ -18,6 +19,25 @@ export function loadFaction(id: string): Promise<FactionData> {
     p.catch(() => factionCache.delete(id));
   }
   return factionCache.get(id)!;
+}
+
+// ---------- Age of Sigmar 4 (backend: GET /roster/data/aos/:name) ----------
+let aosIndexPromise: Promise<AosIndex> | null = null;
+const aosCache = new Map<string, Promise<AosFactionData>>();
+
+export function loadAosIndex(): Promise<AosIndex> {
+  aosIndexPromise ??= apiRequest<AosIndex>('/roster/data/aos/index');
+  aosIndexPromise.catch(() => (aosIndexPromise = null));
+  return aosIndexPromise;
+}
+
+export function loadAosFaction(id: string): Promise<AosFactionData> {
+  if (!aosCache.has(id)) {
+    const p = apiRequest<AosFactionData>(`/roster/data/aos/${encodeURIComponent(id)}`);
+    aosCache.set(id, p);
+    p.catch(() => aosCache.delete(id));
+  }
+  return aosCache.get(id)!;
 }
 
 // ---------- «Поле боя»: раскладки террейна и карты деплоя (40kdc-data) ----------

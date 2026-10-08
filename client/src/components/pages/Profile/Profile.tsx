@@ -148,7 +148,7 @@ export default function Profile() {
           </span>
           <span className="min-w-0 flex-1">
             <span className="block text-sm font-semibold">Roster Builder</span>
-            <span className="block text-xs text-white/55">Конструктор ростеров Warhammer 40,000</span>
+            <span className="block text-xs text-white/55">Ростеры Warhammer 40,000 и Age of Sigmar</span>
           </span>
           <ChevronRight className="size-5 text-accent" />
         </button>

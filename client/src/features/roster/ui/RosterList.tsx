@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { BATTLE_SIZES, BATTLE_SIZE_ORDER } from '../engine/rules';
 import { decodeRoster, duplicateRoster, newRoster } from '../engine/roster';
 import type { BattleSize, DataIndex, Roster } from '../engine/types';
@@ -11,6 +11,7 @@ const ALLEGIANCE_RU: Record<string, string> = { Imperium: 'Империум', Ch
 
 export function RosterList({
   onExit,
+  switcher,
   onRules,
   onBattlefield,
   index,
@@ -21,6 +22,7 @@ export function RosterList({
   onDelete,
 }: {
   onExit: () => void;
+  switcher?: ReactNode;
   onRules: () => void;
   onBattlefield: () => void;
   index: DataIndex;
@@ -37,7 +39,7 @@ export function RosterList({
 
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5">
-      <header className="mb-5 flex items-end justify-between gap-3">
+      <header className="mb-4 flex items-end justify-between gap-3">
         <IconButton icon="back" label="Назад в WarpHub" onClick={onExit} className="mb-0.5 size-9" />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpHub · 11-я редакция</p>
@@ -45,6 +47,7 @@ export function RosterList({
         </div>
         <IconButton icon="upload" label="Импорт ростера по коду" onClick={() => setImporting(true)} />
       </header>
+      {switcher}
 
       <div className="mb-5 grid grid-cols-2 gap-2">
         <ToolTile icon="book" title="Правила" sub="Стратагемы · Core Rules" onClick={onRules} />
@@ -228,6 +231,11 @@ function ImportSheet({ open, onClose, onImport, factions }: { open: boolean; onC
           className="h-12 w-full"
           disabled={!code.trim()}
           onClick={() => {
+            if (code.trim().startsWith('AOS1.')) {
+              setErr('Это код ростера Age of Sigmar — импортируйте его на вкладке Age of Sigmar.');
+              haptic.error();
+              return;
+            }
             try {
               onImport(decodeRoster(code, factions));
               setCode('');

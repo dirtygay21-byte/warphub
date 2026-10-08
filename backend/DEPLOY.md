@@ -245,8 +245,8 @@ do it if the new version really doesn't work.
 
 Do this together with step 5 (backend) and step 6 (client); it adds no new services.
 
-1. **Data files.** The folder `backend/roster-data/` (about 15 MB: `index.json`,
-   `battlefield.json` and the `f/` folder) must be on the server inside
+1. **Data files.** The folder `backend/roster-data/` (about 20 MB: `index.json`,
+   `battlefield.json`, the `f/` folder and the `aos/` folder for Age of Sigmar) must be on the server inside
    `<BACKEND_DIR>`, next to `src/`. It is part of the repository, so copying the
    backend folder brings it along. If you keep it elsewhere, set
    `ROSTER_DATA_DIR=/full/path/to/roster-data` in `.env`. If the folder is missing,
@@ -277,10 +277,10 @@ Do this together with step 5 (backend) and step 6 (client); it adds no new servi
    `401` is correct (it requires login). `404` means the new backend isn't running.
    Then check the data is found:
    ```bash
-   ls <BACKEND_DIR>/roster-data/index.json <BACKEND_DIR>/roster-data/battlefield.json
+   ls <BACKEND_DIR>/roster-data/index.json <BACKEND_DIR>/roster-data/battlefield.json <BACKEND_DIR>/roster-data/aos/index.json
    pm2 logs <backend-process-name> --lines 100 --nostream | grep "\[roster\]"
    ```
-   Both files must be listed, and the second command must print nothing.
+   All three files must be listed, and the second command must print nothing.
 6. **In Telegram:** Admin → «Ростеры» → «Создать код доступа». The code arrives
    from the bot. Another person enters it in Профиль → «Есть код доступа?» and
    gets a «Roster Builder» button in their profile. Access stays until you press

@@ -1,0 +1,26 @@
+{
+ "errors": [],
+ "warnings": [
+  "BoC: лора «Bestial Manifestations» — нет очков",
+  "KB: «Hobgrot Slittaboss» — вариант полка «Monster» не подходит ни одному юниту фракции",
+  "OM: террейн «Great Mawpot» — 0 в CSV, 20 в Battle Profiles (берём Battle Profiles)"
+ ],
+ "info": [
+  "BoC: все юниты в Legends — фракция доступна только с «Показать Legends»",
+  "KO: «Auto-Endrin» — нет очков в Battle Profiles, юнит нельзя добавить",
+  "KO: «Grombrindal, The White Dwarf» — нет очков в Battle Profiles, юнит нельзя добавить",
+  "CoS: «Edmark Valoran, the Manticore Knight» — нет очков в Battle Profiles, юнит нельзя добавить",
+  "CoS: «Bren Tylis, the Renegade Saint» — нет очков в Battle Profiles, юнит нельзя добавить",
+  "CoS: «Inara Sion, the Cleansing Blade» — нет очков в Battle Profiles, юнит нельзя добавить",
+  "CoS: «Drolf Ironhead, the Grizzled Explorer» — нет очков в Battle Profiles, юнит нельзя добавить",
+  "CoS: «Jacobus Vyne, the Jade Wizard» — нет очков в Battle Profiles, юнит нельзя добавить",
+  "CoS: «Drasher Vorn, the Rampaging Beast» — нет очков в Battle Profiles, юнит нельзя добавить",
+  "CoS: «Grombrindal, The White Dwarf» — нет очков в Battle Profiles, юнит нельзя добавить",
+  "OB: «The Grand Necromystic» — вариант полка «PETRIFEX ELITE» не подходит ни одному юниту фракции",
+  "SE: «Hamilcar Bear-Eater» — вариант полка «ASTRAL TEMPLARS» не подходит ни одному юниту фракции",
+  "OM: нет боевых построений",
+  "SY: «Kelthannor, the Forest Prince» — нет очков в Battle Profiles, юнит нельзя добавить",
+  "SoB: нет боевых построений",
+  "IJ: «Dakkbad Grotkicker» — вариант полка «IRONSUNZ» не подходит ни одному юниту фракции"
+ ]
+}

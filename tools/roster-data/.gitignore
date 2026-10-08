@@ -1,6 +1,7 @@
 node_modules
 dist/
 wahapedia-csv/
+wahapedia-aos-csv/
 *.log
 .env*
 40kdc-data/

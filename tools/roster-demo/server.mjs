@@ -154,6 +154,13 @@ async function api(req, res, p) {
     if (!fs.existsSync(f)) return send(res, 404, { error: 'Нет данных' });
     return send(res, 200, fs.readFileSync(f));
   }
+  const aos = /^\/roster\/data\/aos\/([A-Za-z]{1,6}|index)$/.exec(p);
+  if (aos) {
+    if (!hasAccess(user)) return send(res, 403, { error: 'Нет доступа к Roster Builder' });
+    const f = aos[1] === 'index' ? path.join(DATA, 'aos', 'index.json') : path.join(DATA, 'aos', 'f', `${aos[1]}.json`);
+    if (!fs.existsSync(f)) return send(res, 404, { error: 'Нет данных' });
+    return send(res, 200, fs.readFileSync(f));
+  }
 
   if (p.startsWith('/admin/')) {
     if (!user.admin) return send(res, 403, { error: 'Forbidden' });

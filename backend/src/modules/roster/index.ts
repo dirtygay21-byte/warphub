@@ -68,6 +68,19 @@ export const rosterModule = new Elysia({ prefix: '/roster', tags: ['Roster Build
       return file.body;
     },
     { detail: { summary: 'Данные Roster Builder (index, battlefield или код фракции)', hide: true } },
+  )
+  .get(
+    '/data/aos/:name',
+    async ({ user, params, set }) => {
+      if (!(await hasRosterAccess(user))) return status(403, { error: 'Нет доступа к Roster Builder' });
+      const file = readRosterData(params.name.replace(/\.json$/, ''), 'aos');
+      if (!file) return status(404, { error: 'Нет данных' });
+      set.headers['content-type'] = 'application/json; charset=utf-8';
+      set.headers['content-encoding'] = 'gzip';
+      set.headers['cache-control'] = 'private, max-age=3600';
+      return file.body;
+    },
+    { detail: { summary: 'Данные Roster Builder: Age of Sigmar (index или код фракции)', hide: true } },
   );
 
 /** Управление доступом — только администраторы. */
