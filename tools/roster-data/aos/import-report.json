@@ -1,9 +1,10 @@
 {
  "errors": [],
  "warnings": [
-  "BoC: лора «Bestial Manifestations» — нет очков",
+  "BoC: лор «Bestial Manifestations» — нет очков",
   "KB: «Hobgrot Slittaboss» — вариант полка «Monster» не подходит ни одному юниту фракции",
-  "OM: террейн «Great Mawpot» — 0 в CSV, 20 в Battle Profiles (берём Battle Profiles)"
+  "OM: террейн «Great Mawpot» — 0 в CSV, 20 в Battle Profiles (берём Battle Profiles)",
+  "неполные тексты в выгрузке: обрезано лимитом 1024 символа — 177, таблица не выгружена — 21; в конструкторе помечены, полный текст на Wahapedia"
  ],
  "info": [
   "BoC: все юниты в Legends — фракция доступна только с «Показать Legends»",

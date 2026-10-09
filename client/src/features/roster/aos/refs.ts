@@ -143,8 +143,9 @@ export interface SpellsSummary {
   total: number;
 }
 
+/** Заклинания и молитвы армии. Лор манифестаций сюда не входит — у него свой блок (manifestationsOf). */
 export function spellsOf(r: AosRoster, L: AosLookup): SpellsSummary {
-  const lores = (['spell', 'prayer', 'manifestation'] as LoreKind[])
+  const lores = (['spell', 'prayer'] as LoreKind[])
     .map((kind) => ({ kind, lore: r.lores[kind] ? L.lore.get(r.lores[kind]!) : undefined }))
     .filter((x): x is { kind: LoreKind; lore: AosLore } => !!x.lore);
   const byWs = new Map<string, AosWarscroll>();
@@ -153,4 +154,112 @@ export function spellsOf(r: AosRoster, L: AosLookup): SpellsSummary {
   const own = scrolls.map((ws) => ({ ws, rules: ws.abilities.filter(isCastable) })).filter((g) => g.rules.length > 0);
   const total = lores.reduce((s, x) => s + x.lore.items.length, 0) + own.reduce((s, g) => s + g.rules.length, 0);
   return { lores, own, wizards: scrolls.filter((w) => w.wizard), priests: scrolls.filter((w) => w.priest), total };
+}
+
+// ---------- манифестации ----------
+
+/** Заклинание призыва и варскролл манифестации, которую оно призывает. */
+export interface ManifestationEntry {
+  /** «SUMMON DAIS ARCANUM» — значение каста, тайминг, текст призыва */
+  spell: AosRule | null;
+  /** варскролл манифестации; null — в данных не нашёлся (показывается предупреждение) */
+  ws: AosWarscroll | null;
+}
+
+export interface ManifestationSummary {
+  lore: AosLore;
+  entries: ManifestationEntry[];
+}
+
+/** «SUMMON THE BURNING HEAD» и «The Burning Head» → «burninghead». */
+const summonKey = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/^summon\s+/, '')
+    .replace(/[^a-z0-9]/g, '')
+    .replace(/^the/, '');
+
+/**
+ * Выбранный лор манифестаций: каждое заклинание призыва в паре со своим варскроллом (lore.summons).
+ * Пара ищется по имени («Summon X» ↔ «X»); что не нашло пары, остаётся отдельной записью — не теряется молча.
+ */
+export function manifestationsOf(r: AosRoster, L: AosLookup): ManifestationSummary | null {
+  const id = r.lores.manifestation;
+  const lore = id ? L.lore.get(id) : undefined;
+  if (!lore || lore.kind !== 'manifestation') return null;
+  return { lore, entries: pairManifestations(lore, L) };
+}
+
+export function pairManifestations(lore: AosLore, L: AosLookup): ManifestationEntry[] {
+  const scrolls = lore.summons.map((wid) => L.ws.get(wid)).filter((w): w is AosWarscroll => !!w);
+  const free = new Map(scrolls.map((w) => [summonKey(w.name), w]));
+  const entries: ManifestationEntry[] = lore.items.map((spell) => {
+    const key = summonKey(spell.name);
+    const ws = free.get(key) ?? null;
+    if (ws) free.delete(key);
+    return { spell, ws };
+  });
+  for (const ws of free.values()) entries.push({ spell: null, ws });
+  // ссылка лора на варскролл, которого нет в данных
+  for (const wid of lore.summons) if (!L.ws.get(wid)) entries.push({ spell: null, ws: null });
+  return entries;
+}
+
+// ---------- террейн фракции: размещение ----------
+
+export interface TerrainPlacementRule {
+  rule: AosRule;
+  /** откуда правило: «Боевая черта», «Построение: …», «Варскролл террейна» */
+  from: string;
+}
+
+export interface TerrainPlacement {
+  ws: AosWarscroll;
+  /** правила фракции и самого варскролла о том, где и когда ставится этот террейн */
+  rules: TerrainPlacementRule[];
+  /** расстояния из этих правил: «more than 12" from all other friendly Nexuses of Grief» */
+  measures: string[];
+}
+
+/** «Nexus of Grief» → совпадает и с «Nexuses of Grief»; «Awakened Wyldwood» — с «Awakened Wyldwoods». */
+const nameRe = (name: string) =>
+  new RegExp(
+    '\\b' +
+      name
+        .split(/\s+/)
+        .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:e?s)?')
+        .join('\\s+') +
+      '\\b',
+    'i',
+  );
+const SETS_UP = /\bset up\b|\bdeploy/i;
+/** «more than 3" from all units, objectives and …» — до точки или скобки; «…, and more than 12" …» — отдельное расстояние. */
+const MEASURE = /(?:wholly\s+)?(?:within|outside|more than)\s+\d+(?:\.\d+)?(?:"|”|″)[^.;:()\n]*/gi;
+const NEXT_MEASURE = /,?\s+(?:and|or)\s+(?=(?:wholly\s+)?(?:within|outside|more than)\s+\d)|,\s+(?=(?:wholly\s+)?(?:within|outside|more than)\s+\d)/i;
+
+/** Расстояния из текста правила, по одному условию (без повторов). */
+export function measuresOf(text: string): string[] {
+  const out = new Set<string>();
+  for (const m of cleanRuleText(text).matchAll(MEASURE))
+    for (const part of m[0].split(NEXT_MEASURE)) out.add(part.replace(/\s+/g, ' ').replace(/\s+(?:and|or)$/i, '').trim());
+  return [...out];
+}
+
+/**
+ * Как ставится террейн фракции: правила, которые его выставляют (боевые черты, построения),
+ * и способности самого варскролла в фазе деплоя. Связь — по имени террейна в тексте правила.
+ * Общие правила (Core Rules 10.1, батлпак) — в aos/terrain.ts.
+ */
+export function terrainPlacementOf(ws: AosWarscroll, L: AosLookup): TerrainPlacement {
+  const re = nameRe(ws.name);
+  const rules: TerrainPlacementRule[] = [];
+  const take = (rule: AosRule, from: string) => {
+    const text = cleanRuleText(rule.text);
+    if (re.test(text) && SETS_UP.test(text)) rules.push({ rule, from });
+  };
+  for (const r of L.faction.battleTraits) take(r, 'Боевая черта фракции');
+  for (const f of L.faction.formations) for (const r of f.rules) take(r, `Построение: ${f.name}`);
+  for (const r of ws.abilities) if (/deployment phase/i.test(r.timing ?? '')) rules.push({ rule: r, from: 'Варскролл террейна' });
+  const measures = [...new Set(rules.flatMap((r) => measuresOf(r.rule.text)))];
+  return { ws, rules, measures };
 }

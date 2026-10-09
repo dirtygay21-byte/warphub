@@ -9,6 +9,7 @@ import {
   eligibleFor,
   enhancementFit,
   formationFit,
+  formationLegendsLabel,
   formationsOf,
   leaderFit,
   loreFit,
@@ -17,7 +18,7 @@ import {
   warscrollFit,
 } from '../../../client/src/features/roster/aos/engine';
 import { AOS_SEASONS, isSeasonal, seasonActive, seasonLabel, seasonVersion } from '../../../client/src/features/roster/aos/rules';
-import { activeTables, castInfo, grantsOf, isCastable, ruleRefs } from '../../../client/src/features/roster/aos/refs';
+import { activeTables, castInfo, grantsOf, isCastable, manifestationsOf, pairManifestations, ruleRefs, spellsOf } from '../../../client/src/features/roster/aos/refs';
 import { addRegiment, newAosRoster, setEnhancement, setLore } from '../../../client/src/features/roster/aos/roster';
 import type { AosFactionData, AosIndex, AosRoster } from '../../../client/src/features/roster/aos/types';
 
@@ -188,4 +189,135 @@ test('каст: у каждого заклинания и молитвы в ло
         assert.ok(isCastable(it));
       }
     }
+});
+
+// ---------- боевые построения: аудит всех фракций ----------
+
+const CSV = path.join(import.meta.dirname, '..', 'wahapedia-aos-csv');
+const readCsv = (name: string): Record<string, string>[] => {
+  const [head, ...rows] = fs.readFileSync(path.join(CSV, name), 'utf8').replace(/^\uFEFF/, '').split(/\r?\n/).filter(Boolean);
+  const cols = head.split('|');
+  return rows.map((r) => Object.fromEntries(r.split('|').map((v, i) => [cols[i], v])));
+};
+
+test('построения: у каждой фракции свои, с непустыми правилами, без общих и чужих текстов', () => {
+  const seen = new Map<string, string>();
+  for (const f of ALL) {
+    const ids = new Set<string>();
+    for (const fm of f.formations) {
+      assert.ok(!ids.has(fm.id), `${f.id}: повтор построения ${fm.id}`);
+      ids.add(fm.id);
+      assert.ok(fm.name.trim(), `${f.id}: построение без названия`);
+      assert.ok(fm.rules.length, `${f.id} «${fm.name}»: нет правил`);
+      for (const r of fm.rules) {
+        assert.ok(r.name.trim() && r.text.trim(), `${f.id} «${fm.name}»: пустое правило`);
+        // разные построения не делят (не перезаписывают) один и тот же текст — ни в своей фракции, ни в чужой
+        const owner = seen.get(r.text);
+        assert.ok(!owner, `${f.id} «${fm.name}» → «${r.name}»: тот же текст, что у ${owner}`);
+        seen.set(r.text, `${f.id} «${fm.name}»`);
+      }
+    }
+    // фракция без построений — только с объяснением (правила устарели), иначе это потеря данных
+    if (!f.formations.length) assert.ok(f.rulesNotice, `${f.id}: нет построений и нет объяснения`);
+  }
+});
+
+test('построения: даты Warhammer Legends из примечаний выгрузки — уже ушедшие недоступны без показа Legends', () => {
+  const date = INDEX.lastUpdate.slice(0, 10);
+  let dated = 0;
+  for (const f of ALL)
+    for (const fm of f.formations) {
+      if (fm.legendsDate) dated++;
+      assert.equal(!!fm.legends, !!fm.legendsDate && fm.legendsDate <= date, `${f.id} «${fm.name}»`);
+      if (/Warhammer Legends/i.test(fm.notes ?? '')) assert.ok(fm.legendsDate, `${f.id} «${fm.name}»: дата Legends не разобрана`);
+    }
+  assert.ok(dated >= 3, 'даты Legends потерялись при импорте');
+  const sg = load('SG');
+  const ulf = sg.formations.find((x) => x.name === 'Legions of Ulfenkarn')!;
+  assert.equal(ulf.legends, true);
+  assert.equal(formationLegendsLabel(ulf), 'Warhammer Legends с 01.06.2026');
+  const L = makeAosLookup(sg);
+  const r = newAosRoster('SG', 2000);
+  assert.equal(formationFit(ulf, r, L).ok, false);
+  assert.match(formationFit(ulf, r, L).reason!, /Legends/);
+  assert.equal(formationFit(ulf, { ...r, showLegends: true }, L).ok, true);
+  // выбранное построение Legends — предупреждение в проверке армии
+  const c = computeAos({ ...r, showLegends: true, formationId: ulf.id }, L);
+  assert.ok(c.issues.some((i) => i.code === 'legends' && i.message.includes('Legions of Ulfenkarn')));
+  const cos = load('CoS').formations.find((x) => x.name === 'Thrall Warhost')!;
+  assert.equal(cos.legends, false);
+  assert.equal(formationLegendsLabel(cos), 'Уйдёт в Legends 01.06.2027');
+});
+
+test('неполные тексты: обрыв лимитом выгрузки и невыгруженные таблицы помечены у правил построений', () => {
+  const rule = (fid: string, fname: string, rname: string) => load(fid).formations.find((x) => x.name === fname)!.rules.find((x) => x.name === rname)!;
+  assert.equal(rule('ST', 'Fleshmeld Menagerie', 'Prized Creations').incomplete, 'table');
+  assert.equal(rule('SG', 'Legions of Ulfenkarn', 'WARDENS OF THE WOLF').incomplete, 'truncated');
+  for (const f of ALL)
+    for (const fm of f.formations)
+      for (const r of fm.rules) if (r.incomplete) assert.ok(['truncated', 'table'].includes(r.incomplete), `${f.id} «${r.name}»`);
+});
+
+test('построения по выгрузке CSV: каждое построение либо в данных, либо исключено с причиной', { skip: !fs.existsSync(path.join(CSV, 'Faction_abilities.csv')) && 'нет CSV выгрузки (tools/roster-data/wahapedia-aos-csv)' }, () => {
+  const types = new Map(readCsv('Faction_ability_types.csv').map((t) => [t.id, t.name]));
+  const inData = new Set(ALL.flatMap((f) => f.formations.map((x) => x.id)));
+  const missing: string[] = [];
+  for (const s of readCsv('Faction_ability_subtypes.csv')) {
+    if (types.get(s.type_id) !== 'Battle Formations') continue;
+    if (inData.has(s.id)) continue;
+    const season = curated.seasons[s.id];
+    const why = curated.stale.subtypes[s.id] ? 'устарело' : season && !seasonActive(season) ? 'сезон закончился' : null;
+    if (!why) missing.push(`${s.faction_id} «${s.name}»`);
+  }
+  assert.deepEqual(missing, [], 'построения пропали при импорте');
+  // каждый текст, упёршийся в лимит 1024 символа, помечен как обрезанный
+  const byKey = new Map(ALL.flatMap((f) => f.formations.flatMap((fm) => fm.rules.map((r) => [`${f.id}|${fm.id}|${r.name}`, r] as const))));
+  let capped = 0;
+  for (const a of readCsv('Faction_abilities.csv')) {
+    const r = byKey.get(`${a.faction_id}|${a.subtype_id}|${cleanName(a.name)}`);
+    if (r && a.description.length >= 1023) {
+      capped++;
+      assert.equal(r.incomplete, 'truncated', `${a.faction_id} «${a.name}»`);
+    }
+  }
+  assert.ok(capped >= 5, `сверено обрезанных правил построений: ${capped}`);
+});
+const cleanName = (s: string) => s.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').trim();
+
+// ---------- манифестации ----------
+
+test('манифестации: у каждого заклинания призыва есть свой варскролл манифестации, без лишних и потерянных', () => {
+  let pairs = 0;
+  for (const f of ALL) {
+    const L = makeAosLookup(f);
+    for (const lore of f.lores.filter((l) => l.kind === 'manifestation')) {
+      const entries = pairManifestations(lore, L);
+      assert.equal(entries.length, lore.items.length, `${f.id} «${lore.name}»: ${entries.length} записей на ${lore.items.length} заклинаний`);
+      for (const e of entries) {
+        assert.ok(e.spell && e.ws, `${f.id} «${lore.name}»: без пары — ${e.spell?.name ?? e.ws?.name}`);
+        assert.equal(e.ws!.kind, 'manifestation', `${f.id} «${e.ws!.name}»`);
+        assert.ok(castInfo(e.spell!.value), `${f.id} «${e.spell!.name}»: нет значения каста`);
+        pairs++;
+      }
+      assert.equal(new Set(entries.map((e) => e.ws!.id)).size, entries.length, `${f.id} «${lore.name}»: один варскролл у двух заклинаний`);
+    }
+  }
+  assert.ok(pairs >= 500, `пар: ${pairs}`);
+});
+
+test('манифестации: отдельный блок, а не в «Заклинаниях и молитвах»', () => {
+  const f = load('SE');
+  const L = makeAosLookup(f);
+  const lore = f.lores.find((l) => l.kind === 'manifestation' && !l.universal)!;
+  const r = setLore(newAosRoster('SE', 2000), 'manifestation', lore.id);
+  const m = manifestationsOf(r, L)!;
+  assert.equal(m.lore.id, lore.id);
+  assert.deepEqual(m.entries.map((e) => e.ws!.name).sort(), lore.summons.map((id) => L.ws.get(id)!.name).sort());
+  assert.ok(spellsOf(r, L).lores.every((x) => x.kind !== 'manifestation'));
+  assert.equal(manifestationsOf(newAosRoster('SE', 2000), L), null);
+  // отсутствующий варскролл не пропадает молча — запись без пары
+  const broken = { ...lore, summons: [...lore.summons.slice(1), 'missing-id'] };
+  const e = pairManifestations(broken, L);
+  assert.ok(e.some((x) => x.spell && !x.ws));
+  assert.ok(e.some((x) => !x.spell && !x.ws));
 });

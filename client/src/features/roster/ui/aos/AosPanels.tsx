@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { placedUnits, type AosLookup } from '../../aos/engine';
-import { activeTables, castInfo, grantsOf, ruleRefs, spellsOf, type CastInfo } from '../../aos/refs';
+import { activeTables, castInfo, grantsOf, manifestationsOf, ruleRefs, spellsOf, type CastInfo, type ManifestationEntry } from '../../aos/refs';
 import { LORE_LABEL, seasonLabel } from '../../aos/rules';
 import type { AosEnhancement, AosRoster, AosRule, AosUnit, AosWarscroll } from '../../aos/types';
 import { haptic } from '../../telegram';
 import { RuleText } from '../DetachmentPanel';
 import { Icon, Tag } from '../kit';
+import { Warscroll } from './AosUnitCard';
 import { cx } from '../util';
 
 /*
@@ -59,10 +60,22 @@ export function RefChips({ text, L }: { text: string; L: AosLookup }) {
 }
 
 /** Правило AoS: значение каста крупно справа, тайминг подписью, ссылки на таблицы под текстом. */
-export function AosRuleCard({ rule, L, open, extraSub }: { rule: AosRule; L?: AosLookup; open?: boolean; extraSub?: string | null }) {
+export function AosRuleCard({ rule, L, open, extraSub, link }: { rule: AosRule; L?: AosLookup; open?: boolean; extraSub?: string | null; link?: string | null }) {
   const cast = castInfo(rule.value);
   const sub = [rule.timing, rule.type, rule.reaction ? 'реакция' : null, extraSub, cast ? null : rule.value].filter(Boolean).join(' · ') || undefined;
-  return <RuleText name={rule.name} sub={sub} text={rule.text} open={open} badge={cast ? <CastBadge value={rule.value} /> : undefined} extra={L ? <RefChips text={rule.text} L={L} /> : undefined} />;
+  return (
+    <RuleText
+      name={rule.name}
+      sub={sub}
+      text={rule.text}
+      open={open}
+      badge={cast ? <CastBadge value={rule.value} /> : undefined}
+      extra={L ? <RefChips text={rule.text} L={L} /> : undefined}
+      incomplete={rule.incomplete}
+      // полный текст: страница варскролла (если передана) или страница фракции на Wahapedia
+      link={link ?? L?.faction.link}
+    />
+  );
 }
 
 // ---------- заклинания и молитвы ----------
@@ -117,10 +130,93 @@ export function SpellsPanel({ roster, L, open, onToggle }: { roster: AosRoster; 
               ))}
             </div>
           ))}
-          {!s.lores.length && <p className="text-[12.5px] text-white/45">Лоры заклинаний, молитв и манифестаций выбираются в блоке армии выше.</p>}
+          {!s.lores.length && <p className="text-[12.5px] text-white/45">Лоры заклинаний и молитв выбираются в блоке армии выше.</p>}
         </div>
       )}
     </section>
+  );
+}
+
+// ---------- манифестации ----------
+
+/**
+ * «Манифестации»: выбранный лор манифестаций — заклинание призыва (каст крупно) и варскролл манифестации
+ * (характеристики, способности, подставка, ключевые слова) одной карточкой. Отдельно от заклинаний и юнитов:
+ * у манифестаций нет своих очков — платится лор. Если пара заклинание↔варскролл не нашлась — предупреждение.
+ */
+export function ManifestationsPanel({ roster, L, open, onToggle }: { roster: AosRoster; L: AosLookup; open: boolean; onToggle: () => void }) {
+  const m = manifestationsOf(roster, L);
+  const available = L.faction.lores.some((l) => l.kind === 'manifestation');
+  if (!m && !available) return null;
+  return (
+    <section className="rounded-2xl border border-violet-300/25 bg-violet-400/[0.04]" aria-label="Манифестации">
+      <div className="flex items-center gap-2 px-4 py-3">
+        <Icon name="spark" className="size-5 shrink-0 text-violet-200/80" />
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-wider text-violet-200/70">Манифестации{m ? ` · ${m.entries.length}` : ''}</p>
+          <p className="mt-0.5 truncate text-[13px] text-white/60">
+            {m ? `${m.lore.name}${m.lore.points ? ` · ${m.lore.points} очк.` : ''}${seasonLabel(m.lore.season) ? ` · ${seasonLabel(m.lore.season)}` : ''}` : 'Лор манифестаций не выбран'}
+          </p>
+        </div>
+        {m && (
+          <button
+            type="button"
+            onClick={() => (haptic.tap(), onToggle())}
+            aria-expanded={open}
+            className="flex shrink-0 items-center gap-1 rounded-lg bg-white/[0.06] px-2.5 py-1.5 text-[12px] font-semibold text-white/75 active:bg-white/10"
+          >
+            {open ? 'Скрыть' : 'Показать'}
+            <Icon name="down" className={cx('size-3.5 transition', open && 'rotate-180')} />
+          </button>
+        )}
+      </div>
+      {m && open && (
+        <div className="space-y-2.5 border-t border-violet-300/15 px-4 pb-4 pt-3">
+          <p className="text-[12px] leading-snug text-white/45">
+            Манифестации призываются заклинаниями лора и не занимают места в полках; очки платятся один раз — за лор.
+          </p>
+          {m.entries.map((e, i) => (
+            <ManifestationCard key={e.ws?.id ?? e.spell?.name ?? i} entry={e} L={L} />
+          ))}
+        </div>
+      )}
+      {!m && <p className="border-t border-violet-300/15 px-4 py-3 text-[12.5px] text-white/45">Выберите лор манифестаций в блоке армии выше — здесь появятся заклинания призыва и варскроллы манифестаций.</p>}
+    </section>
+  );
+}
+
+function ManifestationCard({ entry, L }: { entry: ManifestationEntry; L: AosLookup }) {
+  const { spell, ws } = entry;
+  const cast = castInfo(spell?.value);
+  return (
+    <details className="group rounded-xl border border-violet-300/20 bg-app-elevated" data-manifestation>
+      <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2.5">
+        <span className="min-w-0 flex-1">
+          <span className="block text-[14px] font-semibold leading-snug text-white/90">{ws?.name ?? spell?.name ?? 'Манифестация'}</span>
+          <span className="block text-[11px] text-violet-200/60">{[ws?.role, ws?.bases ? `подставка ${ws.bases}` : null].filter(Boolean).join(' · ') || 'Манифестация'}</span>
+        </span>
+        {cast && <CastBadge value={spell!.value} />}
+        <Icon name="down" className="size-4 shrink-0 text-white/35 transition group-open:rotate-180" />
+      </summary>
+      <div className="space-y-3 border-t border-white/[0.06] px-3 pb-3 pt-3">
+        {spell ? (
+          <div className="space-y-1.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-violet-200/60">Призыв</p>
+            <AosRuleCard rule={spell} L={L} open />
+          </div>
+        ) : (
+          <p className="rounded-lg bg-warn/10 px-2.5 py-1.5 text-[11.5px] leading-snug text-amber-100">В данных лора нет заклинания призыва для этой манифестации.</p>
+        )}
+        {ws ? (
+          <div className="space-y-1.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-violet-200/60">Варскролл</p>
+            <Warscroll ws={ws} L={L} embedded />
+          </div>
+        ) : (
+          <p className="rounded-lg bg-warn/10 px-2.5 py-1.5 text-[11.5px] leading-snug text-amber-100">Варскролл манифестации не найден в данных — характеристики и способности не показаны.</p>
+        )}
+      </div>
+    </details>
   );
 }
 

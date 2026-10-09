@@ -492,8 +492,17 @@ export function enhancementFit(u: AosUnit, itemId: string, r: AosRoster, L: AosL
 
 export const loresOf = (kind: LoreKind, L: AosLookup) => L.faction.lores.filter((l) => l.kind === kind && seasonActive(l.season));
 
-/** Построения, которые можно выбрать сейчас (без закончившихся сезонов). */
+/** Построения фракции без закончившихся сезонов (построения Warhammer Legends остаются в списке — их блокирует formationFit). */
 export const formationsOf = (L: AosLookup) => L.faction.formations.filter((f) => seasonActive(f.season));
+
+/** «01.06.2027» из даты выгрузки «2027-06-01». */
+export const ruDate = (iso: string) => iso.split('-').reverse().join('.');
+
+/** Подпись о Legends у построения: уже в Legends или дата перехода из примечания выгрузки. */
+export function formationLegendsLabel(f: AosFormation): string | null {
+  if (!f.legendsDate) return f.legends ? 'Warhammer Legends' : null;
+  return f.legends ? `Warhammer Legends с ${ruDate(f.legendsDate)}` : `Уйдёт в Legends ${ruDate(f.legendsDate)}`;
+}
 
 export function loreFit(lore: AosLore, r: AosRoster, L: AosLookup): Fit {
   if (!seasonActive(lore.season)) return no(`Сезон ${seasonLabel(lore.season)} закончился.`);
@@ -505,6 +514,7 @@ export function loreFit(lore: AosLore, r: AosRoster, L: AosLookup): Fit {
 
 export function formationFit(f: AosFormation, r: AosRoster, L: AosLookup): Fit {
   if (!seasonActive(f.season)) return no(`Сезон ${seasonLabel(f.season)} закончился.`);
+  if (f.legends && !r.showLegends) return no(`${formationLegendsLabel(f)} — включите показ Legends.`);
   if (f.points == null) return no('Нет очков в Battle Profiles.');
   const delta = f.points - ((r.formationId && L.formation.get(r.formationId)?.points) || 0);
   return pointsFit(delta, r, L);
@@ -679,12 +689,14 @@ export function computeAos(r: AosRoster, L: AosLookup): AosComputed {
   for (const [id, uids] of items) if (uids.length > 1) err('enh-dup', `«${L.enh.get(id)?.item.name}» выбрано ${uids.length} раза.`, uids);
 
   // построение, лоры, террейн, полк славы
-  const formations = formationsOf(L);
+  // построения Legends не обязывают выбирать (если других нет — армия без построения)
+  const formations = formationsOf(L).filter((f) => !f.legends || r.showLegends);
   if (r.formationId && !L.formation.get(r.formationId)) err('formation', 'Выбранное боевое построение не найдено в данных.');
   else if (!r.formationId && formations.length) err('formation', 'Выберите боевое построение.');
   if (r.formationId && L.formation.get(r.formationId)?.points == null && L.formation.get(r.formationId)) err('formation', 'У построения нет очков в Battle Profiles.');
   const fm = r.formationId ? L.formation.get(r.formationId) : undefined;
   if (fm && !seasonActive(fm.season)) err('formation', `«${fm.name}» — сезон ${seasonLabel(fm.season)} закончился.`);
+  if (fm?.legends) warn('legends', `«${fm.name}» — ${formationLegendsLabel(fm)}, в matched play не допускается.`);
   for (const kind of ['spell', 'prayer', 'manifestation'] as LoreKind[]) {
     const id = r.lores[kind];
     if (!id) continue;

@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseCsv, htmlToText, cleanWahaText } from './import-wahapedia.mjs';
+import { parseCsv, htmlToText, cleanWahaText, rawIncomplete } from './import-wahapedia.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FILES = [
@@ -25,6 +25,12 @@ const FILES = [
 const UNIVERSAL = 'EnS'; // «Endless Spells» — универсальные лоры манифестаций, не отдельная армия
 const MONTHS = { january: 1, february: 2, march: 3, april: 4, may: 5, june: 6, july: 7, august: 8, september: 9, october: 10, november: 11, december: 12 };
 const ALLIANCES = ['ORDER', 'CHAOS', 'DEATH', 'DESTRUCTION'];
+/**
+ * Выгрузка Wahapedia AoS обрезает поле description на 1024 символах HTML (68 способностей варскроллов и 112 правил
+ * фракций в выгрузке от 25.08.2026 упираются ровно в этот лимит, у 40K лимита нет). Такие правила помечаются
+ * incomplete: 'truncated', интерфейс показывает предупреждение и ссылку на полный текст.
+ */
+const AOS_TEXT_CAP = 1024;
 const CORE_TABLES = new Set(['Battle Formations', 'Heroic Traits', 'Artefacts of Power', 'Spell Lore', 'Prayer Lore', 'Manifestation Lore', 'Monstrous Traits']);
 
 // ---------- общие помощники ----------
@@ -195,6 +201,8 @@ export function importAos(src, { curated, eligibility }) {
 
   const rule = (a) => {
     const r = { name: text(a.name), text: text(a.description) };
+    const inc = rawIncomplete(a.description, AOS_TEXT_CAP);
+    if (inc) r.incomplete = inc;
     if (a.condition) r.timing = text(a.condition);
     if (a.ability_type) r.type = a.ability_type;
     if (a.keywords) r.keywords = text(a.keywords);
@@ -495,7 +503,12 @@ export function importAos(src, { curated, eligibility }) {
       if (typeName === 'Battle Formations') {
         const pts = ptsFor(fid, 'formation', subName);
         if (pts == null) report.warnings.push(`${fid}: построение «${subName}» — нет очков`);
-        formations.push({ id: sid, name: subName, points: pts, season, rules: items.map(rule) });
+        // примечание подтипа: сроки перехода в Warhammer Legends («On 1st June 2027, these rules will move over…»)
+        const notes = subDesc.get(`${fid}|${sid}`) ?? '';
+        const lm = notes.match(/(?:on|from)\s+(\d{1,2})(?:st|nd|rd|th)?\s+(\w+)\s+(\d{4}),?\s+these rules will move (?:over )?to Warhammer Legends/i);
+        const legendsDate = lm ? `${lm[3]}-${String(MONTHS[lm[2].toLowerCase()] ?? 1).padStart(2, '0')}-${String(lm[1]).padStart(2, '0')}` : null;
+        if (/Warhammer Legends/i.test(notes) && !legendsDate) report.warnings.push(`${fid}: построение «${subName}» — упоминание Legends без даты: ${notes.slice(0, 80)}`);
+        formations.push({ id: sid, name: subName, points: pts, season, rules: items.map(rule), notes, legendsDate, legends: !!legendsDate && legendsDate <= dataDate });
       } else if (/^(Spell|Prayer|Manifestation) Lore$/.test(typeName)) {
         const kind = typeName.split(' ')[0].toLowerCase();
         const pts = ptsFor(fid, 'lore', subName);
@@ -614,6 +627,10 @@ export function importAos(src, { curated, eligibility }) {
     normaliseAosFaction(data, curated);
     for (const where of findMarkup(data)) report.errors.push(`${fid}: служебная разметка в тексте — ${where}`);
   }
+  const inc = { truncated: 0, table: 0 };
+  for (const data of Object.values(files)) for (const r of rulesOf(data)) if (r.incomplete) inc[r.incomplete]++;
+  if (inc.truncated || inc.table)
+    report.warnings.push(`неполные тексты в выгрузке: обрезано лимитом 1024 символа — ${inc.truncated}, таблица не выгружена — ${inc.table}; в конструкторе помечены, полный текст на Wahapedia`);
   return { index, files, report };
 }
 
@@ -638,7 +655,12 @@ function* rulesOf(data) {
  * чистка всех текстовых полей правил и заметок; сезон у построений.
  */
 export function normaliseAosFaction(data, curated) {
-  for (const r of rulesOf(data)) for (const k of RULE_FIELDS) if (typeof r[k] === 'string') r[k] = cleanWahaText(r[k]);
+  for (const r of rulesOf(data)) {
+    // в готовых файлах обрывок тега и заглушка таблицы могли остаться — отмечаем до чистки
+    const inc = r.incomplete ?? rawIncomplete(r.text);
+    if (inc) r.incomplete = inc;
+    for (const k of RULE_FIELDS) if (typeof r[k] === 'string') r[k] = cleanWahaText(r[k]);
+  }
   for (const w of [...data.warscrolls, ...data.rorUnits, ...data.universalManifestations]) {
     if (typeof w.notes === 'string') w.notes = cleanWahaText(w.notes);
     for (const wp of w.weapons) if (typeof wp.abilities === 'string') wp.abilities = cleanWahaText(wp.abilities);

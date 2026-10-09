@@ -214,3 +214,22 @@ test('союзники: Assigned Agents и Daemonic Pact', () => {
   const codesC = computeRoster(c, LC).issues.map((i) => i.code);
   assert.ok(codesC.includes('daemons-ratio'));
 });
+
+test('очки 40K: справочник раскладывает итог computeRoster, DP и улучшения отдельно, VP партии — нет данных', async () => {
+  const { w40kPointSystems } = await import('../../../client/src/features/roster/points');
+  let r = baseRoster();
+  r = addUnit(r, byName('Captain'));
+  r = addUnit(r, byName('Intercessor Squad'));
+  const cr = computeRoster(r, L);
+  const sys = w40kPointSystems(r, L, cr);
+  const num = (v: string) => Number(v.replace(/[^\d]/g, ''));
+  const army = sys.find((s) => s.id === '40k-army')!;
+  assert.equal(army.lines.slice(1).reduce((s, l) => s + num(l.value), 0), cr.points);
+  assert.equal(sys.find((s) => s.id === '40k-dp')!.lines[0].value, `${cr.dp} / ${cr.dpLimit}`);
+  const cp = sys.find((s) => s.id === '40k-cp')!;
+  const strats = SM.stratagems.filter((s) => r.detachmentIds.includes(s.detachment));
+  assert.equal(cp.lines.reduce((s, l) => s + num(l.value), 0), strats.length);
+  assert.equal(sys.find((s) => s.id === '40k-vp')!.status, 'unavailable');
+  // AoS-правила (VP/CP Age of Sigmar) не попадают в 40K
+  assert.ok(sys.every((s) => !s.id.startsWith('aos')));
+});

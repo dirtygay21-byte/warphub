@@ -24,18 +24,22 @@ const curated = JSON.parse(fs.readFileSync(path.join(HERE, '..', 'aos', 'curated
 
 let changedFiles = 0;
 let changedValues = 0;
-for (const file of fs.readdirSync(path.join(DIR, 'f')).filter((f) => f.endsWith('.json')).sort()) {
+const files = fs.readdirSync(path.join(DIR, 'f')).filter((f) => f.endsWith('.json')).sort();
+const loaded = files.map((file) => {
   const p = path.join(DIR, 'f', file);
   const before = fs.readFileSync(p, 'utf8');
-  const data = normaliseAosFaction(JSON.parse(before), curated);
+  return { file, p, before, data: normaliseAosFaction(JSON.parse(before), curated) };
+});
+// без CSV длина исходного HTML неизвестна: обрыв по лимиту 1024 символа точно отмечает только импорт;
+// здесь отмечаются лишь видимые признаки (обрывок тега, заглушка таблицы) — см. normaliseAosFaction
+for (const { file, p, before, data } of loaded) {
   const after = JSON.stringify(data);
   const left = findMarkup(data);
   if (left.length) console.log(`  ✗ ${file}: разметка осталась — ${left.slice(0, 3).join(', ')}`);
   if (after === before) continue;
-  // сколько строковых значений поменялось (для отчёта)
   const a = before.match(/"(?:[^"\\]|\\.)*"/g) ?? [];
   const b = after.match(/"(?:[^"\\]|\\.)*"/g) ?? [];
-  const diff = b.length - a.length + a.filter((s, i) => s !== b[i]).length;
+  const diff = Math.abs(b.length - a.length) + a.filter((x, i) => x !== b[i]).length;
   changedFiles++;
   changedValues += diff;
   console.log(`  ${CHECK ? '~' : '✓'} ${file}: изменений ~${diff}`);
