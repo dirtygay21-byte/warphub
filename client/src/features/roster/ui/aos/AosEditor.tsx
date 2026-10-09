@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { loadAosFaction } from '../../data';
-import { computeAos, formationsOf, makeAosLookup, regimentCap, slotsUsed, unitTotal, type AosComputed, type AosLookup } from '../../aos/engine';
+import { computeAos, formationsOf, makeAosLookup, terrainOf, regimentCap, slotsUsed, unitTotal, type AosComputed, type AosLookup } from '../../aos/engine';
 import {
   addAuxiliary,
   addRegiment,
@@ -25,7 +25,10 @@ import { cx, fmtPts } from '../util';
 import { AosExportSheet } from './AosExportSheet';
 import { AosPicker, type PickTarget } from './AosPicker';
 import { AosUnitCard, Warscroll } from './AosUnitCard';
-import { AosRuleCard, EnhancementsPanel, SpellsPanel } from './AosPanels';
+import { AosRuleCard, EnhancementsPanel, ManifestationsPanel, SpellsPanel } from './AosPanels';
+import { aosPointSystems } from '../../points';
+import { AosTerrainGuide } from './AosTerrainGuide';
+import { AosScoreTracker, PointsSheet } from '../PointsSheet';
 import { useSpellsOpen } from './useSpellsOpen';
 import { EnhancementSheet, FormationSheet, LoreSheet, MoveSheet, RorSheet, TerrainSheet } from './AosSheets';
 
@@ -95,7 +98,7 @@ function Editor({
   const [expanded, setExpanded] = useState<string | null>(null);
   const [picker, setPicker] = useState<PickTarget | null>(null);
   const [armyOpen, setArmyOpen] = useState(roster.regiments.length === 0);
-  const [sheet, setSheet] = useState<null | 'formation' | 'terrain' | 'ror' | 'problems' | 'export' | 'menu' | 'traits'>(null);
+  const [sheet, setSheet] = useState<null | 'formation' | 'terrain' | 'ror' | 'problems' | 'export' | 'menu' | 'traits' | 'points'>(null);
   const [lore, setLoreSheet] = useState<LoreKind | null>(null);
   const [enh, setEnh] = useState<{ uid: string; typeKey: string } | null>(null);
   const [moving, setMoving] = useState<string | null>(null);
@@ -103,6 +106,9 @@ function Editor({
   // режим просмотра: только чтение, без кнопок изменения (как просмотр ростера в приложениях-конструкторах)
   const [view, setView] = useState(false);
   const [spellsOpen, toggleSpells] = useSpellsOpen();
+  const [manifOpen, setManifOpen] = useState(true);
+  /** открыт гид «Как ставить террейн» — id варскролла террейна */
+  const [guide, setGuide] = useState<string | null>(null);
   const toastTimer = useRef<number | undefined>(undefined);
   const f = L.faction;
   const over = cr.points.total > roster.pointsLimit;
@@ -189,10 +195,11 @@ function Editor({
           {!view && <IconButton icon="more" label="Меню" onClick={() => setSheet('menu')} className="size-9" />}
         </div>
         <div className="mt-3 flex items-end justify-between gap-3">
-          <div className="flex min-w-0 items-baseline gap-1.5">
+          <button type="button" onClick={() => (haptic.tap(), setSheet('points'))} aria-label="Очки: сборка армии и партия" className="flex min-w-0 items-baseline gap-1.5 rounded-lg text-left active:opacity-70">
             <span className={cx('font-display text-[32px] max-[359px]:text-[26px] font-semibold leading-none tabular-nums', over ? 'text-danger' : 'text-white')}>{fmtPts(cr.points.total)}</span>
             <span className="whitespace-nowrap text-sm text-white/40">/ {fmtPts(roster.pointsLimit)}</span>
-          </div>
+            <Icon name="info" className="size-3.5 shrink-0 self-center text-white/35" />
+          </button>
           <div className="flex gap-1.5">
             <Stat label="Полки" value={`${roster.regiments.length}/${AOS_RULES.maxRegiments}`} bad={cr.issues.some((i) => i.code === 'regiments' || i.code === 'no-regiment')} />
             <Stat label="Высадки" value={String(cr.drops)} />
@@ -232,7 +239,7 @@ function Editor({
             </div>
             <Icon name="down" className={cx('size-5 shrink-0 text-white/40 transition', armyOpen && 'rotate-180')} />
           </button>
-          {armyOpen && view && <ArmyView roster={roster} L={L} />}
+          {armyOpen && view && <ArmyView roster={roster} L={L} onGuide={setGuide} />}
           {armyOpen && !view && (
             <div className="space-y-4 border-t border-white/[0.06] px-4 pb-4 pt-4">
               {f.rulesNotice && <p className="rounded-xl border border-warn/30 bg-warn/10 px-3 py-2 text-[12.5px] leading-snug text-amber-100">{f.rulesNotice}</p>}
@@ -250,6 +257,11 @@ function Editor({
                 return <PickRow key={k} label={LORE_LABEL[k]} value={l?.name} points={l?.points} empty={avail ? 'Выбрать' : 'Нет у фракции'} onClick={avail ? () => setLoreSheet(k) : undefined} />;
               })}
               <PickRow label="Террейн фракции" value={terrain?.name} points={terrain?.cost} empty={f.warscrolls.some((w) => w.kind === 'terrain') ? 'Выбрать' : 'Нет у фракции'} onClick={f.warscrolls.some((w) => w.kind === 'terrain') ? () => setSheet('terrain') : undefined} />
+              {terrainOf(L).length > 0 && (
+                <Button variant="outline" className="w-full justify-start" onClick={() => setGuide((terrain ?? terrainOf(L)[0]).id)}>
+                  <Icon name="map" className="size-4" /> Как ставить террейн фракции
+                </Button>
+              )}
               <PickRow label="Полк славы" value={ror?.name} points={ror ? cr.points.ror : null} empty={f.rors.length ? 'Выбрать' : 'Нет'} onClick={f.rors.length ? () => setSheet('ror') : undefined} />
               {f.battleTraits.length > 0 && (
                 <Button variant="outline" className="w-full justify-start" onClick={() => setSheet('traits')}>
@@ -261,6 +273,7 @@ function Editor({
         </section>
 
         <SpellsPanel roster={roster} L={L} open={spellsOpen} onToggle={toggleSpells} />
+        <ManifestationsPanel roster={roster} L={L} open={manifOpen} onToggle={() => setManifOpen((o) => !o)} />
         <EnhancementsPanel roster={roster} L={L} onUnit={scrollTo} />
 
         {/* ---- полки ---- */}
@@ -379,11 +392,13 @@ function Editor({
 
       <AosPicker key={picker ? picker.kind + (picker.kind === 'regiment' ? picker.regUid : '') : 'none'} target={picker} onClose={() => setPicker(null)} roster={roster} L={L} onPick={pick} onToggleLegends={() => set({ showLegends: !roster.showLegends })} />
       <FormationSheet open={sheet === 'formation'} onClose={() => setSheet(null)} roster={roster} L={L} onPick={(id) => (set({ formationId: id }), setSheet(null))} />
-      <TerrainSheet open={sheet === 'terrain'} onClose={() => setSheet(null)} roster={roster} L={L} onPick={(id) => (set({ terrainId: id }), setSheet(null))} />
+      <TerrainSheet open={sheet === 'terrain'} onClose={() => setSheet(null)} roster={roster} L={L} onPick={(id) => (set({ terrainId: id }), setSheet(null))} onGuide={(id) => (setSheet(null), setGuide(id))} />
+      <AosTerrainGuide ws={guide ? (L.ws.get(guide) ?? null) : null} L={L} onClose={() => setGuide(null)} />
       <RorSheet key={sheet === 'ror' ? 'ror-open' : 'ror'} open={sheet === 'ror'} onClose={() => setSheet(null)} roster={roster} L={L} onPick={(v) => (set({ ror: v }), setSheet(null))} />
       <LoreSheet key={'lore-' + (lore ?? 'closed')} kind={lore} onClose={() => setLoreSheet(null)} roster={roster} L={L} onPick={(id) => (lore && onChange(setLore(roster, lore, id)), setLoreSheet(null))} />
       <EnhancementSheet target={enh} onClose={() => setEnh(null)} roster={roster} L={L} onPick={(id) => (enh && onChange(setEnhancement(roster, enh.uid, enh.typeKey, id)), setEnh(null))} />
       <MoveSheet uid={moving} onClose={() => setMoving(null)} roster={roster} L={L} onMove={(t) => (moving && apply(moveAosUnit(roster, moving, t, L), 'Перенесено'), setMoving(null))} />
+      <PointsSheet open={sheet === 'points'} onClose={() => setSheet(null)} systems={aosPointSystems(roster, L, cr)} extra={{ game: <AosScoreTracker /> }} />
       <AosExportSheet open={sheet === 'export'} onClose={() => setSheet(null)} roster={roster} L={L} cr={cr} />
 
       <Sheet open={sheet === 'traits'} onClose={() => setSheet(null)} title="Боевые черты" tall>
@@ -454,7 +469,7 @@ function Editor({
 }
 
 /** Блок армии в режиме просмотра: построение с правилами, лоры, террейн, полк славы, боевые черты — без выбора. */
-function ArmyView({ roster, L }: { roster: AosRoster; L: AosLookup }) {
+function ArmyView({ roster, L, onGuide }: { roster: AosRoster; L: AosLookup; onGuide: (id: string) => void }) {
   const f = L.faction;
   const formation = roster.formationId ? L.formation.get(roster.formationId) : null;
   const terrain = roster.terrainId ? L.ws.get(roster.terrainId) : null;
@@ -481,6 +496,11 @@ function ArmyView({ roster, L }: { roster: AosRoster; L: AosLookup }) {
         {line('Террейн', terrain?.name, terrain?.cost)}
         {line('Полк славы', ror?.name)}
       </div>
+      {terrainOf(L).length > 0 && (
+        <Button variant="outline" className="w-full justify-start" onClick={() => onGuide((terrain ?? terrainOf(L)[0]).id)}>
+          <Icon name="map" className="size-4" /> Как ставить террейн фракции
+        </Button>
+      )}
       {formation && formation.rules.length > 0 && (
         <div className="space-y-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Построение · {formation.name}</p>

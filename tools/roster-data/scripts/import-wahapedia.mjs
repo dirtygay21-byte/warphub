@@ -125,11 +125,30 @@ export function cleanWahaText(input) {
   }
   out = out.replace(/<br\s*\/?>/gi, '\n').replace(/<\/?[A-Za-z][A-Za-z0-9]{0,9}\s*\/?>/g, '');
   out = out.replace(/%\d{6,}([^%\n]*)%/g, '$1').replace(/%\d{6,}/g, '');
+  // текст оборвался посреди тега («… inflict D3 <a href="/aos4/the-rul») — обрывок тега убираем;
+  // заглушка таблицы «$000001417» (сама таблица в выгрузку не попала) — тоже. Что текст неполный,
+  // отмечает rawIncomplete (поле incomplete у правила), а не молчаливое удаление.
+  out = out.replace(/<[A-Za-z/][^>\n]*$/, '').replace(/\n?\$\d{6,}/g, '');
   return out
     .replace(/[ \t\u00a0\u2002\u2003\u2009]+/g, ' ')
     .replace(/ *\n */g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
+}
+
+/**
+ * Признак неполного текста по сырому HTML из выгрузки:
+ *   'table'     — вместо таблицы заглушка «$000001417» (таблиц в выгрузке нет, см. Export_Data_Specs);
+ *   'truncated' — текст оборван: длина упёрлась в лимит поля выгрузки (cap; у AoS — 1024 символа,
+ *                 пробел на месте обрыва Wahapedia срезает, поэтому 1023 тоже обрыв) или кончается посреди тега.
+ * Иначе null.
+ */
+export function rawIncomplete(html, cap = 0) {
+  const t = String(html ?? '');
+  if (/\$\d{6,}/.test(t)) return 'table';
+  if (cap && t.length >= cap - 1) return 'truncated';
+  if (/<[A-Za-z/][^>]*$/.test(t.trimEnd())) return 'truncated';
+  return null;
 }
 
 export function htmlToText(html) {

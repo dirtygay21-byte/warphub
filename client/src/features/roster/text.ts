@@ -43,6 +43,9 @@ export function cleanRuleText(s: string | null | undefined): string {
   }
   out = out.replace(/<br\s*\/?>/gi, '\n').replace(TAG, '');
   out = out.replace(WAHA_LINK, '$1').replace(WAHA_LINK_ORPHAN, '');
+  // обрывок тега в конце («… D3 <a href="/aos4/the-rul») и заглушка таблицы «$000001417»; что текст неполный,
+  // показывает rawIncomplete / поле incomplete правила (предупреждение со ссылкой на полный текст)
+  out = out.replace(/<[A-Za-z/][^>\n]*$/, '').replace(/\n?\$\d{6,}/g, '');
   return out
     .replace(/[ \t\u00a0\u2002\u2003\u2009]+/g, ' ')
     .replace(/ *\n */g, '\n')
@@ -56,3 +59,22 @@ export function hasMarkup(s: string | null | undefined): boolean {
   // без флага g: у глобального RegExp.test есть состояние (lastIndex)
   return /%\d{6,}/.test(s) || new RegExp(TAG.source).test(s) || /&(#\d+|#x[0-9a-f]+|[a-z]+);/i.test(s);
 }
+
+/** Почему текст правила неполный (как в данных: incomplete у правила AoS). */
+export type IncompleteKind = 'truncated' | 'table';
+
+/**
+ * Признак неполного текста по самому тексту, до очистки: заглушка таблицы «$000001417» или обрыв посреди тега.
+ * Та же проверка, что rawIncomplete в импортёре; нужна для данных без поля incomplete (40K, старые файлы).
+ */
+export function rawIncomplete(s: string | null | undefined): IncompleteKind | null {
+  const t = String(s ?? '').trimEnd();
+  if (/\$\d{6,}/.test(t)) return 'table';
+  if (/<[A-Za-z/][^>]*$/.test(t)) return 'truncated';
+  return null;
+}
+
+export const INCOMPLETE_TEXT: Record<IncompleteKind, string> = {
+  truncated: 'Текст обрезан в выгрузке Wahapedia (лимит 1024 символа) — конец правила не показан.',
+  table: 'В правиле есть таблица, которой нет в выгрузке Wahapedia.',
+};

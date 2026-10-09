@@ -13,6 +13,8 @@ export interface AosRule {
   /** «Spell 7», «Prayer 4», «Command 1» */
   value?: string;
   reaction?: boolean;
+  /** текст в выгрузке неполный: обрезан лимитом 1024 символа или без невыгруженной таблицы (см. tools/roster-data README) */
+  incomplete?: 'truncated' | 'table';
 }
 
 export interface AosWeapon {
@@ -169,6 +171,12 @@ export interface AosFormation {
   /** сезон построения; в старых данных поля нет — значит 'standard' */
   season?: Season;
   rules: AosRule[];
+  /** примечание выгрузки (Faction_ability_subtypes.description), например дата перехода в Legends */
+  notes?: string | null;
+  /** дата перехода в Warhammer Legends (YYYY-MM-DD), если указана в примечании */
+  legendsDate?: string | null;
+  /** на дату выгрузки построение уже в Legends — для обычных игр недоступно */
+  legends?: boolean;
 }
 
 export interface AosFactionData {

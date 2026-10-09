@@ -234,9 +234,13 @@ function Row({ label, value, action, reason }: { label: string; value: string; a
   );
 }
 
-/** Варскролл: характеристики, оружие, способности, ключевые слова. */
-export function Warscroll({ ws, unit, L, defaultOpen = false }: { ws: AosWarscroll; unit?: AosUnit; L?: AosLookup; defaultOpen?: boolean }) {
-  const [open, setOpen] = useState(defaultOpen);
+/**
+ * Варскролл: характеристики, оружие, способности, ключевые слова.
+ * embedded — без своей кнопки «Варскролл» и без строки размера/очков (манифестация: очки платятся за лор).
+ */
+export function Warscroll({ ws, unit, L, defaultOpen = false, embedded = false }: { ws: AosWarscroll; unit?: AosUnit; L?: AosLookup; defaultOpen?: boolean; embedded?: boolean }) {
+  const [toggled, setOpen] = useState(defaultOpen);
+  const open = embedded || toggled;
   const ranged = ws.weapons.filter((w) => w.type === 'ranged');
   const melee = ws.weapons.filter((w) => w.type === 'melee');
   const stat = (label: string, v: string) => (
@@ -246,13 +250,15 @@ export function Warscroll({ ws, unit, L, defaultOpen = false }: { ws: AosWarscro
     </div>
   );
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02]">
-      <button type="button" onClick={() => setOpen((o) => !o)} className="flex w-full items-center justify-between px-3 py-2.5 text-sm font-semibold text-white/75">
-        Варскролл
-        <Icon name="down" className={cx('size-4 text-white/40 transition', open && 'rotate-180')} />
-      </button>
+    <div className={cx(!embedded && 'rounded-xl border border-white/10 bg-white/[0.02]')}>
+      {!embedded && (
+        <button type="button" onClick={() => setOpen((o) => !o)} className="flex w-full items-center justify-between px-3 py-2.5 text-sm font-semibold text-white/75">
+          Варскролл
+          <Icon name="down" className={cx('size-4 text-white/40 transition', open && 'rotate-180')} />
+        </button>
+      )}
       {open && (
-        <div className="space-y-3 border-t border-white/[0.06] px-3 pb-3 pt-3">
+        <div className={cx('space-y-3', !embedded && 'border-t border-white/[0.06] px-3 pb-3 pt-3')}>
           <div className={cx('grid gap-1.5', ws.stats.ward ? 'grid-cols-5' : 'grid-cols-4')}>
             {stat('Move', ws.stats.move)}
             {stat('Save', ws.stats.save)}
@@ -266,7 +272,7 @@ export function Warscroll({ ws, unit, L, defaultOpen = false }: { ws: AosWarscro
             <div className="space-y-1.5">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Способности</p>
               {ws.abilities.map((a, i) => (
-                <AosRuleCard key={i} rule={a} L={L} />
+                <AosRuleCard key={i} rule={a} L={L} link={ws.link} />
               ))}
             </div>
           )}
@@ -287,10 +293,12 @@ export function Warscroll({ ws, unit, L, defaultOpen = false }: { ws: AosWarscro
             ))}
           </div>
           <div className="space-y-0.5 text-[12px] text-white/45">
-            <p>
-              Размер: {ws.unitSize} мод.{unit?.reinforced ? ` (усилен — ${ws.unitSize * 2})` : ''} · Очки: {ws.cost ?? '—'}
-              {ws.reinforceable ? ' · можно усилить' : ''}
-            </p>
+            {!embedded && (
+              <p>
+                Размер: {ws.unitSize} мод.{unit?.reinforced ? ` (усилен — ${ws.unitSize * 2})` : ''} · Очки: {ws.cost ?? '—'}
+                {ws.reinforceable ? ' · можно усилить' : ''}
+              </p>
+            )}
             {ws.bases && <p>Подставка: {ws.bases}</p>}
             {ws.notes && <p className="whitespace-pre-line">{cleanRuleText(ws.notes)}</p>}
             {ws.legendsDate && !ws.legends && <p>Уйдёт в Warhammer Legends: {ws.legendsDate}</p>}

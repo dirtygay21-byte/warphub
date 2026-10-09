@@ -13,6 +13,8 @@ import { UnitPicker } from './UnitPicker';
 import { ExportSheet } from './ExportSheet';
 import { DetachmentPanel, RuleText } from './DetachmentPanel';
 import { cleanRuleText } from '../text';
+import { w40kPointSystems } from '../points';
+import { PointsSheet } from './PointsSheet';
 
 const GROUPS: { key: ReturnType<typeof roleGroup>; title: string }[] = [
   { key: 'characters', title: 'Персонажи' },
@@ -117,6 +119,7 @@ function Editor({
   // режим просмотра: только чтение, без кнопок изменения
   const [view, setView] = useState(false);
   const [detInfo, setDetInfo] = useState<string | null>(null);
+  const [pointsInfo, setPointsInfo] = useState(false);
   const closeDetInfo = useCallback(() => setDetInfo(null), []);
   const shownDet = detInfo && cr.detachments.some((d) => d.id === detInfo) ? detInfo : null;
   const toggleDetInfo = (id: string) => {
@@ -173,12 +176,13 @@ function Editor({
           {!view && <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />}
         </div>
         <div className="mt-3 flex items-end justify-between gap-3">
-          <div className="min-w-0">
+          <button type="button" onClick={() => (haptic.tap(), setPointsInfo(true))} aria-label="Очки: сборка армии и партия" className="min-w-0 rounded-lg text-left active:opacity-70">
             <div className="flex items-baseline gap-1.5">
               <span className={cx('font-display text-[32px] font-semibold leading-none tabular-nums', over ? 'text-danger' : 'text-white')}>{fmtPts(cr.points)}</span>
               <span className="text-sm text-white/40">/ {fmtPts(size.points)}</span>
+              <Icon name="info" className="size-3.5 shrink-0 self-center text-white/35" />
             </div>
-          </div>
+          </button>
           <div className="flex gap-1.5">
             <Stat label="DP" value={`${cr.dp}/${cr.dpLimit}`} bad={cr.issues.some((i) => i.code === 'dp')} />
             <Stat label="Улучш." value={`${cr.enhancementsUsed}/${cr.enhancementsLimit}`} bad={cr.issues.some((i) => i.code === 'enh-cap')} />
@@ -410,6 +414,7 @@ function Editor({
         </div>
       )}
 
+      <PointsSheet open={pointsInfo} onClose={() => setPointsInfo(false)} systems={w40kPointSystems(roster, L, cr)} />
       <UnitPicker open={picker} onClose={() => setPicker(false)} roster={roster} L={L} cr={cr} onAdd={add} onToggleLegends={() => set({ showLegends: !roster.showLegends })} />
 
       <DetachmentSheet open={detSheet} onClose={() => setDetSheet(false)} roster={roster} L={L} cr={cr} onPick={(d) => {

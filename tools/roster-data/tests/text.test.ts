@@ -3,8 +3,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { cleanRuleText, hasMarkup } from '../../../client/src/features/roster/text';
-import { cleanWahaText, htmlToText } from '../scripts/import-wahapedia.mjs';
+import { cleanRuleText, hasMarkup, rawIncomplete as clientIncomplete } from '../../../client/src/features/roster/text';
+import { cleanWahaText, htmlToText, rawIncomplete } from '../scripts/import-wahapedia.mjs';
 import { findMarkup, normaliseAosFaction } from '../scripts/import-wahapedia-aos.mjs';
 
 const ROOT = path.join(import.meta.dirname, '..', '..', '..');
@@ -32,6 +32,10 @@ const CASES: [string, string][] = [
   ['Line one<br>Line two', 'Line one\nLine two'],
   ['• [LETHAL HITS]\n• [SUSTAINED HITS 1]', '• [LETHAL HITS]\n• [SUSTAINED HITS 1]'],
   ['', ''],
+  // текст, обрезанный лимитом выгрузки посреди ссылки (Surge of Hatred): обрывок тега не показывается
+  ['add D3 to the roll. <a href="/aos4/the-rules/the-c', 'add D3 to the roll.'],
+  // заглушка невыгруженной таблицы (Skaven, Prized Creations)
+  ['Pick 1 of the following:\n$000001417', 'Pick 1 of the following:'],
 ];
 
 test('текст: очистка в клиенте и в импортёре даёт одинаковый результат', () => {
@@ -44,6 +48,24 @@ test('текст: очистка в клиенте и в импортёре да
   assert.equal(cleanRuleText(undefined), '');
   // hasMarkup без состояния между вызовами (глобальный RegExp с lastIndex)
   for (let i = 0; i < 3; i++) assert.equal(hasMarkup('a <KY>B</KY>'), true);
+});
+
+test('неполные тексты: обрыв по лимиту 1024 символа и невыгруженная таблица распознаются одинаково', () => {
+  // лимит поля description в выгрузке AoS — 1024 символа; Wahapedia иногда срезает хвостовой пробел (1023)
+  assert.equal(rawIncomplete('x'.repeat(1024), 1024), 'truncated');
+  assert.equal(rawIncomplete('x'.repeat(1023), 1024), 'truncated');
+  assert.equal(rawIncomplete('x'.repeat(1022), 1024), null);
+  // без лимита (40K) — только видимые признаки, как в клиенте
+  for (const [s, want] of [
+    ['x'.repeat(2000), null],
+    ['Roll a D6. <a href="/aos4/the-rul', 'truncated'],
+    ['Pick 1:\n$000001417', 'table'],
+    ['if x < 3 and y > 2', null],
+    ['', null],
+  ] as const) {
+    assert.equal(rawIncomplete(s), want, `importer: ${s.slice(0, 40)}`);
+    assert.equal(clientIncomplete(s), want, `client: ${s.slice(0, 40)}`);
+  }
 });
 
 test('импорт: колонка condition (поле timing) проходит ту же очистку, что и текст', () => {

@@ -4,6 +4,7 @@ import {
   enhancementFit,
   findUnit,
   formationFit,
+  formationLegendsLabel,
   formationsOf,
   loreFit,
   loresOf,
@@ -86,11 +87,32 @@ function ChoiceList({ choices, selected, onPick, onClear, clearLabel }: { choice
 const rules = (list: AosRule[], L?: AosLookup) => list.map((a, i) => <AosRuleCard key={i} rule={a} L={L} />);
 
 export function FormationSheet({ open, onClose, roster, L, onPick }: { open: boolean; onClose: () => void; roster: AosRoster; L: AosLookup; onPick: (id: string) => void }) {
-  const choices: Choice[] = formationsOf(L).map((f) => ({ id: f.id, title: f.name, sub: seasonLabel(f.season) ?? undefined, points: f.points, fit: formationFit(f, roster, L), body: rules(f.rules, L) }));
+  // построения, уже ушедшие в Legends, видны только при включённом показе Legends (как юниты и террейн)
+  const hiddenLegends = roster.showLegends ? 0 : formationsOf(L).filter((f) => f.legends && f.id !== roster.formationId).length;
+  const choices: Choice[] = formationsOf(L)
+    .filter((f) => roster.showLegends || !f.legends || f.id === roster.formationId)
+    .map((f) => {
+      const notes = cleanRuleText(f.notes);
+      return {
+        id: f.id,
+        title: f.name,
+        sub: seasonLabel(f.season) ?? undefined,
+        tags: [formationLegendsLabel(f)].filter((t): t is string => !!t),
+        points: f.points,
+        fit: formationFit(f, roster, L),
+        body: (
+          <>
+            {notes && <p className="rounded-lg bg-white/[0.05] px-2.5 py-1.5 text-[11.5px] leading-snug text-white/60">{notes}</p>}
+            {rules(f.rules, L)}
+          </>
+        ),
+      };
+    });
   return (
     <Sheet open={open} onClose={onClose} title="Боевое построение" tall>
       <p className="mb-3 text-[12.5px] text-white/50">Армия выбирает одно построение — оно даёт способность на бой. Нажмите на название, чтобы прочитать правило.</p>
       <ChoiceList choices={choices} selected={roster.formationId} onPick={onPick} />
+      {hiddenLegends > 0 && <p className="pb-2 text-center text-[12px] text-white/45">Ещё в Warhammer Legends: {hiddenLegends} — включите «Показывать Warhammer Legends» в меню ростера (⋯).</p>}
     </Sheet>
   );
 }
@@ -149,13 +171,26 @@ export function LoreSheet({ kind, onClose, roster, L, onPick }: { kind: LoreKind
   );
 }
 
-export function TerrainSheet({ open, onClose, roster, L, onPick }: { open: boolean; onClose: () => void; roster: AosRoster; L: AosLookup; onPick: (id: string | null) => void }) {
+export function TerrainSheet({ open, onClose, roster, L, onPick, onGuide }: { open: boolean; onClose: () => void; roster: AosRoster; L: AosLookup; onPick: (id: string | null) => void; onGuide: (id: string) => void }) {
   const choices: Choice[] = terrainOf(L)
     .filter((t) => roster.showLegends || !t.legends)
-    .map((t) => ({ id: t.id, title: t.name, points: t.cost, fit: terrainFit(t, roster, L), body: <Warscroll ws={t} /> }));
+    .map((t) => ({
+      id: t.id,
+      title: t.name,
+      points: t.cost,
+      fit: terrainFit(t, roster, L),
+      body: (
+        <>
+          <Button variant="outline" className="w-full justify-start" onClick={() => onGuide(t.id)}>
+            <Icon name="map" className="size-4" /> Как ставить: правила и схема
+          </Button>
+          <Warscroll ws={t} />
+        </>
+      ),
+    }));
   return (
     <Sheet open={open} onClose={onClose} title="Террейн фракции" tall>
-      <p className="mb-3 text-[12.5px] text-white/50">Не больше одного террейна фракции. Ставится в своей зоне при деплое.</p>
+      <p className="mb-3 text-[12.5px] text-white/50">Не больше одного террейна фракции. Ставится целиком в своей территории, дальше 3" от объективов и другого террейна (Core Rules 10.1).</p>
       <ChoiceList choices={choices} selected={roster.terrainId} onPick={onPick} onClear={() => onPick(null)} clearLabel="Без террейна" />
     </Sheet>
   );
@@ -199,7 +234,9 @@ export function RorSheet({ open, onClose, roster, L, onPick }: { open: boolean; 
                 })}
             </div>
           )}
-          {rules(r.abilities, L)}
+          {r.abilities.map((a, i) => (
+            <AosRuleCard key={i} rule={a} L={L} link={r.link} />
+          ))}
           {r.notes && <p className="whitespace-pre-line text-[12px] text-white/45">{cleanRuleText(r.notes)}</p>}
           {r.units.map((u) => {
             const w = L.ws.get(u.id);
