@@ -6,9 +6,10 @@ OUT=${1:?output dir}; BASE=${2:-/warphub-demo/}
 ESBUILD=${ESBUILD:-npx esbuild}
 cd "$(dirname "$0")/.."
 mkdir -p "$OUT"
-find "$OUT" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+find "$OUT" -mindepth 1 -maxdepth 1 ! -name .git ! -name .github -exec rm -rf {} +
 $ESBUILD demo/entry.ts --bundle --minify --outfile="$OUT/app.js" --format=esm --jsx=automatic \
   --tsconfig=tsconfig.app.json --loader:.css=empty \
+  --alias:@wh-backend="${BACKEND_SRC:-../backend/src}" \
   --define:import.meta.env.VITE_BACKEND_API_URL="\"${BASE}api\"" \
   --define:import.meta.env.VITE_S3_BASE_URL="\"${BASE%/}/s3\"" \
   --define:import.meta.env.VITE_S3_BUCKET_NAME='"warphub"' \

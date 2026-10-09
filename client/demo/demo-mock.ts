@@ -1,3 +1,4 @@
+import { handleMinigames } from "./minigames-mock";
 /**
  * Демо-режим: подменяет запросы к серверу образцовыми данными прямо в браузере.
  * Используется только для демо-сборки (GitHub Pages), в рабочую сборку не входит.
@@ -16,6 +17,8 @@ const FRI = dayKey(daysUntil(5));
 const SAT = dayKey(daysUntil(6));
 const THU = dayKey(daysUntil(4));
 const NEXT_SAT = dayKey(daysUntil(6) + 7);
+/** Первый день записи, который календарь откроет сам: сегодня, если сегодня пт–вс */
+const FIRST_OPEN = [5, 6, 7].includes(clubNow.getUTCDay() || 7) ? dayKey(0) : FRI;
 const at = (date: string, h: number, m = 0) => `${date}T${pad(h)}:${pad(m)}:00+05:00`;
 const nextDay = (date: string) => {
   const d = new Date(`${date}T00:00:00Z`);
@@ -61,8 +64,8 @@ const user = { id: "demo-user", telegramId: 100000001, firstName: "Гость", 
 const u = (firstName: string, username: string, telegramId: number) => ({ id: `id-${username}`, telegramId, firstName, lastName: null, username });
 const player = (firstName: string, army: string, points: number, level: string) => ({ firstName, army, points, experienceLevel: level, experienceLabel: levels[level] });
 
-// Заранее занятые игры на ближайшую пятницу и субботу
-const seededSessions = (date: string) => date === FRI || date === SAT
+// Заранее занятые игры на первый открытый день, ближайшую пятницу и субботу
+const seededSessions = (date: string) => date === FIRST_OPEN || date === FRI || date === SAT
   ? [
       { tableId: 2, startsAt: at(date, 15), endsAt: at(date, 18), players: [player("Анна", "Necrons", 1000, "player"), player("Илья", "Orks", 1000, "beginner")] },
       { tableId: 1, startsAt: at(date, 18), endsAt: at(date, 21), players: [player("Егор", "Astra Militarum", 1500, "experienced")] },
@@ -165,6 +168,9 @@ function handle(method: string, url: URL, bodyText: string | null): Result {
   const q = url.searchParams;
   const body = bodyText ? JSON.parse(bodyText) : {};
   let m: RegExpMatchArray | null;
+
+  const games = handleMinigames(method, path, q, body);
+  if (games) return games;
 
   if (method === "GET") {
     if (path === "/disciplines") return { body: disciplines };

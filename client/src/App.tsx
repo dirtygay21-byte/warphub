@@ -7,6 +7,13 @@ import AdminReservations from "@/components/pages/Admin/Reservations";
 import ContentManagment from "@/components/pages/Admin/ContentManagment";
 import AdminWarhammer from "@/components/pages/Admin/Warhammer/AdminWarhammer";
 import AdminDnd from "@/components/pages/Admin/Dnd/AdminDnd";
+import AdminRewards from "@/components/pages/Admin/Rewards/AdminRewards";
+import GamesHub, { MyRewards } from "@/components/games/GamesHub";
+import RunnerGame from "@/components/games/RunnerGame";
+import DiceGame from "@/components/games/DiceGame";
+import EggGame from "@/components/games/EggGame";
+import CardsGame, { CardCollection } from "@/components/games/CardsGame";
+import GamesLayout from "@/layouts/GamesLayout";
 import Reservation from "@/components/pages/Reservations/Reservation";
 import News from "@/components/pages/News/News";
 import Profile from "@/components/pages/Profile/Profile";
@@ -29,6 +36,16 @@ export default function App() {
 
           <Route path="/roster" element={<RosterPage />} />
 
+          <Route path="/games" element={<GamesLayout />}>
+            <Route index element={<GamesHub />} />
+            <Route path="rewards" element={<MyRewards />} />
+            <Route path="runner" element={<RunnerGame />} />
+            <Route path="dice" element={<DiceGame />} />
+            <Route path="egg" element={<EggGame />} />
+            <Route path="cards" element={<CardsGame />} />
+            <Route path="cards/collection" element={<CardCollection />} />
+          </Route>
+
           <Route
             path="/admin"
             element={
@@ -42,6 +59,7 @@ export default function App() {
             <Route path="warhammer" element={<AdminWarhammer />} />
             <Route path="dnd" element={<AdminDnd />} />
             <Route path="roster" element={<AdminRoster />} />
+            <Route path="rewards" element={<AdminRewards />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

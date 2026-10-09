@@ -4,7 +4,7 @@ import { AccessCodeDialog } from "./AccessCodeDialog";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getFullName, getInitials } from "@/utils/user";
 import { useQuery } from "@tanstack/react-query";
-import { AtSign, ChevronRight, Hash, LoaderCircle, RefreshCw, Swords, UserRound } from "lucide-react";
+import { AtSign, ChevronRight, Gamepad2, Hash, LoaderCircle, RefreshCw, Swords, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
@@ -95,6 +95,19 @@ export default function Profile() {
           )}
         </div>
       </section>
+
+      <button
+        type="button"
+        onClick={() => navigate("/games")}
+        className="mt-6 flex w-full items-center gap-3 rounded-2xl border-2 border-accent/60 bg-accent/10 px-4 py-4 text-left transition-transform active:scale-[0.98]"
+      >
+        <Gamepad2 className="size-7 shrink-0 text-accent" />
+        <div className="flex-1">
+          <p className="text-base font-semibold text-white">Мини-игры</p>
+          <p className="text-xs text-white/60">Играйте и получайте скидки в клубе</p>
+        </div>
+        <ChevronRight className="size-5 text-accent" />
+      </button>
 
       <section className="mt-6">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-white/50">

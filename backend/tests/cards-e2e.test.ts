@@ -3,7 +3,14 @@
  * Time is "fast-forwarded" by moving started_at back in the database,
  * so we can test realistic scores without waiting.
  */
-import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
+import { afterAll, beforeAll, describe as baseDescribe, expect, test } from 'bun:test';
+
+/**
+ * Эти проверки идут против запущенного тестового сервера и тестовой базы.
+ * На боевом сервере они не запускаются: включаются только при WARPHUB_E2E=1.
+ */
+const E2E = process.env.WARPHUB_E2E === '1';
+const describe = E2E ? baseDescribe : baseDescribe.skip;
 import { createHmac } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 
@@ -64,6 +71,7 @@ const T: Record<string, string> = {};
 const ID = { lena: 4001, olya: 4002, race: 4003, admin: 777 };
 
 beforeAll(async () => {
+  if (!E2E) return;
   for (const [name, id] of Object.entries(ID)) {
     const r = await api('POST', '/auth/telegram', undefined, {
       initData: initData({ id, first_name: name[0]!.toUpperCase() + name.slice(1), username: name }),
@@ -74,6 +82,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  if (!E2E) return;
   await api('PUT', '/admin/minigames/settings', T.admin, {});
 });
 
