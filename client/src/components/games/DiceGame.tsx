@@ -13,7 +13,7 @@ import clsx from "clsx";
 import { FastForward, Flag, LoaderCircle, Swords } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { BattleArena, type ArenaEvent } from "./BattleArena";
-import { ErrorNote, GameTopBar, PixelButton, ResultPanel, StickyActions, TierList } from "./common";
+import { ErrorNote, GameTopBar, PixelButton, ResultPanel, TierList } from "./common";
 import { errorText, oswald, pluralWins, stageFrame, useGameInfo } from "./helpers";
 import { FACTION_LABELS, fighterFaction, type Faction } from "./pixel/factions";
 
@@ -340,15 +340,14 @@ export default function DiceGame() {
 
       {!inBattle && (
         <div className="px-4">
-          <StickyActions>
-            <PixelButton className="w-full" onClick={start} disabled={phase === "starting"}>
-              {phase === "starting" ? <LoaderCircle className="size-5 animate-spin" /> : <Swords className="size-5" />}
-              В бой
-            </PixelButton>
-          </StickyActions>
           <div className={stageFrame}>
             <BattleArena playerId="iron_captain" enemyId="hive_reaper" event={null} />
           </div>
+          {/* «В бой» — сразу под картинкой, как кнопки в самом бою */}
+          <PixelButton className="mt-4 w-full" onClick={start} disabled={phase === "starting"}>
+            {phase === "starting" ? <LoaderCircle className="size-5 animate-spin" /> : <Swords className="size-5" />}
+            В бой
+          </PixelButton>
           {phase === "error" && (
             <div className="-mx-4 mt-4">
               <ErrorNote message={error} />
