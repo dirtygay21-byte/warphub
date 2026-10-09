@@ -8,6 +8,19 @@
    "Wahapedia AoS4 faction pages (Oct 2026): Grudgebound War Throng, Thrall Warhost (Battletome Supplement: Cities of Sigmar), Sacrosanct Convocation (Battletome Supplement: Stormcast Eternals) — 0"
   ]
  },
+ "seasonInfo": {
+  "about": "Сезоны General’s Handbook: label — префикс имени сезонного профиля («Scourge of Aqshy …»), handbook — год в заметке Battle Profiles («General’s Handbook 2026-27»). active=false — сезон закончился: его таблицы, лоры и построения не импортируются, а профили юнитов нельзя взять. Новый сезон: добавьте его сюда и в AOS_SEASONS (client/src/features/roster/aos/rules.ts) — тест проверяет, что списки совпадают.",
+  "aqshy": {
+   "label": "Scourge of Aqshy",
+   "handbook": "2026",
+   "active": true
+  },
+  "ghyran": {
+   "label": "Scourge of Ghyran",
+   "handbook": "2025",
+   "active": false
+  }
+ },
  "seasons": {
   "000001925": "standard",
   "000001926": "standard",

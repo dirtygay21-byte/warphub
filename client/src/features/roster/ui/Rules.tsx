@@ -4,6 +4,7 @@ import type { DataIndex, FactionData, Stratagem } from '../engine/types';
 import { openExternal } from '../telegram';
 import { IconButton, Segmented, Tag } from './kit';
 import { cx } from './util';
+import { cleanRuleText } from '../text';
 
 const CORE_URL = 'https://wahapedia.ru/wh40k11ed/the-rules/core-rules/';
 
@@ -263,7 +264,7 @@ function StratCard({ s }: { s: Stratagem }) {
       {open && (
         <div className="border-t border-white/[0.06] px-3.5 pb-3 pt-2.5">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{s.type}</p>
-          <p className="mt-1.5 whitespace-pre-line text-[13.5px] leading-relaxed text-white/75">{s.text}</p>
+          <p className="mt-1.5 whitespace-pre-line text-[13.5px] leading-relaxed text-white/75">{cleanRuleText(s.text)}</p>
         </div>
       )}
     </li>

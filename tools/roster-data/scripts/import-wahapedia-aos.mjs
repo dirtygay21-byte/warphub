@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseCsv, htmlToText } from './import-wahapedia.mjs';
+import { parseCsv, htmlToText, cleanWahaText } from './import-wahapedia.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FILES = [
@@ -60,7 +60,7 @@ const byLine = (a, b) => (int(a.line) ?? 0) - (int(b.line) ?? 0);
  * «1 отряд на каждый …», «не больше N … в полку не-… героя», «нельзя вместе с …», «только в Army of Renown».
  * rest — то, что осталось неразобранным (должно быть пусто или только справочные фразы).
  */
-export function parseNotes(html, dataDate) {
+export function parseNotes(html, dataDate, seasonInfo = {}) {
   let s = text(html).replace(/\s+/g, ' ').trim();
   const out = {
     legends: false, legendsDate: null, season: null, joinAs: [], joinLeaders: [], onlyIn: [], perUnitOf: null,
@@ -78,7 +78,7 @@ export function parseNotes(html, dataDate) {
   take(/Legends Warscroll\.?/gi, () => (out.legends = true));
   take(/This unit cannot be reinforced\.?/gi, () => {});
   take(/T?his unit is legal for Matched Play for battles fought using the\s+General.?s Handbook (\d{4})-(\d{2,4}) battlepack\.?/gi, (_, y) => {
-    out.season = y === '2025' ? 'ghyran' : y === '2026' ? 'aqshy' : 'season-' + y;
+    out.season = Object.entries(seasonInfo).find(([, v]) => v?.handbook === y)?.[0] ?? 'season-' + y;
   });
   take(/This HERO regiment as can join an eligible ([^.]+?)\./gi, (_, t) => out.joinAs.push(norm(t)));
   take(/This (?:HERO|Hero) can join (?:an )?eligible regiment as (?:an? )?(.+?)(?:\.|(?=This |You |$))/g, (_, t) => out.joinAs.push(norm(t)));
@@ -212,9 +212,9 @@ export function importAos(src, { curated, eligibility }) {
     const factionKeywords = [...new Set(kws.filter((k) => k.is_faction_keyword === 'true').map((k) => up(k.keyword)))];
     const param = (kw) => kws.find((k) => up(k.keyword) === kw)?.parameter?.trim() || null;
     const hero = /hero/i.test(x.role) || keywords.includes('HERO');
-    const notes = parseNotes(x.notes, dataDate);
+    const notes = parseNotes(x.notes, dataDate, curated.seasonInfo);
     const name = text(x.name);
-    const seasonByName = /^Scourge of Ghyran /i.test(name) ? 'ghyran' : /^Scourge of Aqshy /i.test(name) ? 'aqshy' : null;
+    const seasonByName = Object.entries(curated.seasonInfo).find(([, v]) => v?.label && name.toLowerCase().startsWith(v.label.toLowerCase() + ' '))?.[0] ?? null;
     const season = notes.season ?? seasonByName;
     const kind = x.role === 'Faction Terrain' ? 'terrain' : /Endless Spell|Manifestation/i.test(x.role) || x.faction_id === UNIVERSAL ? 'manifestation' : 'unit';
     // у не-героев колонка regiment_options = «значимые ключевые слова» из Battle Profiles
@@ -229,7 +229,7 @@ export function importAos(src, { curated, eligibility }) {
       id: x.id,
       faction: x.faction_id,
       name,
-      baseName: season ? name.replace(/^Scourge of (?:Ghyran|Aqshy)\s+/i, '') : name,
+      baseName: season && curated.seasonInfo[season]?.label && name.toLowerCase().startsWith(curated.seasonInfo[season].label.toLowerCase() + ' ') ? name.slice(curated.seasonInfo[season].label.length + 1) : name,
       role: x.role,
       kind,
       hero,
@@ -311,7 +311,7 @@ export function importAos(src, { curated, eligibility }) {
     for (const [sid, items] of groupBy(rows.filter((r) => r.type_name === 'Manifestation Lore'), 'subtype_id')) {
       const name = text(items[0].subtype_name);
       const pts = curated.universalLores[norm(name)];
-      if (typeof pts !== 'number') report.warnings.push(`универсальная лора без очков: ${name}`);
+      if (typeof pts !== 'number') report.warnings.push(`универсальный лор без очков: ${name}`);
       universalLores.push({ id: sid, kind: 'manifestation', name, points: typeof pts === 'number' ? pts : null, universal: true, season: 'standard', items: items.sort(byLine).map(rule), summons: [] });
     }
   }
@@ -344,7 +344,7 @@ export function importAos(src, { curated, eligibility }) {
       const nm = m[1].replace(/\s*\(.*?\)\s*$/, '').trim();
       const models = m[2] ? +m[2] : null;
       const cands = rorPool.filter((y) => [nameKey(nm), nameKey(nm).replace(/s$/, '')].includes(nameKey(y.name)));
-      const legendsOf = (y) => parseNotes(y.notes, dataDate).legends;
+      const legendsOf = (y) => parseNotes(y.notes, dataDate, curated.seasonInfo).legends;
       const pick =
         cands.find((y) => y.faction_id === x.faction_id && y.virtual !== 'true' && !legendsOf(y)) ??
         cands.find((y) => y.faction_id === x.faction_id) ??
@@ -491,15 +491,15 @@ export function importAos(src, { curated, eligibility }) {
         if (CORE_TABLES.has(typeName)) report.warnings.push(`${fid}: таблица «${subName}» (${typeName}) не размечена в curated.json — пропущена`);
         continue;
       }
-      if (season === 'ghyran') continue; // сезон Scourge of Ghyran закончился
+      if (!seasonActive(curated, season)) continue; // сезон закончился (curated.json → seasonInfo)
       if (typeName === 'Battle Formations') {
         const pts = ptsFor(fid, 'formation', subName);
         if (pts == null) report.warnings.push(`${fid}: построение «${subName}» — нет очков`);
-        formations.push({ id: sid, name: subName, points: pts, rules: items.map(rule) });
+        formations.push({ id: sid, name: subName, points: pts, season, rules: items.map(rule) });
       } else if (/^(Spell|Prayer|Manifestation) Lore$/.test(typeName)) {
         const kind = typeName.split(' ')[0].toLowerCase();
         const pts = ptsFor(fid, 'lore', subName);
-        if (pts == null) report.warnings.push(`${fid}: лора «${subName}» — нет очков`);
+        if (pts == null) report.warnings.push(`${fid}: лор «${subName}» — нет очков`);
         lores.push({ id: sid, kind, name: subName, points: pts, universal: false, season, items: items.map(rule), summons: [] });
       } else {
         const key = typeName === 'Heroic Traits' ? 'heroic' : typeName === 'Artefacts of Power' ? 'artefact' : typeName === 'Monstrous Traits' ? 'monstrous' : 'x:' + norm(typeName);
@@ -562,7 +562,7 @@ export function importAos(src, { curated, eligibility }) {
     const allianceCount = new Map();
     for (const w of units) for (const k of w.factionKeywords) if (ALLIANCES.includes(k)) allianceCount.set(k, (allianceCount.get(k) ?? 0) + 1);
     const grandAlliance = [...allianceCount.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
-    const selectable = units.filter((w) => w.cost != null && !w.legends && w.season !== 'ghyran' && !w.aorOnly);
+    const selectable = units.filter((w) => w.cost != null && !w.legends && seasonActive(curated, w.season) && !w.aorOnly);
     const terrain = own.filter((w) => w.kind === 'terrain');
     for (const t of terrain) {
       const curatedPts = ptsFor(fid, 'terrain', t.name);
@@ -610,7 +610,50 @@ export function importAos(src, { curated, eligibility }) {
     pointsSource: curated.sources,
     factions: factions.sort((a, b) => ALLIANCES.indexOf(a.grandAlliance) - ALLIANCES.indexOf(b.grandAlliance) || a.name.localeCompare(b.name)),
   };
+  for (const [fid, data] of Object.entries(files)) {
+    normaliseAosFaction(data, curated);
+    for (const where of findMarkup(data)) report.errors.push(`${fid}: служебная разметка в тексте — ${where}`);
+  }
   return { index, files, report };
+}
+
+// ---------- последняя обработка данных фракции ----------
+/** Сезон действует? Неизвестный сезон считается действующим, но тест данных потребует его описать. */
+export const seasonActive = (curated, season) => !season || season === 'standard' || curated.seasonInfo?.[season]?.active !== false;
+
+const RULE_FIELDS = ['name', 'text', 'timing', 'type', 'keywords', 'value'];
+/** Все объекты-правила фракции: способности, черты, построения, улучшения, заклинания, правила полков славы. */
+function* rulesOf(data) {
+  const scrolls = [...data.warscrolls, ...data.rorUnits, ...data.universalManifestations];
+  for (const w of scrolls) yield* w.abilities;
+  yield* data.battleTraits;
+  for (const f of data.formations) yield* f.rules;
+  for (const t of data.enhancementTypes) for (const tb of t.tables) yield* tb.items;
+  for (const l of data.lores) yield* l.items;
+  for (const r of data.rors) yield* r.abilities;
+}
+
+/**
+ * Одинаковая обработка для свежего импорта и для уже готовых файлов (scripts/repair-aos-data.mjs):
+ * чистка всех текстовых полей правил и заметок; сезон у построений.
+ */
+export function normaliseAosFaction(data, curated) {
+  for (const r of rulesOf(data)) for (const k of RULE_FIELDS) if (typeof r[k] === 'string') r[k] = cleanWahaText(r[k]);
+  for (const w of [...data.warscrolls, ...data.rorUnits, ...data.universalManifestations]) {
+    if (typeof w.notes === 'string') w.notes = cleanWahaText(w.notes);
+    for (const wp of w.weapons) if (typeof wp.abilities === 'string') wp.abilities = cleanWahaText(wp.abilities);
+  }
+  for (const r of data.rors) if (typeof r.notes === 'string') r.notes = cleanWahaText(r.notes);
+  for (const f of data.formations) f.season ??= curated.seasons?.[f.id] ?? 'standard';
+  return data;
+}
+
+/** Где в данных осталась разметка Wahapedia (пусто — всё чисто). */
+export function findMarkup(data) {
+  const bad = /%\d{6,}|<\/?[A-Za-z][A-Za-z0-9]{0,9}\s*\/?>|&(#\d+|#x[0-9a-f]+|[a-z]+);/i;
+  const out = [];
+  for (const r of rulesOf(data)) for (const k of RULE_FIELDS) if (typeof r[k] === 'string' && bad.test(r[k])) out.push(`«${r.name}» (${k})`);
+  return out;
 }
 
 function main() {

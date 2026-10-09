@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { loadAosFaction } from '../../data';
-import { computeAos, makeAosLookup, regimentCap, slotsUsed, unitTotal, type AosComputed, type AosLookup } from '../../aos/engine';
+import { computeAos, formationsOf, makeAosLookup, regimentCap, slotsUsed, unitTotal, type AosComputed, type AosLookup } from '../../aos/engine';
 import {
   addAuxiliary,
   addRegiment,
@@ -20,12 +20,13 @@ import {
 import { AOS_RULES, LORE_LABEL, POINTS_LIMIT_LABEL, auxiliarySurcharge } from '../../aos/rules';
 import type { AosFactionData, AosIndex, AosRegiment, AosRoster, AosUnit, AosWarscroll, LoreKind } from '../../aos/types';
 import { confirmAsk, haptic } from '../../telegram';
-import { RuleText } from '../DetachmentPanel';
 import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
 import { cx, fmtPts } from '../util';
 import { AosExportSheet } from './AosExportSheet';
 import { AosPicker, type PickTarget } from './AosPicker';
-import { AosUnitCard } from './AosUnitCard';
+import { AosUnitCard, Warscroll } from './AosUnitCard';
+import { AosRuleCard, EnhancementsPanel, SpellsPanel } from './AosPanels';
+import { useSpellsOpen } from './useSpellsOpen';
 import { EnhancementSheet, FormationSheet, LoreSheet, MoveSheet, RorSheet, TerrainSheet } from './AosSheets';
 
 /** Редактор ростера Age of Sigmar: загрузка данных фракции. */
@@ -99,6 +100,9 @@ function Editor({
   const [enh, setEnh] = useState<{ uid: string; typeKey: string } | null>(null);
   const [moving, setMoving] = useState<string | null>(null);
   const [toast, setToast] = useState<{ text: string; bad?: boolean } | null>(null);
+  // режим просмотра: только чтение, без кнопок изменения (как просмотр ростера в приложениях-конструкторах)
+  const [view, setView] = useState(false);
+  const [spellsOpen, toggleSpells] = useSpellsOpen();
   const toastTimer = useRef<number | undefined>(undefined);
   const f = L.faction;
   const over = cr.points.total > roster.pointsLimit;
@@ -171,8 +175,18 @@ function Editor({
       <div className="sticky top-0 z-30 border-b border-white/[0.06] bg-app/95 px-4 pb-3 pt-3 backdrop-blur">
         <div className="flex items-center gap-2">
           <IconButton icon="back" label="К списку" onClick={onBack} className="size-9" />
-          <NameInput value={roster.name} onChange={(name) => set({ name })} />
-          <IconButton icon="more" label="Меню" onClick={() => setSheet('menu')} className="size-9" />
+          {view ? (
+            <p className="font-display min-w-0 flex-1 truncate px-1.5 py-1 text-lg font-semibold uppercase">{roster.name}</p>
+          ) : (
+            <NameInput value={roster.name} onChange={(name) => set({ name })} />
+          )}
+          <IconButton
+            icon={view ? 'edit' : 'eye'}
+            label={view ? 'Редактировать' : 'Режим просмотра'}
+            onClick={() => (setView((v) => !v), setExpanded(null), setPicker(null))}
+            className={cx('size-9', view && 'bg-accent/15 text-accent')}
+          />
+          {!view && <IconButton icon="more" label="Меню" onClick={() => setSheet('menu')} className="size-9" />}
         </div>
         <div className="mt-3 flex items-end justify-between gap-3">
           <div className="flex min-w-0 items-baseline gap-1.5">
@@ -208,7 +222,7 @@ function Editor({
               <p className="text-xs font-semibold uppercase tracking-wider text-white/45">
                 Age of Sigmar · {f.name} · {POINTS_LIMIT_LABEL[roster.pointsLimit]}
               </p>
-              <p className="mt-0.5 truncate text-[15px] font-semibold">{formation ? formation.name : f.formations.length ? <span className="text-accent">Выберите боевое построение</span> : 'Без построения'}</p>
+              <p className="mt-0.5 truncate text-[15px] font-semibold">{formation ? formation.name : formationsOf(L).length ? <span className="text-accent">Выберите боевое построение</span> : 'Без построения'}</p>
               <p className="mt-0.5 truncate text-sm text-white/55">
                 {(['spell', 'prayer', 'manifestation'] as LoreKind[])
                   .map((k) => (roster.lores[k] ? L.lore.get(roster.lores[k]!)?.name : null))
@@ -218,7 +232,8 @@ function Editor({
             </div>
             <Icon name="down" className={cx('size-5 shrink-0 text-white/40 transition', armyOpen && 'rotate-180')} />
           </button>
-          {armyOpen && (
+          {armyOpen && view && <ArmyView roster={roster} L={L} />}
+          {armyOpen && !view && (
             <div className="space-y-4 border-t border-white/[0.06] px-4 pb-4 pt-4">
               {f.rulesNotice && <p className="rounded-xl border border-warn/30 bg-warn/10 px-3 py-2 text-[12.5px] leading-snug text-amber-100">{f.rulesNotice}</p>}
               <Field label="Лимит очков">
@@ -228,7 +243,7 @@ function Editor({
                   options={AOS_RULES.pointsLimits.map((p) => ({ value: String(p) as '1000' | '2000', label: POINTS_LIMIT_LABEL[p] }))}
                 />
               </Field>
-              <PickRow label="Боевое построение" value={formation?.name} points={formation?.points} warn={!formation && f.formations.length > 0} empty={f.formations.length ? 'Выбрать' : 'Нет в данных'} onClick={f.formations.length ? () => setSheet('formation') : undefined} />
+              <PickRow label="Боевое построение" value={formation?.name} points={formation?.points} warn={!formation && formationsOf(L).length > 0} empty={formationsOf(L).length ? 'Выбрать' : 'Нет в данных'} onClick={formationsOf(L).length ? () => setSheet('formation') : undefined} />
               {(['spell', 'prayer', 'manifestation'] as LoreKind[]).map((k) => {
                 const l = roster.lores[k] ? L.lore.get(roster.lores[k]!) : null;
                 const avail = f.lores.some((x) => x.kind === k);
@@ -244,6 +259,9 @@ function Editor({
             </div>
           )}
         </section>
+
+        <SpellsPanel roster={roster} L={L} open={spellsOpen} onToggle={toggleSpells} />
+        <EnhancementsPanel roster={roster} L={L} onUnit={scrollTo} />
 
         {/* ---- полки ---- */}
         {roster.regiments.length === 0 && <Empty title="Нет полков">Армия собирается из полков: герой-лидер и до 3 юнитов. Нажмите «Новый полк».</Empty>}
@@ -265,15 +283,15 @@ function Editor({
                 <span className="text-xs font-semibold tabular-nums text-white/40">{fmtPts(total)}</span>
               </div>
               <div className="space-y-2">
-                <AosUnitCard unit={reg.leader} roster={roster} L={L} cr={cr} regiment={reg} leader expanded={expanded === reg.leader.uid} actions={actionsFor(reg.leader, reg, true)} />
+                <AosUnitCard unit={reg.leader} roster={roster} L={L} cr={cr} regiment={reg} leader expanded={expanded === reg.leader.uid} actions={actionsFor(reg.leader, reg, true)} readOnly={view} />
                 {reg.units.length > 0 && (
                   <div className="space-y-2 border-l-2 border-white/[0.07] pl-2.5">
                     {reg.units.map((u) => (
-                      <AosUnitCard key={u.uid} unit={u} roster={roster} L={L} cr={cr} regiment={reg} leader={false} expanded={expanded === u.uid} actions={actionsFor(u, reg, false)} />
+                      <AosUnitCard key={u.uid} unit={u} roster={roster} L={L} cr={cr} regiment={reg} leader={false} expanded={expanded === u.uid} actions={actionsFor(u, reg, false)} readOnly={view} />
                     ))}
                   </div>
                 )}
-                {leaderWs && leaderWs.options.length > 0 && (
+                {!view && leaderWs && leaderWs.options.length > 0 && (
                   <button
                     type="button"
                     onClick={() => setPicker({ kind: 'regiment', regUid: reg.uid })}
@@ -288,7 +306,7 @@ function Editor({
         })}
 
         {/* ---- вспомогательные ---- */}
-        {(roster.auxiliaries.length > 0 || roster.regiments.length > 0) && (
+        {(roster.auxiliaries.length > 0 || (!view && roster.regiments.length > 0)) && (
           <section>
             <div className="mb-2 flex items-baseline justify-between px-1">
               <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-white/70">
@@ -299,8 +317,9 @@ function Editor({
             </div>
             <div className="space-y-2">
               {roster.auxiliaries.map((u) => (
-                <AosUnitCard key={u.uid} unit={u} roster={roster} L={L} cr={cr} regiment={null} leader={false} expanded={expanded === u.uid} actions={actionsFor(u, null, false)} />
+                <AosUnitCard key={u.uid} unit={u} roster={roster} L={L} cr={cr} regiment={null} leader={false} expanded={expanded === u.uid} actions={actionsFor(u, null, false)} readOnly={view} />
               ))}
+              {!view && (
               <button
                 type="button"
                 onClick={() => setPicker({ kind: 'aux' })}
@@ -308,6 +327,7 @@ function Editor({
               >
                 <Icon name="plus" className="size-4" /> Юнит вне полка
               </button>
+              )}
             </div>
           </section>
         )}
@@ -318,7 +338,7 @@ function Editor({
               <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-white/70">Полк славы</h2>
               <span className="text-xs font-semibold tabular-nums text-white/40">{fmtPts(cr.points.ror)}</span>
             </div>
-            <button type="button" onClick={() => setSheet('ror')} className="w-full rounded-2xl border border-white/10 bg-app-elevated px-3.5 py-3 text-left">
+            <button type="button" onClick={() => !view && setSheet('ror')} className="w-full rounded-2xl border border-white/10 bg-app-elevated px-3.5 py-3 text-left">
               <p className="text-[15px] font-semibold">{ror.name}</p>
               <p className="mt-0.5 text-[12px] text-white/45">
                 {ror.units
@@ -336,9 +356,15 @@ function Editor({
       {/* ---- нижняя панель ---- */}
       <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
         <div className="mx-auto flex max-w-lg gap-2 lg:max-w-3xl lg:px-4">
-          <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => setPicker({ kind: 'leader' })}>
-            <Icon name="plus" /> <span className="whitespace-nowrap">Новый полк</span>
-          </Button>
+          {view ? (
+            <Button variant="outline" className="h-12 flex-1 text-base" onClick={() => setView(false)}>
+              <Icon name="edit" /> <span className="whitespace-nowrap">Редактировать</span>
+            </Button>
+          ) : (
+            <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => setPicker({ kind: 'leader' })}>
+              <Icon name="plus" /> <span className="whitespace-nowrap">Новый полк</span>
+            </Button>
+          )}
           <Button variant="ghost" className="h-12 px-4" onClick={() => setSheet('export')}>
             <Icon name="share" /> <span className="max-[359px]:sr-only">Экспорт</span>
           </Button>
@@ -355,7 +381,7 @@ function Editor({
       <FormationSheet open={sheet === 'formation'} onClose={() => setSheet(null)} roster={roster} L={L} onPick={(id) => (set({ formationId: id }), setSheet(null))} />
       <TerrainSheet open={sheet === 'terrain'} onClose={() => setSheet(null)} roster={roster} L={L} onPick={(id) => (set({ terrainId: id }), setSheet(null))} />
       <RorSheet key={sheet === 'ror' ? 'ror-open' : 'ror'} open={sheet === 'ror'} onClose={() => setSheet(null)} roster={roster} L={L} onPick={(v) => (set({ ror: v }), setSheet(null))} />
-      <LoreSheet kind={lore} onClose={() => setLoreSheet(null)} roster={roster} L={L} onPick={(id) => (lore && onChange(setLore(roster, lore, id)), setLoreSheet(null))} />
+      <LoreSheet key={'lore-' + (lore ?? 'closed')} kind={lore} onClose={() => setLoreSheet(null)} roster={roster} L={L} onPick={(id) => (lore && onChange(setLore(roster, lore, id)), setLoreSheet(null))} />
       <EnhancementSheet target={enh} onClose={() => setEnh(null)} roster={roster} L={L} onPick={(id) => (enh && onChange(setEnhancement(roster, enh.uid, enh.typeKey, id)), setEnh(null))} />
       <MoveSheet uid={moving} onClose={() => setMoving(null)} roster={roster} L={L} onMove={(t) => (moving && apply(moveAosUnit(roster, moving, t, L), 'Перенесено'), setMoving(null))} />
       <AosExportSheet open={sheet === 'export'} onClose={() => setSheet(null)} roster={roster} L={L} cr={cr} />
@@ -363,7 +389,7 @@ function Editor({
       <Sheet open={sheet === 'traits'} onClose={() => setSheet(null)} title="Боевые черты" tall>
         <div className="space-y-1.5 pb-2">
           {f.battleTraits.map((a, i) => (
-            <RuleText key={i} name={a.name} sub={[a.timing, a.type].filter(Boolean).join(' · ') || undefined} text={a.text} />
+            <AosRuleCard key={i} rule={a} L={L} />
           ))}
         </div>
       </Sheet>
@@ -423,6 +449,55 @@ function Editor({
           </Button>
         </div>
       </Sheet>
+    </div>
+  );
+}
+
+/** Блок армии в режиме просмотра: построение с правилами, лоры, террейн, полк славы, боевые черты — без выбора. */
+function ArmyView({ roster, L }: { roster: AosRoster; L: AosLookup }) {
+  const f = L.faction;
+  const formation = roster.formationId ? L.formation.get(roster.formationId) : null;
+  const terrain = roster.terrainId ? L.ws.get(roster.terrainId) : null;
+  const ror = roster.ror ? L.ror.get(roster.ror.id) : null;
+  const line = (label: string, value: string | null | undefined, points?: number | null) => (
+    <div className="flex items-baseline justify-between gap-3 border-b border-white/[0.05] py-1.5 last:border-0">
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{label}</span>
+      <span className="text-right text-[13.5px] font-semibold text-white/85">
+        {value ?? <span className="text-white/35">—</span>}
+        {points ? <span className="ml-1.5 text-xs text-white/40">+{points}</span> : null}
+      </span>
+    </div>
+  );
+  return (
+    <div className="space-y-4 border-t border-white/[0.06] px-4 pb-4 pt-3">
+      {f.rulesNotice && <p className="rounded-xl border border-warn/30 bg-warn/10 px-3 py-2 text-[12.5px] leading-snug text-amber-100">{f.rulesNotice}</p>}
+      <div>
+        {line('Лимит', POINTS_LIMIT_LABEL[roster.pointsLimit])}
+        {line('Построение', formation?.name, formation?.points)}
+        {(['spell', 'prayer', 'manifestation'] as LoreKind[]).map((k) => {
+          const l = roster.lores[k] ? L.lore.get(roster.lores[k]!) : null;
+          return <div key={k}>{line(LORE_LABEL[k], l?.name, l?.points)}</div>;
+        })}
+        {line('Террейн', terrain?.name, terrain?.cost)}
+        {line('Полк славы', ror?.name)}
+      </div>
+      {formation && formation.rules.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Построение · {formation.name}</p>
+          {formation.rules.map((a, i) => (
+            <AosRuleCard key={i} rule={a} L={L} />
+          ))}
+        </div>
+      )}
+      {f.battleTraits.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Боевые черты · {f.battleTraits.length}</p>
+          {f.battleTraits.map((a, i) => (
+            <AosRuleCard key={i} rule={a} L={L} />
+          ))}
+        </div>
+      )}
+      {terrain && <Warscroll ws={terrain} L={L} />}
     </div>
   );
 }

@@ -1,7 +1,8 @@
 // Типы данных и ростера Age of Sigmar 4. Данные — из tools/roster-data/scripts/import-wahapedia-aos.mjs.
 
 export type GrandAlliance = 'ORDER' | 'CHAOS' | 'DEATH' | 'DESTRUCTION';
-export type Season = 'standard' | 'aqshy' | 'ghyran' | null;
+/** 'standard' — правила батлтома; иначе ключ сезона из AOS_SEASONS (aos/rules.ts), например 'aqshy'. */
+export type Season = string | null;
 
 export interface AosRule {
   name: string;
@@ -157,7 +158,7 @@ export interface AosLore {
   universal: boolean;
   season: Season;
   items: AosRule[];
-  /** варскроллы манифестаций, которые призывает лора */
+  /** варскроллы манифестаций, которые призывает лор */
   summons: string[];
 }
 
@@ -165,6 +166,8 @@ export interface AosFormation {
   id: string;
   name: string;
   points: number | null;
+  /** сезон построения; в старых данных поля нет — значит 'standard' */
+  season?: Season;
   rules: AosRule[];
 }
 

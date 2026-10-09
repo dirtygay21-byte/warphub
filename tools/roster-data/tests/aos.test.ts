@@ -462,7 +462,7 @@ test('перебор по всем фракциям: всё, что интерф
       const r = ok(addRegiment(base(2000), anyLeader!, L));
       const r2 = setLore(r, lore.kind, lore.id);
       if (lore.points == null) assert.ok(codes(r2, L).includes('lore'));
-      else assert.ok(!codes(r2, L).includes('lore'), `${f.id}: лора ${lore.name}`);
+      else assert.ok(!codes(r2, L).includes('lore'), `${f.id}: лор ${lore.name}`);
     }
   }
   assert.ok(checked > 8000, `проверено ${checked}`);
