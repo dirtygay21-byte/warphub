@@ -8,14 +8,16 @@
  *
  * Сервер имитирует API WarpHub в памяти: вход через Telegram, профиль, админку и всё, что связано
  * с кодами доступа (создание, ввод, лимит попыток, отзыв). «Сообщения бота» печатаются в эту консоль.
- * Пользователя переключает вкладка «ДЕМО» у левого края экрана. Остальные разделы приложения в демо пустые.
- * После перезапуска сервера всё обнуляется.
+ * Пользователя переключает вкладка «ДЕМО» у левого края экрана. Остальные разделы (запись, ивенты, новости,
+ * D&D, админка) работают на фейковом бэкенде в памяти (fake-backend.mjs) — для UI-тестов всех экранов.
+ * После перезапуска сервера (или GET /api/__reset) всё обнуляется.
  */
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { randomInt } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { createFakeBackend } from './fake-backend.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const DIST = process.env.DEMO_DIST || path.join(ROOT, 'client/dist-demo');
@@ -30,6 +32,8 @@ const USERS = [
   { id: 'u-ivan', telegramId: 2002, firstName: 'Иван', lastName: 'Петров', username: 'ivan_demo', photoUrl: '', admin: false, role: 'игрок' },
   { id: 'u-anna', telegramId: 3003, firstName: 'Анна', lastName: 'Смирнова', username: 'anna_demo', photoUrl: '', admin: false, role: 'игрок' },
 ];
+// остальные разделы WarpHub (запись, ивенты, новости, D&D, админка) — фейковый бэкенд в памяти
+const fake = createFakeBackend({ users: USERS });
 const byTg = (id) => USERS.find((u) => u.telegramId === Number(id));
 const pub = ({ admin, role, ...u }) => u;
 const nameOf = (u) => `${u.firstName} ${u.lastName}`.trim() + (u.username ? ` (@${u.username})` : '');
@@ -137,6 +141,7 @@ async function api(req, res, p) {
     return send(res, 200, { token: `demo:${u.telegramId}`, user: pub(u) });
   }
   const user = userFrom(req);
+  if (await fake.handle(req, res, p, user, send)) return;
   if (!user) return send(res, 401, { error: 'Unauthorized' });
 
   if (p === '/me') return send(res, 200, pub(user));
@@ -273,6 +278,7 @@ http
     const p = new URL(req.url, 'http://x').pathname;
     try {
       if (p.startsWith('/api/')) return await api(req, res, p.slice(4));
+      if (fake.asset(res, p)) return;
       return staticFile(res, p);
     } catch (e) {
       console.error(e);

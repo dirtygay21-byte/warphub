@@ -459,7 +459,7 @@ function Legend() {
 
 function Shell({ onBack, children }: { onBack: () => void; children: ReactNode }) {
   return (
-    <div className="mx-auto min-h-dvh max-w-lg px-4 pb-10 pt-5">
+    <div className="mx-auto min-h-dvh max-w-lg px-4 pb-10 pt-5 lg:max-w-4xl lg:pt-8">
       <header className="mb-4 flex items-end gap-3">
         <IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" />
         <div className="min-w-0 flex-1">

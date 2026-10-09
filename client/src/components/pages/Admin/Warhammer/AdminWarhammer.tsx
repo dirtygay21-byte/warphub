@@ -135,7 +135,7 @@ export default function AdminWarhammer() {
             {day.sessions.length === 0 ? (
               <EmptyBox>На этот день записей нет.</EmptyBox>
             ) : (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:items-start xl:grid-cols-3">
                 {day.sessions.map((session) => (
                   <SessionAdminCard
                     key={`${session.serviceId}-${session.tableId}-${session.startsAt}`}
@@ -157,7 +157,7 @@ export default function AdminWarhammer() {
             {day.painting.length === 0 ? (
               <EmptyBox>Записей на покраску нет.</EmptyBox>
             ) : (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:items-start xl:grid-cols-3">
                 {day.painting.map((booking) => {
                   const details = isPaintingDetails(booking.details)
                     ? booking.details

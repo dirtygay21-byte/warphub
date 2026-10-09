@@ -59,10 +59,10 @@ export function Button({
       }}
       className={cx(
         'inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40',
-        variant === 'primary' && 'bg-accent text-accent-foreground',
-        variant === 'ghost' && 'bg-white/[0.05] text-white/85 active:bg-white/10',
-        variant === 'outline' && 'border border-white/10 text-white/85 active:bg-white/5',
-        variant === 'danger' && 'bg-danger/10 text-danger active:bg-danger/20',
+        variant === 'primary' && 'bg-accent text-accent-foreground hover:brightness-105',
+        variant === 'ghost' && 'bg-white/[0.05] text-white/85 hover:bg-white/[0.09] active:bg-white/10',
+        variant === 'outline' && 'border border-white/10 text-white/85 hover:bg-white/[0.04] active:bg-white/5',
+        variant === 'danger' && 'bg-danger/10 text-danger hover:bg-danger/15 active:bg-danger/20',
         className,
       )}
     >
@@ -81,7 +81,7 @@ export function IconButton({ icon, onClick, label, className }: { icon: string; 
         haptic.tap();
         onClick();
       }}
-      className={cx('flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-white/80 transition active:bg-white/10', className)}
+      className={cx('flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-white/80 transition hover:bg-white/[0.08] hover:text-white active:bg-white/10', className)}
     >
       <Icon name={icon} />
     </button>
@@ -109,7 +109,7 @@ export function Sheet({ open, onClose, title, children, footer, tall }: { open: 
       <div className="fade-enter absolute inset-0 bg-black/70 backdrop-blur-[2px]" onClick={onClose} />
       <div
         className={cx(
-          'sheet-enter relative flex w-full max-w-lg flex-col rounded-t-3xl border border-white/10 bg-app-elevated sm:rounded-3xl',
+          'sheet-enter relative flex w-full max-w-lg flex-col rounded-t-3xl border border-white/10 bg-app-elevated sm:rounded-3xl lg:max-w-xl',
           tall ? 'h-[92dvh] sm:h-[85dvh]' : 'max-h-[88dvh]',
         )}
       >
@@ -141,7 +141,7 @@ export function Segmented<T extends string>({ value, options, onChange, classNam
             }}
             className={cx(
               'min-h-10 rounded-lg border px-3 py-1.5 text-left text-sm font-semibold transition disabled:opacity-40',
-              active ? 'border-accent bg-accent/10 text-accent' : 'border-white/10 bg-white/[0.03] text-white/80 active:bg-white/10',
+              active ? 'border-accent bg-accent/10 text-accent' : 'border-white/10 bg-white/[0.03] text-white/80 hover:border-white/20 active:bg-white/10',
             )}
           >
             <span className="block leading-tight">{o.label}</span>

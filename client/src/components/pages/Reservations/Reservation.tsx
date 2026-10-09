@@ -235,13 +235,13 @@ export default function Reservation() {
 
   if (isPageLoading) {
     return (
-      <div className="px-6 py-3 text-white">
+      <div className="px-6 py-3 text-white lg:pt-8">
         <div className="mb-4">
           <h1 className="text-2xl font-semibold">Мои записи</h1>
           <p className="mt-1 text-sm text-white/50">Загружаем записи...</p>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start">
           {Array.from({ length: RESERVATION_SKELETON_COUNT }, (_, index) => (
             <ReservationCardSkeleton key={index} />
           ))}
@@ -251,7 +251,7 @@ export default function Reservation() {
   }
 
   return (
-    <div className="px-6 py-3 text-white">
+    <div className="px-6 py-3 text-white lg:pt-8">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Мои записи</h1>
@@ -321,7 +321,7 @@ export default function Reservation() {
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start">
           {registeredEvent && (
             <EventReservationCard
               event={registeredEvent}

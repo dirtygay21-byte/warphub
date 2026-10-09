@@ -109,7 +109,7 @@ export default function NewsList() {
         ) : (
           <div
             className={clsx(
-              "space-y-3",
+              "space-y-3 md:grid md:grid-cols-2 md:items-start md:gap-4 md:space-y-0 xl:grid-cols-3",
               newsQuery.isFetching && "opacity-70",
             )}
           >

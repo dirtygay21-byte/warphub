@@ -28,6 +28,7 @@ export default function Home() {
         {currentStage === "ServiceSelection" && (
           <motion.div
             key="service-selection"
+            className="lg:mx-auto lg:max-w-3xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
@@ -40,6 +41,7 @@ export default function Home() {
         {currentStage === "TableSelection" && (
           <motion.div
             key="table-selection"
+            className="lg:mx-auto lg:max-w-3xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
@@ -52,6 +54,7 @@ export default function Home() {
         {currentStage === "ServiceDetails" && (
           <motion.div
             key="service-details"
+            className="lg:mx-auto lg:max-w-3xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
@@ -64,6 +67,7 @@ export default function Home() {
         {currentStage === "Confirmation" && (
           <motion.div
             key="confirmation"
+            className="lg:mx-auto lg:max-w-3xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}

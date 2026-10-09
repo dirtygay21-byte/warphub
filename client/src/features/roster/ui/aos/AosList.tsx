@@ -35,7 +35,7 @@ export function AosList({
   const factionName = useMemo(() => Object.fromEntries(index.factions.map((f) => [f.id, f.name])), [index]);
 
   return (
-    <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5">
+    <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-4xl lg:pt-8">
       <header className="mb-4 flex items-end justify-between gap-3">
         <IconButton icon="back" label="Назад в WarpHub" onClick={onExit} className="mb-0.5 size-9" />
         <div className="min-w-0 flex-1">
@@ -54,7 +54,7 @@ export function AosList({
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Соберите первую армию: полки с героями, вспомогательные юниты, лоры и улучшения проверяются сразу.</Empty>
       ) : (
-        <ul className="space-y-2.5">
+        <ul className="space-y-2.5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-2.5 lg:space-y-0">
           {rosters.map((r) => (
             <Card key={r.id} roster={r} faction={factionName[r.factionId] ?? r.factionId} onOpen={() => onOpen(r.id)} onMenu={() => setMenu(r)} />
           ))}
@@ -68,8 +68,8 @@ export function AosList({
       </p>
 
       <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
-        <div className="mx-auto max-w-lg">
-          <Button variant="primary" className="h-12 w-full text-base" onClick={() => setCreating(true)}>
+        <div className="mx-auto max-w-lg lg:flex lg:max-w-4xl lg:justify-end lg:px-4">
+          <Button variant="primary" className="h-12 w-full text-base lg:w-auto lg:px-8" onClick={() => setCreating(true)}>
             <Icon name="plus" /> Новый ростер AoS
           </Button>
         </div>
