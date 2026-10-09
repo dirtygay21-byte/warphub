@@ -151,7 +151,7 @@ function Editor({
   const over = cr.points > size.points;
 
   return (
-    <div className="mx-auto min-h-dvh max-w-lg pb-32">
+    <div className="mx-auto min-h-dvh max-w-lg pb-32 lg:max-w-3xl">
       {/* ---- шапка ---- */}
       <div className="sticky top-0 z-30 border-b border-white/[0.06] bg-app/95 px-4 pb-3 pt-3 backdrop-blur">
         <div className="flex items-center gap-2">
@@ -346,7 +346,7 @@ function Editor({
 
       {/* ---- нижняя панель ---- */}
       <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
-        <div className="mx-auto flex max-w-lg gap-2">
+        <div className="mx-auto flex max-w-lg gap-2 lg:max-w-3xl lg:px-4">
           <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => setPicker(true)}>
             <Icon name="plus" /> <span className="whitespace-nowrap">Добавить юнит</span>
           </Button>

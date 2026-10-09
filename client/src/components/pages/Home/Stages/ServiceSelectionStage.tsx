@@ -121,7 +121,7 @@ function ServiceItemComponent({
 }) {
   return (
     <li
-      className="flex items-center  gap-2 rounded-md bg-app-subtle px-2 py-2 hover:cursor-pointer"
+      className="flex items-center gap-2 rounded-md bg-app-subtle px-2 py-2 transition-colors hover:cursor-pointer hover:bg-white/[0.05]"
       onClick={onClick}
     >
       <img
@@ -159,7 +159,7 @@ function DndEntryItem({
 }) {
   return (
     <li
-      className="flex items-center gap-3 rounded-md bg-app-subtle px-3 py-3 hover:cursor-pointer"
+      className="flex items-center gap-3 rounded-md bg-app-subtle px-3 py-3 transition-colors hover:cursor-pointer hover:bg-white/[0.05]"
       onClick={onClick}
     >
       <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-accent/10">

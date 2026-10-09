@@ -23,6 +23,7 @@ export default function Header() {
   const username = user ? user.firstName?.toUpperCase() : "";
   const isAdminRoute = pathname.startsWith("/admin");
   const isHomeRoute = pathname === "/";
+  const isTitleOnlyRoute = ["/reservations", "/news", "/profile"].some((p) => pathname.startsWith(p));
   const adminSection = pathname.includes("/content")
     ? "ContentManagement"
     : pathname.includes("/warhammer")
@@ -56,7 +57,14 @@ export default function Header() {
 
   return (
     <>
-      <div className="sticky top-0 z-50 w-full flex items-center h-[60px] gap-6 px-4 text-accent bg-app-bg">
+      <div
+        className={clsx(
+          "sticky top-0 z-50 w-full flex items-center h-[60px] gap-6 px-4 text-accent bg-app-bg",
+          // на широком экране раздел видно в боковой панели, а у страницы свой крупный заголовок
+          isTitleOnlyRoute && "lg:hidden",
+          isAdminRoute && "lg:px-6"
+        )}
+      >
         {pathname.startsWith("/reservations") && (
           <p className="text-white text-md font-medium text-center w-full">
             Список записей
@@ -105,14 +113,14 @@ export default function Header() {
 
         {isHomeRoute && currentStage === "Home" && (
           <>
-            <img src={s3Url("logo.png")} alt="logo" className="size-10" />
+            <img src={s3Url("logo.png")} alt="logo" className="size-10 lg:hidden" />
             <h1 className="text-md [font-family:var(--font-oswald)]">
               {`ДОБРО ПОЖАЛОВАТЬ${username ? `, ${username}` : ""} !`}
             </h1>
           </>
         )}
         {isHomeRoute && currentStage !== "Home" && (
-          <div className="w-full text-center relative">
+          <div className="w-full text-center relative lg:mx-auto lg:max-w-3xl">
             <button
               onClick={handleBackBtnClick}
               className="text-white flex items-center gap-2 hover:cursor-pointer absolute left-0 top-1/2 -translate-y-1/2"

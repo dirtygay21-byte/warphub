@@ -15,7 +15,7 @@ export default function NewsCard({
     <button
       type="button"
       onClick={onClick}
-      className="relative aspect-[5/2] w-full overflow-hidden rounded-2xl border border-white/10 text-left transition-transform active:scale-[0.99]"
+      className="relative aspect-[5/2] w-full overflow-hidden rounded-2xl border border-white/10 text-left transition-[transform,border-color] hover:cursor-pointer hover:border-accent/40 active:scale-[0.99]"
     >
       {coverUrl ? (
         <img

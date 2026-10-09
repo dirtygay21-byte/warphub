@@ -65,8 +65,8 @@ export default function Profile() {
   const fullName = getFullName(user?.firstName ?? "", user?.lastName ?? "");
 
   return (
-    <div className="px-6 py-3 text-white">
-      <section className="overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
+    <div className="px-6 py-3 text-white lg:grid lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start lg:gap-x-6 lg:pt-8">
+      <section className="overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.35)] lg:sticky lg:top-8 lg:row-span-6">
         <div className="relative px-6 pb-6 pt-8 text-center">
           <div className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-accent/15 to-transparent" />
 
@@ -96,7 +96,7 @@ export default function Profile() {
         </div>
       </section>
 
-      <section className="mt-6">
+      <section className="mt-6 lg:mt-0">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-white/50">
           Информация
         </h2>

@@ -126,9 +126,9 @@ function GamesTab() {
       ) : gamesQuery.isError ? (
         <p className="text-sm text-red-300">{gamesQuery.error.message}</p>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3 lg:grid lg:grid-cols-2 lg:items-start lg:gap-3 lg:space-y-0">
           {upcoming.length === 0 && (
-            <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-white/60">
+            <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-white/60 lg:col-span-2">
               Предстоящих игр нет. Нажмите «Новая игра», чтобы создать первую.
             </p>
           )}
@@ -140,7 +140,7 @@ function GamesTab() {
             <button
               type="button"
               onClick={() => setShowPast((value) => !value)}
-              className="mt-2 text-sm font-medium text-white/60"
+              className="mt-2 text-left text-sm font-medium text-white/60 hover:text-white lg:col-span-2"
             >
               {showPast ? "Скрыть прошедшие" : `Показать прошедшие (${past.length})`}
             </button>
@@ -394,7 +394,7 @@ function TrialsTab() {
           Заявок нет.
         </p>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3 lg:grid lg:grid-cols-2 lg:items-start lg:gap-3 lg:space-y-0">
           {trials.map((trial) => (
             <TrialCard
               key={trial.id}

@@ -12,7 +12,7 @@ export default function NewsCard({ news, onClick }: NewsCardProps) {
     <button
       type="button"
       onClick={onClick}
-      className="w-full overflow-hidden rounded-2xl border border-white/10 bg-app-elevated text-left transition-colors active:bg-white/5"
+      className="w-full overflow-hidden rounded-2xl border border-white/10 bg-app-elevated text-left transition-colors hover:cursor-pointer hover:border-accent/40 active:bg-white/5"
     >
       {news.coverUrl ? (
         <img

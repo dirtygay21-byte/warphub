@@ -22,13 +22,13 @@ export default function News() {
 
   if (newsQuery.isLoading) {
     return (
-      <div className="px-6 py-3 text-white">
+      <div className="px-6 py-3 text-white lg:pt-8">
         <div className="mb-4">
           <h1 className="text-2xl font-semibold">Новости</h1>
           <p className="mt-1 text-sm text-white/50">Загружаем новости...</p>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
           {Array.from({ length: NEWS_SKELETON_COUNT }, (_, index) => (
             <NewsCardSkeleton key={index} />
           ))}
@@ -56,7 +56,7 @@ export default function News() {
   }
 
   return (
-    <div className="px-6 py-3 text-white">
+    <div className="px-6 py-3 text-white lg:pt-8">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Новости</h1>
@@ -91,7 +91,7 @@ export default function News() {
       ) : (
         <div
           className={clsx(
-            "flex flex-col gap-4",
+            "flex flex-col gap-4 lg:grid lg:grid-cols-2",
             newsQuery.isFetching && "opacity-70"
           )}
         >
