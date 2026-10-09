@@ -95,24 +95,53 @@ function load(dir, name) {
 }
 
 // ---------- текст ----------
-const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', laquo: '«', raquo: '»', mdash: '—', ndash: '–', rsquo: '’', lsquo: '‘', hellip: '…', times: '×' };
+const ENTITIES = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', emsp: ' ', ensp: ' ', thinsp: ' ',
+  laquo: '«', raquo: '»', mdash: '—', ndash: '–', rsquo: '’', lsquo: '‘', ldquo: '“', rdquo: '”', hellip: '…', times: '×', bull: '•',
+};
+const decodeEntities = (s) =>
+  s.replace(/&(#\d+|#x[0-9a-f]+|[a-z]+);/gi, (m, e) => {
+    if (e[0] === '#') {
+      const code = e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
+      return Number.isFinite(code) ? String.fromCodePoint(code) : m;
+    }
+    return ENTITIES[e.toLowerCase()] ?? m;
+  });
+
+/**
+ * Последняя чистка любого текста из выгрузки (та же логика, что cleanRuleText в client/src/features/roster/text.ts —
+ * их совпадение проверяет tests/text.test.ts):
+ *   • повторно закодированные сущности («&amp;emsp;», «&lt;KY&gt;») раскодируются, после чего теги убираются ещё раз;
+ *   • ссылки Wahapedia «%000009837Redeploy%» превращаются в «Redeploy».
+ */
+export function cleanWahaText(input) {
+  if (!input) return '';
+  // дважды закодированное («&amp;emsp;») раскодируем, пока текст меняется (не больше 3 раз)
+  let out = String(input);
+  for (let i = 0; i < 3; i++) {
+    const next = decodeEntities(out);
+    if (next === out) break;
+    out = next;
+  }
+  out = out.replace(/<br\s*\/?>/gi, '\n').replace(/<\/?[A-Za-z][A-Za-z0-9]{0,9}\s*\/?>/g, '');
+  out = out.replace(/%\d{6,}([^%\n]*)%/g, '$1').replace(/%\d{6,}/g, '');
+  return out
+    .replace(/[ \t\u00a0\u2002\u2003\u2009]+/g, ' ')
+    .replace(/ *\n */g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 export function htmlToText(html) {
   if (!html) return '';
-  return html
+  const text = html
     .replace(/<!--.*?-->/gs, '')
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<\/(p|div|li|tr|h\d|table|ul)>/gi, '\n')
     .replace(/<ul[^>]*>/gi, '\n')
     .replace(/<li[^>]*>/gi, '• ')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&(#\d+|#x[0-9a-f]+|\w+);/gi, (m, e) => {
-      if (e[0] === '#') return String.fromCodePoint(e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10));
-      return ENTITIES[e.toLowerCase()] ?? m;
-    })
-    .replace(/[ \t]+/g, ' ')
-    .replace(/ *\n */g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
+    .replace(/<[^>]+>/g, '');
+  return cleanWahaText(text);
 }
 const bool = (v) => String(v).trim().toLowerCase() === 'true';
 const int = (v) => {

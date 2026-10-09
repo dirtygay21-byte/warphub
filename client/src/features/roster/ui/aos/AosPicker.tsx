@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { auxiliaryFit, leaderFit, optionsText, regimentCap, regimentFit, slotsUsed, type AosLookup, type Fit } from '../../aos/engine';
-import { nextAuxiliarySurcharge } from '../../aos/rules';
+import { nextAuxiliarySurcharge, seasonActive, seasonLabel } from '../../aos/rules';
 import type { AosRoster, AosWarscroll } from '../../aos/types';
 import { haptic } from '../../telegram';
 import { Icon, Sheet } from '../kit';
@@ -49,7 +49,7 @@ export function AosPicker({
       target.kind === 'leader' ? leaderFit(w, roster, L) : target.kind === 'aux' ? auxiliaryFit(w, roster, L) : reg ? regimentFit(reg, w, roster, L) : { ok: false, reason: 'Полк не найден.' };
     return L.faction.warscrolls
       .filter((w) => w.kind === 'unit' && (target.kind !== 'leader' || w.hero))
-      .filter((w) => w.season !== 'ghyran' && !w.aorOnly && (roster.showLegends || !w.legends))
+      .filter((w) => seasonActive(w.season) && !w.aorOnly && (roster.showLegends || !w.legends))
       .filter((w) => !needle || w.name.toLowerCase().includes(needle) || w.keywords.some((k) => k.toLowerCase() === needle))
       .map((w) => ({ w, fit: fitOf(w), group: groupOf(w) }))
       .sort((a, b) => Number(b.fit.ok) - Number(a.fit.ok) || GROUPS.findIndex((g) => g.key === a.group) - GROUPS.findIndex((g) => g.key === b.group) || a.w.name.localeCompare(b.w.name));
@@ -131,7 +131,7 @@ export function AosPicker({
                 <div className="min-w-0 flex-1">
                   <p className={cx('text-[14px] font-semibold leading-snug', !fit.ok && 'text-white/45')}>{w.name}</p>
                   <p className="mt-0.5 text-[12px] leading-snug text-white/40">
-                    {[w.role, w.unitSize > 1 ? `${w.unitSize} мод.` : null, w.unique ? 'Unique' : null, w.warmaster ? 'Warmaster' : null, w.season === 'aqshy' ? 'Scourge of Aqshy' : null, w.legends ? 'Legends' : null]
+                    {[w.role, w.unitSize > 1 ? `${w.unitSize} мод.` : null, w.unique ? 'Unique' : null, w.warmaster ? 'Warmaster' : null, seasonLabel(w.season), w.legends ? 'Legends' : null]
                       .filter(Boolean)
                       .join(' · ')}
                   </p>

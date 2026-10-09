@@ -1,4 +1,4 @@
-import type { AosPointsLimit, LoreKind } from './types';
+import type { AosPointsLimit, LoreKind, Season } from './types';
 
 /**
  * Правила формирования армии Age of Sigmar 4, General’s Handbook 2026-27 (matched play).
@@ -43,3 +43,23 @@ export function nextAuxiliarySurcharge(count: number): number {
 }
 
 export const LORE_LABEL: Record<LoreKind, string> = { spell: 'Заклинания', prayer: 'Молитвы', manifestation: 'Манифестации' };
+
+/**
+ * Сезоны General’s Handbook. Единственное место в клиенте, где перечислены сезоны:
+ * движок и интерфейс спрашивают только isSeasonal / seasonActive / seasonLabel.
+ * Новый сезон: добавить сюда и в tools/roster-data/aos/curated.json → seasonInfo
+ * (тест tools/roster-data/tests/aos-structure.test.ts проверяет, что списки совпадают и что в данных нет неописанных сезонов).
+ */
+export const AOS_SEASONS: Record<string, { label: string; active: boolean }> = {
+  aqshy: { label: 'Scourge of Aqshy', active: true },
+  ghyran: { label: 'Scourge of Ghyran', active: false },
+};
+
+/** Сезонный профиль, таблица, лор или построение (не обычные правила батлтома). */
+export const isSeasonal = (s: Season | undefined): s is string => !!s && s !== 'standard';
+/** Можно ли брать в matched play сейчас. Неизвестный сезон — нельзя: сначала его нужно описать в AOS_SEASONS. */
+export const seasonActive = (s: Season | undefined): boolean => !isSeasonal(s) || AOS_SEASONS[s]?.active === true;
+/** Подпись сезона для интерфейса; null — не сезонное. */
+export const seasonLabel = (s: Season | undefined): string | null => (isSeasonal(s) ? AOS_SEASONS[s]?.label ?? s : null);
+/** «Версия» юнита: все копии одного юнита в армии должны быть одной версии (обычной или сезонной). */
+export const seasonVersion = (s: Season | undefined): string => (isSeasonal(s) ? s : 'standard');

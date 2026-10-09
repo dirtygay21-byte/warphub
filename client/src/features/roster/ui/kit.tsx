@@ -24,6 +24,8 @@ const paths: Record<string, string> = {
   upload: 'M12 16V4M7 9l5-5 5 5M4 20h16',
   book: 'M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2V5zM4 19a2 2 0 012-2h13M8 7h7',
   map: 'M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14',
+  eye: 'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12zM12 15a3 3 0 100-6 3 3 0 000 6z',
+  edit: 'M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4',
 };
 
 export function Icon({ name, className = 'size-5', strokeWidth = 2 }: { name: keyof typeof paths | string; className?: string; strokeWidth?: number }) {

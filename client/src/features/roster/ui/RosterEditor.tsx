@@ -11,7 +11,8 @@ import { UnitCard } from './UnitCard';
 import { sortRosterUnits } from '../engine/sort';
 import { UnitPicker } from './UnitPicker';
 import { ExportSheet } from './ExportSheet';
-import { DetachmentPanel } from './DetachmentPanel';
+import { DetachmentPanel, RuleText } from './DetachmentPanel';
+import { cleanRuleText } from '../text';
 
 const GROUPS: { key: ReturnType<typeof roleGroup>; title: string }[] = [
   { key: 'characters', title: 'Персонажи' },
@@ -113,6 +114,8 @@ function Editor({
   const [menu, setMenu] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(roster.detachmentIds.length === 0);
   const [flash, setFlash] = useState<string | null>(null);
+  // режим просмотра: только чтение, без кнопок изменения
+  const [view, setView] = useState(false);
   const [detInfo, setDetInfo] = useState<string | null>(null);
   const closeDetInfo = useCallback(() => setDetInfo(null), []);
   const shownDet = detInfo && cr.detachments.some((d) => d.id === detInfo) ? detInfo : null;
@@ -156,8 +159,18 @@ function Editor({
       <div className="sticky top-0 z-30 border-b border-white/[0.06] bg-app/95 px-4 pb-3 pt-3 backdrop-blur">
         <div className="flex items-center gap-2">
           <IconButton icon="back" label="К списку" onClick={onBack} className="size-9" />
-          <NameInput value={roster.name} onChange={(name) => set({ name })} />
-          <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />
+          {view ? (
+            <p className="font-display min-w-0 flex-1 truncate px-1.5 py-1 text-lg font-semibold uppercase">{roster.name}</p>
+          ) : (
+            <NameInput value={roster.name} onChange={(name) => set({ name })} />
+          )}
+          <IconButton
+            icon={view ? 'edit' : 'eye'}
+            label={view ? 'Редактировать' : 'Режим просмотра'}
+            onClick={() => (setView((v) => !v), setExpanded(null))}
+            className={cx('size-9', view && 'bg-accent/15 text-accent')}
+          />
+          {!view && <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />}
         </div>
         <div className="mt-3 flex items-end justify-between gap-3">
           <div className="min-w-0">
@@ -203,7 +216,35 @@ function Editor({
             </div>
             <Icon name="down" className={cx('size-5 shrink-0 text-white/40 transition', settingsOpen && 'rotate-180')} />
           </button>
-          {settingsOpen && (
+          {settingsOpen && view && (
+            <div className="space-y-4 border-t border-white/[0.06] px-4 pb-4 pt-3">
+              <div>
+                {[
+                  ['Размер боя', `${size.label} · ${fmtPts(size.points)}`],
+                  ['Орден', L.faction.chapters.length ? roster.chapter ?? cr.chapter ?? '—' : null],
+                  ['Детачменты', cr.detachments.map((d) => d.name).join(' + ') || '—'],
+                  ['Force Disposition', roster.forceDisposition],
+                ]
+                  .filter((x): x is [string, string] => !!x[1])
+                  .map(([k, v]) => (
+                    <div key={k} className="flex items-baseline justify-between gap-3 border-b border-white/[0.05] py-1.5 last:border-0">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{k}</span>
+                      <span className="text-right text-[13.5px] font-semibold text-white/85">{v}</span>
+                    </div>
+                  ))}
+              </div>
+              {L.faction.armyRules.length > 0 && (
+                <div className="space-y-1.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Правила армии</p>
+                  {L.faction.armyRules.map((id) => {
+                    const r = L.faction.rules[id];
+                    return r ? <RuleText key={id} name={r.name} text={r.text} /> : null;
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+          {settingsOpen && !view && (
             <div className="space-y-5 border-t border-white/[0.06] px-4 pb-4 pt-4">
               <Field label="Размер боя">
                 <Segmented
@@ -334,6 +375,7 @@ function Editor({
                     expanded={expanded}
                     setExpanded={setExpanded}
                     onChange={onChange}
+                    readOnly={view}
                   />
                 ))}
               </div>
@@ -347,9 +389,15 @@ function Editor({
       {/* ---- нижняя панель ---- */}
       <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
         <div className="mx-auto flex max-w-lg gap-2 lg:max-w-3xl lg:px-4">
-          <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => setPicker(true)}>
-            <Icon name="plus" /> <span className="whitespace-nowrap">Добавить юнит</span>
-          </Button>
+          {view ? (
+            <Button variant="outline" className="h-12 flex-1 text-base" onClick={() => setView(false)}>
+              <Icon name="edit" /> <span className="whitespace-nowrap">Редактировать</span>
+            </Button>
+          ) : (
+            <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => setPicker(true)}>
+              <Icon name="plus" /> <span className="whitespace-nowrap">Добавить юнит</span>
+            </Button>
+          )}
           <Button variant="ghost" className="h-12 px-4" onClick={() => setExporting(true)}>
             <Icon name="share" /> <span className="max-[359px]:sr-only">Экспорт</span>
           </Button>
@@ -486,6 +534,7 @@ function UnitGroup({
   expanded,
   setExpanded,
   onChange,
+  readOnly = false,
 }: {
   c: ComputedUnit;
   cr: ComputedRoster;
@@ -495,6 +544,7 @@ function UnitGroup({
   expanded: string | null;
   setExpanded: (u: string | null) => void;
   onChange: (r: Roster) => void;
+  readOnly?: boolean;
 }) {
   const card = (x: ComputedUnit, nested: boolean) => (
     <UnitCard
@@ -514,6 +564,7 @@ function UnitGroup({
         onChange(removeUnit(roster, x.unit.uid));
         haptic.tap();
       }}
+      readOnly={readOnly}
     />
   );
   if (!c.attached.length) return card(c, false);
@@ -576,7 +627,7 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
                   {d.abilities.map((a, i) => (
                     <div key={i}>
                       <p className="font-semibold text-accent">{a.name}</p>
-                      <p className="mt-1 whitespace-pre-line text-white/70">{a.text}</p>
+                      <p className="mt-1 whitespace-pre-line text-white/70">{cleanRuleText(a.text)}</p>
                     </div>
                   ))}
                   {L.faction.stratagems.some((st) => st.detachment === d.id) && (
@@ -613,17 +664,3 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
   );
 }
 
-function RuleText({ name, text, sub }: { name: string; text: string; sub?: string }) {
-  return (
-    <details className="group rounded-xl border border-white/10 bg-white/[0.03]">
-      <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2">
-        <span className="min-w-0 flex-1">
-          <span className="block text-[13px] font-semibold text-white/85">{name}</span>
-          {sub && <span className="block text-[11px] text-white/40">{sub}</span>}
-        </span>
-        <Icon name="down" className="size-4 shrink-0 text-white/35 transition group-open:rotate-180" />
-      </summary>
-      <p className="whitespace-pre-line border-t border-white/[0.06] px-3 py-2 text-[12px] leading-relaxed text-white/65">{text}</p>
-    </details>
-  );
-}

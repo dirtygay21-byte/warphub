@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { eligibleFor, enhancementFit, generalFit, reinforceFit, unitBaseCost, unitTotal, type AosComputed, type AosIssue, type AosLookup } from '../../aos/engine';
 import type { AosRegiment, AosRoster, AosUnit, AosWarscroll, AosWeapon } from '../../aos/types';
 import { haptic, openExternal } from '../../telegram';
-import { RuleText } from '../DetachmentPanel';
 import { Button, Icon, Tag } from '../kit';
 import { cx } from '../util';
+import { cleanRuleText } from '../../text';
+import { seasonLabel } from '../../aos/rules';
+import { AosRuleCard } from './AosPanels';
 
 export interface UnitActions {
   onToggle: () => void;
@@ -26,6 +28,7 @@ export function AosUnitCard({
   leader,
   expanded,
   actions,
+  readOnly = false,
 }: {
   unit: AosUnit;
   roster: AosRoster;
@@ -35,6 +38,8 @@ export function AosUnitCard({
   leader: boolean;
   expanded: boolean;
   actions: UnitActions;
+  /** режим просмотра: без кнопок изменения, варскролл сразу раскрыт */
+  readOnly?: boolean;
 }) {
   const ws = L.ws.get(unit.warscrollId);
   const issues: AosIssue[] = cr.byUid.get(unit.uid) ?? [];
@@ -44,16 +49,19 @@ export function AosUnitCard({
     return (
       <div className="flex items-center gap-2 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2.5 text-sm text-red-100">
         <span className="flex-1">Юнит {unit.warscrollId} не найден в данных</span>
-        <Button variant="danger" className="h-9 px-3" onClick={actions.onRemove}>
-          <Icon name="trash" className="size-4" />
-        </Button>
+        {!readOnly && (
+          <Button variant="danger" className="h-9 px-3" onClick={actions.onRemove}>
+            <Icon name="trash" className="size-4" />
+          </Button>
+        )}
       </div>
     );
   }
   const models = ws.unitSize * (unit.reinforced ? 2 : 1);
-  const enh = Object.values(unit.enhancements)
-    .map((id) => L.enh.get(id)?.item.name)
-    .filter(Boolean);
+  const enhRefs = Object.values(unit.enhancements)
+    .map((id) => L.enh.get(id))
+    .filter((x): x is NonNullable<typeof x> => !!x);
+  const enh = enhRefs.map((e) => e.item.name);
   return (
     <div id={'u-' + unit.uid} className={cx('overflow-hidden rounded-2xl border bg-app-elevated transition', errors.length ? 'border-danger/40' : expanded ? 'border-white/20' : 'border-white/10')}>
       <button type="button" onClick={() => (haptic.tap(), actions.onToggle())} className="flex w-full items-center gap-3 px-3.5 py-3 text-left">
@@ -63,7 +71,7 @@ export function AosUnitCard({
             <span className="min-w-0 break-words">{ws.name}</span>
           </p>
           <p className="mt-0.5 text-[12px] leading-snug text-white/45">
-            {[leader ? 'Лидер полка' : ws.hero ? 'Герой' : null, models > 1 ? `${models} мод.` : null, unit.reinforced ? 'усилен' : null, ws.season === 'aqshy' ? 'Scourge of Aqshy' : null, ws.legends ? 'Legends' : null]
+            {[leader ? 'Лидер полка' : ws.hero ? 'Герой' : null, models > 1 ? `${models} мод.` : null, unit.reinforced ? 'усилен' : null, seasonLabel(ws.season), ws.legends ? 'Legends' : null]
               .filter(Boolean)
               .join(' · ')}
           </p>
@@ -83,12 +91,32 @@ export function AosUnitCard({
               {i.message}
             </p>
           ))}
-          <Controls unit={unit} ws={ws} roster={roster} L={L} regiment={regiment} leader={leader} isGeneral={isGeneral} actions={actions} />
-          <Warscroll ws={ws} unit={unit} />
+          {!readOnly && <Controls unit={unit} ws={ws} roster={roster} L={L} regiment={regiment} leader={leader} isGeneral={isGeneral} actions={actions} />}
+          {enhRefs.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Улучшения юнита</p>
+              {enhRefs.map((e) => (
+                <AosRuleCard key={e.item.id} rule={e.item} L={L} open={readOnly} extraSub={[e.type.name, e.item.points ? `+${e.item.points} очк.` : null, seasonLabel(e.table.season)].filter(Boolean).join(' · ')} />
+              ))}
+            </div>
+          )}
+          <KnownLores ws={ws} roster={roster} L={L} />
+          <Warscroll ws={ws} unit={unit} L={L} defaultOpen={readOnly} />
         </div>
       )}
     </div>
   );
+}
+
+/** WIZARD/PRIEST: какие лоры армии знает юнит (по правилам — лоры, выбранные для армии). */
+function KnownLores({ ws, roster, L }: { ws: AosWarscroll; roster: AosRoster; L: AosLookup }) {
+  if (!ws.wizard && !ws.priest) return null;
+  const name = (k: 'spell' | 'prayer' | 'manifestation') => (roster.lores[k] ? L.lore.get(roster.lores[k]!)?.name : null);
+  const parts = [
+    ws.wizard ? `WIZARD (${ws.wizard}): ${[name('spell'), name('manifestation')].filter(Boolean).join(' · ') || 'лор не выбран'}` : null,
+    ws.priest ? `PRIEST (${ws.priest}): ${[name('prayer'), name('manifestation')].filter(Boolean).join(' · ') || 'лор не выбран'}` : null,
+  ].filter(Boolean);
+  return <p className="rounded-lg bg-white/[0.04] px-2.5 py-2 text-[12px] leading-snug text-white/60">{parts.join(' · ')}</p>;
 }
 
 function Controls({
@@ -207,8 +235,8 @@ function Row({ label, value, action, reason }: { label: string; value: string; a
 }
 
 /** Варскролл: характеристики, оружие, способности, ключевые слова. */
-export function Warscroll({ ws, unit }: { ws: AosWarscroll; unit?: AosUnit }) {
-  const [open, setOpen] = useState(false);
+export function Warscroll({ ws, unit, L, defaultOpen = false }: { ws: AosWarscroll; unit?: AosUnit; L?: AosLookup; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
   const ranged = ws.weapons.filter((w) => w.type === 'ranged');
   const melee = ws.weapons.filter((w) => w.type === 'melee');
   const stat = (label: string, v: string) => (
@@ -238,7 +266,7 @@ export function Warscroll({ ws, unit }: { ws: AosWarscroll; unit?: AosUnit }) {
             <div className="space-y-1.5">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Способности</p>
               {ws.abilities.map((a, i) => (
-                <RuleText key={i} name={a.name} sub={[a.timing, a.value, a.reaction ? 'реакция' : null].filter(Boolean).join(' · ') || undefined} text={a.text} />
+                <AosRuleCard key={i} rule={a} L={L} />
               ))}
             </div>
           )}
@@ -264,7 +292,7 @@ export function Warscroll({ ws, unit }: { ws: AosWarscroll; unit?: AosUnit }) {
               {ws.reinforceable ? ' · можно усилить' : ''}
             </p>
             {ws.bases && <p>Подставка: {ws.bases}</p>}
-            {ws.notes && <p className="whitespace-pre-line">{ws.notes}</p>}
+            {ws.notes && <p className="whitespace-pre-line">{cleanRuleText(ws.notes)}</p>}
             {ws.legendsDate && !ws.legends && <p>Уйдёт в Warhammer Legends: {ws.legendsDate}</p>}
           </div>
           <button type="button" onClick={() => openExternal(ws.link)} className="flex items-center gap-1.5 text-xs font-semibold text-accent/90">

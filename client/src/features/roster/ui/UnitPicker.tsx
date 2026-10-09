@@ -5,6 +5,7 @@ import type { Datasheet, Roster } from '../engine/types';
 import { haptic } from '../telegram';
 import { Icon, Sheet } from './kit';
 import { cx } from './util';
+import { cleanRuleText } from '../text';
 
 /** Короткие подписи быстрых фильтров — по одной на каждую секцию списка. */
 const CHIP: Record<UnitType, string> = {
@@ -144,7 +145,7 @@ export function UnitPicker({
               <summary className="cursor-pointer list-none">
                 <b className="text-white/80">{a.name}:</b> {a.note}
               </summary>
-              {a.text && <p className="mt-1.5 whitespace-pre-line leading-relaxed text-white/60">{a.text}</p>}
+              {a.text && <p className="mt-1.5 whitespace-pre-line leading-relaxed text-white/60">{cleanRuleText(a.text)}</p>}
             </details>
           ))}
         </div>
