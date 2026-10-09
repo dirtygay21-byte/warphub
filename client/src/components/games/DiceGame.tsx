@@ -375,7 +375,29 @@ export default function DiceGame() {
 
       {inBattle && battle && (
         <div className="px-4">
-          <StickyActions>
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs text-white/50">Раунд {battle.round + 1}</span>
+            <span className={`text-lg font-semibold text-accent ${oswald}`}>
+              {battle.wins} {pluralWins(battle.wins)}
+            </span>
+          </div>
+
+          <div className={stageFrame}>
+            <BattleArena playerId={battle.player.sprite} enemyId={battle.opponent.sprite} event={arenaEvent} />
+            {banner && (
+              <p className={`absolute inset-x-3 top-2 rounded-lg bg-black/70 px-3 py-1.5 text-center text-sm uppercase tracking-wide text-accent ${oswald}`}>
+                {banner}
+              </p>
+            )}
+          </div>
+
+          <div className="mt-3 flex gap-4">
+            <FighterPanel fighter={battle.player} wounds={battle.playerWounds} align="left" />
+            <FighterPanel fighter={battle.opponent} wounds={battle.opponentWounds} align="right" />
+          </div>
+
+          {/* кнопки боя — всегда здесь, между бойцами и ходом: не нужно листать вниз */}
+          <div className="mt-4">
             {phase === "animating" ? (
               <PixelButton variant="dark" className="w-full" onClick={skipAnimation}>
                 <FastForward className="size-5" /> Пропустить анимацию
@@ -403,29 +425,9 @@ export default function DiceGame() {
                 )}
               </div>
             )}
-          </StickyActions>
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs text-white/50">Раунд {battle.round + 1}</span>
-            <span className={`text-lg font-semibold text-accent ${oswald}`}>
-              {battle.wins} {pluralWins(battle.wins)}
-            </span>
           </div>
 
-          <div className={stageFrame}>
-            <BattleArena playerId={battle.player.sprite} enemyId={battle.opponent.sprite} event={arenaEvent} />
-            {banner && (
-              <p className={`absolute inset-x-3 top-2 rounded-lg bg-black/70 px-3 py-1.5 text-center text-sm uppercase tracking-wide text-accent ${oswald}`}>
-                {banner}
-              </p>
-            )}
-          </div>
-
-          <div className="mt-3 flex gap-4">
-            <FighterPanel fighter={battle.player} wounds={battle.playerWounds} align="left" />
-            <FighterPanel fighter={battle.opponent} wounds={battle.opponentWounds} align="right" />
-          </div>
-
-          <p className="mt-3 text-center text-xs text-white/45">
+          <p className="mt-2 text-center text-xs text-white/45">
             {next ? `До «${next.label}»: ${next.minScore} ${pluralWins(next.minScore)}. ` : "Максимальная награда! "}
             При поражении награда за эту попытку сгорает.
           </p>
@@ -449,9 +451,6 @@ export default function DiceGame() {
                   defenderName={battle.player.name}
                   faction={fighterFaction(enemyAttack.attacker)}
                 />
-              )}
-              {phase === "animating" && (
-                <p className="text-center text-[11px] text-white/35">Нажмите, чтобы пропустить анимацию</p>
               )}
             </div>
           )}
