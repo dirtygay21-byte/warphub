@@ -83,6 +83,30 @@ export default function RunnerGame() {
     if (phase === "playing") worldRef.current.jumpBuffer = 0.12;
   }, [phase]);
 
+  // Во время забега прыжок — по нажатию в ЛЮБОМ месте экрана: слушаем всё окно,
+  // а не только блок игры (под ним раньше был «мёртвый» фон страницы). Кнопки (например, «Назад») работают как обычно.
+  useEffect(() => {
+    if (phase !== "playing") return;
+    const onDown = (e: PointerEvent) => {
+      if ((e.target as Element | null)?.closest?.("button, a, input, textarea, select")) return;
+      if (e.button > 0) return; // правая/средняя кнопка мыши
+      e.preventDefault();
+      jump();
+    };
+    // на время забега экран не прокручивается и не масштабируется от касаний
+    const html = document.documentElement;
+    const prevTouch = html.style.touchAction;
+    const prevSelect = html.style.userSelect;
+    html.style.touchAction = "none";
+    html.style.userSelect = "none";
+    window.addEventListener("pointerdown", onDown, { passive: false });
+    return () => {
+      window.removeEventListener("pointerdown", onDown);
+      html.style.touchAction = prevTouch;
+      html.style.userSelect = prevSelect;
+    };
+  }, [phase, jump]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.code === "Space" || e.code === "ArrowUp") {
@@ -113,13 +137,7 @@ export default function RunnerGame() {
   const nextTier = game?.tiers.find((t) => t.minScore > meters);
 
   return (
-    <div
-      className="min-h-full pb-10 text-white"
-      onPointerDown={() => {
-        // во время забега прыжок — по нажатию в любом месте экрана
-        if (phase === "playing") jump();
-      }}
-    >
+    <div className="min-h-full pb-10 text-white">
       <GameTopBar title={game?.title ?? "Зелёный рывок"} />
 
       {phase !== "result" && (

@@ -10,10 +10,10 @@ import {
 } from "@/apiUtils/minigames";
 import { useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
-import { Flag, LoaderCircle, Swords } from "lucide-react";
+import { FastForward, Flag, LoaderCircle, Swords } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { BattleArena, type ArenaEvent } from "./BattleArena";
-import { ErrorNote, GameTopBar, PixelButton, ResultPanel, TierList } from "./common";
+import { ErrorNote, GameTopBar, PixelButton, ResultPanel, StickyActions, TierList } from "./common";
 import { errorText, oswald, pluralWins, stageFrame, useGameInfo } from "./helpers";
 import { FACTION_LABELS, fighterFaction, type Faction } from "./pixel/factions";
 
@@ -317,6 +317,7 @@ export default function DiceGame() {
           result={result}
           title={battle?.lost ? (battle.wins > 0 ? "Поражение — награда сгорела" : "Поражение") : "Победы"}
           onAgain={start}
+          actionsOnTop
         >
           {battle && (
             <p className="mt-3 text-xs text-white/60">
@@ -339,6 +340,12 @@ export default function DiceGame() {
 
       {!inBattle && (
         <div className="px-4">
+          <StickyActions>
+            <PixelButton className="w-full" onClick={start} disabled={phase === "starting"}>
+              {phase === "starting" ? <LoaderCircle className="size-5 animate-spin" /> : <Swords className="size-5" />}
+              В бой
+            </PixelButton>
+          </StickyActions>
           <div className={stageFrame}>
             <BattleArena playerId="iron_captain" enemyId="hive_reaper" event={null} />
           </div>
@@ -363,15 +370,40 @@ export default function DiceGame() {
               <TierList game={game} />
             </div>
           )}
-          <PixelButton className="mt-6 w-full" onClick={start} disabled={phase === "starting"}>
-            {phase === "starting" ? <LoaderCircle className="size-5 animate-spin" /> : <Swords className="size-5" />}
-            В бой
-          </PixelButton>
         </div>
       )}
 
       {inBattle && battle && (
         <div className="px-4">
+          <StickyActions>
+            {phase === "animating" ? (
+              <PixelButton variant="dark" className="w-full" onClick={skipAnimation}>
+                <FastForward className="size-5" /> Пропустить анимацию
+              </PixelButton>
+            ) : (
+              <div className="space-y-2">
+                <PixelButton className="w-full" onClick={() => act("roll")} disabled={phase === "sending"}>
+                  {phase === "sending" ? <LoaderCircle className="size-5 animate-spin" /> : <Swords className="size-5" />}
+                  {battle.wins > 0 && exchange?.opponentDefeated ? "Сражаться дальше" : "Атаковать"}
+                </PixelButton>
+                {battle.wins > 0 && current ? (
+                  <PixelButton variant="dark" className="w-full" onClick={() => act("stop")} disabled={phase === "sending"}>
+                    <Flag className="size-5" /> Забрать: {current.label}
+                    {battle.clutchWins > 0 ? " + бонус" : ""}
+                  </PixelButton>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => act("stop")}
+                    disabled={phase === "sending"}
+                    className="w-full text-center text-xs text-white/45 underline underline-offset-4"
+                  >
+                    Отступить (без награды)
+                  </button>
+                )}
+              </div>
+            )}
+          </StickyActions>
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs text-white/50">Раунд {battle.round + 1}</span>
             <span className={`text-lg font-semibold text-accent ${oswald}`}>
@@ -392,6 +424,11 @@ export default function DiceGame() {
             <FighterPanel fighter={battle.player} wounds={battle.playerWounds} align="left" />
             <FighterPanel fighter={battle.opponent} wounds={battle.opponentWounds} align="right" />
           </div>
+
+          <p className="mt-3 text-center text-xs text-white/45">
+            {next ? `До «${next.label}»: ${next.minScore} ${pluralWins(next.minScore)}. ` : "Максимальная награда! "}
+            При поражении награда за эту попытку сгорает.
+          </p>
 
           {exchange && playerAttack && (
             <div className="mt-4 space-y-2">
@@ -419,35 +456,6 @@ export default function DiceGame() {
             </div>
           )}
 
-          {phase !== "animating" && (
-            <div className="mt-5 space-y-3">
-              <PixelButton className="w-full" onClick={() => act("roll")} disabled={phase === "sending"}>
-                {phase === "sending" ? <LoaderCircle className="size-5 animate-spin" /> : <Swords className="size-5" />}
-                {battle.wins > 0 && exchange?.opponentDefeated ? "Сражаться дальше" : "Атаковать"}
-              </PixelButton>
-
-              {battle.wins > 0 && current ? (
-                <PixelButton variant="dark" className="w-full" onClick={() => act("stop")} disabled={phase === "sending"}>
-                  <Flag className="size-5" /> Забрать: {current.label}
-                  {battle.clutchWins > 0 ? " + бонус" : ""}
-                </PixelButton>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => act("stop")}
-                  disabled={phase === "sending"}
-                  className="w-full text-center text-xs text-white/45 underline underline-offset-4"
-                >
-                  Отступить (без награды)
-                </button>
-              )}
-
-              <p className="text-center text-xs text-white/45">
-                {next ? `До «${next.label}»: ${next.minScore} ${pluralWins(next.minScore)}. ` : "Максимальная награда! "}
-                При поражении награда за эту попытку сгорает.
-              </p>
-            </div>
-          )}
         </div>
       )}
     </div>

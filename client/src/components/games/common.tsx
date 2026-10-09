@@ -42,6 +42,18 @@ export function GameTopBar({
 }
 
 
+/**
+ * Кнопки действия, закреплённые сверху под заголовком игры: видны при любой прокрутке,
+ * чтобы не листать вниз ради «Играть» / «Атаковать».
+ */
+export function StickyActions({ children }: { children: ReactNode }) {
+  return (
+    <div className="sticky top-[56px] z-10 -mx-4 mb-3 border-b border-white/10 bg-app-bg/95 px-4 py-2.5 backdrop-blur">
+      {children}
+    </div>
+  );
+}
+
 export function PixelButton({
   children,
   onClick,
@@ -175,12 +187,15 @@ export function ResultPanel({
   title,
   children,
   onAgain,
+  actionsOnTop = false,
 }: {
   game: MinigameInfo | undefined;
   result: FinishResult;
   title: string;
   children?: ReactNode;
   onAgain: () => void;
+  /** кнопки «Ещё раз» / «К играм» закреплены сверху, а не внизу экрана */
+  actionsOnTop?: boolean;
 }) {
   const navigate = useNavigate();
   const nextTier = game?.tiers.find((tier) => tier.minScore > result.score);
@@ -190,8 +205,20 @@ export function ResultPanel({
       result.rewardOutcome === "upgraded" ||
       result.rewardOutcome === "kept");
 
+  const actions = (
+    <div className="grid grid-cols-2 gap-3">
+      <PixelButton onClick={onAgain}>
+        <RotateCcw className="size-4" /> Ещё раз
+      </PixelButton>
+      <PixelButton variant="dark" onClick={() => navigate("/games")}>
+        К играм
+      </PixelButton>
+    </div>
+  );
+
   return (
     <div className="mx-auto w-full max-w-md px-4 pb-10">
+      {actionsOnTop && <StickyActions>{actions}</StickyActions>}
       <div className="rounded-2xl border border-white/10 bg-app-elevated p-5 text-center">
         <p className={`text-sm uppercase tracking-widest text-white/50 ${oswald}`}>{title}</p>
         <p className={`mt-1 text-6xl font-semibold text-accent ${oswald}`}>
@@ -238,14 +265,7 @@ export function ResultPanel({
         {showReward && result.reward && <RewardCodeCard reward={result.reward} />}
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
-        <PixelButton onClick={onAgain}>
-          <RotateCcw className="size-4" /> Ещё раз
-        </PixelButton>
-        <PixelButton variant="dark" onClick={() => navigate("/games")}>
-          К играм
-        </PixelButton>
-      </div>
+      {!actionsOnTop && <div className="mt-6">{actions}</div>}
       <button
         type="button"
         onClick={() => navigate("/games/rewards")}
