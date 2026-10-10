@@ -1,7 +1,7 @@
 {
  "edition": "11",
  "lastUpdate": "2026-09-28 02:38:04",
- "generatedAt": "2026-10-05T15:26:34.622Z",
+ "generatedAt": "2026-10-10T06:42:24.810Z",
  "credit": "powered by Wahapedia",
  "factions": [
   {
@@ -24,13 +24,6 @@
    "allegiance": "Imperium",
    "units": 38,
    "detachments": 10
-  },
-  {
-   "id": "TL",
-   "name": "Adeptus Titanicus",
-   "allegiance": "Imperium",
-   "units": 4,
-   "detachments": 0
   },
   {
    "id": "AE",

@@ -56,6 +56,8 @@ export interface UnitAbility {
   text: string;
   /** ссылка на общее правило FactionData.rules */
   ref?: string;
+  /** текст неполный в выгрузке (заглушка таблицы/схемы) */
+  incomplete?: 'truncated' | 'table';
 }
 export interface WargearOption {
   star: boolean;
@@ -83,6 +85,11 @@ export interface Datasheet {
   dedicatedTransport: boolean;
   titanic: boolean;
   costs: CostBand[];
+  /**
+   * Цены орденов: дополнительные таблицы цен (в выгрузке без подписи ордена). chapter — орден армии,
+   * для которого действует таблица (tools/roster-data/40k/curated.json); null — не установлен, не применяется.
+   */
+  costVariants?: { chapter: string | null; costs: CostBand[] }[];
   leads: string[];
   leaderNote: string;
   leaderExtra: boolean;
@@ -155,6 +162,7 @@ export interface Enhancement {
   upgrade: boolean;
   restriction: string;
   text: string;
+  incomplete?: 'truncated' | 'table';
 }
 export interface AllyGroup {
   key: string;
@@ -172,6 +180,9 @@ export interface Stratagem {
   turn: string;
   phase: string;
   text: string;
+  /** стратагема правил армии (не детачмента) — показывается как общая для фракции */
+  army?: boolean;
+  incomplete?: 'truncated' | 'table';
 }
 export interface FactionData {
   id: string;

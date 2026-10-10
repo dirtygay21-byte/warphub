@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { bandFor, battlelineGrants, copyLimit, isBattleline, type ComputedRoster, type DataLookup } from '../engine/compute';
+import { bandFor, battlelineGrants, copyKey, copyLimit, isBattleline, type ComputedRoster, type DataLookup } from '../engine/compute';
 import { compareUnits, typeLabel, typeRank, unitType, type UnitType } from '../engine/sort';
 import type { Datasheet, Roster } from '../engine/types';
 import { haptic } from '../telegram';
@@ -46,9 +46,14 @@ export function UnitPicker({
   const grants = useMemo(() => battlelineGrants(cr.detachments), [cr.detachments]);
   const counts = useMemo(() => {
     const m = new Map<string, number>();
-    for (const u of roster.units) m.set(u.datasheetId, (m.get(u.datasheetId) ?? 0) + 1);
+    // по названию, как лимит копий в движке (copyKey)
+    for (const u of roster.units) {
+      const ds = L.ds.get(u.datasheetId);
+      const k = ds ? copyKey(ds) : u.datasheetId;
+      m.set(k, (m.get(k) ?? 0) + 1);
+    }
     return m;
-  }, [roster.units]);
+  }, [roster.units, L]);
 
   const chapter = cr.chapter;
   // союзные правила, которые выбранный детачмент отключает (Reaper’s Wager → Corsairs)
@@ -166,8 +171,10 @@ export function UnitPicker({
                   <PickerRow
                     key={ds.id}
                     ds={ds}
-                    count={counts.get(ds.id) ?? 0}
+                    count={counts.get(copyKey(ds)) ?? 0}
                     limit={copyLimit(ds, roster.battleSize, isBattleline(ds, grants))}
+                    chapter={cr.chapter}
+                    factionName={L.faction.name}
                     onAdd={() => onAdd(ds)}
                   />
                 ))}
@@ -186,8 +193,8 @@ export function UnitPicker({
   );
 }
 
-function PickerRow({ ds, count, limit, onAdd }: { ds: Datasheet; count: number; limit: number; onAdd: () => void }) {
-  const next = bandFor(ds, count + 1);
+function PickerRow({ ds, count, limit, chapter, factionName, onAdd }: { ds: Datasheet; count: number; limit: number; chapter: string | null; factionName: string; onAdd: () => void }) {
+  const next = bandFor(ds, count + 1, chapter);
   const opts = next?.options ?? [];
   const price = opts[0]?.cost;
   const full = count >= limit;
@@ -196,9 +203,13 @@ function PickerRow({ ds, count, limit, onAdd }: { ds: Datasheet; count: number; 
   if (ds.leads.length) sub.push(ds.support ? 'Support' : 'Leader');
   if (models.length && !(models.length === 1 && models[0] === 1)) sub.push(models.join(' / ') + ' мод.');
   if (ds.forgeWorld) sub.push('Forge World');
+  // книга-источник, если она не основная книга фракции: так различаются одноимённые версии (Space Marines / Black Templars)
+  else if (ds.source && !ds.legends && ds.source !== factionName) sub.push(ds.source);
+  const noCost = !ds.costs.length;
+  if (noCost) sub.push('нет цены в данных — в армию не входит');
   return (
     <li className="border-b border-white/[0.06] last:border-b-0">
-      <button type="button" onClick={onAdd} className={cx('flex w-full items-center gap-3 px-3.5 py-3 text-left transition active:bg-white/[0.06]', full && 'opacity-40')}>
+      <button type="button" onClick={onAdd} className={cx('flex w-full items-center gap-3 px-3.5 py-3 text-left transition active:bg-white/[0.06]', (full || noCost) && 'opacity-40')}>
         <div className="min-w-0 flex-1">
           <p className="text-[14px] font-semibold leading-snug">{ds.name}</p>
           {sub.length > 0 && <p className="mt-0.5 text-[12px] leading-snug text-white/45">{sub.join(' · ')}</p>}

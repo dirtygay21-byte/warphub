@@ -6,8 +6,12 @@ import { groupDetRules, groupOf, roleOf } from '../engine/group';
 import { openExternal } from '../telegram';
 import { Button, Counter, Field, Icon, Segmented, Tag } from './kit';
 import { cx, fmtPts } from './util';
-import { cleanRuleText } from '../text';
+import { cleanRuleText, INCOMPLETE_TEXT } from '../text';
 import { RuleText } from './DetachmentPanel';
+
+/** В выгрузке дальность и навык — голые числа («24», «3»); на карточке инфолиста — «24″» и «3+». */
+const fmtRange = (r: string) => (/^\d+$/.test(r.trim()) ? `${r.trim()}″` : r);
+const fmtSkill = (v: string) => (/^\d$/.test(v.trim()) ? `${v.trim()}+` : v);
 
 export function UnitCard({
   c,
@@ -435,6 +439,14 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
               {a.type === 'wargear' && <span className="ml-1.5 text-[11px] font-medium uppercase text-white/35">снаряжение</span>}
             </p>
             <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-white/70">{cleanRuleText(a.ref ? L.faction.rules[a.ref]?.text : a.text)}</p>
+            {a.incomplete && (
+              <p className="mt-1 rounded-lg bg-warn/10 px-2.5 py-1.5 text-[11.5px] leading-snug text-amber-100">
+                {INCOMPLETE_TEXT[a.incomplete]}{' '}
+                <button type="button" onClick={() => openExternal(ds.link)} className="font-semibold text-accent underline underline-offset-2">
+                  Полный текст на Wahapedia
+                </button>
+              </p>
+            )}
           </div>
         ))}
         <UnitRules c={c} cr={cr} L={L} detachmentIds={detachmentIds} />
@@ -496,9 +508,9 @@ function WeaponTable({ title, skill, weapons, count }: { title: string; skill: s
                     </span>
                     {p.keywords && <span className="block text-[10px] uppercase leading-tight text-accent/70">{p.keywords}</span>}
                   </td>
-                  <td className="px-1 py-1.5">{p.type === 'Melee' ? '—' : p.range}</td>
+                  <td className="px-1 py-1.5">{p.type === 'Melee' ? '—' : fmtRange(p.range)}</td>
                   <td className="px-1 py-1.5">{p.A}</td>
-                  <td className="px-1 py-1.5">{p.skill}</td>
+                  <td className="px-1 py-1.5">{fmtSkill(p.skill)}</td>
                   <td className="px-1 py-1.5">{p.S}</td>
                   <td className="px-1 py-1.5">{p.AP}</td>
                   <td className="px-1 py-1.5">{p.D}</td>

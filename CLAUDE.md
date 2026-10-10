@@ -47,6 +47,8 @@ Mini App WarpHub (Telegram) и скрытый раздел Roster Builder (Warha
 - AoS: `Faction_ability_subtypes.description` — примечания подтипа (например, дата перехода построения в Warhammer Legends).
 - 40K: лимита длины нет; ссылка-заглушка `$…` встречается единично.
 - Очков сезонных таблиц, построений, лоров и террейна AoS в CSV нет — они в `curated.json` (Battle Profiles).
+- 40K: у 9 инфолистов Space Marines несколько таблиц цен без подписи ордена — привязка в `tools/roster-data/40k/curated.json`.
+  Отчёты импорта: `tools/roster-data/aos/import-report.json`, `tools/roster-data/40k/import-report.json`.
 
 ## Проверки
 

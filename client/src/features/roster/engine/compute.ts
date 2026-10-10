@@ -159,8 +159,21 @@ export function copyLimit(ds: Datasheet, battleSize: Roster['battleSize'], battl
   return base;
 }
 
-export function bandFor(ds: Datasheet, copy: number): CostBand | undefined {
-  return ds.costs.find((b) => copy >= b.from && (b.to === null || copy <= b.to)) ?? ds.costs[ds.costs.length - 1];
+/**
+ * Ключ лимита копий — название инфолиста. У одного названия бывает несколько инфолистов
+ * (обычный Space Marines и версия Black Templars, Space Wolves): лимит «не больше N копий» общий.
+ */
+export const copyKey = (ds: Pick<Datasheet, 'name'>) => ds.name.trim().toUpperCase();
+
+/** Таблица цен инфолиста для ордена армии: своя таблица ордена, если она известна, иначе обычная. */
+export function costsFor(ds: Datasheet, chapter: string | null = null): CostBand[] {
+  const v = chapter ? ds.costVariants?.find((x) => x.chapter === chapter) : undefined;
+  return v?.costs ?? ds.costs;
+}
+
+export function bandFor(ds: Datasheet, copy: number, chapter: string | null = null): CostBand | undefined {
+  const costs = costsFor(ds, chapter);
+  return costs.find((b) => copy >= b.from && (b.to === null || copy <= b.to)) ?? costs[costs.length - 1];
 }
 
 /** Ключевые слова/названия, которым выбранные детачменты дают BATTLELINE. */
@@ -204,12 +217,14 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
   const chapter = roster.chapter ?? [...detChapters][0] ?? [...unitChapters][0] ?? null;
 
   // ---------- юниты и стоимость ----------
+  // копии считаются по названию (copyKey): одноимённые инфолисты разных версий делят лимит и ступени цены
   const copies = new Map<string, number>();
   const units: ComputedUnit[] = roster.units.map((unit) => {
     const ds = L.ds.get(unit.datasheetId);
-    const copy = (copies.get(unit.datasheetId) ?? 0) + 1;
-    copies.set(unit.datasheetId, copy);
-    const band = ds ? bandFor(ds, copy) : undefined;
+    const key = ds ? copyKey(ds) : unit.datasheetId;
+    const copy = (copies.get(key) ?? 0) + 1;
+    copies.set(key, copy);
+    const band = ds ? bandFor(ds, copy, chapter) : undefined;
     const opt = band?.options.find((o) => o.label === unit.size) ?? band?.options[0];
     let extras = 0;
     for (const a of band?.addons ?? []) extras += (unit.addons[a.label] ?? 0) * a.cost;
@@ -346,14 +361,16 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
   }
 
   // ---------- лимиты копий ----------
-  for (const [id, n] of copies) {
-    const ds = L.ds.get(id);
+  for (const [key, n] of copies) {
+    const same = units.filter((c) => c.ds && copyKey(c.ds) === key);
+    const ds = same[0]?.ds;
     if (!ds) continue;
-    const bl = units.find((c) => c.unit.datasheetId === id)?.isBattleline ?? false;
-    let limit = copyLimit(ds, roster.battleSize, bl);
+    const bl = same.some((c) => c.isBattleline);
+    // самый строгий лимит среди версий (Epic Hero у одной из них — 1 на все)
+    let limit = Math.min(...same.map((c) => copyLimit(c.ds!, roster.battleSize, bl)));
     for (const d of detachments) if (d.limitOverride?.names.includes(ds.name.toUpperCase())) limit = Math.max(limit, d.limitOverride.max);
     if (n > limit) {
-      const uids = units.filter((c) => c.unit.datasheetId === id).map((c) => c.unit.uid);
+      const uids = same.map((c) => c.unit.uid);
       err('copies', `«${ds.name}»: ${n} шт., максимум ${limit}${ds.epicHero ? ' (Epic Hero)' : ''}.`, uids);
     }
   }

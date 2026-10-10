@@ -181,44 +181,51 @@ export function parseBandHeader(desc) {
 }
 
 /**
- * Datasheets_models_cost → { default: Band[], aoi?: Band[], assigned?: Band[] }
+ * Datasheets_models_cost → { default: Band[], assigned?: Band[], variants: { default?: Band[][], … } }
  * Band = { from, to, options:[{label, models, cost}], addons:[{label,cost}], wargear:[{label,cost}] }
- * Особенности данных: у некоторых инфолистов Space Marines несколько таблиц подряд (варианты орденов) —
- * берём первую; строки внутри таблицы иногда дублируются — убираем дубли.
+ *
+ * Таблица = полосы от первого заголовка «YOUR … COST» до его повтора в уже заполненной полосе.
+ * У части инфолистов Space Marines несколько таблиц подряд — цены орденов (Blood Angels, Dark Angels, Deathwatch);
+ * в выгрузке не подписано, какая чья. Первая таблица — обычная цена (default); остальные, отличные от неё, —
+ * variants (порядок как в выгрузке). Какому ордену какая — задаётся в 40k/curated.json → chapterCosts.
+ * Строки внутри таблицы иногда задублированы (каждая дважды) — дубли убираются.
  */
 export function parseCosts(rows) {
-  const ctx = {};
+  const tables = {}; // контекст → [[band…], …]
   let cur = 'default';
+  let bands = null;
   let band = null;
   let mode = 'size';
-  const done = new Set(); // контексты, которые уже завершены (начался повтор таблицы)
+  const newTable = () => {
+    bands = [];
+    (tables[cur] ||= []).push(bands);
+    band = null;
+    mode = 'size';
+  };
   const sorted = [...rows].sort((a, b) => int(a.line) - int(b.line));
   for (const r of sorted) {
     const raw = r.description || '';
     if (/dsHeaderAoI/.test(raw)) {
       const t = htmlToText(raw).toUpperCase();
       cur = t.includes('ASSIGNED') ? 'assigned' : 'aoi';
-      band = null;
-      mode = 'size';
+      newTable();
       continue;
     }
-    if (done.has(cur)) continue;
+    if (!bands) newTable();
     const label = htmlToText(raw).replace(/^\+\s*/, '+ ').trim();
     const bh = parseBandHeader(label);
-    const bands = (ctx[cur] ||= []);
     if (bh) {
       const existing = bands.find((b) => b.from === bh.from && b.to === bh.to);
-      if (existing) {
-        if (existing.options.length) {
-          // повтор уже заполненной полосы = следующий вариант таблицы → стоп
-          done.add(cur);
-          continue;
-        }
+      if (existing && existing.options.length) {
+        // повтор уже заполненной полосы = следующая таблица цен
+        newTable();
+      } else if (existing) {
         band = existing;
-      } else {
-        band = { from: bh.from, to: bh.to, options: [], addons: [], wargear: [] };
-        bands.push(band);
+        mode = 'size';
+        continue;
       }
+      band = { from: bh.from, to: bh.to, options: [], addons: [], wargear: [] };
+      bands.push(band);
       mode = 'size';
       continue;
     }
@@ -246,18 +253,40 @@ export function parseCosts(rows) {
     const models = (label.match(/\d+/g) || []).reduce((s, n) => s + +n, 0) || 1;
     band.options.push({ label, models, cost });
   }
-  // полосы без вариантов размера (только wargear) наследуют размеры соседней
-  for (const bands of Object.values(ctx)) {
-    bands.sort((a, b) => a.from - b.from);
-    const proto = bands.find((b) => b.options.length);
-    for (const b of bands) {
-      if (!b.options.length && proto) b.options = proto.options;
-      if (!b.wargear.length && proto) b.wargear = proto.wargear;
+  const ctx = {};
+  const variants = {};
+  for (const [key, list] of Object.entries(tables)) {
+    const filled = [];
+    for (const bs of list) {
+      // полосы без вариантов размера (только wargear) наследуют размеры соседней
+      bs.sort((a, b) => a.from - b.from);
+      const proto = bs.find((b) => b.options.length);
+      if (!proto) continue;
+      for (const b of bs) {
+        if (!b.options.length) b.options = proto.options;
+        if (!b.wargear.length) b.wargear = proto.wargear;
+      }
+      filled.push(bs);
     }
+    if (!filled.length) continue;
+    ctx[key] = filled[0];
+    const seen = new Set([JSON.stringify(filled[0])]);
+    const rest = [];
+    for (const bs of filled.slice(1)) {
+      const k = JSON.stringify(bs);
+      if (seen.has(k)) continue;
+      seen.add(k);
+      rest.push(bs);
+    }
+    if (rest.length) variants[key] = rest;
   }
-  if (!ctx.default && ctx.aoi) ctx.default = ctx.aoi;
+  if (!ctx.default && ctx.aoi) {
+    ctx.default = ctx.aoi;
+    if (variants.aoi) variants.default = variants.aoi;
+  }
   delete ctx.aoi;
-  if (ctx.default && !ctx.default.length) delete ctx.default;
+  delete variants.aoi;
+  ctx.variants = variants;
   return ctx;
 }
 
@@ -316,7 +345,8 @@ export function parseDetachmentRules(texts, vocab = new Set(), names = new Set()
     const ch = one.match(/Your army can include ([A-Za-z’' ]+?) units, but it cannot include (?:any )?ADEPTUS ASTARTES units drawn from any other Chapter/i);
     if (ch) out.chapter = titleKw(ch[1]);
     for (const line of t.split('\n')) {
-      const m = line.match(/(?:^|\.\s*|KEYWORDS\s*|Detachment,\s*)([A-Za-z’'\- ,]+?) (?:units|models) from your army (?:gain|have) the BATTLELINE keyword/i);
+      // строка может начинаться с маркера списка: «• Troupe units from your army gain…», «• WAR DOG units … have…»
+      const m = line.match(/(?:^|\.\s*|KEYWORDS\s*|Detachment,\s*)(?:[•▪◦]\s*)?([A-Za-z’'\- ,]+?) (?:units|models) from your army (?:gain|have) the BATTLELINE keyword/i);
       if (m) {
         const nm = m[1].replace(/^.*Detachment,\s*/i, '').replace(/^(KEYWORDS|TRAVELLING PLAYERS)\s*/i, '').split(KW_SEP).map((x) => x.trim()).filter(Boolean);
         out.battleline.push(...nm);
@@ -439,6 +469,7 @@ export function parseWeapons(rows) {
   const out = [];
   for (const w of [...rows].sort(byLine)) {
     const full = htmlToText(w.name).trim();
+    if (!full) continue; // пустые строки выгрузки (без названия и характеристик)
     const profile = {
       name: full, type: w.type || '', range: (w.range || '').replace(/"$/, '') ? w.range : w.range, A: w.A, skill: w.BS_WS, S: w.S, AP: w.AP, D: w.D,
       keywords: htmlToText(w.description).replace(/\s*,\s*/g, ', '),
@@ -464,14 +495,19 @@ export function parseWeapons(rows) {
  */
 export function parseLoadout(text, weapons) {
   const rules = [];
-  const names = weapons.map((w) => ({ w: w.name, n: normName(w.name) }));
+  // «the» снимается с обеих сторон: в тексте «the Axe Mortalis», в оружии «The Axe Mortalis»
+  const names = weapons.map((w) => ({ w: w.name, n: normName(w.name).replace(/^the /, '') }));
   const find = (item) => {
     const n = normName(item).replace(/^the /, '');
-    return (
+    if (!n) return undefined;
+    const exact =
       names.find((x) => x.n === n) ||
       names.find((x) => x.n === n.replace(/s$/, '')) ||
-      names.find((x) => x.n.replace(/s$/, '') === n.replace(/s$/, ''))
-    )?.w;
+      names.find((x) => x.n.replace(/s$/, '') === n.replace(/s$/, ''));
+    if (exact) return exact.w;
+    // сокращённое название в тексте: «Perdition» ↔ оружие «Perdition Pistol» — только если такое оружие одно
+    const pre = names.filter((x) => x.n.startsWith(n + ' '));
+    return pre.length === 1 ? pre[0].w : undefined;
   };
   for (const m of text.matchAll(/(^|\n|\.\s*)([^.\n:]*?)\s+(?:is|are) equipped with:\s*([^.\n]+)/gi)) {
     const subj = m[2].trim();
@@ -501,11 +537,91 @@ const ABILITY_TYPE = {
   Psychic: 'datasheet', Primarch: 'datasheet', 'Fortification (левая колонка)': 'datasheet', 'Special (правая колонка)': 'datasheet',
 };
 
+// ---------- ручные дополнения и отчёт импорта ----------
+const HERE = path.dirname(new URL(import.meta.url).pathname);
+const CURATED = path.join(HERE, '..', '40k', 'curated.json');
+const REPORT = path.join(HERE, '..', '40k', 'import-report.json');
+
+function loadCurated() {
+  return fs.existsSync(CURATED) ? JSON.parse(fs.readFileSync(CURATED, 'utf8')) : {};
+}
+
+/**
+ * Проверка самой выгрузки: повторы id, ссылки на несуществующие записи, пустые строки.
+ * Ничего не исправляет — только записывает в отчёт, чтобы новая выгрузка не принесла проблемы молча.
+ */
+export function auditSource(T) {
+  const report = { errors: [], warnings: [], info: [] };
+  const ids = (t) => new Set(T[t].map((r) => r.id));
+  for (const t of ['Factions', 'Source', 'Datasheets', 'Abilities', 'Detachments', 'Enhancements', 'Stratagems', 'Detachment_abilities']) {
+    const seen = new Map();
+    for (const r of T[t]) seen.set(r.id, (seen.get(r.id) ?? 0) + 1);
+    const dup = [...seen].filter(([, n]) => n > 1);
+    if (dup.length) report.info.push(`${t}: ${dup.length} id повторяются (${dup.slice(0, 5).map(([k]) => k).join(', ')}${dup.length > 5 ? '…' : ''})`);
+  }
+  const ds = ids('Datasheets');
+  const fk = (t, col, target, label) => {
+    const bad = T[t].filter((r) => r[col] && !target.has(r[col]));
+    if (bad.length) report.info.push(`${t}.${col}: ${bad.length} ссылок на несуществующие ${label} (${uniq(bad.map((r) => r[col])).slice(0, 5).join(', ')})`);
+  };
+  for (const t of ['Datasheets_abilities', 'Datasheets_keywords', 'Datasheets_models', 'Datasheets_models_cost', 'Datasheets_options', 'Datasheets_unit_composition', 'Datasheets_wargear', 'Datasheets_enhancements', 'Datasheets_stratagems', 'Datasheets_detachment_abilities'])
+    fk(t, 'datasheet_id', ds, 'инфолисты');
+  fk('Datasheets_leader', 'leader_id', ds, 'инфолисты');
+  fk('Datasheets_leader', 'attached_id', ds, 'инфолисты');
+  fk('Datasheets_abilities', 'ability_id', ids('Abilities'), 'способности');
+  fk('Datasheets_enhancements', 'enhancement_id', ids('Enhancements'), 'улучшения');
+  fk('Datasheets_stratagems', 'stratagem_id', ids('Stratagems'), 'стратагемы');
+  fk('Datasheets_detachment_abilities', 'detachment_ability_id', ids('Detachment_abilities'), 'правила детачментов');
+  for (const t of ['Enhancements', 'Stratagems', 'Detachment_abilities', 'Detachments_chapter_dp']) fk(t, 'detachment_id', ids('Detachments'), 'детачменты');
+  const noLine = T.Datasheets_wargear.filter((r) => !String(r.line).trim()).length;
+  if (noLine) report.info.push(`Datasheets_wargear: ${noLine} строк без номера line — порядок профилей берётся из файла`);
+  const emptyKw = T.Datasheets_keywords.filter((r) => !r.keyword.trim()).length;
+  if (emptyKw) report.info.push(`Datasheets_keywords: ${emptyKw} пустых ключевых слов (пропущены)`);
+  const noSrc = T.Datasheets.filter((d) => !bool(d.virtual) && !d.source_id);
+  if (noSrc.length) report.warnings.push(`Datasheets: без source_id — ${noSrc.map((d) => `${d.faction_id} «${htmlToText(d.name)}»`).join(', ')}`);
+  const mfm = T.Source.find((s) => /munitorum field manual/i.test(s.name));
+  if (mfm && /^0?1\.0?1\.0+1/.test(mfm.errata_date)) report.warnings.push(`Source: у «${mfm.name}» нет даты версии (${mfm.errata_date}) — версию очков по выгрузке не установить`);
+  return report;
+}
+
+/** Мин. и макс. число моделей по составу отряда («1 Sergeant», «4-9 Intercessors»); null — состав не разобрать. */
+export function compositionRange(lines) {
+  if (lines.some((l) => /\bor\b|one of the following|models maximum/i.test(l))) return null;
+  let lo = 0;
+  let hi = 0;
+  for (const l of lines) {
+    for (const part of l.split(/,|\band\b/)) {
+      const m = part.trim().match(/^(\d+)(?:\s*[-‑–]\s*(\d+))?\s+\S/);
+      if (!m) continue;
+      lo += +m[1];
+      hi += +(m[2] ?? m[1]);
+    }
+  }
+  return hi ? { lo, hi } : null;
+}
+
+function checkDatasheet(rec, ctx, report) {
+  const where = `${rec.faction}: «${rec.name}» (${rec.id})`;
+  if (!rec.costs.length && !ctx.assigned) report.warnings.push(`${where} — нет цены в выгрузке; юнит нельзя взять законно`);
+  // размеры из таблицы цен вне состава отряда («1 model» у Bike Squad при составе 3–7)
+  const range = compositionRange(rec.composition);
+  const sizes = uniq(rec.costs.flatMap((b) => b.options.map((o) => o.models)));
+  const out = range ? sizes.filter((n) => n < range.lo || n > range.hi) : [];
+  if (out.length) report.warnings.push(`${where} — размер в ценах (${out.join(', ')} мод.) вне состава отряда ${range.lo}–${range.hi}; проверить по Munitorum Field Manual`);
+  // снаряжение по умолчанию: оружие есть, текст «equipped with» есть, а разобрать не удалось
+  if (rec.weapons.length && /equipped with:(?!\s*nothing)/i.test(rec.loadout) && !rec.defaultLoadout.length)
+    report.warnings.push(`${where} — снаряжение по умолчанию не разобрано: ${rec.loadout.slice(0, 100)}`);
+  for (const a of rec.abilities) if (a.incomplete) report.info.push(`${where} — способность «${a.name}»: ${a.incomplete === 'table' ? 'таблица или схема не выгружена' : 'текст обрезан'}`);
+}
+
 // ---------- main ----------
 async function main() {
   if (flag('--fetch')) await fetchAll(SRC);
   const T = Object.fromEntries(FILES.map((f) => [f, load(SRC, f)]));
   const lastUpdate = T.Last_update[0]?.last_update?.trim() || null;
+  const curated = loadCurated();
+  const chapterMap = curated.chapterCosts?.map ?? {};
+  const report = auditSource(T);
 
   const sources = new Map(T.Source.map((s) => [s.id, s]));
   const kwBy = groupBy(T.Datasheets_keywords, 'datasheet_id');
@@ -553,6 +669,8 @@ async function main() {
       dedicatedTransport: kwSet.has('DEDICATED TRANSPORT'),
       titanic: kwSet.has('TITANIC'),
       costs: ctx.default || [],
+      // цены орденов: дополнительные таблицы цен и орден каждой (40k/curated.json → chapterCosts)
+      costVariants: (ctx.variants.default || []).map((costs, i) => ({ chapter: chapterMap[d.id]?.[i] ?? null, costs })),
       leads: uniq((leadBy.get(d.id) || []).map((l) => l.attached_id)),
       leaderNote: htmlToText(d.leader_head) ? htmlToText(d.leader_head) + (footer ? '\n' + footer : '') : footer,
       leaderExtra: /even if/i.test(footer),
@@ -572,6 +690,8 @@ async function main() {
           param: htmlToText(a.parameter),
           text: def ? '' : htmlToText(a.description),
           ref: def ? a.ability_id : undefined,
+          // заглушка невыгруженной таблицы/схемы («$000003426») — текст неполный
+          incomplete: def ? undefined : rawIncomplete(a.description) ?? undefined,
         };
       }).filter((a) => a.name || a.text),
       weapons: [],
@@ -583,10 +703,15 @@ async function main() {
     };
     rec.weapons = parseWeapons(wargearBy.get(d.id) || []);
     rec.defaultLoadout = parseLoadout(rec.loadout, rec.weapons);
+    if (!rec.costVariants.length) delete rec.costVariants;
+    checkDatasheet(rec, ctx, report);
     Object.defineProperty(rec, '_kw', { value: kwSet });
     Object.defineProperty(rec, '_ctx', { value: ctx });
     all.set(d.id, rec);
   }
+
+  // ссылки Leader на инфолисты, которых нет в выгрузке, отбрасываются (в отчёте — как сломанные связи)
+  for (const d of all.values()) d.leads = d.leads.filter((id) => all.has(id));
 
   // --- принадлежность фракций (Imperium/Chaos/Xenos) ---
   const allegiance = {};
@@ -629,7 +754,14 @@ async function main() {
     upgrade: bool(e.upgrade),
     restriction: htmlToText(e.support_leader),
     text: htmlToText(e.description),
+    ...(rawIncomplete(e.description) ? { incomplete: rawIncomplete(e.description) } : {}),
   }));
+
+  const allDetIds = new Set(T.Detachments.map((d) => d.id));
+  for (const d of detachments) {
+    const n = T.Stratagems.filter((st) => st.detachment_id === d.id).length;
+    if (!n) report.info.push(`${d.faction}: детачмент «${d.name}» — 0 стратагем в выгрузке`);
+  }
 
   // --- сборка по фракциям ---
   fs.mkdirSync(path.join(OUT, 'f'), { recursive: true });
@@ -694,9 +826,14 @@ async function main() {
     // стратагемы детачментов (для справки)
     // основные стратагемы 11-й ред. — те, на которые ссылаются юниты (старые 10-й ред. остались в выгрузке без ссылок)
     const isCore = (st) => !st.faction_id && /^Core/i.test(htmlToText(st.type)) && usedStrat.has(st.id);
-    const stratagems = T.Stratagems.filter((st) => detIds.has(st.detachment_id) || isCore(st)).map((st) => ({
-      id: st.id, detachment: st.detachment_id, name: htmlToText(st.name), cp: st.cp_cost, type: htmlToText(st.type),
+    // стратагемы правил армии (у Aeldari «Army Rules» — ссылка на детачмент, которого нет в Detachments):
+    // показываются как общие стратагемы фракции, без детачмента
+    const isArmy = (st) => st.faction_id === f.id && !allDetIds.has(st.detachment_id) && /army rules/i.test(st.detachment);
+    const stratagems = T.Stratagems.filter((st) => detIds.has(st.detachment_id) || isCore(st) || isArmy(st)).map((st) => ({
+      id: st.id, detachment: isArmy(st) ? '' : st.detachment_id, name: htmlToText(st.name), cp: st.cp_cost, type: htmlToText(st.type),
       turn: st.turn, phase: st.phase, text: htmlToText(st.description),
+      ...(isArmy(st) ? { army: true } : {}),
+      ...(rawIncomplete(st.description) ? { incomplete: rawIncomplete(st.description) } : {}),
     }));
 
     const chapters = f.id === 'SM'
@@ -719,6 +856,11 @@ async function main() {
       allies,
     };
     fs.writeFileSync(path.join(OUT, 'f', f.id + '.json'), JSON.stringify(data));
+    // фракция без детачментов не может быть основной армией (Adeptus Titanicus — только союзник Titanic Support)
+    if (!dets.length) {
+      report.info.push(`${f.id}: нет детачментов — не показывается как армия (юниты доступны союзникам)`);
+      continue;
+    }
     index.push({ id: f.id, name: f.name, allegiance: allegiance[f.id], units: own.length, detachments: dets.length });
   }
   index.sort((a, b) => a.name.localeCompare(b.name));
@@ -729,7 +871,11 @@ async function main() {
     credit: 'powered by Wahapedia',
     factions: index,
   }, null, 1));
+  for (const d of all.values())
+    for (const v of d.costVariants ?? []) if (!v.chapter) report.warnings.push(`${d.faction}: «${d.name}» (${d.id}) — дополнительная таблица цен без ордена (40k/curated.json → chapterCosts); применяется обычная цена`);
+  fs.writeFileSync(REPORT, JSON.stringify(report, null, 1) + '\n');
   console.log(`Готово: ${index.length} фракций, ${all.size} инфолистов, ${detachments.length} детачментов, ${enhancements.length} улучшений → ${OUT}`);
+  console.log(`отчёт: ${report.errors.length} ошибок, ${report.warnings.length} предупреждений, ${report.info.length} заметок → ${path.relative(process.cwd(), REPORT)}`);
   console.log(`Данные Wahapedia от ${lastUpdate} (GMT+3)`);
 }
 
