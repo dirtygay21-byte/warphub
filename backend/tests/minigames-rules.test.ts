@@ -44,14 +44,14 @@ describe('reward tiers', () => {
     expect(rewardTierFor(t, 499)!.tier.value).toBe(3);
     expect(rewardTierFor(t, 5000)!.tier.value).toBe(5);
   });
-  test('dice: loss → none, 1 win → 2%, 3 → 3%, 5 → 5%, clutch adds 1%', () => {
+  test('dice: loss → none, 1 win → 5%, 3 → 7%, 5 → 10%, clutch adds 1%', () => {
     const t = S.games.dice.tiers;
     const p = S.games.dice.params;
     expect(diceRewardFor(t, 0, 0, p)).toBeNull();
-    expect(diceRewardFor(t, 1, 0, p)!.tier.value).toBe(2);
-    expect(diceRewardFor(t, 3, 0, p)!.tier.value).toBe(3);
-    expect(diceRewardFor(t, 7, 0, p)!.tier.value).toBe(5);
-    expect(diceRewardFor(t, 1, 1, p)!.tier.value).toBe(3);
+    expect(diceRewardFor(t, 1, 0, p)!.tier.value).toBe(5);
+    expect(diceRewardFor(t, 3, 0, p)!.tier.value).toBe(7);
+    expect(diceRewardFor(t, 7, 0, p)!.tier.value).toBe(10);
+    expect(diceRewardFor(t, 1, 1, p)!.tier.value).toBe(6);
   });
 });
 

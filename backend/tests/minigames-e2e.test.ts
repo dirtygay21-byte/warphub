@@ -256,7 +256,7 @@ describe('mini-games: dice battle (server rolls)', () => {
     expect(last.result).toBeTruthy();
     if (last.battle.wins >= 1) {
       expect(last.result.rewardOutcome).toBe('new');
-      expect(last.result.reward.label).toMatch(/^Скидка [23]%$/);
+      expect(last.result.reward.label).toMatch(/^Скидка [56]%$/);
     } else {
       expect(last.battle.lost).toBe(true);
       expect(last.result.rewardOutcome).toBe('none');

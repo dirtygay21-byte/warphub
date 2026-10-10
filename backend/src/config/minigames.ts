@@ -97,9 +97,9 @@ export const DEFAULT_MINIGAME_SETTINGS: MinigameSettings = {
     dice: {
       enabled: true,
       tiers: [
-        { minScore: 1, rewardType: 'percent_discount', value: 2 },
-        { minScore: 3, rewardType: 'percent_discount', value: 3 },
-        { minScore: 5, rewardType: 'percent_discount', value: 5 },
+        { minScore: 1, rewardType: 'percent_discount', value: 5 },
+        { minScore: 3, rewardType: 'percent_discount', value: 7 },
+        { minScore: 5, rewardType: 'percent_discount', value: 10 },
       ],
       params: { clutchBonusPercent: 1, clutchThreshold: 0.25, healAfterWin: 1, enemyWoundsPerWin: 1, enemyAttacksPerWin: 0.25 },
     },
