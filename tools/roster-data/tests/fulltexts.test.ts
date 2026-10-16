@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fullTextFits, fullTextReport, normaliseAosFaction, rulesWithOwner } from '../scripts/import-wahapedia-aos.mjs';
+import { fullTextFits, fullTextReport, normaliseAosFaction, refreshAosReport, rulesWithOwner } from '../scripts/import-wahapedia-aos.mjs';
 
 const ROOT = path.join(import.meta.dirname, '..', '..', '..');
 const AOS = path.join(ROOT, 'backend', 'roster-data', 'aos');
@@ -271,4 +271,23 @@ test('таблицы AoS: «DEPICT RUNE» — 5 рун по порядку со 
 test('таблицы AoS: «THE CREEPING OVERGROWTH» — таблица между текстом и Designer’s Note', () => {
   const t = record('SY|trait', 'THE CREEPING OVERGROWTH').text;
   inOrder(t, ['as shown:', 'Overgrown Tokens — Creeping Overgrowth Range', '0-2 — 6"', '3-5 — 9"', '6-8 — 12"', '9+ — Whole battlefield', 'Designer’s Note: Awakened Wyldwoods'], 'THE CREEPING OVERGROWTH');
+});
+
+// ---------- отчёт импорта по готовым данным (repair-aos-data.mjs → refreshAosReport) ----------
+
+test('отчёт импорта соответствует данным: полные тексты, неполные тексты, юниты без очков; пересчёт не меняет его', () => {
+  const report = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', 'aos', 'import-report.json'), 'utf8'));
+  const files = Object.fromEntries(fs.readdirSync(path.join(AOS, 'f')).filter((f) => f.endsWith('.json')).map((f) => [f, JSON.parse(fs.readFileSync(path.join(AOS, 'f', f), 'utf8'))]));
+  assert.deepEqual(refreshAosReport(report, files, curated), report, 'отчёт устарел — запустите scripts/repair-aos-data.mjs');
+  assert.deepEqual(report.exportIncomplete, { truncated: 177, table: 21 });
+  assert.ok(report.info.includes('полные тексты восстановлены: обрезанных — 172 из 177, без таблицы — 21 из 21'));
+  assert.ok(report.warnings.some((l: string) => l.includes('обрезано лимитом 1024 символа — 5, таблица не выгружена — 0')));
+  assert.equal(report.info.filter((l: string) => l.startsWith('полного текста нет: ')).length, curated.fullTexts.missing.length);
+  // юнит с ценой или Legends не числится «без очков»; Auto-Endrin — «очков нет по правилам»
+  for (const l of report.info.filter((x: string) => / — нет очков в Battle Profiles/.test(x))) {
+    const [fid, name] = [l.split(':')[0], l.match(/«(.+?)»/)![1]];
+    const w = files[`${fid}.json`].warscrolls.find((x: { name: string }) => x.name === name);
+    assert.ok(w && w.cost == null && !w.legends, l);
+  }
+  assert.ok(report.info.some((l: string) => l.startsWith('KO: «Auto-Endrin» — очков нет по правилам')));
 });

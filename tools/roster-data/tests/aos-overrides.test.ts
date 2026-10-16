@@ -168,3 +168,14 @@ test('устаревшие правила OM и SoB: предупреждени�
   assert.match(load('OM').rulesNotice!, /Ogor Mawtribes \(июль 2026\)/);
   assert.match(load('SoB').rulesNotice!, /Sons of Behemat \(сентябрь 2026\)/);
 });
+
+test('источники правок и пометок «правила устарели» — только Wahapedia, с датой проверки', () => {
+  for (const it of curated.warscrollOverrides.items) {
+    assert.ok(it.source.length > 0 && it.source.every((u: string) => u.startsWith('https://wahapedia.ru/aos4/')), `${it.ids.join(',')}: ${it.source.join(' ')}`);
+    assert.match(it.checked, /^\d{4}-\d{2}-\d{2}$/);
+  }
+  // Darkwater Heroes: страница Wahapedia на каждый из 8 варскроллов
+  const dw = curated.warscrollOverrides.items.find((x: { ids: string[] }) => x.ids.includes('000002663'));
+  assert.equal(dw.source.length, dw.ids.length);
+  for (const fid of Object.keys(curated.stale.factions)) assert.match(curated.stale.sources[fid], /^https:\/\/wahapedia\.ru\/aos4\/factions\/.+проверено \d{4}-\d{2}-\d{2}/, fid);
+});

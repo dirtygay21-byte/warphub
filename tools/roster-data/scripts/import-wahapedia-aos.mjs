@@ -625,15 +625,15 @@ export function importAos(src, { curated, eligibility }) {
     factions: factions.sort((a, b) => ALLIANCES.indexOf(a.grandAlliance) - ALLIANCES.indexOf(b.grandAlliance) || a.name.localeCompare(b.name)),
   };
   const refs = warscrollRefs(files);
+  // сколько неполных текстов в самой выгрузке (до подстановки полных текстов из curated.fullTexts)
+  report.exportIncomplete = incompleteCounts(files);
   for (const [fid, data] of Object.entries(files)) {
     normaliseAosFaction(data, curated, refs);
     for (const where of findMarkup(data)) report.errors.push(`${fid}: служебная разметка в тексте — ${where}`);
   }
   report.info.push(...fullTextReport(files, curated));
-  const inc = { truncated: 0, table: 0 };
-  for (const data of Object.values(files)) for (const r of rulesOf(data)) if (r.incomplete) inc[r.incomplete]++;
-  if (inc.truncated || inc.table)
-    report.warnings.push(`неполные тексты в выгрузке: обрезано лимитом 1024 символа — ${inc.truncated}, таблица не выгружена — ${inc.table}; в конструкторе помечены, полный текст на Wahapedia`);
+  const inc = incompleteLine(files);
+  if (inc) report.warnings.push(inc);
   return { index, files, report };
 }
 
@@ -810,6 +810,53 @@ export function fullTextReport(files, curated) {
   if (unused.length) out.push(`полный текст из curated не подставлен (правило не найдено, уже полное или текст не совпал с началом): ${unused.join('; ')}`);
   for (const m of ft.missing ?? []) out.push(`полного текста нет: ${m.in} «${m.name}» — ${m.why}`);
   return out;
+}
+
+/** Строки отчёта, которые пересчитываются по готовым данным (refreshAosReport); остальные строки — только из импорта CSV. */
+const INCOMPLETE_LINE = 'неполные тексты в выгрузке:';
+const FULLTEXT_LINE = /^(полные тексты правил \(|полные тексты восстановлены: |на сайте Wahapedia другая редакция|полный текст из curated не подставлен|полного текста нет: )/;
+const POINTS_LINE = / — (нет очков в Battle Profiles, юнит нельзя добавить|очков нет по правилам: )/;
+export const REPORT_REFRESHED = 'строки о полных текстах, неполных текстах и юнитах без очков пересчитаны по данным (scripts/repair-aos-data.mjs); остальное — из импорта CSV';
+
+/** Число неполных текстов в данных: { truncated, table }. */
+export function incompleteCounts(files) {
+  const inc = { truncated: 0, table: 0 };
+  for (const data of Object.values(files)) for (const r of rulesOf(data)) if (r.incomplete) inc[r.incomplete]++;
+  return inc;
+}
+
+/** Строка предупреждения о неполных текстах (как в импорте) или null. */
+export function incompleteLine(files) {
+  const inc = incompleteCounts(files);
+  return inc.truncated || inc.table ? `${INCOMPLETE_LINE} обрезано лимитом 1024 символа — ${inc.truncated}, таблица не выгружена — ${inc.table}; в конструкторе помечены, полный текст на Wahapedia` : null;
+}
+
+/**
+ * Отчёт импорта по готовым данным без CSV: строки о полных текстах, неполных текстах и юнитах без очков
+ * пересчитываются (те же функции, что в импорте), прочие строки остаются. files — { "<id>.json" | "<id>": данные }.
+ */
+export function refreshAosReport(report, files, curated) {
+  const byId = Object.fromEntries(Object.values(files).map((d) => [d.id, d]));
+  const warnings = report.warnings.filter((l) => !l.startsWith(INCOMPLETE_LINE));
+  const inc = incompleteLine(byId);
+  if (inc) warnings.push(inc);
+  const firstPoints = report.info.findIndex((l) => POINTS_LINE.test(l));
+  const info = report.info.filter((l) => !FULLTEXT_LINE.test(l) && !POINTS_LINE.test(l));
+  const points = [];
+  for (const [fid, data] of Object.entries(byId)) for (const w of data.warscrolls ?? []) {
+    const n = missingPointsNote(fid, w, curated);
+    if (n) points.push(n);
+  }
+  info.splice(firstPoints < 0 ? info.length : Math.min(firstPoints, info.length), 0, ...points);
+  info.push(...fullTextReport(byId, curated));
+  // неполные тексты в выгрузке: из импорта (exportIncomplete) или, у старого отчёта, из его строки предупреждения
+  const was = report.exportIncomplete ?? (() => {
+    const m = report.warnings.find((l) => l.startsWith(INCOMPLETE_LINE))?.match(/— (\d+), таблица не выгружена — (\d+)/);
+    return m ? { truncated: +m[1], table: +m[2] } : null;
+  })();
+  const now = incompleteCounts(byId);
+  if (was) info.push(`полные тексты восстановлены: обрезанных — ${was.truncated - now.truncated} из ${was.truncated}, без таблицы — ${was.table - now.table} из ${was.table}`);
+  return { ...report, warnings, info, ...(was ? { exportIncomplete: was } : {}), refreshed: REPORT_REFRESHED };
 }
 
 /** Где в данных осталась разметка Wahapedia (пусто — всё чисто). */
