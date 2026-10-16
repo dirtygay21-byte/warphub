@@ -1015,6 +1015,10 @@
   "factions": {
    "OM": "Новый батлтом Ogor Mawtribes (июль 2026) заменил построения, черты, артефакты и лоры; в выгрузке Wahapedia от 25.08.2026 их ещё нет. Доступны юниты, полки и таблицы Scourge of Aqshy.",
    "SoB": "Новый батлтом Sons of Behemat (сентябрь 2026) заменил построения, черты, артефакты и лоры; в выгрузке Wahapedia от 25.08.2026 их ещё нет. Доступны юниты, полки и правила Scourge of Aqshy."
+  },
+  "sources": {
+   "OM": "https://wahapedia.ru/aos4/factions/ogor-mawtribes — Books: «Ogor Mawtribes Battletome 4», July 2026 (проверено 2026-10-16)",
+   "SoB": "https://wahapedia.ru/aos4/factions/sons-of-behemat — Books: «Sons of Behemat Battletome», Last update 4 September 2026 (проверено 2026-10-16)"
   }
  },
  "warscrollOverrides": {
@@ -1035,11 +1039,16 @@
     "set": {
      "legends": true
     },
-    "why": "Darkwater Heroes: Edmark Valoran, Bren Tylis, Inara Sion, Drolf Ironhead, Jacobus Vyne, Wisper, Drasher Vorn, Kelthannor — источник «Darkwater Heroes - Legends Warscrolls»; GW (Warhammer Community, Grotmas 2025 day 12): Legends rules",
+    "why": "Darkwater Heroes: Edmark Valoran, Bren Tylis, Inara Sion, Drolf Ironhead, Jacobus Vyne, Wisper, Drasher Vorn, Kelthannor — на странице каждого варскролла Wahapedia источник «Darkwater Heroes - Legends Warscrolls (4th edition)», очков нет (Wisper: показывается только с «Show Legends»). Источник решения — только Wahapedia (ссылка Warhammer Community убрана 2026-10-16: не нужна, страницы Wahapedia достаточно).",
     "source": [
      "https://wahapedia.ru/aos4/factions/cities-of-sigmar/Edmark-Valoran-the-Manticore-Knight",
-     "https://wahapedia.ru/aos4/factions/sylvaneth/Kelthannor-the-Forest-Prince",
-     "https://www.warhammer-community.com/en-gb/articles/fgrfqfgy/grotmas-calendar-day-12-the-heroes-of-darkwater-bring-the-fight-to-the-mortal-realms/"
+     "https://wahapedia.ru/aos4/factions/cities-of-sigmar/Bren-Tylis-the-Renegade-Saint",
+     "https://wahapedia.ru/aos4/factions/cities-of-sigmar/Inara-Sion-the-Cleansing-Blade",
+     "https://wahapedia.ru/aos4/factions/cities-of-sigmar/Drolf-Ironhead-the-Grizzled-Explorer",
+     "https://wahapedia.ru/aos4/factions/cities-of-sigmar/Jacobus-Vyne-the-Jade-Wizard",
+     "https://wahapedia.ru/aos4/factions/cities-of-sigmar/Wisper",
+     "https://wahapedia.ru/aos4/factions/cities-of-sigmar/Drasher-Vorn-the-Rampaging-Beast",
+     "https://wahapedia.ru/aos4/factions/sylvaneth/Kelthannor-the-Forest-Prince"
     ],
     "checked": "2026-10-16"
    },
@@ -1049,7 +1058,7 @@
      "000002686"
     ],
     "copyFrom": "000002684",
-    "why": "Grombrindal, The White Dwarf (CoS, KO): строки выгрузки сломаны (Move «\"», Save «<img src=\"», нет очков, способностей и оружия); страницы CoS и KO на Wahapedia совпадают с варскроллом Fyreslayers 000002684 — 360 очков, Legends, White Dwarf 11/24 «The Duardin Ascendant»",
+    "why": "Grombrindal, The White Dwarf (CoS, KO): строки выгрузки сломаны (Move «\"», Save «<img src=\"», нет очков, способностей и оружия); страницы CoS и KO на Wahapedia совпадают с варскроллом Fyreslayers 000002684 — 360 очков, Legends, White Dwarf 11/24 «The Duardin Ascendant». Очки — не перенос из Fyreslayers: Battle Profile на странице CoS и на странице KO (Wahapedia) сам указывает «Points: 360» (проверено 2026-10-16).",
     "source": [
      "https://wahapedia.ru/aos4/factions/cities-of-sigmar/Grombrindal-The-White-Dwarf",
      "https://wahapedia.ru/aos4/factions/kharadron-overlords/Grombrindal-The-White-Dwarf"

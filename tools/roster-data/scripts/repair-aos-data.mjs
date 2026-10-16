@@ -8,12 +8,14 @@
  * (scripts/import-wahapedia-aos.mjs): чистка служебной разметки во всех текстовых полях правил
  * и сезон у построений. Нужна, когда исправлена последняя обработка, а свежей выгрузки под рукой нет.
  * Порядок ключей и формат файлов сохраняются, меняются только исправленные значения.
+ * Отчёт tools/roster-data/aos/import-report.json: строки о полных текстах, неполных текстах и юнитах без очков
+ * пересчитываются по данным (refreshAosReport), остальные строки остаются от импорта CSV.
  * --check — ничего не записывать, только показать, что изменилось бы (код выхода 1, если есть изменения).
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { findMarkup, fullTextReport, normaliseAosFaction, warscrollRefs } from './import-wahapedia-aos.mjs';
+import { findMarkup, fullTextReport, normaliseAosFaction, refreshAosReport, warscrollRefs } from './import-wahapedia-aos.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -49,5 +51,16 @@ for (const { file, p, before, data } of loaded) {
   if (!CHECK) fs.writeFileSync(p, after);
 }
 for (const line of fullTextReport(Object.fromEntries(loaded.map((l) => [l.file, l.data])), curated)) console.log(`  · ${line}`);
+// отчёт импорта — по данным после обработки
+// (только для данных приложения: с --dir отчёт не трогается — он описывает backend/roster-data/aos)
+const REPORT = path.join(HERE, '..', 'aos', 'import-report.json');
+const isAppData = DIR === path.resolve(HERE, '../../../backend/roster-data/aos');
+const reportBefore = isAppData ? fs.readFileSync(REPORT, 'utf8') : '';
+const reportAfter = isAppData ? JSON.stringify(refreshAosReport(JSON.parse(reportBefore), Object.fromEntries(loaded.map((l) => [l.file, l.data])), curated), null, 1) : '';
+if (reportAfter !== reportBefore) {
+  changedFiles++;
+  console.log(`  ${CHECK ? '~' : '✓'} aos/import-report.json: пересчитаны строки о полных текстах, неполных текстах и юнитах без очков`);
+  if (!CHECK) fs.writeFileSync(REPORT, reportAfter);
+}
 console.log(changedFiles ?`${CHECK ? 'Нужно обновить' : 'Обновлено'}: ${changedFiles} файлов, ~${changedValues} значений.` : 'Данные уже в порядке.');
 if (CHECK && changedFiles) process.exitCode = 1;

@@ -4,24 +4,27 @@
   "BoC: лор «Bestial Manifestations» — нет очков",
   "KB: «Hobgrot Slittaboss» — вариант полка «Monster» не подходит ни одному юниту фракции",
   "OM: террейн «Great Mawpot» — 0 в CSV, 20 в Battle Profiles (берём Battle Profiles)",
-  "неполные тексты в выгрузке: обрезано лимитом 1024 символа — 177, таблица не выгружена — 21; в конструкторе помечены, полный текст на Wahapedia"
+  "неполные тексты в выгрузке: обрезано лимитом 1024 символа — 5, таблица не выгружена — 0; в конструкторе помечены, полный текст на Wahapedia"
  ],
  "info": [
   "BoC: все юниты в Legends — фракция доступна только с «Показать Legends»",
-  "KO: «Auto-Endrin» — нет очков в Battle Profiles, юнит нельзя добавить",
-  "KO: «Grombrindal, The White Dwarf» — нет очков в Battle Profiles, юнит нельзя добавить",
-  "CoS: «Edmark Valoran, the Manticore Knight» — нет очков в Battle Profiles, юнит нельзя добавить",
-  "CoS: «Bren Tylis, the Renegade Saint» — нет очков в Battle Profiles, юнит нельзя добавить",
-  "CoS: «Inara Sion, the Cleansing Blade» — нет очков в Battle Profiles, юнит нельзя добавить",
-  "CoS: «Drolf Ironhead, the Grizzled Explorer» — нет очков в Battle Profiles, юнит нельзя добавить",
-  "CoS: «Jacobus Vyne, the Jade Wizard» — нет очков в Battle Profiles, юнит нельзя добавить",
-  "CoS: «Drasher Vorn, the Rampaging Beast» — нет очков в Battle Profiles, юнит нельзя добавить",
-  "CoS: «Grombrindal, The White Dwarf» — нет очков в Battle Profiles, юнит нельзя добавить",
+  "KO: «Auto-Endrin» — очков нет по правилам: ставится способностью «Release The Auto-Endrins» (Zontari Endrin Dock)",
   "OB: «The Grand Necromystic» — вариант полка «PETRIFEX ELITE» не подходит ни одному юниту фракции",
   "SE: «Hamilcar Bear-Eater» — вариант полка «ASTRAL TEMPLARS» не подходит ни одному юниту фракции",
   "OM: нет боевых построений",
-  "SY: «Kelthannor, the Forest Prince» — нет очков в Battle Profiles, юнит нельзя добавить",
   "SoB: нет боевых построений",
-  "IJ: «Dakkbad Grotkicker» — вариант полка «IRONSUNZ» не подходит ни одному юниту фракции"
- ]
+  "IJ: «Dakkbad Grotkicker» — вариант полка «IRONSUNZ» не подходит ни одному юниту фракции",
+  "полные тексты правил (aos/curated.json → fullTexts, сайт Wahapedia 2026-10-16): подставлено 193",
+  "полного текста нет: OB|ws:Katakros, Mortarch of the Necropolis «Supreme Lord of the Bonereaper Legions» — conflict: site drops the sentence about reinforced targets spending an additional relentless discipline point",
+  "полного текста нет: NT|ws:Lord Vitriolic «Spectral Alchemy» — conflict: site Effect rewritten (\"If this unit's shooting attacks inflicted damage…\") — different version",
+  "полного текста нет: CoS|ws:Linebreaker Cogfort «OUTPUT TO MAXIMUM!» — held: site text itself ends \"…Move characteristic is 10\" (no inch mark or full stop); needs further source verification",
+  "полного текста нет: SG|ws:Scourge of Aqshy Vengorian Lord «Frenzied Surge» — conflict: site movement rule changed (X\" for this unit, then X\" for the target, instead of X+D3\")",
+  "полного текста нет: StD|form:Despoilers «FERAL RUIN» — conflict: site wording differs from the export (adds \"friendly\" and \"that does not have an Ensorcelled Banner\")",
+  "полные тексты восстановлены: обрезанных — 172 из 177, без таблицы — 21 из 21"
+ ],
+ "exportIncomplete": {
+  "truncated": 177,
+  "table": 21
+ },
+ "refreshed": "строки о полных текстах, неполных текстах и юнитах без очков пересчитаны по данным (scripts/repair-aos-data.mjs); остальное — из импорта CSV"
 }
