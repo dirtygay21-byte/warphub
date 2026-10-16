@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { cleanRuleText, hasMarkup, rawIncomplete as clientIncomplete } from '../../../client/src/features/roster/text';
 import { cleanWahaText, htmlToText, rawIncomplete } from '../scripts/import-wahapedia.mjs';
-import { findMarkup, normaliseAosFaction } from '../scripts/import-wahapedia-aos.mjs';
+import { findMarkup, normaliseAosFaction, warscrollRefs } from '../scripts/import-wahapedia-aos.mjs';
 
 const ROOT = path.join(import.meta.dirname, '..', '..', '..');
 const AOS = path.join(ROOT, 'backend', 'roster-data', 'aos');
@@ -75,12 +75,14 @@ test('импорт: колонка condition (поле timing) проходит 
 });
 
 test('данные AoS: ни в одном текстовом поле правил нет разметки', () => {
+  // как в repair-aos-data.mjs: правкам copyFrom (curated.warscrollOverrides) нужны варскроллы всех фракций
+  const refs = warscrollRefs(Object.fromEntries(files(AOS).map((f) => [f, JSON.parse(fs.readFileSync(path.join(AOS, 'f', f), 'utf8'))])));
   for (const f of files(AOS)) {
     const data = JSON.parse(fs.readFileSync(path.join(AOS, 'f', f), 'utf8'));
     assert.deepEqual(findMarkup(data), [], f);
     // и повторная обработка ничего не меняет — данные уже в итоговом виде (scripts/repair-aos-data.mjs --check)
     const raw = JSON.stringify(data);
-    assert.equal(JSON.stringify(normaliseAosFaction(JSON.parse(raw), curated)), raw, `${f}: нужна обработка repair-aos-data.mjs`);
+    assert.equal(JSON.stringify(normaliseAosFaction(JSON.parse(raw), curated, refs)), raw, `${f}: нужна обработка repair-aos-data.mjs`);
   }
 });
 

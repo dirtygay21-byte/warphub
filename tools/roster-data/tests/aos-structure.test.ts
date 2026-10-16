@@ -251,8 +251,9 @@ test('построения: даты Warhammer Legends из примечаний
 
 test('неполные тексты: обрыв лимитом выгрузки и невыгруженные таблицы помечены у правил построений', () => {
   const rule = (fid: string, fname: string, rname: string) => load(fid).formations.find((x) => x.name === fname)!.rules.find((x) => x.name === rname)!;
-  assert.equal(rule('ST', 'Fleshmeld Menagerie', 'Prized Creations').incomplete, 'table');
-  assert.equal(rule('SG', 'Legions of Ulfenkarn', 'WARDENS OF THE WOLF').incomplete, 'truncated');
+  assert.equal(rule('ST', 'Fleshmeld Menagerie', 'Prized Creations').incomplete, undefined);
+  assert.equal(rule('ST', 'Fleshmeld Menagerie', 'Prized Creations').textSource, 'wahapedia-site');
+  assert.equal(rule('StD', 'Despoilers', 'FERAL RUIN').incomplete, 'truncated');
   for (const f of ALL)
     for (const fm of f.formations)
       for (const r of fm.rules) if (r.incomplete) assert.ok(['truncated', 'table'].includes(r.incomplete), `${f.id} «${r.name}»`);
