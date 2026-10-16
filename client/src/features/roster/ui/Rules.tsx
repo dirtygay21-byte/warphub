@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { loadFaction } from '../data';
-import type { DataIndex, FactionData, Stratagem } from '../engine/types';
+import type { DataIndex, Detachment, FactionData, Stratagem } from '../engine/types';
 import { openExternal } from '../telegram';
 import { IconButton, Segmented, Tag } from './kit';
 import { cx } from './util';
 import { cleanRuleText } from '../text';
+import { factionCredit, ruleLabel, visibleStratagem } from '../engine/source';
 
 const CORE_URL = 'https://wahapedia.ru/wh40k11ed/the-rules/core-rules/';
 
@@ -115,12 +116,14 @@ export function Rules({
     const list = faction.stratagems.filter((s) => inPhase(s, phase));
     const out: { title: string; sub?: string; items: Stratagem[] }[] = [{ title: 'Основные стратагемы', sub: 'Core', items: list.filter((s) => !s.detachment) }];
     if (fid) {
+      // устаревшие детачменты (нет в текущем источнике) — только если выбраны в ростере
       const dets = faction.detachments.filter((d) =>
-        det === 'mine' ? detachmentIds?.includes(d.id) : det === 'all' ? true : d.id === det,
+        det === 'mine' ? detachmentIds?.includes(d.id) : det === 'all' ? !d.outdated || !!detachmentIds?.includes(d.id) : d.id === det,
       );
+      const byId = new Map<string, Detachment>(faction.detachments.map((d: Detachment) => [d.id, d]));
       for (const d of dets) {
-        const items = list.filter((s) => s.detachment === d.id);
-        if (items.length) out.push({ title: d.name, sub: 'Детачмент', items });
+        const items = list.filter((s) => s.detachment === d.id && visibleStratagem(s, byId));
+        if (items.length) out.push({ title: ruleLabel(d), sub: 'Детачмент', items });
       }
     }
     return out.filter((g) => g.items.length);
@@ -190,11 +193,13 @@ export function Rules({
               <Select value={det} onChange={setDet}>
                 {fid === factionId && detachmentIds?.length ? <option value="mine">Детачменты ростера</option> : null}
                 <option value="all">Все детачменты</option>
-                {faction.detachments.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.name}
-                  </option>
-                ))}
+                {faction.detachments
+                  .filter((d) => !d.outdated || detachmentIds?.includes(d.id))
+                  .map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {ruleLabel(d)}
+                    </option>
+                  ))}
               </Select>
             )}
           </div>
@@ -239,7 +244,7 @@ export function Rules({
                   </ul>
                 </section>
               ))}
-              <p className="text-center text-[11px] text-white/35">Данные: powered by Wahapedia</p>
+              <p className="text-center text-[11px] text-white/35">Данные: {factionCredit(faction, index)}</p>
             </div>
           )}
         </div>

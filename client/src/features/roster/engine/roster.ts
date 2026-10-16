@@ -1,4 +1,4 @@
-import type { BattleSize, Datasheet, Roster, RosterUnit } from './types';
+import type { BattleSize, Datasheet, MigrationReason, Roster, RosterUnit, UnitMigration } from './types';
 
 export const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
 
@@ -131,14 +131,43 @@ const picksOf = (v: Record<string, unknown>): Record<string, number[]> =>
       .map(([k, a]) => [k, (a as unknown[]).map((n) => (typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0))]),
   );
 
+const REASONS: MigrationReason[] = ['renamed', 'merged', 'shared', 'replaced', 'options'];
+/** Сведения о переводе юнита на новый инфолист (engine/migrate.ts); битые — отбрасываются. */
+function migrationOf(v: unknown): UnitMigration | null {
+  if (!isObj(v) || typeof v.from !== 'string' || !v.from) return null;
+  const d = isObj(v.dropped) ? v.dropped : {};
+  const dropped: UnitMigration['dropped'] = {};
+  if (typeof d.size === 'string' && d.size) dropped.size = d.size;
+  for (const k of ['addons', 'wargear', 'weapons'] as const) if (isObj(d[k])) dropped[k] = counts(d[k]);
+  if (isObj(d.picks)) dropped.picks = picksOf(d.picks);
+  return { from: v.from, reason: REASONS.includes(v.reason as MigrationReason) ? (v.reason as MigrationReason) : 'replaced', note: str(v.note), dropped };
+}
+function migrationNotesOf(v: unknown): Roster['migrationNotes'] {
+  if (!Array.isArray(v)) return undefined;
+  const out = v.filter(isObj).flatMap((n) =>
+    typeof n.from === 'string' && (n.kind === 'detachment' || n.kind === 'enhancement')
+      ? [{ from: n.from, to: strOrNull(n.to), kind: n.kind as 'detachment' | 'enhancement', note: str(n.note) }]
+      : [],
+  );
+  return out.length ? out : undefined;
+}
+
+function legacyKeptOf(v: unknown): Roster['legacyKept'] {
+  if (!isObj(v)) return undefined;
+  const ids = (a: unknown) => (Array.isArray(a) ? [...new Set(a.filter((x): x is string => typeof x === 'string' && !!x))] : []);
+  const out = { detachments: ids(v.detachments), enhancements: ids(v.enhancements) };
+  return out.detachments.length || out.enhancements.length ? out : undefined;
+}
+
 /**
  * Приводит «чужой» ростер к ожидаемой форме: лишние поля отбрасываются, недостающие получают значения
  * по умолчанию. null — если это вообще не ростер. Так битый код или старая запись не роняют раздел.
  */
 export function sanitizeRoster(raw: unknown): Roster | null {
   if (!isObj(raw) || typeof raw.factionId !== 'string' || !raw.factionId || !Array.isArray(raw.units)) return null;
-  const units: RosterUnit[] = raw.units.filter(isObj).flatMap((u) =>
-    typeof u.datasheetId === 'string' && u.datasheetId
+  const units: RosterUnit[] = raw.units.filter(isObj).flatMap((u) => {
+    const migration = migrationOf(u.migration);
+    return typeof u.datasheetId === 'string' && u.datasheetId
       ? [
           {
             uid: str(u.uid) || uid(),
@@ -150,10 +179,11 @@ export function sanitizeRoster(raw: unknown): Roster | null {
             picks: isObj(u.picks) ? picksOf(u.picks) : null,
             enhancementId: strOrNull(u.enhancementId),
             attachedTo: strOrNull(u.attachedTo),
+            ...(migration ? { migration } : {}),
           },
         ]
-      : [],
-  );
+      : [];
+  });
   const uids = new Set(units.map((u) => u.uid));
   for (const u of units) if (u.attachedTo && !uids.has(u.attachedTo)) u.attachedTo = null;
   const now = Date.now();
@@ -170,6 +200,9 @@ export function sanitizeRoster(raw: unknown): Roster | null {
     warlordUid: typeof raw.warlordUid === 'string' && uids.has(raw.warlordUid) ? raw.warlordUid : null,
     showLegends: raw.showLegends === true,
     dataVersion: strOrNull(raw.dataVersion),
+    ...(migrationNotesOf(raw.migrationNotes) ? { migrationNotes: migrationNotesOf(raw.migrationNotes) } : {}),
+    ...(Array.isArray(raw.appliedMigrations) ? { appliedMigrations: raw.appliedMigrations.filter((x): x is string => typeof x === 'string' && !!x) } : {}),
+    ...(legacyKeptOf(raw.legacyKept) ? { legacyKept: legacyKeptOf(raw.legacyKept) } : {}),
     summary: isObj(s) ? { points: num(s.points), errors: num(s.errors), warnings: num(s.warnings) } : undefined,
     createdAt: num(raw.createdAt, now),
     updatedAt: num(raw.updatedAt, now),

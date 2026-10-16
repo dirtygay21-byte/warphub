@@ -1,6 +1,7 @@
 import { BATTLE_SIZES } from './rules';
 import { paidWargear, roleGroup, type ComputedRoster, type ComputedUnit, type DataLookup } from './compute';
 import { sortRosterUnits } from './sort';
+import { sourceLabel } from './source';
 import type { Roster } from './types';
 
 const pts = (n: number) => n.toLocaleString('en-US');
@@ -74,7 +75,7 @@ export function exportGw(roster: Roster, L: DataLookup, cr: ComputedRoster, data
     out.push(title);
     for (const c of list) out.push(...unitLines(c, roster), '');
   }
-  out.push(`Exported with WarpHub Roster Builder (data: Wahapedia ${dataVersion ?? '?'})`);
+  out.push(`Exported with WarpHub Roster Builder (data: ${L.faction.source ? sourceLabel(L.faction.source) : `Wahapedia ${dataVersion ?? '?'}`})`);
   return out.join('\n');
 }
 

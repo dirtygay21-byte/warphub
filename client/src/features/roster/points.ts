@@ -17,6 +17,7 @@ import { castInfo } from './aos/refs';
 import type { ComputedRoster, DataLookup } from './engine/compute';
 import { BATTLE_SIZES } from './engine/rules';
 import type { Roster } from './engine/types';
+import { visibleStratagem } from './engine/source';
 
 export type PointCategory = 'army' | 'game';
 
@@ -159,7 +160,7 @@ export function w40kPointSystems(roster: Roster, L: DataLookup, cr: ComputedRost
   const base = cr.units.reduce((s, c) => s + c.base, 0);
   const extras = cr.units.reduce((s, c) => s + c.extras, 0);
   const enh = cr.units.reduce((s, c) => s + c.enhancementCost, 0);
-  const strats = L.faction.stratagems.filter((s) => cr.detachments.some((d) => d.id === s.detachment));
+  const strats = L.faction.stratagems.filter((s) => cr.detachments.some((d) => d.id === s.detachment) && visibleStratagem(s, L.det));
   const byCp = new Map<string, number>();
   for (const s of strats) byCp.set(String(s.cp), (byCp.get(String(s.cp)) ?? 0) + 1);
   return [

@@ -6,6 +6,7 @@ import { cloudEnabled } from '../storage';
 import { confirmAsk, haptic } from '../telegram';
 import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag } from './kit';
 import { cx, fmtPts } from './util';
+import { indexCredit } from '../engine/source';
 
 const ALLEGIANCE_RU: Record<string, string> = { Imperium: 'Империум', Chaos: 'Хаос', Xenos: 'Ксеносы' };
 
@@ -65,8 +66,13 @@ export function RosterList({
       )}
 
       <p className="mt-8 text-center text-xs leading-relaxed text-white/35">
-        Данные: powered by Wahapedia · обновлено {index.lastUpdate?.slice(0, 10) ?? '—'}
-        <br />
+        {indexCredit(index).map((line, i) => (
+          <span key={i}>
+            {i === 0 ? 'Данные: ' : ''}
+            {line}
+            <br />
+          </span>
+        ))}
         {cloudEnabled() ? 'Ростеры синхронизируются через Telegram' : 'Ростеры хранятся в этом браузере'}
       </p>
 

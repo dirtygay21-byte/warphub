@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { paidWargear, type ComputedRoster, type ComputedUnit, type DataLookup, type Issue } from '../engine/compute';
 import type { Datasheet, Roster, RosterUnit, Weapon } from '../engine/types';
 import { optionsOf, whoText, type ParsedOption } from '../engine/wargear';
+import { linkLabel, OUTDATED_MARK, outdatedNote, ruleLabel, selectableEnhancement, visibleStratagem } from '../engine/source';
 import { groupDetRules, groupOf, roleOf } from '../engine/group';
 import { openExternal } from '../telegram';
 import { Button, Counter, Field, Icon, Segmented, Tag } from './kit';
@@ -69,7 +70,7 @@ export function UnitCard({
   for (const [l, n] of [...Object.entries(c.unit.addons), ...Object.entries(paidWargear(c))]) if (n > 0) meta.push(`${n}× ${l}`);
 
   // доступные улучшения
-  const enhOptions = L.faction.enhancements.filter((e) => roster.detachmentIds.includes(e.detachment) && ds.enhancements.includes(e.id));
+  const enhOptions = L.faction.enhancements.filter((e) => roster.detachmentIds.includes(e.detachment) && ds.enhancements.includes(e.id) && selectableEnhancement(e, c.unit.enhancementId, roster.legacyKept?.enhancements));
   const enhBlocked = ds.epicHero ? 'Epic Hero не может получить улучшение' : ds.group.startsWith('ally:') && !c.grant ? 'Союзники не получают улучшения' : null;
   const usedBy = new Map<string, number>();
   for (const u of cr.units) if (u.unit.enhancementId && u.unit.uid !== c.unit.uid) usedBy.set(u.unit.enhancementId, (usedBy.get(u.unit.enhancementId) ?? 0) + 1);
@@ -103,6 +104,11 @@ export function UnitCard({
           <p className="text-[15px] font-semibold leading-tight">
             {isWarlord && <Icon name="crown" className="-mt-0.5 mr-1 inline size-[15px] text-accent" />}
             {ds.name}
+            {ds.outdated && (
+              <span className="text-warn" title={outdatedNote(ds) ?? undefined}>
+                {OUTDATED_MARK}
+              </span>
+            )}
             {c.copy > 1 && <span className="ml-1.5 text-xs font-semibold text-white/30">#{c.copy}</span>}
           </p>
           {(meta.length > 0 || (!attachedTo && ds.support)) && (
@@ -137,6 +143,7 @@ export function UnitCard({
 
       {expanded && (
         <div className="space-y-5 border-t border-white/[0.06] bg-black/20 px-4 pb-4 pt-4">
+          {ds.outdated && <p className="rounded-lg bg-warn/10 px-2.5 py-2 text-[13px] text-amber-200">{outdatedNote(ds)}</p>}
           {issues.length > 0 && (
             <ul className="space-y-1.5">
               {issues.map((i, n) => (
@@ -144,6 +151,13 @@ export function UnitCard({
                   {i.message}
                 </li>
               ))}
+              {c.unit.migration && !readOnly && (
+                <li>
+                  <Button variant="outline" className="w-full" onClick={() => onPatch({ migration: null })}>
+                    {c.unit.migration.reason === 'options' ? 'Понятно — скрыть сообщение об изменённых вариантах' : 'Понятно — скрыть сообщение о замене инфолиста'}
+                  </Button>
+                </li>
+              )}
             </ul>
           )}
 
@@ -164,7 +178,7 @@ export function UnitCard({
             <Field label="Дополнительно">
               <div className="space-y-2">
                 {c.band.addons.map((a) => (
-                  <Row key={a.label} label={a.label} hint={`+${a.cost} очк.`}>
+                  <Row key={a.label} label={a.label} hint={`+${a.cost} очк.`} warn={a.unverified ? 'не проверено' : undefined}>
                     <Counter value={c.unit.addons[a.label] ?? 0} max={addonMax(ds.composition, a.label)} onChange={(n) => onPatch({ addons: { ...c.unit.addons, [a.label]: n } })} />
                   </Row>
                 ))}
@@ -182,14 +196,16 @@ export function UnitCard({
                     <div key={w.label} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">{w.label}</p>
-                        <p className="text-xs text-white/45">+{w.cost} за шт. · считается по заменам в «Снаряжении»</p>
+                        <p className="text-xs text-white/45">
+                          +{w.cost} за шт.{w.unverified && <span className="text-warn"> · не проверено</span>} · считается по заменам в «Снаряжении»
+                        </p>
                       </div>
                       <span className={cx('text-sm font-semibold tabular-nums', c.paidAuto[w.label] ? 'text-accent' : 'text-white/40')}>
                         {c.paidAuto[w.label]} шт. · +{c.paidAuto[w.label]! * w.cost}
                       </span>
                     </div>
                   ) : (
-                    <Row key={w.label} label={w.label} hint={`+${w.cost} за шт.`}>
+                    <Row key={w.label} label={w.label} hint={`+${w.cost} за шт.`} warn={w.unverified ? 'не проверено' : undefined}>
                       <Counter value={c.unit.wargear[w.label] ?? 0} max={Math.max(1, c.models)} onChange={(n) => onPatch({ wargear: { ...c.unit.wargear, [w.label]: n } })} />
                     </Row>
                   ),
@@ -227,7 +243,7 @@ export function UnitCard({
                         key={e.id}
                         active={c.unit.enhancementId === e.id}
                         onClick={() => onPatch({ enhancementId: e.id })}
-                        title={e.name}
+                        title={ruleLabel(e)}
                         right={`${e.cost} очк.`}
                         sub={[e.upgrade ? `Upgrade · до 3 юнитов${used ? ` (занято ${used})` : ''}` : taken ? 'уже взято другим юнитом' : '', e.restriction].filter(Boolean).join(' · ')}
                         dim={taken}
@@ -280,7 +296,7 @@ export function UnitCard({
             )}
             {ds.link && (
               <Button variant="ghost" className="flex-1" onClick={() => openExternal(ds.link)}>
-                <Icon name="link" className="size-4" /> Wahapedia
+                <Icon name="link" className="size-4" /> {linkLabel(ds.link)}
               </Button>
             )}
             {!readOnly && (
@@ -329,12 +345,15 @@ function addonMax(composition: string[], label: string): number {
   return 1;
 }
 
-function Row({ label, hint, children }: { label: string; hint: string; children: ReactNode }) {
+function Row({ label, hint, warn, children }: { label: string; hint: string; warn?: string; children: ReactNode }) {
   return (
     <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] py-1.5 pl-3 pr-1.5">
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold">{label}</p>
-        <p className="text-xs text-white/45">{hint}</p>
+        <p className="text-xs text-white/45">
+          {hint}
+          {warn && <span className="text-warn"> · {warn}</span>}
+        </p>
       </div>
       {children}
     </div>
@@ -443,7 +462,7 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
               <p className="mt-1 rounded-lg bg-warn/10 px-2.5 py-1.5 text-[11.5px] leading-snug text-amber-100">
                 {INCOMPLETE_TEXT[a.incomplete]}{' '}
                 <button type="button" onClick={() => openExternal(ds.link)} className="font-semibold text-accent underline underline-offset-2">
-                  Полный текст на Wahapedia
+                  Полный текст — {linkLabel(ds.link)}
                 </button>
               </p>
             )}
@@ -702,7 +721,7 @@ function UnitRules({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedR
     det: r.det,
     own: r.via.includes(ds.name),
   }));
-  const strats = L.faction.stratagems.filter((st) => ds.stratagems.includes(st.id) && (!st.detachment || detIds.has(st.detachment)));
+  const strats = L.faction.stratagems.filter((st) => ds.stratagems.includes(st.id) && (!st.detachment || detIds.has(st.detachment)) && visibleStratagem(st, L.det));
   if (!detRules.length && !strats.length) return null;
   return (
     <div className="space-y-2">

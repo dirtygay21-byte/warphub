@@ -11,6 +11,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { repair40kData } from './updates-40k.mjs';
 
 const BASE_URL = 'https://wahapedia.ru/wh40k11ed/';
 const FILES = [
@@ -871,6 +872,10 @@ async function main() {
     credit: 'powered by Wahapedia',
     factions: index,
   }, null, 1));
+  // проверенные обновления поверх выгрузки (40k/curated.json → updates) — та же функция, что в repair-40k-data.mjs
+  // обработчик whrules-faction (scripts/whrules-convert.mjs) использует движок клиента — импорт запускается через bun или node --import tsx
+  const { WHRULES_APPLIERS } = await import('./whrules-convert.mjs');
+  report.info.push(...repair40kData(OUT, curated, { appliers: WHRULES_APPLIERS }).lines);
   for (const d of all.values())
     for (const v of d.costVariants ?? []) if (!v.chapter) report.warnings.push(`${d.faction}: «${d.name}» (${d.id}) — дополнительная таблица цен без ордена (40k/curated.json → chapterCosts); применяется обычная цена`);
   fs.writeFileSync(REPORT, JSON.stringify(report, null, 1) + '\n');

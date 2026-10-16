@@ -59,12 +59,13 @@ test('W40-02: 4 копии War Dog Karnivore в Houndpack Lance и Troupe в Gho
 // ---------- W40-03: лимит копий по названию ----------
 
 test('W40-03: одноимённые инфолисты (Space Marines и Black Templars) делят лимит копий', () => {
+  // wh-rules.ru 981: Sternguard Veteran Squad у Black Templars — общий инфолист; одноимённая пара — Gladiator Lancer
   const SM = load('SM');
   const det = SM.detachments.find((d) => d.dp === 2 && !d.chapter)!;
   let r: Roster = { ...newRoster('SM'), detachmentIds: [det.id], forceDisposition: det.forceDisposition, chapter: 'Black Templars' };
-  for (let i = 0; i < 3; i++) r = addUnit(r, own(SM, 'Sternguard Veteran Squad', 'Space Marines'));
+  for (let i = 0; i < 3; i++) r = addUnit(r, own(SM, 'Gladiator Lancer', 'Space Marines'));
   assert.deepEqual(copiesErrors(r, SM), []);
-  r = addUnit(r, own(SM, 'Sternguard Veteran Squad', 'Black Templars'));
+  r = addUnit(r, own(SM, 'Gladiator Lancer', 'Black Templars'));
   const e = copiesErrors(r, SM);
   assert.equal(e.length, 1);
   assert.equal(e[0]!.unitUids!.length, 4);
@@ -90,11 +91,17 @@ test('W40-01: все таблицы цен сохраняются; дубли т
 
 test('W40-01: цена берётся по ордену армии, если таблица ордена известна; без привязки — обычная', () => {
   const SM = load('SM');
+  // wh-rules.ru 981: цены орденов — pointsOverrides снимка (Centurion Devastator Squad у 4 орденов)
+  const cds = own(SM, 'Centurion Devastator Squad');
+  assert.deepEqual(cds.costVariants!.map((v) => v.chapter), ['Black Templars', 'Blood Angels', 'Dark Angels', 'Space Wolves']);
+  assert.equal(costsFor(cds, 'Blood Angels'), cds.costVariants![1]!.costs);
+  assert.equal(costsFor(cds, 'Ultramarines'), cds.costs, 'орден без своей таблицы — обычная цена');
   const ai = own(SM, 'Assault Intercessor Squad');
-  assert.ok(ai.costVariants?.length, 'у Assault Intercessor Squad есть дополнительная таблица цен');
-  assert.equal(costsFor(ai, 'Blood Angels'), ai.costs, 'без привязки в curated.json — обычная цена');
-  // привязка таблицы к ордену (как её задаст 40k/curated.json → chapterCosts)
-  const mapped: Datasheet = { ...ai, costVariants: [{ chapter: 'Blood Angels', costs: ai.costVariants![0]!.costs }] };
+  assert.equal(ai.costVariants, undefined, 'без таблицы ордена в источнике');
+  assert.equal(costsFor(ai, 'Blood Angels'), ai.costs);
+  // механизм: таблица ордена с другой ценой
+  const other = ai.costs.map((b) => ({ ...b, options: b.options.map((o) => ({ ...o, cost: o.cost + 5 })) }));
+  const mapped: Datasheet = { ...ai, costVariants: [{ chapter: 'Blood Angels', costs: other }] };
   const F: FactionData = { ...SM, datasheets: SM.datasheets.map((d) => (d.id === ai.id ? mapped : d)) };
   const L = makeLookup(F);
   const price = (chapter: string | null) => {
@@ -103,7 +110,7 @@ test('W40-01: цена берётся по ордену армии, если т�
     return computeRoster(r, L).units[0]!.base;
   };
   assert.equal(price(null), ai.costs[0]!.options[0]!.cost);
-  assert.equal(price('Blood Angels'), ai.costVariants![0]!.costs[0]!.options[0]!.cost);
+  assert.equal(price('Blood Angels'), other[0]!.options[0]!.cost);
   assert.notEqual(price(null), price('Blood Angels'));
   assert.equal(bandFor(mapped, 1, 'Dark Angels'), bandFor(mapped, 1));
 });
@@ -148,8 +155,10 @@ test('W40-08: стратагемы правил армии Aeldari есть в �
 
 test('W40-13, W40-20: нет оружия без названия; заглушка схемы помечена как неполный текст', () => {
   for (const F of ALL) for (const d of F.datasheets) for (const w of d.weapons) assert.ok(w.name.trim(), `${F.id} «${d.name}»: оружие без названия`);
+  // wh-rules.ru 981 даёт полный текст Drop Pod (в выгрузке Wahapedia была заглушка схемы): пометки «неполный» нет
   const pod = own(load('SM'), 'Drop Pod');
-  assert.ok(pod.abilities.some((a) => a.incomplete === 'table'));
+  assert.ok(pod.abilities.every((a) => !a.incomplete));
+  assert.ok(pod.abilities.find((a) => a.name === 'Drop Pod Assault')!.text.length > 100);
   for (const F of ALL) for (const d of F.datasheets) for (const a of d.abilities) assert.ok(!/\$\d{6,}/.test(a.text), `${d.name}: заглушка в тексте`);
 });
 
@@ -180,7 +189,7 @@ test('W40-09: «two different weapons from the following list» — пары р�
     if (r.length === 2) assert.equal(r.filter((i) => pistol(i.weapon)).length, 1, c.map((i) => i.weapon).join(' + '));
   }
   // Wolf Guard Pack Leader in Terminator Armour: два дальнобойных — только cyclone + storm bolter / combi-weapon
-  const term = optionsOf(own(SM, 'Wolf Guard Pack Leader In Terminator Armour')).parsed.find((o) => o.pairs)!;
+  const term = optionsOf(own(SM, 'Wolf Guard Pack Leader in Terminator Armour')).parsed.find((o) => o.pairs)!;
   const names = term.choices.map((c) => c.map((i) => i.weapon).join(' + '));
   assert.ok(names.some((n) => n.startsWith('Cyclone missile launcher + Storm bolter + ')), 'cyclone+storm bolter с оружием ближнего боя');
   assert.ok(!names.includes('Assault cannon + Heavy flamer'));

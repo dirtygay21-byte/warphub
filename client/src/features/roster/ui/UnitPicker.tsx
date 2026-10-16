@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { bandFor, battlelineGrants, copyKey, copyLimit, isBattleline, type ComputedRoster, type DataLookup } from '../engine/compute';
+import { dsLabel, outdatedNote } from '../engine/source';
 import { compareUnits, typeLabel, typeRank, unitType, type UnitType } from '../engine/sort';
 import type { Datasheet, Roster } from '../engine/types';
 import { haptic } from '../telegram';
@@ -205,13 +206,16 @@ function PickerRow({ ds, count, limit, chapter, factionName, onAdd }: { ds: Data
   if (ds.forgeWorld) sub.push('Forge World');
   // книга-источник, если она не основная книга фракции: так различаются одноимённые версии (Space Marines / Black Templars)
   else if (ds.source && !ds.legends && ds.source !== factionName) sub.push(ds.source);
+  if (ds.outdated) sub.push('* данные устарели');
   const noCost = !ds.costs.length;
   if (noCost) sub.push('нет цены в данных — в армию не входит');
   return (
     <li className="border-b border-white/[0.06] last:border-b-0">
       <button type="button" onClick={onAdd} className={cx('flex w-full items-center gap-3 px-3.5 py-3 text-left transition active:bg-white/[0.06]', (full || noCost) && 'opacity-40')}>
         <div className="min-w-0 flex-1">
-          <p className="text-[14px] font-semibold leading-snug">{ds.name}</p>
+          <p className="text-[14px] font-semibold leading-snug" title={outdatedNote(ds) ?? undefined}>
+            {dsLabel(ds)}
+          </p>
           {sub.length > 0 && <p className="mt-0.5 text-[12px] leading-snug text-white/45">{sub.join(' · ')}</p>}
         </div>
         {count > 0 && (

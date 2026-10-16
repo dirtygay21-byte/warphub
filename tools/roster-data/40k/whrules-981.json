@@ -1,0 +1,8978 @@
+{
+ "schema": "whrules-points-snapshot/1",
+ "source": {
+  "site": "https://wh-rules.ru",
+  "pages": [
+   "https://wh-rules.ru/ru/patches",
+   "https://wh-rules.ru/ru/factions/space-marines/datasheets",
+   "https://wh-rules.ru/ru/factions/black-templars/datasheets",
+   "https://wh-rules.ru/ru/factions/blood-angels/datasheets",
+   "https://wh-rules.ru/ru/factions/dark-angels/datasheets",
+   "https://wh-rules.ru/ru/factions/deathwatch/datasheets",
+   "https://wh-rules.ru/ru/factions/space-wolves/datasheets",
+   "https://wh-rules.ru/ru/factions/imperial-agents/datasheets"
+  ],
+  "dataVersion": 981,
+  "mfm": "1.6",
+  "date": "2026-10-14",
+  "extractedAt": "2026-10-15T23:31:12.452Z"
+ },
+ "assets": {
+  "909-BOUUpawt.js": "d8fcdfc10489f851fcba5a7b8266c1408669eae0d4664902d1b83915b8363ab7",
+  "912-C2pOHvnU.js": "e68df051bf73afc4c8ef724c90d59ecff335723244d3f10d707b0579a6289973",
+  "913-C5P2BGVd.js": "1d6097d5c95f3a7ae86d5876359719c204407ea31d14d04da840f5e344aee3e9",
+  "925-BfimoMJt.js": "0496878b7b70401b49d018dc138da6bed47c199ae1df8dde490570e2f416d8cd",
+  "931-CNbUetfO.js": "b92f32369560812ece285f1a5abf11e4d8f16d1ae1dc96866a4fe48e15dda410",
+  "946-DI-WSX-C.js": "acaeceba5597c646827d141dc37bd9c6c442fef4a03185b29a99a35944c829ce",
+  "963-C4d3lqiN.js": "1a0e0878d3e9b100f26b31a9c4698f6a3f411d15bad4303d73a262d2124d2108",
+  "972-C2DmHCYB.js": "b3f484a6703db2c83faf8cbdf1399e4aa8d939091a9c5e45a4ad4cd52189379c",
+  "981-DL-b2COP.js": "b27a6c9137e6976d25f04e0df5dc0744301e91e0f03862832be6770ff62badae",
+  "PatchesView-Dkre8v6S.js": "e994890f50fdc010b06d6a60b70ac91487a60f06ebbc4c12cea4886a3cd32a75",
+  "app-DkXshQ1o.js": "98a2ef6b46dfeb1a19ceb2e0505a5b6073370fc24c6cc7720ad09d330488e5f0",
+  "black-templars-BH58uker.js": "b48796ff8c8471b7b98b95fd501e4e49a79e116edbd91d1b4fb92359db780959",
+  "blood-angels-BbUbUtvX.js": "9fdec7b561943fb4651ebc6a679e2b8a4b2c085a716e0daa22f3c104b7e47970",
+  "dark-angels-DLy-bjHv.js": "3d98ee1cf3581bf084098b648fd59a3cd2e8a9ddec793bf8847b54b521bb4fdf",
+  "deathwatch-BKDhhrDO.js": "6d1c0f5cfa4fe4188a794cc970e2c624ecb0096f77f270b7ddf5f45d9ff02b2f",
+  "imperial-agents-BZC3-2qG.js": "2b5f508b94e1cf1611bf0fac0b6e1f031781b7bcab616b61259e2b282ac8925a",
+  "index-BMx_xz1o.js": "3b364796b3044db53198120ee784d2ea56a1d0300498d8fbd7ccbf5ca1017ad5",
+  "mfm-1.1-CXbYjmXV.js": "f72da9808304b17b7ec6b57d16e2a3d32a0320cade1418d2e09314d0dc39c903",
+  "mfm-1.2-n1T_ZW4A.js": "5975de39ce57c3d5559936f482bf27b774d97ed5ec66e9859e8d55bf3f6c76c1",
+  "space-marines-DcWON6QN.js": "47f6eef5002222d4009b38502efa889fa345d0107d30e796c1440d6cff59a44f",
+  "space-wolves-BV7cG4ZR.js": "61271cf7da6a747b1d32366c36d9b260e7977cf38df9b92878b158785aca7df1"
+ },
+ "factions": {
+  "space-marines": {
+   "file": "space-marines-DcWON6QN.js",
+   "datasheets": [
+    {
+     "id": "adrax-agatone",
+     "name": "Adrax Agatone",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 90
+      }
+     ]
+    },
+    {
+     "id": "aethon-shaan",
+     "name": "Aethon Shaan",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 105
+      }
+     ]
+    },
+    {
+     "id": "aggressor-squad",
+     "name": "Aggressor Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 3,
+       "points": 90
+      },
+      {
+       "models": 6,
+       "points": 180
+      }
+     ]
+    },
+    {
+     "id": "ancient",
+     "name": "Ancient",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 40
+      }
+     ]
+    },
+    {
+     "id": "ancient-in-terminator-armour",
+     "name": "Ancient in Terminator Armour",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "apothecary",
+     "name": "Apothecary",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 45
+      }
+     ]
+    },
+    {
+     "id": "apothecary-biologis",
+     "name": "Apothecary Biologis",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 60
+      }
+     ]
+    },
+    {
+     "id": "assault-intercessor-squad",
+     "name": "Assault Intercessor Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 85
+      },
+      {
+       "models": 10,
+       "points": 170
+      }
+     ]
+    },
+    {
+     "id": "assault-intercessors-with-jump-packs",
+     "name": "Assault Intercessors with Jump Packs",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 95,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 190,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 105,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 200,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "astraeus",
+     "name": "Astraeus",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 550,
+       "note": "1st"
+      },
+      {
+       "models": 1,
+       "points": 650,
+       "note": "2nd+"
+      }
+     ]
+    },
+    {
+     "id": "ballistus-dreadnought",
+     "name": "Ballistus Dreadnought",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 150,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 170,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "bladeguard-ancient",
+     "name": "Bladeguard Ancient",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 70
+      }
+     ]
+    },
+    {
+     "id": "bladeguard-veteran-squad",
+     "name": "Bladeguard Veteran Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 3,
+       "points": 90,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 6,
+       "points": 180,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 3,
+       "points": 110,
+       "note": "3rd+"
+      },
+      {
+       "models": 6,
+       "points": 200,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "brutalis-dreadnought",
+     "name": "Brutalis Dreadnought",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 160,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 180,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "caanok-var",
+     "name": "Caanok Var",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 100
+      }
+     ]
+    },
+    {
+     "id": "captain",
+     "name": "Captain",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 90
+      }
+     ]
+    },
+    {
+     "id": "captain-in-gravis-armour",
+     "name": "Captain in Gravis Armour",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 90
+      }
+     ]
+    },
+    {
+     "id": "captain-in-phobos-armour",
+     "name": "Captain in Phobos Armour",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "captain-in-terminator-armour",
+     "name": "Captain in Terminator Armour",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 90
+      }
+     ]
+    },
+    {
+     "id": "captain-on-bike",
+     "name": "Captain on Bike",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 110
+      }
+     ]
+    },
+    {
+     "id": "captain-titus",
+     "name": "Captain Titus",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 115
+      }
+     ]
+    },
+    {
+     "id": "captain-with-jump-pack",
+     "name": "Captain with Jump Pack",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 90
+      }
+     ]
+    },
+    {
+     "id": "cato-sicarius",
+     "name": "Cato Sicarius",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 115
+      }
+     ]
+    },
+    {
+     "id": "centurion-assault-squad",
+     "name": "Centurion Assault Squad",
+     "legends": true,
+     "points": [
+      {
+       "models": 3,
+       "points": 150
+      },
+      {
+       "models": 6,
+       "points": 300
+      }
+     ]
+    },
+    {
+     "id": "centurion-devastator-squad",
+     "name": "Centurion Devastator Squad",
+     "legends": true,
+     "points": [
+      {
+       "models": 3,
+       "points": 175
+      },
+      {
+       "models": 6,
+       "points": 350
+      }
+     ]
+    },
+    {
+     "id": "cerberus",
+     "name": "Cerberus",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 270
+      }
+     ]
+    },
+    {
+     "id": "chaplain",
+     "name": "Chaplain",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 60
+      }
+     ]
+    },
+    {
+     "id": "chaplain-in-terminator-armour",
+     "name": "Chaplain in Terminator Armour",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "chaplain-on-bike",
+     "name": "Chaplain on Bike",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "chaplain-with-jump-pack",
+     "name": "Chaplain with Jump Pack",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "chief-librarian-tigurius",
+     "name": "Chief Librarian Tigurius",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 115
+      }
+     ]
+    },
+    {
+     "id": "company-heroes",
+     "name": "Company Heroes",
+     "legends": false,
+     "points": [
+      {
+       "models": 4,
+       "points": 125,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 4,
+       "points": 145,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "darnath-lysander",
+     "name": "Darnath Lysander",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 160
+      }
+     ]
+    },
+    {
+     "id": "desolation-squad",
+     "name": "Desolation Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 140,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 150,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "dreadnought",
+     "name": "Dreadnought",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 135
+      }
+     ]
+    },
+    {
+     "id": "drop-pod",
+     "name": "Drop Pod",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 60,
+       "note": "1st-3rd"
+      },
+      {
+       "models": 1,
+       "points": 70,
+       "note": "4th+"
+      }
+     ]
+    },
+    {
+     "id": "eliminator-squad",
+     "name": "Eliminator Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 3,
+       "points": 85
+      }
+     ]
+    },
+    {
+     "id": "eradicator-squad-with-heavy-bolters",
+     "name": "Eradicator Squad with heavy bolters",
+     "legends": false,
+     "points": [
+      {
+       "models": 3,
+       "points": 100,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 6,
+       "points": 215,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 3,
+       "points": 130,
+       "note": "3rd+"
+      },
+      {
+       "models": 6,
+       "points": 245,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "eradicator-squad-with-melta-rifles",
+     "name": "Eradicator Squad with melta rifles",
+     "legends": false,
+     "points": [
+      {
+       "models": 3,
+       "points": 100,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 6,
+       "points": 200,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 3,
+       "points": 120,
+       "note": "3rd+"
+      },
+      {
+       "models": 6,
+       "points": 220,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "falchion",
+     "name": "Falchion",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 420
+      }
+     ]
+    },
+    {
+     "id": "firestrike-servo-turrets",
+     "name": "Firestrike Servo-turrets",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 80
+      },
+      {
+       "models": 2,
+       "points": 160
+      }
+     ]
+    },
+    {
+     "id": "gladiator-lancer",
+     "name": "Gladiator Lancer",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 160,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 180,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "gladiator-reaper",
+     "name": "Gladiator Reaper",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 165,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 185,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "gladiator-valiant",
+     "name": "Gladiator Valiant",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 165,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 185,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "hammerfall-bunker",
+     "name": "Hammerfall Bunker",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 175
+      }
+     ]
+    },
+    {
+     "id": "heavy-intercessor-squad",
+     "name": "Heavy Intercessor Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 115
+      },
+      {
+       "models": 10,
+       "points": 230
+      }
+     ]
+    },
+    {
+     "id": "hellblaster-squad",
+     "name": "Hellblaster Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 115,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 230,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 130,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 245,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "impulsor",
+     "name": "Impulsor",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 70,
+       "note": "1st-3rd"
+      },
+      {
+       "models": 1,
+       "points": 80,
+       "note": "4th+"
+      }
+     ]
+    },
+    {
+     "id": "inceptor-squad",
+     "name": "Inceptor Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 3,
+       "points": 130,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 6,
+       "points": 260,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 3,
+       "points": 150,
+       "note": "3rd+"
+      },
+      {
+       "models": 6,
+       "points": 280,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "incursor-squad",
+     "name": "Incursor Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 90,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 170,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 100,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 180,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "infernus-squad",
+     "name": "Infernus Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 95,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 190,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 105,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 200,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "infiltrator-squad",
+     "name": "Infiltrator Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 85
+      },
+      {
+       "models": 10,
+       "points": 150
+      }
+     ]
+    },
+    {
+     "id": "intercessor-squad",
+     "name": "Intercessor Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 85
+      },
+      {
+       "models": 10,
+       "points": 170
+      }
+     ]
+    },
+    {
+     "id": "invader-atvs",
+     "name": "Invader ATVs",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 65,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 2,
+       "points": 130,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 75,
+       "note": "3rd+"
+      },
+      {
+       "models": 2,
+       "points": 140,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "invictor-tactical-warsuit",
+     "name": "Invictor Tactical Warsuit",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 135,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 150,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "iron-father-feirros",
+     "name": "Iron Father Feirros",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 85
+      }
+     ]
+    },
+    {
+     "id": "judiciar",
+     "name": "Judiciar",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 50
+      }
+     ]
+    },
+    {
+     "id": "kaius-konorius",
+     "name": "Kaius Konorius",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 100
+      }
+     ]
+    },
+    {
+     "id": "kayvaan-shrike",
+     "name": "Kayvaan Shrike",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 95
+      }
+     ]
+    },
+    {
+     "id": "korsarro-khan",
+     "name": "Kor’sarro Khan",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 80
+      }
+     ]
+    },
+    {
+     "id": "kratos",
+     "name": "Kratos",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 240
+      }
+     ]
+    },
+    {
+     "id": "land-raider",
+     "name": "Land Raider",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 245,
+       "note": "1st"
+      },
+      {
+       "models": 1,
+       "points": 265,
+       "note": "2nd+"
+      }
+     ]
+    },
+    {
+     "id": "land-raider-crusader",
+     "name": "Land Raider Crusader",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 230,
+       "note": "1st"
+      },
+      {
+       "models": 1,
+       "points": 250,
+       "note": "2nd+"
+      }
+     ]
+    },
+    {
+     "id": "land-raider-excelsior",
+     "name": "Land Raider Excelsior",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 250
+      }
+     ]
+    },
+    {
+     "id": "land-raider-redeemer",
+     "name": "Land Raider Redeemer",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 245,
+       "note": "1st"
+      },
+      {
+       "models": 1,
+       "points": 265,
+       "note": "2nd+"
+      }
+     ]
+    },
+    {
+     "id": "land-speeder",
+     "name": "Land Speeder",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 105
+      }
+     ]
+    },
+    {
+     "id": "librarian",
+     "name": "Librarian",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "librarian-in-phobos-armour",
+     "name": "Librarian in Phobos Armour",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "librarian-in-terminator-armour",
+     "name": "Librarian in Terminator Armour",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 80
+      }
+     ]
+    },
+    {
+     "id": "lieutenant",
+     "name": "Lieutenant",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 50
+      }
+     ]
+    },
+    {
+     "id": "lieutenant-in-phobos-armour",
+     "name": "Lieutenant in Phobos Armour",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 40
+      }
+     ]
+    },
+    {
+     "id": "lieutenant-with-combi-weapon",
+     "name": "Lieutenant with Combi-weapon",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 85
+      }
+     ]
+    },
+    {
+     "id": "marneus-calgar",
+     "name": "Marneus Calgar",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 180
+      }
+     ]
+    },
+    {
+     "id": "mastodon",
+     "name": "Mastodon",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 540
+      }
+     ]
+    },
+    {
+     "id": "outrider-squad",
+     "name": "Outrider Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 3,
+       "points": 80
+      },
+      {
+       "models": 6,
+       "points": 160
+      }
+     ]
+    },
+    {
+     "id": "predator-annihilator",
+     "name": "Predator Annihilator",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 135,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 145,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "predator-destructor",
+     "name": "Predator Destructor",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 140,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 150,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "rapier-carrier",
+     "name": "Rapier Carrier",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 90
+      }
+     ]
+    },
+    {
+     "id": "razorback",
+     "name": "Razorback",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 95
+      }
+     ]
+    },
+    {
+     "id": "redemptor-dreadnought",
+     "name": "Redemptor Dreadnought",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 170,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 190,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "reiver-squad",
+     "name": "Reiver Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 85
+      },
+      {
+       "models": 10,
+       "points": 165
+      }
+     ]
+    },
+    {
+     "id": "relic-razorback",
+     "name": "Relic Razorback",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 105
+      }
+     ]
+    },
+    {
+     "id": "repulsor",
+     "name": "Repulsor",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 190,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 210,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "repulsor-executioner",
+     "name": "Repulsor Executioner",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 260,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 280,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "rhino",
+     "name": "Rhino",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 70,
+       "note": "1st-3rd"
+      },
+      {
+       "models": 1,
+       "points": 80,
+       "note": "4th+"
+      }
+     ]
+    },
+    {
+     "id": "rhino-primaris",
+     "name": "Rhino Primaris",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 95
+      }
+     ]
+    },
+    {
+     "id": "roboute-guilliman",
+     "name": "Roboute Guilliman",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 415
+      }
+     ]
+    },
+    {
+     "id": "scout-bike-squad",
+     "name": "Scout Bike Squad",
+     "legends": true,
+     "points": [
+      {
+       "models": 3,
+       "points": 75
+      },
+      {
+       "models": 6,
+       "points": 150
+      }
+     ]
+    },
+    {
+     "id": "scout-squad",
+     "name": "Scout Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 65
+      },
+      {
+       "models": 10,
+       "points": 120
+      }
+     ]
+    },
+    {
+     "id": "sicaran",
+     "name": "Sicaran",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 180
+      }
+     ]
+    },
+    {
+     "id": "sternguard-veteran-squad",
+     "name": "Sternguard Veteran Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 105,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 210,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 120,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 225,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "storm-speeder-hailstrike",
+     "name": "Storm Speeder Hailstrike",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 110,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 120,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "storm-speeder-hammerstrike",
+     "name": "Storm Speeder Hammerstrike",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 140,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 150,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "storm-speeder-thunderstrike",
+     "name": "Storm Speeder Thunderstrike",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 140,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 150,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "stormhawk-interceptor",
+     "name": "Stormhawk Interceptor",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 155
+      }
+     ]
+    },
+    {
+     "id": "stormraven-gunship",
+     "name": "Stormraven Gunship",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 280,
+       "note": "1st"
+      },
+      {
+       "models": 1,
+       "points": 300,
+       "note": "2nd+"
+      }
+     ]
+    },
+    {
+     "id": "stormtalon-gunship",
+     "name": "Stormtalon Gunship",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 165
+      }
+     ]
+    },
+    {
+     "id": "suboden-khan",
+     "name": "Suboden Khan",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 105
+      }
+     ]
+    },
+    {
+     "id": "tarantula-air-defence-battery",
+     "name": "Tarantula Air Defence Battery",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 70
+      }
+     ]
+    },
+    {
+     "id": "tarantula-sentry-battery",
+     "name": "Tarantula Sentry Battery",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 30
+      },
+      {
+       "models": 2,
+       "points": 60
+      },
+      {
+       "models": 3,
+       "points": 90
+      }
+     ]
+    },
+    {
+     "id": "techmarine",
+     "name": "Techmarine",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 55
+      }
+     ]
+    },
+    {
+     "id": "terminator-assault-squad",
+     "name": "Terminator Assault Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 170,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 340,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 210,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 380,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "terminator-squad",
+     "name": "Terminator Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 190,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 380,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 230,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 420,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "terrax-pattern-termite",
+     "name": "Terrax-pattern Termite",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 200
+      }
+     ]
+    },
+    {
+     "id": "thunderhawk-gunship",
+     "name": "Thunderhawk Gunship",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 850,
+       "note": "1st"
+      },
+      {
+       "models": 1,
+       "points": 950,
+       "note": "2nd+"
+      }
+     ]
+    },
+    {
+     "id": "tor-garadon",
+     "name": "Tor Garadon",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 90
+      }
+     ]
+    },
+    {
+     "id": "typhon",
+     "name": "Typhon",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 320
+      }
+     ]
+    },
+    {
+     "id": "vanguard-veteran-squad",
+     "name": "Vanguard Veteran Squad",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 120
+      },
+      {
+       "models": 10,
+       "points": 240
+      }
+     ]
+    },
+    {
+     "id": "vanguard-veteran-squad-with-jump-packs",
+     "name": "Vanguard Veteran Squad with Jump Packs",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 110,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 220,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 130,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 240,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "venerable-dreadnought",
+     "name": "Venerable Dreadnought",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 165
+      }
+     ]
+    },
+    {
+     "id": "victrix-honour-guard",
+     "name": "Victrix Honour Guard",
+     "legends": false,
+     "points": [
+      {
+       "models": 3,
+       "points": 120,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 6,
+       "points": 250,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 3,
+       "points": 150,
+       "note": "3rd+"
+      },
+      {
+       "models": 6,
+       "points": 280,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "vindicator",
+     "name": "Vindicator",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 185,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 200,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "vulkan-hestan",
+     "name": "Vulkan He’stan",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 105
+      }
+     ]
+    },
+    {
+     "id": "wardens-of-ultramar",
+     "name": "Wardens of Ultramar",
+     "legends": false,
+     "points": [
+      {
+       "models": 6,
+       "points": 115
+      }
+     ]
+    },
+    {
+     "id": "whirlwind",
+     "name": "Whirlwind",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 175,
+       "note": "1st"
+      },
+      {
+       "models": 1,
+       "points": 195,
+       "note": "2nd+"
+      }
+     ]
+    }
+   ]
+  },
+  "black-templars": {
+   "file": "black-templars-BH58uker.js",
+   "datasheets": [
+    {
+     "id": "castellan",
+     "name": "Castellan",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "chaplain-grimaldus",
+     "name": "Chaplain Grimaldus",
+     "legends": false,
+     "points": [
+      {
+       "models": 4,
+       "points": 120
+      }
+     ]
+    },
+    {
+     "id": "crusade-ancient",
+     "name": "Crusade Ancient",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 45
+      }
+     ]
+    },
+    {
+     "id": "crusader-squad",
+     "name": "Crusader Squad",
+     "legends": false,
+     "points": [
+      {
+       "points": 160,
+       "note": "1 Sword Brother, 4 Neophytes, 5 Initiates"
+      },
+      {
+       "points": 305,
+       "note": "1 Sword Brother, 8 Neophytes, 11 Initiates"
+      }
+     ]
+    },
+    {
+     "id": "emperors-champion",
+     "name": "Emperor's Champion",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 100
+      }
+     ]
+    },
+    {
+     "id": "execrator",
+     "name": "Execrator",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 65
+      }
+     ]
+    },
+    {
+     "id": "gladiator-lancer",
+     "name": "Gladiator Lancer",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 165,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 185,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "gladiator-reaper",
+     "name": "Gladiator Reaper",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 165,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 185,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "gladiator-valiant",
+     "name": "Gladiator Valiant",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 145,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 165,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "high-marshal-helbrecht",
+     "name": "High Marshal Helbrecht",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 125
+      }
+     ]
+    },
+    {
+     "id": "impulsor",
+     "name": "Impulsor",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 70,
+       "note": "1st-3rd"
+      },
+      {
+       "models": 1,
+       "points": 80,
+       "note": "4th+"
+      }
+     ]
+    },
+    {
+     "id": "marshal",
+     "name": "Marshal",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 80
+      }
+     ]
+    },
+    {
+     "id": "repulsor",
+     "name": "Repulsor",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 190,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 210,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "repulsor-executioner",
+     "name": "Repulsor Executioner",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 265,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 285,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "sword-brethren-squad",
+     "name": "Sword Brethren Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 4,
+       "points": 115,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 140,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 9,
+       "points": 250,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 275,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 4,
+       "points": 135,
+       "note": "3rd+"
+      },
+      {
+       "models": 5,
+       "points": 160,
+       "note": "3rd+"
+      },
+      {
+       "models": 9,
+       "points": 270,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 295,
+       "note": "3rd+"
+      }
+     ]
+    }
+   ],
+   "pointsOverrides": {
+    "centurion-devastator-squad": [
+     {
+      "models": 3,
+      "points": 175
+     },
+     {
+      "models": 6,
+      "points": 350
+     }
+    ]
+   },
+   "sharedUnitIds": [
+    "aggressor-squad",
+    "ancient",
+    "ancient-in-terminator-armour",
+    "apothecary",
+    "apothecary-biologis",
+    "assault-intercessor-squad",
+    "assault-intercessors-with-jump-packs",
+    "astraeus",
+    "ballistus-dreadnought",
+    "bladeguard-ancient",
+    "bladeguard-veteran-squad",
+    "brutalis-dreadnought",
+    "captain",
+    "captain-in-gravis-armour",
+    "captain-in-phobos-armour",
+    "captain-in-terminator-armour",
+    "captain-on-bike",
+    "captain-with-jump-pack",
+    "centurion-assault-squad",
+    "centurion-devastator-squad",
+    "cerberus",
+    "chaplain",
+    "chaplain-in-terminator-armour",
+    "chaplain-on-bike",
+    "chaplain-with-jump-pack",
+    "company-heroes",
+    "desolation-squad",
+    "dreadnought",
+    "drop-pod",
+    "eliminator-squad",
+    "eradicator-squad-with-heavy-bolters",
+    "eradicator-squad-with-melta-rifles",
+    "falchion",
+    "firestrike-servo-turrets",
+    "hammerfall-bunker",
+    "heavy-intercessor-squad",
+    "hellblaster-squad",
+    "inceptor-squad",
+    "incursor-squad",
+    "infernus-squad",
+    "infiltrator-squad",
+    "intercessor-squad",
+    "invader-atvs",
+    "invictor-tactical-warsuit",
+    "judiciar",
+    "kratos",
+    "land-raider",
+    "land-raider-crusader",
+    "land-raider-excelsior",
+    "land-raider-redeemer",
+    "land-speeder",
+    "lieutenant",
+    "lieutenant-in-phobos-armour",
+    "lieutenant-with-combi-weapon",
+    "mastodon",
+    "outrider-squad",
+    "predator-annihilator",
+    "predator-destructor",
+    "rapier-carrier",
+    "razorback",
+    "redemptor-dreadnought",
+    "reiver-squad",
+    "relic-razorback",
+    "rhino",
+    "rhino-primaris",
+    "scout-bike-squad",
+    "scout-squad",
+    "sicaran",
+    "sternguard-veteran-squad",
+    "storm-speeder-hailstrike",
+    "storm-speeder-hammerstrike",
+    "storm-speeder-thunderstrike",
+    "stormhawk-interceptor",
+    "stormraven-gunship",
+    "stormtalon-gunship",
+    "tarantula-air-defence-battery",
+    "tarantula-sentry-battery",
+    "techmarine",
+    "terminator-assault-squad",
+    "terminator-squad",
+    "terrax-pattern-termite",
+    "thunderhawk-gunship",
+    "typhon",
+    "vanguard-veteran-squad",
+    "vanguard-veteran-squad-with-jump-packs",
+    "venerable-dreadnought",
+    "vindicator",
+    "whirlwind"
+   ]
+  },
+  "blood-angels": {
+   "file": "blood-angels-BbUbUtvX.js",
+   "datasheets": [
+    {
+     "id": "astorath",
+     "name": "Astorath",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 90
+      }
+     ]
+    },
+    {
+     "id": "baal-predator",
+     "name": "Baal Predator",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 135,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 150,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "blood-angels-captain",
+     "name": "Blood Angels Captain",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 90
+      }
+     ]
+    },
+    {
+     "id": "brother-corbulo",
+     "name": "Brother Corbulo",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "captain-tycho",
+     "name": "Captain Tycho",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "chief-librarian-mephiston",
+     "name": "Chief Librarian Mephiston",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 175
+      }
+     ]
+    },
+    {
+     "id": "commander-dante",
+     "name": "Commander Dante",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 140
+      }
+     ]
+    },
+    {
+     "id": "death-company-captain",
+     "name": "Death Company Captain",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 80
+      }
+     ]
+    },
+    {
+     "id": "death-company-captain-with-jump-pack",
+     "name": "Death Company Captain with Jump Pack",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 85
+      }
+     ]
+    },
+    {
+     "id": "death-company-dreadnought",
+     "name": "Death Company Dreadnought",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 165,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 185,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "death-company-dreadnought-with-magna-grapple",
+     "name": "Death Company Dreadnought with Magna-grapple",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 145
+      }
+     ]
+    },
+    {
+     "id": "death-company-marines",
+     "name": "Death Company Marines",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 90,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 170,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 105,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 185,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "death-company-marines-with-boltguns",
+     "name": "Death Company Marines with Boltguns",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 125
+      },
+      {
+       "models": 10,
+       "points": 250
+      }
+     ]
+    },
+    {
+     "id": "death-company-marines-with-boltguns-and-jump-packs",
+     "name": "Death Company Marines with Boltguns and Jump Packs",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 140
+      },
+      {
+       "models": 10,
+       "points": 280
+      }
+     ]
+    },
+    {
+     "id": "death-company-marines-with-jump-packs",
+     "name": "Death Company Marines with Jump Packs",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 130,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 260,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 160,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 290,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "furioso-dreadnought",
+     "name": "Furioso Dreadnought",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 150
+      }
+     ]
+    },
+    {
+     "id": "gabriel-seth",
+     "name": "Gabriel Seth",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 90
+      }
+     ]
+    },
+    {
+     "id": "lemartes",
+     "name": "Lemartes",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 110
+      }
+     ]
+    },
+    {
+     "id": "librarian-dreadnought",
+     "name": "Librarian Dreadnought",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 170
+      }
+     ]
+    },
+    {
+     "id": "sanguinary-guard",
+     "name": "Sanguinary Guard",
+     "legends": false,
+     "points": [
+      {
+       "models": 3,
+       "points": 135,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 6,
+       "points": 275,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 3,
+       "points": 150,
+       "note": "3rd+"
+      },
+      {
+       "models": 6,
+       "points": 290,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "sanguinary-priest",
+     "name": "Sanguinary Priest",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 60
+      }
+     ]
+    },
+    {
+     "id": "sanguinary-priest-with-jump-pack",
+     "name": "Sanguinary Priest with Jump Pack",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 100
+      }
+     ]
+    },
+    {
+     "id": "the-sanguinor",
+     "name": "The Sanguinor",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 120
+      }
+     ]
+    },
+    {
+     "id": "tycho-the-lost",
+     "name": "Tycho the Lost",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 90
+      }
+     ]
+    }
+   ],
+   "pointsOverrides": {
+    "centurion-devastator-squad": [
+     {
+      "models": 3,
+      "points": 175
+     },
+     {
+      "models": 6,
+      "points": 350
+     }
+    ]
+   },
+   "sharedUnitIds": [
+    "aggressor-squad",
+    "ancient",
+    "ancient-in-terminator-armour",
+    "apothecary",
+    "apothecary-biologis",
+    "assault-intercessor-squad",
+    "assault-intercessors-with-jump-packs",
+    "astraeus",
+    "ballistus-dreadnought",
+    "bladeguard-ancient",
+    "bladeguard-veteran-squad",
+    "brutalis-dreadnought",
+    "captain",
+    "captain-in-gravis-armour",
+    "captain-in-phobos-armour",
+    "captain-in-terminator-armour",
+    "captain-on-bike",
+    "captain-with-jump-pack",
+    "centurion-assault-squad",
+    "centurion-devastator-squad",
+    "cerberus",
+    "chaplain",
+    "chaplain-in-terminator-armour",
+    "chaplain-on-bike",
+    "chaplain-with-jump-pack",
+    "company-heroes",
+    "desolation-squad",
+    "dreadnought",
+    "drop-pod",
+    "eliminator-squad",
+    "eradicator-squad-with-heavy-bolters",
+    "eradicator-squad-with-melta-rifles",
+    "falchion",
+    "firestrike-servo-turrets",
+    "gladiator-lancer",
+    "gladiator-reaper",
+    "gladiator-valiant",
+    "hammerfall-bunker",
+    "heavy-intercessor-squad",
+    "hellblaster-squad",
+    "impulsor",
+    "inceptor-squad",
+    "incursor-squad",
+    "infernus-squad",
+    "infiltrator-squad",
+    "intercessor-squad",
+    "invader-atvs",
+    "invictor-tactical-warsuit",
+    "judiciar",
+    "kratos",
+    "land-raider",
+    "land-raider-crusader",
+    "land-raider-excelsior",
+    "land-raider-redeemer",
+    "land-speeder",
+    "librarian",
+    "librarian-in-phobos-armour",
+    "librarian-in-terminator-armour",
+    "lieutenant",
+    "lieutenant-in-phobos-armour",
+    "lieutenant-with-combi-weapon",
+    "mastodon",
+    "outrider-squad",
+    "predator-annihilator",
+    "predator-destructor",
+    "rapier-carrier",
+    "razorback",
+    "redemptor-dreadnought",
+    "reiver-squad",
+    "relic-razorback",
+    "repulsor",
+    "repulsor-executioner",
+    "rhino",
+    "rhino-primaris",
+    "scout-bike-squad",
+    "scout-squad",
+    "sicaran",
+    "sternguard-veteran-squad",
+    "storm-speeder-hailstrike",
+    "storm-speeder-hammerstrike",
+    "storm-speeder-thunderstrike",
+    "stormhawk-interceptor",
+    "stormraven-gunship",
+    "stormtalon-gunship",
+    "tarantula-air-defence-battery",
+    "tarantula-sentry-battery",
+    "techmarine",
+    "terminator-assault-squad",
+    "terminator-squad",
+    "terrax-pattern-termite",
+    "thunderhawk-gunship",
+    "typhon",
+    "vanguard-veteran-squad",
+    "vanguard-veteran-squad-with-jump-packs",
+    "venerable-dreadnought",
+    "vindicator",
+    "whirlwind"
+   ]
+  },
+  "dark-angels": {
+   "file": "dark-angels-DLy-bjHv.js",
+   "datasheets": [
+    {
+     "id": "asmodai",
+     "name": "Asmodai",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 80
+      }
+     ]
+    },
+    {
+     "id": "azrael",
+     "name": "Azrael",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 150
+      }
+     ]
+    },
+    {
+     "id": "belial",
+     "name": "Belial",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 100
+      }
+     ]
+    },
+    {
+     "id": "deathwing-command-squad",
+     "name": "Deathwing Command Squad",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 200
+      },
+      {
+       "models": 10,
+       "points": 400
+      }
+     ]
+    },
+    {
+     "id": "deathwing-knights",
+     "name": "Deathwing Knights",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 255,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 275,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "deathwing-strikemaster",
+     "name": "Deathwing Strikemaster",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 80
+      }
+     ]
+    },
+    {
+     "id": "deathwing-terminator-squad",
+     "name": "Deathwing Terminator Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 190,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 380,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 230,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 420,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "ezekiel",
+     "name": "Ezekiel",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 110
+      }
+     ]
+    },
+    {
+     "id": "inner-circle-companions",
+     "name": "Inner Circle Companions",
+     "legends": false,
+     "points": [
+      {
+       "models": 3,
+       "points": 90,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 6,
+       "points": 180,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 3,
+       "points": 105,
+       "note": "3rd+"
+      },
+      {
+       "models": 6,
+       "points": 195,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "land-speeder-vengeance",
+     "name": "Land Speeder Vengeance",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 150,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 160,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "lazarus",
+     "name": "Lazarus",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 80
+      }
+     ]
+    },
+    {
+     "id": "lion-eljonson",
+     "name": "Lion El'Jonson",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 415
+      }
+     ]
+    },
+    {
+     "id": "nephilim-jetfighter",
+     "name": "Nephilim Jetfighter",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 200
+      }
+     ]
+    },
+    {
+     "id": "ravenwing-black-knights",
+     "name": "Ravenwing Black Knights",
+     "legends": false,
+     "points": [
+      {
+       "models": 3,
+       "points": 85,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 6,
+       "points": 170,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 3,
+       "points": 95,
+       "note": "3rd+"
+      },
+      {
+       "models": 6,
+       "points": 180,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "ravenwing-command-squad",
+     "name": "Ravenwing Command Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 3,
+       "points": 115,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 3,
+       "points": 135,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "ravenwing-dark-talon",
+     "name": "Ravenwing Dark Talon",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 190
+      }
+     ]
+    },
+    {
+     "id": "ravenwing-darkshroud",
+     "name": "Ravenwing Darkshroud",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 80
+      }
+     ]
+    },
+    {
+     "id": "ravenwing-talonmaster",
+     "name": "Ravenwing Talonmaster",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 105
+      }
+     ]
+    },
+    {
+     "id": "sammael",
+     "name": "Sammael",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 120
+      }
+     ]
+    }
+   ],
+   "pointsOverrides": {
+    "centurion-devastator-squad": [
+     {
+      "models": 3,
+      "points": 175
+     },
+     {
+      "models": 6,
+      "points": 350
+     }
+    ]
+   },
+   "sharedUnitIds": [
+    "aggressor-squad",
+    "ancient",
+    "ancient-in-terminator-armour",
+    "apothecary",
+    "apothecary-biologis",
+    "assault-intercessor-squad",
+    "assault-intercessors-with-jump-packs",
+    "astraeus",
+    "ballistus-dreadnought",
+    "bladeguard-ancient",
+    "bladeguard-veteran-squad",
+    "brutalis-dreadnought",
+    "captain",
+    "captain-in-gravis-armour",
+    "captain-in-phobos-armour",
+    "captain-in-terminator-armour",
+    "captain-on-bike",
+    "captain-with-jump-pack",
+    "centurion-assault-squad",
+    "centurion-devastator-squad",
+    "cerberus",
+    "chaplain",
+    "chaplain-in-terminator-armour",
+    "chaplain-on-bike",
+    "chaplain-with-jump-pack",
+    "company-heroes",
+    "desolation-squad",
+    "dreadnought",
+    "drop-pod",
+    "eliminator-squad",
+    "eradicator-squad-with-heavy-bolters",
+    "eradicator-squad-with-melta-rifles",
+    "falchion",
+    "firestrike-servo-turrets",
+    "gladiator-lancer",
+    "gladiator-reaper",
+    "gladiator-valiant",
+    "hammerfall-bunker",
+    "heavy-intercessor-squad",
+    "hellblaster-squad",
+    "impulsor",
+    "inceptor-squad",
+    "incursor-squad",
+    "infernus-squad",
+    "infiltrator-squad",
+    "intercessor-squad",
+    "invader-atvs",
+    "invictor-tactical-warsuit",
+    "judiciar",
+    "kratos",
+    "land-raider",
+    "land-raider-crusader",
+    "land-raider-excelsior",
+    "land-raider-redeemer",
+    "land-speeder",
+    "librarian",
+    "librarian-in-phobos-armour",
+    "librarian-in-terminator-armour",
+    "lieutenant",
+    "lieutenant-in-phobos-armour",
+    "lieutenant-with-combi-weapon",
+    "mastodon",
+    "outrider-squad",
+    "predator-annihilator",
+    "predator-destructor",
+    "rapier-carrier",
+    "razorback",
+    "redemptor-dreadnought",
+    "reiver-squad",
+    "relic-razorback",
+    "repulsor",
+    "repulsor-executioner",
+    "rhino",
+    "rhino-primaris",
+    "scout-bike-squad",
+    "scout-squad",
+    "sicaran",
+    "sternguard-veteran-squad",
+    "storm-speeder-hailstrike",
+    "storm-speeder-hammerstrike",
+    "storm-speeder-thunderstrike",
+    "stormhawk-interceptor",
+    "stormraven-gunship",
+    "stormtalon-gunship",
+    "tarantula-air-defence-battery",
+    "tarantula-sentry-battery",
+    "techmarine",
+    "terminator-assault-squad",
+    "terminator-squad",
+    "terrax-pattern-termite",
+    "thunderhawk-gunship",
+    "typhon",
+    "vanguard-veteran-squad",
+    "vanguard-veteran-squad-with-jump-packs",
+    "venerable-dreadnought",
+    "vindicator",
+    "whirlwind"
+   ]
+  },
+  "deathwatch": {
+   "file": "deathwatch-BKDhhrDO.js",
+   "datasheets": [
+    {
+     "id": "corvus-blackstar",
+     "name": "Corvus Blackstar",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 180
+      }
+     ]
+    },
+    {
+     "id": "deathwatch-terminator-squad",
+     "name": "Deathwatch Terminator Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 190,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 380,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 230,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 420,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "deathwatch-veterans",
+     "name": "Deathwatch Veterans",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 115
+      },
+      {
+       "models": 10,
+       "points": 220
+      }
+     ]
+    },
+    {
+     "id": "decimus-kill-team",
+     "name": "Decimus Kill Team",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 110
+      },
+      {
+       "models": 10,
+       "points": 210
+      }
+     ]
+    },
+    {
+     "id": "fortis-kill-team",
+     "name": "Fortis Kill Team",
+     "legends": false,
+     "points": [
+      {
+       "models": 10,
+       "points": 210,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 225,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "indomitor-kill-team",
+     "name": "Indomitor Kill Team",
+     "legends": false,
+     "points": [
+      {
+       "models": 10,
+       "points": 280,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 300,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "spectrus-kill-team",
+     "name": "Spectrus Kill Team",
+     "legends": false,
+     "points": [
+      {
+       "models": 10,
+       "points": 185,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 195,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "talonstrike-kill-team",
+     "name": "Talonstrike Kill Team",
+     "legends": false,
+     "points": [
+      {
+       "models": 10,
+       "points": 280,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 300,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "watch-captain-artemis",
+     "name": "Watch Captain Artemis",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "watch-master",
+     "name": "Watch Master",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 105
+      }
+     ]
+    }
+   ],
+   "pointsOverrides": {},
+   "sharedUnitIds": [
+    "aggressor-squad",
+    "ancient",
+    "ancient-in-terminator-armour",
+    "apothecary",
+    "apothecary-biologis",
+    "assault-intercessor-squad",
+    "assault-intercessors-with-jump-packs",
+    "astraeus",
+    "ballistus-dreadnought",
+    "bladeguard-ancient",
+    "bladeguard-veteran-squad",
+    "brutalis-dreadnought",
+    "captain",
+    "captain-in-gravis-armour",
+    "captain-in-phobos-armour",
+    "captain-in-terminator-armour",
+    "captain-on-bike",
+    "captain-with-jump-pack",
+    "centurion-assault-squad",
+    "centurion-devastator-squad",
+    "cerberus",
+    "chaplain",
+    "chaplain-in-terminator-armour",
+    "chaplain-on-bike",
+    "chaplain-with-jump-pack",
+    "company-heroes",
+    "desolation-squad",
+    "dreadnought",
+    "drop-pod",
+    "eliminator-squad",
+    "eradicator-squad-with-heavy-bolters",
+    "eradicator-squad-with-melta-rifles",
+    "falchion",
+    "firestrike-servo-turrets",
+    "gladiator-lancer",
+    "gladiator-reaper",
+    "gladiator-valiant",
+    "hammerfall-bunker",
+    "heavy-intercessor-squad",
+    "hellblaster-squad",
+    "impulsor",
+    "inceptor-squad",
+    "incursor-squad",
+    "infernus-squad",
+    "infiltrator-squad",
+    "intercessor-squad",
+    "invader-atvs",
+    "invictor-tactical-warsuit",
+    "judiciar",
+    "kratos",
+    "land-raider",
+    "land-raider-crusader",
+    "land-raider-excelsior",
+    "land-raider-redeemer",
+    "land-speeder",
+    "librarian",
+    "librarian-in-phobos-armour",
+    "librarian-in-terminator-armour",
+    "lieutenant",
+    "lieutenant-in-phobos-armour",
+    "lieutenant-with-combi-weapon",
+    "mastodon",
+    "outrider-squad",
+    "predator-annihilator",
+    "predator-destructor",
+    "rapier-carrier",
+    "razorback",
+    "redemptor-dreadnought",
+    "reiver-squad",
+    "relic-razorback",
+    "repulsor",
+    "repulsor-executioner",
+    "rhino",
+    "rhino-primaris",
+    "scout-bike-squad",
+    "sicaran",
+    "sternguard-veteran-squad",
+    "storm-speeder-hailstrike",
+    "storm-speeder-hammerstrike",
+    "storm-speeder-thunderstrike",
+    "stormhawk-interceptor",
+    "stormraven-gunship",
+    "stormtalon-gunship",
+    "tarantula-air-defence-battery",
+    "tarantula-sentry-battery",
+    "techmarine",
+    "terrax-pattern-termite",
+    "thunderhawk-gunship",
+    "typhon",
+    "vanguard-veteran-squad",
+    "vanguard-veteran-squad-with-jump-packs",
+    "venerable-dreadnought",
+    "vindicator",
+    "whirlwind"
+   ]
+  },
+  "space-wolves": {
+   "file": "space-wolves-BV7cG4ZR.js",
+   "datasheets": [
+    {
+     "id": "arjac-rockfist",
+     "name": "Arjac Rockfist",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 105
+      }
+     ]
+    },
+    {
+     "id": "bjorn-the-fell-handed",
+     "name": "Bjorn the Fell-handed",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 160
+      }
+     ]
+    },
+    {
+     "id": "blood-claws",
+     "name": "Blood Claws",
+     "legends": false,
+     "points": [
+      {
+       "models": 10,
+       "points": 150
+      },
+      {
+       "models": 20,
+       "points": 290
+      }
+     ]
+    },
+    {
+     "id": "canis-wolfborn",
+     "name": "Canis Wolfborn",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "cyberwolf",
+     "name": "Cyberwolf",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 20
+      }
+     ]
+    },
+    {
+     "id": "fenrisian-wolves",
+     "name": "Fenrisian Wolves",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 45,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 75,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 50,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 80,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "grey-hunters",
+     "name": "Grey Hunters",
+     "legends": false,
+     "points": [
+      {
+       "models": 10,
+       "points": 180
+      }
+     ]
+    },
+    {
+     "id": "harald-deathwolf",
+     "name": "Harald Deathwolf",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 85
+      }
+     ]
+    },
+    {
+     "id": "hounds-of-morkai",
+     "name": "Hounds of Morkai",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 95
+      },
+      {
+       "models": 10,
+       "points": 190
+      }
+     ]
+    },
+    {
+     "id": "iron-priest",
+     "name": "Iron Priest",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 60
+      }
+     ]
+    },
+    {
+     "id": "krom-dragongaze",
+     "name": "Krom Dragongaze",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 65
+      }
+     ]
+    },
+    {
+     "id": "logan-grimnar",
+     "name": "Logan Grimnar",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 150
+      }
+     ]
+    },
+    {
+     "id": "logan-grimnar-on-stormrider",
+     "name": "Logan Grimnar on Stormrider",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 180
+      }
+     ]
+    },
+    {
+     "id": "long-fangs",
+     "name": "Long Fangs",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 120
+      },
+      {
+       "models": 6,
+       "points": 145
+      }
+     ]
+    },
+    {
+     "id": "lukas-the-trickster",
+     "name": "Lukas the Trickster",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 50
+      }
+     ]
+    },
+    {
+     "id": "murderfang",
+     "name": "Murderfang",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 150
+      }
+     ]
+    },
+    {
+     "id": "njal-stormcaller",
+     "name": "Njal Stormcaller",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 100
+      }
+     ]
+    },
+    {
+     "id": "ragnar-blackmane",
+     "name": "Ragnar Blackmane",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 100
+      }
+     ]
+    },
+    {
+     "id": "skyclaws",
+     "name": "Skyclaws",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 90
+      },
+      {
+       "models": 10,
+       "points": 165
+      },
+      {
+       "models": 15,
+       "points": 240
+      }
+     ]
+    },
+    {
+     "id": "stormfang-gunship",
+     "name": "Stormfang Gunship",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 300
+      }
+     ]
+    },
+    {
+     "id": "stormwolf",
+     "name": "Stormwolf",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 250
+      }
+     ]
+    },
+    {
+     "id": "thunderwolf-cavalry",
+     "name": "Thunderwolf Cavalry",
+     "legends": false,
+     "points": [
+      {
+       "models": 3,
+       "points": 115,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 6,
+       "points": 230,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 3,
+       "points": 145,
+       "note": "3rd+"
+      },
+      {
+       "models": 6,
+       "points": 260,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "ulrik-the-slayer",
+     "name": "Ulrik the Slayer",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 90
+      }
+     ]
+    },
+    {
+     "id": "venerable-dreadnought",
+     "name": "Venerable Dreadnought",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 130,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 140,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "wolf-guard",
+     "name": "Wolf Guard",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 85
+      },
+      {
+       "models": 10,
+       "points": 170
+      }
+     ]
+    },
+    {
+     "id": "wolf-guard-battle-leader",
+     "name": "Wolf Guard Battle Leader",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 80
+      }
+     ]
+    },
+    {
+     "id": "wolf-guard-battle-leader-in-terminator-armour",
+     "name": "Wolf Guard Battle Leader in Terminator Armour",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "wolf-guard-battle-leader-on-thunderwolf",
+     "name": "Wolf Guard Battle Leader on Thunderwolf",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 80
+      }
+     ]
+    },
+    {
+     "id": "wolf-guard-headtakers",
+     "name": "Wolf Guard Headtakers",
+     "legends": false,
+     "points": [
+      {
+       "points": 85,
+       "note": "3 Wolf Guard Headtakers (1st-2nd)"
+      },
+      {
+       "points": 115,
+       "note": "3 Wolf Guard Headtakers, 3 Hunting Wolves (1st-2nd)"
+      },
+      {
+       "points": 170,
+       "note": "6 Wolf Guard Headtakers (1st-2nd)"
+      },
+      {
+       "points": 230,
+       "note": "6 Wolf Guard Headtakers, 6 Hunting Wolves (1st-2nd)"
+      },
+      {
+       "points": 95,
+       "note": "3 Wolf Guard Headtakers (3rd+)"
+      },
+      {
+       "points": 125,
+       "note": "3 Wolf Guard Headtakers, 3 Hunting Wolves (3rd+)"
+      },
+      {
+       "points": 180,
+       "note": "6 Wolf Guard Headtakers (3rd+)"
+      },
+      {
+       "points": 240,
+       "note": "6 Wolf Guard Headtakers, 6 Hunting Wolves (3rd+)"
+      }
+     ]
+    },
+    {
+     "id": "wolf-guard-pack-leader",
+     "name": "Wolf Guard Pack Leader",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 30
+      }
+     ]
+    },
+    {
+     "id": "wolf-guard-pack-leader-in-terminator-armour",
+     "name": "Wolf Guard Pack Leader in Terminator Armour",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 40
+      }
+     ]
+    },
+    {
+     "id": "wolf-guard-pack-leader-with-jump-pack",
+     "name": "Wolf Guard Pack Leader with Jump Pack",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 35
+      }
+     ]
+    },
+    {
+     "id": "wolf-guard-terminators",
+     "name": "Wolf Guard Terminators",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 180,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 365,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 220,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 405,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "wolf-lord-on-thunderwolf",
+     "name": "Wolf Lord on Thunderwolf",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 100
+      }
+     ]
+    },
+    {
+     "id": "wolf-priest",
+     "name": "Wolf Priest",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "wolf-scouts",
+     "name": "Wolf Scouts",
+     "legends": false,
+     "points": [
+      {
+       "models": 6,
+       "points": 95,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 12,
+       "points": 190,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 6,
+       "points": 105,
+       "note": "3rd+"
+      },
+      {
+       "models": 12,
+       "points": 200,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "wulfen",
+     "name": "Wulfen",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 90,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 180,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 105,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 195,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "wulfen-dreadnought",
+     "name": "Wulfen Dreadnought",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 140,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 1,
+       "points": 150,
+       "note": "3rd+"
+      }
+     ]
+    },
+    {
+     "id": "wulfen-with-storm-shields",
+     "name": "Wulfen with Storm Shields",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 125,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 10,
+       "points": 250,
+       "note": "1st-2nd"
+      },
+      {
+       "models": 5,
+       "points": 155,
+       "note": "3rd+"
+      },
+      {
+       "models": 10,
+       "points": 280,
+       "note": "3rd+"
+      }
+     ]
+    }
+   ],
+   "pointsOverrides": {
+    "centurion-devastator-squad": [
+     {
+      "models": 3,
+      "points": 175
+     },
+     {
+      "models": 6,
+      "points": 350
+     }
+    ]
+   },
+   "sharedUnitIds": [
+    "aggressor-squad",
+    "ancient",
+    "ancient-in-terminator-armour",
+    "assault-intercessor-squad",
+    "assault-intercessors-with-jump-packs",
+    "astraeus",
+    "ballistus-dreadnought",
+    "bladeguard-ancient",
+    "bladeguard-veteran-squad",
+    "brutalis-dreadnought",
+    "captain",
+    "captain-in-gravis-armour",
+    "captain-in-phobos-armour",
+    "captain-in-terminator-armour",
+    "captain-on-bike",
+    "captain-with-jump-pack",
+    "centurion-assault-squad",
+    "centurion-devastator-squad",
+    "cerberus",
+    "chaplain",
+    "chaplain-in-terminator-armour",
+    "chaplain-on-bike",
+    "chaplain-with-jump-pack",
+    "company-heroes",
+    "desolation-squad",
+    "dreadnought",
+    "drop-pod",
+    "eliminator-squad",
+    "eradicator-squad-with-heavy-bolters",
+    "eradicator-squad-with-melta-rifles",
+    "falchion",
+    "firestrike-servo-turrets",
+    "gladiator-lancer",
+    "gladiator-reaper",
+    "gladiator-valiant",
+    "hammerfall-bunker",
+    "heavy-intercessor-squad",
+    "hellblaster-squad",
+    "impulsor",
+    "inceptor-squad",
+    "incursor-squad",
+    "infernus-squad",
+    "infiltrator-squad",
+    "intercessor-squad",
+    "invader-atvs",
+    "invictor-tactical-warsuit",
+    "judiciar",
+    "kratos",
+    "land-raider",
+    "land-raider-crusader",
+    "land-raider-excelsior",
+    "land-raider-redeemer",
+    "land-speeder",
+    "librarian",
+    "librarian-in-phobos-armour",
+    "librarian-in-terminator-armour",
+    "lieutenant",
+    "lieutenant-in-phobos-armour",
+    "lieutenant-with-combi-weapon",
+    "mastodon",
+    "outrider-squad",
+    "predator-annihilator",
+    "predator-destructor",
+    "rapier-carrier",
+    "razorback",
+    "redemptor-dreadnought",
+    "reiver-squad",
+    "relic-razorback",
+    "repulsor",
+    "repulsor-executioner",
+    "rhino",
+    "rhino-primaris",
+    "scout-bike-squad",
+    "scout-squad",
+    "sicaran",
+    "sternguard-veteran-squad",
+    "storm-speeder-hailstrike",
+    "storm-speeder-hammerstrike",
+    "storm-speeder-thunderstrike",
+    "stormhawk-interceptor",
+    "stormraven-gunship",
+    "stormtalon-gunship",
+    "tarantula-air-defence-battery",
+    "tarantula-sentry-battery",
+    "techmarine",
+    "terminator-assault-squad",
+    "terminator-squad",
+    "terrax-pattern-termite",
+    "thunderhawk-gunship",
+    "typhon",
+    "vanguard-veteran-squad",
+    "vanguard-veteran-squad-with-jump-packs",
+    "vindicator",
+    "whirlwind"
+   ]
+  },
+  "imperial-agents": {
+   "file": "imperial-agents-BZC3-2qG.js",
+   "datasheets": [
+    {
+     "id": "aquila-kill-team",
+     "name": "Aquila Kill Team",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 110
+      },
+      {
+       "models": 10,
+       "points": 210
+      }
+     ]
+    },
+    {
+     "id": "callidus-assassin",
+     "name": "Callidus Assassin",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 100
+      }
+     ]
+    },
+    {
+     "id": "corvus-blackstar",
+     "name": "Corvus Blackstar",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 180
+      }
+     ]
+    },
+    {
+     "id": "culexus-assassin",
+     "name": "Culexus Assassin",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 85
+      }
+     ]
+    },
+    {
+     "id": "daemonhost",
+     "name": "Daemonhost",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 40
+      },
+      {
+       "models": 2,
+       "points": 80
+      }
+     ]
+    },
+    {
+     "id": "damned-legionnaires",
+     "name": "Damned Legionnaires",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 90
+      },
+      {
+       "models": 10,
+       "points": 180
+      }
+     ]
+    },
+    {
+     "id": "deathwatch-kill-team",
+     "name": "Deathwatch Kill Team",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 115
+      },
+      {
+       "models": 10,
+       "points": 220
+      }
+     ]
+    },
+    {
+     "id": "deathwatch-terminator-squad",
+     "name": "Deathwatch Terminator Squad",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 210
+      },
+      {
+       "models": 10,
+       "points": 420
+      }
+     ]
+    },
+    {
+     "id": "eversor-assassin",
+     "name": "Eversor Assassin",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 100
+      },
+      {
+       "models": 1,
+       "points": 110,
+       "note": "Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "exaction-squad",
+     "name": "Exaction Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 11,
+       "points": 90
+      },
+      {
+       "models": 11,
+       "points": 85,
+       "note": "Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "fortis-kill-team",
+     "name": "Fortis Kill Team",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 100
+      },
+      {
+       "models": 10,
+       "points": 200
+      }
+     ]
+    },
+    {
+     "id": "grey-knights-terminator-squad",
+     "name": "Grey Knights Terminator Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 5,
+       "points": 175
+      },
+      {
+       "models": 5,
+       "points": 190,
+       "note": "Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "imperial-navy-breachers",
+     "name": "Imperial Navy Breachers",
+     "legends": false,
+     "points": [
+      {
+       "models": 10,
+       "points": 90
+      }
+     ]
+    },
+    {
+     "id": "imperial-rhino",
+     "name": "Imperial Rhino",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 65,
+       "note": "1st-3rd"
+      },
+      {
+       "models": 1,
+       "points": 75,
+       "note": "4th+"
+      }
+     ]
+    },
+    {
+     "id": "indomitor-kill-team",
+     "name": "Indomitor Kill Team",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 120
+      },
+      {
+       "models": 10,
+       "points": 240
+      }
+     ]
+    },
+    {
+     "id": "inquisitor",
+     "name": "Inquisitor",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 55
+      },
+      {
+       "models": 1,
+       "points": 65,
+       "note": "Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "inquisitor-coteaz",
+     "name": "Inquisitor Coteaz",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      },
+      {
+       "models": 1,
+       "points": 95,
+       "note": "Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "inquisitor-draxus",
+     "name": "Inquisitor Draxus",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      },
+      {
+       "models": 1,
+       "points": 110,
+       "note": "Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "inquisitor-eisenhorn",
+     "name": "Inquisitor Eisenhorn",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 65
+      }
+     ]
+    },
+    {
+     "id": "inquisitor-greyfax",
+     "name": "Inquisitor Greyfax",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 65
+      }
+     ]
+    },
+    {
+     "id": "inquisitor-in-terminator-armour",
+     "name": "Inquisitor in Terminator Armour",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 70
+      }
+     ]
+    },
+    {
+     "id": "inquisitor-karamazov",
+     "name": "Inquisitor Karamazov",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 140
+      }
+     ]
+    },
+    {
+     "id": "inquisitor-kroyle",
+     "name": "Inquisitor Kroyle",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 100
+      }
+     ]
+    },
+    {
+     "id": "inquisitor-ostromandeus",
+     "name": "Inquisitor Ostromandeus",
+     "legends": true,
+     "points": [
+      {
+       "models": 2,
+       "points": 65
+      }
+     ]
+    },
+    {
+     "id": "inquisitorial-agents",
+     "name": "Inquisitorial Agents",
+     "legends": false,
+     "points": [
+      {
+       "models": 6,
+       "points": 50
+      },
+      {
+       "models": 12,
+       "points": 100
+      },
+      {
+       "models": 6,
+       "points": 60,
+       "note": "Agents of the Imperium (allied)"
+      },
+      {
+       "models": 12,
+       "points": 120,
+       "note": "Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "inquisitorial-chimera",
+     "name": "Inquisitorial Chimera",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 60,
+       "note": "1st-3rd"
+      },
+      {
+       "models": 1,
+       "points": 70,
+       "note": "4th+"
+      }
+     ]
+    },
+    {
+     "id": "janus-draik",
+     "name": "Janus Draik",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 40
+      }
+     ]
+    },
+    {
+     "id": "jokaero-weaponsmith",
+     "name": "Jokaero Weaponsmith",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 30
+      }
+     ]
+    },
+    {
+     "id": "kill-team-cassius",
+     "name": "Kill Team Cassius",
+     "legends": true,
+     "points": [
+      {
+       "models": 11,
+       "points": 220
+      }
+     ]
+    },
+    {
+     "id": "ministorum-priest",
+     "name": "Ministorum Priest",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 40
+      }
+     ]
+    },
+    {
+     "id": "navigator",
+     "name": "Navigator",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 60
+      },
+      {
+       "models": 1,
+       "points": 75,
+       "note": "Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "neyam-shai-murad",
+     "name": "Neyam Shai Murad",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 40
+      }
+     ]
+    },
+    {
+     "id": "proteus-kill-team",
+     "name": "Proteus Kill Team",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 160
+      },
+      {
+       "models": 10,
+       "points": 320
+      }
+     ]
+    },
+    {
+     "id": "rogue-trader-entourage",
+     "name": "Rogue Trader Entourage",
+     "legends": false,
+     "points": [
+      {
+       "models": 4,
+       "points": 75
+      },
+      {
+       "models": 4,
+       "points": 105,
+       "note": "Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "sanctifiers",
+     "name": "Sanctifiers",
+     "legends": false,
+     "points": [
+      {
+       "models": 9,
+       "points": 100
+      }
+     ]
+    },
+    {
+     "id": "sisters-of-battle-immolator",
+     "name": "Sisters of Battle Immolator",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 90,
+       "note": "1st-3rd"
+      },
+      {
+       "models": 1,
+       "points": 100,
+       "note": "4th+"
+      },
+      {
+       "models": 1,
+       "points": 105,
+       "note": "1st-3rd, Agents of the Imperium (allied)"
+      },
+      {
+       "models": 1,
+       "points": 115,
+       "note": "4th+, Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "sisters-of-battle-squad",
+     "name": "Sisters of Battle Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 10,
+       "points": 100
+      },
+      {
+       "models": 10,
+       "points": 110,
+       "note": "Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "spectrus-kill-team",
+     "name": "Spectrus Kill Team",
+     "legends": true,
+     "points": [
+      {
+       "models": 5,
+       "points": 90
+      },
+      {
+       "models": 10,
+       "points": 180
+      }
+     ]
+    },
+    {
+     "id": "subductor-squad",
+     "name": "Subductor Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 11,
+       "points": 85
+      },
+      {
+       "models": 11,
+       "points": 100,
+       "note": "Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "ur-025",
+     "name": "UR-025",
+     "legends": true,
+     "points": [
+      {
+       "models": 1,
+       "points": 55
+      }
+     ]
+    },
+    {
+     "id": "veteran-bike-squad",
+     "name": "Veteran Bike Squad",
+     "legends": true,
+     "points": [
+      {
+       "models": 3,
+       "points": 70
+      },
+      {
+       "models": 6,
+       "points": 140
+      }
+     ]
+    },
+    {
+     "id": "vigilant-squad",
+     "name": "Vigilant Squad",
+     "legends": false,
+     "points": [
+      {
+       "models": 11,
+       "points": 85
+      }
+     ]
+    },
+    {
+     "id": "vindicare-assassin",
+     "name": "Vindicare Assassin",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 110
+      },
+      {
+       "models": 1,
+       "points": 125,
+       "note": "Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "voidsmen-at-arms",
+     "name": "Voidsmen-at-Arms",
+     "legends": false,
+     "points": [
+      {
+       "models": 6,
+       "points": 50
+      },
+      {
+       "models": 6,
+       "points": 70,
+       "note": "Agents of the Imperium (allied)"
+      }
+     ]
+    },
+    {
+     "id": "watch-captain-artemis",
+     "name": "Watch Captain Artemis",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 75
+      }
+     ]
+    },
+    {
+     "id": "watch-master",
+     "name": "Watch Master",
+     "legends": false,
+     "points": [
+      {
+       "models": 1,
+       "points": 105
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "patches": [
+  {
+   "id": "909",
+   "date": "2026-07-22",
+   "labels": {
+    "app": 909
+   },
+   "points": []
+  },
+  {
+   "id": "912",
+   "date": "2026-07-23",
+   "labels": {
+    "app": 912
+   },
+   "points": []
+  },
+  {
+   "id": "913",
+   "date": "2026-07-28",
+   "labels": {
+    "app": 913
+   },
+   "points": []
+  },
+  {
+   "id": "mfm-1.1",
+   "date": "2026-07-29",
+   "labels": {
+    "mfm": "1.1"
+   },
+   "points": [
+    {
+     "faction": "black-templars",
+     "name": "Chaplain Grimaldus",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 4,
+       "from": 110,
+       "to": 100
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Crusade Ancient",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 45,
+       "to": 40
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Emperor’s Champion",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 100,
+       "to": 90
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Execrator",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 60,
+       "to": 50
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "High Marshal Helbrecht",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 120,
+       "to": 110
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Impulsor",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-3rd",
+       "from": 85,
+       "to": 75
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Marshal",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "2nd",
+       "from": 90,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Repulsor Executioner",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 245,
+       "to": 255
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 265,
+       "to": 275
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Deathwing Knights",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "2nd",
+       "from": 260,
+       "to": 240
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Inner Circle Companions",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 170,
+       "to": 160
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 180,
+       "to": 170
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Land Speeder Vengeance",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 120,
+       "to": 130
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 130,
+       "to": 140
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Lion El’jonson",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 285,
+       "to": 265
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Nephilim Jetfighter",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 195,
+       "to": 180
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Ravenwing Black Knights",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 85,
+       "to": 75
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 160,
+       "to": 150
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Ravenwing Command Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 115,
+       "to": 105
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 125,
+       "to": 115
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Ravenwing Darkshroud",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 80,
+       "to": 70
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Sammael",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 105,
+       "to": 95
+      }
+     ]
+    },
+    {
+     "faction": "imperial-agents",
+     "name": "Eversor Assassin",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 110,
+       "to": 100
+      }
+     ]
+    },
+    {
+     "faction": "imperial-agents",
+     "name": "Grey Knights Terminator Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "from": 190,
+       "to": 175
+      }
+     ]
+    },
+    {
+     "faction": "imperial-agents",
+     "name": "Imperial Rhino",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-3rd",
+       "from": 75,
+       "to": 65
+      }
+     ]
+    },
+    {
+     "faction": "imperial-agents",
+     "name": "Inquisitorial Chimera",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-3rd",
+       "from": 70,
+       "to": 60
+      }
+     ]
+    },
+    {
+     "faction": "imperial-agents",
+     "name": "Sisters of Battle Immolator",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-3rd",
+       "from": 100,
+       "to": 90
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Aggressor Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 90,
+       "to": 80
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 100,
+       "to": 90
+      },
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 180,
+       "to": 165
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 190,
+       "to": 175
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Drop Pod",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-3rd",
+       "from": 70,
+       "to": 60
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Eradicator Squad with Heavy Bolters",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 70,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Impulsor",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-3rd",
+       "from": 80,
+       "to": 70
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Inceptor Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 120,
+       "to": 125
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 135,
+       "to": 140
+      },
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 240,
+       "to": 250
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 255,
+       "to": 265
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Infernus Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 10,
+       "from": 170,
+       "to": 180
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Land Speeder",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 95,
+       "to": 105
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Librarian",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 60,
+       "to": 70
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 60,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Lieutenant with Combi-Weapon",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 85,
+       "to": 95
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Razorback",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-3rd",
+       "from": 95,
+       "to": 85
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Repulsor Executioner",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 240,
+       "to": 255
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 260,
+       "to": 275
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Rhino",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-3rd",
+       "from": 75,
+       "to": 65
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Sternguard Veteran Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 10,
+       "from": 190,
+       "to": 200
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Storm Speeder Hammerstrike",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 130,
+       "to": 140
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 140,
+       "to": 150
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Suppressor Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "from": 75,
+       "to": 85
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Vanguard Veteran Squad with Jump Packs",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 100,
+       "to": 105
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 110,
+       "to": 115
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 200,
+       "to": 210
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 210,
+       "to": 220
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Arjac Rockfist",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 105,
+       "to": 95
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Iron Priest",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 55,
+       "to": 50
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Logan Grimnar",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 110,
+       "to": 100
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Njal Stormcaller",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 85,
+       "to": 75
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Ragnar Blackmane",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 100,
+       "to": 90
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Wolf Guard Terminators",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "2nd",
+       "from": 160,
+       "to": 150
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 160,
+       "to": 165
+      },
+      {
+       "models": 10,
+       "tier": "2nd",
+       "from": 310,
+       "to": 300
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 310,
+       "to": 315
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Wolf Scouts",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 95,
+       "to": 90
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 105,
+       "to": 90
+      },
+      {
+       "models": 12,
+       "tier": "1st-2nd",
+       "from": 190,
+       "to": 180
+      },
+      {
+       "models": 12,
+       "tier": "3rd+",
+       "from": 200,
+       "to": 180
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "925",
+   "date": "2026-08-05",
+   "labels": {
+    "app": 925
+   },
+   "points": []
+  },
+  {
+   "id": "mfm-1.2",
+   "date": "2026-08-15",
+   "labels": {
+    "mfm": "1.2"
+   },
+   "points": []
+  },
+  {
+   "id": "931",
+   "date": "2026-08-26",
+   "labels": {
+    "app": 931,
+    "mfm": "1.3"
+   },
+   "points": [
+    {
+     "faction": "black-templars",
+     "name": "Sword Brethren Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 4,
+       "tier": "1st-2nd",
+       "from": 105,
+       "to": 100
+      },
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 130,
+       "to": 125
+      },
+      {
+       "models": 9,
+       "tier": "1st-2nd",
+       "from": 235,
+       "to": 225
+      },
+      {
+       "models": 9,
+       "tier": "3rd+",
+       "from": 250,
+       "to": 245
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 260,
+       "to": 250
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 275,
+       "to": 270
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Death Company Marines with Jump Packs",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 120,
+       "to": 115
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 135,
+       "to": 130
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Sanguinary Guard",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 125,
+       "to": 120
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 145,
+       "to": 140
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "The Sanguinor",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 130,
+       "to": 120
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Ravenwing Black Knights",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 75,
+       "to": 85
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 150,
+       "to": 160
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Sammael",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 95,
+       "to": 105
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Centurion Devastator Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 6,
+       "from": 350,
+       "to": 365
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Land Raider Redeemer",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 250,
+       "to": 260
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 270,
+       "to": 280
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Librarian in Terminator Armour",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 75,
+       "to": 85
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Thunderwolf Cavalry",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 110,
+       "to": 130
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 210,
+       "to": 230
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Wolf Guard Terminators",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 150,
+       "to": 155
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 165,
+       "to": 195
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 300,
+       "to": 310
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 315,
+       "to": 350
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "946",
+   "date": "2026-09-02",
+   "labels": {
+    "app": 946,
+    "mfm": "1.4"
+   },
+   "points": []
+  },
+  {
+   "id": "963",
+   "date": "2026-09-30",
+   "labels": {
+    "app": 963,
+    "mfm": "1.5"
+   },
+   "points": [
+    {
+     "faction": "black-templars",
+     "name": "Castellan",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 70,
+       "to": 75
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Chaplain Grimaldus",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 4,
+       "from": 100,
+       "to": 120
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Crusade Ancient",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 40,
+       "to": 45
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Crusader Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "label": "1 Sword Brother, 4 Neophytes, 5 Initiates",
+       "from": 150,
+       "to": 160
+      },
+      {
+       "label": "1 Sword Brother, 8 Neophytes, 11 Initiates",
+       "from": 290,
+       "to": 305
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Emperor’s Champion",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 90,
+       "to": 100
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Execrator",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 50,
+       "to": 65
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Gladiator Lancer",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 160,
+       "to": 165
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 170,
+       "to": 185
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Gladiator Reaper",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 160,
+       "to": 165
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 170,
+       "to": 185
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Gladiator Valiant",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 150,
+       "to": 145
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 160,
+       "to": 165
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "High Marshal Helbrecht",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 110,
+       "to": 125
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Impulsor",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-3rd",
+       "from": 75,
+       "to": 70
+      },
+      {
+       "models": 1,
+       "tier": "4th+",
+       "from": 85,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Marshal",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 90,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Repulsor",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 170,
+       "to": 190
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 190,
+       "to": 210
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Repulsor Executioner",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 255,
+       "to": 265
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 275,
+       "to": 285
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Sword Brethren Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 4,
+       "tier": "1st-2nd",
+       "from": 100,
+       "to": 115
+      },
+      {
+       "models": 4,
+       "tier": "3rd+",
+       "from": 120,
+       "to": 135
+      },
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 125,
+       "to": 140
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 145,
+       "to": 160
+      },
+      {
+       "models": 9,
+       "tier": "1st-2nd",
+       "from": 225,
+       "to": 250
+      },
+      {
+       "models": 9,
+       "tier": "3rd+",
+       "from": 245,
+       "to": 270
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 250,
+       "to": 275
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 270,
+       "to": 295
+      }
+     ]
+    },
+    {
+     "faction": "black-templars",
+     "name": "Land Raider Crusader",
+     "change": "removed"
+    },
+    {
+     "faction": "black-templars",
+     "name": "Sternguard Veteran Squad",
+     "change": "removed"
+    },
+    {
+     "faction": "black-templars",
+     "name": "Terminator Squad",
+     "change": "removed"
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Astorath",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 85,
+       "to": 90
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Baal Predator",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 125,
+       "to": 135
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 135,
+       "to": 150
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Blood Angels Captain",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 80,
+       "to": 90
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Chief Librarian Mephiston",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 110,
+       "to": 175
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Commander Dante",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 125,
+       "to": 140
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Death Company Captain",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 70,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Death Company Captain with Jump Pack",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 75,
+       "to": 85
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Death Company Dreadnought",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 150,
+       "to": 165
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 160,
+       "to": 185
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Death Company Marines",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 85,
+       "to": 90
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 95,
+       "to": 105
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 160,
+       "to": 170
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 170,
+       "to": 185
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Death Company Marines with Jump Packs",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 115,
+       "to": 130
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 130,
+       "to": 160
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 230,
+       "to": 260
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 245,
+       "to": 290
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Lemartes",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 100,
+       "to": 110
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Sanguinary Guard",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 120,
+       "to": 135
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 140,
+       "to": 150
+      },
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 260,
+       "to": 275
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 280,
+       "to": 290
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Sanguinary Priest",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 75,
+       "to": 60
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 85,
+       "to": 60
+      }
+     ]
+    },
+    {
+     "faction": "blood-angels",
+     "name": "Death Company Marines with Bolt Rifles",
+     "change": "removed"
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Asmodai",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 70,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Azrael",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 140,
+       "to": 150
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Belial",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 75,
+       "to": 100
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Deathwing Knights",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 240,
+       "to": 255
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 260,
+       "to": 275
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Deathwing Terminator Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 165,
+       "to": 190
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 165,
+       "to": 230
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 330,
+       "to": 380
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 330,
+       "to": 420
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Ezekiel",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 75,
+       "to": 110
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Inner Circle Companions",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 80,
+       "to": 90
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 90,
+       "to": 105
+      },
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 160,
+       "to": 180
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 170,
+       "to": 195
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Land Speeder Vengeance",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 130,
+       "to": 150
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 140,
+       "to": 160
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Lazarus",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 70,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Lion El’jonson",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 265,
+       "to": 415
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Nephilim Jetfighter",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 180,
+       "to": 200
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Ravenwing Black Knights",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 75,
+       "to": 85
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 85,
+       "to": 95
+      },
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 150,
+       "to": 170
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 160,
+       "to": 180
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Ravenwing Command Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 105,
+       "to": 115
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 115,
+       "to": 135
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Ravenwing Darkshroud",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 70,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Ravenwing Dark Talon",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 200,
+       "to": 190
+      }
+     ]
+    },
+    {
+     "faction": "dark-angels",
+     "name": "Sammael",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 105,
+       "to": 120
+      }
+     ]
+    },
+    {
+     "faction": "deathwatch",
+     "name": "Deathwatch Terminator Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 180,
+       "to": 190
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 180,
+       "to": 230
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 330,
+       "to": 380
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 330,
+       "to": 420
+      }
+     ]
+    },
+    {
+     "faction": "deathwatch",
+     "name": "Deathwatch Veterans",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "from": 100,
+       "to": 115
+      },
+      {
+       "models": 10,
+       "from": 190,
+       "to": 220
+      }
+     ]
+    },
+    {
+     "faction": "deathwatch",
+     "name": "Decimus Kill Team",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "from": 100,
+       "to": 110
+      },
+      {
+       "models": 10,
+       "from": 190,
+       "to": 210
+      }
+     ]
+    },
+    {
+     "faction": "deathwatch",
+     "name": "Fortis Kill Team",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 195,
+       "to": 210
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 210,
+       "to": 225
+      }
+     ]
+    },
+    {
+     "faction": "deathwatch",
+     "name": "Indomitor Kill Team",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 275,
+       "to": 280
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 290,
+       "to": 300
+      }
+     ]
+    },
+    {
+     "faction": "deathwatch",
+     "name": "Spectrus Kill Team",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 170,
+       "to": 185
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 180,
+       "to": 195
+      }
+     ]
+    },
+    {
+     "faction": "deathwatch",
+     "name": "Talonstrike Kill Team",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 265,
+       "to": 280
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 280,
+       "to": 300
+      }
+     ]
+    },
+    {
+     "faction": "deathwatch",
+     "name": "Watch Captain Artemis",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 65,
+       "to": 75
+      }
+     ]
+    },
+    {
+     "faction": "deathwatch",
+     "name": "Watch Master",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 95,
+       "to": 105
+      }
+     ]
+    },
+    {
+     "faction": "imperial-agents",
+     "name": "Aquila Kill Team",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "from": 100,
+       "to": 110
+      },
+      {
+       "models": 10,
+       "from": 200,
+       "to": 210
+      }
+     ]
+    },
+    {
+     "faction": "imperial-agents",
+     "name": "Deathwatch Kill Team",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "from": 100,
+       "to": 115
+      },
+      {
+       "models": 10,
+       "from": 190,
+       "to": 220
+      }
+     ]
+    },
+    {
+     "faction": "imperial-agents",
+     "name": "Watch Captain Artemis",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 65,
+       "to": 75
+      }
+     ]
+    },
+    {
+     "faction": "imperial-agents",
+     "name": "Watch Master",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 95,
+       "to": 105
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Aggressor Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 80,
+       "to": 90
+      },
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 165,
+       "to": 180
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 175,
+       "to": 180
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Ancient",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 40,
+       "to": 45
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Ancient in Terminator Armour",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 65,
+       "to": 75
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Apothecary",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 40,
+       "to": 45
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Apothecary Biologis",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 70,
+       "to": 60
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Assault Intercessor Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "from": 75,
+       "to": 90
+      },
+      {
+       "models": 10,
+       "from": 150,
+       "to": 175
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Assault Intercessors with Jump Packs",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 85,
+       "to": 100
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 95,
+       "to": 110
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 160,
+       "to": 190
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 170,
+       "to": 200
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Astraeus",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st",
+       "from": 525,
+       "to": 550
+      },
+      {
+       "models": 1,
+       "tier": "2nd+",
+       "from": 575,
+       "to": 650
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Bladeguard Ancient",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 40,
+       "to": 60
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Bladeguard Veteran Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 80,
+       "to": 85
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 90,
+       "to": 95
+      },
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 160,
+       "to": 170
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 170,
+       "to": 180
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Brutalis Dreadnought",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 150,
+       "to": 160
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 160,
+       "to": 170
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Captain",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 80,
+       "to": 90
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Captain in Gravis Armour",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 80,
+       "to": 90
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Captain in Phobos Armour",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 70,
+       "to": 75
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Captain in Terminator Armour",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 85,
+       "to": 100
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Captain on Bike",
+     "change": "added"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Captain with Jump Pack",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 75,
+       "to": 90
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Chaplain",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 60,
+       "to": 70
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Chaplain in Terminator Armour",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 75,
+       "to": 85
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Chaplain on Bike",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 70,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Chaplain with Jump Pack",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 75,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Company Heroes",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 4,
+       "tier": "1st-2nd",
+       "from": 105,
+       "to": 135
+      },
+      {
+       "models": 4,
+       "tier": "3rd+",
+       "from": 105,
+       "to": 150
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Desolation Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st",
+       "from": 180,
+       "to": 135
+      },
+      {
+       "models": 5,
+       "tier": "2nd",
+       "from": 210,
+       "to": 135
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 210,
+       "to": 145
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Eliminator Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "from": 75,
+       "to": 85
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Eradicator Squad with Heavy Bolters",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 80,
+       "to": 95
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 80,
+       "to": 110
+      },
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": null,
+       "to": 200
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": null,
+       "to": 215
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Eradicator Squad with Melta Rifles",
+     "change": "added"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Firestrike Servo-Turrets",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 75,
+       "to": 80
+      },
+      {
+       "models": 2,
+       "from": 150,
+       "to": 160
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Gladiator Lancer",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 160,
+       "to": 165
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 170,
+       "to": 175
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Gladiator Reaper",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 160,
+       "to": 165
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 170,
+       "to": 175
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Gladiator Valiant",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 150,
+       "to": 165
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 160,
+       "to": 175
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Heavy Intercessor Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "from": 100,
+       "to": 110
+      },
+      {
+       "models": 10,
+       "from": 200,
+       "to": 220
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Hellblaster Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 110,
+       "to": 125
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 220,
+       "to": 235
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Incursor Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 85,
+       "to": 95
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 95,
+       "to": 105
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 150,
+       "to": 160
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 160,
+       "to": 170
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Infernus Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 85,
+       "to": 100
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 85,
+       "to": 110
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 180,
+       "to": 200
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 180,
+       "to": 210
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Infiltrator Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 110,
+       "to": 80
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 120,
+       "to": 80
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 180,
+       "to": 150
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 190,
+       "to": 150
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Intercessor Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "from": 80,
+       "to": 95
+      },
+      {
+       "models": 10,
+       "from": 150,
+       "to": 175
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Invader Atvs",
+     "change": "added"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Invictor Tactical Warsuit",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 125,
+       "to": 140
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Judiciar",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 55,
+       "to": 50
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Land Raider",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 220,
+       "to": 245
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 240,
+       "to": 265
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Land Raider Crusader",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 220,
+       "to": 245
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 240,
+       "to": 265
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Land Raider Redeemer",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 260,
+       "to": 245
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 280,
+       "to": 265
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Land Speeder",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 105,
+       "to": 110
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Librarian",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 70,
+       "to": 75
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 80,
+       "to": 75
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Librarian in Phobos Armour",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 70,
+       "to": 75
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Lieutenant",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 45,
+       "to": 50
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Lieutenant in Phobos Armour",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 45,
+       "to": 40
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Lieutenant with Combi-Weapon",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 95,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Outrider Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "from": 70,
+       "to": 85
+      },
+      {
+       "models": 6,
+       "from": 140,
+       "to": 160
+      },
+      {
+       "from": 60,
+       "to": null
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Redemptor Dreadnought",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 195,
+       "to": 180
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 210,
+       "to": 195
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Reiver Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "from": 75,
+       "to": 85
+      },
+      {
+       "models": 10,
+       "from": 150,
+       "to": 165
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Repulsor",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 170,
+       "to": 190
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 190,
+       "to": 210
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Repulsor Executioner",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 255,
+       "to": 275
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 275,
+       "to": 295
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Rhino",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-3rd",
+       "from": 65,
+       "to": 70
+      },
+      {
+       "models": 1,
+       "tier": "4th+",
+       "from": 75,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Scout Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 75,
+       "to": 65
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 130,
+       "to": 120
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Sternguard Veteran Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 100,
+       "to": 105
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 100,
+       "to": 115
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 200,
+       "to": 210
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 200,
+       "to": 220
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Storm Speeder Hailstrike",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 105,
+       "to": 110
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 115,
+       "to": 120
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Storm Speeder Thunderstrike",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 135,
+       "to": 155
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 145,
+       "to": 165
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Techmarine",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 55,
+       "to": 65
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Terminator Assault Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 155,
+       "to": 175
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 155,
+       "to": 215
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 310,
+       "to": 350
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 310,
+       "to": 390
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Terminator Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 160,
+       "to": 195
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 160,
+       "to": 235
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 320,
+       "to": 390
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 320,
+       "to": 430
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Thunderhawk Gunship",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st",
+       "from": 840,
+       "to": 850
+      },
+      {
+       "models": 1,
+       "tier": "2nd+",
+       "from": 840,
+       "to": 950
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Vanguard Veteran Squad with Jump Packs",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 105,
+       "to": 120
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 115,
+       "to": 130
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 210,
+       "to": 240
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 220,
+       "to": 250
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Centurion Assault Squad",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Centurion Devastator Squad",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Devastator Squad",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Dreadnought",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Eradicator Squad",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Hammerfall Bunker",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Invader ATV",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Lieutenant in Reiver Armour",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Predator Annihilator",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Predator Destructor",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Razorback",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Stormhawk Interceptor",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Stormraven Gunship",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Stormtalon Gunship",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Suppressor Squad",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Tactical Squad",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Vindicator",
+     "change": "removed"
+    },
+    {
+     "faction": "space-marines",
+     "name": "Whirlwind",
+     "change": "removed"
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Arjac Rockfist",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 95,
+       "to": 105
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Blood Claws",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 10,
+       "from": 135,
+       "to": 150
+      },
+      {
+       "models": 20,
+       "from": 270,
+       "to": 290
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Grey Hunters",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 10,
+       "from": 165,
+       "to": 180
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Iron Priest",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 50,
+       "to": 60
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Logan Grimnar",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 100,
+       "to": 150
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Njal Stormcaller",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 75,
+       "to": 100
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Ragnar Blackmane",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 90,
+       "to": 100
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Thunderwolf Cavalry",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 100,
+       "to": 115
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 130,
+       "to": 145
+      },
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 200,
+       "to": 230
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 230,
+       "to": 260
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Ulrik the Slayer",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 70,
+       "to": 90
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Venerable Dreadnought",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 125,
+       "to": 130
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 135,
+       "to": 140
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Wolf Guard Battle Leader",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 65,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Wolf Guard Headtakers",
+     "change": "changed",
+     "fields": [
+      {
+       "label": "3 Wolf Guard Headtakers",
+       "tier": "1st-2nd",
+       "from": 85,
+       "to": 115
+      },
+      {
+       "label": "3 Wolf Guard Headtakers",
+       "tier": "3rd+",
+       "from": 95,
+       "to": 125
+      },
+      {
+       "label": "3 Wolf Guard Headtakers, 3 Hunting Wolves",
+       "tier": "1st-2nd",
+       "from": 115,
+       "to": 170
+      },
+      {
+       "label": "3 Wolf Guard Headtakers, 3 Hunting Wolves",
+       "tier": "3rd+",
+       "from": 125,
+       "to": 180
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Wolf Guard Terminators",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 155,
+       "to": 180
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 195,
+       "to": 220
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 310,
+       "to": 365
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 350,
+       "to": 405
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Wolf Priest",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 70,
+       "to": 75
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Wolf Scouts",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 90,
+       "to": 95
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 90,
+       "to": 105
+      },
+      {
+       "models": 12,
+       "tier": "1st-2nd",
+       "from": 180,
+       "to": 190
+      },
+      {
+       "models": 12,
+       "tier": "3rd+",
+       "from": 180,
+       "to": 200
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Wulfen",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 85,
+       "to": 90
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 95,
+       "to": 105
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 170,
+       "to": 180
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 180,
+       "to": 195
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Wulfen Dreadnought",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 135,
+       "to": 140
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 145,
+       "to": 150
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Wulfen with Storm Shields",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 100,
+       "to": 125
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 110,
+       "to": 155
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 200,
+       "to": 250
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 210,
+       "to": 280
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "972",
+   "date": "2026-10-02",
+   "labels": {
+    "app": 972,
+    "mfm": "1.5"
+   },
+   "points": [
+    {
+     "faction": "space-marines",
+     "name": "Ancient",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 45,
+       "to": 40
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Assault Intercessor Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "from": 90,
+       "to": 85
+      },
+      {
+       "models": 10,
+       "from": 175,
+       "to": 170
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Assault Intercessors with Jump Packs",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 100,
+       "to": 95
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 110,
+       "to": 105
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Ballistus Dreadnought",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 160,
+       "to": 170
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Bladeguard Ancient",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 60,
+       "to": 70
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Bladeguard Veteran Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 85,
+       "to": 90
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 95,
+       "to": 110
+      },
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 170,
+       "to": 180
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 180,
+       "to": 200
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Brutalis Dreadnought",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 170,
+       "to": 180
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Captain in Terminator Armour",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 100,
+       "to": 90
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Chaplain",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 70,
+       "to": 60
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Chaplain in Terminator Armour",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 85,
+       "to": 75
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Chaplain on Bike",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 80,
+       "to": 75
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Chaplain with Jump Pack",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 80,
+       "to": 75
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Company Heroes",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 4,
+       "tier": "1st-2nd",
+       "from": 135,
+       "to": 125
+      },
+      {
+       "models": 4,
+       "tier": "3rd+",
+       "from": 150,
+       "to": 145
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Desolation Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 135,
+       "to": 140
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 145,
+       "to": 150
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Eradicator Squad with Heavy Bolters",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 95,
+       "to": 100
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 110,
+       "to": 130
+      },
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 200,
+       "to": 215
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 215,
+       "to": 245
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Eradicator Squad with Melta Rifles",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 90,
+       "to": 100
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 105,
+       "to": 120
+      },
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 190,
+       "to": 200
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 205,
+       "to": 220
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Gladiator Lancer",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 165,
+       "to": 160
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 175,
+       "to": 180
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Gladiator Reaper",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 175,
+       "to": 185
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Gladiator Valiant",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 175,
+       "to": 185
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Heavy Intercessor Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "from": 110,
+       "to": 115
+      },
+      {
+       "models": 10,
+       "from": 220,
+       "to": 230
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Hellblaster Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 110,
+       "to": 115
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 125,
+       "to": 130
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 220,
+       "to": 230
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 235,
+       "to": 245
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Inceptor Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "tier": "1st-2nd",
+       "from": 125,
+       "to": 130
+      },
+      {
+       "models": 3,
+       "tier": "3rd+",
+       "from": 140,
+       "to": 150
+      },
+      {
+       "models": 6,
+       "tier": "1st-2nd",
+       "from": 250,
+       "to": 260
+      },
+      {
+       "models": 6,
+       "tier": "3rd+",
+       "from": 265,
+       "to": 280
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Incursor Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 95,
+       "to": 90
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 105,
+       "to": 100
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 160,
+       "to": 170
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 170,
+       "to": 180
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Infernus Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 100,
+       "to": 95
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 110,
+       "to": 105
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 200,
+       "to": 190
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 210,
+       "to": 200
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Infiltrator Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "from": 80,
+       "to": 85
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Intercessor Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "from": 95,
+       "to": 85
+      },
+      {
+       "models": 10,
+       "from": 175,
+       "to": 170
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Invictor Tactical Warsuit",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 140,
+       "to": 135
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 140,
+       "to": 150
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Land Raider",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "2nd",
+       "from": 245,
+       "to": 265
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Land Raider Crusader",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st",
+       "from": 245,
+       "to": 230
+      },
+      {
+       "models": 1,
+       "tier": "2nd",
+       "from": 245,
+       "to": 250
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 265,
+       "to": 250
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Land Raider Redeemer",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "2nd",
+       "from": 245,
+       "to": 265
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Land Speeder",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 110,
+       "to": 105
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Librarian in Terminator Armour",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 85,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Lieutenant with Combi-Weapon",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 80,
+       "to": 85
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Outrider Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 3,
+       "from": 85,
+       "to": 80
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Redemptor Dreadnought",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 180,
+       "to": 170
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 195,
+       "to": 190
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Repulsor Executioner",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 275,
+       "to": 260
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 295,
+       "to": 280
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Sternguard Veteran Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 115,
+       "to": 120
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 220,
+       "to": 225
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Storm Speeder Thunderstrike",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "tier": "1st-2nd",
+       "from": 155,
+       "to": 140
+      },
+      {
+       "models": 1,
+       "tier": "3rd+",
+       "from": 165,
+       "to": 150
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Techmarine",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 1,
+       "from": 65,
+       "to": 55
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Terminator Assault Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 175,
+       "to": 170
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 215,
+       "to": 210
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 350,
+       "to": 340
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 390,
+       "to": 380
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Terminator Squad",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 195,
+       "to": 190
+      },
+      {
+       "models": 5,
+       "tier": "3rd+",
+       "from": 235,
+       "to": 230
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 390,
+       "to": 380
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 430,
+       "to": 420
+      }
+     ]
+    },
+    {
+     "faction": "space-marines",
+     "name": "Vanguard Veteran Squad with Jump Packs",
+     "change": "changed",
+     "fields": [
+      {
+       "models": 5,
+       "tier": "1st-2nd",
+       "from": 120,
+       "to": 110
+      },
+      {
+       "models": 10,
+       "tier": "1st-2nd",
+       "from": 240,
+       "to": 220
+      },
+      {
+       "models": 10,
+       "tier": "3rd+",
+       "from": 250,
+       "to": 240
+      }
+     ]
+    },
+    {
+     "faction": "space-wolves",
+     "name": "Wolf Guard Headtakers",
+     "change": "changed",
+     "fields": [
+      {
+       "label": "3 Wolf Guard Headtakers",
+       "tier": "1st-2nd",
+       "from": 115,
+       "to": 85
+      },
+      {
+       "label": "3 Wolf Guard Headtakers",
+       "tier": "3rd+",
+       "from": 125,
+       "to": 95
+      },
+      {
+       "label": "3 Wolf Guard Headtakers, 3 Hunting Wolves",
+       "tier": "1st-2nd",
+       "from": 170,
+       "to": 115
+      },
+      {
+       "label": "3 Wolf Guard Headtakers, 3 Hunting Wolves",
+       "tier": "3rd+",
+       "from": 180,
+       "to": 125
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "981",
+   "date": "2026-10-14",
+   "labels": {
+    "app": 981,
+    "mfm": "1.6"
+   },
+   "points": []
+  }
+ ],
+ "fingerprint": "bfefb473c041fc9c0a08aeb2982fa58ac77c8b4687f6dd8f68c20b518a297f33"
+}

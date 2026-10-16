@@ -4,5 +4,18 @@
     "about": "У части инфолистов Space Marines в Datasheets_models_cost несколько таблиц цен без подписи ордена. Первая — обычная цена; остальные (variants, по порядку в выгрузке, без повторов) — цены орденов. Ключ — id инфолиста, значение — орден для каждой дополнительной таблицы: [\"Blood Angels\"] или [\"Blood Angels\", \"Dark Angels\"]. null — орден не установлен (таблица не применяется). Имена орденов — как ключевые слова фракции (Blood Angels, Dark Angels, Deathwatch …).",
     "map": {}
   },
-  "sources": []
+  "sources": [],
+  "updates": {
+    "about": "Проверенные обновления поверх выгрузки Wahapedia (scripts/updates-40k.mjs: применяются в конце импорта и в scripts/repair-40k-data.mjs). Элемент: { id, kind, snapshot (файл в 40k/, проверяется fingerprint), enabled, scope (что обновлено), note }. Применённые записываются в index.json → updates. Снимки: 40k/whrules-<версия>.json (scripts/whrules-extract.js + scripts/whrules-save.mjs), полный — 40k/whrules-<версия>-full.json (scripts/whrules-extract-full.js + whrules-map.mjs --save-full). whrules-faction — scripts/whrules-convert.mjs (сухой прогон: bun scripts/whrules-convert.mjs --out <файл>); одобрено владельцем 2026-10-16 по отчёту сухого прогона v4.",
+    "items": [
+      {
+        "id": "whrules-981-space-marines",
+        "kind": "whrules-faction",
+        "snapshot": "whrules-981-full.json",
+        "enabled": true,
+        "scope": ["SM", "AoI"],
+        "note": "Space Marines (с орденами) и Imperial Agents из wh-rules.ru 981; копии Imperial Agents в AC, AM, AS, AdM, GK, QI, TL"
+      }
+    ]
+  }
 }
