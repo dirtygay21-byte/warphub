@@ -120,6 +120,9 @@ test('fullTexts в curated: обход проверки редакции (revise
   assert.equal(ft.items.reduce((n: number, it: { in: string[] }) => n + it.in.length, 0), 193);
 });
 
+const officialText = (ref: string, name: string) =>
+  curated.officialUpdates?.items.find((i: { kind: string; field: string; ruleName?: string; owners?: string[] }) => i.kind === 'rule' && i.field === 'text' && i.ruleName === name && i.owners!.includes(ref));
+
 test('данные AoS: все 193 записи из fullTexts получили полный текст из curated', () => {
   let n = 0;
   for (const it of ft.items)
@@ -127,7 +130,10 @@ test('данные AoS: все 193 записи из fullTexts получили 
       const recs = find(ref, it.name);
       assert.equal(recs.length, 1, `${ref} «${it.name}»: ожидалась ровно одна запись`);
       const r = recs[0]!;
-      assert.equal(r.text, it.text, `${ref} «${it.name}»`);
+      // текст заменён официальной правкой GW (curated.officialUpdates): в данных — её значение, а заменён был именно восстановленный текст
+      const ou = officialText(ref, it.name);
+      if (ou) assert.equal(ou.previous, it.text, `${ref} «${it.name}»: правка заменяет не восстановленный текст`);
+      assert.equal(r.text, ou ? ou.value : it.text, `${ref} «${it.name}»`);
       assert.equal(r.incomplete, undefined, `${ref} «${it.name}»`);
       assert.equal(r.textSource, 'wahapedia-site', `${ref} «${it.name}»`);
       n++;
@@ -135,17 +141,21 @@ test('данные AoS: все 193 записи из fullTexts получили 
   assert.equal(n, 193);
 });
 
-// 4 конфликта (на сайте другая редакция) и 1 удержанное правило (текст на сайте сам выглядит оборванным):
-// остаются с исходным текстом выгрузки и пометкой «неполный». Хэш — текст до восстановления (16.10.2026).
+// 1 удержанное правило (текст на сайте сам выглядит оборванным): остаётся с исходным текстом выгрузки и пометкой «неполный».
+// Хэш — текст до восстановления (16.10.2026).
 const HELD: [string, string, string][] = [
-  ['OB|ws:Katakros, Mortarch of the Necropolis', 'Supreme Lord of the Bonereaper Legions', 'bb30160560c41909'],
-  ['NT|ws:Lord Vitriolic', 'Spectral Alchemy', '754edcf4e7e36b9f'],
   ['CoS|ws:Linebreaker Cogfort', 'OUTPUT TO MAXIMUM!', 'c5b17d806b92f0a4'],
-  ['SG|ws:Scourge of Aqshy Vengorian Lord', 'Frenzied Surge', '54a95ff1bd5a0ab8'],
-  ['StD|form:Despoilers', 'FERAL RUIN', '83307c15f8521431'],
+];
+// 4 конфликта (на сайте другая редакция): Rules Updates GW 23.09.2026 подтвердили редакцию сайта — в данных официальный текст
+// (curated.officialUpdates, Stage A), пометки «неполный» нет. Хэш — обрезанный текст выгрузки, который заменён (16.10.2026).
+const OFFICIAL: [string, string, string, string][] = [
+  ['OB|ws:Katakros, Mortarch of the Necropolis', 'Supreme Lord of the Bonereaper Legions', 'bb30160560c41909', 'A412'],
+  ['NT|ws:Lord Vitriolic', 'Spectral Alchemy', '754edcf4e7e36b9f', 'A406'],
+  ['SG|ws:Scourge of Aqshy Vengorian Lord', 'Frenzied Surge', '54a95ff1bd5a0ab8', 'A422'],
+  ['StD|form:Despoilers', 'FERAL RUIN', '83307c15f8521431', 'A415'],
 ];
 
-test('данные AoS: конфликты и удержанное правило не тронуты — исходный текст и пометка «неполный»', () => {
+test('данные AoS: удержанное правило не тронуто, 4 конфликта заменены официальным текстом GW', () => {
   assert.deepEqual(
     ft.missing.map((m: { in: string; name: string }) => `${m.in}|${m.name}`).sort(),
     HELD.map(([ref, name]) => `${ref}|${name}`).sort(),
@@ -158,6 +168,20 @@ test('данные AoS: конфликты и удержанное правил�
     assert.equal(recs[0]!.incomplete, 'truncated', `${ref} «${name}»`);
     assert.equal(recs[0]!.textSource, undefined, `${ref} «${name}»`);
     assert.equal(sha(recs[0]!.text), hash, `${ref} «${name}»: текст изменился`);
+  }
+  for (const [ref, name, hash, planRef] of OFFICIAL) {
+    assert.ok(!restored.has(`${ref}|${name}`), `${ref} «${name}» не должен быть в fullTexts.items`);
+    const ou = officialText(ref, name);
+    assert.ok(ou, `${ref} «${name}»: нет правки в curated.officialUpdates`);
+    assert.equal(ou.ref, planRef, `${ref} «${name}»`);
+    assert.equal(ou.source, 'RU-2026-09', `${ref} «${name}»`);
+    assert.equal(ou.clearIncomplete, true, `${ref} «${name}»`);
+    assert.equal(sha(ou.previous), hash, `${ref} «${name}»: правка заменяет не тот текст`);
+    const recs = find(ref, name);
+    assert.equal(recs.length, 1, `${ref} «${name}»`);
+    assert.equal(recs[0]!.incomplete, undefined, `${ref} «${name}»`);
+    assert.equal(recs[0]!.textSource, 'gw-rules-updates', `${ref} «${name}»`);
+    assert.equal(recs[0]!.text, ou.value, `${ref} «${name}»`);
   }
 });
 
@@ -280,8 +304,9 @@ test('отчёт импорта соответствует данным: пол�
   const files = Object.fromEntries(fs.readdirSync(path.join(AOS, 'f')).filter((f) => f.endsWith('.json')).map((f) => [f, JSON.parse(fs.readFileSync(path.join(AOS, 'f', f), 'utf8'))]));
   assert.deepEqual(refreshAosReport(report, files, curated), report, 'отчёт устарел — запустите scripts/repair-aos-data.mjs');
   assert.deepEqual(report.exportIncomplete, { truncated: 177, table: 21 });
-  assert.ok(report.info.includes('полные тексты восстановлены: обрезанных — 172 из 177, без таблицы — 21 из 21'));
-  assert.ok(report.warnings.some((l: string) => l.includes('обрезано лимитом 1024 символа — 5, таблица не выгружена — 0')));
+  // 172 восстановлены с сайта Wahapedia + 4 заменены официальным текстом GW (Stage A); обрезанным осталось 1 (OUTPUT TO MAXIMUM!)
+  assert.ok(report.info.includes('полные тексты восстановлены: обрезанных — 176 из 177, без таблицы — 21 из 21'));
+  assert.ok(report.warnings.some((l: string) => l.includes('обрезано лимитом 1024 символа — 1, таблица не выгружена — 0')));
   assert.equal(report.info.filter((l: string) => l.startsWith('полного текста нет: ')).length, curated.fullTexts.missing.length);
   // юнит с ценой или Legends не числится «без очков»; Auto-Endrin — «очков нет по правилам»
   for (const l of report.info.filter((x: string) => / — нет очков в Battle Profiles/.test(x))) {
