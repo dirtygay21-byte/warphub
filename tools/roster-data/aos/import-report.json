@@ -4,7 +4,7 @@
   "BoC: лор «Bestial Manifestations» — нет очков",
   "KB: «Hobgrot Slittaboss» — вариант полка «Monster» не подходит ни одному юниту фракции",
   "OM: террейн «Great Mawpot» — 0 в CSV, 20 в Battle Profiles (берём Battle Profiles)",
-  "неполные тексты в выгрузке: обрезано лимитом 1024 символа — 5, таблица не выгружена — 0; в конструкторе помечены, полный текст на Wahapedia"
+  "неполные тексты в выгрузке: обрезано лимитом 1024 символа — 1, таблица не выгружена — 0; в конструкторе помечены, полный текст на Wahapedia"
  ],
  "info": [
   "BoC: все юниты в Legends — фракция доступна только с «Показать Legends»",
@@ -15,12 +15,15 @@
   "SoB: нет боевых построений",
   "IJ: «Dakkbad Grotkicker» — вариант полка «IRONSUNZ» не подходит ни одному юниту фракции",
   "полные тексты правил (aos/curated.json → fullTexts, сайт Wahapedia 2026-10-16): подставлено 193",
-  "полного текста нет: OB|ws:Katakros, Mortarch of the Necropolis «Supreme Lord of the Bonereaper Legions» — conflict: site drops the sentence about reinforced targets spending an additional relentless discipline point",
-  "полного текста нет: NT|ws:Lord Vitriolic «Spectral Alchemy» — conflict: site Effect rewritten (\"If this unit's shooting attacks inflicted damage…\") — different version",
   "полного текста нет: CoS|ws:Linebreaker Cogfort «OUTPUT TO MAXIMUM!» — held: site text itself ends \"…Move characteristic is 10\" (no inch mark or full stop); needs further source verification",
-  "полного текста нет: SG|ws:Scourge of Aqshy Vengorian Lord «Frenzied Surge» — conflict: site movement rule changed (X\" for this unit, then X\" for the target, instead of X+D3\")",
-  "полного текста нет: StD|form:Despoilers «FERAL RUIN» — conflict: site wording differs from the export (adds \"friendly\" and \"that does not have an Ensorcelled Banner\")",
-  "полные тексты восстановлены: обрезанных — 172 из 177, без таблицы — 21 из 21"
+  "официальные правки GW (aos/curated.json → officialUpdates, Battle Profiles, September 2026 2026-09-23; Rules Updates, September 2026 2026-09-23; Battle Profiles: Khazalite Holds, October 2026 2026-10-14): применено 364 из 364",
+  "официальная правка не выполнена: A216 «Stumblefoot Gargant» — Deferred (decision of 17.10.2026), record left unchanged: marked DELETED in Battle Profiles, September 2026 (23.09.2026); keeping the record with an empty allowed list would break the faction-membership invariant (tests/aos.test.ts), and removing it from the faction files would break saved rosters.",
+  "официальная правка не выполнена: A219 «Norgrimm’s Rune Throng» — Deferred (decision of 17.10.2026), record left unchanged: moves to Warhammer Legends on 1 June 2027 per Battle Profiles, September 2026 (23.09.2026); Regiment of Renown records have no Legends field, and Legends status is not encoded as plain notes.",
+  "официальная правка не выполнена: A228 «Krittok’s Clawpack» — Deferred (decision of 17.10.2026), record left unchanged: Beasts of Chaos is listed for this Regiment of Renown in Battle Profiles July and September 2026; adding it needs the RoR record and its unit copies in BoC.json, which the per-file repair step cannot create without changing scripts/repair-aos-data.mjs.",
+  "официальная правка не выполнена: A235 «Volt-Klaw’s Enginecoven» — Deferred (decision of 17.10.2026), record left unchanged: Beasts of Chaos is listed for this Regiment of Renown in Battle Profiles July and September 2026; adding it needs the RoR record and its unit copies in BoC.json, which the per-file repair step cannot create without changing scripts/repair-aos-data.mjs.",
+  "официальная правка не выполнена: A446 «Magmic Invocations» — Deferred (decision of 17.10.2026), record left unchanged: moves to Warhammer Legends on 1 June 2027 per Battle Profiles: Khazalite Holds, October 2026 (14.10.2026); manifestation lores have no Legends field in the data format or the roster engine.",
+  "официальная правка не выполнена: A448 «Fjori’s Flamebearers» — Deferred (decision of 17.10.2026), record left unchanged: moves to Warhammer Legends on 1 June 2027 per Battle Profiles: Khazalite Holds, October 2026 (14.10.2026), Regiments of Renown section; Regiment of Renown records have no Legends field, and Legends status is not encoded as plain notes.",
+  "полные тексты восстановлены: обрезанных — 176 из 177, без таблицы — 21 из 21"
  ],
  "exportIncomplete": {
   "truncated": 177,

@@ -253,7 +253,13 @@ test('неполные тексты: обрыв лимитом выгрузки 
   const rule = (fid: string, fname: string, rname: string) => load(fid).formations.find((x) => x.name === fname)!.rules.find((x) => x.name === rname)!;
   assert.equal(rule('ST', 'Fleshmeld Menagerie', 'Prized Creations').incomplete, undefined);
   assert.equal(rule('ST', 'Fleshmeld Menagerie', 'Prized Creations').textSource, 'wahapedia-site');
-  assert.equal(rule('StD', 'Despoilers', 'FERAL RUIN').incomplete, 'truncated');
+  // FERAL RUIN (Despoilers): Rules Updates 23.09.2026 — официальный текст GW (curated.officialUpdates, A415) вместо обрезанной выгрузки
+  const feral = rule('StD', 'Despoilers', 'FERAL RUIN');
+  const feralOU = curated.officialUpdates.items.find((i: { ref: string; field: string }) => i.ref === 'A415' && i.field === 'text');
+  assert.equal(feral.incomplete, undefined);
+  assert.equal(feral.textSource, 'gw-rules-updates');
+  assert.equal(feral.text, feralOU.value);
+  assert.match(feral.text, /that does not have an Ensorcelled Banner/);
   for (const f of ALL)
     for (const fm of f.formations)
       for (const r of fm.rules) if (r.incomplete) assert.ok(['truncated', 'table'].includes(r.incomplete), `${f.id} «${r.name}»`);
@@ -278,7 +284,19 @@ test('построения по выгрузке CSV: каждое постро�
     const r = byKey.get(`${a.faction_id}|${a.subtype_id}|${cleanName(a.name)}`);
     if (r && a.description.length >= 1023) {
       capped++;
-      assert.equal(r.incomplete, 'truncated', `${a.faction_id} «${a.name}»`);
+      // полный текст восстановлен с сайта Wahapedia (curated.json → fullTexts): пометки нет, а текст длиннее обрывка выгрузки;
+      // иначе правило по-прежнему обязано быть помечено как обрезанное
+      if (r.textSource === 'wahapedia-site') {
+        assert.equal(r.incomplete, undefined, `${a.faction_id} «${a.name}»: восстановлен, но помечен ${r.incomplete}`);
+        assert.ok(r.text.length > cleanName(a.description).length, `${a.faction_id} «${a.name}»: восстановленный текст не длиннее обрывка выгрузки`);
+      } else if (r.textSource === 'gw-rules-updates') {
+        // текст заменён официальным (Rules Updates GW, curated.officialUpdates): пометки нет, текст — ровно из правки
+        const ou = curated.officialUpdates.items.find((i: { kind: string; field: string; ruleName?: string; owners?: string[] }) =>
+          i.kind === 'rule' && i.field === 'text' && i.ruleName === r.name && i.owners!.some((o) => o.startsWith(`${a.faction_id}|form:`)));
+        assert.ok(ou, `${a.faction_id} «${a.name}»: источник gw-rules-updates без правки в curated.officialUpdates`);
+        assert.equal(r.incomplete, undefined, `${a.faction_id} «${a.name}»`);
+        assert.equal(r.text, ou.value, `${a.faction_id} «${a.name}»`);
+      } else assert.equal(r.incomplete, 'truncated', `${a.faction_id} «${a.name}»`);
     }
   }
   assert.ok(capped >= 5, `сверено обрезанных правил построений: ${capped}`);

@@ -2339,29 +2339,6153 @@
   ],
   "missing": [
    {
-    "in": "OB|ws:Katakros, Mortarch of the Necropolis",
-    "name": "Supreme Lord of the Bonereaper Legions",
-    "why": "conflict: site drops the sentence about reinforced targets spending an additional relentless discipline point"
-   },
-   {
-    "in": "NT|ws:Lord Vitriolic",
-    "name": "Spectral Alchemy",
-    "why": "conflict: site Effect rewritten (\"If this unit's shooting attacks inflicted damage…\") — different version"
-   },
-   {
     "in": "CoS|ws:Linebreaker Cogfort",
     "name": "OUTPUT TO MAXIMUM!",
     "why": "held: site text itself ends \"…Move characteristic is 10\" (no inch mark or full stop); needs further source verification"
+   }
+  ]
+ },
+ "officialUpdates": {
+  "about": "Stage A (approved 16.10.2026): official Games Workshop documents are authoritative for points, army-building restrictions, Legends status and rules changes; Wahapedia stays the source of rules text and data structure. Each item: ref = row of the approved plan (AoS_StageA_change_plan_v2.csv), previous = value in the branch before the change, value = official value. Applied in normaliseAosFaction (import and scripts/repair-aos-data.mjs) only when the stored value equals previous; otherwise reported as not applied. notApplied: approved rows that could not be implemented within the approved scope. aliases: official spellings of stored names (no data change).",
+  "checked": "2026-10-16",
+  "sources": {
+   "BP-2026-09": {
+    "title": "Battle Profiles, September 2026",
+    "date": "2026-09-23",
+    "url": "https://assets.warhammer-community.com/eng_23-09_aos_core&key_battle_profiles-5zexz8yaxd-kamikjxgsp.pdf"
+   },
+   "RU-2026-09": {
+    "title": "Rules Updates, September 2026",
+    "date": "2026-09-23",
+    "url": "https://assets.warhammer-community.com/eng_23-09_aos_core&key_rule_updates-eu6fu82jl3-dlyuiignte.pdf"
+   },
+   "KH-BP-2026-10": {
+    "title": "Battle Profiles: Khazalite Holds, October 2026",
+    "date": "2026-10-14",
+    "url": "https://assets.warhammer-community.com/eng_14-10_aos_battle_profiles_khazalite_holds_profiles-8i6msk2pso-e6wai6sooz.pdf"
+   }
+  },
+  "items": [
+   {
+    "ref": "A001",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000001677",
+    "name": "Alchemite Warforger",
+    "field": "cost",
+    "previous": 130,
+    "value": 140,
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "stored = July 2026 value"
    },
    {
-    "in": "SG|ws:Scourge of Aqshy Vengorian Lord",
-    "name": "Frenzied Surge",
-    "why": "conflict: site movement rule changed (X\" for this unit, then X\" for the target, instead of X+D3\")"
+    "ref": "A002",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000003443",
+    "name": "Conqueror Cogfort",
+    "field": "cost",
+    "previous": 440,
+    "value": 420,
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "stored = July 2026 value"
    },
    {
-    "in": "StD|form:Despoilers",
-    "name": "FERAL RUIN",
-    "why": "conflict: site wording differs from the export (adds \"friendly\" and \"that does not have an Ensorcelled Banner\")"
+    "ref": "A003",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000003439",
+    "name": "Erasmus Zonn, the Enlightened One",
+    "field": "cost",
+    "previous": 170,
+    "value": 160,
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A004",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000001679",
+    "name": "Freeguild Cavalier-Marshal",
+    "field": "cost",
+    "previous": 120,
+    "value": 130,
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A005",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000001678",
+    "name": "Freeguild Marshal and Relic Envoy",
+    "field": "cost",
+    "previous": 110,
+    "value": 100,
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A006",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000001681",
+    "name": "Pontifex Zenestra, Matriarch of the Great Wheel",
+    "field": "cost",
+    "previous": 190,
+    "value": 170,
+    "source": "BP-2026-09",
+    "page": 4,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A007",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000003564",
+    "name": "Scourge of Aqshy Alchemite Warforger",
+    "field": "cost",
+    "previous": 100,
+    "value": 90,
+    "source": "BP-2026-09",
+    "page": 4,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A008",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000001688",
+    "name": "Freeguild Cavaliers",
+    "field": "cost",
+    "previous": 140,
+    "value": 180,
+    "source": "BP-2026-09",
+    "page": 5,
+    "why": "July BP 150; stored value is the Wahapedia export value; replaced per your decision 2",
+    "decision": "Decision 2 of 16 Oct (first set): September values for the 4 conflicts"
+   },
+   {
+    "ref": "A009",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000003469",
+    "name": "Freeguild Gallants",
+    "field": "cost",
+    "previous": 130,
+    "value": 110,
+    "source": "BP-2026-09",
+    "page": 6,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A010",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000001676",
+    "name": "Freeguild Steelhelms",
+    "field": "cost",
+    "previous": 90,
+    "value": 110,
+    "source": "BP-2026-09",
+    "page": 6,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A011",
+    "kind": "warscroll",
+    "faction": "DoK",
+    "id": "000000874",
+    "name": "Hag Queen",
+    "field": "cost",
+    "previous": 110,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 8,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A012",
+    "kind": "warscroll",
+    "faction": "DoK",
+    "id": "000000880",
+    "name": "Hag Queen on Cauldron of Blood",
+    "field": "cost",
+    "previous": 290,
+    "value": 280,
+    "source": "BP-2026-09",
+    "page": 8,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A013",
+    "kind": "warscroll",
+    "faction": "DoK",
+    "id": "000000923",
+    "name": "Melusai Ironscale",
+    "field": "cost",
+    "previous": 110,
+    "value": 100,
+    "source": "BP-2026-09",
+    "page": 8,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A014",
+    "kind": "warscroll",
+    "faction": "DoK",
+    "id": "000000875",
+    "name": "Morathi-Khaine",
+    "field": "cost",
+    "previous": 750,
+    "value": 770,
+    "source": "BP-2026-09",
+    "page": 8,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A015",
+    "kind": "warscroll",
+    "faction": "DoK",
+    "id": "000003569",
+    "name": "Scourge of Aqshy Melusai Ironscale",
+    "field": "cost",
+    "previous": 140,
+    "value": 150,
+    "source": "BP-2026-09",
+    "page": 8,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A016",
+    "kind": "warscroll",
+    "faction": "DoK",
+    "id": "000000883",
+    "name": "Blood Sisters",
+    "field": "cost",
+    "previous": 160,
+    "value": 170,
+    "source": "BP-2026-09",
+    "page": 8,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A017",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000000228",
+    "name": "Auric Runesmiter",
+    "field": "cost",
+    "previous": 90,
+    "value": 110,
+    "source": "BP-2026-09",
+    "page": 10,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A018",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000000238",
+    "name": "Grimwrath Berzerker",
+    "field": "cost",
+    "previous": 120,
+    "value": 110,
+    "source": "BP-2026-09",
+    "page": 10,
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: 120; new official: 110. stored 120 differs from both July and September official (110); comes from the Wahapedia export",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A019",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000000236",
+    "name": "Auric Hearthguard",
+    "field": "cost",
+    "previous": 100,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 10,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A020",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000001704",
+    "name": "Vulkyn Flameseekers",
+    "field": "cost",
+    "previous": 150,
+    "value": 160,
+    "source": "BP-2026-09",
+    "page": 10,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A021",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000003558",
+    "name": "Scourge of Aqshy Vulkyn Flameseekers",
+    "field": "cost",
+    "previous": 160,
+    "value": 190,
+    "source": "BP-2026-09",
+    "page": 10,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A022",
+    "kind": "warscroll",
+    "faction": "ID",
+    "id": "000001403",
+    "name": "Akhelian Thrallmaster",
+    "field": "cost",
+    "previous": 90,
+    "value": 70,
+    "source": "BP-2026-09",
+    "page": 12,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A023",
+    "kind": "warscroll",
+    "faction": "ID",
+    "id": "000000900",
+    "name": "Eidolon of Mathlann, Aspect of the Sea",
+    "field": "cost",
+    "previous": 340,
+    "value": 310,
+    "source": "BP-2026-09",
+    "page": 12,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A024",
+    "kind": "warscroll",
+    "faction": "ID",
+    "id": "000002468",
+    "name": "Ikon of the Sea",
+    "field": "cost",
+    "previous": 130,
+    "value": 110,
+    "source": "BP-2026-09",
+    "page": 12,
+    "why": "July BP 120; stored value is the Wahapedia export value; replaced per your decision 2",
+    "decision": "Decision 2 of 16 Oct (first set): September values for the 4 conflicts"
+   },
+   {
+    "ref": "A025",
+    "kind": "warscroll",
+    "faction": "ID",
+    "id": "000000905",
+    "name": "Lotann, Warden of the Soul Ledgers",
+    "field": "cost",
+    "previous": 100,
+    "value": 90,
+    "source": "BP-2026-09",
+    "page": 12,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A026",
+    "kind": "warscroll",
+    "faction": "KO",
+    "id": "000003559",
+    "name": "Scourge of Aqshy Null-Khemist",
+    "field": "cost",
+    "previous": 200,
+    "value": 160,
+    "source": "BP-2026-09",
+    "page": 14,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A027",
+    "kind": "warscroll",
+    "faction": "KO",
+    "id": "000000686",
+    "name": "Arkanaut Frigate",
+    "field": "cost",
+    "previous": 300,
+    "value": 280,
+    "source": "BP-2026-09",
+    "page": 14,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A028",
+    "kind": "warscroll",
+    "faction": "KO",
+    "id": "000000687",
+    "name": "Arkanaut Ironclad",
+    "field": "cost",
+    "previous": 450,
+    "value": 430,
+    "source": "BP-2026-09",
+    "page": 14,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A029",
+    "kind": "warscroll",
+    "faction": "KO",
+    "id": "000000696",
+    "name": "Endrinriggers",
+    "field": "cost",
+    "previous": 100,
+    "value": 90,
+    "source": "BP-2026-09",
+    "page": 14,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A030",
+    "kind": "warscroll",
+    "faction": "KO",
+    "id": "000003560",
+    "name": "Scourge of Aqshy Endrinriggers",
+    "field": "cost",
+    "previous": 140,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 14,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A031",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000000837",
+    "name": "Alarith Stonemage",
+    "field": "cost",
+    "previous": 120,
+    "value": 110,
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A032",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000000841",
+    "name": "Avalenor, The Stoneheart King",
+    "field": "cost",
+    "previous": 400,
+    "value": 390,
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A033",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000001049",
+    "name": "Ellania and Ellathor, Eclipsian Warsages",
+    "field": "cost",
+    "previous": 310,
+    "value": 330,
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A034",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000001058",
+    "name": "Vanari Lord Regent",
+    "field": "cost",
+    "previous": 110,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A035",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000003029",
+    "name": "Vanari Lord Regent on Lightcourser",
+    "field": "cost",
+    "previous": 150,
+    "value": 130,
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A036",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000003571",
+    "name": "Scourge of Aqshy Alarith Stonemage",
+    "field": "cost",
+    "previous": 150,
+    "value": 140,
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A037",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000003572",
+    "name": "Scourge of Aqshy Scinari Loreseeker",
+    "field": "cost",
+    "previous": 160,
+    "value": 140,
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A038",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000000836",
+    "name": "Alarith Spirit of the Mountain",
+    "field": "cost",
+    "previous": 310,
+    "value": 300,
+    "source": "BP-2026-09",
+    "page": 17,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A039",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000000842",
+    "name": "Alarith Stoneguard",
+    "field": "cost",
+    "previous": 130,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 17,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A040",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000001060",
+    "name": "Hurakan Windchargers",
+    "field": "cost",
+    "previous": 170,
+    "value": 180,
+    "source": "BP-2026-09",
+    "page": 17,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A041",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000001061",
+    "name": "Vanari Bladelords",
+    "field": "cost",
+    "previous": 150,
+    "value": 140,
+    "source": "BP-2026-09",
+    "page": 17,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A042",
+    "kind": "warscroll",
+    "faction": "SN",
+    "id": "000000712",
+    "name": "Saurus Oldblood",
+    "field": "cost",
+    "previous": 90,
+    "value": 80,
+    "source": "BP-2026-09",
+    "page": 18,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A043",
+    "kind": "warscroll",
+    "faction": "SN",
+    "id": "000000720",
+    "name": "Saurus Oldblood on Carnosaur",
+    "field": "cost",
+    "previous": 220,
+    "value": 210,
+    "source": "BP-2026-09",
+    "page": 18,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A044",
+    "kind": "warscroll",
+    "faction": "SN",
+    "id": "000000721",
+    "name": "Saurus Scar-Veteran on Carnosaur",
+    "field": "cost",
+    "previous": 200,
+    "value": 190,
+    "source": "BP-2026-09",
+    "page": 18,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A045",
+    "kind": "warscroll",
+    "faction": "SN",
+    "id": "000000731",
+    "name": "Skinks",
+    "field": "cost",
+    "previous": 80,
+    "value": 70,
+    "source": "BP-2026-09",
+    "page": 19,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A046",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000001135",
+    "name": "Knight-Arcanum",
+    "field": "cost",
+    "previous": 120,
+    "value": 110,
+    "source": "BP-2026-09",
+    "page": 20,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A047",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000000066",
+    "name": "Knight-Azyros",
+    "field": "cost",
+    "previous": 110,
+    "value": 100,
+    "source": "BP-2026-09",
+    "page": 20,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A048",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000001351",
+    "name": "Knight-Draconis",
+    "field": "cost",
+    "previous": 230,
+    "value": 200,
+    "source": "BP-2026-09",
+    "page": 20,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A049",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000000069",
+    "name": "Knight-Questor",
+    "field": "cost",
+    "previous": 110,
+    "value": 100,
+    "source": "BP-2026-09",
+    "page": 20,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A050",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000001885",
+    "name": "Tornus the Redeemed",
+    "field": "cost",
+    "previous": 150,
+    "value": 140,
+    "source": "BP-2026-09",
+    "page": 21,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A051",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000000123",
+    "name": "Gryph-hounds",
+    "field": "cost",
+    "previous": 90,
+    "value": 80,
+    "source": "BP-2026-09",
+    "page": 22,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A052",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000001382",
+    "name": "Stormdrake Guard",
+    "field": "cost",
+    "previous": 310,
+    "value": 290,
+    "source": "BP-2026-09",
+    "page": 22,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A053",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000001835",
+    "name": "Stormdrake Guard (1 model)",
+    "field": "cost",
+    "previous": 160,
+    "value": 150,
+    "source": "BP-2026-09",
+    "page": 22,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A054",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000000131",
+    "name": "Vanguard-Hunters",
+    "field": "cost",
+    "previous": 120,
+    "value": 110,
+    "source": "BP-2026-09",
+    "page": 22,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A055",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000001828",
+    "name": "Vanguard-Palladors with Shock Handaxes",
+    "field": "cost",
+    "previous": 250,
+    "value": 240,
+    "source": "BP-2026-09",
+    "page": 22,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A056",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000003568",
+    "name": "Scourge of Aqshy Stormstrike Palladors",
+    "field": "cost",
+    "previous": 220,
+    "value": 210,
+    "source": "BP-2026-09",
+    "page": 22,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A057",
+    "kind": "warscroll",
+    "faction": "SY",
+    "id": "000000306",
+    "name": "Arch-Revenant",
+    "field": "cost",
+    "previous": 110,
+    "value": 90,
+    "source": "BP-2026-09",
+    "page": 24,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A058",
+    "kind": "warscroll",
+    "faction": "SY",
+    "id": "000003136",
+    "name": "Grove Guardian",
+    "field": "cost",
+    "previous": 220,
+    "value": 200,
+    "source": "BP-2026-09",
+    "page": 24,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A059",
+    "kind": "warscroll",
+    "faction": "SY",
+    "id": "000000314",
+    "name": "Treelord Ancient",
+    "field": "cost",
+    "previous": 280,
+    "value": 260,
+    "source": "BP-2026-09",
+    "page": 24,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A060",
+    "kind": "warscroll",
+    "faction": "SY",
+    "id": "000001121",
+    "name": "Warsong Revenant",
+    "field": "cost",
+    "previous": 170,
+    "value": 190,
+    "source": "BP-2026-09",
+    "page": 24,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A061",
+    "kind": "warscroll",
+    "faction": "SY",
+    "id": "000000305",
+    "name": "Treelord",
+    "field": "cost",
+    "previous": 240,
+    "value": 200,
+    "source": "BP-2026-09",
+    "page": 24,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A062",
+    "kind": "warscroll",
+    "faction": "SY",
+    "id": "000001915",
+    "name": "The Twistweald",
+    "field": "cost",
+    "previous": 140,
+    "value": 160,
+    "source": "BP-2026-09",
+    "page": 24,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A063",
+    "kind": "warscroll",
+    "faction": "SY",
+    "id": "000003555",
+    "name": "Scourge of Aqshy Kurnoth Hunters with Greatswords",
+    "field": "cost",
+    "previous": 240,
+    "value": 220,
+    "source": "BP-2026-09",
+    "page": 24,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A064",
+    "kind": "warscroll",
+    "faction": "BoK",
+    "id": "000002453",
+    "name": "Deathbringer",
+    "field": "cost",
+    "previous": 120,
+    "value": 110,
+    "source": "BP-2026-09",
+    "page": 26,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A065",
+    "kind": "warscroll",
+    "faction": "BoK",
+    "id": "000000144",
+    "name": "Herald of Khorne on Blood Throne",
+    "field": "cost",
+    "previous": 160,
+    "value": 150,
+    "source": "BP-2026-09",
+    "page": 26,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A066",
+    "kind": "warscroll",
+    "faction": "BoK",
+    "id": "000000150",
+    "name": "Skullgrinder",
+    "field": "cost",
+    "previous": 110,
+    "value": 100,
+    "source": "BP-2026-09",
+    "page": 26,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A067",
+    "kind": "warscroll",
+    "faction": "BoK",
+    "id": "000000135",
+    "name": "Skull Cannon",
+    "field": "cost",
+    "previous": 130,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 27,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A068",
+    "kind": "warscroll",
+    "faction": "BoK",
+    "id": "000003573",
+    "name": "Scourge of Aqshy Bloodletters",
+    "field": "cost",
+    "previous": 190,
+    "value": 140,
+    "source": "BP-2026-09",
+    "page": 27,
+    "why": "July BP 150; stored value is the Wahapedia export value; replaced per your decision 2",
+    "decision": "Decision 2 of 16 Oct (first set): September values for the 4 conflicts"
+   },
+   {
+    "ref": "A069",
+    "kind": "warscroll",
+    "faction": "DoT",
+    "id": "000000646",
+    "name": "Changecaster, Herald of Tzeentch",
+    "field": "cost",
+    "previous": 140,
+    "value": 130,
+    "source": "BP-2026-09",
+    "page": 28,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A070",
+    "kind": "warscroll",
+    "faction": "DoT",
+    "id": "000000650",
+    "name": "Fateskimmer, Herald of Tzeentch on Burning Chariot",
+    "field": "cost",
+    "previous": 140,
+    "value": 150,
+    "source": "BP-2026-09",
+    "page": 28,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A071",
+    "kind": "warscroll",
+    "faction": "DoT",
+    "id": "000000652",
+    "name": "Gaunt Summoner",
+    "field": "cost",
+    "previous": 180,
+    "value": 160,
+    "source": "BP-2026-09",
+    "page": 28,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A072",
+    "kind": "warscroll",
+    "faction": "DoT",
+    "id": "000001544",
+    "name": "Gaunt Summoner on Disc of Tzeentch",
+    "field": "cost",
+    "previous": 210,
+    "value": 190,
+    "source": "BP-2026-09",
+    "page": 28,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A073",
+    "kind": "warscroll",
+    "faction": "DoT",
+    "id": "000000655",
+    "name": "Ogroid Thaumaturge",
+    "field": "cost",
+    "previous": 110,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 28,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A074",
+    "kind": "warscroll",
+    "faction": "DoT",
+    "id": "000001908",
+    "name": "Burning Chariot of Tzeentch",
+    "field": "cost",
+    "previous": 120,
+    "value": 130,
+    "source": "BP-2026-09",
+    "page": 29,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A075",
+    "kind": "warscroll",
+    "faction": "DoT",
+    "id": "000001907",
+    "name": "Exalted Flamer of Tzeentch",
+    "field": "cost",
+    "previous": 120,
+    "value": 110,
+    "source": "BP-2026-09",
+    "page": 29,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A076",
+    "kind": "warscroll",
+    "faction": "DoT",
+    "id": "000003575",
+    "name": "Scourge of Aqshy Screamers of Tzeentch",
+    "field": "cost",
+    "previous": 110,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 29,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A077",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000001123",
+    "name": "Dexcessa, the Talon of Slaanesh",
+    "field": "cost",
+    "previous": 280,
+    "value": 260,
+    "source": "BP-2026-09",
+    "page": 30,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A078",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000000339",
+    "name": "Keeper of Secrets",
+    "field": "cost",
+    "previous": 420,
+    "value": 410,
+    "source": "BP-2026-09",
+    "page": 30,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A079",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000003588",
+    "name": "Lord of Hysteria",
+    "field": "cost",
+    "previous": 120,
+    "value": 140,
+    "source": "BP-2026-09",
+    "page": 30,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A080",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000001028",
+    "name": "Lord of Pain",
+    "field": "cost",
+    "previous": 120,
+    "value": 110,
+    "source": "BP-2026-09",
+    "page": 30,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A081",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000000336",
+    "name": "Syll’Esske, the Vengeful Allegiance",
+    "field": "cost",
+    "previous": 250,
+    "value": 240,
+    "source": "BP-2026-09",
+    "page": 30,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A082",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000001124",
+    "name": "Synessa, the Voice of Slaanesh",
+    "field": "cost",
+    "previous": 250,
+    "value": 220,
+    "source": "BP-2026-09",
+    "page": 30,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A083",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000000337",
+    "name": "The Masque",
+    "field": "cost",
+    "previous": 120,
+    "value": 140,
+    "source": "BP-2026-09",
+    "page": 30,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A084",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000003587",
+    "name": "Thricefold Discord",
+    "field": "cost",
+    "previous": 180,
+    "value": 190,
+    "source": "BP-2026-09",
+    "page": 30,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A085",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000000330",
+    "name": "Daemonettes",
+    "field": "cost",
+    "previous": 110,
+    "value": 100,
+    "source": "BP-2026-09",
+    "page": 30,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A086",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000001034",
+    "name": "Myrmidesh Painbringers",
+    "field": "cost",
+    "previous": 120,
+    "value": 130,
+    "source": "BP-2026-09",
+    "page": 30,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A087",
+    "kind": "warscroll",
+    "faction": "HoH",
+    "id": "000002614",
+    "name": "Daemonsmith on Infernal Taurus",
+    "field": "cost",
+    "previous": 290,
+    "value": 270,
+    "source": "BP-2026-09",
+    "page": 32,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A088",
+    "kind": "warscroll",
+    "faction": "HoH",
+    "id": "000002625",
+    "name": "Dominator Engine with Bane Maces",
+    "field": "cost",
+    "previous": 150,
+    "value": 140,
+    "source": "BP-2026-09",
+    "page": 32,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A089",
+    "kind": "warscroll",
+    "faction": "HoH",
+    "id": "000002626",
+    "name": "Dominator Engine with Immolation Cannons",
+    "field": "cost",
+    "previous": 160,
+    "value": 150,
+    "source": "BP-2026-09",
+    "page": 32,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A090",
+    "kind": "warscroll",
+    "faction": "HoH",
+    "id": "000002613",
+    "name": "Tormentor Bombard",
+    "field": "cost",
+    "previous": 140,
+    "value": 130,
+    "source": "BP-2026-09",
+    "page": 32,
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: 140; new official: 130. stored 140 differs from both July and September official (130); comes from the Wahapedia export",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A091",
+    "kind": "warscroll",
+    "faction": "MoN",
+    "id": "000002730",
+    "name": "Cankerborn",
+    "field": "cost",
+    "previous": 180,
+    "value": 170,
+    "source": "BP-2026-09",
+    "page": 34,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A092",
+    "kind": "warscroll",
+    "faction": "MoN",
+    "id": "000002731",
+    "name": "Gelgus Pust, the Prince of Sores",
+    "field": "cost",
+    "previous": 200,
+    "value": 190,
+    "source": "BP-2026-09",
+    "page": 34,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A093",
+    "kind": "warscroll",
+    "faction": "MoN",
+    "id": "000000945",
+    "name": "Morbidex Twiceborn",
+    "field": "cost",
+    "previous": 250,
+    "value": 230,
+    "source": "BP-2026-09",
+    "page": 34,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A094",
+    "kind": "warscroll",
+    "faction": "MoN",
+    "id": "000000946",
+    "name": "Orghotts Daemonspew",
+    "field": "cost",
+    "previous": 260,
+    "value": 250,
+    "source": "BP-2026-09",
+    "page": 34,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A095",
+    "kind": "warscroll",
+    "faction": "MoN",
+    "id": "000003579",
+    "name": "Scourge of Aqshy Sloven Knights",
+    "field": "cost",
+    "previous": 210,
+    "value": 180,
+    "source": "BP-2026-09",
+    "page": 35,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A096",
+    "kind": "warscroll",
+    "faction": "ST",
+    "id": "000001820",
+    "name": "Clawlord on Gnaw-beast",
+    "field": "cost",
+    "previous": 110,
+    "value": 90,
+    "source": "BP-2026-09",
+    "page": 36,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A097",
+    "kind": "warscroll",
+    "faction": "ST",
+    "id": "000000265",
+    "name": "Lord Skreech Verminking",
+    "field": "cost",
+    "previous": 380,
+    "value": 350,
+    "source": "BP-2026-09",
+    "page": 36,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A098",
+    "kind": "warscroll",
+    "faction": "ST",
+    "id": "000000268",
+    "name": "Verminlord Corruptor",
+    "field": "cost",
+    "previous": 260,
+    "value": 310,
+    "source": "BP-2026-09",
+    "page": 36,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A099",
+    "kind": "warscroll",
+    "faction": "ST",
+    "id": "000000269",
+    "name": "Verminlord Deceiver",
+    "field": "cost",
+    "previous": 390,
+    "value": 360,
+    "source": "BP-2026-09",
+    "page": 36,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A100",
+    "kind": "warscroll",
+    "faction": "ST",
+    "id": "000003582",
+    "name": "Scourge of Aqshy Verminlord Corruptor",
+    "field": "cost",
+    "previous": 310,
+    "value": 290,
+    "source": "BP-2026-09",
+    "page": 36,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A101",
+    "kind": "warscroll",
+    "faction": "ST",
+    "id": "000001817",
+    "name": "Brood Terror",
+    "field": "cost",
+    "previous": 220,
+    "value": 200,
+    "source": "BP-2026-09",
+    "page": 36,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A102",
+    "kind": "warscroll",
+    "faction": "ST",
+    "id": "000000279",
+    "name": "Rat Ogors",
+    "field": "cost",
+    "previous": 140,
+    "value": 130,
+    "source": "BP-2026-09",
+    "page": 37,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A103",
+    "kind": "warscroll",
+    "faction": "StD",
+    "id": "000001748",
+    "name": "Abraxia, Spear of the Everchosen",
+    "field": "cost",
+    "previous": 250,
+    "value": 230,
+    "source": "BP-2026-09",
+    "page": 38,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A104",
+    "kind": "warscroll",
+    "faction": "StD",
+    "id": "000000558",
+    "name": "Archaon, the Everchosen",
+    "field": "cost",
+    "previous": 810,
+    "value": 780,
+    "source": "BP-2026-09",
+    "page": 38,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A105",
+    "kind": "warscroll",
+    "faction": "StD",
+    "id": "000000564",
+    "name": "Chaos Lord on Karkadrak",
+    "field": "cost",
+    "previous": 190,
+    "value": 180,
+    "source": "BP-2026-09",
+    "page": 38,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A106",
+    "kind": "warscroll",
+    "faction": "StD",
+    "id": "000003584",
+    "name": "Scourge of Aqshy Chaos Lord on Karkadrak",
+    "field": "cost",
+    "previous": 230,
+    "value": 200,
+    "source": "BP-2026-09",
+    "page": 38,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A107",
+    "kind": "warscroll",
+    "faction": "StD",
+    "id": "000001771",
+    "name": "Chaos Furies",
+    "field": "cost",
+    "previous": 120,
+    "value": 100,
+    "source": "BP-2026-09",
+    "page": 39,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A108",
+    "kind": "warscroll",
+    "faction": "StD",
+    "id": "000000593",
+    "name": "Fomoroid Crusher",
+    "field": "cost",
+    "previous": 120,
+    "value": 100,
+    "source": "BP-2026-09",
+    "page": 39,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A109",
+    "kind": "warscroll",
+    "faction": "StD",
+    "id": "000000555",
+    "name": "Mutalith Vortex Beast",
+    "field": "cost",
+    "previous": 160,
+    "value": 150,
+    "source": "BP-2026-09",
+    "page": 39,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A110",
+    "kind": "warscroll",
+    "faction": "StD",
+    "id": "000000556",
+    "name": "Slaughterbrute",
+    "field": "cost",
+    "previous": 200,
+    "value": 170,
+    "source": "BP-2026-09",
+    "page": 39,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A111",
+    "kind": "warscroll",
+    "faction": "StD",
+    "id": "000000603",
+    "name": "Varanguard",
+    "field": "cost",
+    "previous": 300,
+    "value": 290,
+    "source": "BP-2026-09",
+    "page": 39,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A112",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000000359",
+    "name": "Abhorrant Archregent",
+    "field": "cost",
+    "previous": 140,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A113",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000000360",
+    "name": "Abhorrant Ghoul King",
+    "field": "cost",
+    "previous": 110,
+    "value": 100,
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A114",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000001722",
+    "name": "Abhorrant Gorewarden",
+    "field": "cost",
+    "previous": 150,
+    "value": 140,
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A115",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000001723",
+    "name": "Grand Justice Gormayne",
+    "field": "cost",
+    "previous": 130,
+    "value": 110,
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A116",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000001648",
+    "name": "Marrowscroll Herald",
+    "field": "cost",
+    "previous": 100,
+    "value": 90,
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A117",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000000367",
+    "name": "Crypt Flayers",
+    "field": "cost",
+    "previous": 160,
+    "value": 140,
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A118",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000000368",
+    "name": "Crypt Horrors",
+    "field": "cost",
+    "previous": 160,
+    "value": 150,
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A119",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000001726",
+    "name": "Morbheg Knights",
+    "field": "cost",
+    "previous": 170,
+    "value": 150,
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A120",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000001639",
+    "name": "Royal Beastflayers",
+    "field": "cost",
+    "previous": 110,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A121",
+    "kind": "warscroll",
+    "faction": "NT",
+    "id": "000000201",
+    "name": "Reikenor the Grimhailer",
+    "field": "cost",
+    "previous": 200,
+    "value": 180,
+    "source": "BP-2026-09",
+    "page": 43,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A122",
+    "kind": "warscroll",
+    "faction": "NT",
+    "id": "000001407",
+    "name": "Scriptor Mortis",
+    "field": "cost",
+    "previous": 110,
+    "value": 90,
+    "source": "BP-2026-09",
+    "page": 43,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A123",
+    "kind": "warscroll",
+    "faction": "NT",
+    "id": "000000202",
+    "name": "Spirit Torment",
+    "field": "cost",
+    "previous": 110,
+    "value": 100,
+    "source": "BP-2026-09",
+    "page": 43,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A124",
+    "kind": "warscroll",
+    "faction": "NT",
+    "id": "000001873",
+    "name": "Dreadblade Harrows",
+    "field": "cost",
+    "previous": 140,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 44,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A125",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000000531",
+    "name": "Arkhan the Black, Mortarch of Sacrament",
+    "field": "cost",
+    "previous": 440,
+    "value": 430,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A126",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000000525",
+    "name": "Katakros, Mortarch of the Necropolis",
+    "field": "cost",
+    "previous": 470,
+    "value": 450,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A127",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000003088",
+    "name": "Liege-Kavalos on War Chariot",
+    "field": "cost",
+    "previous": 210,
+    "value": 180,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A128",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000000529",
+    "name": "Mortisan Soulreaper",
+    "field": "cost",
+    "previous": 120,
+    "value": 110,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A129",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000001867",
+    "name": "Nagash, Supreme Lord of the Undead",
+    "field": "cost",
+    "previous": 830,
+    "value": 790,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A130",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000000523",
+    "name": "Gothizzar Harvester",
+    "field": "cost",
+    "previous": 200,
+    "value": 180,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A131",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000000533",
+    "name": "Immortis Guard",
+    "field": "cost",
+    "previous": 170,
+    "value": 150,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A132",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000000520",
+    "name": "Kavalos Deathriders",
+    "field": "cost",
+    "previous": 150,
+    "value": 160,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A133",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000003084",
+    "name": "Kavalos War Chariot",
+    "field": "cost",
+    "previous": 150,
+    "value": 140,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A134",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000000534",
+    "name": "Morghast Archai",
+    "field": "cost",
+    "previous": 250,
+    "value": 240,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A135",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000000535",
+    "name": "Morghast Harbingers",
+    "field": "cost",
+    "previous": 240,
+    "value": 230,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A136",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000000521",
+    "name": "Mortek Guard",
+    "field": "cost",
+    "previous": 110,
+    "value": 100,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A137",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000003085",
+    "name": "Mortek Triaxes",
+    "field": "cost",
+    "previous": 140,
+    "value": 130,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A138",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000000536",
+    "name": "Necropolis Stalkers",
+    "field": "cost",
+    "previous": 130,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A139",
+    "kind": "warscroll",
+    "faction": "SG",
+    "id": "000002349",
+    "name": "Blades of the Hollow King",
+    "field": "cost",
+    "previous": 270,
+    "value": 260,
+    "source": "BP-2026-09",
+    "page": 47,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A140",
+    "kind": "warscroll",
+    "faction": "SG",
+    "id": "000000995",
+    "name": "Coven Throne",
+    "field": "cost",
+    "previous": 230,
+    "value": 210,
+    "source": "BP-2026-09",
+    "page": 47,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A141",
+    "kind": "warscroll",
+    "faction": "SG",
+    "id": "000000984",
+    "name": "Mortis Engine",
+    "field": "cost",
+    "previous": 230,
+    "value": 210,
+    "source": "BP-2026-09",
+    "page": 47,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A142",
+    "kind": "warscroll",
+    "faction": "SG",
+    "id": "000000999",
+    "name": "Prince Vhordrai",
+    "field": "cost",
+    "previous": 470,
+    "value": 450,
+    "source": "BP-2026-09",
+    "page": 47,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A143",
+    "kind": "warscroll",
+    "faction": "SG",
+    "id": "000002346",
+    "name": "Vampire Lord on Nightmare Steed",
+    "field": "cost",
+    "previous": 180,
+    "value": 170,
+    "source": "BP-2026-09",
+    "page": 47,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A144",
+    "kind": "warscroll",
+    "faction": "SG",
+    "id": "000001567",
+    "name": "Askurgan Trueblades",
+    "field": "cost",
+    "previous": 140,
+    "value": 150,
+    "source": "BP-2026-09",
+    "page": 48,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A145",
+    "kind": "warscroll",
+    "faction": "SG",
+    "id": "000001003",
+    "name": "Blood Knights",
+    "field": "cost",
+    "previous": 220,
+    "value": 210,
+    "source": "BP-2026-09",
+    "page": 48,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A146",
+    "kind": "warscroll",
+    "faction": "SG",
+    "id": "000001006",
+    "name": "Fell Bats",
+    "field": "cost",
+    "previous": 80,
+    "value": 90,
+    "source": "BP-2026-09",
+    "page": 48,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A147",
+    "kind": "warscroll",
+    "faction": "SG",
+    "id": "000002340",
+    "name": "Revenant Draconith",
+    "field": "cost",
+    "previous": 180,
+    "value": 170,
+    "source": "BP-2026-09",
+    "page": 48,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A148",
+    "kind": "warscroll",
+    "faction": "GG",
+    "id": "000002285",
+    "name": "Frazzlegit Shaman on War-Wheela",
+    "field": "cost",
+    "previous": 130,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 49,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A149",
+    "kind": "warscroll",
+    "faction": "GG",
+    "id": "000000023",
+    "name": "Loonboss",
+    "field": "cost",
+    "previous": 80,
+    "value": 70,
+    "source": "BP-2026-09",
+    "page": 49,
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: 80; new official: 70. stored 80 differs from both July and September official (70); comes from the Wahapedia export",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A150",
+    "kind": "warscroll",
+    "faction": "GG",
+    "id": "000002289",
+    "name": "Snarlboss on War-Wheela",
+    "field": "cost",
+    "previous": 140,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 49,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A151",
+    "kind": "warscroll",
+    "faction": "GG",
+    "id": "000002288",
+    "name": "Snarlpack Cavalry",
+    "field": "cost",
+    "previous": 110,
+    "value": 100,
+    "source": "BP-2026-09",
+    "page": 50,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A152",
+    "kind": "warscroll",
+    "faction": "GG",
+    "id": "000002287",
+    "name": "Sunsteala Wheelas",
+    "field": "cost",
+    "previous": 130,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 50,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A153",
+    "kind": "warscroll",
+    "faction": "GG",
+    "id": "000003622",
+    "name": "Scourge of Aqshy Fellwater Troggoths",
+    "field": "cost",
+    "previous": 180,
+    "value": 160,
+    "source": "BP-2026-09",
+    "page": 50,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A154",
+    "kind": "warscroll",
+    "faction": "GG",
+    "id": "000003623",
+    "name": "Scourge of Aqshy Sunsteala Wheelas",
+    "field": "cost",
+    "previous": 170,
+    "value": 150,
+    "source": "BP-2026-09",
+    "page": 50,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A155",
+    "kind": "warscroll",
+    "faction": "IJ",
+    "id": "000000391",
+    "name": "Gordrakk, the Fist of Gork",
+    "field": "cost",
+    "previous": 340,
+    "value": 320,
+    "source": "BP-2026-09",
+    "page": 51,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A156",
+    "kind": "warscroll",
+    "faction": "IJ",
+    "id": "000001853",
+    "name": "Megaboss",
+    "field": "cost",
+    "previous": 130,
+    "value": 120,
+    "source": "BP-2026-09",
+    "page": 51,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A157",
+    "kind": "warscroll",
+    "faction": "IJ",
+    "id": "000000392",
+    "name": "Megaboss on Maw-Krusha",
+    "field": "cost",
+    "previous": 330,
+    "value": 310,
+    "source": "BP-2026-09",
+    "page": 51,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A158",
+    "kind": "warscroll",
+    "faction": "IJ",
+    "id": "000003617",
+    "name": "Scourge of Aqshy Brutes",
+    "field": "cost",
+    "previous": 160,
+    "value": 170,
+    "source": "BP-2026-09",
+    "page": 51,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A159",
+    "kind": "warscroll",
+    "faction": "KB",
+    "id": "000002228",
+    "name": "Hobgrot Slittaboss",
+    "field": "cost",
+    "previous": 70,
+    "value": 60,
+    "source": "BP-2026-09",
+    "page": 53,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A160",
+    "kind": "warscroll",
+    "faction": "KB",
+    "id": "000001146",
+    "name": "Killaboss with Stab-grot",
+    "field": "cost",
+    "previous": 80,
+    "value": 70,
+    "source": "BP-2026-09",
+    "page": 53,
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A161",
+    "kind": "warscroll",
+    "faction": "KB",
+    "id": "000002229",
+    "name": "Skaregob Totem",
+    "field": "cost",
+    "previous": 20,
+    "value": 0,
+    "source": "BP-2026-09",
+    "page": 54,
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: 20; new official: 0. stored 20 differs from both July and September official (0); comes from the Wahapedia export",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A190",
+    "kind": "points",
+    "faction": "CoS",
+    "name": "THE LAST BLADE OF EMBERGARD",
+    "table": "enhancement",
+    "field": "points",
+    "previous": 0,
+    "value": 10,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A191",
+    "kind": "points",
+    "faction": "DoK",
+    "name": "Coven of Blood",
+    "table": "formation",
+    "field": "points",
+    "previous": 0,
+    "value": 20,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A192",
+    "kind": "points",
+    "faction": "DoK",
+    "name": "Fervent Ritualists",
+    "table": "formation",
+    "field": "points",
+    "previous": 0,
+    "value": 10,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A193",
+    "kind": "points",
+    "faction": "FY",
+    "name": "ASH-CLOUD RUNE",
+    "table": "enhancement",
+    "field": "points",
+    "previous": 0,
+    "value": 20,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A194",
+    "kind": "points",
+    "faction": "DoT",
+    "name": "SILVER SUMMONER",
+    "table": "enhancement",
+    "field": "points",
+    "previous": 0,
+    "value": 10,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A195",
+    "kind": "points",
+    "faction": "HS",
+    "name": "Depraved Carnival",
+    "table": "formation",
+    "field": "points",
+    "previous": 0,
+    "value": 10,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A196",
+    "kind": "points",
+    "faction": "HS",
+    "name": "OBSESSION WITH CONTROL",
+    "table": "enhancement",
+    "field": "points",
+    "previous": 10,
+    "value": 20,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A197",
+    "kind": "points",
+    "faction": "HS",
+    "name": "INCENSED",
+    "table": "enhancement",
+    "field": "points",
+    "previous": 0,
+    "value": 10,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A198",
+    "kind": "points",
+    "faction": "ST",
+    "name": "MASTER OF THE SWARM",
+    "table": "enhancement",
+    "field": "points",
+    "previous": 0,
+    "value": 20,
+    "source": "BP-2026-09",
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: 0; new official: 20. July and September both 20; stored 0",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A199",
+    "kind": "points",
+    "faction": "ST",
+    "name": "ESSENCE OF THE GNAW",
+    "table": "enhancement",
+    "field": "points",
+    "previous": 0,
+    "value": 20,
+    "source": "BP-2026-09",
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: 0; new official: 20. July and September both 20; stored 0",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A200",
+    "kind": "points",
+    "faction": "StD",
+    "name": "RADIANCE OF DARK GLORY",
+    "table": "enhancement",
+    "field": "points",
+    "previous": 20,
+    "value": 0,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A201",
+    "kind": "points",
+    "faction": "NT",
+    "name": "Quicksilver Gheists",
+    "table": "formation",
+    "field": "points",
+    "previous": 40,
+    "value": 20,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A202",
+    "kind": "points",
+    "faction": "NT",
+    "name": "RULER OF THE SPECTRAL HOSTS",
+    "table": "enhancement",
+    "field": "points",
+    "previous": 20,
+    "value": 0,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A203",
+    "kind": "points",
+    "faction": "NT",
+    "name": "LIGHTSHARD OF THE HARVEST MOON",
+    "table": "enhancement",
+    "field": "points",
+    "previous": 20,
+    "value": 0,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A204",
+    "kind": "points",
+    "faction": "SG",
+    "name": "THE NEVER-DEAD",
+    "table": "enhancement",
+    "field": "points",
+    "previous": 10,
+    "value": 20,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A205",
+    "kind": "points",
+    "faction": "KB",
+    "name": "EGOMANIAK",
+    "table": "enhancement",
+    "field": "points",
+    "previous": 0,
+    "value": 10,
+    "source": "BP-2026-09",
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: 0; new official: 10. July and September both 10; stored 0",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A207",
+    "kind": "ror",
+    "id": "000001956",
+    "name": "Big Drogg Fort-Kicka",
+    "field": "cost",
+    "previous": 450,
+    "value": 440,
+    "source": "BP-2026-09",
+    "why": "stored 450 = July 2026 value; Sept 440. Name in BP: \"Big Drogg Fort-kicker\" (stored \"Big Drogg Fort-Kicka\")."
+   },
+   {
+    "ref": "A208",
+    "kind": "ror",
+    "id": "000001935",
+    "name": "Bundo Whalebiter",
+    "field": "cost",
+    "previous": 450,
+    "value": 360,
+    "source": "BP-2026-09",
+    "why": "July BP 400; stored value from Wahapedia export; replaced per your decision 2",
+    "decision": "Decision 2 of 16 Oct (first set): September values for the 4 conflicts"
+   },
+   {
+    "ref": "A209",
+    "kind": "ror",
+    "id": "000001935",
+    "name": "Bundo Whalebiter",
+    "field": "allowedRemove",
+    "previous": [
+     "BS",
+     "CoS",
+     "DoK",
+     "FY",
+     "GG",
+     "ID",
+     "IJ",
+     "KB",
+     "KO",
+     "LRL",
+     "OM",
+     "SE",
+     "SN",
+     "SY"
+    ],
+    "value": [
+     "CoS",
+     "DoK",
+     "FY",
+     "GG",
+     "ID",
+     "IJ",
+     "KB",
+     "KO",
+     "LRL",
+     "OM",
+     "SE",
+     "SN",
+     "SY"
+    ],
+    "remove": [
+     "BS"
+    ],
+    "source": "BP-2026-09",
+    "page": 59,
+    "why": "Bonesplitterz/Beasts of Chaos no longer listed (both are Warhammer Legends factions)"
+   },
+   {
+    "ref": "A210",
+    "kind": "ror",
+    "id": "000001966",
+    "name": "One-eyed Grunnock",
+    "field": "allowedRemove",
+    "previous": [
+     "BoC",
+     "BoK",
+     "BS",
+     "DoT",
+     "GG",
+     "HoH",
+     "HS",
+     "IJ",
+     "KB",
+     "MoN",
+     "OM",
+     "ST",
+     "StD"
+    ],
+    "value": [
+     "BoK",
+     "DoT",
+     "GG",
+     "HoH",
+     "HS",
+     "IJ",
+     "KB",
+     "MoN",
+     "OM",
+     "ST",
+     "StD"
+    ],
+    "remove": [
+     "BS",
+     "BoC"
+    ],
+    "source": "BP-2026-09",
+    "page": 59,
+    "why": "Bonesplitterz/Beasts of Chaos no longer listed (both are Warhammer Legends factions)"
+   },
+   {
+    "ref": "A211",
+    "kind": "ror",
+    "id": "000002026",
+    "name": "Exile Scavengers",
+    "field": "cost",
+    "previous": 410,
+    "value": 390,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A212",
+    "kind": "ror",
+    "id": "000002018",
+    "name": "Goroan Scions",
+    "field": "cost",
+    "previous": 420,
+    "value": 360,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A214",
+    "kind": "ror",
+    "id": "000002031",
+    "name": "Snerk’s Trogg-Fer-Hire",
+    "field": "cost",
+    "previous": 220,
+    "value": 200,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A215",
+    "kind": "ror",
+    "id": "000002027",
+    "name": "Squires of the Everchosen",
+    "field": "cost",
+    "previous": 280,
+    "value": 240,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A217",
+    "kind": "ror",
+    "id": "000002431",
+    "name": "Drekki’s Privateers",
+    "field": "cost",
+    "previous": 500,
+    "value": 460,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A218",
+    "kind": "ror",
+    "id": "000001606",
+    "name": "Elthwin’s Thorns",
+    "field": "cost",
+    "previous": 220,
+    "value": 200,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A220",
+    "kind": "ror",
+    "id": "000001838",
+    "name": "Saviours of Cinderfall",
+    "field": "cost",
+    "previous": 290,
+    "value": 270,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A221",
+    "kind": "ror",
+    "id": "000003471",
+    "name": "Rogue Engine",
+    "field": "cost",
+    "previous": 470,
+    "value": 450,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A222",
+    "kind": "ror",
+    "id": "000003496",
+    "name": "Cogfort Raiders",
+    "field": "cost",
+    "previous": 450,
+    "value": 410,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A223",
+    "kind": "ror",
+    "id": "000001822",
+    "name": "Brand’s Oathbound",
+    "field": "cost",
+    "previous": 200,
+    "value": 190,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A224",
+    "kind": "ror",
+    "id": "000002743",
+    "name": "Diseased Revellers",
+    "field": "cost",
+    "previous": 310,
+    "value": 270,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A225",
+    "kind": "ror",
+    "id": "000002013",
+    "name": "Godmarked Ascendant",
+    "field": "cost",
+    "previous": 260,
+    "value": 240,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A226",
+    "kind": "ror",
+    "id": "000001823",
+    "name": "Hargax’s Pit-Beasts",
+    "field": "cost",
+    "previous": 390,
+    "value": 350,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A227",
+    "kind": "ror",
+    "id": "000001785",
+    "name": "Krittok’s Clawpack",
+    "field": "cost",
+    "previous": 380,
+    "value": 350,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A229",
+    "kind": "ror",
+    "id": "000001905",
+    "name": "Phulgoth’s Shudderhood",
+    "field": "cost",
+    "previous": 530,
+    "value": 460,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A230",
+    "kind": "ror",
+    "id": "000001912",
+    "name": "The Coven of Thryx",
+    "field": "cost",
+    "previous": 280,
+    "value": 270,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A231",
+    "kind": "ror",
+    "id": "000002636",
+    "name": "The Curse-Steel Battery",
+    "field": "cost",
+    "previous": 380,
+    "value": 390,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A232",
+    "kind": "ror",
+    "id": "000002454",
+    "name": "The Exiled One",
+    "field": "cost",
+    "previous": 390,
+    "value": 400,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A233",
+    "kind": "ror",
+    "id": "000002461",
+    "name": "The Red Revelation",
+    "field": "cost",
+    "previous": 380,
+    "value": 350,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A234",
+    "kind": "ror",
+    "id": "000001776",
+    "name": "Volt-Klaw’s Enginecoven",
+    "field": "cost",
+    "previous": 410,
+    "value": 380,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A236",
+    "kind": "ror",
+    "id": "000003596",
+    "name": "The Accursed Reflection",
+    "field": "cost",
+    "previous": 150,
+    "value": 130,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A237",
+    "kind": "ror",
+    "id": "000002357",
+    "name": "Blades of the Hollow King",
+    "field": "cost",
+    "previous": 260,
+    "value": 230,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A238",
+    "kind": "ror",
+    "id": "000002549",
+    "name": "Casket of Resurrections",
+    "field": "cost",
+    "previous": 200,
+    "value": 180,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A239",
+    "kind": "ror",
+    "id": "000003090",
+    "name": "Heralds of the Bone-tithe",
+    "field": "cost",
+    "previous": 510,
+    "value": 390,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A240",
+    "kind": "ror",
+    "id": "000001925",
+    "name": "Neferata’s Royal Echelon",
+    "field": "cost",
+    "previous": 760,
+    "value": 710,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A241",
+    "kind": "ror",
+    "id": "000002350",
+    "name": "The Beast of Castle Sternieste",
+    "field": "cost",
+    "previous": 190,
+    "value": 160,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A242",
+    "kind": "ror",
+    "id": "000002247",
+    "name": "Da Kountin’ Krew",
+    "field": "cost",
+    "previous": 320,
+    "value": 280,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A243",
+    "kind": "ror",
+    "id": "000001950",
+    "name": "Odo Godswallow",
+    "field": "allowedRemove",
+    "previous": [
+     "BS",
+     "GG",
+     "IJ",
+     "KB",
+     "OM"
+    ],
+    "value": [
+     "GG",
+     "IJ",
+     "KB",
+     "OM"
+    ],
+    "remove": [
+     "BS"
+    ],
+    "source": "BP-2026-09",
+    "page": 59,
+    "why": "Bonesplitterz/Beasts of Chaos no longer listed (both are Warhammer Legends factions)"
+   },
+   {
+    "ref": "A244",
+    "kind": "ror",
+    "id": "000002297",
+    "name": "Skulkrik’s Loonladz",
+    "field": "cost",
+    "previous": 310,
+    "value": 280,
+    "source": "BP-2026-09",
+    "why": "stored = July 2026 value"
+   },
+   {
+    "ref": "A245",
+    "kind": "ror",
+    "id": "000001956",
+    "name": "Big Drogg Fort-Kicka",
+    "field": "allowedRemove",
+    "previous": [
+     "BS",
+     "FE",
+     "GG",
+     "IJ",
+     "KB",
+     "NT",
+     "OB",
+     "OM",
+     "SG"
+    ],
+    "value": [
+     "FE",
+     "GG",
+     "IJ",
+     "KB",
+     "NT",
+     "OB",
+     "OM",
+     "SG"
+    ],
+    "remove": [
+     "BS"
+    ],
+    "source": "BP-2026-09",
+    "page": 59,
+    "why": "Bonesplitterz removed from the list in September"
+   },
+   {
+    "ref": "A246",
+    "kind": "warscroll",
+    "faction": "SN",
+    "id": "000000729",
+    "name": "Saurus Guard",
+    "field": "reinforceable",
+    "previous": true,
+    "value": false,
+    "source": "BP-2026-09",
+    "page": 19,
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: true; new official: false. BP July and September: \"This unit cannot be reinforced.\"",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A247",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000000356",
+    "name": "Crypt Ghouls",
+    "field": "reinforceable",
+    "previous": true,
+    "value": false,
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: true; new official: false. BP July and September: \"This unit cannot be reinforced.\"",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A248",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000001725",
+    "name": "Cryptguard",
+    "field": "reinforceable",
+    "previous": true,
+    "value": false,
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: true; new official: false. BP July and September: \"This unit cannot be reinforced.\"",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A260",
+    "kind": "warscroll",
+    "faction": "DoK",
+    "id": "000003153",
+    "name": "Knives of the Crone",
+    "field": "legends",
+    "previous": false,
+    "value": true,
+    "source": "BP-2026-09",
+    "page": "66-70",
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: false; new official: true (listed under Warhammer Legends). Listed in the Warhammer Legends section in July and September BP (\"The Knives of the Crone\", \"Plague Censer Bearers\")",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A261",
+    "kind": "warscroll",
+    "faction": "ST",
+    "id": "000001821",
+    "name": "Plague Censer Bearer",
+    "field": "legends",
+    "previous": false,
+    "value": true,
+    "source": "BP-2026-09",
+    "page": "66-70",
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: false; new official: true (listed under Warhammer Legends). Listed in the Warhammer Legends section in July and September BP (\"The Knives of the Crone\", \"Plague Censer Bearers\")",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A263",
+    "kind": "options",
+    "faction": "CoS",
+    "id": "000003446",
+    "name": "Cannonade Cogfort",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Freeguild Veteran"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Sigmarite"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Allies of the Free Cities"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Freeguild Veteran"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Thaumaturgical Specialist"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Sigmarite"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Allies of the Free Cities"
+      ]
+     }
+    ],
+    "official": "0-1 Freeguild Veteran, 0-1 Thaumaturgical Specialist, Any Sigmarite, Any Allies of the Free Cities",
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p3"
+   },
+   {
+    "ref": "A264",
+    "kind": "options",
+    "faction": "CoS",
+    "id": "000003443",
+    "name": "Conqueror Cogfort",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Freeguild Veteran"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Sigmarite"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Allies of the Free Cities"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Freeguild Veteran"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Thaumaturgical Specialist"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Sigmarite"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Allies of the Free Cities"
+      ]
+     }
+    ],
+    "official": "0-1 Freeguild Veteran, 0-1 Thaumaturgical Specialist, Any Sigmarite, Any Allies of the Free Cities",
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p3"
+   },
+   {
+    "ref": "A265",
+    "kind": "options",
+    "faction": "CoS",
+    "id": "000001679",
+    "name": "Freeguild Cavalier-Marshal",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Freeguild Veteran"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Sigmarite"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Allies of the Free Cities"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Freeguild Veteran"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Thaumaturgical Specialist"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Sigmarite"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Allies of the Free Cities"
+      ]
+     }
+    ],
+    "official": "0-1 Freeguild Veteran, 0-1 Thaumaturgical Specialist, Any Sigmarite, Any Allies of the Free Cities",
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p3"
+   },
+   {
+    "ref": "A266",
+    "kind": "options",
+    "faction": "CoS",
+    "id": "000001678",
+    "name": "Freeguild Marshal and Relic Envoy",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Freeguild Veteran"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Sigmarite"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Allies of the Free Cities"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Freeguild Veteran"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Thaumaturgical Specialist"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Sigmarite"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Allies of the Free Cities"
+      ]
+     }
+    ],
+    "official": "0-1 Freeguild Veteran, 0-1 Thaumaturgical Specialist, Any Sigmarite, Any Allies of the Free Cities",
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p3"
+   },
+   {
+    "ref": "A267",
+    "kind": "options",
+    "faction": "CoS",
+    "id": "000001684",
+    "name": "Freeguild Marshal on Griffon",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Freeguild Veteran"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Sigmarite"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Freeguild Veteran"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Thaumaturgical Specialist"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Sigmarite"
+      ]
+     }
+    ],
+    "official": "0-1 Freeguild Veteran, 0-1 Thaumaturgical Specialist, Any Sigmarite",
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p3"
+   },
+   {
+    "ref": "A268",
+    "kind": "options",
+    "faction": "CoS",
+    "id": "000001680",
+    "name": "Fusil-Major on Ogor Warhulk",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Freeguild Veteran"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Sigmarite"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Allies of the Free Cities"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Freeguild Veteran"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Thaumaturgical Specialist"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Sigmarite"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Allies of the Free Cities"
+      ]
+     }
+    ],
+    "official": "0-1 Freeguild Veteran, 0-1 Thaumaturgical Specialist, Any Sigmarite, Any Allies of the Free Cities",
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p3"
+   },
+   {
+    "ref": "A269",
+    "kind": "options",
+    "faction": "CoS",
+    "id": "000003467",
+    "name": "Jorvan Kreel, Heir of the Kraken",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Freeguild Veteran"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Sigmarite"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Freeguild Veteran"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Thaumaturgical Specialist"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Sigmarite"
+      ]
+     }
+    ],
+    "official": "0-1 Freeguild Veteran, 0-1 Thaumaturgical Specialist, Any Sigmarite",
+    "source": "BP-2026-09",
+    "page": 4,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p4"
+   },
+   {
+    "ref": "A270",
+    "kind": "options",
+    "faction": "CoS",
+    "id": "000001681",
+    "name": "Pontifex Zenestra, Matriarch of the Great Wheel",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Freeguild Veteran"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Sigmarite"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Freeguild Veteran"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Thaumaturgical Specialist"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Sigmarite"
+      ]
+     }
+    ],
+    "official": "0-1 Freeguild Veteran, 0-1 Thaumaturgical Specialist, Any Sigmarite",
+    "source": "BP-2026-09",
+    "page": 4,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p4"
+   },
+   {
+    "ref": "A271",
+    "kind": "options",
+    "faction": "CoS",
+    "id": "000001685",
+    "name": "Tahlia Vedra, Lioness of the Parch",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Freeguild Veteran"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "SIGMARITE"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Freeguild Veteran"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Thaumaturgical Specialist"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Sigmarite"
+      ]
+     }
+    ],
+    "official": "0-1 Freeguild Veteran, 0-1 Thaumaturgical Specialist, Any Sigmarite",
+    "source": "BP-2026-09",
+    "page": 4,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p4"
+   },
+   {
+    "ref": "A272",
+    "kind": "options",
+    "faction": "CoS",
+    "id": "000003563",
+    "name": "Scourge of Aqshy Pontifex Zenestra, Matriarch of the Great Wheel",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Freeguild Veteran"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Sigmarite"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Freeguild Veteran"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Thaumaturgical Specialist"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Sigmarite"
+      ]
+     }
+    ],
+    "official": "0-1 Freeguild Veteran, 0-1 Thaumaturgical Specialist, Any Sigmarite",
+    "source": "BP-2026-09",
+    "page": 4,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p4"
+   },
+   {
+    "ref": "A273",
+    "kind": "options",
+    "faction": "DoK",
+    "id": "000003569",
+    "name": "Scourge of Aqshy Melusai Ironscale",
+    "field": "options",
+    "previous": [
+     {
+      "q": "any",
+      "required": false,
+      "label": "Daughters of Khaine"
+     }
+    ],
+    "value": [
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "non-Aelf"
+      ]
+     }
+    ],
+    "official": "Any non- Aelf",
+    "source": "BP-2026-09",
+    "page": 8,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p8"
+   },
+   {
+    "ref": "A274",
+    "kind": "options",
+    "faction": "ID",
+    "id": "000003565",
+    "name": "Scourge of Aqshy Isharann Tidecaster",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Isharann Emissary"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Idoneth Deepkin"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Isharann Emissary"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Namarti"
+      ]
+     }
+    ],
+    "official": "0-1 Isharann Emissary, Any Namarti",
+    "source": "BP-2026-09",
+    "page": 12,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p12"
+   },
+   {
+    "ref": "A275",
+    "kind": "options",
+    "faction": "LRL",
+    "id": "000000841",
+    "name": "Avalenor, The Stoneheart King",
+    "field": "options",
+    "previous": [
+     {
+      "q": "any",
+      "required": false,
+      "label": "ALARITH"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "VANARI"
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Lumineth Paragon"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Alarith Stonemage"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Lumineth Paragon"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Vanari"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Alarith"
+      ]
+     }
+    ],
+    "official": "0-1 Alarith Stonemage, 0-1 Lumineth Paragon, Any Vanari, Any Alarith",
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p16"
+   },
+   {
+    "ref": "A276",
+    "kind": "options",
+    "faction": "LRL",
+    "id": "000001056",
+    "name": "Sevireth, Lord of the Seventh Wind",
+    "field": "options",
+    "previous": [
+     {
+      "q": "any",
+      "required": false,
+      "label": "VANARI"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "HURAKAN"
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Lumineth Paragon"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Hurakan Windmage"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Lumineth Paragon"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Vanari"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Hurakan"
+      ]
+     }
+    ],
+    "official": "0-1 Hurakan Windmage, 0-1 Lumineth Paragon, Any Vanari, Any Hurakan",
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p16"
+   },
+   {
+    "ref": "A277",
+    "kind": "options",
+    "faction": "SN",
+    "id": "000000708",
+    "name": "Lord Kroak",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Skink Starpriest или Favoured Spawning"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Seraphon"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Skink Starpriest",
+       "Skink Starseer",
+       "Favoured Spawning"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Seraphon"
+      ]
+     }
+    ],
+    "official": "0-1 Skink Starpriest, Skink Starseer or Favoured Spawning, Any Seraphon",
+    "source": "BP-2026-09",
+    "page": 18,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p18"
+   },
+   {
+    "ref": "A278",
+    "kind": "options",
+    "faction": "SN",
+    "id": "000000718",
+    "name": "Slann Starmaster",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Skink Starpriest или Favoured Spawning"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Seraphon"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Skink Starpriest",
+       "Skink Starseer",
+       "Favoured Spawning"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Seraphon"
+      ]
+     }
+    ],
+    "official": "0-1 Skink Starpriest, Skink Starseer or Favoured Spawning, Any Seraphon",
+    "source": "BP-2026-09",
+    "page": 18,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p18"
+   },
+   {
+    "ref": "A279",
+    "kind": "options",
+    "faction": "StD",
+    "id": "000000567",
+    "name": "Darkoath Chieftain",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Monster"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Darkoath"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Oathsworn"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Monster"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Darkoath"
+      ]
+     }
+    ],
+    "official": "0-1 Oathsworn, 0-1 Monster, Any Darkoath",
+    "source": "BP-2026-09",
+    "page": 38,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p38"
+   },
+   {
+    "ref": "A280",
+    "kind": "options",
+    "faction": "OB",
+    "id": "000000524",
+    "name": "Arch-Kavalos Zandtos",
+    "field": "options",
+    "previous": [
+     {
+      "q": "any",
+      "required": false,
+      "label": "OSSIARCH BONEREAPERS"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Mortisan Vizier"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Ossiarch Bonereapers"
+      ]
+     }
+    ],
+    "official": "0-1 Mortisan Vizier, Any Ossiarch Bonereapers",
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p45"
+   },
+   {
+    "ref": "A281",
+    "kind": "options",
+    "faction": "OB",
+    "id": "000000531",
+    "name": "Arkhan the Black, Mortarch of Sacrament",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Legion Subcommander"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "OSSIARCH BONEREAPERS"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Legion Subcommander"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Mortisan Vizier"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Ossiarch Bonereapers"
+      ]
+     }
+    ],
+    "official": "0-1 Legion Subcommander, 0-1 Mortisan Vizier, Any Ossiarch Bonereapers",
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p45"
+   },
+   {
+    "ref": "A282",
+    "kind": "options",
+    "faction": "OB",
+    "id": "000000525",
+    "name": "Katakros, Mortarch of the Necropolis",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Legion Subcommander"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "OSSIARCH BONEREAPERS"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Legion Subcommander"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Mortisan Vizier"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Ossiarch Bonereapers"
+      ]
+     }
+    ],
+    "official": "0-1 Legion Subcommander, 0-1 Mortisan Vizier, Any Ossiarch Bonereapers",
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p45"
+   },
+   {
+    "ref": "A283",
+    "kind": "options",
+    "faction": "OB",
+    "id": "000000526",
+    "name": "Liege-Kavalos",
+    "field": "options",
+    "previous": [
+     {
+      "q": "any",
+      "required": false,
+      "label": "OSSIARCH BONEREAPERS"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Mortisan Vizier"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Ossiarch Bonereapers"
+      ]
+     }
+    ],
+    "official": "0-1 Mortisan Vizier, Any Ossiarch Bonereapers",
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p45"
+   },
+   {
+    "ref": "A284",
+    "kind": "options",
+    "faction": "OB",
+    "id": "000003088",
+    "name": "Liege-Kavalos on War Chariot",
+    "field": "options",
+    "previous": [
+     {
+      "q": "any",
+      "required": false,
+      "label": "OSSIARCH BONEREAPERS"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Mortisan Vizier"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Ossiarch Bonereapers"
+      ]
+     }
+    ],
+    "official": "0-1 Mortisan Vizier, Any Ossiarch Bonereapers",
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p45"
+   },
+   {
+    "ref": "A285",
+    "kind": "options",
+    "faction": "OB",
+    "id": "000003087",
+    "name": "Liege-Mortek",
+    "field": "options",
+    "previous": [
+     {
+      "q": "any",
+      "required": false,
+      "label": "OSSIARCH BONEREAPERS"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Mortisan Vizier"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Mortek Crawler"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Infantry"
+      ]
+     }
+    ],
+    "official": "0-1 Mortisan Vizier, 0-1 Mortek Crawler, Any Infantry",
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "Two parts: (1) Sept 2026 adds \"0-1 Mortisan Vizier\" (new); (2) older discrepancy: stored \"Any Ossiarch Bonereapers\" while July and Sept both give \"0-1 Mortek Crawler, Any Infantry\". Previous stored: Any Ossiarch Bonereapers; new official: 0-1 Mortek Crawler, 0-1 Mortisan Vizier, Any Infantry.",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A286",
+    "kind": "options",
+    "faction": "OB",
+    "id": "000001867",
+    "name": "Nagash, Supreme Lord of the Undead",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Legion Subcommander"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "OSSIARCH BONEREAPERS"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Legion Subcommander"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Mortisan Vizier"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Ossiarch Bonereapers"
+      ]
+     }
+    ],
+    "official": "0-1 Legion Subcommander, 0-1 Mortisan Vizier, Any Ossiarch Bonereapers",
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p45"
+   },
+   {
+    "ref": "A287",
+    "kind": "options",
+    "faction": "OB",
+    "id": "000000530",
+    "name": "Vokmortian, Master of the Bone-tithe",
+    "field": "options",
+    "previous": [
+     {
+      "q": "any",
+      "required": false,
+      "label": "OSSIARCH BONEREAPERS"
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Legion Subcommander"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Legion Subcommander"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Mortisan Vizier"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Ossiarch Bonereapers"
+      ]
+     }
+    ],
+    "official": "0-1 Legion Subcommander, 0-1 Mortisan Vizier, Any Ossiarch Bonereapers",
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p45"
+   },
+   {
+    "ref": "A288",
+    "kind": "options",
+    "faction": "OB",
+    "id": "000003603",
+    "name": "Scourge of Aqshy Vokmortian, Master of the Bone-tithe",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Legion Subcommander"
+     },
+     {
+      "q": "any",
+      "required": false,
+      "label": "Ossiarch Bonereapers"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Legion Subcommander"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Mortisan Vizier"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Ossiarch Bonereapers"
+      ]
+     }
+    ],
+    "official": "0-1 Legion Subcommander, 0-1 Mortisan Vizier, Any Ossiarch Bonereapers",
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p45"
+   },
+   {
+    "ref": "A289",
+    "kind": "options",
+    "faction": "SG",
+    "id": "000001109",
+    "name": "Mannfred von Carstein, Mortarch of Night",
+    "field": "options",
+    "previous": [
+     {
+      "q": "any",
+      "required": false,
+      "label": "SOULBLIGHT GRAVELORDS"
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Deathrattle Overseer"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Necromancer"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Deathrattle Overseer"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Soulblight Gravelords"
+      ]
+     }
+    ],
+    "official": "0-1 Necromancer, 0-1 Deathrattle Overseer, Any Soulblight Gravelords",
+    "source": "BP-2026-09",
+    "page": 47,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p47"
+   },
+   {
+    "ref": "A290",
+    "kind": "options",
+    "faction": "SG",
+    "id": "000000997",
+    "name": "Nagash, Supreme Lord of the Undead",
+    "field": "options",
+    "previous": [
+     {
+      "q": "any",
+      "required": false,
+      "label": "SOULBLIGHT GRAVELORDS"
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Deathrattle Overseer"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Necromancer"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Deathrattle Overseer"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Soulblight Gravelords"
+      ]
+     }
+    ],
+    "official": "0-1 Necromancer, 0-1 Deathrattle Overseer, Any Soulblight Gravelords",
+    "source": "BP-2026-09",
+    "page": 47,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p47"
+   },
+   {
+    "ref": "A291",
+    "kind": "options",
+    "faction": "SG",
+    "id": "000000998",
+    "name": "Neferata, Mortarch of Blood",
+    "field": "options",
+    "previous": [
+     {
+      "q": "any",
+      "required": false,
+      "label": "SOULBLIGHT GRAVELORDS"
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Deathrattle Overseer"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Necromancer"
+      ]
+     },
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Deathrattle Overseer"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Soulblight Gravelords"
+      ]
+     }
+    ],
+    "official": "0-1 Necromancer, 0-1 Deathrattle Overseer, Any Soulblight Gravelords",
+    "source": "BP-2026-09",
+    "page": 47,
+    "why": "Regiment options: official value per Battle Profiles, September 2026 (2026-09-23), p47"
+   },
+   {
+    "ref": "A306",
+    "kind": "options",
+    "faction": "SY",
+    "id": "000000306",
+    "name": "Arch-Revenant",
+    "field": "options",
+    "previous": [
+     {
+      "q": "any",
+      "required": false,
+      "label": "SYLVANETH или MONSTER"
+     }
+    ],
+    "value": [
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "non-Monster Sylvaneth"
+      ]
+     }
+    ],
+    "official": "Any non-Monster Sylvaneth",
+    "source": "BP-2026-09",
+    "page": 24,
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: Any Sylvaneth или Monster; new official: Any non-Monster Sylvaneth. Same in July and September; the stored label is a mis-parse that allows Monsters",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A307",
+    "kind": "options",
+    "faction": "BoC",
+    "id": "000000611",
+    "name": "Beastlord",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Herd Alpha или Beasts of Chaos"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Herd Alpha"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Beasts of Chaos"
+      ]
+     }
+    ],
+    "official": "0-1 Herd Alpha ; Any Beasts of Chaos",
+    "source": "BP-2026-09",
+    "page": 67,
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: 0-1 Herd Alpha или Beasts of Chaos; new official: 0-1 Herd Alpha ; Any Beasts of Chaos. Legends faction; same in July and September",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A307",
+    "kind": "options",
+    "faction": "BoC",
+    "id": "000000612",
+    "name": "Doombull",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Herd Alpha или Beasts of Chaos"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Herd Alpha"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Beasts of Chaos"
+      ]
+     }
+    ],
+    "official": "0-1 Herd Alpha ; Any Beasts of Chaos",
+    "source": "BP-2026-09",
+    "page": 67,
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: 0-1 Herd Alpha или Beasts of Chaos; new official: 0-1 Herd Alpha ; Any Beasts of Chaos. Legends faction; same in July and September",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A307",
+    "kind": "options",
+    "faction": "BoC",
+    "id": "000000613",
+    "name": "Dragon Ogor Shaggoth",
+    "field": "options",
+    "previous": [
+     {
+      "q": "max1",
+      "required": false,
+      "label": "Herd Alpha или Beasts of Chaos"
+     }
+    ],
+    "value": [
+     {
+      "q": "max1",
+      "required": false,
+      "alts": [
+       "Herd Alpha"
+      ]
+     },
+     {
+      "q": "any",
+      "required": false,
+      "alts": [
+       "Beasts of Chaos"
+      ]
+     }
+    ],
+    "official": "0-1 Herd Alpha ; Any Beasts of Chaos",
+    "source": "BP-2026-09",
+    "page": 67,
+    "why": "Reason: stored value differs from the official value in both July 2026 and September 2026 Battle Profiles (identical in both); stored value originates from the Wahapedia export. Previous stored: 0-1 Herd Alpha или Beasts of Chaos; new official: 0-1 Herd Alpha ; Any Beasts of Chaos. Legends faction; same in July and September",
+    "decision": "Decision 3 (16 Oct): apply latest official value; identity matched unambiguously"
+   },
+   {
+    "ref": "A308",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000001677",
+    "name": "Alchemite Warforger",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "thaumaturgical specialist"
+    ],
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A309",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000003444",
+    "name": "Amethyst Knellmage",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "thaumaturgical specialist"
+    ],
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A310",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000003442",
+    "name": "Aqshian Pyrocaster",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "thaumaturgical specialist"
+    ],
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A311",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000000434",
+    "name": "Battlemage",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "thaumaturgical specialist"
+    ],
+    "source": "BP-2026-09",
+    "page": 3,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A312",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000003467",
+    "name": "Jorvan Kreel, Heir of the Kraken",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "freeguild veteran"
+    ],
+    "source": "BP-2026-09",
+    "page": 4,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A313",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000003468",
+    "name": "Mallus Forgepriest",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "thaumaturgical specialist"
+    ],
+    "source": "BP-2026-09",
+    "page": 4,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A314",
+    "kind": "warscroll",
+    "faction": "CoS",
+    "id": "000003564",
+    "name": "Scourge of Aqshy Alchemite Warforger",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "thaumaturgical specialist"
+    ],
+    "source": "BP-2026-09",
+    "page": 4,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A315",
+    "kind": "warscroll",
+    "faction": "DoK",
+    "id": "000000874",
+    "name": "Hag Queen",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "coven matriarch"
+    ],
+    "source": "BP-2026-09",
+    "page": 8,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A316",
+    "kind": "warscroll",
+    "faction": "DoK",
+    "id": "000000878",
+    "name": "Slaughter Queen",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "coven matriarch"
+    ],
+    "source": "BP-2026-09",
+    "page": 8,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A317",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000001411",
+    "name": "Auric Flamekeeper",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "grimnir's chosen"
+    ],
+    "source": "BP-2026-09",
+    "page": 10,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A318",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000000227",
+    "name": "Auric Runemaster",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "grimnir's chosen"
+    ],
+    "source": "BP-2026-09",
+    "page": 10,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A319",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000000228",
+    "name": "Auric Runesmiter",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "grimnir's chosen"
+    ],
+    "source": "BP-2026-09",
+    "page": 10,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A320",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000000234",
+    "name": "Auric Runesmiter on Magmadroth",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "vulcatrix's chosen"
+    ],
+    "source": "BP-2026-09",
+    "page": 10,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A321",
+    "kind": "warscroll",
+    "faction": "ID",
+    "id": "000000904",
+    "name": "Isharann Tidecaster",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "isharann emissary"
+    ],
+    "source": "BP-2026-09",
+    "page": 12,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A322",
+    "kind": "warscroll",
+    "faction": "ID",
+    "id": "000003565",
+    "name": "Scourge of Aqshy Isharann Tidecaster",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "isharann emissary"
+    ],
+    "source": "BP-2026-09",
+    "page": 12,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A323",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000001054",
+    "name": "Scinari Calligrave",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "lumineth paragon"
+    ],
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A324",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000000838",
+    "name": "Scinari Cathallar",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "lumineth paragon"
+    ],
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A325",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000001535",
+    "name": "Scinari Enlightener",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "lumineth paragon"
+    ],
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A326",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000001055",
+    "name": "Scinari Loreseeker",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "lumineth paragon"
+    ],
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A327",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000003029",
+    "name": "Vanari Lord Regent on Lightcourser",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "lumineth paragon"
+    ],
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A328",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000003572",
+    "name": "Scourge of Aqshy Scinari Loreseeker",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "lumineth paragon"
+    ],
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A329",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000001135",
+    "name": "Knight-Arcanum",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "stormcast exemplar"
+    ],
+    "source": "BP-2026-09",
+    "page": 20,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A330",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000001353",
+    "name": "Knight-Relictor",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "stormcast exemplar"
+    ],
+    "source": "BP-2026-09",
+    "page": 20,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A331",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000000073",
+    "name": "Lord-Aquilor",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "stormcast exemplar"
+    ],
+    "source": "BP-2026-09",
+    "page": 21,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A332",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000000079",
+    "name": "Lord-Celestant",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "stormcast exemplar"
+    ],
+    "source": "BP-2026-09",
+    "page": 21,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A333",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000000084",
+    "name": "Lord-Veritant",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "stormcast exemplar"
+    ],
+    "source": "BP-2026-09",
+    "page": 21,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A334",
+    "kind": "warscroll",
+    "faction": "SY",
+    "id": "000000308",
+    "name": "Branchwych",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "forest sentinel"
+    ],
+    "source": "BP-2026-09",
+    "page": 24,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A335",
+    "kind": "warscroll",
+    "faction": "BoK",
+    "id": "000000140",
+    "name": "Bloodmaster, Herald of Khorne",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "slaughter seeker"
+    ],
+    "source": "BP-2026-09",
+    "page": 26,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A336",
+    "kind": "warscroll",
+    "faction": "BoK",
+    "id": "000001617",
+    "name": "Realmgore Ritualist",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "bloodbound warmonger"
+    ],
+    "source": "BP-2026-09",
+    "page": 26,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A337",
+    "kind": "warscroll",
+    "faction": "BoK",
+    "id": "000000153",
+    "name": "Slaughterpriest",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "bloodbound warmonger"
+    ],
+    "source": "BP-2026-09",
+    "page": 26,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A338",
+    "kind": "warscroll",
+    "faction": "DoT",
+    "id": "000000656",
+    "name": "Tzaangor Shaman",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "arcanite cabalist"
+    ],
+    "source": "BP-2026-09",
+    "page": 28,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A339",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000001627",
+    "name": "Contorted Epitome",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "slaaneshi beguiler"
+    ],
+    "source": "BP-2026-09",
+    "page": 30,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A340",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000001029",
+    "name": "Shardspeaker of Slaanesh",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "dark egotist"
+    ],
+    "source": "BP-2026-09",
+    "page": 30,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A341",
+    "kind": "warscroll",
+    "faction": "HoH",
+    "id": "000002621",
+    "name": "Ashen Elder",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "hashutite commander"
+    ],
+    "source": "BP-2026-09",
+    "page": 32,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A342",
+    "kind": "warscroll",
+    "faction": "HoH",
+    "id": "000002617",
+    "name": "Daemonsmith",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "hashutite commander"
+    ],
+    "source": "BP-2026-09",
+    "page": 32,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A343",
+    "kind": "warscroll",
+    "faction": "MoN",
+    "id": "000001394",
+    "name": "Rotbringer Sorcerer",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "rotbringer lord"
+    ],
+    "source": "BP-2026-09",
+    "page": 34,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A344",
+    "kind": "warscroll",
+    "faction": "ST",
+    "id": "000000254",
+    "name": "Arch-Warlock",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "skaven overclaw"
+    ],
+    "source": "BP-2026-09",
+    "page": 36,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A345",
+    "kind": "warscroll",
+    "faction": "StD",
+    "id": "000000565",
+    "name": "Chaos Sorcerer Lord",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "ruinous champion"
+    ],
+    "source": "BP-2026-09",
+    "page": 38,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A346",
+    "kind": "warscroll",
+    "faction": "StD",
+    "id": "000000568",
+    "name": "Darkoath Warqueen",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "oathsworn"
+    ],
+    "source": "BP-2026-09",
+    "page": 38,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A347",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000000359",
+    "name": "Abhorrant Archregent",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "royal attendant"
+    ],
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A348",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000001721",
+    "name": "Abhorrant Cardinal",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "royal attendant"
+    ],
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A349",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000000360",
+    "name": "Abhorrant Ghoul King",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "royal attendant"
+    ],
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A350",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000001722",
+    "name": "Abhorrant Gorewarden",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "royal attendant"
+    ],
+    "source": "BP-2026-09",
+    "page": 41,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A351",
+    "kind": "warscroll",
+    "faction": "NT",
+    "id": "000001406",
+    "name": "Guardian of Souls",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "cursed soul"
+    ],
+    "source": "BP-2026-09",
+    "page": 43,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A352",
+    "kind": "warscroll",
+    "faction": "NT",
+    "id": "000001072",
+    "name": "Krulghast Cruciator",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "cursed soul"
+    ],
+    "source": "BP-2026-09",
+    "page": 43,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A353",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000000527",
+    "name": "Mortisan Boneshaper",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "mortisan vizier"
+    ],
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A354",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000001622",
+    "name": "Mortisan Ossifector",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "mortisan vizier"
+    ],
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A355",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000000528",
+    "name": "Mortisan Soulmason",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "mortisan vizier"
+    ],
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A356",
+    "kind": "warscroll",
+    "faction": "OB",
+    "id": "000000529",
+    "name": "Mortisan Soulreaper",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "mortisan vizier"
+    ],
+    "source": "BP-2026-09",
+    "page": 45,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A357",
+    "kind": "warscroll",
+    "faction": "IJ",
+    "id": "000001854",
+    "name": "Warchanter",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "headstompa"
+    ],
+    "source": "BP-2026-09",
+    "page": 51,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A358",
+    "kind": "warscroll",
+    "faction": "IJ",
+    "id": "000001850",
+    "name": "Weirdnob Shaman",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "headstompa"
+    ],
+    "source": "BP-2026-09",
+    "page": 51,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A359",
+    "kind": "warscroll",
+    "faction": "KB",
+    "id": "000001852",
+    "name": "Swampcalla Shaman with Pot-grot",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "mob wrangler"
+    ],
+    "source": "BP-2026-09",
+    "page": 53,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A370",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000000067",
+    "name": "Knight-Heraldor",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "stormcast exemplar"
+    ],
+    "source": "BP-2026-09",
+    "page": 66,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A371",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000000068",
+    "name": "Knight-Incantor",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "stormcast exemplar"
+    ],
+    "source": "BP-2026-09",
+    "page": 66,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A372",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000000074",
+    "name": "Lord-Arcanum",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "stormcast exemplar"
+    ],
+    "source": "BP-2026-09",
+    "page": 66,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A373",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000000078",
+    "name": "Lord-Castellant",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "stormcast exemplar"
+    ],
+    "source": "BP-2026-09",
+    "page": 66,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A374",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000000081",
+    "name": "Lord-Exorcist",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "stormcast exemplar"
+    ],
+    "source": "BP-2026-09",
+    "page": 66,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A375",
+    "kind": "warscroll",
+    "faction": "SE",
+    "id": "000000082",
+    "name": "Lord-Ordinator",
+    "field": "joinAs",
+    "previous": [],
+    "value": [
+     "stormcast exemplar"
+    ],
+    "source": "BP-2026-09",
+    "page": 66,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A376",
+    "kind": "warscroll",
+    "faction": "FE",
+    "id": "000000361",
+    "name": "Crypt Ghast Courtier",
+    "field": "joinAs",
+    "previous": [
+     "flesh-eater noble"
+    ],
+    "value": [
+     "royal attendant"
+    ],
+    "source": "BP-2026-09",
+    "page": 71,
+    "why": "\"This Hero can join an eligible regiment as …\""
+   },
+   {
+    "ref": "A379",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000000837",
+    "name": "Alarith Stonemage",
+    "field": "joinLeaderIds",
+    "previous": [],
+    "value": [
+     "000000841"
+    ],
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "New note \"This Hero can join the regiment of …\"; leaders get the matching 0-1 option (see Regiment options)"
+   },
+   {
+    "ref": "A380",
+    "kind": "warscroll",
+    "faction": "LRL",
+    "id": "000001050",
+    "name": "Hurakan Windmage",
+    "field": "joinLeaderIds",
+    "previous": [],
+    "value": [
+     "000001056"
+    ],
+    "source": "BP-2026-09",
+    "page": 16,
+    "why": "New note \"This Hero can join the regiment of …\"; leaders get the matching 0-1 option (see Regiment options)"
+   },
+   {
+    "ref": "A381",
+    "kind": "warscroll",
+    "faction": "SN",
+    "id": "000000717",
+    "name": "Skink Starseer",
+    "field": "joinLeaderIds",
+    "previous": [],
+    "value": [
+     "000000708",
+     "000000718"
+    ],
+    "source": "BP-2026-09",
+    "page": 18,
+    "why": "New note \"This Hero can join the regiment of …\"; leaders get the matching 0-1 option (see Regiment options)"
+   },
+   {
+    "ref": "A382",
+    "kind": "warscroll",
+    "faction": "SG",
+    "id": "000000988",
+    "name": "Necromancer",
+    "field": "joinLeaderIds",
+    "previous": [],
+    "value": [
+     "000001109",
+     "000000997",
+     "000000998"
+    ],
+    "source": "BP-2026-09",
+    "page": 47,
+    "why": "New note \"This Hero can join the regiment of …\"; leaders get the matching 0-1 option (see Regiment options)"
+   },
+   {
+    "ref": "A383",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000003586",
+    "name": "Scourge of Aqshy Infernal Enrapturess, Herald of Slaanesh",
+    "field": "cost",
+    "previous": 90,
+    "value": 80,
+    "officialName": "Scourge of Aqshy Infernal Enrapturess",
+    "source": "BP-2026-09",
+    "why": "name differs; points change -10"
+   },
+   {
+    "ref": "A384",
+    "kind": "warscroll",
+    "faction": "ST",
+    "id": "000000281",
+    "name": "Ratling Gun",
+    "field": "cost",
+    "previous": 170,
+    "value": 160,
+    "officialName": "Ratling Guns",
+    "source": "BP-2026-09",
+    "why": "name differs (plural in BP); points change -10"
+   },
+   {
+    "ref": "A385",
+    "kind": "warscroll",
+    "faction": "KB",
+    "id": "000001731",
+    "name": "Monsta-killaz",
+    "field": "cost",
+    "previous": 120,
+    "value": 140,
+    "officialName": "Kruleboyz Monsta-killaz",
+    "source": "BP-2026-09",
+    "why": "name differs; points change +20"
+   },
+   {
+    "ref": "A395",
+    "kind": "rule",
+    "owners": [
+     "CoS|ws:War Hydra"
+    ],
+    "ruleName": "Impossible to Destroy",
+    "field": "timing",
+    "previous": "Passive",
+    "value": "Once Per Turn (Army), End of Any Turn",
+    "source": "RU-2026-09",
+    "page": 30,
+    "why": "RU badge: NEW. Wahapedia page not yet updated; official text wins (decision rule)"
+   },
+   {
+    "ref": "A395",
+    "kind": "rule",
+    "owners": [
+     "CoS|ws:War Hydra"
+    ],
+    "ruleName": "Impossible to Destroy",
+    "field": "text",
+    "previous": "Effect: If this unit would be destroyed, before removing it from play, roll 6 dice. Subtract 1 from the number of dice rolled for each destroyed head token this unit has.\n\nIf any of the rolls are a 5+, this unit is not destroyed and any remaining damage points inflicted on it have no effect. Then, Heal (1) this unit for each 5+. Finally, give this unit 1 destroyed head token.",
+    "value": "Effect: Heal (6) this unit.",
+    "source": "RU-2026-09",
+    "page": 30,
+    "why": "RU badge: NEW. Wahapedia page not yet updated; official text wins (decision rule)"
+   },
+   {
+    "ref": "A396",
+    "kind": "rule",
+    "owners": [
+     "DoT|trait"
+    ],
+    "ruleName": "SMOKE AND MIRRORS",
+    "field": "text",
+    "previous": "Declare: Pick a friendly non-MONSTER DISCIPLES OF TZEENTCH unit that was not set up this turn and was not set up using this ability in the previous turn to be the target, then pick a friendly unit that is masked by illusion to be the substitute.\n\nEffect: Set up the substitute wholly within 6\" of the target and not in combat. Then, remove the target from the battlefield and set it up in reserve masked by illusion.",
+    "value": "Declare: Pick a friendly non-MONSTER DISCIPLES OF TZEENTCH unit that was not set up on the battlefield this turn and was not set up on the battlefield using this ability in the previous turn to be the target, then pick a friendly unit that is masked by illusion to be the substitute.\n\nEffect: Set up the substitute wholly within 6\" of the target and not in combat. Then, remove the target from the battlefield and set it up in reserve masked by illusion.",
+    "source": "RU-2026-09",
+    "page": 41,
+    "why": "RU badge: UPDATED. declare step wording (\"set up on the battlefield\")"
+   },
+   {
+    "ref": "A397",
+    "kind": "rule",
+    "owners": [
+     "DoT|trait"
+    ],
+    "ruleName": "ALL PART OF THE PLAN",
+    "field": "text",
+    "previous": "Effect: You start the battle with 0 fate points.\nGain 1 fate point each time:\n\n• You lose the priority roll.\n• A spell cast by a friendly DISCIPLES OF TZEENTCH unit is unbound.\n• A friendly DISCIPLES OF TZEENTCH unit miscasts a spell.\n• Your opponent gains control of an objective that you controlled at the start of the turn.\n• A friendly Argent Shard is demolished.",
+    "value": "Effect: You start the battle with 0 fate points.\nGain 1 fate point each time:\n\n• You lose the priority roll.\n• A spell cast by a friendly DISCIPLES OF TZEENTCH unit is unbound.\n• A friendly DISCIPLES OF TZEENTCH unit miscasts a spell.\n• Your opponent gains control of an objective that you controlled at the start of the turn.\n• A friendly Argent Shard is demolished.\n\nYou can have a maximum of 9 fate points.",
+    "source": "RU-2026-09",
+    "page": 41,
+    "why": "RU badge: NEW. add sentence \"You can have a maximum of 9 fate points.\""
+   },
+   {
+    "ref": "A398",
+    "kind": "rule",
+    "owners": [
+     "DoT|ws:Flamers of Tzeentch"
+    ],
+    "ruleName": "Lingering Burns",
+    "field": "text",
+    "previous": "Declare: This unit can use this ability even if it has been destroyed. Pick any number of BURNING enemy units to be the targets.\n\nEffect: Roll a D3 for each target. On a 1, the target no longer has the BURNING keyword. On a 2+, inflict an amount of mortal damage on the target equal to the roll.",
+    "value": "Declare: This unit can use this ability even if it has been destroyed or is in reserve. Pick any number of BURNING enemy units to be the targets.\n\nEffect: Roll a D3 for each target. On a 1, the target no longer has the BURNING keyword. On a 2+, inflict an amount of mortal damage on the target equal to the roll.",
+    "source": "RU-2026-09",
+    "page": 41,
+    "why": "RU badge: NEW. first sentence"
+   },
+   {
+    "ref": "A399",
+    "kind": "rule",
+    "owners": [
+     "HoH|form:Hashutite Host"
+    ],
+    "ruleName": "AMASSED LEGIONS",
+    "field": "text",
+    "previous": "Effect: Each time a friendly HELSMITHS OF HASHUT INFANTRY unit with 3 daemonic power points uses the ‘Rally’ command, you can make 3 additional rally rolls of D6.",
+    "value": "Effect: Each time a friendly HELSMITHS OF HASHUT unit within the combat range of a friendly HELSMITHS OF HASHUT INFANTRY unit with 1 or more daemonic power points uses the ‘Rally’ command, you can make 3 additional rally rolls of D6.",
+    "source": "RU-2026-09",
+    "page": 50,
+    "why": "RU badge: NEW. formation Hashutite Host"
+   },
+   {
+    "ref": "A400",
+    "kind": "rule",
+    "owners": [
+     "HoH|form:The Bullfather’s Horns"
+    ],
+    "ruleName": "BULLS OF THE ZIGGURAT",
+    "field": "text",
+    "previous": "Effect: Add 2\" to the Move characteristic of friendly HELSMITHS OF HASHUT CAVALRY and MONSTER units while they have 3 daemonic power points.",
+    "value": "Effect: Add 1\" to the Move characteristic of friendly HELSMITHS OF HASHUT units for each daemonic power point that unit has.",
+    "source": "RU-2026-09",
+    "page": 50,
+    "why": "RU badge: NEW. formation The Bullfather’s Horns"
+   },
+   {
+    "ref": "A401",
+    "kind": "rule",
+    "owners": [
+     "HoH|form:Daemonsmith Cabal"
+    ],
+    "ruleName": "ARCANE DOMINANCE",
+    "field": "text",
+    "previous": "Effect: Add 1 to casting rolls, unbinding rolls, banishment rolls and chanting rolls for friendly HELSMITHS OF HASHUT WIZARDS and PRIESTS while they have 3 daemonic power points.",
+    "value": "Effect: Add 1 to casting rolls, chanting rolls, unbinding rolls, and banishment rolls for friendly HELSMITHS OF HASHUT WIZARDS and PRIESTS while they are wholly within 12\" of another friendly HELSMITHS OF HASHUT WIZARD or PRIEST with 1 or more daemonic power points.",
+    "source": "RU-2026-09",
+    "page": 50,
+    "why": "RU badge: NEW. formation Daemonsmith Cabal"
+   },
+   {
+    "ref": "A402",
+    "kind": "rule",
+    "owners": [
+     "HoH|form:Castigation Battery"
+    ],
+    "ruleName": "EXPERIMENTAL MUNITIONS",
+    "field": "text",
+    "previous": "Effect: Add 1 to the Attacks characteristic of ranged weapons used by friendly HELSMITHS OF HASHUT WAR MACHINES while they have 3 daemonic power points.",
+    "value": "Effect: Ranged weapons used by friendly HELSMITHS OF HASHUT units have Crit (2 Hits) while they have 2 or more daemonic power points.",
+    "source": "RU-2026-09",
+    "page": 50,
+    "why": "RU badge: NEW. formation Castigation Battery"
+   },
+   {
+    "ref": "A403",
+    "kind": "rule",
+    "owners": [
+     "NT|form:Death Stalkers"
+    ],
+    "ruleName": "THERE IS NO ESCAPE",
+    "field": "timing",
+    "previous": "Once Per Turn (Army), Your Movement Phase",
+    "value": "Once Per Turn (Army), Any Hero Phase",
+    "source": "RU-2026-09",
+    "page": 58,
+    "why": "RU badge: NEW. formation Death Stalkers; timing changes to Any Hero Phase"
+   },
+   {
+    "ref": "A403",
+    "kind": "rule",
+    "owners": [
+     "NT|form:Death Stalkers"
+    ],
+    "ruleName": "THERE IS NO ESCAPE",
+    "field": "text",
+    "previous": "Declare: Pick a friendly NIGHTHAUNT unit to be the target.\n\nEffect: For the rest of the turn:\n\n• The target can use CHARGE and SHOOT abilities even if it has used a RETREAT ability in the same turn.\n• The target can use the ’Retreat’ ability without any mortal damage being inflicted on it.",
+    "value": "Declare: If there is not a condemned enemy unit on the battlefield, pick an enemy unit to be condemned.\n\nEffect: For the rest of the battle, add 1 to the Rend characteristic of melee weapons used for attacks made by friendly NIGHTHAUNT units that target the condemned enemy unit.",
+    "source": "RU-2026-09",
+    "page": 58,
+    "why": "RU badge: NEW. formation Death Stalkers; timing changes to Any Hero Phase"
+   },
+   {
+    "ref": "A404",
+    "kind": "rule",
+    "owners": [
+     "NT|enh:Shades of Death"
+    ],
+    "ruleName": "SHADOWY AURA",
+    "field": "timing",
+    "previous": "Reaction: You declared the ’Redeploy’ command for a friendly NIGHTHAUNT unit wholly within 12\" of this unit",
+    "value": "Passive",
+    "source": "RU-2026-09",
+    "page": 58,
+    "why": "RU badge: NEW. heroic trait; timing becomes Passive"
+   },
+   {
+    "ref": "A404",
+    "kind": "rule",
+    "owners": [
+     "NT|enh:Shades of Death"
+    ],
+    "ruleName": "SHADOWY AURA",
+    "field": "text",
+    "previous": "Effect: For the rest of the turn, subtract 1 from hit rolls for attacks that target this unit.",
+    "value": "Effect: While they are wholly within 6\" of this unit, friendly NIGHTHAUNT INFANTRY and CAVALRY units are not visible to enemy units more than 9\" from them.",
+    "source": "RU-2026-09",
+    "page": 58,
+    "why": "RU badge: NEW. heroic trait; timing becomes Passive"
+   },
+   {
+    "ref": "A405",
+    "kind": "rule",
+    "owners": [
+     "FE|ws:Scriptor Mortis",
+     "NT|ws:Scriptor Mortis",
+     "OB|ws:Scriptor Mortis",
+     "SG|ws:Scriptor Mortis"
+    ],
+    "ruleName": "Sentenced to Eternal Torment",
+    "field": "text",
+    "previous": "Declare: Pick a visible enemy unit within 18\" of this unit to be the target.\n\nEffect: Roll a dice. On a 3+, inflict 1 mortal damage on the target and the target has the SENTENCED keyword until the start of your next turn.",
+    "value": "Declare: Pick a visible enemy unit within 18\" of this unit to be the target.\n\nEffect: Roll a dice. On a 3+, inflict 1 mortal damage on the target and the target has the SENTENCED keyword for the rest of the battle.",
+    "source": "RU-2026-09",
+    "page": 58,
+    "why": "RU badge: NEW. \"until the start of your next turn\" → \"for the rest of the battle\""
+   },
+   {
+    "ref": "A406",
+    "kind": "rule",
+    "owners": [
+     "NT|ws:Lord Vitriolic"
+    ],
+    "ruleName": "Spectral Alchemy",
+    "field": "text",
+    "previous": "Declare: Pick an enemy unit within 10\" of this unit to be the target.\n\nEffect: Roll a dice. On a 3+, pick 1 of the following effects or roll two dice and apply both corresponding effects in an order of your choosing, including duplicate effects:\n\n1 Phantasmal Solvent: If the target has a Move characteristic of’-’, inflict 6 mortal damage on the target.\n2 Acidic Fug: Inflict D3 mortal damage on the target.\n3 Fling Concoctions: Add 1 to the Attacks characteristic of this unit’s Hurled Vial this phase but all attacks made by this unit this phase must target that enemy unit.\n4 Choking Vapours: If the target is a WIZARD, subtract 1 from its power level until the start of your next turn.\n5 Fear-laced Hallucinogen: If the target is a PRIEST, rem",
+    "value": "Declare: Pick an enemy unit within 10\" of this unit to be the target.\n\nEffect: If this unit’s shooting attacks inflicted damage on the target this turn, apply 1 of the following effects. Otherwise, roll a dice. On a 3+, apply 1 of the following effects:\n\nPhantasmal Solvent: If the target has a Move characteristic of ‘-’, inflict 6 mortal damage on the target.\nAcidic Fug: Inflict D3 mortal damage on the target.\nCorrosive Mist: Inflict 1 mortal damage on each enemy unit within the target’s combat range.\nChoking Vapours: If the target is a WIZARD, subtract 1 from its power level until the start of your next turn.\nFear-laced Hallucinogen: If the target is a PRIEST, remove D3 ritual points from it.\nUnholy Prescription: Ward rolls cannot be made for the target for the rest of the turn.",
+    "clearIncomplete": true,
+    "source": "RU-2026-09",
+    "page": 58,
+    "why": "RU badge: NEW. one of the 4 restored rules: replaces curated \"missing\" entry"
+   },
+   {
+    "ref": "A407",
+    "kind": "rule",
+    "owners": [
+     "OB|trait"
+    ],
+    "ruleName": "IMPASSIVE RETREAT",
+    "field": "text",
+    "previous": "Declare: Pick a friendly OSSIARCH BONEREAPERS unit that has not used a RELENTLESS DISCIPLINE ability this phase to use this ability.\n\nEffect: Spend 1 relentless discipline point. If that unit is reinforced and has more than half of its starting models, spend 2 relentless discipline points instead. For the rest of the turn, that unit can use CHARGE abilities even if it used a RETREAT ability in the same turn.",
+    "value": "Declare: Pick a friendly OSSIARCH BONEREAPERS unit that has not used a RELENTLESS DISCIPLINE ability this phase to use this ability.\n\nEffect: Spend 1 relentless discipline point. For the rest of the turn, that unit can use CHARGE abilities even if it used a RETREAT ability in the same turn.",
+    "source": "RU-2026-09",
+    "page": 64,
+    "why": "RU badge: NEW. remove 2nd line: \"If that unit is reinforced and has more than half of its starting models, spend 2 relentless discipline points instead.\""
+   },
+   {
+    "ref": "A408",
+    "kind": "rule",
+    "owners": [
+     "OB|trait"
+    ],
+    "ruleName": "RUTHLESS EXTERMINATION",
+    "field": "text",
+    "previous": "Used By: The unit using that SHOOT ability.\n\nEffect: Spend 1 relentless discipline point. If that unit is reinforced and has more than half of its starting models, spend 2 relentless discipline points instead. Subtract 1 from ward rolls for damage points inflicted by attacks made as part of that SHOOT ability.",
+    "value": "Used By: The unit using that SHOOT ability.\n\nEffect: Spend 1 relentless discipline point. Subtract 1 from ward rolls for damage points inflicted by attacks made as part of that SHOOT ability.",
+    "source": "RU-2026-09",
+    "page": 64,
+    "why": "RU badge: NEW. remove same 2nd line"
+   },
+   {
+    "ref": "A409",
+    "kind": "rule",
+    "owners": [
+     "OB|trait"
+    ],
+    "ruleName": "PITILESS ASSAULT",
+    "field": "text",
+    "previous": "Used By: The unit using that FIGHT ability.\n\nEffect: Spend 1 relentless discipline point. If that unit is reinforced and has more than half of its starting models, spend 2 relentless discipline points instead. Add 1 to wound rolls for attacks made as part of that FIGHT ability.",
+    "value": "Used By: The unit using that FIGHT ability.\n\nEffect: Spend 1 relentless discipline point. Add 1 to wound rolls for attacks made as part of that FIGHT ability.",
+    "source": "RU-2026-09",
+    "page": 64,
+    "why": "RU badge: NEW. remove same 2nd line"
+   },
+   {
+    "ref": "A410",
+    "kind": "rule",
+    "owners": [
+     "OB|trait"
+    ],
+    "ruleName": "REMORSELESS MARCH",
+    "field": "text",
+    "previous": "Declare: Pick a friendly OSSIARCH BONEREAPERS unit that has not used a RELENTLESS DISCIPLINE ability this phase to use this ability.\n\nEffect: Spend 1 relentless discipline point. If that unit is reinforced and has more than half of its starting models, spend 2 relentless discipline points instead. Add 3\" to the Move characteristic of that unit for the rest of the phase. That unit cannot use RUN abilities for the rest of the turn.",
+    "value": "Declare: Pick a friendly OSSIARCH BONEREAPERS unit that has not used a RELENTLESS DISCIPLINE ability this phase to use this ability.\n\nEffect: Spend 1 relentless discipline point. Add 3\" to the Move characteristic of that unit for the rest of the phase. That unit cannot use RUN abilities for the rest of the turn.",
+    "source": "RU-2026-09",
+    "page": 64,
+    "why": "RU badge: NEW. remove same 2nd line"
+   },
+   {
+    "ref": "A411",
+    "kind": "rule",
+    "owners": [
+     "OB|trait"
+    ],
+    "ruleName": "INVIOLATE LEGIONS",
+    "field": "text",
+    "previous": "Used By: A friendly OSSIARCH BONEREAPERS unit targeted by that ATTACK ability. Friendly OSSIARCH BONEREAPERS units can use this ability more than once per phase.\n\nEffect: Spend 1 relentless discipline point. If that unit is reinforced and has more than half of its starting models, spend 2 relentless discipline points instead. That unit has WARD (5+) against damage points inflicted by attacks made as part of that ATTACK ability.",
+    "value": "Used By: A friendly OSSIARCH BONEREAPERS unit targeted by that ATTACK ability. Friendly OSSIARCH BONEREAPERS units can use this ability more than once per phase.\n\nEffect: Spend 1 relentless discipline point. That unit has WARD (5+) against damage points inflicted by attacks made as part of that ATTACK ability.",
+    "source": "RU-2026-09",
+    "page": 64,
+    "why": "RU badge: NEW. remove same 2nd line"
+   },
+   {
+    "ref": "A412",
+    "kind": "rule",
+    "owners": [
+     "OB|ws:Katakros, Mortarch of the Necropolis"
+    ],
+    "ruleName": "Supreme Lord of the Bonereaper Legions",
+    "field": "text",
+    "previous": "Declare: If this unit is not in combat, pick a visible friendly OSSIARCH BONEREAPERS unit wholly within 12\" of this unit that is in combat and has not used a RELENTLESS DISCIPLINE ability this phase to be the target.\n\nEffect: Spend a number of relentless discipline points equal to the target’s Health characteristic. If the target is reinforced and has more than half of its starting models, spend an additional relentless discipline point. The target can use 2 FIGHT abilities this phase. After the first is used, however, the target has",
+    "value": "Declare: If this unit is not in combat, pick a visible friendly OSSIARCH BONEREAPERS unit wholly within 12\" of this unit that is in combat and has not used a RELENTLESS DISCIPLINE ability this phase to be the target.\n\nEffect: Spend a number of relentless discipline points equal to the target’s Health characteristic. The target can use 2 FIGHT abilities this phase. After the first is used, however, the target has STRIKE-LAST for the rest of the turn. In addition, the target cannot use RELENTLESS DISCIPLINE abilities for the rest of the phase.",
+    "clearIncomplete": true,
+    "source": "RU-2026-09",
+    "page": 64,
+    "why": "RU badge: NEW. one of the 4 restored rules: remove \"If the target is reinforced and has more than half of its starting models, spend an additional relentless discipline point.\"; rest of the restored text kept"
+   },
+   {
+    "ref": "A413",
+    "kind": "rule",
+    "owners": [
+     "BoK|ws:Krittok Foulblade",
+     "DoT|ws:Krittok Foulblade",
+     "HS|ws:Krittok Foulblade",
+     "MoN|ws:Krittok Foulblade",
+     "ST|ws:Krittok Foulblade",
+     "StD|ws:Krittok Foulblade"
+    ],
+    "ruleName": "A Reputation For Cunning",
+    "field": "value",
+    "previous": "Command 1",
+    "value": null,
+    "source": "RU-2026-09",
+    "page": 65,
+    "why": "RU badge: NEW. value \"Command 1\" → none (all faction copies)"
+   },
+   {
+    "ref": "A414",
+    "kind": "rule",
+    "owners": [
+     "BoK|ws:Warlock Galvaneer",
+     "DoT|ws:Warlock Galvaneer",
+     "HS|ws:Warlock Galvaneer",
+     "MoN|ws:Warlock Galvaneer",
+     "ST|ws:Warlock Galvaneer",
+     "StD|ws:Warlock Galvaneer"
+    ],
+    "ruleName": "Lightning Master",
+    "field": "text",
+    "previous": "Declare: Pick a friendly Warpvolt Scourgers unit within this unit’s combat range to be the target.\n\nEffect: Roll a dice. On a 2+, set the Attacks characteristic of the target’s Warpvolt Scourgers to 10 for the rest of the turn.",
+    "value": "Declare: Pick a friendly Warpvolt Scourgers unit within this unit’s combat range to be the target.\n\nEffect: Set the Attacks characteristic of the target’s Warpvolt Scourgers to 10 for the rest of the turn.",
+    "source": "RU-2026-09",
+    "page": 65,
+    "why": "RU badge: NEW. Wahapedia not yet updated; all faction/RoR copies"
+   },
+   {
+    "ref": "A415",
+    "kind": "rule",
+    "owners": [
+     "StD|form:Despoilers"
+    ],
+    "ruleName": "FERAL RUIN",
+    "field": "text",
+    "previous": "Declare: Pick a friendly Daemon Prince to use this ability. Then, pick a visible non-DAEMON non-UNIQUE SLAVES TO DARKNESS unit wholly within 12\" of this unit to be the target.\n\nEffect: Remove any PLEDGE TO CHAOS keywords the target has. Then, the target gains any PLEDGE TO CHAOS keywords thi",
+    "value": "Declare: Pick a friendly Daemon Prince to use this ability. Then, pick a visible friendly non-DAEMON non-UNIQUE SLAVES TO DARKNESS unit that does not have an Ensorcelled Banner wholly within 12\" of this unit to be the target.\n\nEffect: Remove any Pledge to Chaos keywords the target has. Then, the target gains any Pledge to Chaos keywords this unit has.",
+    "clearIncomplete": true,
+    "nameNote": "RU 23 Sep 2026 p67: instruction names ‘Feral Ruin’; replacement block titled ‘YOU WILL SERVE!’ — name and identifier kept",
+    "source": "RU-2026-09",
+    "page": 67,
+    "why": "RU badge: UPDATED. one of the 4 restored rules. Official block is headed \"YOU WILL SERVE!\" while the instruction says \"Change the Despoilers’ ‘Feral Ruin’ ability to:\". Proposal: keep the name FERAL RUIN, take the official text; flag the heading discrepancy."
+   },
+   {
+    "ref": "A416",
+    "kind": "rule",
+    "owners": [
+     "StD|ws:Chaos Sorcerer Lord"
+    ],
+    "ruleName": "Oracular Visions",
+    "field": "text",
+    "previous": "Declare: Pick a friendly WARRIORS OF CHAOS unit wholly within 12\" of this unit to be the target and roll a dice.\n\nEffect: On a 3+, the target has WARD (5+) until the start of your next turn.",
+    "value": "Declare: Pick a friendly WARRIORS OF CHAOS unit wholly within 12\" of this unit to be the target.\n\nEffect: If this unit successfully cast a spell this phase, the target has WARD (5+) until the start of your next turn. Otherwise, the target has WARD (6+) until the start of your next turn.",
+    "source": "RU-2026-09",
+    "page": 68,
+    "why": "RU badge: NEW. RU names only \"Chaos Sorcerer Lord\""
+   },
+   {
+    "ref": "A418",
+    "kind": "rule",
+    "owners": [
+     "StD|ws:Darkoath Savagers"
+    ],
+    "ruleName": "Oath of Conquest",
+    "field": "text",
+    "previous": "Effect: If this unit is contesting an objective you control that is wholly within enemy territory, this unit has WARD (5+) for the rest of the battle.",
+    "value": "Effect: If this unit is contesting an objective you control that is not within friendly territory, this unit has WARD (5+) for the rest of the battle.",
+    "source": "RU-2026-09",
+    "page": 68,
+    "why": "RU badge: NEW. \"wholly within enemy territory\" → \"not within friendly territory\""
+   },
+   {
+    "ref": "A420",
+    "kind": "rule",
+    "owners": [
+     "StD|enh:Brands of the Dark Gods"
+    ],
+    "ruleName": "BRAND OF THE UNALIGNED",
+    "field": "text",
+    "previous": "Effect: Remove all of this unit’s Pledge to Chaos keywords. Then, pick 1 of the following Pledge to Chaos keywords. You cannot pick a keyword you picked for this unit earlier in the battle.\n\n• PLEDGED TO KHORNE\n• PLEDGED TO TZEENTCH\n• PLEDGED TO NURGLE\n• PLEDGED TO SLAANESH\n\nThis unit has that keyword for the rest of the battle.",
+    "value": "Declare: This unit cannot use this ability if it has an Ensorcelled Banner.\n\nEffect: Remove all of this unit’s Pledge to Chaos keywords. Then, pick 1 of the following Pledge to Chaos keywords. You cannot pick a keyword you picked for this unit earlier in the battle.\n\n• PLEDGED TO KHORNE\n• PLEDGED TO TZEENTCH\n• PLEDGED TO NURGLE\n• PLEDGED TO SLAANESH\n\nThis unit has that keyword for the rest of the battle.",
+    "source": "RU-2026-09",
+    "page": 33,
+    "why": "RU badge: NEW. Scourge of Aqshy table \"Brands of the Dark Gods\": add declare step"
+   },
+   {
+    "ref": "A421",
+    "kind": "rule",
+    "owners": [
+     "ID|enh:Champions of the Tides"
+    ],
+    "ruleName": "ABYSSAL DWELLER",
+    "field": "text",
+    "previous": "Declare: Pick an objective within 18\" of this unit to be the target.\n\nEffect: For the rest of the battle, while enemy units are contesting the target objective:\n\n• Subtract the current battle round number from those units’ Move characteristic.\n• Those units cannot use RUN, RETREAT or CHARGE abilities.",
+    "value": "Declare: Pick an objective within 18\" of this unit to be the target.\n\nEffect: For the rest of the battle, while enemy units are contesting the target objective:\n\n• Those units cannot use RUN, RETREAT or CHARGE abilities.",
+    "source": "RU-2026-09",
+    "page": 33,
+    "why": "RU badge: NEW. Scourge of Aqshy heroic trait: delete first bullet (\"Subtract the current battle round number from those units’ Move characteristic.\")"
+   },
+   {
+    "ref": "A422",
+    "kind": "rule",
+    "owners": [
+     "SG|ws:Scourge of Aqshy Vengorian Lord"
+    ],
+    "ruleName": "Frenzied Surge",
+    "field": "timing",
+    "previous": "Once Per Turn (Army), Any Combat Phase",
+    "value": "Once Per Turn (Army), Any Charge Phase",
+    "source": "RU-2026-09",
+    "page": 33,
+    "why": "RU badge: NEW. one of the 4 restored rules; timing → Any Charge Phase"
+   },
+   {
+    "ref": "A422",
+    "kind": "rule",
+    "owners": [
+     "SG|ws:Scourge of Aqshy Vengorian Lord"
+    ],
+    "ruleName": "Frenzied Surge",
+    "field": "text",
+    "previous": "Declare: You can pick another visible friendly non-HERO SOULBLIGHT GRAVELORDS INFANTRY or MONSTER unit wholly within 12\" of this unit to be the target.\n\nEffect: This unit and the target (if any) can move up to X+D3\", where X is your fury level. They can move through enemy models and the combat ranges of enemy units during that move and must end that move",
+    "value": "Declare: You can pick another visible friendly non-HERO SOULBLIGHT GRAVELORDS INFANTRY or MONSTER unit wholly within 12\" of this unit to be the target.\n\nEffect: This unit can move up to X\", where X is your fury level. It must end that move in combat.\n\nThen, the target can move up to X\", where X is your fury level. It can move through enemy models and the combat ranges of enemy units during that move but must end that move in combat with an enemy unit that this unit is in combat with.",
+    "clearIncomplete": true,
+    "source": "RU-2026-09",
+    "page": 33,
+    "why": "RU badge: NEW. one of the 4 restored rules; timing → Any Charge Phase"
+   },
+   {
+    "ref": "A423",
+    "kind": "rule",
+    "owners": [
+     "FY|lore:Vulkyn Gifts"
+    ],
+    "ruleName": "BLAZING IMPETUS",
+    "field": "text",
+    "previous": "Declare: Pick a friendly FYRESLAYERS PRIEST to chant this prayer, pick a visible friendly Fyreslayers unit wholly within 12\" of them to be the target, then make a chanting roll of D6.\n\nEffect: If the chanting roll was 10+, you can pick another eligible unit to be a second target. Each target can use the ‘Normal Move’ or ‘Retreat’ ability as if it were your movement phase.",
+    "value": "Declare: Pick a friendly FYRESLAYERS PRIEST to chant this prayer, pick a visible friendly FYRESLAYERS unit that was not set up this turn and that is wholly within 12\" of them to be the target, then make a chanting roll of D6.\n\nEffect: If the chanting roll was 10+, you can pick another eligible unit to be a second target. Each target can use the ‘Normal Move’ or ‘Retreat’ ability as if it were your movement phase.",
+    "source": "RU-2026-09",
+    "page": 33,
+    "why": "RU badge: NEW. Scourge of Aqshy lore Vulkyn Gifts: declare step"
+   },
+   {
+    "ref": "A427",
+    "kind": "rule",
+    "owners": [
+     "HS|ws:Scourge of Aqshy Infernal Enrapturess, Herald of Slaanesh"
+    ],
+    "ruleName": "Like nails on a Chalkboard",
+    "field": "text",
+    "previous": "Effect: You and your opponent must roll off. If you roll higher, pick another unit (friendly or enemy) within the combat range of the enemy unit using the ‘Eruption of Fury’ ability. That unit is now the target of that ‘Eruption of Fury’ ability. Your opponent must spend as many rage dice as possible as part of that ability, to a maximum of 3.",
+    "value": "Effect: You and your opponent must roll off. If you roll higher, pick a unit (friendly or enemy) other than the enemy unit using the ‘Eruption of Fury’ ability within that enemy unit’s combat range. That unit is now the target of that ‘Eruption of Fury’ ability. Your opponent must spend as many rage dice as possible as part of that ability, to a maximum of 3.",
+    "source": "RU-2026-09",
+    "page": "32-33",
+    "why": "not badged (older erratum). second sentence; RU p32"
+   },
+   {
+    "ref": "A428",
+    "kind": "rule",
+    "owners": [
+     "DoK|ws:Scourge of Aqshy Khainite Shadowstalkers"
+    ],
+    "ruleName": "Shadow Lariat",
+    "field": "text",
+    "previous": "Declare: If this unit is not in combat, pick a visible enemy INFANTRY or CAVALRY HERO that has no more than 1 model and is within 12\" of this unit to be the target.\n\nEffect: If the target is more than 3\" from all other friendly units, apply the effect below. Otherwise, roll a dice. On a 3+, apply the effect below.\n\nYour opponent must remove the target from the battlefield and set it up again in combat with this unit.",
+    "value": "Declare: If this unit is not in combat, pick a visible enemy INFANTRY or CAVALRY HERO that has no more than 1 model and is within 12\" of this unit to be the target.\n\nEffect: If the target is more than 3\" from all other enemy units, apply the effect below. Otherwise, roll a dice. On a 3+, apply the effect below.\n\nYour opponent must remove the target from the battlefield and set it up again in combat with this unit.",
+    "source": "RU-2026-09",
+    "page": "32-33",
+    "why": "not badged (older erratum). first sentence: \"more than 3\" from all other enemy units\" (stored: friendly units)"
+   },
+   {
+    "ref": "A429",
+    "kind": "rule",
+    "owners": [
+     "ST|enh:Devious Machinations"
+    ],
+    "ruleName": "ESSENCE OF THE GNAW",
+    "field": "text",
+    "previous": "Declare: Pick another visible SKAVEN unit wholly within 13\" of this unit and in combat to be the target.\n\nEffect: For the rest of the turn, this unit has Strike-first and the target has Strike-last.",
+    "value": "Declare: Pick another visible friendly SKAVEN unit wholly within 13\" of this unit and in combat to be the target.\n\nEffect: For the rest of the turn, this unit has Strike-first and the target has Strike-last.",
+    "source": "RU-2026-09",
+    "page": "32-33",
+    "why": "not badged (older erratum). Scourge of Aqshy heroic trait: \"visible Skaven unit\" → \"visible friendly Skaven unit\""
+   },
+   {
+    "ref": "A430",
+    "kind": "rule",
+    "owners": [
+     "SN|ws:Scourge of Aqshy Saurus Scar-Veteran on Aggradon"
+    ],
+    "ruleName": "Saurian Ambush",
+    "field": "text",
+    "previous": "Declare: Pick each friendly unit that is stalking the prey to be the targets.\n\nEffect: Set up the targets on the battlefield wholly within 7\" of the battlefield edge and more than 9\" from all enemy units.",
+    "value": "Declare: This unit can use this ability even if it is in reserve. Pick each friendly unit that is stalking the prey to be the targets.\n\nEffect: Set up the targets on the battlefield wholly within 7\" of the battlefield edge and more than 9\" from all enemy units.",
+    "source": "RU-2026-09",
+    "page": "32-33",
+    "why": "not badged (older erratum). add to start of declare: \"This unit can use this ability even if it is in reserve.\""
+   },
+   {
+    "ref": "A431",
+    "kind": "rule",
+    "owners": [
+     "BoK|ws:Karanak"
+    ],
+    "ruleName": "Stalk The Prey",
+    "field": "text",
+    "previous": "Declare: Pick this unit and up to 1 friendly Flesh Hounds unit to be the targets.\n\nEffect: Remove the targets from the battleeld and set them up again on the battleeld more than 6\" from this unit’s quarry and more than 9\" from all other enemy units. If picked to be a target, the unit of Flesh Hounds must also be set up wholly within 12\" of this unit.",
+    "value": "Declare: If this unit’s quarry is on the battlefield, pick this unit and up to 1 friendly Flesh Hounds unit to be the targets.\n\nEffect: Remove the targets from the battleeld and set them up again on the battleeld more than 6\" from this unit’s quarry and more than 9\" from all other enemy units. If picked to be a target, the unit of Flesh Hounds must also be set up wholly within 12\" of this unit.",
+    "source": "RU-2026-09",
+    "why": "not badged (older erratum). declare: add \"If this unit’s quarry is on the battlefield,\" (RU p35)"
+   },
+   {
+    "ref": "A432",
+    "kind": "rule",
+    "owners": [
+     "CoS|ror:Namarti Shore Raid",
+     "DoK|ror:Namarti Shore Raid",
+     "FY|ror:Namarti Shore Raid",
+     "KO|ror:Namarti Shore Raid",
+     "LRL|ror:Namarti Shore Raid",
+     "SE|ror:Namarti Shore Raid",
+     "SN|ror:Namarti Shore Raid",
+     "SY|ror:Namarti Shore Raid"
+    ],
+    "ruleName": "IN THE SHADOW OF THE ETHERSEA",
+    "field": "text",
+    "previous": "Declare: This ability must be used to deploy this Regiment of Renown.\n\nEffect: Set up the units in this Regiment of Renown in reserve in the ethersea. They have now been deployed.",
+    "value": "Declare: This ability must be used to deploy this Regiment of Renown instead of the ‘Deploy Unit’ ability or the ‘Deploy Regiment’ ability.\n\nEffect: Set up the units in this Regiment of Renown in reserve in the ethersea. They have now been deployed.",
+    "source": "RU-2026-09",
+    "why": "not badged (older erratum). Namarti Shore Raid RoR, declare: add \"instead of the ‘Deploy Unit’ ability or the ‘Deploy Regiment’ ability\" (RU p51)"
+   },
+   {
+    "ref": "A433",
+    "kind": "rule",
+    "owners": [
+     "StD|ws:Darkoath Warqueen"
+    ],
+    "ruleName": "Ruin-blessed Conqueror",
+    "field": "timing",
+    "previous": "Once Per Turn (Army), Your Hero Phase",
+    "value": "Once Per Turn (Army), Any Hero Phase",
+    "source": "RU-2026-09",
+    "why": "not badged (older erratum). timing Your Hero Phase → Any Hero Phase (RU p67)"
+   },
+   {
+    "ref": "A434",
+    "kind": "rule",
+    "owners": [
+     "BoC|ws:Bestigors"
+    ],
+    "ruleName": "Despoilers",
+    "field": "text",
+    "previous": "Effect: Add 1 to the Attacks characteristic of this unit’s Despoiler Axes for the rest of the turn.",
+    "value": "Effect: This unit’s attacks score critical hits on unmodified hit rolls of 5+ for the rest of the turn.",
+    "source": "RU-2026-09",
+    "why": "not badged (older erratum). Legends faction; effect replaced (RU p29)"
+   },
+   {
+    "ref": "A435",
+    "kind": "rule",
+    "owners": [
+     "SY|lore:Lore of the Spirit-Song"
+    ],
+    "ruleName": "SONG OF THE LOST",
+    "field": "text",
+    "previous": "Declare: Pick a friendly SYLVANETH PRIEST to chant this prayer, pick a friendly SYLVANETH unit that is wholly within the creeping overgrowth or that is visible to them and wholly within 12\" of them to be the target, then make a chanting roll of D6.\n\nEffect: Until the start of your next turn, subtract 1 from wound rolls for attacks that target that friendly unit. In addition, if the chanting roll was 8+:\n\n• If the target is a MONSTER, Heal (3) the target.\n• If the target is not a MONSTER, ignore modifiers to save rolls for the target (positive and negative) until the start of your next turn.",
+    "value": "Declare: Pick a friendly SYLVANETH PRIEST to chant this prayer, pick a friendly SYLVANETH unit that is wholly within the creeping overgrowth or that is visible to them and wholly within 12\" of them to be the target, then make a chanting roll of D6.\n\nEffect: Until the start of your next turn, subtract 1 from wound rolls for attacks that target that friendly unit. In addition, if the chanting roll was 8+, pick 1 of the following effects:\n\n• You can Heal (3) the target.\n• If the target is not a MONSTER, ignore modifiers to save rolls for the target (positive and negative) until the start of your next turn.",
+    "source": "RU-2026-09",
+    "why": "not badged (older erratum). restored full text differs: official = \"pick 1 of the following effects: • You can Heal (3) the target. • If the target is not a Monster, ignore modifiers…\" (RU p73)"
+   },
+   {
+    "ref": "A436",
+    "kind": "weapon",
+    "faction": "NT",
+    "id": "000000208",
+    "name": "Glaivewraith Stalkers",
+    "weapon": "Hunter’s Glaive",
+    "field": "rend",
+    "previous": "2",
+    "value": "1",
+    "source": "RU-2026-09",
+    "why": "not badged (older erratum). Rend 2 → 1 (RU p29)"
+   },
+   {
+    "ref": "A437",
+    "kind": "warscroll",
+    "faction": "BS",
+    "id": "000002000",
+    "name": "Hedkrakka’s Madmob",
+    "field": "keywords",
+    "previous": [
+     "CHAMPION",
+     "INFANTRY",
+     "ORRUK",
+     "UNIQUE",
+     "WARD"
+    ],
+    "value": [
+     "CHAMPION",
+     "INFANTRY",
+     "UNIQUE",
+     "WARD"
+    ],
+    "source": "RU-2026-09",
+    "why": "not badged (older erratum). remove ORRUK keyword (RU p29 \"All warscrolls\")"
+   },
+   {
+    "ref": "A440",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000000227",
+    "name": "Auric Runemaster",
+    "field": "legendsDate",
+    "previous": null,
+    "value": "2027-06-01",
+    "source": "KH-BP-2026-10",
+    "page": "1-2",
+    "why": "Khazalite Holds Battle Profiles (14 Oct 2026) note \"will move to Warhammer Legends on 1 June 2027\"; corroborated by WHC article \"Fyreslayers in Battletome: Khazalite Holds – What you need to know\", 9 Oct 2026, https://www.warhammer-community.com/articles/rv6irmgo/fyreslayers-in-battletome-khazalite-holds-what-you-need-to-know (lists Vulkite Berzerkers, Auric Runemaster, Battlesmith, Doomseeker, Grimwrath Berzerker, Magmic Battleforge, Magmic Invocations as moving to Legends). Applies to the Fyreslayers (legacy) faction; points stay at September values.",
+    "decision": "Decision 1 (16 Oct): add Legends flag only; no points change"
+   },
+   {
+    "ref": "A441",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000000230",
+    "name": "Battlesmith",
+    "field": "legendsDate",
+    "previous": null,
+    "value": "2027-06-01",
+    "source": "KH-BP-2026-10",
+    "page": "1-2",
+    "why": "Khazalite Holds Battle Profiles (14 Oct 2026) note \"will move to Warhammer Legends on 1 June 2027\"; corroborated by WHC article \"Fyreslayers in Battletome: Khazalite Holds – What you need to know\", 9 Oct 2026, https://www.warhammer-community.com/articles/rv6irmgo/fyreslayers-in-battletome-khazalite-holds-what-you-need-to-know (lists Vulkite Berzerkers, Auric Runemaster, Battlesmith, Doomseeker, Grimwrath Berzerker, Magmic Battleforge, Magmic Invocations as moving to Legends). Applies to the Fyreslayers (legacy) faction; points stay at September values.",
+    "decision": "Decision 1 (16 Oct): add Legends flag only; no points change"
+   },
+   {
+    "ref": "A442",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000000237",
+    "name": "Doomseeker",
+    "field": "legendsDate",
+    "previous": null,
+    "value": "2027-06-01",
+    "source": "KH-BP-2026-10",
+    "page": "1-2",
+    "why": "Khazalite Holds Battle Profiles (14 Oct 2026) note \"will move to Warhammer Legends on 1 June 2027\"; corroborated by WHC article \"Fyreslayers in Battletome: Khazalite Holds – What you need to know\", 9 Oct 2026, https://www.warhammer-community.com/articles/rv6irmgo/fyreslayers-in-battletome-khazalite-holds-what-you-need-to-know (lists Vulkite Berzerkers, Auric Runemaster, Battlesmith, Doomseeker, Grimwrath Berzerker, Magmic Battleforge, Magmic Invocations as moving to Legends). Applies to the Fyreslayers (legacy) faction; points stay at September values.",
+    "decision": "Decision 1 (16 Oct): add Legends flag only; no points change"
+   },
+   {
+    "ref": "A443",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000000238",
+    "name": "Grimwrath Berzerker",
+    "field": "legendsDate",
+    "previous": null,
+    "value": "2027-06-01",
+    "source": "KH-BP-2026-10",
+    "page": "1-2",
+    "why": "Khazalite Holds Battle Profiles (14 Oct 2026) note \"will move to Warhammer Legends on 1 June 2027\"; corroborated by WHC article \"Fyreslayers in Battletome: Khazalite Holds – What you need to know\", 9 Oct 2026, https://www.warhammer-community.com/articles/rv6irmgo/fyreslayers-in-battletome-khazalite-holds-what-you-need-to-know (lists Vulkite Berzerkers, Auric Runemaster, Battlesmith, Doomseeker, Grimwrath Berzerker, Magmic Battleforge, Magmic Invocations as moving to Legends). Applies to the Fyreslayers (legacy) faction; points stay at September values.",
+    "decision": "Decision 1 (16 Oct): add Legends flag only; no points change"
+   },
+   {
+    "ref": "A444",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000001410",
+    "name": "Vulkite Berzerkers with Bladed Slingshields",
+    "field": "legendsDate",
+    "previous": null,
+    "value": "2027-06-01",
+    "source": "KH-BP-2026-10",
+    "page": "1-2",
+    "why": "Khazalite Holds Battle Profiles (14 Oct 2026) note \"will move to Warhammer Legends on 1 June 2027\"; corroborated by WHC article \"Fyreslayers in Battletome: Khazalite Holds – What you need to know\", 9 Oct 2026, https://www.warhammer-community.com/articles/rv6irmgo/fyreslayers-in-battletome-khazalite-holds-what-you-need-to-know (lists Vulkite Berzerkers, Auric Runemaster, Battlesmith, Doomseeker, Grimwrath Berzerker, Magmic Battleforge, Magmic Invocations as moving to Legends). Applies to the Fyreslayers (legacy) faction; points stay at September values.",
+    "decision": "Decision 1 (16 Oct): add Legends flag only; no points change"
+   },
+   {
+    "ref": "A445",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000001982",
+    "name": "Vulkite Berzerkers with Fyresteel Weapons",
+    "field": "legendsDate",
+    "previous": null,
+    "value": "2027-06-01",
+    "source": "KH-BP-2026-10",
+    "page": "1-2",
+    "why": "Khazalite Holds Battle Profiles (14 Oct 2026) note \"will move to Warhammer Legends on 1 June 2027\"; corroborated by WHC article \"Fyreslayers in Battletome: Khazalite Holds – What you need to know\", 9 Oct 2026, https://www.warhammer-community.com/articles/rv6irmgo/fyreslayers-in-battletome-khazalite-holds-what-you-need-to-know (lists Vulkite Berzerkers, Auric Runemaster, Battlesmith, Doomseeker, Grimwrath Berzerker, Magmic Battleforge, Magmic Invocations as moving to Legends). Applies to the Fyreslayers (legacy) faction; points stay at September values.",
+    "decision": "Decision 1 (16 Oct): add Legends flag only; no points change"
+   },
+   {
+    "ref": "A447",
+    "kind": "warscroll",
+    "faction": "FY",
+    "id": "000000247",
+    "name": "Magmic Battleforge",
+    "field": "legendsDate",
+    "previous": null,
+    "value": "2027-06-01",
+    "source": "KH-BP-2026-10",
+    "page": 2,
+    "why": "Khazalite Holds Battle Profiles (14 Oct 2026) note \"will move to Warhammer Legends on 1 June 2027\"; corroborated by WHC article \"Fyreslayers in Battletome: Khazalite Holds – What you need to know\", 9 Oct 2026, https://www.warhammer-community.com/articles/rv6irmgo/fyreslayers-in-battletome-khazalite-holds-what-you-need-to-know (lists Vulkite Berzerkers, Auric Runemaster, Battlesmith, Doomseeker, Grimwrath Berzerker, Magmic Battleforge, Magmic Invocations as moving to Legends). Applies to the Fyreslayers (legacy) faction; points stay at September values.",
+    "decision": "Decision 1 (16 Oct): add Legends flag only; no points change"
+   }
+  ],
+  "notApplied": [
+   {
+    "ref": "A216",
+    "item": "Stumblefoot Gargant",
+    "reason": "Deferred (decision of 17.10.2026), record left unchanged: marked DELETED in Battle Profiles, September 2026 (23.09.2026); keeping the record with an empty allowed list would break the faction-membership invariant (tests/aos.test.ts), and removing it from the faction files would break saved rosters.",
+    "status": "deferred"
+   },
+   {
+    "ref": "A219",
+    "item": "Norgrimm’s Rune Throng",
+    "reason": "Deferred (decision of 17.10.2026), record left unchanged: moves to Warhammer Legends on 1 June 2027 per Battle Profiles, September 2026 (23.09.2026); Regiment of Renown records have no Legends field, and Legends status is not encoded as plain notes.",
+    "status": "deferred"
+   },
+   {
+    "ref": "A228",
+    "item": "Krittok’s Clawpack",
+    "reason": "Deferred (decision of 17.10.2026), record left unchanged: Beasts of Chaos is listed for this Regiment of Renown in Battle Profiles July and September 2026; adding it needs the RoR record and its unit copies in BoC.json, which the per-file repair step cannot create without changing scripts/repair-aos-data.mjs.",
+    "status": "deferred"
+   },
+   {
+    "ref": "A235",
+    "item": "Volt-Klaw’s Enginecoven",
+    "reason": "Deferred (decision of 17.10.2026), record left unchanged: Beasts of Chaos is listed for this Regiment of Renown in Battle Profiles July and September 2026; adding it needs the RoR record and its unit copies in BoC.json, which the per-file repair step cannot create without changing scripts/repair-aos-data.mjs.",
+    "status": "deferred"
+   },
+   {
+    "ref": "A446",
+    "item": "Magmic Invocations",
+    "reason": "Deferred (decision of 17.10.2026), record left unchanged: moves to Warhammer Legends on 1 June 2027 per Battle Profiles: Khazalite Holds, October 2026 (14.10.2026); manifestation lores have no Legends field in the data format or the roster engine.",
+    "status": "deferred"
+   },
+   {
+    "ref": "A448",
+    "item": "Fjori’s Flamebearers",
+    "reason": "Deferred (decision of 17.10.2026), record left unchanged: moves to Warhammer Legends on 1 June 2027 per Battle Profiles: Khazalite Holds, October 2026 (14.10.2026), Regiments of Renown section; Regiment of Renown records have no Legends field, and Legends status is not encoded as plain notes.",
+    "status": "deferred"
+   }
+  ],
+  "aliases": [
+   {
+    "ref": "A386",
+    "faction": "HoH",
+    "id": "000002619",
+    "stored": "Hobgrotz Vandalz",
+    "official": "Hobgrot Vandalz"
+   },
+   {
+    "ref": "A387",
+    "faction": "SG",
+    "id": "000001924",
+    "stored": "Wight King on Skeleton Steed",
+    "official": "Wight King on Skeletal Steed"
+   },
+   {
+    "ref": "A388",
+    "faction": "SE",
+    "id": "000001826",
+    "stored": "Knight-Judicator with Gryph Hounds",
+    "official": "Knight-Judicator with Gryph-hounds"
+   },
+   {
+    "ref": "A389",
+    "faction": "FY",
+    "id": "000001981",
+    "stored": "Hearthguard Berzerker with Berzerker Broadaxes",
+    "official": "Hearthguard Berzerkers with Berzerker Broadaxes"
    }
   ]
  }
