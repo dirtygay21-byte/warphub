@@ -6,6 +6,7 @@ import {
   formationFit,
   formationLegendsLabel,
   formationsOf,
+  legendsLabel,
   loreFit,
   loresOf,
   regimentFit,
@@ -126,6 +127,7 @@ export function LoreSheet({ kind, onClose, roster, L, onPick }: { kind: LoreKind
     id: l.id,
     title: l.name,
     sub: l.universal ? 'Универсальный лор манифестаций' : seasonLabel(l.season) ?? undefined,
+    tags: [legendsLabel(l)].filter((t): t is string => !!t),
     points: l.points,
     fit: loreFit(l, roster, L),
     body: (
@@ -209,7 +211,7 @@ export function RorSheet({ open, onClose, roster, L, onPick }: { open: boolean; 
       sub: [r.built ? 'собирается из героев' : null, r.source].filter(Boolean).join(' · ') || undefined,
       points: rorPrice(r, picked),
       fit,
-      tags: r.units.filter((u) => !u.optional).map((u) => `${u.count > 1 ? u.count + '× ' : ''}${L.ws.get(u.id)?.name ?? '?'}`),
+      tags: [legendsLabel(r), ...r.units.filter((u) => !u.optional).map((u) => `${u.count > 1 ? u.count + '× ' : ''}${L.ws.get(u.id)?.name ?? '?'}`)].filter((t): t is string => !!t),
       body: (
         <>
           {r.built && (

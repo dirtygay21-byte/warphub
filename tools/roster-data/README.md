@@ -252,7 +252,7 @@ Legends не выбирается, а выбранное — предупреж�
 выгрузила без таблицы. Запись: `name`, `in` (`"<фракция>|<владелец>"`: `ws:<варскролл>`, `trait`, `form:<построение>`,
 `enh:<таблица>`, `lore:<лор>`, `ror:<полк славы>`), `text`, `source` (страница Wahapedia), `checked`. Текст = фрагмент
 выгрузки до последнего целого слова + остаток с сайта; таблица — строка на строку, ячейки через « — ». `missing` —
-правила, которые не восстановлены (на сайте другая редакция или источник сомнителен), с причиной; они остаются `incomplete`.
+правила, которые не восстановлены (на сайте другая редакция или источник сомнителен), с причиной; они остаются `incomplete` (с 17.10.2026 список пуст). Необязательное `note` — замечание о тексте сайта.
 Подстановка — в `normaliseAosFaction` (`import-wahapedia-aos.mjs`), то есть и при импорте, и в `repair-aos-data.mjs`:
 правило с `incomplete` заменяется, только если полный текст начинается с фрагмента выгрузки, а у правил с таблицей —
 содержит все части фрагмента до и после таблицы (`fullTextFits`).
@@ -266,6 +266,23 @@ Legends не выбирается, а выбранное — предупреж�
 варианты полка пересчитываются по своей фракции). У каждой правки обязательны `why` и `source`; неизвестное поле
 останавливает импорт. Там же `stale.factions` — предупреждение об устаревших правилах фракции (импорт и repair).
 Тесты — `tests/aos-overrides.test.ts`.
+
+**Legends по публикации.** Варскроллы из публикации GW «Legends Warscrolls» (в `Source.csv` — «Legends Warscrolls» и
+«Darkwater Heroes - Legends Warscrolls») получают `legends: true` в `normaliseAosFaction` (`LEGENDS_PUBLICATION`):
+в выгрузке признак есть только в заметке «Legends Warscroll», которой у большинства из них нет. Сверено с разделами
+«Warhammer Legends» Battle Profiles 09.2026 (Kragnos — Legends только у Bonesplitterz). `index.json` (число доступных
+юнитов, «только Legends») считается по готовым данным (`indexEntry`) — и импортом, и `repair-aos-data.mjs`.
+
+**Официальные правки GW (`aos/curated.json → officialUpdates`).** Очки, ограничения, статус Legends и тексты правил из
+Battle Profiles / Rules Updates, которых нет в выгрузке. Правка применяется, только если в данных `previous`; у каждой —
+`ref`, `source`, `page`, `why`. Виды: `warscroll`, `options`, `weapon`, `points`, `enhancement` (по id улучшения: `name`,
+`points`), `lore` (`legendsDate`), `rule` (`text` / `timing` / `value`; у правила с официальным текстом
+`textSource: "gw-rules-updates"`), `ror`: `cost`, `legendsDate`, `allowedAdd` (запись полка и копии юнитов добавляются
+в файлы `add`), `allowedRemove` и `withdrawn` (полк убирается из файлов `remove`, у фракции остаётся запись
+`withdrawnRors` с причиной — сохранённый ростер показывает её вместо «не найден»). `reviewed` — исследованные вопросы
+с решением и доказательством, `unresolved` — что открыто. Итог печатают импорт и repair; тесты —
+`tests/aos-officialupdates.test.ts`. У полков славы и лоров `legendsDate` показывается подписью «Уйдёт в Legends …»;
+уже ушедшие (`legends`) без показа Legends не выбираются.
 
 Порядок источников данных и где лежит выгрузка Wahapedia (CSV + описание полей Excel) — в `CLAUDE.md` в корне репозитория.
 

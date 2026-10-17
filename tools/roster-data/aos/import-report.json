@@ -3,8 +3,7 @@
  "warnings": [
   "BoC: лор «Bestial Manifestations» — нет очков",
   "KB: «Hobgrot Slittaboss» — вариант полка «Monster» не подходит ни одному юниту фракции",
-  "OM: террейн «Great Mawpot» — 0 в CSV, 20 в Battle Profiles (берём Battle Profiles)",
-  "неполные тексты в выгрузке: обрезано лимитом 1024 символа — 1, таблица не выгружена — 0; в конструкторе помечены, полный текст на Wahapedia"
+  "OM: террейн «Great Mawpot» — 0 в CSV, 20 в Battle Profiles (берём Battle Profiles)"
  ],
  "info": [
   "BoC: все юниты в Legends — фракция доступна только с «Показать Legends»",
@@ -14,16 +13,20 @@
   "OM: нет боевых построений",
   "SoB: нет боевых построений",
   "IJ: «Dakkbad Grotkicker» — вариант полка «IRONSUNZ» не подходит ни одному юниту фракции",
-  "полные тексты правил (aos/curated.json → fullTexts, сайт Wahapedia 2026-10-16): подставлено 193",
-  "полного текста нет: CoS|ws:Linebreaker Cogfort «OUTPUT TO MAXIMUM!» — held: site text itself ends \"…Move characteristic is 10\" (no inch mark or full stop); needs further source verification",
-  "официальные правки GW (aos/curated.json → officialUpdates, Battle Profiles, September 2026 2026-09-23; Rules Updates, September 2026 2026-09-23; Battle Profiles: Khazalite Holds, October 2026 2026-10-14): применено 364 из 364",
-  "официальная правка не выполнена: A216 «Stumblefoot Gargant» — Deferred (decision of 17.10.2026), record left unchanged: marked DELETED in Battle Profiles, September 2026 (23.09.2026); keeping the record with an empty allowed list would break the faction-membership invariant (tests/aos.test.ts), and removing it from the faction files would break saved rosters.",
-  "официальная правка не выполнена: A219 «Norgrimm’s Rune Throng» — Deferred (decision of 17.10.2026), record left unchanged: moves to Warhammer Legends on 1 June 2027 per Battle Profiles, September 2026 (23.09.2026); Regiment of Renown records have no Legends field, and Legends status is not encoded as plain notes.",
-  "официальная правка не выполнена: A228 «Krittok’s Clawpack» — Deferred (decision of 17.10.2026), record left unchanged: Beasts of Chaos is listed for this Regiment of Renown in Battle Profiles July and September 2026; adding it needs the RoR record and its unit copies in BoC.json, which the per-file repair step cannot create without changing scripts/repair-aos-data.mjs.",
-  "официальная правка не выполнена: A235 «Volt-Klaw’s Enginecoven» — Deferred (decision of 17.10.2026), record left unchanged: Beasts of Chaos is listed for this Regiment of Renown in Battle Profiles July and September 2026; adding it needs the RoR record and its unit copies in BoC.json, which the per-file repair step cannot create without changing scripts/repair-aos-data.mjs.",
-  "официальная правка не выполнена: A446 «Magmic Invocations» — Deferred (decision of 17.10.2026), record left unchanged: moves to Warhammer Legends on 1 June 2027 per Battle Profiles: Khazalite Holds, October 2026 (14.10.2026); manifestation lores have no Legends field in the data format or the roster engine.",
-  "официальная правка не выполнена: A448 «Fjori’s Flamebearers» — Deferred (decision of 17.10.2026), record left unchanged: moves to Warhammer Legends on 1 June 2027 per Battle Profiles: Khazalite Holds, October 2026 (14.10.2026), Regiments of Renown section; Regiment of Renown records have no Legends field, and Legends status is not encoded as plain notes.",
-  "полные тексты восстановлены: обрезанных — 176 из 177, без таблицы — 21 из 21"
+  "полные тексты правил (aos/curated.json → fullTexts, сайт Wahapedia 2026-10-16): подставлено 194",
+  "полный текст затем заменён официальной правкой GW (officialUpdates): SY|lore:Lore of the Spirit-Song «SONG OF THE LOST»; KB|trait «DIRTY TRICKS»",
+  "официальные правки GW (aos/curated.json → officialUpdates, Battle Profiles, September 2026 2026-09-23; Rules Updates, September 2026 2026-09-23; Battle Profiles: Khazalite Holds, October 2026 2026-10-14): применено 378 из 378",
+  "проверено по официальным документам: A262 «Pyrofane Fusiliers, Pyrofane Great Cannon, Pyrofane Fusil-Major on Ogor Warhulk, Pyrofane Steelhelms (DoT)» — marked Warhammer Legends (curated.warscrollOverrides, set.legends); points unchanged",
+  "проверено по официальным документам: A391 «Iron March: Immolator Cogfort, Linebreaker Cogfort (CoS)» — no change",
+  "проверено по официальным документам: A417 «Oracular Visions — Chaos Sorcerer Lord on Manticore (StD)» — no text change",
+  "проверено по официальным документам: A419 «Oath of Conquest — Godsworn Hunt (StD)» — no text change",
+  "проверено по официальным документам: A439 «OUTPUT TO MAXIMUM! — Linebreaker Cogfort (CoS)» — full text restored from the Wahapedia page (curated.fullTexts)",
+  "проверено по официальным документам: F04 «Grombrindal, The White Dwarf (CoS, FY, KO)» — no change",
+  "проверено по официальным документам: F05 «SONG OF THE LOST — Lore of the Spirit-Song (SY)» — source metadata fixed",
+  "проверено по официальным документам: F06 «Warscrolls from the GW \"Legends Warscrolls\" publication (export Source.csv 000000138)» — marked Warhammer Legends in normaliseAosFaction (import and repair)",
+  "не решено: A216 «Krong the Club (Regiment of Renown, 140)» — Battle Profiles, September 2026, p. 59 replaces Stumblefoot Gargant with Krong the Club; the Wahapedia export of 2026-08-25 has no record for it — needs a newer export (Stage B).",
+  "не решено: A449 «Gotrek Gurnisson as a Khazalite Holds hero (220)» — Khazalite Holds has no data in the app (no Wahapedia export yet); Khazalite Holds stays separate from Fyreslayers.",
+  "полные тексты восстановлены: обрезанных — 177 из 177, без таблицы — 21 из 21"
  ],
  "exportIncomplete": {
   "truncated": 177,
