@@ -498,15 +498,18 @@ export const formationsOf = (L: AosLookup) => L.faction.formations.filter((f) =>
 /** «01.06.2027» из даты выгрузки «2027-06-01». */
 export const ruDate = (iso: string) => iso.split('-').reverse().join('.');
 
-/** Подпись о Legends у построения: уже в Legends или дата перехода из примечания выгрузки. */
-export function formationLegendsLabel(f: AosFormation): string | null {
+/** Подпись о Legends у построения, полка славы или лора: уже в Legends или дата перехода. */
+export function legendsLabel(f: { legends?: boolean; legendsDate?: string | null }): string | null {
   if (!f.legendsDate) return f.legends ? 'Warhammer Legends' : null;
   return f.legends ? `Warhammer Legends с ${ruDate(f.legendsDate)}` : `Уйдёт в Legends ${ruDate(f.legendsDate)}`;
 }
+/** Подпись о Legends у построения: уже в Legends или дата перехода из примечания выгрузки. */
+export const formationLegendsLabel = (f: AosFormation): string | null => legendsLabel(f);
 
 export function loreFit(lore: AosLore, r: AosRoster, L: AosLookup): Fit {
   if (!seasonActive(lore.season)) return no(`Сезон ${seasonLabel(lore.season)} закончился.`);
   if (lore.points == null) return no('Нет очков в Battle Profiles.');
+  if (lore.legends && !r.showLegends) return no(`${legendsLabel(lore)} — включите показ Legends.`);
   const cur = r.lores[lore.kind];
   const delta = lore.points - ((cur && L.lore.get(cur)?.points) || 0);
   return pointsFit(delta, r, L);
@@ -537,6 +540,7 @@ export function rorPrice(ror: AosRor, picked: string[]): number {
 
 export function rorFit(ror: AosRor, r: AosRoster, L: AosLookup, picked: string[] = []): Fit {
   if (!ror.allowed.includes(L.faction.id)) return no('Этот полк славы нельзя взять в эту фракцию.');
+  if (ror.legends && !r.showLegends) return no(`${legendsLabel(ror)} — включите показ Legends.`);
   if (!ror.built && ror.cost == null) return no('Нет очков в Battle Profiles.');
   if (ror.built && !ror.units.some((u) => u.optional && picked.includes(u.id))) return no('Отметьте хотя бы один юнит полка (нажмите на название).');
   const own = placedUnits(r, L).filter((p) => p.ws);
@@ -704,6 +708,7 @@ export function computeAos(r: AosRoster, L: AosLookup): AosComputed {
     if (!lore || lore.kind !== kind) err('lore', 'Лор не найден в данных.');
     else if (lore.points == null) err('lore', `«${lore.name}» — нет очков в Battle Profiles.`);
     else if (!seasonActive(lore.season)) err('lore', `«${lore.name}» — сезон ${seasonLabel(lore.season)} закончился.`);
+    else if (lore.legends) warn('legends', `«${lore.name}» — ${legendsLabel(lore)}, в matched play не допускается.`);
   }
   if (r.terrainId) {
     const t = L.ws.get(r.terrainId);
@@ -712,12 +717,17 @@ export function computeAos(r: AosRoster, L: AosLookup): AosComputed {
     else if (t.legends) warn('legends', `«${t.name}» — Warhammer Legends, в matched play не допускается.`);
   }
   if (r.ror) {
-    const ror = L.ror.get(r.ror.id);
-    if (!ror) err('ror', 'Полк славы не найден в данных.');
+    const rorId = r.ror.id;
+    const ror = L.ror.get(rorId);
+    // полк убран из фракции официальными документами — причина вместо «не найден» (ростер не меняется молча)
+    const gone = ror ? null : L.faction.withdrawnRors?.find((w) => w.id === rorId);
+    if (gone) err('ror', `Полк славы «${gone.name}» ${gone.reason} — уберите его из ростера.`);
+    else if (!ror) err('ror', 'Полк славы не найден в данных.');
     else {
       if (!ror.allowed.includes(L.faction.id)) err('ror', `«${ror.name}» нельзя взять в ${L.faction.name}.`);
       if (ror.built && !ror.units.some((u) => u.optional && r.ror!.picked.includes(u.id))) err('ror', `«${ror.name}»: выберите хотя бы один юнит полка.`);
       if (!ror.built && ror.cost == null) err('ror', `«${ror.name}» — нет очков в Battle Profiles.`);
+      if (ror.legends) warn('legends', `«${ror.name}» — ${legendsLabel(ror)}, в matched play не допускается.`);
     }
   }
   if (L.faction.rulesNotice) warn('stale-rules', L.faction.rulesNotice);

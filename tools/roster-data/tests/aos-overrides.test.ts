@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 // @ts-expect-error — .mjs без типов
-import { missingPointsNote, normaliseAosFaction, rulesNoticeOf, warscrollOverrides, warscrollRefs } from '../scripts/import-wahapedia-aos.mjs';
+import { LEGENDS_PUBLICATION, missingPointsNote, normaliseAosFaction, rulesNoticeOf, warscrollOverrides, warscrollRefs } from '../scripts/import-wahapedia-aos.mjs';
 import { makeAosLookup, rorFit, warscrollFit } from '../../../client/src/features/roster/aos/engine';
 import { newAosRoster } from '../../../client/src/features/roster/aos/roster';
 import type { AosFactionData, AosIndex, AosWarscroll } from '../../../client/src/features/roster/aos/types';
@@ -22,6 +22,7 @@ const ws = (fid: string, id: string): AosWarscroll => load(fid).warscrolls.find(
 const DARKWATER = ['000002663', '000002664', '000002665', '000002666', '000002667', '000002668', '000002669', '000003138'];
 const GROMBRINDAL = { FY: '000002684', CoS: '000002685', KO: '000002686' };
 const AUTO_ENDRIN = '000002427';
+const PYROFANE = ['000002689', '000002690', '000002691', '000002692'];
 
 // ---------- механизм на искусственных данных ----------
 
@@ -93,7 +94,41 @@ test('отчёт импорта: юнит без очков отмечается
 
 test('curated.warscrollOverrides: схема в порядке, у каждой правки есть обоснование и источник', () => {
   const map = warscrollOverrides(curated);
-  assert.deepEqual([...map.keys()].sort(), [...DARKWATER, GROMBRINDAL.CoS, GROMBRINDAL.KO, AUTO_ENDRIN].sort());
+  assert.deepEqual([...map.keys()].sort(), [...DARKWATER, GROMBRINDAL.CoS, GROMBRINDAL.KO, AUTO_ENDRIN, ...PYROFANE].sort());
+});
+
+test('Pyrofane Cult (4 варскролла DoT) — Legends, очки не тронуты; без показа Legends не берутся', () => {
+  const data = load('DoT');
+  const L = makeAosLookup(data);
+  assert.deepEqual(PYROFANE.map((id) => [ws('DoT', id).name, ws('DoT', id).cost, ws('DoT', id).legends]), [
+    ['Pyrofane Fusiliers', 120, true],
+    ['Pyrofane Great Cannon', 130, true],
+    ['Pyrofane Fusil-Major on Ogor Warhulk', 180, true],
+    ['Pyrofane Steelhelms', 100, true],
+  ]);
+  for (const id of PYROFANE) assert.equal(warscrollFit(ws('DoT', id), newAosRoster('DoT'), L).ok, false);
+});
+
+test('публикация «Legends Warscrolls»: все её варскроллы — Legends (Battle Profiles 09.2026, разделы Warhammer Legends)', () => {
+  let n = 0;
+  for (const f of ALL)
+    for (const w of [...f.warscrolls, ...f.rorUnits, ...f.universalManifestations])
+      if (LEGENDS_PUBLICATION.test(w.source ?? '')) {
+        n++;
+        assert.equal(w.legends, true, `${f.id} ${w.name}`);
+      }
+  assert.ok(n >= 95 + 56, `варскроллов из публикации: ${n}`);
+  // Kragnos: Legends только у Bonesplitterz; новая Thricefold Discord (190) — не Legends, старая The Thricefold Discord (130) — Legends
+  assert.equal(load('BS').warscrolls.find((w) => w.name === 'Kragnos, the End of Empires')!.legends, true);
+  for (const fid of ['GG', 'IJ', 'KB', 'OM', 'SoB']) assert.equal(load(fid).warscrolls.find((w) => w.name === 'Kragnos, the End of Empires')!.legends, false, fid);
+  const hs = load('HS').warscrolls;
+  assert.equal(hs.find((w) => w.name === 'The Thricefold Discord')!.legends, true);
+  assert.equal(hs.find((w) => w.name === 'Thricefold Discord')!.legends, false);
+  // правило работает и на копии: варскролл с источником-публикацией без флага получает Legends
+  const raw = structuredClone(load('GG'));
+  const mollog = raw.warscrolls.find((w) => w.name === 'Mollog')!;
+  mollog.legends = false;
+  assert.equal(normaliseAosFaction(raw, curated, warscrollRefs({ GG: raw })).warscrolls.find((w) => w.name === 'Mollog')!.legends, true);
 });
 
 test('Darkwater Heroes (7 героев и Wisper) — Legends во всех файлах, где встречаются; очков у самих варскроллов нет', () => {

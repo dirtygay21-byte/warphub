@@ -1080,6 +1080,25 @@
      "https://wahapedia.ru/aos4/factions/kharadron-overlords/Auto-Endrin"
     ],
     "checked": "2026-10-16"
+   },
+   {
+    "ids": [
+     "000002689",
+     "000002690",
+     "000002691",
+     "000002692"
+    ],
+    "set": {
+     "legends": true
+    },
+    "why": "Pyrofane Cult (DoT): Pyrofane Fusiliers, Pyrofane Great Cannon, Pyrofane Fusil-Major on Ogor Warhulk, Pyrofane Steelhelms — на странице каждого варскролла Wahapedia: «This warscroll is part of the Warhammer Legends range of rules» (проверено 2026-10-17); в выгрузке источник «Pyrofane Cult» без заметки Legends. Rules Updates GW 23.09.2026, FAQ с. 34: Army of Renown Pyrofane Cult (White Dwarf 514) — Legends; в Battle Profiles этих юнитов нет. Очки не меняются.",
+    "source": [
+     "https://wahapedia.ru/aos4/factions/disciples-of-tzeentch/Pyrofane-Fusiliers",
+     "https://wahapedia.ru/aos4/factions/disciples-of-tzeentch/Pyrofane-Great-Cannon-1",
+     "https://wahapedia.ru/aos4/factions/disciples-of-tzeentch/Pyrofane-Fusil-Major-on-Ogor-Warhulk",
+     "https://wahapedia.ru/aos4/factions/disciples-of-tzeentch/Pyrofane-Steelhelms"
+    ],
+    "checked": "2026-10-17"
    }
   ]
  },
@@ -2335,19 +2354,22 @@
     "text": "Effect: The creeping overgrowth is measured from each terrain feature that has a friendly overgrown token. The range of the creeping overgrowth is based on the number of friendly overgrown tokens on the battlefield as shown:\n\nOvergrown Tokens — Creeping Overgrowth Range\n0-2 — 6\"\n3-5 — 9\"\n6-8 — 12\"\n9+ — Whole battlefield\n\nDesigner’s Note: Awakened Wyldwoods are your main way of generating overgrown tokens. Some unit abilities allow you to do so too.",
     "source": "https://wahapedia.ru/aos4/factions/sylvaneth",
     "checked": "2026-10-16"
+   },
+   {
+    "name": "OUTPUT TO MAXIMUM!",
+    "in": [
+     "CoS|ws:Linebreaker Cogfort"
+    ],
+    "text": "Effect: Pick 1 or more of the following effects to apply for the rest of the turn. For each effect you pick, give this unit a number of heat tokens equal to the number beside it.\n\n1 - Trample Them to Dust!: This unit’s Crushing Iron Feet have Anti-MONSTER (+1 Rend).\n\n1 - Go, Go, Go!: When making charge rolls for this unit, add 1 to the number of dice rolled, to a maximum of 3, then remove 1 dice of your choice and use the remaining dice as the charge roll.\n\n2 - Get Us In There!: This unit’s Crushing Iron Feet have Charge (+1 Damage).\n\n2 - Load Heavy Shot!: Add 1 to the Rend characteristic of this unit’s Godbreaker Cannon, but all of this unit’s attacks made with that weapon this turn must target the same enemy unit.\n\n2 - Full Throttle!: This unit’s Move characteristic is 10",
+    "source": "https://wahapedia.ru/aos4/factions/cities-of-sigmar/Linebreaker-Cogfort",
+    "note": "Checked 2026-10-17: the site text ends \"Move characteristic is 10\" without an inch mark; kept verbatim."
    }
   ],
-  "missing": [
-   {
-    "in": "CoS|ws:Linebreaker Cogfort",
-    "name": "OUTPUT TO MAXIMUM!",
-    "why": "held: site text itself ends \"…Move characteristic is 10\" (no inch mark or full stop); needs further source verification"
-   }
-  ]
+  "missing": []
  },
  "officialUpdates": {
-  "about": "Stage A (approved 16.10.2026): official Games Workshop documents are authoritative for points, army-building restrictions, Legends status and rules changes; Wahapedia stays the source of rules text and data structure. Each item: ref = row of the approved plan (AoS_StageA_change_plan_v2.csv), previous = value in the branch before the change, value = official value. Applied in normaliseAosFaction (import and scripts/repair-aos-data.mjs) only when the stored value equals previous; otherwise reported as not applied. notApplied: approved rows that could not be implemented within the approved scope. aliases: official spellings of stored names (no data change).",
-  "checked": "2026-10-16",
+  "about": "Stage A (approved 16.10.2026): official Games Workshop documents are authoritative for points, army-building restrictions, Legends status and rules changes; Wahapedia stays the source of rules text and data structure. Each item: ref = row of the approved plan (AoS_StageA_change_plan_v2.csv), previous = value in the branch before the change, value = official value. Applied in normaliseAosFaction (import and scripts/repair-aos-data.mjs) only when the stored value equals previous; otherwise reported as not applied. notApplied: approved rows that could not be implemented within the approved scope (none since the follow-up of 17.10.2026). reviewed: researched questions with the decision and evidence (no data change, or a change made outside officialUpdates). unresolved: what is still open and why. aliases: official spellings of stored names (no data change).",
+  "checked": "2026-10-17",
   "sources": {
    "BP-2026-09": {
     "title": "Battle Profiles, September 2026",
@@ -8008,6 +8030,7 @@
     "ref": "A413",
     "kind": "rule",
     "owners": [
+     "BoC|ws:Krittok Foulblade",
      "BoK|ws:Krittok Foulblade",
      "DoT|ws:Krittok Foulblade",
      "HS|ws:Krittok Foulblade",
@@ -8021,12 +8044,13 @@
     "value": null,
     "source": "RU-2026-09",
     "page": 65,
-    "why": "RU badge: NEW. value \"Command 1\" → none (all faction copies)"
+    "why": "RU badge: NEW. value \"Command 1\" → none (all faction copies) BoC added 17.10.2026: the unit is copied into BoC.json with Krittok’s Clawpack / Volt-Klaw’s Enginecoven (A228/A235)."
    },
    {
     "ref": "A414",
     "kind": "rule",
     "owners": [
+     "BoC|ws:Warlock Galvaneer",
      "BoK|ws:Warlock Galvaneer",
      "DoT|ws:Warlock Galvaneer",
      "HS|ws:Warlock Galvaneer",
@@ -8040,7 +8064,7 @@
     "value": "Declare: Pick a friendly Warpvolt Scourgers unit within this unit’s combat range to be the target.\n\nEffect: Set the Attacks characteristic of the target’s Warpvolt Scourgers to 10 for the rest of the turn.",
     "source": "RU-2026-09",
     "page": 65,
-    "why": "RU badge: NEW. Wahapedia not yet updated; all faction/RoR copies"
+    "why": "RU badge: NEW. Wahapedia not yet updated; all faction/RoR copies BoC added 17.10.2026: the unit is copied into BoC.json with Krittok’s Clawpack / Volt-Klaw’s Enginecoven (A228/A235)."
    },
    {
     "ref": "A415",
@@ -8418,46 +8442,294 @@
     "page": 2,
     "why": "Khazalite Holds Battle Profiles (14 Oct 2026) note \"will move to Warhammer Legends on 1 June 2027\"; corroborated by WHC article \"Fyreslayers in Battletome: Khazalite Holds – What you need to know\", 9 Oct 2026, https://www.warhammer-community.com/articles/rv6irmgo/fyreslayers-in-battletome-khazalite-holds-what-you-need-to-know (lists Vulkite Berzerkers, Auric Runemaster, Battlesmith, Doomseeker, Grimwrath Berzerker, Magmic Battleforge, Magmic Invocations as moving to Legends). Applies to the Fyreslayers (legacy) faction; points stay at September values.",
     "decision": "Decision 1 (16 Oct): add Legends flag only; no points change"
-   }
-  ],
-  "notApplied": [
+   },
    {
     "ref": "A216",
-    "item": "Stumblefoot Gargant",
-    "reason": "Deferred (decision of 17.10.2026), record left unchanged: marked DELETED in Battle Profiles, September 2026 (23.09.2026); keeping the record with an empty allowed list would break the faction-membership invariant (tests/aos.test.ts), and removing it from the faction files would break saved rosters.",
-    "status": "deferred"
+    "kind": "ror",
+    "id": "000002030",
+    "name": "Stumblefoot Gargant",
+    "field": "withdrawn",
+    "previous": [
+     "BoC",
+     "BoK",
+     "BS",
+     "CoS",
+     "DoK",
+     "DoT",
+     "FE",
+     "FY",
+     "GG",
+     "HoH",
+     "HS",
+     "ID",
+     "IJ",
+     "KB",
+     "KO",
+     "LRL",
+     "MoN",
+     "NT",
+     "OB",
+     "OM",
+     "SE",
+     "SG",
+     "SN",
+     "ST",
+     "StD",
+     "SY"
+    ],
+    "value": [],
+    "remove": [
+     "BS",
+     "BoC",
+     "BoK",
+     "CoS",
+     "DoK",
+     "DoT",
+     "FE",
+     "FY",
+     "GG",
+     "HS",
+     "HoH",
+     "ID",
+     "IJ",
+     "KB",
+     "KO",
+     "LRL",
+     "MoN",
+     "NT",
+     "OB",
+     "OM",
+     "SE",
+     "SG",
+     "SN",
+     "ST",
+     "SY",
+     "StD"
+    ],
+    "replacedBy": "Krong the Club (140; в данных приложения его пока нет)",
+    "source": "BP-2026-09",
+    "page": 59,
+    "why": "Battle Profiles, September 2026, p. 59, Regiments of Renown: entry headed \"DELETED Stumblefoot Gargant\" (140, 1 Mancrusher Gargant). Removed from all 26 faction files; each file keeps a withdrawnRors entry so saved rosters show the reason. Replacement Krong the Club (same page, 140, 1 Mancrusher Gargant) is not added: the Wahapedia export (2026-08-25) has no record for it (Stage B, with the Sons of Behemat data)."
    },
    {
     "ref": "A219",
-    "item": "Norgrimm’s Rune Throng",
-    "reason": "Deferred (decision of 17.10.2026), record left unchanged: moves to Warhammer Legends on 1 June 2027 per Battle Profiles, September 2026 (23.09.2026); Regiment of Renown records have no Legends field, and Legends status is not encoded as plain notes.",
-    "status": "deferred"
-   },
-   {
-    "ref": "A228",
-    "item": "Krittok’s Clawpack",
-    "reason": "Deferred (decision of 17.10.2026), record left unchanged: Beasts of Chaos is listed for this Regiment of Renown in Battle Profiles July and September 2026; adding it needs the RoR record and its unit copies in BoC.json, which the per-file repair step cannot create without changing scripts/repair-aos-data.mjs.",
-    "status": "deferred"
-   },
-   {
-    "ref": "A235",
-    "item": "Volt-Klaw’s Enginecoven",
-    "reason": "Deferred (decision of 17.10.2026), record left unchanged: Beasts of Chaos is listed for this Regiment of Renown in Battle Profiles July and September 2026; adding it needs the RoR record and its unit copies in BoC.json, which the per-file repair step cannot create without changing scripts/repair-aos-data.mjs.",
-    "status": "deferred"
-   },
-   {
-    "ref": "A446",
-    "item": "Magmic Invocations",
-    "reason": "Deferred (decision of 17.10.2026), record left unchanged: moves to Warhammer Legends on 1 June 2027 per Battle Profiles: Khazalite Holds, October 2026 (14.10.2026); manifestation lores have no Legends field in the data format or the roster engine.",
-    "status": "deferred"
+    "kind": "ror",
+    "id": "000001837",
+    "name": "Norgrimm’s Rune Throng",
+    "field": "legendsDate",
+    "previous": null,
+    "value": "2027-06-01",
+    "source": "BP-2026-09",
+    "page": 60,
+    "why": "Battle Profiles, September 2026, p. 60: \"This unit will move to Warhammer Legends on 1 June 2027.\" Stored as the Regiment of Renown's legendsDate (new field); stays selectable until that date, the roster shows the date."
    },
    {
     "ref": "A448",
-    "item": "Fjori’s Flamebearers",
-    "reason": "Deferred (decision of 17.10.2026), record left unchanged: moves to Warhammer Legends on 1 June 2027 per Battle Profiles: Khazalite Holds, October 2026 (14.10.2026), Regiments of Renown section; Regiment of Renown records have no Legends field, and Legends status is not encoded as plain notes.",
-    "status": "deferred"
+    "kind": "ror",
+    "id": "000001984",
+    "name": "Fjori’s Flamebearers",
+    "field": "legendsDate",
+    "previous": null,
+    "value": "2027-06-01",
+    "source": "KH-BP-2026-10",
+    "page": 3,
+    "why": "Battle Profiles: Khazalite Holds, October 2026, p. 3 (Regiments of Renown – Order): \"This Regiment of Renown will move to Warhammer Legends on 1 June 2027.\" Points (420) and factions unchanged (same as September)."
+   },
+   {
+    "ref": "A228",
+    "kind": "ror",
+    "id": "000001785",
+    "name": "Krittok’s Clawpack",
+    "field": "allowedAdd",
+    "previous": [
+     "BoK",
+     "DoT",
+     "HS",
+     "MoN",
+     "StD"
+    ],
+    "value": [
+     "BoC",
+     "BoK",
+     "DoT",
+     "HS",
+     "MoN",
+     "StD"
+    ],
+    "add": [
+     "BoC"
+    ],
+    "source": "BP-2026-09",
+    "page": 62,
+    "why": "Battle Profiles, September 2026, p. 62 (and July 2026): \"This Regiment of Renown can be included in the following factions: Beasts of Chaos, Blades of Khorne, Disciples of Tzeentch, Maggotkin of Nurgle, Hedonites of Slaanesh, Slaves to Darkness.\" Beasts of Chaos was missing from the export; the record and its unit copies are added to BoC.json from the other faction files (insertOfficialRors)."
+   },
+   {
+    "ref": "A235",
+    "kind": "ror",
+    "id": "000001776",
+    "name": "Volt-Klaw’s Enginecoven",
+    "field": "allowedAdd",
+    "previous": [
+     "BoK",
+     "DoT",
+     "HS",
+     "MoN",
+     "StD"
+    ],
+    "value": [
+     "BoC",
+     "BoK",
+     "DoT",
+     "HS",
+     "MoN",
+     "StD"
+    ],
+    "add": [
+     "BoC"
+    ],
+    "source": "BP-2026-09",
+    "page": 62,
+    "why": "Battle Profiles, September 2026, p. 62 (and July 2026): \"This Regiment of Renown can be included in the following factions: Beasts of Chaos, Blades of Khorne, Disciples of Tzeentch, Maggotkin of Nurgle, Hedonites of Slaanesh, Slaves to Darkness.\" Beasts of Chaos was missing from the export; the record and its unit copies are added to BoC.json from the other faction files (insertOfficialRors)."
+   },
+   {
+    "ref": "A446",
+    "kind": "lore",
+    "faction": "FY",
+    "name": "Magmic Invocations",
+    "field": "legendsDate",
+    "previous": null,
+    "value": "2027-06-01",
+    "source": "KH-BP-2026-10",
+    "page": 2,
+    "why": "Battle Profiles: Khazalite Holds, October 2026, p. 2: \"Magmic Invocations will move to Warhammer Legends on 1 June 2027.\" Stored as the lore's legendsDate (new field); points unchanged (0)."
+   },
+   {
+    "ref": "A449",
+    "kind": "ror",
+    "id": "000002216",
+    "name": "Gotrek Gurnisson",
+    "field": "cost",
+    "previous": 320,
+    "value": 220,
+    "source": "KH-BP-2026-10",
+    "page": 3,
+    "why": "September BP p. 60: 320 for CoS, DoK, FY, ID, KO, LRL, SN, SE, SY. Battle Profiles: Khazalite Holds, October 2026, p. 3, section \"Regiments of Renown\" (Order): 220 for the same list without Fyreslayers. The October entry is a general Regiment of Renown profile (published in the RoR section, lists eight non-Khazalite factions); per the September BP p. 1 precedence rule (\"the new version takes precedence over versions with an earlier publication date\") it replaces the September profile."
+   },
+   {
+    "ref": "A449b",
+    "kind": "ror",
+    "id": "000002216",
+    "name": "Gotrek Gurnisson",
+    "field": "allowedRemove",
+    "previous": [
+     "CoS",
+     "DoK",
+     "FY",
+     "ID",
+     "KO",
+     "LRL",
+     "SE",
+     "SN",
+     "SY"
+    ],
+    "value": [
+     "CoS",
+     "DoK",
+     "ID",
+     "KO",
+     "LRL",
+     "SE",
+     "SN",
+     "SY"
+    ],
+    "remove": [
+     "FY"
+    ],
+    "source": "KH-BP-2026-10",
+    "page": 3,
+    "why": "Same October profile omits Fyreslayers; Gotrek is now a Khazalite Holds hero (KH BP p. 1: 220, regiment options None). No current document keeps Fyreslayers access at 220 or 320, so Fyreslayers access is removed (FY.json keeps a withdrawnRors entry for saved rosters). Khazalite Holds itself has no data in the app (no export) — not added there."
+   },
+   {
+    "ref": "A206",
+    "kind": "enhancement",
+    "faction": "BoK",
+    "id": "000004483:3",
+    "name": "FRENZIED TASKMASTER",
+    "field": "name",
+    "previous": "FRENZIED TASKMASTER",
+    "value": "BLADE-LIMBS",
+    "source": "BP-2026-09",
+    "page": 27,
+    "why": "Brazen Mutations, 3rd item. The export (Faction_abilities.csv, Brazen Mutations line 3) and the Wahapedia site label it \"FRENZIED TASKMASTER\", but its flavour text is \"these warriors have secondary limbs that end in razor-sharp blades\" and Battle Profiles July (p. 26) and September 2026 (p. 27) list Brazen Mutations as Brass Flesh 20, Blade-limbs 20, Scorpion Tails 10. FRENZIED TASKMASTER is a separate heroic trait (Slaughterers of Thousands), which is why the curated points by name gave 0. Rename by enhancement id; rule text unchanged."
+   },
+   {
+    "ref": "A206b",
+    "kind": "enhancement",
+    "faction": "BoK",
+    "id": "000004483:3",
+    "name": "FRENZIED TASKMASTER",
+    "field": "points",
+    "previous": 0,
+    "value": 20,
+    "source": "BP-2026-09",
+    "page": 27,
+    "why": "Blade-limbs 20 points in Battle Profiles July and September 2026; the Wahapedia site shows 20 for the same item."
+   },
+   {
+    "ref": "A438",
+    "kind": "rule",
+    "owners": [
+     "KB|trait"
+    ],
+    "ruleName": "DIRTY TRICKS",
+    "field": "text",
+    "previous": "Effect: The effect of a DIRTY TRICK ability is only applied if you make a successful dirty trick roll. The success of a dirty trick roll depends on the number of DIRTY TRICK abilities your army has already used this battle round.\n\nDirty Trick — Dirty Trick Roll\nFirst — 2+\nSecond — 3+\nThird — 4+\nFourth or subsequent — 5+",
+    "value": "Effect: The success of a dirty trick roll depends on the number of DIRTY TRICK abilities your army has already used this battle round.\n\nDirty Trick — Dirty Trick Roll\nFirst — 2+\nSecond — 3+\nThird — 4+\nFourth or subsequent — 5+",
+    "source": "RU-2026-09",
+    "page": 61,
+    "why": "Rules Updates, September 2026, p. 61, Kruleboyz Battle Traits: \"Remove the first sentence of the effect of ‘Dirty Tricks’\". The export and the Wahapedia site (checked 2026-10-17) still have that sentence, so the stored text was not yet corrected. Table restored from Wahapedia is kept."
+   },
+   {
+    "ref": "F01",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000000332",
+    "name": "Bladebringer, Herald on Hellflayer",
+    "field": "legends",
+    "previous": false,
+    "value": true,
+    "source": "BP-2026-09",
+    "page": 69,
+    "why": "Battle Profiles, September 2026, p. 69 (and July 2026, p. 69): listed under \"Warhammer Legends – Chaos\", Legends Heroes. Not from the \"Legends Warscrolls\" publication in the export, so the source rule does not cover it; the Wahapedia page (checked 2026-10-17) has no Legends marker — official Battle Profiles take precedence for Legends status. Points unchanged."
+   },
+   {
+    "ref": "F02",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000000333",
+    "name": "Bladebringer, Herald on Seeker Chariot",
+    "field": "legends",
+    "previous": false,
+    "value": true,
+    "source": "BP-2026-09",
+    "page": 69,
+    "why": "Battle Profiles, September 2026, p. 69 (and July 2026, p. 69): listed under \"Warhammer Legends – Chaos\", Legends Heroes. Not from the \"Legends Warscrolls\" publication in the export, so the source rule does not cover it; the Wahapedia page (checked 2026-10-17) has no Legends marker — official Battle Profiles take precedence for Legends status. Points unchanged."
+   },
+   {
+    "ref": "F03",
+    "kind": "warscroll",
+    "faction": "HS",
+    "id": "000000338",
+    "name": "Viceleader, Herald of Slaanesh",
+    "field": "legends",
+    "previous": false,
+    "value": true,
+    "source": "BP-2026-09",
+    "page": 69,
+    "why": "Battle Profiles, September 2026, p. 69 (and July 2026, p. 69): listed under \"Warhammer Legends – Chaos\", Legends Heroes. Not from the \"Legends Warscrolls\" publication in the export, so the source rule does not cover it; the Wahapedia page (checked 2026-10-17) has no Legends marker — official Battle Profiles take precedence for Legends status. Points unchanged."
    }
   ],
+  "notApplied": [],
   "aliases": [
    {
     "ref": "A386",
@@ -8486,6 +8758,68 @@
     "id": "000001981",
     "stored": "Hearthguard Berzerker with Berzerker Broadaxes",
     "official": "Hearthguard Berzerkers with Berzerker Broadaxes"
+   }
+  ],
+  "reviewed": [
+   {
+    "ref": "A262",
+    "item": "Pyrofane Fusiliers, Pyrofane Great Cannon, Pyrofane Fusil-Major on Ogor Warhulk, Pyrofane Steelhelms (DoT)",
+    "decision": "marked Warhammer Legends (curated.warscrollOverrides, set.legends); points unchanged",
+    "evidence": "Rules Updates, September 2026, p. 34 (FAQ): the Pyrofane Cult Army of Renown (White Dwarf 514) is a Legends Army of Renown; not in any Battle Profiles section; each Wahapedia warscroll page states \"This warscroll is part of the Warhammer Legends range of rules\" (checked 2026-10-17)."
+   },
+   {
+    "ref": "A391",
+    "item": "Iron March: Immolator Cogfort, Linebreaker Cogfort (CoS)",
+    "decision": "no change",
+    "evidence": "Already aorOnly \"Iron March\" (cannot be taken in a normal army) at 510 / 450 = Battle Profiles, September 2026; Wahapedia page: 450, not Legends (checked 2026-10-17)."
+   },
+   {
+    "ref": "A417",
+    "item": "Oracular Visions — Chaos Sorcerer Lord on Manticore (StD)",
+    "decision": "no text change",
+    "evidence": "Rules Updates, September 2026 changes \"Chaos Sorcerer Lord\" only (applied, A416). The Manticore version is a Warhammer Legends warscroll (Battle Profiles September 2026 p. 70, Legends – Chaos; export source \"Legends Warscrolls\"), Legends rules are not updated, and the Wahapedia page still shows the old wording (checked 2026-10-17). The unit is now marked Legends by the Legends-publication rule."
+   },
+   {
+    "ref": "A419",
+    "item": "Oath of Conquest — Godsworn Hunt (StD)",
+    "decision": "no text change",
+    "evidence": "Rules Updates, September 2026 changes \"Darkoath Savagers\" only (applied, A418). Godsworn Hunt is a Warhammer Legends warscroll (Battle Profiles September 2026 p. 70; export source \"Legends Warscrolls\"); the Wahapedia page keeps \"wholly within enemy territory\" (checked 2026-10-17). Now marked Legends."
+   },
+   {
+    "ref": "A439",
+    "item": "OUTPUT TO MAXIMUM! — Linebreaker Cogfort (CoS)",
+    "decision": "full text restored from the Wahapedia page (curated.fullTexts)",
+    "evidence": "Export cut at 1024 characters (\"…This unit’s Move char\"). The Wahapedia page has the complete ability, ending \"2 - Full Throttle!: This unit’s Move characteristic is 10\" (no inch mark on the site; not added — the analogous official Cogfort ability in the Warhammer Community article of 11 May 2026 reads 10\"). No GW warscroll PDF for the Iron March Cogforts was found (the Armies of Renown PDF of 29 Jul 2026 does not contain it)."
+   },
+   {
+    "ref": "F04",
+    "item": "Grombrindal, The White Dwarf (CoS, FY, KO)",
+    "decision": "no change",
+    "evidence": "Legends, 360 points (curated.warscrollOverrides copyFrom, Wahapedia CoS/KO pages, 2026-10-16); not in the September 2026 or Khazalite Holds October 2026 Battle Profiles, which list only matched-play units and RoRs, so no official value conflicts."
+   },
+   {
+    "ref": "F05",
+    "item": "SONG OF THE LOST — Lore of the Spirit-Song (SY)",
+    "decision": "source metadata fixed",
+    "evidence": "Text replaced by Rules Updates, September 2026 (A435) but textSource stayed \"wahapedia-site\"; every official text change now sets textSource \"gw-rules-updates\"."
+   },
+   {
+    "ref": "F06",
+    "item": "Warscrolls from the GW \"Legends Warscrolls\" publication (export Source.csv 000000138)",
+    "decision": "marked Warhammer Legends in normaliseAosFaction (import and repair)",
+    "evidence": "93 such warscrolls had legends false because the export flags Legends only through a \"Legends Warscroll\" note. All of them are in the \"Warhammer Legends\" sections of Battle Profiles September 2026 (pp. 65–74; Kragnos only for Bonesplitterz, The Thricefold Discord 130 — not the new Thricefold Discord 190); the Wahapedia pages state \"part of the Warhammer Legends range\". Saved rosters keep these units with the existing Legends warning."
+   }
+  ],
+  "unresolved": [
+   {
+    "ref": "A216",
+    "item": "Krong the Club (Regiment of Renown, 140)",
+    "reason": "Battle Profiles, September 2026, p. 59 replaces Stumblefoot Gargant with Krong the Club; the Wahapedia export of 2026-08-25 has no record for it — needs a newer export (Stage B)."
+   },
+   {
+    "ref": "A449",
+    "item": "Gotrek Gurnisson as a Khazalite Holds hero (220)",
+    "reason": "Khazalite Holds has no data in the app (no Wahapedia export yet); Khazalite Holds stays separate from Fyreslayers."
    }
   ]
  }

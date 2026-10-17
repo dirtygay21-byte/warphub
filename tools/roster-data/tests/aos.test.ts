@@ -239,11 +239,12 @@ test('усиление: вдвое дороже; героя и одиночну�
 });
 
 test('очки: лимит и «не больше половины на один юнит»', () => {
-  const { L, ws } = ctx('BS');
-  const r = newAosRoster('BS', 1000);
+  // Kragnos у Bonesplitterz — Warhammer Legends (публикация «Legends Warscrolls»), у Gloomspite Gitz — обычный юнит (Battle Profiles 09.2026)
+  const { L, ws } = ctx('GG');
+  const r = newAosRoster('GG', 1000);
   const k = ws('Kragnos, the End of Empires');
   assert.match(reason(leaderFit(k, r, L)), /половины лимита \(500/);
-  const r2 = newAosRoster('BS', 2000);
+  const r2 = newAosRoster('GG', 2000);
   assert.ok(leaderFit(k, r2, L).ok);
   // лимит очков не превышается при добавлении
   const s = ctx('SE');

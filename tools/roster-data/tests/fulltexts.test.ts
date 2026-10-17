@@ -115,15 +115,15 @@ test('fullTexts в curated: обход проверки редакции (revise
     assert.match(it.source, /^https:\/\/wahapedia\.ru\/aos4\//, it.name);
     assert.ok(it.in.length > 0, it.name);
   }
-  // 116 текстов, обрезанных лимитом 1024 символа (172 записи), + 16 текстов с восстановленными таблицами (21 запись)
-  assert.equal(ft.items.length, 132);
-  assert.equal(ft.items.reduce((n: number, it: { in: string[] }) => n + it.in.length, 0), 193);
+  // 117 текстов, обрезанных лимитом 1024 символа (173 записи, с OUTPUT TO MAXIMUM! с 17.10.2026), + 16 текстов с восстановленными таблицами (21 запись)
+  assert.equal(ft.items.length, 133);
+  assert.equal(ft.items.reduce((n: number, it: { in: string[] }) => n + it.in.length, 0), 194);
 });
 
 const officialText = (ref: string, name: string) =>
   curated.officialUpdates?.items.find((i: { kind: string; field: string; ruleName?: string; owners?: string[] }) => i.kind === 'rule' && i.field === 'text' && i.ruleName === name && i.owners!.includes(ref));
 
-test('данные AoS: все 193 записи из fullTexts получили полный текст из curated', () => {
+test('данные AoS: все 194 записи из fullTexts получили полный текст из curated', () => {
   let n = 0;
   for (const it of ft.items)
     for (const ref of it.in) {
@@ -135,15 +135,16 @@ test('данные AoS: все 193 записи из fullTexts получили 
       if (ou) assert.equal(ou.previous, it.text, `${ref} «${it.name}»: правка заменяет не восстановленный текст`);
       assert.equal(r.text, ou ? ou.value : it.text, `${ref} «${it.name}»`);
       assert.equal(r.incomplete, undefined, `${ref} «${it.name}»`);
-      assert.equal(r.textSource, 'wahapedia-site', `${ref} «${it.name}»`);
+      // источник текста — официальная правка, если она заменила восстановленный текст (SONG OF THE LOST, DIRTY TRICKS)
+      assert.equal(r.textSource, ou ? 'gw-rules-updates' : 'wahapedia-site', `${ref} «${it.name}»`);
       n++;
     }
-  assert.equal(n, 193);
+  assert.equal(n, 194);
 });
 
-// 1 удержанное правило (текст на сайте сам выглядит оборванным): остаётся с исходным текстом выгрузки и пометкой «неполный».
-// Хэш — текст до восстановления (16.10.2026).
-const HELD: [string, string, string][] = [
+// OUTPUT TO MAXIMUM! (удерживался 16.10.2026): восстановлен 17.10.2026 — текст сайта Wahapedia дословно, без знака дюйма,
+// которого нет и на сайте. Хэш — обрезанный текст выгрузки, к которому дописан только хвост.
+const HELD_RESTORED: [string, string, string][] = [
   ['CoS|ws:Linebreaker Cogfort', 'OUTPUT TO MAXIMUM!', 'c5b17d806b92f0a4'],
 ];
 // 4 конфликта (на сайте другая редакция): Rules Updates GW 23.09.2026 подтвердили редакцию сайта — в данных официальный текст
@@ -155,19 +156,20 @@ const OFFICIAL: [string, string, string, string][] = [
   ['StD|form:Despoilers', 'FERAL RUIN', '83307c15f8521431', 'A415'],
 ];
 
-test('данные AoS: удержанное правило не тронуто, 4 конфликта заменены официальным текстом GW', () => {
-  assert.deepEqual(
-    ft.missing.map((m: { in: string; name: string }) => `${m.in}|${m.name}`).sort(),
-    HELD.map(([ref, name]) => `${ref}|${name}`).sort(),
-  );
-  const restored = new Set(ft.items.flatMap((it: { in: string[]; name: string }) => it.in.map((ref) => `${ref}|${it.name}`)));
-  for (const [ref, name, hash] of HELD) {
-    assert.ok(!restored.has(`${ref}|${name}`), `${ref} «${name}» не должен быть в fullTexts.items`);
+test('данные AoS: удержанных правил нет (OUTPUT TO MAXIMUM! восстановлен), 4 конфликта заменены официальным текстом GW', () => {
+  assert.deepEqual(ft.missing, []);
+  const restored = new Map(ft.items.flatMap((it: { in: string[]; name: string; text: string }) => it.in.map((ref) => [`${ref}|${it.name}`, it.text])));
+  for (const [ref, name, hash] of HELD_RESTORED) {
+    const full = restored.get(`${ref}|${name}`);
+    assert.ok(full, `${ref} «${name}» должен быть в fullTexts.items`);
+    const cut = full.slice(0, full.indexOf('Move char') + 'Move char'.length);
+    assert.equal(sha(cut), hash, `${ref} «${name}»: начало должно совпадать с текстом выгрузки`);
+    assert.ok(full.endsWith('2 - Full Throttle!: This unit’s Move characteristic is 10'), `${ref} «${name}»`);
     const recs = find(ref, name);
     assert.equal(recs.length, 1, `${ref} «${name}»`);
-    assert.equal(recs[0]!.incomplete, 'truncated', `${ref} «${name}»`);
-    assert.equal(recs[0]!.textSource, undefined, `${ref} «${name}»`);
-    assert.equal(sha(recs[0]!.text), hash, `${ref} «${name}»: текст изменился`);
+    assert.equal(recs[0]!.incomplete, undefined, `${ref} «${name}»`);
+    assert.equal(recs[0]!.textSource, 'wahapedia-site', `${ref} «${name}»`);
+    assert.equal(recs[0]!.text, full, `${ref} «${name}»`);
   }
   for (const [ref, name, hash, planRef] of OFFICIAL) {
     assert.ok(!restored.has(`${ref}|${name}`), `${ref} «${name}» не должен быть в fullTexts.items`);
@@ -187,8 +189,10 @@ test('данные AoS: удержанное правило не тронуто,
 
 test('данные AoS: отчёт подстановки без неподошедших текстов', () => {
   const lines = fullTextReport(Object.fromEntries(Object.entries(data).map(([id, d]) => [`${id}.json`, d])), curated);
-  assert.ok(lines.some((l) => /подставлено 193\b/.test(l)), lines.join('\n'));
+  assert.ok(lines.some((l) => /подставлено 194\b/.test(l)), lines.join('\n'));
   assert.ok(!lines.some((l) => l.startsWith('полный текст из curated не подставлен')), lines.join('\n'));
+  // восстановленный текст затем заменён официальной правкой GW — отдельной строкой, а не как «не подставлен»
+  assert.ok(lines.includes('полный текст затем заменён официальной правкой GW (officialUpdates): SY|lore:Lore of the Spirit-Song «SONG OF THE LOST»; KB|trait «DIRTY TRICKS»'), lines.join('\n'));
 });
 
 // ---------- таблицы правил AoS (вместо заглушки «$000001417» в выгрузке) ----------
@@ -235,9 +239,11 @@ test('таблицы AoS: все 21 запись восстановлены, б�
   const items = new Map(ft.items.flatMap((it: { in: string[]; name: string; text: string }) => it.in.map((ref) => [`${ref}|${it.name}`, it.text])));
   for (const [ref, name] of TABLE_RULES) {
     const r = record(ref, name);
+    const ou = officialText(ref, name); // DIRTY TRICKS: Rules Updates 09.2026 убрали первое предложение — таблица остаётся
     assert.equal(r.incomplete, undefined, `${ref} «${name}»`);
-    assert.equal(r.textSource, 'wahapedia-site', `${ref} «${name}»`);
-    assert.equal(r.text, items.get(`${ref}|${name}`), `${ref} «${name}»`);
+    assert.equal(r.textSource, ou ? 'gw-rules-updates' : 'wahapedia-site', `${ref} «${name}»`);
+    assert.equal(r.text, ou ? ou.value : items.get(`${ref}|${name}`), `${ref} «${name}»`);
+    if (ou) assert.equal(ou.previous, items.get(`${ref}|${name}`), `${ref} «${name}»`);
     assert.ok(!/\$\d{6,}/.test(r.text), `${ref} «${name}»: осталась заглушка таблицы`);
   }
   // и во всех данных AoS больше нет правил с невыгруженной таблицей
@@ -304,9 +310,9 @@ test('отчёт импорта соответствует данным: пол�
   const files = Object.fromEntries(fs.readdirSync(path.join(AOS, 'f')).filter((f) => f.endsWith('.json')).map((f) => [f, JSON.parse(fs.readFileSync(path.join(AOS, 'f', f), 'utf8'))]));
   assert.deepEqual(refreshAosReport(report, files, curated), report, 'отчёт устарел — запустите scripts/repair-aos-data.mjs');
   assert.deepEqual(report.exportIncomplete, { truncated: 177, table: 21 });
-  // 172 восстановлены с сайта Wahapedia + 4 заменены официальным текстом GW (Stage A); обрезанным осталось 1 (OUTPUT TO MAXIMUM!)
-  assert.ok(report.info.includes('полные тексты восстановлены: обрезанных — 176 из 177, без таблицы — 21 из 21'));
-  assert.ok(report.warnings.some((l: string) => l.includes('обрезано лимитом 1024 символа — 1, таблица не выгружена — 0')));
+  // 173 восстановлены с сайта Wahapedia (с OUTPUT TO MAXIMUM! с 17.10.2026) + 4 заменены официальным текстом GW (Stage A); обрезанных не осталось
+  assert.ok(report.info.includes('полные тексты восстановлены: обрезанных — 177 из 177, без таблицы — 21 из 21'));
+  assert.ok(!report.warnings.some((l: string) => l.startsWith('неполные тексты в выгрузке:')), 'неполных текстов больше нет');
   assert.equal(report.info.filter((l: string) => l.startsWith('полного текста нет: ')).length, curated.fullTexts.missing.length);
   // юнит с ценой или Legends не числится «без очков»; Auto-Endrin — «очков нет по правилам»
   for (const l of report.info.filter((x: string) => / — нет очков в Battle Profiles/.test(x))) {

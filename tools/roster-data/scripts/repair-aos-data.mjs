@@ -10,12 +10,13 @@
  * Порядок ключей и формат файлов сохраняются, меняются только исправленные значения.
  * Отчёт tools/roster-data/aos/import-report.json: строки о полных текстах, неполных текстах и юнитах без очков
  * пересчитываются по данным (refreshAosReport), остальные строки остаются от импорта CSV.
+ * index.json: строки фракций (число доступных юнитов, «только Legends») пересчитываются по данным (indexEntry, как в импорте).
  * --check — ничего не записывать, только показать, что изменилось бы (код выхода 1, если есть изменения).
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { findMarkup, fullTextReport, normaliseAosFaction, refreshAosReport, warscrollRefs } from './import-wahapedia-aos.mjs';
+import { findMarkup, fullTextReport, indexEntry, normaliseAosFaction, refreshAosReport, warscrollRefs } from './import-wahapedia-aos.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -57,6 +58,18 @@ const REPORT = path.join(HERE, '..', 'aos', 'import-report.json');
 const isAppData = DIR === path.resolve(HERE, '../../../backend/roster-data/aos');
 const reportBefore = isAppData ? fs.readFileSync(REPORT, 'utf8') : '';
 const reportAfter = isAppData ? JSON.stringify(refreshAosReport(JSON.parse(reportBefore), Object.fromEntries(loaded.map((l) => [l.file, l.data])), curated), null, 1) : '';
+// index.json — строки фракций по данным после обработки (порядок фракций и остальные поля не меняются)
+const INDEX = path.join(DIR, 'index.json');
+const indexBefore = fs.readFileSync(INDEX, 'utf8');
+const byId = Object.fromEntries(loaded.map((l) => [l.data.id, l.data]));
+const idx = JSON.parse(indexBefore);
+idx.factions = idx.factions.map((f) => (byId[f.id] ? indexEntry(byId[f.id], curated) : f));
+const indexAfter = JSON.stringify(idx);
+if (indexAfter !== indexBefore) {
+  changedFiles++;
+  console.log(`  ${CHECK ? '~' : '✓'} index.json: пересчитаны строки фракций`);
+  if (!CHECK) fs.writeFileSync(INDEX, indexAfter);
+}
 if (reportAfter !== reportBefore) {
   changedFiles++;
   console.log(`  ${CHECK ? '~' : '✓'} aos/import-report.json: пересчитаны строки о полных текстах, неполных текстах и юнитах без очков`);

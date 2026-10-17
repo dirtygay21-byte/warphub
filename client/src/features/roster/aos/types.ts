@@ -118,6 +118,19 @@ export interface AosRor {
   allowed: string[];
   link: string;
   source: string | null;
+  /** дата перехода в Warhammer Legends (YYYY-MM-DD) по официальным Battle Profiles */
+  legendsDate?: string | null;
+  /** полк уже в Warhammer Legends — для обычных игр недоступен */
+  legends?: boolean;
+}
+
+/** Полк славы, убранный из фракции по официальным документам GW: сохранённый ростер показывает причину. */
+export interface AosWithdrawnRor {
+  id: string;
+  name: string;
+  reason: string;
+  /** строка плана правок (curated.officialUpdates) */
+  ref: string;
 }
 
 export interface AosEligibility {
@@ -162,6 +175,10 @@ export interface AosLore {
   items: AosRule[];
   /** варскроллы манифестаций, которые призывает лор */
   summons: string[];
+  /** дата перехода в Warhammer Legends (YYYY-MM-DD) по официальным Battle Profiles */
+  legendsDate?: string | null;
+  /** лор уже в Warhammer Legends — для обычных игр недоступен */
+  legends?: boolean;
 }
 
 export interface AosFormation {
@@ -196,6 +213,8 @@ export interface AosFactionData {
   universalManifestations: AosWarscroll[];
   /** правила фракции в выгрузке устарели — предупреждение */
   rulesNotice: string | null;
+  /** полки славы, убранные из фракции официальными документами (в старых данных поля нет) */
+  withdrawnRors?: AosWithdrawnRor[];
 }
 
 export interface AosIndex {
