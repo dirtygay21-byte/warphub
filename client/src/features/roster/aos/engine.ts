@@ -1,4 +1,4 @@
-import { AOS_RULES, auxiliarySurcharge, nextAuxiliarySurcharge } from './rules';
+import { AOS_RULES, auxiliarySurcharge, isSeasonal, nextAuxiliarySurcharge, seasonActive, seasonLabel, seasonVersion } from './rules';
 import type {
   AosEnhancement,
   AosEnhancementTable,
@@ -38,7 +38,7 @@ export interface EnhancementRef {
   type: AosEnhancementType;
   table: AosEnhancementTable;
   item: AosEnhancement;
-  /** слот армии: одна таблица — одно улучшение; таблица Scourge of Aqshy делит слот с обычной таблицей того же типа */
+  /** слот армии: одна таблица — одно улучшение; сезонная таблица (Scourge of Aqshy) делит слот с обычной таблицей того же типа */
   slot: string;
 }
 
@@ -60,7 +60,7 @@ export function makeAosLookup(faction: AosFactionData): AosLookup {
   for (const w of [...faction.universalManifestations, ...faction.rorUnits, ...faction.warscrolls]) ws.set(w.id, w);
   const enh = new Map<string, EnhancementRef>();
   for (const type of faction.enhancementTypes) {
-    const shared = type.tables.some((t) => t.season === 'aqshy');
+    const shared = type.tables.some((t) => isSeasonal(t.season));
     for (const table of type.tables) for (const item of table.items) enh.set(item.id, { type, table, item, slot: shared ? 'type:' + type.key : 'table:' + table.id });
   }
   return {
@@ -171,14 +171,14 @@ const listNames = (ids: string[], L: AosLookup) => [...new Set(ids.map((id) => L
 export function warscrollFit(ws: AosWarscroll, r: AosRoster, L: AosLookup): Fit {
   if (!L.own.has(ws.id)) return no('Юнит другой фракции — только в составе полка славы.');
   if (ws.kind !== 'unit') return no('Это не юнит.');
-  if (ws.season === 'ghyran') return no('Профиль Scourge of Ghyran — сезон закончился.');
+  if (!seasonActive(ws.season)) return no(`Профиль ${seasonLabel(ws.season)} — сезон закончился.`);
   if (ws.aorOnly) return no(`Только в Army of Renown «${ws.aorOnly}».`);
   if (ws.cost == null) return no('Нет очков в Battle Profiles — юнит не допущен в matched play.');
   if (ws.legends && !r.showLegends) return no('Warhammer Legends — включите показ Legends.');
   return OK;
 }
 
-/** Ограничения армии в целом: Unique, «нельзя вместе», «1 на каждый», версии Scourge of Aqshy. */
+/** Ограничения армии в целом: Unique, «нельзя вместе», «1 на каждый», версии юнита (обычная или сезонная). */
 export function armyFit(ws: AosWarscroll, r: AosRoster, L: AosLookup, ignoreUid?: string): Fit {
   const others = placedUnits(r, L).filter((p) => p.unit.uid !== ignoreUid && p.ws);
   const rorWs = rorUnitsOf(r, L).map((x) => x.ws);
@@ -186,8 +186,8 @@ export function armyFit(ws: AosWarscroll, r: AosRoster, L: AosLookup, ignoreUid?
   if (ws.unique && rorWs.some((w) => w.baseName === ws.baseName)) return no(`«${ws.baseName}» — UNIQUE, уже есть в полку славы.`);
   const rorClash = rorWs.find((w) => ws.exclusiveWithIds.includes(w.id) || w.exclusiveWithIds.includes(ws.id));
   if (rorClash) return no(`Нельзя вместе с «${rorClash.name}» из полка славы.`);
-  const mix = others.find((p) => p.ws!.baseName === ws.baseName && (p.ws!.season === 'aqshy') !== (ws.season === 'aqshy'));
-  if (mix) return no(`В армии уже «${mix.ws!.name}» — все копии юнита должны быть одной версии (обычной или Scourge of Aqshy).`);
+  const mix = others.find((p) => p.ws!.baseName === ws.baseName && seasonVersion(p.ws!.season) !== seasonVersion(ws.season));
+  if (mix) return no(`В армии уже «${mix.ws!.name}» — все копии юнита должны быть одной версии (обычной или ${seasonLabel(mix.ws!.season) ?? seasonLabel(ws.season)}).`);
   const clash = others.find((p) => ws.exclusiveWithIds.includes(p.ws!.id) || p.ws!.exclusiveWithIds.includes(ws.id));
   if (clash) return no(`Нельзя вместе с «${clash.ws!.name}».`);
   if (r.ror && ws.exclusiveWithRorIds.includes(r.ror.id)) return no(`Нельзя вместе с полком славы «${L.ror.get(r.ror.id)?.name}».`);
@@ -473,6 +473,7 @@ export function enhancementFit(u: AosUnit, itemId: string, r: AosRoster, L: AosL
   if (ws.unique) return no('UNIQUE юниту нельзя давать улучшения.');
   // Юниты полка славы в ростере — не AosUnit, улучшения им в этом конструкторе не выдаются (по правилам — только с ключевым словом фракции)
   if (!L.own.has(ws.id) && !ws.factionKeywords.includes(L.factionKeyword)) return no('Юниту полка славы без ключевого слова фракции улучшения нельзя.');
+  if (!seasonActive(ref.table.season)) return no(`«${ref.table.name}» — сезон ${seasonLabel(ref.table.season)} закончился.`);
   if (!eligibleFor(ws, ref.table)) return no(`«${ref.table.name}» — только: ${ref.table.eligibility.text}.`);
   if (ref.item.points == null) return no('Нет очков в Battle Profiles.');
   const holder = slotHolder(ref.slot, r, L, u.uid);
@@ -489,16 +490,34 @@ export function enhancementFit(u: AosUnit, itemId: string, r: AosRoster, L: AosL
 
 // ---------- лоры, построение, террейн, полк славы ----------
 
-export const loresOf = (kind: LoreKind, L: AosLookup) => L.faction.lores.filter((l) => l.kind === kind && l.season !== 'ghyran');
+export const loresOf = (kind: LoreKind, L: AosLookup) => L.faction.lores.filter((l) => l.kind === kind && seasonActive(l.season));
+
+/** Построения фракции без закончившихся сезонов (построения Warhammer Legends остаются в списке — их блокирует formationFit). */
+export const formationsOf = (L: AosLookup) => L.faction.formations.filter((f) => seasonActive(f.season));
+
+/** «01.06.2027» из даты выгрузки «2027-06-01». */
+export const ruDate = (iso: string) => iso.split('-').reverse().join('.');
+
+/** Подпись о Legends у построения, полка славы или лора: уже в Legends или дата перехода. */
+export function legendsLabel(f: { legends?: boolean; legendsDate?: string | null }): string | null {
+  if (!f.legendsDate) return f.legends ? 'Warhammer Legends' : null;
+  return f.legends ? `Warhammer Legends с ${ruDate(f.legendsDate)}` : `Уйдёт в Legends ${ruDate(f.legendsDate)}`;
+}
+/** Подпись о Legends у построения: уже в Legends или дата перехода из примечания выгрузки. */
+export const formationLegendsLabel = (f: AosFormation): string | null => legendsLabel(f);
 
 export function loreFit(lore: AosLore, r: AosRoster, L: AosLookup): Fit {
+  if (!seasonActive(lore.season)) return no(`Сезон ${seasonLabel(lore.season)} закончился.`);
   if (lore.points == null) return no('Нет очков в Battle Profiles.');
+  if (lore.legends && !r.showLegends) return no(`${legendsLabel(lore)} — включите показ Legends.`);
   const cur = r.lores[lore.kind];
   const delta = lore.points - ((cur && L.lore.get(cur)?.points) || 0);
   return pointsFit(delta, r, L);
 }
 
 export function formationFit(f: AosFormation, r: AosRoster, L: AosLookup): Fit {
+  if (!seasonActive(f.season)) return no(`Сезон ${seasonLabel(f.season)} закончился.`);
+  if (f.legends && !r.showLegends) return no(`${formationLegendsLabel(f)} — включите показ Legends.`);
   if (f.points == null) return no('Нет очков в Battle Profiles.');
   const delta = f.points - ((r.formationId && L.formation.get(r.formationId)?.points) || 0);
   return pointsFit(delta, r, L);
@@ -521,6 +540,7 @@ export function rorPrice(ror: AosRor, picked: string[]): number {
 
 export function rorFit(ror: AosRor, r: AosRoster, L: AosLookup, picked: string[] = []): Fit {
   if (!ror.allowed.includes(L.faction.id)) return no('Этот полк славы нельзя взять в эту фракцию.');
+  if (ror.legends && !r.showLegends) return no(`${legendsLabel(ror)} — включите показ Legends.`);
   if (!ror.built && ror.cost == null) return no('Нет очков в Battle Profiles.');
   if (ror.built && !ror.units.some((u) => u.optional && picked.includes(u.id))) return no('Отметьте хотя бы один юнит полка (нажмите на название).');
   const own = placedUnits(r, L).filter((p) => p.ws);
@@ -619,7 +639,7 @@ export function computeAos(r: AosRoster, L: AosLookup): AosComputed {
   for (const [name, list] of seen) {
     const w = list[0]!.ws!;
     if (w.unique && list.length > 1) err('unique', `«${name}» — UNIQUE, в армии ${list.length} копии.`, list.map((p) => p.unit.uid));
-    if (new Set(list.map((p) => p.ws!.season === 'aqshy')).size > 1) err('season', `«${name}»: все копии должны быть одной версии (обычной или Scourge of Aqshy).`, list.map((p) => p.unit.uid));
+    if (new Set(list.map((p) => seasonVersion(p.ws!.season))).size > 1) err('season', `«${name}»: все копии должны быть одной версии (обычной или сезонной).`, list.map((p) => p.unit.uid));
     if (w.perUnitOf) {
       const base = placed.filter((p) => p.ws && w.perUnitOf!.ids.includes(p.ws.id)).length;
       if (list.length > base * w.perUnitOf.per) err('per-unit', `«${name}»: ${w.perUnitOf.per} на каждый «${w.perUnitOf.label}» — сейчас ${list.length} при ${base}.`, list.map((p) => p.unit.uid));
@@ -664,6 +684,7 @@ export function computeAos(r: AosRoster, L: AosLookup): AosComputed {
       if (p.ws.unique) err('enh-unique', `«${p.ws.name}» — UNIQUE, улучшения нельзя.`, [p.unit.uid]);
       if (!eligibleFor(p.ws, ref.table)) err('enh-eligible', `«${ref.item.name}» — только: ${ref.table.eligibility.text}.`, [p.unit.uid]);
       if (ref.item.points == null) err('enh-points', `«${ref.item.name}» — нет очков в Battle Profiles.`, [p.unit.uid]);
+      if (!seasonActive(ref.table.season)) err('enh-season', `«${ref.item.name}» — сезон ${seasonLabel(ref.table.season)} закончился.`, [p.unit.uid]);
       slots.set(ref.slot, [...(slots.get(ref.slot) ?? []), { uid: p.unit.uid, name: ref.item.name }]);
       items.set(id, [...(items.get(id) ?? []), p.unit.uid]);
     }
@@ -672,17 +693,22 @@ export function computeAos(r: AosRoster, L: AosLookup): AosComputed {
   for (const [id, uids] of items) if (uids.length > 1) err('enh-dup', `«${L.enh.get(id)?.item.name}» выбрано ${uids.length} раза.`, uids);
 
   // построение, лоры, террейн, полк славы
-  const formations = L.faction.formations;
+  // построения Legends не обязывают выбирать (если других нет — армия без построения)
+  const formations = formationsOf(L).filter((f) => !f.legends || r.showLegends);
   if (r.formationId && !L.formation.get(r.formationId)) err('formation', 'Выбранное боевое построение не найдено в данных.');
   else if (!r.formationId && formations.length) err('formation', 'Выберите боевое построение.');
   if (r.formationId && L.formation.get(r.formationId)?.points == null && L.formation.get(r.formationId)) err('formation', 'У построения нет очков в Battle Profiles.');
+  const fm = r.formationId ? L.formation.get(r.formationId) : undefined;
+  if (fm && !seasonActive(fm.season)) err('formation', `«${fm.name}» — сезон ${seasonLabel(fm.season)} закончился.`);
+  if (fm?.legends) warn('legends', `«${fm.name}» — ${formationLegendsLabel(fm)}, в matched play не допускается.`);
   for (const kind of ['spell', 'prayer', 'manifestation'] as LoreKind[]) {
     const id = r.lores[kind];
     if (!id) continue;
     const lore = L.lore.get(id);
-    if (!lore || lore.kind !== kind) err('lore', 'Лора не найдена в данных.');
+    if (!lore || lore.kind !== kind) err('lore', 'Лор не найден в данных.');
     else if (lore.points == null) err('lore', `«${lore.name}» — нет очков в Battle Profiles.`);
-    else if (lore.season === 'ghyran') err('lore', `«${lore.name}» — сезон Scourge of Ghyran закончился.`);
+    else if (!seasonActive(lore.season)) err('lore', `«${lore.name}» — сезон ${seasonLabel(lore.season)} закончился.`);
+    else if (lore.legends) warn('legends', `«${lore.name}» — ${legendsLabel(lore)}, в matched play не допускается.`);
   }
   if (r.terrainId) {
     const t = L.ws.get(r.terrainId);
@@ -691,12 +717,17 @@ export function computeAos(r: AosRoster, L: AosLookup): AosComputed {
     else if (t.legends) warn('legends', `«${t.name}» — Warhammer Legends, в matched play не допускается.`);
   }
   if (r.ror) {
-    const ror = L.ror.get(r.ror.id);
-    if (!ror) err('ror', 'Полк славы не найден в данных.');
+    const rorId = r.ror.id;
+    const ror = L.ror.get(rorId);
+    // полк убран из фракции официальными документами — причина вместо «не найден» (ростер не меняется молча)
+    const gone = ror ? null : L.faction.withdrawnRors?.find((w) => w.id === rorId);
+    if (gone) err('ror', `Полк славы «${gone.name}» ${gone.reason} — уберите его из ростера.`);
+    else if (!ror) err('ror', 'Полк славы не найден в данных.');
     else {
       if (!ror.allowed.includes(L.faction.id)) err('ror', `«${ror.name}» нельзя взять в ${L.faction.name}.`);
       if (ror.built && !ror.units.some((u) => u.optional && r.ror!.picked.includes(u.id))) err('ror', `«${ror.name}»: выберите хотя бы один юнит полка.`);
       if (!ror.built && ror.cost == null) err('ror', `«${ror.name}» — нет очков в Battle Profiles.`);
+      if (ror.legends) warn('legends', `«${ror.name}» — ${legendsLabel(ror)}, в matched play не допускается.`);
     }
   }
   if (L.faction.rulesNotice) warn('stale-rules', L.faction.rulesNotice);

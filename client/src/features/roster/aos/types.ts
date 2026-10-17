@@ -1,7 +1,8 @@
 // Типы данных и ростера Age of Sigmar 4. Данные — из tools/roster-data/scripts/import-wahapedia-aos.mjs.
 
 export type GrandAlliance = 'ORDER' | 'CHAOS' | 'DEATH' | 'DESTRUCTION';
-export type Season = 'standard' | 'aqshy' | 'ghyran' | null;
+/** 'standard' — правила батлтома; иначе ключ сезона из AOS_SEASONS (aos/rules.ts), например 'aqshy'. */
+export type Season = string | null;
 
 export interface AosRule {
   name: string;
@@ -12,6 +13,8 @@ export interface AosRule {
   /** «Spell 7», «Prayer 4», «Command 1» */
   value?: string;
   reaction?: boolean;
+  /** текст в выгрузке неполный: обрезан лимитом 1024 символа или без невыгруженной таблицы (см. tools/roster-data README) */
+  incomplete?: 'truncated' | 'table';
 }
 
 export interface AosWeapon {
@@ -115,6 +118,19 @@ export interface AosRor {
   allowed: string[];
   link: string;
   source: string | null;
+  /** дата перехода в Warhammer Legends (YYYY-MM-DD) по официальным Battle Profiles */
+  legendsDate?: string | null;
+  /** полк уже в Warhammer Legends — для обычных игр недоступен */
+  legends?: boolean;
+}
+
+/** Полк славы, убранный из фракции по официальным документам GW: сохранённый ростер показывает причину. */
+export interface AosWithdrawnRor {
+  id: string;
+  name: string;
+  reason: string;
+  /** строка плана правок (curated.officialUpdates) */
+  ref: string;
 }
 
 export interface AosEligibility {
@@ -157,15 +173,27 @@ export interface AosLore {
   universal: boolean;
   season: Season;
   items: AosRule[];
-  /** варскроллы манифестаций, которые призывает лора */
+  /** варскроллы манифестаций, которые призывает лор */
   summons: string[];
+  /** дата перехода в Warhammer Legends (YYYY-MM-DD) по официальным Battle Profiles */
+  legendsDate?: string | null;
+  /** лор уже в Warhammer Legends — для обычных игр недоступен */
+  legends?: boolean;
 }
 
 export interface AosFormation {
   id: string;
   name: string;
   points: number | null;
+  /** сезон построения; в старых данных поля нет — значит 'standard' */
+  season?: Season;
   rules: AosRule[];
+  /** примечание выгрузки (Faction_ability_subtypes.description), например дата перехода в Legends */
+  notes?: string | null;
+  /** дата перехода в Warhammer Legends (YYYY-MM-DD), если указана в примечании */
+  legendsDate?: string | null;
+  /** на дату выгрузки построение уже в Legends — для обычных игр недоступно */
+  legends?: boolean;
 }
 
 export interface AosFactionData {
@@ -185,6 +213,8 @@ export interface AosFactionData {
   universalManifestations: AosWarscroll[];
   /** правила фракции в выгрузке устарели — предупреждение */
   rulesNotice: string | null;
+  /** полки славы, убранные из фракции официальными документами (в старых данных поля нет) */
+  withdrawnRors?: AosWithdrawnRor[];
 }
 
 export interface AosIndex {

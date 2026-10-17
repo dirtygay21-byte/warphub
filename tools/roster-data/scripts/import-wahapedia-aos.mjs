@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseCsv, htmlToText } from './import-wahapedia.mjs';
+import { parseCsv, htmlToText, cleanWahaText, rawIncomplete } from './import-wahapedia.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FILES = [
@@ -25,6 +25,12 @@ const FILES = [
 const UNIVERSAL = 'EnS'; // «Endless Spells» — универсальные лоры манифестаций, не отдельная армия
 const MONTHS = { january: 1, february: 2, march: 3, april: 4, may: 5, june: 6, july: 7, august: 8, september: 9, october: 10, november: 11, december: 12 };
 const ALLIANCES = ['ORDER', 'CHAOS', 'DEATH', 'DESTRUCTION'];
+/**
+ * Выгрузка Wahapedia AoS обрезает поле description на 1024 символах HTML (68 способностей варскроллов и 112 правил
+ * фракций в выгрузке от 25.08.2026 упираются ровно в этот лимит, у 40K лимита нет). Такие правила помечаются
+ * incomplete: 'truncated', интерфейс показывает предупреждение и ссылку на полный текст.
+ */
+const AOS_TEXT_CAP = 1024;
 const CORE_TABLES = new Set(['Battle Formations', 'Heroic Traits', 'Artefacts of Power', 'Spell Lore', 'Prayer Lore', 'Manifestation Lore', 'Monstrous Traits']);
 
 // ---------- общие помощники ----------
@@ -60,7 +66,7 @@ const byLine = (a, b) => (int(a.line) ?? 0) - (int(b.line) ?? 0);
  * «1 отряд на каждый …», «не больше N … в полку не-… героя», «нельзя вместе с …», «только в Army of Renown».
  * rest — то, что осталось неразобранным (должно быть пусто или только справочные фразы).
  */
-export function parseNotes(html, dataDate) {
+export function parseNotes(html, dataDate, seasonInfo = {}) {
   let s = text(html).replace(/\s+/g, ' ').trim();
   const out = {
     legends: false, legendsDate: null, season: null, joinAs: [], joinLeaders: [], onlyIn: [], perUnitOf: null,
@@ -78,7 +84,7 @@ export function parseNotes(html, dataDate) {
   take(/Legends Warscroll\.?/gi, () => (out.legends = true));
   take(/This unit cannot be reinforced\.?/gi, () => {});
   take(/T?his unit is legal for Matched Play for battles fought using the\s+General.?s Handbook (\d{4})-(\d{2,4}) battlepack\.?/gi, (_, y) => {
-    out.season = y === '2025' ? 'ghyran' : y === '2026' ? 'aqshy' : 'season-' + y;
+    out.season = Object.entries(seasonInfo).find(([, v]) => v?.handbook === y)?.[0] ?? 'season-' + y;
   });
   take(/This HERO regiment as can join an eligible ([^.]+?)\./gi, (_, t) => out.joinAs.push(norm(t)));
   take(/This (?:HERO|Hero) can join (?:an )?eligible regiment as (?:an? )?(.+?)(?:\.|(?=This |You |$))/g, (_, t) => out.joinAs.push(norm(t)));
@@ -195,6 +201,8 @@ export function importAos(src, { curated, eligibility }) {
 
   const rule = (a) => {
     const r = { name: text(a.name), text: text(a.description) };
+    const inc = rawIncomplete(a.description, AOS_TEXT_CAP);
+    if (inc) r.incomplete = inc;
     if (a.condition) r.timing = text(a.condition);
     if (a.ability_type) r.type = a.ability_type;
     if (a.keywords) r.keywords = text(a.keywords);
@@ -212,9 +220,9 @@ export function importAos(src, { curated, eligibility }) {
     const factionKeywords = [...new Set(kws.filter((k) => k.is_faction_keyword === 'true').map((k) => up(k.keyword)))];
     const param = (kw) => kws.find((k) => up(k.keyword) === kw)?.parameter?.trim() || null;
     const hero = /hero/i.test(x.role) || keywords.includes('HERO');
-    const notes = parseNotes(x.notes, dataDate);
+    const notes = parseNotes(x.notes, dataDate, curated.seasonInfo);
     const name = text(x.name);
-    const seasonByName = /^Scourge of Ghyran /i.test(name) ? 'ghyran' : /^Scourge of Aqshy /i.test(name) ? 'aqshy' : null;
+    const seasonByName = Object.entries(curated.seasonInfo).find(([, v]) => v?.label && name.toLowerCase().startsWith(v.label.toLowerCase() + ' '))?.[0] ?? null;
     const season = notes.season ?? seasonByName;
     const kind = x.role === 'Faction Terrain' ? 'terrain' : /Endless Spell|Manifestation/i.test(x.role) || x.faction_id === UNIVERSAL ? 'manifestation' : 'unit';
     // у не-героев колонка regiment_options = «значимые ключевые слова» из Battle Profiles
@@ -229,7 +237,7 @@ export function importAos(src, { curated, eligibility }) {
       id: x.id,
       faction: x.faction_id,
       name,
-      baseName: season ? name.replace(/^Scourge of (?:Ghyran|Aqshy)\s+/i, '') : name,
+      baseName: season && curated.seasonInfo[season]?.label && name.toLowerCase().startsWith(curated.seasonInfo[season].label.toLowerCase() + ' ') ? name.slice(curated.seasonInfo[season].label.length + 1) : name,
       role: x.role,
       kind,
       hero,
@@ -311,7 +319,7 @@ export function importAos(src, { curated, eligibility }) {
     for (const [sid, items] of groupBy(rows.filter((r) => r.type_name === 'Manifestation Lore'), 'subtype_id')) {
       const name = text(items[0].subtype_name);
       const pts = curated.universalLores[norm(name)];
-      if (typeof pts !== 'number') report.warnings.push(`универсальная лора без очков: ${name}`);
+      if (typeof pts !== 'number') report.warnings.push(`универсальный лор без очков: ${name}`);
       universalLores.push({ id: sid, kind: 'manifestation', name, points: typeof pts === 'number' ? pts : null, universal: true, season: 'standard', items: items.sort(byLine).map(rule), summons: [] });
     }
   }
@@ -344,7 +352,7 @@ export function importAos(src, { curated, eligibility }) {
       const nm = m[1].replace(/\s*\(.*?\)\s*$/, '').trim();
       const models = m[2] ? +m[2] : null;
       const cands = rorPool.filter((y) => [nameKey(nm), nameKey(nm).replace(/s$/, '')].includes(nameKey(y.name)));
-      const legendsOf = (y) => parseNotes(y.notes, dataDate).legends;
+      const legendsOf = (y) => parseNotes(y.notes, dataDate, curated.seasonInfo).legends;
       const pick =
         cands.find((y) => y.faction_id === x.faction_id && y.virtual !== 'true' && !legendsOf(y)) ??
         cands.find((y) => y.faction_id === x.faction_id) ??
@@ -463,7 +471,8 @@ export function importAos(src, { curated, eligibility }) {
         if (!w.regimentCap.ids.includes(w.id)) report.warnings.push(`${fid}: «${w.name}» — ограничение «${w.regimentCap.phrase}» не относится к самому юниту`);
       }
       if (n.rest) report.info.push(`${fid}: «${w.name}» — неразобранная заметка: ${n.rest}`);
-      if (w.kind === 'unit' && w.cost == null && !w.legends) report.info.push(`${fid}: «${w.name}» — нет очков в Battle Profiles, юнит нельзя добавить`);
+      const pointsNote = missingPointsNote(fid, w, curated);
+      if (pointsNote) report.info.push(pointsNote);
       delete w._notes;
       delete w._rawOptions;
     }
@@ -491,15 +500,20 @@ export function importAos(src, { curated, eligibility }) {
         if (CORE_TABLES.has(typeName)) report.warnings.push(`${fid}: таблица «${subName}» (${typeName}) не размечена в curated.json — пропущена`);
         continue;
       }
-      if (season === 'ghyran') continue; // сезон Scourge of Ghyran закончился
+      if (!seasonActive(curated, season)) continue; // сезон закончился (curated.json → seasonInfo)
       if (typeName === 'Battle Formations') {
         const pts = ptsFor(fid, 'formation', subName);
         if (pts == null) report.warnings.push(`${fid}: построение «${subName}» — нет очков`);
-        formations.push({ id: sid, name: subName, points: pts, rules: items.map(rule) });
+        // примечание подтипа: сроки перехода в Warhammer Legends («On 1st June 2027, these rules will move over…»)
+        const notes = subDesc.get(`${fid}|${sid}`) ?? '';
+        const lm = notes.match(/(?:on|from)\s+(\d{1,2})(?:st|nd|rd|th)?\s+(\w+)\s+(\d{4}),?\s+these rules will move (?:over )?to Warhammer Legends/i);
+        const legendsDate = lm ? `${lm[3]}-${String(MONTHS[lm[2].toLowerCase()] ?? 1).padStart(2, '0')}-${String(lm[1]).padStart(2, '0')}` : null;
+        if (/Warhammer Legends/i.test(notes) && !legendsDate) report.warnings.push(`${fid}: построение «${subName}» — упоминание Legends без даты: ${notes.slice(0, 80)}`);
+        formations.push({ id: sid, name: subName, points: pts, season, rules: items.map(rule), notes, legendsDate, legends: !!legendsDate && legendsDate <= dataDate });
       } else if (/^(Spell|Prayer|Manifestation) Lore$/.test(typeName)) {
         const kind = typeName.split(' ')[0].toLowerCase();
         const pts = ptsFor(fid, 'lore', subName);
-        if (pts == null) report.warnings.push(`${fid}: лора «${subName}» — нет очков`);
+        if (pts == null) report.warnings.push(`${fid}: лор «${subName}» — нет очков`);
         lores.push({ id: sid, kind, name: subName, points: pts, universal: false, season, items: items.map(rule), summons: [] });
       } else {
         const key = typeName === 'Heroic Traits' ? 'heroic' : typeName === 'Artefacts of Power' ? 'artefact' : typeName === 'Monstrous Traits' ? 'monstrous' : 'x:' + norm(typeName);
@@ -562,7 +576,7 @@ export function importAos(src, { curated, eligibility }) {
     const allianceCount = new Map();
     for (const w of units) for (const k of w.factionKeywords) if (ALLIANCES.includes(k)) allianceCount.set(k, (allianceCount.get(k) ?? 0) + 1);
     const grandAlliance = [...allianceCount.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
-    const selectable = units.filter((w) => w.cost != null && !w.legends && w.season !== 'ghyran' && !w.aorOnly);
+    const selectable = units.filter((w) => w.cost != null && !w.legends && seasonActive(curated, w.season) && !w.aorOnly);
     const terrain = own.filter((w) => w.kind === 'terrain');
     for (const t of terrain) {
       const curatedPts = ptsFor(fid, 'terrain', t.name);
@@ -586,7 +600,7 @@ export function importAos(src, { curated, eligibility }) {
       lores: [...lores, ...universalLores],
       universalManifestations,
       // правила фракции в выгрузке устарели (вышел новый батлтом) — показываем предупреждение
-      rulesNotice: curated.stale.factions[fid] ?? null,
+      rulesNotice: rulesNoticeOf(curated, fid),
     };
     files[fid] = data;
     // без доступного героя полк не собрать — такая фракция играется только с Legends
@@ -610,7 +624,533 @@ export function importAos(src, { curated, eligibility }) {
     pointsSource: curated.sources,
     factions: factions.sort((a, b) => ALLIANCES.indexOf(a.grandAlliance) - ALLIANCES.indexOf(b.grandAlliance) || a.name.localeCompare(b.name)),
   };
+  const refs = warscrollRefs(files);
+  // сколько неполных текстов в самой выгрузке (до подстановки полных текстов из curated.fullTexts)
+  report.exportIncomplete = incompleteCounts(files);
+  for (const [fid, data] of Object.entries(files)) {
+    normaliseAosFaction(data, curated, refs);
+    for (const where of findMarkup(data)) report.errors.push(`${fid}: служебная разметка в тексте — ${where}`);
+  }
+  // строки index.json — по данным после последней обработки (Legends, очки и правки GW меняют число доступных юнитов)
+  index.factions = index.factions.map((f) => indexEntry(files[f.id], curated));
+  report.info.push(...fullTextReport(files, curated));
+  report.info.push(...officialUpdatesReport(files, curated));
+  const inc = incompleteLine(files);
+  if (inc) report.warnings.push(inc);
   return { index, files, report };
+}
+
+// ---------- последняя обработка данных фракции ----------
+/** Сезон действует? Неизвестный сезон считается действующим, но тест данных потребует его описать. */
+export const seasonActive = (curated, season) => !season || season === 'standard' || curated.seasonInfo?.[season]?.active !== false;
+
+const RULE_FIELDS = ['name', 'text', 'timing', 'type', 'keywords', 'value'];
+/** Все объекты-правила фракции: способности, черты, построения, улучшения, заклинания, правила полков славы. */
+function* rulesOf(data) {
+  const scrolls = [...data.warscrolls, ...data.rorUnits, ...data.universalManifestations];
+  for (const w of scrolls) yield* w.abilities;
+  yield* data.battleTraits;
+  for (const f of data.formations) yield* f.rules;
+  for (const t of data.enhancementTypes) for (const tb of t.tables) yield* tb.items;
+  for (const l of data.lores) yield* l.items;
+  for (const r of data.rors) yield* r.abilities;
+}
+
+/** То же, что rulesOf, но с владельцем правила: ключ «ws:<варскролл>», «trait», «form:<построение>»,
+ *  «enh:<таблица улучшений>», «lore:<лор>», «ror:<полк славы>» — по нему подставляются полные тексты. */
+export function* rulesWithOwner(data) {
+  for (const w of [...data.warscrolls, ...data.rorUnits, ...data.universalManifestations]) for (const r of w.abilities) yield [`ws:${w.name}`, r];
+  for (const r of data.battleTraits) yield ['trait', r];
+  for (const f of data.formations) for (const r of f.rules) yield [`form:${f.name}`, r];
+  for (const t of data.enhancementTypes) for (const tb of t.tables) for (const r of tb.items) yield [`enh:${tb.name}`, r];
+  for (const l of data.lores) for (const r of l.items) yield [`lore:${l.name}`, r];
+  for (const r0 of data.rors) for (const r of r0.abilities) yield [`ror:${r0.name}`, r];
+}
+
+/** Полные тексты правил из curated.fullTexts по ключу «<фракция>|<владелец>|<правило>». */
+function fullTextIndex(curated) {
+  const map = new Map();
+  for (const it of curated.fullTexts?.items ?? []) for (const at of it.in) map.set(`${at}|${it.name}`, it);
+  return map;
+}
+const looseText = (s) => s.replace(/•/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+/**
+ * Подходит ли полный текст к обрывку из выгрузки: начало совпадает (обрезанный хвост слова не в счёт),
+ * а у правил без таблицы — все строки до и после таблицы. Правила, у которых на сайте уже другая редакция
+ * (revised в curated), подставляются без этой проверки — так записано в curated осознанно.
+ */
+export function fullTextFits(stored, item) {
+  if (item.revised) return true;
+  const full = looseText(item.text);
+  const parts = stored.split(/\n\n/).map(looseText).filter(Boolean);
+  const head = looseText(stored).replace(/\s*\S+$/, '');
+  return full.startsWith(head) || parts.every((p) => full.includes(p));
+}
+
+/**
+ * Одинаковая обработка для свежего импорта и для уже готовых файлов (scripts/repair-aos-data.mjs):
+ * чистка всех текстовых полей правил и заметок; сезон у построений; неполные тексты выгрузки (обрезанные
+ * лимитом 1024 символа или без таблицы) заменяются полными из curated.fullTexts, если они там есть;
+ * правки варскроллов из curated.warscrollOverrides; предупреждение об устаревших правилах из curated.stale.
+ * refs — варскроллы всех фракций по id (warscrollRefs), нужны правкам copyFrom.
+ */
+export function normaliseAosFaction(data, curated, refs = null) {
+  // полки славы, которые официальные документы разрешили фракции, а в выгрузке их нет — до чистки текстов и правок
+  insertOfficialRors(data, curated, refs);
+  applyWarscrollOverrides(data, curated, refs);
+  markLegendsPublications(data);
+  if ('rulesNotice' in data) data.rulesNotice = rulesNoticeOf(curated, data.id);
+  for (const r of rulesOf(data)) {
+    // в готовых файлах обрывок тега и заглушка таблицы могли остаться — отмечаем до чистки
+    const inc = r.incomplete ?? rawIncomplete(r.text);
+    if (inc) r.incomplete = inc;
+    for (const k of RULE_FIELDS) if (typeof r[k] === 'string') r[k] = cleanWahaText(r[k]);
+  }
+  const full = fullTextIndex(curated);
+  if (full.size)
+    for (const [owner, r] of rulesWithOwner(data)) {
+      if (!r.incomplete) continue;
+      const it = full.get(`${data.id}|${owner}|${r.name}`);
+      if (!it || !fullTextFits(r.text, it)) continue;
+      r.text = it.text;
+      delete r.incomplete;
+      // откуда текст: в выгрузке его не было целиком (а у revised — другая, более старая редакция)
+      r.textSource = it.revised ? 'wahapedia-site-revised' : 'wahapedia-site';
+    }
+  for (const w of [...data.warscrolls, ...data.rorUnits, ...data.universalManifestations]) {
+    if (typeof w.notes === 'string') w.notes = cleanWahaText(w.notes);
+    for (const wp of w.weapons) if (typeof wp.abilities === 'string') wp.abilities = cleanWahaText(wp.abilities);
+  }
+  for (const r of data.rors) if (typeof r.notes === 'string') r.notes = cleanWahaText(r.notes);
+  for (const f of data.formations) f.season ??= curated.seasons?.[f.id] ?? 'standard';
+  applyOfficialUpdates(data, curated, refs);
+  return data;
+}
+
+/**
+ * Варскроллы из публикации GW «Legends Warscrolls» (Source.csv: «Legends Warscrolls», «Darkwater Heroes - Legends Warscrolls»)
+ * — это Warhammer Legends: в выгрузке признак Legends есть только в заметке «Legends Warscroll», у большинства таких
+ * варскроллов её нет. Battle Profiles (июль и сентябрь 2026) перечисляют их в разделах «Warhammer Legends».
+ */
+export const LEGENDS_PUBLICATION = /(?:^|- )Legends Warscrolls$/;
+function markLegendsPublications(data) {
+  for (const w of [...data.warscrolls, ...data.rorUnits, ...data.universalManifestations]) if (LEGENDS_PUBLICATION.test(w.source ?? '')) w.legends = true;
+}
+
+// ---------- официальные правки GW (curated.officialUpdates) ----------
+/**
+ * Правки по официальным документам Games Workshop (Battle Profiles, Rules Updates), которых нет в выгрузке.
+ * Каждая правка: ref (строка утверждённого плана), kind, цель, field, previous (значение до правки), value, source, why.
+ * Правка применяется, только если текущее значение равно previous; если уже равно value — ничего не делается;
+ * иначе пропускается (в отчёте импорта — строка «не применена»). Так новая выгрузка с другим значением не затирается молча.
+ *   kind warscroll: { faction, id, field: cost|reinforceable|legends|legendsDate|joinAs|joinLeaderIds|keywords } — варскролл фракции faction;
+ *   kind options:   { faction, id, value: [{ q, required, alts }] } — варианты полка героя (ids пересчитываются по фракции);
+ *   kind points:    { faction, table: formation|enhancement|lore, name } — очки построения, улучшения, лора;
+ *   kind ror:       { id, field: cost|legendsDate|allowedRemove|allowedAdd|withdrawn } — полк славы во всех файлах;
+ *                   allowedRemove убирает его из файлов remove, withdrawn (удалён из Battle Profiles) — из всех файлов remove;
+ *                   в обоих случаях фракция получает запись withdrawnRors (сохранённый ростер видит причину, а не «не найден»);
+ *                   allowedAdd добавляет запись полка и копии его юнитов в файлы add (insertOfficialRors);
+ *   kind lore:      { faction, name, field: legendsDate } — лор фракции;
+ *   kind enhancement: { faction, id, field: name|points } — улучшение по id (имена в разных таблицах совпадают);
+ *   kind rule:      { owners: ["<фракция>|<владелец>"], ruleName, field: text|timing|value } — правило (владелец как в rulesWithOwner);
+ *   kind weapon:    { faction, id, weapon, field } — характеристика оружия варскролла.
+ * После правок joinAs варианты полка с этими метками пересчитываются у всех героев фракции.
+ */
+const OU_KINDS = {
+  warscroll: ['cost', 'reinforceable', 'legends', 'legendsDate', 'joinAs', 'joinLeaderIds', 'keywords'],
+  options: ['options'],
+  points: ['points'],
+  ror: ['cost', 'legendsDate', 'allowedRemove', 'allowedAdd', 'withdrawn'],
+  lore: ['legendsDate'],
+  enhancement: ['name', 'points'],
+  rule: ['text', 'timing', 'value'],
+  weapon: ['rend'],
+};
+const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+
+export function officialUpdates(curated) {
+  const ou = curated.officialUpdates;
+  if (!ou) return [];
+  const seen = new Set();
+  for (const it of ou.items ?? []) {
+    if (!OU_KINDS[it.kind]?.includes(it.field)) throw new Error(`curated.officialUpdates ${it.ref}: неизвестная правка ${it.kind}.${it.field}`);
+    if (!it.ref || !it.why || !ou.sources?.[it.source] || !('previous' in it) || !('value' in it)) throw new Error(`curated.officialUpdates ${it.ref}: неполная правка`);
+    if (['allowedRemove', 'withdrawn'].includes(it.field) && !it.remove?.length) throw new Error(`curated.officialUpdates ${it.ref}: нет списка remove`);
+    if (it.field === 'allowedAdd' && !it.add?.length) throw new Error(`curated.officialUpdates ${it.ref}: нет списка add`);
+    const key = JSON.stringify([it.kind, it.faction, it.id, it.table, it.kind === 'enhancement' ? null : it.name, it.owners, it.ruleName, it.weapon, it.field]);
+    if (seen.has(key)) throw new Error(`curated.officialUpdates ${it.ref}: цель указана дважды`);
+    seen.add(key);
+  }
+  return ou.items ?? [];
+}
+
+const optionLabel = (t) => t.alts.join(' или ');
+// варианты полка сравниваются по q, required и метке без учёта регистра (в данных метки из выгрузки, в правке — из Battle Profiles)
+const optionShape = (opts) => opts.map((o) => ({ q: o.q, required: o.required, label: norm(o.label) }));
+const valueShape = (tokens) => tokens.map((t) => ({ q: t.q, required: t.required, label: norm(optionLabel(t)) }));
+
+/** Цели правки в этом файле фракции: [{ get, set }]. Варскролл — все его копии по id (свой список фракции и копии
+ *  в rorUnits других фракций: при импорте это один и тот же объект, в готовых файлах — отдельные копии). */
+function officialTargets(data, it) {
+  const out = [];
+  const prop = (obj, k) => ({ get: () => obj[k], set: (v) => (v === null && k === 'value' ? delete obj[k] : (obj[k] = v)), obj });
+  if (it.kind === 'warscroll' || it.kind === 'options' || it.kind === 'weapon') {
+    for (const w of [...data.warscrolls, ...data.rorUnits, ...data.universalManifestations].filter((x) => x.id === it.id)) {
+      if (it.kind === 'weapon') for (const wp of w.weapons.filter((x) => x.name === it.weapon)) out.push(prop(wp, it.field));
+      else if (it.kind === 'options') out.push({ get: () => optionShape(w.options), set: null, obj: w });
+      else out.push(prop(w, it.field));
+    }
+  } else if (it.kind === 'points') {
+    if (data.id !== it.faction) return out;
+    const objs = it.table === 'formation' ? data.formations : it.table === 'lore' ? data.lores : data.enhancementTypes.flatMap((t) => t.tables.flatMap((tb) => tb.items));
+    for (const o of objs.filter((x) => x.name === it.name)) out.push(prop(o, 'points'));
+  } else if (it.kind === 'lore') {
+    if (data.id !== it.faction) return out;
+    for (const l of data.lores.filter((x) => x.name === it.name)) out.push(prop(l, it.field));
+  } else if (it.kind === 'enhancement') {
+    if (data.id !== it.faction) return out;
+    for (const e of data.enhancementTypes.flatMap((t) => t.tables.flatMap((tb) => tb.items)).filter((x) => x.id === it.id)) out.push(prop(e, it.field));
+  } else if (it.kind === 'ror') {
+    if (it.field === 'withdrawn') return out; // записи не остаётся — проверка в officialUpdatesReport
+    for (const r of data.rors.filter((x) => x.id === it.id)) out.push(['cost', 'legendsDate'].includes(it.field) ? prop(r, it.field) : { get: () => r.allowed, set: (v) => (r.allowed = v), obj: r });
+  } else if (it.kind === 'rule') {
+    const mine = new Set(it.owners.filter((o) => o.startsWith(data.id + '|')).map((o) => o.slice(data.id.length + 1)));
+    for (const [owner, r] of rulesWithOwner(data)) if (mine.has(owner) && r.name === it.ruleName) out.push({ ...prop(r, it.field), rule: r });
+  }
+  return out;
+}
+
+/** Метки joinAs до и после правок — по самим правкам, а не по порядку обработки файлов. */
+function joinAsTables(items) {
+  const byId = new Map();
+  for (const it of items) if (it.kind === 'warscroll' && it.field === 'joinAs') byId.set(it.id, it);
+  const pick = (u, which) => {
+    const it = byId.get(u.id);
+    if (!it || !(same(u.joinAs, it.previous) || same(u.joinAs, it.value))) return u.joinAs ?? [];
+    return it[which];
+  };
+  const tagsOf = new Map();
+  for (const it of byId.values()) for (const t of [...it.previous, ...it.value]) (tagsOf.get(it.faction) ?? tagsOf.set(it.faction, new Set()).get(it.faction)).add(t);
+  return { before: (u) => pick(u, 'previous'), after: (u) => pick(u, 'value'), tagsOf };
+}
+
+/** Юниты фракции-владельца (варианты полка считаются по ним, как при импорте). */
+function ownerUnits(fid, data, refs) {
+  const pool = refs ? [...refs.values()] : data.warscrolls;
+  return pool.filter((u) => u.faction === fid && u.kind === 'unit');
+}
+
+function resolveOption(units, t, joinAfter) {
+  const kwSet = (u) => new Set([...u.keywords, ...u.factionKeywords, ...u.regimentKeywords]);
+  const allKw = new Set(units.flatMap((u) => [...kwSet(u)]));
+  const kinds = new Set();
+  const ids = new Set();
+  for (const alt of t.alts) {
+    const key = norm(alt);
+    const tagged = units.filter((u) => u.hero && joinAfter(u).includes(key));
+    // как idsByName импорта: точное имя, единственное/множественное число, «Eternus» = «Eternus, Blade of the First Prince»
+    const base = key.replace(/^(?:an?|the) /, '');
+    const keys = new Set([key, base].flatMap((k) => [k, k.replace(/s$/, ''), k + 's']));
+    let named = units.filter((u) => keys.has(norm(u.name)));
+    if (!named.length) named = units.filter((u) => norm(u.name).startsWith(base + ','));
+    if (tagged.length) {
+      kinds.add('tag');
+      for (const u of tagged) ids.add(u.id);
+    } else if (named.length) {
+      kinds.add('unit');
+      for (const u of named) ids.add(u.id);
+    } else {
+      kinds.add('keyword');
+      for (const u of units) if (!u.hero && phraseMatches(alt, kwSet(u), allKw)) ids.add(u.id);
+    }
+  }
+  return { q: t.q, required: t.required, label: optionLabel(t), kind: kinds.size === 1 ? [...kinds][0] : 'mixed', ids: [...ids] };
+}
+
+function applyOfficialUpdates(data, curated, refs) {
+  const items = officialUpdates(curated);
+  if (!items.length) return;
+  const join = joinAsTables(items);
+  // варианты полка — после всех остальных правок
+  const ordered = [...items.filter((it) => it.kind !== 'options'), ...items.filter((it) => it.kind === 'options')];
+  for (const it of ordered) {
+    for (const tg of officialTargets(data, it)) {
+      const cur = tg.get();
+      if (it.kind === 'options') {
+        if (same(cur, valueShape(it.value)) || !same(cur, optionShape(it.previous))) continue;
+        const w = tg.obj;
+        const units = ownerUnits(it.faction, data, refs);
+        w.options = it.value.map((t) => w.options.find((o) => o.q === t.q && norm(o.label) === norm(optionLabel(t))) ?? resolveOption(units, t, join.after));
+        continue;
+      }
+      const done = same(cur, it.value);
+      if (!done && !same(cur, it.previous)) continue;
+      if (!done) tg.set(structuredClone(it.value));
+      // текст правила — из Rules Updates GW: источник текста указывается и у уже применённой правки
+      // (данные, обработанные до этого правила, иначе остались бы с textSource сайта); пометка «неполный» снимается, если так записано
+      if (it.kind === 'rule' && it.field === 'text') {
+        if (it.clearIncomplete) delete tg.rule.incomplete;
+        tg.rule.textSource = 'gw-rules-updates';
+      }
+    }
+    // полк славы больше не разрешён этой фракции или удалён из Battle Profiles — убрать его (и его юниты, если они
+    // больше ни в каком полку) и оставить запись withdrawnRors: сохранённый ростер покажет причину
+    if (it.kind === 'ror' && (it.field === 'allowedRemove' || it.field === 'withdrawn') && it.remove.includes(data.id)) withdrawRor(data, it, curated);
+  }
+  // метки «can join … as …» изменились — в вариантах полка с этими метками: убрать героев, потерявших метку,
+  // добавить получивших; остальные id, их порядок и вид варианта (kind) не трогаются
+  for (const w of [...data.warscrolls, ...data.rorUnits]) {
+    const tags = join.tagsOf.get(w.faction);
+    if (!tags) continue;
+    let heroes = null;
+    for (const o of w.options) {
+      const hit = o.label.split(' или ').map(norm).filter((a) => tags.has(a));
+      if (!hit.length) continue;
+      heroes ??= ownerUnits(w.faction, data, refs).filter((u) => u.hero);
+      const has = (u, f) => hit.some((a) => f(u).includes(a));
+      const lost = new Set(heroes.filter((u) => has(u, join.before) && !has(u, join.after)).map((u) => u.id));
+      const ids = o.ids.filter((id) => !lost.has(id));
+      for (const u of heroes) if (has(u, join.after) && !ids.includes(u.id)) ids.push(u.id);
+      o.ids = ids;
+    }
+  }
+}
+
+/** Текст причины для withdrawnRors (показывается в ростере). */
+function withdrawnReason(it, curated) {
+  const src = curated.officialUpdates.sources[it.source];
+  const where = `${src.title} (${src.date}${it.page ? `, с. ${it.page}` : ''})`;
+  return it.field === 'withdrawn' ? `удалён из ${where}${it.replacedBy ? `; вместо него — ${it.replacedBy}` : ''}` : `больше не разрешён этой фракции: ${where}`;
+}
+
+function withdrawRor(data, it, curated) {
+  if (data.rors.some((r) => r.id === it.id)) {
+    data.rors = data.rors.filter((r) => r.id !== it.id);
+    const used = new Set(data.rors.flatMap((r) => r.units.map((u) => u.id)));
+    data.rorUnits = data.rorUnits.filter((u) => used.has(u.id));
+  }
+  const list = (data.withdrawnRors ??= []);
+  const entry = { id: it.id, name: it.name, reason: withdrawnReason(it, curated), ref: it.ref };
+  const at = list.findIndex((w) => w.id === it.id);
+  if (at < 0) list.push(entry);
+  else list[at] = entry;
+}
+
+/**
+ * Полки славы, которые официальный документ разрешил фракции (officialUpdates: ror.allowedAdd с add), а записи в её файле нет:
+ * запись полка и копии его юнитов берутся из файла, где они есть (refs.rors / refs по id), до остальной обработки —
+ * дальше они проходят ту же чистку, полные тексты и правки, что и везде. Список allowed исправляет сама правка allowedAdd.
+ */
+function insertOfficialRors(data, curated, refs) {
+  for (const it of curated.officialUpdates?.items ?? []) {
+    if (it.kind !== 'ror' || it.field !== 'allowedAdd' || !it.add.includes(data.id) || data.rors.some((r) => r.id === it.id)) continue;
+    const src = refs?.rors?.get(it.id);
+    if (!src) throw new Error(`curated.officialUpdates ${it.ref}: нет записи полка славы ${it.id} ни в одном файле`);
+    data.rors.push(structuredClone(src.ror));
+    for (const u of src.ror.units) {
+      if (data.rorUnits.some((w) => w.id === u.id) || data.warscrolls.some((w) => w.id === u.id)) continue;
+      const w = src.units.get(u.id) ?? refs.get(u.id);
+      if (!w) throw new Error(`curated.officialUpdates ${it.ref}: нет варскролла ${u.id} полка славы ${it.id}`);
+      data.rorUnits.push(structuredClone(w));
+    }
+  }
+}
+
+/** Строки отчёта импорта о правках curated.officialUpdates: сколько применено, какие не применены. */
+export function officialUpdatesReport(files, curated) {
+  const items = officialUpdates(curated);
+  if (!items.length) return [];
+  const all = Object.values(files);
+  let applied = 0;
+  const notApplied = [];
+  for (const it of items) {
+    const tg = all.flatMap((d) => officialTargets(d, it));
+    const want = it.kind === 'options' ? valueShape(it.value) : it.value;
+    const removed = it.remove?.length && all.filter((d) => it.remove.includes(d.id)).every((d) => !d.rors.some((r) => r.id === it.id) && d.withdrawnRors?.some((w) => w.id === it.id));
+    const added = !it.add?.length || all.filter((d) => it.add.includes(d.id)).every((d) => d.rors.some((r) => r.id === it.id));
+    const ok = it.field === 'withdrawn' ? removed && all.every((d) => !d.rors.some((r) => r.id === it.id)) : tg.length && tg.every((t) => same(t.get(), want)) && (!it.remove?.length || removed) && added;
+    if (ok) applied++;
+    else notApplied.push(`${it.ref} ${it.faction ?? ''} «${it.name ?? it.ruleName}» ${it.field}${tg.length || it.field === 'withdrawn' ? '' : ' (цель не найдена)'}`);
+  }
+  const ou = curated.officialUpdates;
+  const out = [`официальные правки GW (aos/curated.json → officialUpdates, ${Object.values(ou.sources).map((s) => `${s.title} ${s.date}`).join('; ')}): применено ${applied} из ${items.length}`];
+  if (notApplied.length) out.push(`официальные правки не применены (значение в данных не совпало с previous или цель не найдена): ${notApplied.join('; ')}`);
+  for (const b of ou.notApplied ?? []) out.push(`официальная правка не выполнена: ${b.ref} «${b.item}» — ${b.reason}`);
+  for (const b of ou.reviewed ?? []) out.push(`проверено по официальным документам: ${b.ref} «${b.item}» — ${b.decision}`);
+  for (const b of ou.unresolved ?? []) out.push(`не решено: ${b.ref} «${b.item}» — ${b.reason}`);
+  return out;
+}
+
+/** Предупреждение «правила фракции устарели» (curated.stale.factions) — одно место и для импорта, и для repair. */
+export const rulesNoticeOf = (curated, fid) => curated.stale?.factions?.[fid] ?? null;
+
+/**
+ * curated.warscrollOverrides — проверенные по источнику правки варскроллов, которых нет в выгрузке.
+ * Схема узкая, всё остальное — ошибка:
+ *   { ids: [id варскролла…], set?: { legends?: true, setUpBy?: { warscroll, ability } }, copyFrom?: id, why, source, checked }
+ * set.legends — юнит из публикации Warhammer Legends, а заметки «Legends Warscroll» в выгрузке нет;
+ * set.setUpBy — юнит не покупается, его ставит на стол способность другого варскролла (очков нет по правилам);
+ * copyFrom — строка выгрузки сломана, а на сайте тот же варскролл, что и у другой фракции: копируются поля
+ *   COPY_FIELDS, свои id, фракция и ссылка остаются; варианты полка (options) пересчитываются по юнитам своей фракции.
+ */
+const OVERRIDE_KEYS = new Set(['ids', 'set', 'copyFrom', 'why', 'source', 'checked']);
+const OVERRIDE_SET_KEYS = new Set(['legends', 'setUpBy']);
+const COPY_FIELDS = ['unitSize', 'cost', 'stats', 'weapons', 'abilities', 'bases', 'legends', 'legendsDate', 'notes', 'options'];
+
+/** Правки по id варскролла; схема проверяется — неизвестный ключ или пустое обоснование останавливают обработку. */
+export function warscrollOverrides(curated) {
+  const map = new Map();
+  for (const it of curated.warscrollOverrides?.items ?? []) {
+    const bad = Object.keys(it).filter((k) => !OVERRIDE_KEYS.has(k)).concat(Object.keys(it.set ?? {}).filter((k) => !OVERRIDE_SET_KEYS.has(k)));
+    if (bad.length) throw new Error(`curated.warscrollOverrides: неизвестные поля ${bad.join(', ')}`);
+    if (!it.ids?.length || !it.why || !it.source || (!it.set && !it.copyFrom)) throw new Error(`curated.warscrollOverrides: неполная правка ${JSON.stringify(it.ids)}`);
+    if (it.set && 'legends' in it.set && it.set.legends !== true) throw new Error('curated.warscrollOverrides: set.legends может быть только true');
+    if (it.set?.setUpBy && (!it.set.setUpBy.warscroll || !it.set.setUpBy.ability)) throw new Error('curated.warscrollOverrides: setUpBy = { warscroll, ability }');
+    for (const id of it.ids) {
+      if (map.has(id)) throw new Error(`curated.warscrollOverrides: ${id} указан дважды`);
+      map.set(id, it);
+    }
+  }
+  return map;
+}
+
+/** Варскроллы всех фракций по id — источник для copyFrom; в refs.rors — полки славы по id с копиями их юнитов
+ *  (источник для insertOfficialRors). */
+export function warscrollRefs(files) {
+  const refs = new Map();
+  for (const data of Object.values(files)) for (const w of data.warscrolls) if (!refs.has(w.id)) refs.set(w.id, w);
+  refs.rors = new Map();
+  for (const data of Object.values(files))
+    for (const r of data.rors) if (!refs.rors.has(r.id)) refs.rors.set(r.id, { ror: r, units: new Map(data.rorUnits.map((w) => [w.id, w])) });
+  return refs;
+}
+
+/** Строка index.json о фракции — по готовым данным (импорт и scripts/repair-aos-data.mjs считают одинаково). */
+export function indexEntry(data, curated) {
+  const selectable = data.warscrolls.filter((w) => w.faction === data.id && w.kind === 'unit' && w.cost != null && !w.legends && seasonActive(curated, w.season) && !w.aorOnly);
+  // без доступного героя полк не собрать — такая фракция играется только с Legends
+  return { id: data.id, name: data.name, grandAlliance: data.grandAlliance, units: selectable.length, legendsOnly: !selectable.some((w) => w.hero && !w.onlyInIds.length) };
+}
+
+/** Заметка отчёта импорта о юните без очков (null — отмечать нечего). */
+export function missingPointsNote(fid, w, curated) {
+  if (w.kind !== 'unit' || w.cost != null || w.legends) return null;
+  const o = warscrollOverrides(curated).get(w.id);
+  if (o?.set?.setUpBy) return `${fid}: «${w.name}» — очков нет по правилам: ставится способностью «${o.set.setUpBy.ability}» (${o.set.setUpBy.warscroll})`;
+  if (o) return null; // Legends или восстановлен copyFrom — см. curated.warscrollOverrides
+  return `${fid}: «${w.name}» — нет очков в Battle Profiles, юнит нельзя добавить`;
+}
+
+function applyWarscrollOverrides(data, curated, refs) {
+  const overrides = warscrollOverrides(curated);
+  if (!overrides.size) return;
+  const kwSet = (u) => new Set([...u.keywords, ...u.factionKeywords, ...u.regimentKeywords]);
+  for (const w of [...data.warscrolls, ...data.rorUnits, ...data.universalManifestations]) {
+    const o = overrides.get(w.id);
+    if (!o) continue;
+    if (o.copyFrom) {
+      const src = refs?.get(o.copyFrom);
+      if (!src) throw new Error(`curated.warscrollOverrides: для ${w.id} нет варскролла-источника ${o.copyFrom}`);
+      if (src.name !== w.name) throw new Error(`curated.warscrollOverrides: ${w.id} «${w.name}» ≠ источник «${src.name}»`);
+      for (const k of COPY_FIELDS) w[k] = structuredClone(src[k]);
+      // варианты полка — по своей фракции; поддерживается только вариант по ключевым словам без NON- и «или»
+      const own = data.warscrolls.filter((u) => u.kind === 'unit' && !u.hero);
+      const allKw = new Set(data.warscrolls.flatMap((u) => [...kwSet(u)]));
+      for (const opt of w.options) {
+        if (opt.kind !== 'keyword' || / или |\bNON-/i.test(opt.label)) throw new Error(`curated.warscrollOverrides: вариант полка «${opt.label}» (${opt.kind}) у ${w.id} не поддерживается`);
+        opt.ids = own.filter((u) => phraseMatches(opt.label, kwSet(u), allKw)).map((u) => u.id);
+      }
+    }
+    if (o.set?.legends) w.legends = true;
+    if (o.set?.setUpBy) w.setUpBy = { ...o.set.setUpBy };
+  }
+}
+
+/** Строки отчёта импорта про полные тексты из curated.fullTexts (сколько подставлено, что не подошло). */
+export function fullTextReport(files, curated) {
+  const out = [];
+  const ft = curated.fullTexts;
+  if (!ft) return out;
+  const applied = new Map();
+  const official = new Set();
+  for (const data of Object.values(files))
+    for (const [owner, r] of rulesWithOwner(data)) {
+      const key = `${data.id}|${owner}|${r.name}`;
+      if (r.textSource?.startsWith('wahapedia-site')) applied.set(key, r.textSource);
+      else if (r.textSource === 'gw-rules-updates') official.add(key);
+    }
+  const unused = [];
+  const superseded = [];
+  for (const it of ft.items)
+    for (const at of it.in) {
+      const key = `${at}|${it.name}`;
+      if (applied.has(key)) continue;
+      // полный текст был подставлен, а затем заменён официальной правкой GW (curated.officialUpdates)
+      (official.has(key) ? superseded : unused).push(`${at} «${it.name}»`);
+    }
+  out.push(`полные тексты правил (aos/curated.json → fullTexts, сайт Wahapedia ${ft.checked}): подставлено ${applied.size + superseded.length}`);
+  if (superseded.length) out.push(`полный текст затем заменён официальной правкой GW (officialUpdates): ${superseded.join('; ')}`);
+  const revised = ft.items.filter((it) => it.revised).map((it) => `«${it.name}»`);
+  if (revised.length) out.push(`на сайте Wahapedia другая редакция, чем в выгрузке, — взят текст сайта: ${revised.join(', ')}`);
+  if (unused.length) out.push(`полный текст из curated не подставлен (правило не найдено, уже полное или текст не совпал с началом): ${unused.join('; ')}`);
+  for (const m of ft.missing ?? []) out.push(`полного текста нет: ${m.in} «${m.name}» — ${m.why}`);
+  return out;
+}
+
+/** Строки отчёта, которые пересчитываются по готовым данным (refreshAosReport); остальные строки — только из импорта CSV. */
+const INCOMPLETE_LINE = 'неполные тексты в выгрузке:';
+const FULLTEXT_LINE = /^(полные тексты правил \(|полные тексты восстановлены: |на сайте Wahapedia другая редакция|полный текст из curated не подставлен|полный текст затем заменён официальной правкой GW|полного текста нет: |официальные правки GW \(|официальные правки не применены|официальная правка не выполнена: |проверено по официальным документам: |не решено: )/;
+const POINTS_LINE = / — (нет очков в Battle Profiles, юнит нельзя добавить|очков нет по правилам: )/;
+export const REPORT_REFRESHED = 'строки о полных текстах, неполных текстах и юнитах без очков пересчитаны по данным (scripts/repair-aos-data.mjs); остальное — из импорта CSV';
+
+/** Число неполных текстов в данных: { truncated, table }. */
+export function incompleteCounts(files) {
+  const inc = { truncated: 0, table: 0 };
+  for (const data of Object.values(files)) for (const r of rulesOf(data)) if (r.incomplete) inc[r.incomplete]++;
+  return inc;
+}
+
+/** Строка предупреждения о неполных текстах (как в импорте) или null. */
+export function incompleteLine(files) {
+  const inc = incompleteCounts(files);
+  return inc.truncated || inc.table ? `${INCOMPLETE_LINE} обрезано лимитом 1024 символа — ${inc.truncated}, таблица не выгружена — ${inc.table}; в конструкторе помечены, полный текст на Wahapedia` : null;
+}
+
+/**
+ * Отчёт импорта по готовым данным без CSV: строки о полных текстах, неполных текстах и юнитах без очков
+ * пересчитываются (те же функции, что в импорте), прочие строки остаются. files — { "<id>.json" | "<id>": данные }.
+ */
+export function refreshAosReport(report, files, curated) {
+  const byId = Object.fromEntries(Object.values(files).map((d) => [d.id, d]));
+  const warnings = report.warnings.filter((l) => !l.startsWith(INCOMPLETE_LINE));
+  const inc = incompleteLine(byId);
+  if (inc) warnings.push(inc);
+  const firstPoints = report.info.findIndex((l) => POINTS_LINE.test(l));
+  const info = report.info.filter((l) => !FULLTEXT_LINE.test(l) && !POINTS_LINE.test(l));
+  const points = [];
+  for (const [fid, data] of Object.entries(byId)) for (const w of data.warscrolls ?? []) {
+    const n = missingPointsNote(fid, w, curated);
+    if (n) points.push(n);
+  }
+  info.splice(firstPoints < 0 ? info.length : Math.min(firstPoints, info.length), 0, ...points);
+  info.push(...fullTextReport(byId, curated));
+  info.push(...officialUpdatesReport(byId, curated));
+  // неполные тексты в выгрузке: из импорта (exportIncomplete) или, у старого отчёта, из его строки предупреждения
+  const was = report.exportIncomplete ?? (() => {
+    const m = report.warnings.find((l) => l.startsWith(INCOMPLETE_LINE))?.match(/— (\d+), таблица не выгружена — (\d+)/);
+    return m ? { truncated: +m[1], table: +m[2] } : null;
+  })();
+  const now = incompleteCounts(byId);
+  if (was) info.push(`полные тексты восстановлены: обрезанных — ${was.truncated - now.truncated} из ${was.truncated}, без таблицы — ${was.table - now.table} из ${was.table}`);
+  return { ...report, warnings, info, ...(was ? { exportIncomplete: was } : {}), refreshed: REPORT_REFRESHED };
+}
+
+/** Где в данных осталась разметка Wahapedia (пусто — всё чисто). */
+export function findMarkup(data) {
+  const bad = /%\d{6,}|<\/?[A-Za-z][A-Za-z0-9]{0,9}\s*\/?>|&(#\d+|#x[0-9a-f]+|[a-z]+);/i;
+  const out = [];
+  for (const r of rulesOf(data)) for (const k of RULE_FIELDS) if (typeof r[k] === 'string' && bad.test(r[k])) out.push(`«${r.name}» (${k})`);
+  return out;
 }
 
 function main() {

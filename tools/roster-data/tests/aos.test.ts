@@ -7,6 +7,8 @@ import {
   auxiliaryFit,
   computeAos,
   enhancementFit,
+  formationFit,
+  formationsOf,
   generalFit,
   leaderFit,
   makeAosLookup,
@@ -15,6 +17,7 @@ import {
   regimentFit,
   reinforceFit,
   rorFit,
+  terrainFit,
   type AosLookup,
 } from '../../../client/src/features/roster/aos/engine';
 import {
@@ -236,11 +239,12 @@ test('усиление: вдвое дороже; героя и одиночну�
 });
 
 test('очки: лимит и «не больше половины на один юнит»', () => {
-  const { L, ws } = ctx('BS');
-  const r = newAosRoster('BS', 1000);
+  // Kragnos у Bonesplitterz — Warhammer Legends (публикация «Legends Warscrolls»), у Gloomspite Gitz — обычный юнит (Battle Profiles 09.2026)
+  const { L, ws } = ctx('GG');
+  const r = newAosRoster('GG', 1000);
   const k = ws('Kragnos, the End of Empires');
   assert.match(reason(leaderFit(k, r, L)), /половины лимита \(500/);
-  const r2 = newAosRoster('BS', 2000);
+  const r2 = newAosRoster('GG', 2000);
   assert.ok(leaderFit(k, r2, L).ok);
   // лимит очков не превышается при добавлении
   const s = ctx('SE');
@@ -462,7 +466,7 @@ test('перебор по всем фракциям: всё, что интерф
       const r = ok(addRegiment(base(2000), anyLeader!, L));
       const r2 = setLore(r, lore.kind, lore.id);
       if (lore.points == null) assert.ok(codes(r2, L).includes('lore'));
-      else assert.ok(!codes(r2, L).includes('lore'), `${f.id}: лора ${lore.name}`);
+      else assert.ok(!codes(r2, L).includes('lore'), `${f.id}: лор ${lore.name}`);
     }
   }
   assert.ok(checked > 8000, `проверено ${checked}`);
@@ -574,4 +578,66 @@ test('перебор: два полка, перенос, удаление, см�
     }
   }
   assert.ok(checked > 2000, `проверено ${checked}`);
+});
+
+// ---------- справочник «Очки» ----------
+
+test('очки: справочник раскладывает итог движка по строкам, сборка отдельно от партии', async () => {
+  const { aosPointSystems, AOS_VP } = await import('../../../client/src/features/roster/points');
+  const num = (v: string) => Number(v.replace(/[^\d]/g, ''));
+  for (const f of ALL) {
+    const L = makeAosLookup(f);
+    const leader = f.warscrolls.find((w) => w.kind === 'unit' && w.hero && leaderFit(w, newAosRoster(f.id), L).ok);
+    if (!leader) continue;
+    let r = ok(addRegiment(newAosRoster(f.id), leader, L));
+    const fm = formationsOf(L).find((x) => formationFit(x, r, L).ok);
+    if (fm) r = { ...r, formationId: fm.id };
+    const terrain = f.warscrolls.find((w) => w.kind === 'terrain' && terrainFit(w, r, L).ok);
+    if (terrain) r = { ...r, terrainId: terrain.id };
+    const cr = computeAos(r, L);
+    const sys = aosPointSystems(r, L, cr);
+    const army = sys.find((s) => s.id === 'aos-army')!;
+    assert.equal(army.category, 'army');
+    assert.equal(army.status, 'computed');
+    // строки 1..7 — составляющие итога; их сумма = итог pointsOf (никакого второго расчёта)
+    const parts = army.lines.slice(1, 8).reduce((s, l) => s + num(l.value), 0);
+    assert.equal(parts, cr.points.total, f.id);
+    assert.equal(army.lines[0].value.replace(/\s/g, ''), `${cr.points.total}/${r.pointsLimit}`.replace(/\s/g, ''));
+    assert.ok(sys.filter((s) => s.category === 'game').every((s) => s.status !== 'computed' && s.sources?.length), 'очки партии — только справка с источником');
+  }
+  assert.deepEqual(AOS_VP.objectives.map((o) => o.vp), [3, 3, 4]);
+  assert.equal(AOS_VP.battleTactic, 5);
+});
+
+// ---------- террейн фракции: размещение ----------
+
+test('террейн: правила размещения фракции найдены по имени, с расстояниями, без чужих фракций', async () => {
+  const { terrainPlacementOf, measuresOf } = await import('../../../client/src/features/roster/aos/refs');
+  const { FACTION_TERRAIN_CORE } = await import('../../../client/src/features/roster/aos/terrain');
+  const placement = (id: string) => {
+    const { L, data } = ctx(id);
+    return data.warscrolls.filter((w) => w.kind === 'terrain').map((w) => terrainPlacementOf(w, L));
+  };
+  // Sylvaneth: боевая черта ставит новые Awakened Wyldwoods (множественное число в тексте)
+  const sy = placement('SY')[0]!;
+  assert.ok(sy.rules.some((r) => r.rule.name === 'RECLAIMED BY NATURE'));
+  assert.ok(sy.measures.includes('more than 12" from all other friendly Awakened Wyldwoods'));
+  // Nighthaunt: «Nexuses of Grief»
+  assert.ok(placement('NT')[0]!.measures.some((m) => m.includes('12"')));
+  // Kharadron: способность варскролла в фазе деплоя
+  assert.ok(placement('KO')[0]!.rules.some((r) => r.from === 'Варскролл террейна'));
+  // правила берутся только из своей фракции
+  for (const f of ALL) {
+    const { L } = ctx(f.id);
+    const own = new Set([...f.battleTraits, ...f.formations.flatMap((x) => x.rules)].map((r) => r.text));
+    for (const w of f.warscrolls.filter((x) => x.kind === 'terrain'))
+      for (const r of terrainPlacementOf(w, L).rules) assert.ok(r.from === 'Варскролл террейна' ? w.abilities.includes(r.rule) : own.has(r.rule.text), `${f.id} ${w.name}`);
+  }
+  // запятые внутри условия не теряют часть перечисления
+  assert.deepEqual(measuresOf('Set it up more than 3" from all units, objectives and other terrain features, and more than 12" from X.'), [
+    'more than 3" from all units, objectives and other terrain features',
+    'more than 12" from X',
+  ]);
+  assert.ok(FACTION_TERRAIN_CORE.rules.some((r) => r.kind === 'mandatory' && r.text.includes('3"')));
+  assert.ok(FACTION_TERRAIN_CORE.rules.some((r) => r.kind === 'optional'));
 });

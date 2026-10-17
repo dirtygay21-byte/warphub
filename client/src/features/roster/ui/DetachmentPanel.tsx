@@ -1,25 +1,71 @@
 import { useEffect, type ReactNode } from 'react';
 import type { ComputedRoster, DataLookup } from '../engine/compute';
 import type { Detachment, UnitMatcher } from '../engine/types';
-import { pushOverlay } from '../telegram';
+import { openExternal, pushOverlay } from '../telegram';
+import { cleanRuleText, INCOMPLETE_TEXT, rawIncomplete, type IncompleteKind } from '../text';
 import { Icon, IconButton, Tag } from './kit';
 import { cx } from './util';
 
 const TURN_RU: Record<string, string> = { 'Your turn': 'ваш ход', 'Opponent’s turn': 'ход противника', 'Either player’s turn': 'любой ход' };
 
-/** Раскрывающееся правило: название, подпись, текст. */
-export function RuleText({ name, text, sub, right }: { name: string; text: string; sub?: string; right?: ReactNode }) {
+/**
+ * Раскрывающееся правило: название, подпись, текст. Все строки проходят cleanRuleText —
+ * служебная разметка Wahapedia («%000009837Redeploy%», «<KY>…</KY>») никогда не попадает на экран.
+ * badge — заметная метка справа (значение каста/молитвы); extra — ссылки под текстом; open — раскрыто сразу.
+ */
+export function RuleText({
+  name,
+  text,
+  sub,
+  right,
+  badge,
+  extra,
+  open,
+  incomplete,
+  link,
+}: {
+  name: string;
+  text: string;
+  sub?: string;
+  right?: ReactNode;
+  badge?: ReactNode;
+  extra?: ReactNode;
+  open?: boolean;
+  /** текст неполный (поле incomplete данных); если не передано — проверяется сам текст */
+  incomplete?: IncompleteKind | null;
+  /** где прочитать полный текст */
+  link?: string | null;
+}) {
+  const subText = cleanRuleText(sub);
+  const missing = incomplete ?? rawIncomplete(text);
   return (
-    <details className="group rounded-xl border border-white/10 bg-white/[0.03]">
+    <details open={open} className="group rounded-xl border border-white/10 bg-white/[0.03]">
       <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2">
         <span className="min-w-0 flex-1">
-          <span className="block text-[13px] font-semibold text-white/85">{name}</span>
-          {sub && <span className="block text-[11px] text-white/40">{sub}</span>}
+          <span className="block text-[13px] font-semibold text-white/85">{cleanRuleText(name)}</span>
+          {subText && <span className="block text-[11px] text-white/40">{subText}</span>}
         </span>
+        {badge}
         {right}
         <Icon name="down" className="size-4 shrink-0 text-white/35 transition group-open:rotate-180" />
       </summary>
-      <p className="whitespace-pre-line border-t border-white/[0.06] px-3 py-2 text-[12px] leading-relaxed text-white/65">{text}</p>
+      <div className="border-t border-white/[0.06] px-3 py-2">
+        <p className="whitespace-pre-line text-[12px] leading-relaxed text-white/65">{cleanRuleText(text)}</p>
+        {missing && (
+          <p className="mt-2 rounded-lg bg-warn/10 px-2.5 py-1.5 text-[11.5px] leading-snug text-amber-100">
+            {INCOMPLETE_TEXT[missing]}
+            {link && (
+              <>
+                {' '}
+                <button type="button" onClick={() => openExternal(link)} className="font-semibold text-accent underline underline-offset-2">
+                  Полный текст на Wahapedia
+                </button>
+              </>
+            )}
+          </p>
+        )}
+        {extra}
+      </div>
     </details>
   );
 }

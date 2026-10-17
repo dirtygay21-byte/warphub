@@ -6,6 +6,8 @@ import { groupDetRules, groupOf, roleOf } from '../engine/group';
 import { openExternal } from '../telegram';
 import { Button, Counter, Field, Icon, Segmented, Tag } from './kit';
 import { cx, fmtPts } from './util';
+import { cleanRuleText } from '../text';
+import { RuleText } from './DetachmentPanel';
 
 export function UnitCard({
   c,
@@ -20,6 +22,7 @@ export function UnitCard({
   onWarlord,
   onDuplicate,
   onRemove,
+  readOnly = false,
 }: {
   c: ComputedUnit;
   cr: ComputedRoster;
@@ -33,6 +36,8 @@ export function UnitCard({
   onWarlord: () => void;
   onDuplicate: () => void;
   onRemove: () => void;
+  /** режим просмотра: вместо переключателей — итог выбора, без кнопок изменения */
+  readOnly?: boolean;
 }) {
   const ds = c.ds;
   const isWarlord = roster.warlordUid === c.unit.uid;
@@ -43,9 +48,11 @@ export function UnitCard({
     return (
       <div className="flex items-center gap-3 rounded-xl border border-danger/30 bg-danger/10 px-3 py-3 text-sm">
         <span className="flex-1 text-danger">Инфолист не найден в текущих данных</span>
-        <Button variant="danger" className="h-8 min-h-0" onClick={onRemove}>
-          Убрать
-        </Button>
+        {!readOnly && (
+          <Button variant="danger" className="h-8 min-h-0" onClick={onRemove}>
+            Убрать
+          </Button>
+        )}
       </div>
     );
   }
@@ -136,6 +143,10 @@ export function UnitCard({
             </ul>
           )}
 
+          {readOnly ? (
+            <ReadOnlyChoices c={c} cr={cr} isWarlord={isWarlord} attachedTo={attachedTo?.ds?.name ?? null} />
+          ) : (
+            <>
           {c.band && c.band.options.length > 1 && (
             <Field label="Состав" hint={c.band.from > 1 || c.band.to ? `цены для копии №${c.copy}` : undefined}>
               <Segmented value={c.unit.size} onChange={(size) => onPatch({ size })} options={c.band.options.map((o) => ({ value: o.label, label: o.label, hint: `${o.cost} очк.` }))} />
@@ -246,8 +257,11 @@ export function UnitCard({
                   ))}
                 </div>
               )}
-              {ds.leaderNote && <p className="whitespace-pre-line text-xs text-white/40">{ds.leaderNote}</p>}
+              {ds.leaderNote && <p className="whitespace-pre-line text-xs text-white/40">{cleanRuleText(ds.leaderNote)}</p>}
             </Field>
+          )}
+
+            </>
           )}
 
           <CombinedUnit c={c} cr={cr} L={L} detachmentIds={roster.detachmentIds} />
@@ -255,20 +269,49 @@ export function UnitCard({
           <Profile c={c} cr={cr} L={L} detachmentIds={roster.detachmentIds} />
 
           <div className="flex gap-2 pt-1">
-            <Button variant="ghost" className="flex-1" onClick={onDuplicate}>
-              <Icon name="copy" className="size-4" /> Копия
-            </Button>
+            {!readOnly && (
+              <Button variant="ghost" className="flex-1" onClick={onDuplicate}>
+                <Icon name="copy" className="size-4" /> Копия
+              </Button>
+            )}
             {ds.link && (
               <Button variant="ghost" className="flex-1" onClick={() => openExternal(ds.link)}>
                 <Icon name="link" className="size-4" /> Wahapedia
               </Button>
             )}
-            <Button variant="danger" className="px-3" onClick={onRemove}>
-              <Icon name="trash" className="size-4" />
-            </Button>
+            {!readOnly && (
+              <Button variant="danger" className="px-3" onClick={onRemove}>
+                <Icon name="trash" className="size-4" />
+              </Button>
+            )}
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/** Итог выбора юнита для режима просмотра: состав, снаряжение, Warlord, улучшение, присоединение. */
+function ReadOnlyChoices({ c, cr, isWarlord, attachedTo }: { c: ComputedUnit; cr: ComputedRoster; isWarlord: boolean; attachedTo: string | null }) {
+  const lines: [string, string][] = [];
+  if (c.unit.size) lines.push(['Состав', c.unit.size]);
+  const extras = [...Object.entries(c.unit.addons), ...Object.entries(paidWargear(c))].filter(([, n]) => n > 0).map(([l, n]) => `${n}× ${l}`);
+  if (extras.length) lines.push(['Дополнительно', extras.join(', ')]);
+  if (isWarlord) lines.push(['Warlord', 'да']);
+  if (attachedTo) lines.push(['Присоединён к', attachedTo]);
+  return (
+    <div className="space-y-2">
+      {lines.length > 0 && (
+        <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] px-3 py-1">
+          {lines.map(([k, v]) => (
+            <div key={k} className="flex items-baseline justify-between gap-3 border-b border-white/[0.05] py-1.5 last:border-0">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{k}</span>
+              <span className="text-right text-[13px] font-semibold text-white/85">{v}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {c.enhancement && <RuleText name={c.enhancement.name} sub={`Улучшение · ${c.enhancement.cost} очк. · ${cr.enhancementsUsed}/${cr.enhancementsLimit}`} text={c.enhancement.text} open />}
     </div>
   );
 }
@@ -310,7 +353,7 @@ function Choice({ active, onClick, title, right, sub, dim, detail }: { active: b
         {right && <span className={cx('shrink-0 text-xs font-semibold tabular-nums', active ? 'text-accent' : 'text-white/50')}>{right}</span>}
       </span>
       {sub && <span className="mt-0.5 block text-xs text-white/45">{sub}</span>}
-      {active && detail && <span className="mt-1.5 block whitespace-pre-line text-xs leading-relaxed text-white/60">{detail}</span>}
+      {active && detail && <span className="mt-1.5 block whitespace-pre-line text-xs leading-relaxed text-white/60">{cleanRuleText(detail)}</span>}
     </button>
   );
 }
@@ -391,7 +434,7 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
               {a.param ? ` ${a.param}` : ''}
               {a.type === 'wargear' && <span className="ml-1.5 text-[11px] font-medium uppercase text-white/35">снаряжение</span>}
             </p>
-            <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-white/70">{a.ref ? L.faction.rules[a.ref]?.text : a.text}</p>
+            <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-white/70">{cleanRuleText(a.ref ? L.faction.rules[a.ref]?.text : a.text)}</p>
           </div>
         ))}
         <UnitRules c={c} cr={cr} L={L} detachmentIds={detachmentIds} />
@@ -414,7 +457,7 @@ function Txt({ title, text }: { title: string; text: string }) {
   return (
     <div>
       <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{title}</p>
-      <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-white/70">{text}</p>
+      <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-white/70">{cleanRuleText(text)}</p>
     </div>
   );
 }
@@ -480,7 +523,7 @@ function RuleChip({ name, text, accent }: { name: string; text: string; accent?:
       >
         {name}
       </button>
-      {open && <p className="w-full whitespace-pre-line rounded-lg bg-white/[0.04] px-2.5 py-2 text-[12px] leading-relaxed text-white/65">{text}</p>}
+      {open && <p className="w-full whitespace-pre-line rounded-lg bg-white/[0.04] px-2.5 py-2 text-[12px] leading-relaxed text-white/65">{cleanRuleText(text)}</p>}
     </>
   );
 }

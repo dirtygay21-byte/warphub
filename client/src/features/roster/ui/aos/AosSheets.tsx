@@ -4,6 +4,9 @@ import {
   enhancementFit,
   findUnit,
   formationFit,
+  formationLegendsLabel,
+  formationsOf,
+  legendsLabel,
   loreFit,
   loresOf,
   regimentFit,
@@ -14,13 +17,14 @@ import {
   type AosLookup,
   type Fit,
 } from '../../aos/engine';
-import { LORE_LABEL, nextAuxiliarySurcharge } from '../../aos/rules';
+import { LORE_LABEL, nextAuxiliarySurcharge, seasonLabel } from '../../aos/rules';
 import type { AosRor, AosRoster, AosRule, LoreKind } from '../../aos/types';
 import { haptic } from '../../telegram';
-import { RuleText } from '../DetachmentPanel';
 import { Button, Icon, Sheet, Tag } from '../kit';
 import { cx } from '../util';
 import { Warscroll } from './AosUnitCard';
+import { AosRuleCard } from './AosPanels';
+import { cleanRuleText } from '../../text';
 
 const LORE_TITLE: Record<LoreKind, string> = { spell: 'Spell Lore', prayer: 'Prayer Lore', manifestation: 'Manifestation Lore' };
 
@@ -81,30 +85,54 @@ function ChoiceList({ choices, selected, onPick, onClear, clearLabel }: { choice
   );
 }
 
-const rules = (list: AosRule[]) =>
-  list.map((a, i) => <RuleText key={i} name={a.name} sub={[a.timing, a.value, a.type].filter(Boolean).join(' · ') || undefined} text={a.text} />);
+const rules = (list: AosRule[], L?: AosLookup) => list.map((a, i) => <AosRuleCard key={i} rule={a} L={L} />);
 
 export function FormationSheet({ open, onClose, roster, L, onPick }: { open: boolean; onClose: () => void; roster: AosRoster; L: AosLookup; onPick: (id: string) => void }) {
-  const choices: Choice[] = L.faction.formations.map((f) => ({ id: f.id, title: f.name, points: f.points, fit: formationFit(f, roster, L), body: rules(f.rules) }));
+  // построения, уже ушедшие в Legends, видны только при включённом показе Legends (как юниты и террейн)
+  const hiddenLegends = roster.showLegends ? 0 : formationsOf(L).filter((f) => f.legends && f.id !== roster.formationId).length;
+  const choices: Choice[] = formationsOf(L)
+    .filter((f) => roster.showLegends || !f.legends || f.id === roster.formationId)
+    .map((f) => {
+      const notes = cleanRuleText(f.notes);
+      return {
+        id: f.id,
+        title: f.name,
+        sub: seasonLabel(f.season) ?? undefined,
+        tags: [formationLegendsLabel(f)].filter((t): t is string => !!t),
+        points: f.points,
+        fit: formationFit(f, roster, L),
+        body: (
+          <>
+            {notes && <p className="rounded-lg bg-white/[0.05] px-2.5 py-1.5 text-[11.5px] leading-snug text-white/60">{notes}</p>}
+            {rules(f.rules, L)}
+          </>
+        ),
+      };
+    });
   return (
     <Sheet open={open} onClose={onClose} title="Боевое построение" tall>
       <p className="mb-3 text-[12.5px] text-white/50">Армия выбирает одно построение — оно даёт способность на бой. Нажмите на название, чтобы прочитать правило.</p>
       <ChoiceList choices={choices} selected={roster.formationId} onPick={onPick} />
+      {hiddenLegends > 0 && <p className="pb-2 text-center text-[12px] text-white/45">Ещё в Warhammer Legends: {hiddenLegends} — включите «Показывать Warhammer Legends» в меню ростера (⋯).</p>}
     </Sheet>
   );
 }
 
 export function LoreSheet({ kind, onClose, roster, L, onPick }: { kind: LoreKind | null; onClose: () => void; roster: AosRoster; L: AosLookup; onPick: (id: string | null) => void }) {
   const list = kind ? loresOf(kind, L) : [];
+  const selected = kind ? roster.lores[kind] : null;
+  // универсальные лоры манифестаций (одинаковые у всех фракций) свёрнуты, если выбран не один из них
+  const [showUniversal, setShowUniversal] = useState(() => list.some((l) => l.universal && l.id === selected));
   const choices: Choice[] = list.map((l) => ({
     id: l.id,
     title: l.name,
-    sub: l.universal ? 'Универсальная лора манифестаций' : l.season === 'aqshy' ? 'Scourge of Aqshy' : undefined,
+    sub: l.universal ? 'Универсальный лор манифестаций' : seasonLabel(l.season) ?? undefined,
+    tags: [legendsLabel(l)].filter((t): t is string => !!t),
     points: l.points,
     fit: loreFit(l, roster, L),
     body: (
       <>
-        {rules(l.items)}
+        {rules(l.items, L)}
         {l.summons.map((id) => {
           const w = L.ws.get(id);
           return w ? (
@@ -117,27 +145,54 @@ export function LoreSheet({ kind, onClose, roster, L, onPick }: { kind: LoreKind
       </>
     ),
   }));
+  const universal = choices.filter((c) => list.find((l) => l.id === c.id)?.universal);
+  const own = choices.filter((c) => !universal.includes(c));
   return (
     <Sheet open={!!kind} onClose={onClose} title={kind ? `${LORE_LABEL[kind]} · ${LORE_TITLE[kind]}` : ''} tall>
       <p className="mb-3 text-[12.5px] text-white/50">
         {kind === 'manifestation'
-          ? 'Одна лора манифестаций на армию: её знают все WIZARD и PRIEST.'
+          ? 'Один лор манифестаций на армию: его знают все WIZARD и PRIEST.'
           : kind === 'spell'
-            ? 'Одна лора заклинаний: её знают WIZARD с ключевым словом фракции генерала.'
-            : 'Одна лора молитв: её знают PRIEST с ключевым словом фракции генерала.'}
+            ? 'Один лор заклинаний на армию: его знают WIZARD с ключевым словом фракции генерала.'
+            : 'Один лор молитв на армию: его знают PRIEST с ключевым словом фракции генерала.'}
       </p>
-      <ChoiceList choices={choices} selected={kind ? roster.lores[kind] : null} onPick={(id) => onPick(id)} onClear={() => onPick(null)} clearLabel="Без лоры" />
+      <ChoiceList
+        choices={showUniversal ? choices : own}
+        selected={kind ? roster.lores[kind] : null}
+        onPick={(id) => onPick(id)}
+        onClear={() => onPick(null)}
+        clearLabel="Без лора"
+      />
+      {universal.length > 0 && (
+        <Button variant="outline" className="mb-2 w-full" onClick={() => setShowUniversal((v) => !v)} aria-expanded={showUniversal}>
+          <Icon name="down" className={cx('size-4 transition', showUniversal && 'rotate-180')} />
+          {showUniversal ? 'Скрыть универсальные лоры' : `Показать универсальные лоры · ${universal.length}`}
+        </Button>
+      )}
     </Sheet>
   );
 }
 
-export function TerrainSheet({ open, onClose, roster, L, onPick }: { open: boolean; onClose: () => void; roster: AosRoster; L: AosLookup; onPick: (id: string | null) => void }) {
+export function TerrainSheet({ open, onClose, roster, L, onPick, onGuide }: { open: boolean; onClose: () => void; roster: AosRoster; L: AosLookup; onPick: (id: string | null) => void; onGuide: (id: string) => void }) {
   const choices: Choice[] = terrainOf(L)
     .filter((t) => roster.showLegends || !t.legends)
-    .map((t) => ({ id: t.id, title: t.name, points: t.cost, fit: terrainFit(t, roster, L), body: <Warscroll ws={t} /> }));
+    .map((t) => ({
+      id: t.id,
+      title: t.name,
+      points: t.cost,
+      fit: terrainFit(t, roster, L),
+      body: (
+        <>
+          <Button variant="outline" className="w-full justify-start" onClick={() => onGuide(t.id)}>
+            <Icon name="map" className="size-4" /> Как ставить: правила и схема
+          </Button>
+          <Warscroll ws={t} />
+        </>
+      ),
+    }));
   return (
     <Sheet open={open} onClose={onClose} title="Террейн фракции" tall>
-      <p className="mb-3 text-[12.5px] text-white/50">Не больше одного террейна фракции. Ставится в своей зоне при деплое.</p>
+      <p className="mb-3 text-[12.5px] text-white/50">Не больше одного террейна фракции. Ставится целиком в своей территории, дальше 3" от объективов и другого террейна (Core Rules 10.1).</p>
       <ChoiceList choices={choices} selected={roster.terrainId} onPick={onPick} onClear={() => onPick(null)} clearLabel="Без террейна" />
     </Sheet>
   );
@@ -156,7 +211,7 @@ export function RorSheet({ open, onClose, roster, L, onPick }: { open: boolean; 
       sub: [r.built ? 'собирается из героев' : null, r.source].filter(Boolean).join(' · ') || undefined,
       points: rorPrice(r, picked),
       fit,
-      tags: r.units.filter((u) => !u.optional).map((u) => `${u.count > 1 ? u.count + '× ' : ''}${L.ws.get(u.id)?.name ?? '?'}`),
+      tags: [legendsLabel(r), ...r.units.filter((u) => !u.optional).map((u) => `${u.count > 1 ? u.count + '× ' : ''}${L.ws.get(u.id)?.name ?? '?'}`)].filter((t): t is string => !!t),
       body: (
         <>
           {r.built && (
@@ -181,8 +236,10 @@ export function RorSheet({ open, onClose, roster, L, onPick }: { open: boolean; 
                 })}
             </div>
           )}
-          {rules(r.abilities)}
-          {r.notes && <p className="whitespace-pre-line text-[12px] text-white/45">{r.notes}</p>}
+          {r.abilities.map((a, i) => (
+            <AosRuleCard key={i} rule={a} L={L} link={r.link} />
+          ))}
+          {r.notes && <p className="whitespace-pre-line text-[12px] text-white/45">{cleanRuleText(r.notes)}</p>}
           {r.units.map((u) => {
             const w = L.ws.get(u.id);
             return w ? <Warscroll key={u.id} ws={w} /> : null;
@@ -222,10 +279,10 @@ export function EnhancementSheet({
           tb.items.map((it) => ({
             id: it.id,
             title: it.name,
-            sub: [tb.name, tb.season === 'aqshy' ? 'Scourge of Aqshy' : null, tb.eligibility.text].filter(Boolean).join(' · '),
+            sub: [tb.name, seasonLabel(tb.season), tb.eligibility.text].filter(Boolean).join(' · '),
             points: it.points,
             fit: enhancementFit(unit, it.id, roster, L),
-            body: <RuleText name={it.name} sub={[it.timing, it.type].filter(Boolean).join(' · ') || undefined} text={it.text} />,
+            body: <AosRuleCard rule={it} L={L} open />,
           })),
         )
       : [];
