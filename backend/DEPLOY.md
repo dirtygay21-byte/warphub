@@ -128,8 +128,10 @@ table 1/2 later in the admin panel). Empty output means nothing to do.
    bun run db:migrate
    bun test
    ```
-   - `db:migrate` should finish without red errors.
-   - `bun test` should end with `34 pass` and `0 fail`.
+   - `db:migrate` should finish without red errors. It creates the tables for
+     the Roster Builder (`0011`), the mini-games (`0012`) and the card packs (`0013`).
+   - `bun test` should end with `55 pass`, `33 skip` and `0 fail`. The skipped
+     ones are end-to-end checks that only run on a test server (`WARPHUB_E2E=1`).
 5. Start it again and watch the log for 20–30 seconds:
    ```bash
    pm2 start <backend-process-name>
@@ -146,8 +148,11 @@ table 1/2 later in the admin panel). Empty output means nothing to do.
    curl -s http://127.0.0.1:4000/health
    curl -s http://127.0.0.1:4000/booking-options | head -c 200; echo
    curl -s http://127.0.0.1:4000/dnd/games; echo
+   curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:4000/minigames
    ```
-   Expected: `{"ok":true}`, some JSON with `experienceLevels`, and `[]`.
+   Expected: `{"ok":true}`, some JSON with `experienceLevels`, `[]` (or your
+   D&D games), and `401` (mini-games need a Telegram login; `404` would mean the
+   old backend is still running).
 
 If step 4 or 5 shows errors, copy the red text and send it to me — or roll
 back (section 9).
@@ -205,6 +210,15 @@ restart Telegram if you see the old version).
 - [ ] Мои записи shows the bookings and lets you edit army/points/experience.
 - [ ] A booking for Monday sent manually is rejected (the server checks this, not just the screen).
 
+**Mini-games** (Профиль → **Мини-игры**):
+
+- [ ] The hub shows 4 games: Зелёный рывок, Кости войны, Рой: инкубатор, Легенды Warp Hub.
+- [ ] Play «Рой: инкубатор» and tap fast — with 10+ taps you get a reward with a code like `WH-ABC234`, and the bot sends you the same code. **Мои награды** shows it.
+- [ ] Admin → **Награды** → Проверить код: type the code (without «WH-» is fine) → **Отметить использованной** → the player's card says «Использована».
+- [ ] «Легенды Warp Hub»: tap the pack → flip the 5 cards → "Получено +N очков"; the points chip shows the balance; a second pack the same day is refused with a countdown. Close and reopen the Mini App — the balance and **Коллекция** are still there (they are stored in the database).
+- [ ] Admin → Награды → **Очки игроков**: find the player by @username → write off 100 → the balance drops by 100 and the bot tells them.
+- [ ] The Roster Builder still opens (Профиль → «Roster Builder», or Admin → «Ростеры» for codes) with both **Warhammer 40,000** and **Age of Sigmar** — see section 10.
+
 ---
 
 ## 8. Settings you can change later without code
@@ -216,6 +230,9 @@ restart Telegram if you see the old version).
 | D&D games (title, date, places, picture, status) | Admin → D&D |
 | Experience levels, factions, paint and time options, max D&D players | `src/config/booking.ts` (one file) → restart |
 | Players per table, painting capacity | `services` table: `seats_per_table`, `pool_capacity` |
+| Mini-game rewards (thresholds, % / ₽ / points / badge), reward validity days, attempts per day, turning a game off | Admin → Награды → Настройки |
+| Card packs: points and drop chance per rarity, packs per day, cards per pack | Admin → Награды → Настройки → Легенды Warp Hub |
+| Writing off / adding a player's card points | Admin → Награды → Очки игроков |
 
 **Admins:** open the admin panel from **Профиль → Админ-панель** (or the
 `/admin` address — it now waits for the Telegram login instead of sending

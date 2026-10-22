@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from 'react';
 import type { ComputedRoster, DataLookup } from '../engine/compute';
+import { dispositionsOf, OUTDATED_RULE_NOTE, ruleLabel, visibleStratagem } from '../engine/source';
 import type { Detachment, UnitMatcher } from '../engine/types';
 import { openExternal, pushOverlay } from '../telegram';
 import { cleanRuleText, INCOMPLETE_TEXT, rawIncomplete, type IncompleteKind } from '../text';
@@ -130,15 +131,17 @@ export function DetachmentPanel({
   useEffect(() => pushOverlay(onClose), [onClose]);
   const d = cr.detachments.find((x) => x.id === id);
   if (!d) return null;
-  const strats = L.faction.stratagems.filter((s) => s.detachment === d.id);
-  const enh = L.faction.enhancements.filter((e) => e.detachment === d.id);
+  // у действующего детачмента — только записи текущего источника; у устаревшего — сохранённые прежние
+  const strats = L.faction.stratagems.filter((s) => s.detachment === d.id && visibleStratagem(s, L.det));
+  const enh = L.faction.enhancements.filter((e) => e.detachment === d.id && (!e.outdated || !!d.outdated));
   const cond = conditions(d);
   return (
     <section id="detachment-panel" className="sheet-enter rounded-2xl border border-accent/30 bg-app-elevated">
       <div className="flex items-start gap-2 px-4 pb-2 pt-3">
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent/80">Детачмент</p>
-          <h2 className="font-display mt-0.5 text-xl font-semibold uppercase leading-tight">{d.name}</h2>
+          <h2 className="font-display mt-0.5 text-xl font-semibold uppercase leading-tight">{ruleLabel(d)}</h2>
+          {d.outdated && <p className="mt-1 text-xs text-amber-200">{OUTDATED_RULE_NOTE}</p>}
         </div>
         <IconButton icon="close" label="Закрыть" onClick={onClose} className="size-9" />
       </div>
@@ -151,14 +154,16 @@ export function DetachmentPanel({
               onClick={() => onSwitch(x.id)}
               className={cx('shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold', x.id === d.id ? 'bg-accent text-accent-foreground' : 'bg-white/[0.06] text-white/70')}
             >
-              {x.name}
+              {ruleLabel(x)}
             </button>
           ))}
         </div>
       )}
       <div className="flex flex-wrap gap-1 px-4 pb-3">
         <Tag tone="accent">{dp(d)} DP</Tag>
-        {d.forceDisposition && <Tag>{d.forceDisposition}</Tag>}
+        {dispositionsOf(d).map((fd) => (
+          <Tag key={fd}>{fd}</Tag>
+        ))}
         {d.tag && <Tag>{d.tag}</Tag>}
         {d.chapter && <Tag tone="warn">{d.chapter}</Tag>}
       </div>

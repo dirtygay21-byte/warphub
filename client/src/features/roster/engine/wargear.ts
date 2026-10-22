@@ -56,6 +56,10 @@ export interface ParsedOption {
   noDup: boolean;
   /** общий лимит с другими подпунктами («can do one of the following») */
   share: string | null;
+  /** варианты — пары из списка («two different weapons from the following list»); сноска «*» сужает пары в optionsOf */
+  pairs?: boolean;
+  /** «each X it is equipped with» — каждая штука X на модели заменяется отдельно (perModel = их число на модели) */
+  perInstance?: boolean;
 }
 
 export interface OptionsInfo {
@@ -80,7 +84,9 @@ const key = (s: string) =>
   norm(s)
     .toLowerCase()
     .replace(/^(?:the|a|an|its|their|his|her)\s+/, '')
-    .replace(/[.;:,]+$/, '');
+    .replace(/[.;:,]+$/, '')
+    // «servo-arms» ↔ «Servo arm», «chain sword» ↔ «chainsword» не путаем: только дефис
+    .replace(/[-‑]/g, ' ');
 
 /** «2 Rokkit Pistols» → { weapon: 'Rokkit Pistol', qty: 2 } с привязкой к названиям оружия инфолиста. */
 function parseItem(raw: string, known: Map<string, string>): Item | null {
@@ -129,6 +135,7 @@ interface Choices {
   choices: Item[][];
   perModel: number;
   noDup: boolean;
+  pairs?: boolean;
 }
 
 /** Правая часть: «1 Killsaw», «one of the following: • …», «up to two of the following …», «1 X and one of the following: …». */
@@ -143,8 +150,23 @@ function parseChoices(head: string, rest: string[], known: Map<string, string>):
     }
     return out.length ? out : null;
   };
+  // «(either) 1 twin lightning claws, or two different weapons from the following list:*» / «two different options from …»:
+  // одна модель меняет снимаемое оружие на ДВА разных пункта списка — варианты = все пары пунктов (+ одиночная альтернатива)
+  let m = t.match(/^(?:(?:either\s+)?(.+?),?\s+or\s+)?two different (?:weapons|options) from the following list\s*\**\s*:?\s*$/i);
+  if (m) {
+    const items = bullets(rest).map((l) => parseItems(l, known));
+    if (!items.length || items.some((x) => !x)) return null;
+    const out: Item[][] = [];
+    if (m[1]) {
+      const alt = parseItems(m[1].replace(/^either\s+/i, ''), known);
+      if (!alt) return null;
+      out.push(alt);
+    }
+    for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) out.push([...items[i]!, ...items[j]!]);
+    return { choices: out, perModel: 1, noDup: false, pairs: true };
+  }
   // «up to two of the following(, and can take duplicates):»
-  let m = t.match(/^up to (\w+) of the following(.*)$/i);
+  m = t.match(/^up to (\w+) of the following(.*)$/i);
   if (m) {
     const n = toNum(m[1]!);
     const c = list([]);
@@ -238,6 +260,17 @@ function parseWho(raw: string, groups: string[]): { limit: Limit; group: string 
 /** Одна фраза варианта (первая строка + строки списка после неё). */
 function parseSentence(firstRaw: string, rest: string[], ctx: { key: string; index: number; text: string; groups: string[]; known: Map<string, string>; minModels?: number; maxModels?: number; perUnit?: number; share?: string | null }): ParsedOption | null {
   let first = norm(firstRaw).replace(/\*+$/, '').replace(/\.$/, '').trim();
+  // опечатка выгрузки: «This model's twin heavy bolter replaced with …» (без «can be»)
+  if (!/\bcan\b/i.test(first)) first = first.replace(/^(.+?)\s+replaced with\s+/i, '$1 can be replaced with ');
+  // «This model must be equipped with one of the following» — выбор из списка (обязательность не проверяется)
+  first = first.replace(/\bmust be equipped with\b/i, 'can be equipped with');
+  // «Each model can have each shuriken cannon it is equipped with replaced with …» — каждая штука отдельно
+  let perInstance = false;
+  const inst = first.match(/^(.+?)\s+can\s+have\s+each\s+(.+?)\s+(?:it|they)\s+(?:is|are)\s+equipped with\s+replaced with\s+(.*)$/i);
+  if (inst) {
+    first = `${inst[1]} can have their ${inst[2]} replaced with ${inst[3]}`;
+    perInstance = true;
+  }
   let requires: Item[] = [];
   let forbids: Item[] = [];
   const cond = first.match(/^if (?:this|the|that) (.+?)\s+(?:is|has been)\s+(not\s+)?equipped with (.+?),\s*(?:its|their|it)\s+(.+)$/i);
@@ -301,6 +334,8 @@ function parseSentence(firstRaw: string, rest: string[], ctx: { key: string; ind
       perModel: ch.perModel,
       noDup: ch.noDup,
       share: ctx.share ?? null,
+      ...(ch.pairs ? { pairs: true } : {}),
+      ...(perInstance ? { perInstance: true } : {}),
     };
   }
   return null;
@@ -346,6 +381,14 @@ export function parseOption(text: string, index: number, groups: string[], known
       out.push(o);
     }
     return out.length ? out : null;
+  }
+  // «Up to 2 Chaos Bikers can each have their combi-bolter replaced with 1 combi-weapon, or can be equipped with one of the following: • …»
+  // — два взаимоисключающих варианта с общим лимитом моделей
+  m = first.match(/^(.+?)\s+can\s+(each\s+)?have\s+(.+?)\s+replaced with\s+(.+?),\s*or\s+can\s+be\s+equipped\s+with\s+(.+)$/i);
+  if (m) {
+    const a = parseSentence(`${m[1]} can ${m[2] ?? ''}have ${m[3]} replaced with ${m[4]}`, [], { ...ctx, key: `${index}.0`, share: String(index) });
+    const b = parseSentence(`${m[1]} can ${m[2] ? 'each ' : ''}be equipped with ${m[5]}`, rest, { ...ctx, key: `${index}.1`, share: String(index) });
+    return a && b ? [a, b] : null;
   }
   const one = parseSentence(first, rest, { ...ctx, key: String(index) });
   return one ? [one] : null;
@@ -400,6 +443,42 @@ function knownWeapons(ds: Pick<Datasheet, 'weapons' | 'defaultLoadout'>): Map<st
 
 const cache = new WeakMap<object, OptionsInfo>();
 
+/** Сколько штук оружия у одной модели по стандартному снаряжению («Every model is equipped with: 2 shuriken cannons»). */
+function perModelQty(ds: Pick<Datasheet, 'defaultLoadout'>, weapon: string): number {
+  let q = 0;
+  for (const r of ds.defaultLoadout) for (const it of r.items) if (key(it.weapon) === key(weapon)) q = Math.max(q, it.qty);
+  return q;
+}
+
+/**
+ * Пара пунктов для «two different weapons from the following list» с учётом сноски «*»:
+ *   «only … two ranged weapons if one of them is a Pistol (and it can only have one Pistol)»;
+ *   «only … two ranged weapons if one of them is a cyclone missile launcher and the other is either a storm bolter or a combi-weapon».
+ * Без сноски — любые пары разных пунктов.
+ */
+function pairAllowed(ds: Pick<Datasheet, 'weapons'>, choice: Item[], footnotes: string[]): boolean {
+  const prof = (w: string) => ds.weapons.find((x) => key(x.name) === key(w))?.profiles ?? [];
+  const ranged = choice.filter((it) => prof(it.weapon).some((p) => p.type === 'Ranged'));
+  const pistols = ranged.filter((it) => prof(it.weapon).some((p) => /\bpistol\b/i.test(p.keywords)));
+  for (const f of footnotes) {
+    if (/two ranged weapons if one of them is a pistol/i.test(f)) {
+      if (ranged.length >= 2 && pistols.length !== 1) return false;
+      if (pistols.length > 1) return false;
+    }
+    const m = f.match(/two ranged weapons if one of them is (?:a |an )?(.+?) and the other is either (?:a |an )?(.+?) or (?:a |an )?(.+?)\.?$/i);
+    if (m) {
+      if (ranged.length > 2) return false;
+      if (ranged.length === 2) {
+        const names = ranged.map((it) => key(it.weapon));
+        const one = names.filter((n) => n === key(m[1]!)).length === 1;
+        const other = names.some((n) => n === key(m[2]!) || n === key(m[3]!));
+        if (!one || !other) return false;
+      }
+    }
+  }
+  return true;
+}
+
 /** Все варианты снаряжения инфолиста (с кешем). */
 export function optionsOf(ds: Datasheet): OptionsInfo {
   const hit = cache.get(ds);
@@ -418,6 +497,12 @@ export function optionsOf(ds: Datasheet): OptionsInfo {
     if (r) parsed.push(...r);
     else unparsed.push(i);
   });
+  const footnotes = ds.options.filter((o) => /^\*/.test(o.text.trim())).map((o) => o.text);
+  for (const o of parsed) {
+    if (o.pairs) o.choices = o.choices.filter((c) => pairAllowed(ds, c, footnotes));
+    // «each shuriken cannon it is equipped with»: на модели их несколько — каждая заменяется отдельно
+    if (o.perInstance && o.from.length === 1) o.perModel = Math.max(1, perModelQty(ds, o.from[0]!.weapon));
+  }
   const info = { parsed, unparsed, notes };
   cache.set(ds, info);
   return info;

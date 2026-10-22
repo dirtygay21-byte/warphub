@@ -76,5 +76,5 @@ export function rawIncomplete(s: string | null | undefined): IncompleteKind | nu
 
 export const INCOMPLETE_TEXT: Record<IncompleteKind, string> = {
   truncated: 'Текст обрезан в выгрузке Wahapedia (лимит 1024 символа) — конец правила не показан.',
-  table: 'В правиле есть таблица, которой нет в выгрузке Wahapedia.',
+  table: 'В правиле есть таблица или схема, которой нет в выгрузке Wahapedia.',
 };

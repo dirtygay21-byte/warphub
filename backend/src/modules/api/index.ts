@@ -30,6 +30,15 @@ import {
   cancelEventRegistration,
   EventError,
 } from '../events/service';
+import {
+  diceAction,
+  finishScoreSession,
+  listGamesForUser,
+  listUserRewards,
+  startSession,
+} from '../minigames/service';
+import { handleMinigame } from '../minigames/http';
+import { getCardsState, getPointsHistory, openPack } from '../minigames/cards';
 import { getNewsById, listPublishedNews } from '../news/service';
 import { jwtPlugin } from '../../plugins/jwt-plugin';
 import { authMiddleware } from '../../plugins/auth-middleware';
@@ -612,4 +621,73 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
         description: 'Доступно владельцу записи до её начала.',
       },
     },
-  );
+  )
+  .get('/minigames', async ({ user }) => listGamesForUser(user.id), {
+    detail: {
+      tags: ['Mini-games'],
+      summary: 'Список мини-игр, таблицы наград, лучший результат и награда этой недели',
+    },
+  })
+  .get('/minigames/rewards/my', async ({ user }) => listUserRewards(user.id), {
+    detail: { tags: ['Mini-games'], summary: 'Мои награды (коды для администратора)' },
+  })
+  .post(
+    '/minigames/:game/sessions',
+    async ({ user, params }) => handleMinigame(() => startSession(user.id, params.game)),
+    {
+      params: t.Object({ game: t.String() }),
+      detail: {
+        tags: ['Mini-games'],
+        summary: 'Начать попытку',
+        description:
+          'Сервер запоминает время начала. Для «Костей войны» сервер сразу выбирает бойцов; все броски делает сервер.',
+      },
+    },
+  )
+  .post(
+    '/minigames/sessions/:id/finish',
+    async ({ user, params, body }) =>
+      handleMinigame(() => finishScoreSession(user.id, params.id, body.score)),
+    {
+      params: t.Object({ id: t.String({ format: 'uuid' }) }),
+      body: t.Object({ score: t.Number() }),
+      detail: {
+        tags: ['Mini-games'],
+        summary: 'Завершить попытку (бег, яйцо) и получить награду',
+        description:
+          'Результат проверяется по времени, прошедшему с начала попытки. Неправдоподобный результат не засчитывается.',
+      },
+    },
+  )
+  .post(
+    '/minigames/sessions/:id/dice/:action',
+    async ({ user, params }) =>
+      handleMinigame(() => diceAction(user.id, params.id, params.action)),
+    {
+      params: t.Object({
+        id: t.String({ format: 'uuid' }),
+        action: t.Union([t.Literal('roll'), t.Literal('stop')]),
+      }),
+      detail: {
+        tags: ['Mini-games'],
+        summary: '«Кости войны»: бросок (roll) или забрать награду (stop)',
+      },
+    },
+  )
+  .get('/minigames/cards', async ({ user }) => getCardsState(user.id), {
+    detail: {
+      tags: ['Mini-games'],
+      summary: '«Легенды Warp Hub»: каталог карт, моя коллекция, пакеты на сегодня, счёт очков',
+    },
+  })
+  .post('/minigames/cards/open', async ({ user }) => handleMinigame(() => openPack(user.id)), {
+    detail: {
+      tags: ['Mini-games'],
+      summary: 'Открыть пакет карт',
+      description:
+        'Содержимое пакета генерирует сервер; очки за карты сразу зачисляются на счёт, карты — в коллекцию.',
+    },
+  })
+  .get('/minigames/points/my', async ({ user }) => getPointsHistory(user.id), {
+    detail: { tags: ['Mini-games'], summary: 'Мой счёт очков и история' },
+  });

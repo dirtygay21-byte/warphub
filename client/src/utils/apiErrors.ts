@@ -30,6 +30,21 @@ const EXACT: Record<string, string> = {
   "Request not found": "Заявка не найдена",
   "Table not found": "Стол не найден",
   "Service not found": "Услуга не найдена",
+  "This game is turned off": "Эта игра сейчас выключена",
+  "Daily attempt limit reached":
+    "На сегодня попытки в этой игре закончились — возвращайтесь завтра",
+  "Attempt not found": "Попытка не найдена — начните игру заново",
+  "This attempt has expired": "Попытка устарела — начните игру заново",
+  "This attempt is already finished": "Эта попытка уже завершена",
+  "The result does not match the time played and was not counted":
+    "Результат не засчитан: он не совпадает со временем игры",
+  "Reward not found": "Награда не найдена",
+  "This reward has already been used": "Эта награда уже использована",
+  "This reward has expired": "Срок действия награды истёк",
+  "No packs left today": "Пакеты на сегодня закончились — новый будет завтра",
+  "The player does not have enough points": "У игрока недостаточно очков",
+  "Player not found": "Игрок не найден",
+  "Enter a whole number of points": "Введите целое число очков",
 };
 
 const PATTERNS: Array<[RegExp, string]> = [

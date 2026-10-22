@@ -2,7 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { loadFaction } from '../data';
 import { availableDetachments, computeRoster, makeLookup, roleGroup, type ComputedRoster, type ComputedUnit, type DataLookup } from '../engine/compute';
 import { BATTLE_SIZES, BATTLE_SIZE_ORDER } from '../engine/rules';
+import { legacyIds, migrateRoster } from '../engine/migrate';
 import { addUnit, duplicateRoster, duplicateUnit, removeUnit, touch, updateUnit } from '../engine/roster';
+import { dispositionsOf, factionCredit, OUTDATED_RULE_NOTE, ruleLabel, visibleStratagem } from '../engine/source';
 import type { DataIndex, Datasheet, Detachment, FactionData, Roster } from '../engine/types';
 import { confirmAsk, haptic } from '../telegram';
 import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag } from './kit';
@@ -51,6 +53,13 @@ export function RosterEditor({
 
   const L = useMemo(() => (faction ? makeLookup(faction) : null), [faction]);
   const cr = useMemo(() => (L ? computeRoster(roster, L) : null), [roster, L]);
+
+  // перевод сохранённого ростера на обновлённые данные (замены id из FactionData.migrations)
+  useEffect(() => {
+    if (!L) return;
+    const m = migrateRoster(roster, L);
+    if (m.changed) onChange(m.roster);
+  }, [L, roster, onChange]);
 
   // кэш итогов для списка ростеров (без изменения updatedAt)
   useEffect(() => {
@@ -279,11 +288,11 @@ function Editor({
                     <div key={d.id} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] py-1.5 pl-3 pr-1.5">
                       <button type="button" onClick={() => toggleDetInfo(d.id)} className="min-w-0 flex-1 text-left">
                         <p className="truncate text-sm font-semibold">
-                          {d.name}
+                          {ruleLabel(d)}
                           <span className="ml-1.5 text-xs font-semibold text-accent">подробнее</span>
                         </p>
                         <p className="text-xs text-white/45">
-                          {dpOf(d, cr.chapter)} DP · {d.forceDisposition ?? '—'}
+                          {dpOf(d, cr.chapter)} DP · {dispositionsOf(d).join(' / ') || '—'}
                           {d.tag ? ` · ${d.tag}` : ''}
                         </p>
                       </button>
@@ -293,7 +302,7 @@ function Editor({
                         className="size-8 border-0"
                         onClick={() => {
                           const ids = roster.detachmentIds.filter((x) => x !== d.id);
-                          const fds = ids.map((x) => L.det.get(x)?.forceDisposition);
+                          const fds = ids.flatMap((x) => { const dd = L.det.get(x); return dd ? dispositionsOf(dd) : []; });
                           set({ detachmentIds: ids, forceDisposition: roster.forceDisposition && fds.includes(roster.forceDisposition) ? roster.forceDisposition : null });
                         }}
                       />
@@ -387,7 +396,7 @@ function Editor({
           ))
         )}
 
-        <p className="pt-2 text-center text-xs text-white/30">Данные: powered by Wahapedia · {index.lastUpdate?.slice(0, 10)}</p>
+        <p className="pt-2 text-center text-xs text-white/30">Данные: {factionCredit(L.faction, index)}</p>
       </div>
 
       {/* ---- нижняя панель ---- */}
@@ -420,7 +429,8 @@ function Editor({
       <DetachmentSheet open={detSheet} onClose={() => setDetSheet(false)} roster={roster} L={L} cr={cr} onPick={(d) => {
         const ids = [...roster.detachmentIds, d.id];
         const patch: Partial<Roster> = { detachmentIds: ids };
-        if (!roster.forceDisposition && d.forceDisposition) patch.forceDisposition = d.forceDisposition;
+        const fds = dispositionsOf(d);
+        if (!roster.forceDisposition && fds.length === 1) patch.forceDisposition = fds[0];
         if (d.chapter && !roster.chapter) patch.chapter = d.chapter;
         set(patch);
         setDetSheet(false);
@@ -458,6 +468,13 @@ function Editor({
                 </button>
               </li>
             ))}
+            {!!roster.migrationNotes?.length && (
+              <li>
+                <Button variant="outline" className="w-full" onClick={() => set({ migrationNotes: undefined })}>
+                  Скрыть сообщения о заменённых детачментах и улучшениях
+                </Button>
+              </li>
+            )}
           </ul>
         )}
       </Sheet>
@@ -595,7 +612,7 @@ function UnitGroup({
 
 function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boolean; onClose: () => void; roster: Roster; L: DataLookup; cr: ComputedRoster; onPick: (d: Detachment) => void }) {
   const [info, setInfo] = useState<string | null>(null);
-  const list = availableDetachments(L, roster.chapter ?? cr.chapter).filter((d) => !roster.detachmentIds.includes(d.id));
+  const list = availableDetachments(L, roster.chapter ?? cr.chapter, legacyIds(roster).detachments).filter((d) => !roster.detachmentIds.includes(d.id));
   const usedTags = new Set(cr.detachments.map((d) => d.tag).filter(Boolean));
   const left = cr.dpLimit - cr.dp;
   const sorted = [...list].sort((a, b) => a.dp - b.dp || a.name.localeCompare(b.name));
@@ -609,16 +626,19 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
           const dp = dpOf(d, roster.chapter ?? cr.chapter);
           const tooMuch = dp > left;
           const tagClash = !!d.tag && usedTags.has(d.tag);
-          const enh = L.faction.enhancements.filter((e) => e.detachment === d.id);
+          const enh = L.faction.enhancements.filter((e) => e.detachment === d.id && (!e.outdated || !!d.outdated));
           const open_ = info === d.id;
           return (
             <li key={d.id} className={cx('rounded-xl border bg-white/[0.03]', tooMuch || tagClash ? 'border-white/[0.06]' : 'border-white/10')}>
               <div className="flex items-center gap-2 py-2 pl-3 pr-2">
                 <button type="button" className="min-w-0 flex-1 text-left" onClick={() => setInfo(open_ ? null : d.id)}>
-                  <p className={cx('text-sm font-semibold', (tooMuch || tagClash) && 'text-white/45')}>{d.name}</p>
+                  <p className={cx('text-sm font-semibold', (tooMuch || tagClash) && 'text-white/45')}>{ruleLabel(d)}</p>
+                  {d.outdated && <p className="mt-0.5 text-xs text-amber-200">{OUTDATED_RULE_NOTE} Был в этом ростере — можно вернуть.</p>}
                   <div className="mt-1 flex flex-wrap gap-1">
                     <Tag tone={tooMuch ? 'danger' : 'accent'}>{dp} DP</Tag>
-                    {d.forceDisposition && <Tag>{d.forceDisposition}</Tag>}
+                    {dispositionsOf(d).map((fd) => (
+                      <Tag key={fd}>{fd}</Tag>
+                    ))}
                     {d.tag && <Tag tone={tagClash ? 'danger' : 'muted'}>{d.tag}</Tag>}
                     {d.chapter && <Tag tone="warn">{d.chapter}</Tag>}
                   </div>
@@ -635,12 +655,12 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
                       <p className="mt-1 whitespace-pre-line text-white/70">{cleanRuleText(a.text)}</p>
                     </div>
                   ))}
-                  {L.faction.stratagems.some((st) => st.detachment === d.id) && (
+                  {L.faction.stratagems.some((st) => st.detachment === d.id && visibleStratagem(st, L.det)) && (
                     <div>
                       <p className="font-semibold text-white/85">Стратагемы</p>
                       <div className="mt-1 space-y-1.5">
                         {L.faction.stratagems
-                          .filter((st) => st.detachment === d.id)
+                          .filter((st) => st.detachment === d.id && visibleStratagem(st, L.det))
                           .map((st) => (
                             <RuleText key={st.id} name={`${st.name} · ${st.cp} CP`} sub={[st.type, st.turn, st.phase].filter(Boolean).join(' · ')} text={st.text} />
                           ))}

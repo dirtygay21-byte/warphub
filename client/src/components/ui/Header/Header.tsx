@@ -32,12 +32,15 @@ export default function Header() {
         ? "Dnd"
         : pathname.includes("/roster")
           ? "Roster"
-          : "Reservations";
+          : pathname.includes("/rewards")
+            ? "Rewards"
+            : "Reservations";
 
   const adminTabs = [
     { id: "Reservations", label: "Записи", path: "/admin" },
     { id: "Warhammer", label: "Столы WH", path: "/admin/warhammer" },
     { id: "Dnd", label: "D&D", path: "/admin/dnd" },
+    { id: "Rewards", label: "Награды", path: "/admin/rewards" },
     { id: "ContentManagement", label: "Контент", path: "/admin/content" },
     { id: "Roster", label: "Ростеры", path: "/admin/roster" },
   ];

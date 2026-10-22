@@ -1,5 +1,7 @@
 import { ALLY_RULES, BATTLE_SIZES, LIMITS, sizeIndex } from './rules';
 import type { CostBand, Datasheet, Detachment, DetachmentGrant, Enhancement, FactionData, Roster, RosterUnit, UnitMatcher } from './types';
+import { droppedSummary } from './migrate';
+import { dispositionsOf } from './source';
 import { applyPicks, hasPicks, modelGroups, optionsOf, ruleCount, type LoadoutResult } from './wargear';
 
 export type IssueLevel = 'error' | 'warning';
@@ -159,8 +161,21 @@ export function copyLimit(ds: Datasheet, battleSize: Roster['battleSize'], battl
   return base;
 }
 
-export function bandFor(ds: Datasheet, copy: number): CostBand | undefined {
-  return ds.costs.find((b) => copy >= b.from && (b.to === null || copy <= b.to)) ?? ds.costs[ds.costs.length - 1];
+/**
+ * Ключ лимита копий — название инфолиста. У одного названия бывает несколько инфолистов
+ * (обычный Space Marines и версия Black Templars, Space Wolves): лимит «не больше N копий» общий.
+ */
+export const copyKey = (ds: Pick<Datasheet, 'name'>) => ds.name.trim().toUpperCase();
+
+/** Таблица цен инфолиста для ордена армии: своя таблица ордена, если она известна, иначе обычная. */
+export function costsFor(ds: Datasheet, chapter: string | null = null): CostBand[] {
+  const v = chapter ? ds.costVariants?.find((x) => x.chapter === chapter) : undefined;
+  return v?.costs ?? ds.costs;
+}
+
+export function bandFor(ds: Datasheet, copy: number, chapter: string | null = null): CostBand | undefined {
+  const costs = costsFor(ds, chapter);
+  return costs.find((b) => copy >= b.from && (b.to === null || copy <= b.to)) ?? costs[costs.length - 1];
 }
 
 /** Ключевые слова/названия, которым выбранные детачменты дают BATTLELINE. */
@@ -204,12 +219,14 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
   const chapter = roster.chapter ?? [...detChapters][0] ?? [...unitChapters][0] ?? null;
 
   // ---------- юниты и стоимость ----------
+  // копии считаются по названию (copyKey): одноимённые инфолисты разных версий делят лимит и ступени цены
   const copies = new Map<string, number>();
   const units: ComputedUnit[] = roster.units.map((unit) => {
     const ds = L.ds.get(unit.datasheetId);
-    const copy = (copies.get(unit.datasheetId) ?? 0) + 1;
-    copies.set(unit.datasheetId, copy);
-    const band = ds ? bandFor(ds, copy) : undefined;
+    const key = ds ? copyKey(ds) : unit.datasheetId;
+    const copy = (copies.get(key) ?? 0) + 1;
+    copies.set(key, copy);
+    const band = ds ? bandFor(ds, copy, chapter) : undefined;
     const opt = band?.options.find((o) => o.label === unit.size) ?? band?.options[0];
     let extras = 0;
     for (const a of band?.addons ?? []) extras += (unit.addons[a.label] ?? 0) * a.cost;
@@ -268,7 +285,13 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
   for (const [tag, names] of tags) if (names.length > 1) err('det-tag', `Детачменты ${names.join(', ')} имеют одинаковый тег ${tag} — их нельзя брать вместе.`);
   if (detChapters.size > 1) err('det-chapter', `Детачменты требуют разных орденов: ${[...detChapters].join(', ')}.`);
 
-  const dispositions = [...new Set(detachments.map((d) => d.forceDisposition).filter((x): x is string => !!x))];
+  for (const id of roster.detachmentIds)
+    if (!L.det.has(id)) err('det-missing', `Детачмент ${id} не найден в данных (возможно, удалён в обновлении) — выберите детачмент заново.`);
+  for (const d of detachments)
+    if (d.outdated) warn('det-outdated', `Детачмент «${d.name}» устарел: ${d.outdated.replace(/^\*\s*/, '')} Выберите действующий детачмент.`);
+  for (const n of roster.migrationNotes ?? [])
+    warn('migrated-' + n.kind, `${n.kind === 'detachment' ? 'Детачмент' : 'Улучшение'} заменён при обновлении данных: ${n.note}`);
+  const dispositions = [...new Set(detachments.flatMap(dispositionsOf))];
   if (detachments.length) {
     if (!roster.forceDisposition) err('fd-missing', 'Выберите Force Disposition.');
     else if (!dispositions.includes(roster.forceDisposition))
@@ -299,6 +322,16 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
     if (!ds) {
       err('missing', `Инфолист ${unit.datasheetId} не найден в данных (возможно, удалён в обновлении).`, [unit.uid]);
       continue;
+    }
+    if (unit.migration) {
+      const lost = droppedSummary(unit.migration.dropped);
+      warn(
+        'migrated',
+        unit.migration.reason === 'options'
+          ? `«${ds.name}»: ${unit.migration.note}` + (lost.length ? ` Отложено — проверьте и выберите заново: ${lost.join(', ')}.` : '')
+          : `«${ds.name}» (прежде ${unit.migration.from}): ${unit.migration.note}` + (lost.length ? ` Не перенесено — выберите заново: ${lost.join(', ')}.` : ''),
+        [unit.uid],
+      );
     }
     if (!ds.costs.length) err('no-cost', `У «${ds.name}» нет стоимости в данных.`, [unit.uid]);
     if (ds.legends) warn('legends', `«${ds.name}» — Warhammer Legends, обычно не допускается на турнирах.`, [unit.uid]);
@@ -346,14 +379,16 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
   }
 
   // ---------- лимиты копий ----------
-  for (const [id, n] of copies) {
-    const ds = L.ds.get(id);
+  for (const [key, n] of copies) {
+    const same = units.filter((c) => c.ds && copyKey(c.ds) === key);
+    const ds = same[0]?.ds;
     if (!ds) continue;
-    const bl = units.find((c) => c.unit.datasheetId === id)?.isBattleline ?? false;
-    let limit = copyLimit(ds, roster.battleSize, bl);
+    const bl = same.some((c) => c.isBattleline);
+    // самый строгий лимит среди версий (Epic Hero у одной из них — 1 на все)
+    let limit = Math.min(...same.map((c) => copyLimit(c.ds!, roster.battleSize, bl)));
     for (const d of detachments) if (d.limitOverride?.names.includes(ds.name.toUpperCase())) limit = Math.max(limit, d.limitOverride.max);
     if (n > limit) {
-      const uids = units.filter((c) => c.unit.datasheetId === id).map((c) => c.unit.uid);
+      const uids = same.map((c) => c.unit.uid);
       err('copies', `«${ds.name}»: ${n} шт., максимум ${limit}${ds.epicHero ? ' (Epic Hero)' : ''}.`, uids);
     }
   }
@@ -361,7 +396,10 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
   // ---------- улучшения ----------
   const enhUse = new Map<string, ComputedUnit[]>();
   for (const c of units) {
+    if (c.unit.enhancementId && !c.enhancement)
+      err('enh-missing', `«${c.ds?.name ?? '?'}»: улучшение ${c.unit.enhancementId} не найдено в данных (возможно, удалено в обновлении) — выберите заново.`, [c.unit.uid]);
     if (!c.enhancement) continue;
+    if (c.enhancement.outdated) warn('enh-outdated', `Улучшение «${c.enhancement.name}» устарело (нет в текущем источнике) — выберите действующее.`, [c.unit.uid]);
     enhUse.set(c.enhancement.id, [...(enhUse.get(c.enhancement.id) ?? []), c]);
     const e = c.enhancement;
     const name = c.ds?.name ?? '?';
@@ -494,8 +532,10 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
 }
 
 /** Детачменты, доступные ростеру (учитывая орден Space Marines). */
-export function availableDetachments(L: DataLookup, chapter: string | null): Detachment[] {
-  return L.faction.detachments.filter((d) => !d.chapter || !chapter || d.chapter === chapter);
+/** chosen — id устаревших детачментов, которые ростер может выбрать (уже выбранные и запомненные, migrate.legacyIds). */
+export function availableDetachments(L: DataLookup, chapter: string | null, chosen: string[] = []): Detachment[] {
+  // устаревшие детачменты (нет в текущем источнике) — только если уже выбраны в ростере
+  return L.faction.detachments.filter((d) => (!d.chapter || !chapter || d.chapter === chapter) && (!d.outdated || chosen.includes(d.id)));
 }
 
 /** Можно ли персонажа `leader` присоединить к юниту `bodyguard`. */

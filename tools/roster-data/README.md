@@ -87,6 +87,51 @@ Datasheets_stratagems, Datasheets_detachment_abilities` — то есть вся
 
 Импортёр без зависимостей, колонки читаются по имени, а не по позиции.
 
+**Отчёт импорта 40K** — `tools/roster-data/40k/import-report.json`: проблемы самой выгрузки (повторы id, ссылки на
+несуществующие записи, инфолисты без цены или без источника, размеры из таблицы цен вне состава отряда, детачменты
+без стратагем) и то, что импорт не смог разобрать. Тест `tests/audit40k.test.ts` проверяет исправления аудита данных
+40K и что повторный импорт не меняет `backend/roster-data` (если CSV на месте).
+
+**Цены орденов.** У части инфолистов Space Marines несколько таблиц цен (Blood Angels, Dark Angels, Deathwatch платят
+иначе), но в выгрузке не подписано, какая чья. Импорт сохраняет их в `costVariants`; орден каждой таблицы задаётся в
+`tools/roster-data/40k/curated.json → chapterCosts.map` (`"<id инфолиста>": ["Blood Angels"]`) по проверенному источнику.
+Пока привязки нет, действует обычная цена, а отчёт импорта перечисляет такие инфолисты. Движок берёт цену по ордену
+ростера (`costsFor` / `bandFor` в `engine/compute.ts`).
+
+**Обновления поверх выгрузки 40K** (`40k/curated.json → updates`). Проверенные изменения данных, которых нет в выгрузке
+Wahapedia (например, более новые очки), применяются функцией `repair40kData` (`scripts/updates-40k.mjs`): в конце
+импорта и командой `node scripts/repair-40k-data.mjs [--check]` для готовых данных без CSV. Повторный запуск ничего не
+меняет; переимпорт не стирает обновления. Элемент: `{ id, kind, snapshot, enabled, scope, note }` — `kind` выбирает
+обработчик, `snapshot` — файл снимка источника в `40k/` (проверяется fingerprint), `scope`/`note` — что обновлено и что
+осталось на версии выгрузки. Применённые обновления записываются в `index.json → updates` (источник, версия данных,
+версия Munitorum Field Manual, дата). Включено одно обновление — `whrules-981-space-marines` (kind `whrules-faction`, `scripts/whrules-convert.mjs`): Space Marines с орденами и Imperial Agents из полного снимка wh-rules.ru 981, копии Imperial Agents в AC, AM, AS, AdM, GK, QI, TL. Обработчик использует движок клиента (TypeScript), поэтому импорт и repair запускаются через `bun` или `node --import tsx` (`npm run data` уже так). Сухой прогон: `bun scripts/whrules-convert.mjs --out <файл>` — считается от данных до обновления (`scripts/baseline-40k.mjs`: история git, коммит 4a91fa0); тесты — `tests/whrules-*.test.ts`, `tests/updates40k.test.ts`.
+
+**Снимок wh-rules.ru** (`40k/whrules-<версия>.json`, сейчас `whrules-981.json`: данные приложения 981, MFM 1.6,
+14.10.2026). Схема `whrules-points-snapshot/1`: `source` (сайт, версия данных, MFM, дата, время снятия), `assets`
+(SHA-256 каждого прочитанного JS-модуля сайта), `factions` (Space Marines, 5 орденов, Imperial Agents: инфолисты
+`{id, name, legends, points}`, у орденов `pointsOverrides` и `sharedUnitIds`), `patches` (история обновлений и изменения
+очков этих фракций), `fingerprint` (SHA-256 от `JSON.stringify` снимка без него). Как снять заново: открыть
+https://wh-rules.ru/ru/patches, выполнить `scripts/whrules-extract.js` в консоли браузера, сохранить строку
+`window.__whrulesSnapshot` в файл и запустить `node scripts/whrules-save.mjs <файл>` — он проверит схему и fingerprint.
+wh-rules.ru — вторичный источник (не GW): версии и даты сверены с Warhammer Community; стоимости снаряжения в нём нет.
+
+**Полный снимок wh-rules.ru** (`40k/whrules-981-full.json`, схема `whrules-full/1`): инфолисты целиком (профили, оружие,
+способности, состав, снаряжение, варианты, ключевые слова, лидер, транспорт, очки, Legends, источник), построения
+(правило, улучшения с очками, стратагемы), правило армии и ордена — для тех же 7 фракций; художественный текст и русские
+переводы не снимаются. Снять: `scripts/whrules-extract-full.js` в консоли браузера на wh-rules.ru, сохранить
+`window.__whrulesFullGz` (gzip+base64) или `window.__whrulesFull` в файл, затем `node scripts/whrules-map.mjs --save-full <файл>`
+(проверка схемы, SHA-256 модулей и fingerprint). Только источник: данные приложения он не меняет.
+
+**Id и сохранённые ростеры при обновлении** (`planSpaceMarines` в `scripts/whrules-map.mjs`, клиент — `engine/migrate.ts`).
+Сопоставленные инфолисты сохраняют id; новые получают `whr:<фракция>:<slug>`; объединённые и заменённые общими
+инфолистами записываются в `FactionData.migrations` (`datasheets`/`detachments`/`enhancements`: прежний id → `{to, reason, note,
+keepPicks}`). Редактор при открытии ростера переводит его на новые id: совместимые выборы переносятся, несовместимые
+откладываются в `unit.migration.dropped` с предупреждением (не удаляются). Инфолисты, которых нет в собранном снимке,
+остаются доступными и получают `outdated` (пояснение) — в списках к названию добавляется «*».
+
+**Лимит копий** считается по названию инфолиста: одноимённые версии (Space Marines и Black Templars) делят лимит и
+ступени цены. Фракция без детачментов (Adeptus Titanicus) не показывается как армия — её юниты остаются союзниками.
+
 ## «Поле боя»: раскладки и деплой
 
 Карты в разделе «Поле боя» — 45 раскладок террейна Chapter Approved 2026–27 (по 3 на каждую из 15 пар типов армий)

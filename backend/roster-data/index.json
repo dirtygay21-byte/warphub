@@ -1,7 +1,7 @@
 {
  "edition": "11",
  "lastUpdate": "2026-09-28 02:38:04",
- "generatedAt": "2026-10-05T15:26:34.622Z",
+ "generatedAt": "2026-10-10T06:42:24.810Z",
  "credit": "powered by Wahapedia",
  "factions": [
   {
@@ -24,13 +24,6 @@
    "allegiance": "Imperium",
    "units": 38,
    "detachments": 10
-  },
-  {
-   "id": "TL",
-   "name": "Adeptus Titanicus",
-   "allegiance": "Imperium",
-   "units": 4,
-   "detachments": 0
   },
   {
    "id": "AE",
@@ -171,6 +164,25 @@
    "allegiance": "Chaos",
    "units": 58,
    "detachments": 8
+  }
+ ],
+ "updates": [
+  {
+   "id": "whrules-981-space-marines",
+   "kind": "whrules-faction",
+   "scope": [
+    "SM",
+    "AoI"
+   ],
+   "note": "Space Marines (с орденами) и Imperial Agents из wh-rules.ru 981; копии Imperial Agents в AC, AM, AS, AdM, GK, QI, TL",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 981,
+    "mfm": "1.6",
+    "date": "2026-10-14",
+    "snapshot": "whrules-981-full.json",
+    "fingerprint": "aebb093d50e8a4d7a5ab2fa315d7e13dd63bf0d79d23e2756e3f9c4d4ee49361"
+   }
   }
  ]
 }

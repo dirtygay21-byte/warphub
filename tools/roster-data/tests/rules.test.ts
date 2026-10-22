@@ -101,11 +101,16 @@ test('Space Marines: один орден и орденские детачмен�
   r = roster('SM', ['Champions of Fenris']);
   r = add(r, 'SM', 'Death Company Marines');
   has(r, 'chapter');
-  // Stormlance Task Force стоит 2 DP для Black Templars (3 DP обычно)
+  // wh-rules.ru 981: Stormlance Task Force — 1 DP для любого ордена (особой цены для орденов в источнике нет)
   r = { ...roster('SM', ['Stormlance Task Force']), chapter: 'Black Templars' };
-  assert.equal(run(r).dp, 2);
+  assert.equal(run(r).dp, 1);
   r = { ...r, chapter: null };
+  assert.equal(run(r).dp, 1);
+  // DP по ордену (chapterDp) — у сохранённого устаревшего Bastion Task Force: 2 DP, для Black Templars 3
+  r = { ...roster('SM', ['Bastion Task Force']), chapter: 'Black Templars' };
   assert.equal(run(r).dp, 3);
+  r = { ...r, chapter: null };
+  assert.equal(run(r).dp, 2);
 });
 
 test('лимит копий: 3 / 2 в Incursion, Battleline ×2, Epic Hero 1, BATTLELINE от детачмента', () => {
@@ -123,7 +128,7 @@ test('лимит копий: 3 / 2 в Incursion, Battleline ×2, Epic Hero 1, BA
   r = add(r, 'SM', 'Intercessor Squad');
   has(r, 'copies');
   r = roster('SM', ['Gladius Task Force']);
-  r = add(r, 'SM', 'Marneus Calgar in Armour of Antilochus', 2);
+  r = add(r, 'SM', 'Marneus Calgar', 2);
   has(r, 'copies');
   // Company of Hunters: OUTRIDER SQUAD получает BATTLELINE → можно 6
   r = { ...roster('SM', ['Company of Hunters']), chapter: 'Dark Angels' };
@@ -169,7 +174,7 @@ test('улучшения: лимит, повторы, детачмент, Epic H
   has(r, 'enh-det');
   // Epic Hero
   r = roster('SM', ['Gladius Task Force']);
-  r = add(r, 'SM', 'Marneus Calgar in Armour of Antilochus');
+  r = add(r, 'SM', 'Marneus Calgar');
   r = updateUnit(r, r.units[0].uid, { enhancementId: enh[0].id });
   has(r, 'enh-epic');
   // недопустимый инфолист

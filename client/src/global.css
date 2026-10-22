@@ -160,3 +160,47 @@ body {
     opacity: 0;
   }
 }
+
+/* Мини-игры: кубик кувыркается во время броска */
+@keyframes dice-tumble {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(0.85); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* «Легенды Warp Hub»: анимации пакета и карт */
+@keyframes pack-shake {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  20% { transform: rotate(-4deg) scale(1.02); }
+  40% { transform: rotate(4deg) scale(1.04); }
+  60% { transform: rotate(-3deg) scale(1.05); }
+  80% { transform: rotate(3deg) scale(1.06); }
+}
+@keyframes pack-tear {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(60px, -140px) rotate(28deg); opacity: 0; }
+}
+@keyframes pack-fade {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(40px) scale(0.9); opacity: 0; }
+}
+@keyframes card-deal {
+  0% { transform: translateY(-90px) scale(0.6) rotate(-8deg); opacity: 0; }
+  100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes card-hint {
+  0%, 100% { box-shadow: 0 0 6px var(--hint); }
+  50% { box-shadow: 0 0 22px var(--hint); }
+}
+@keyframes legend-shine {
+  0% { transform: translateX(-120%) skewX(-20deg); }
+  60%, 100% { transform: translateX(220%) skewX(-20deg); }
+}
+@keyframes reveal-burst {
+  0% { transform: scale(0.3); opacity: 0.9; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+@keyframes float-up {
+  0% { transform: translateY(6px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
