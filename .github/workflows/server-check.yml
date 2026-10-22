@@ -1,0 +1,63 @@
+# Read-only production check. Started by hand (Actions → Server check → Run workflow).
+# Connects with a key that the server allows to run only /usr/local/bin/warphub-check
+# (ops/server/warphub-check) and posts the output as a comment on the "Server check" issue.
+name: Server check
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: server-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Run the check on the server
+        env:
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_KNOWN_HOSTS: ${{ secrets.SERVER_KNOWN_HOSTS }}
+        run: |
+          for v in SERVER_SSH_KEY SERVER_HOST SERVER_KNOWN_HOSTS; do
+            [ -n "${!v}" ] || { echo "::error::Repository secret $v is not set"; exit 1; }
+          done
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SERVER_SSH_KEY" > ~/.ssh/warphub_check && chmod 600 ~/.ssh/warphub_check
+          printf '%s\n' "$SERVER_KNOWN_HOSTS" > ~/.ssh/known_hosts && chmod 600 ~/.ssh/known_hosts
+          set +e
+          ssh -i ~/.ssh/warphub_check -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+              -o UserKnownHostsFile=~/.ssh/known_hosts -o ConnectTimeout=20 -o BatchMode=yes \
+              "root@$SERVER_HOST" warphub-check > output.txt 2>&1
+          echo "SSH_EXIT=$?" >> "$GITHUB_ENV"
+          rm -f ~/.ssh/warphub_check
+
+      - name: Post the output on the "Server check" issue
+        if: ${{ always() && hashFiles('output.txt') != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          N=$(gh api "repos/$REPO/issues?state=open&per_page=100" --jq '[.[] | select(.title == "Server check" and (.pull_request | not))][0].number // empty')
+          if [ -z "$N" ]; then
+            N=$(gh api -X POST "repos/$REPO/issues" -f title="Server check" \
+                -f body="Output of the read-only server check workflow (.github/workflows/server-check.yml). One comment per run." --jq .number)
+          fi
+          {
+            echo "Run: $RUN_URL — ssh exit code ${SSH_EXIT:-unknown}"
+            echo
+            echo '```'
+            head -c 60000 output.txt
+            echo
+            echo '```'
+          } > comment.md
+          gh api -X POST "repos/$REPO/issues/$N/comments" -F body=@comment.md --jq .html_url
+          cat output.txt >> "$GITHUB_STEP_SUMMARY"
+          [ "${SSH_EXIT:-1}" = "0" ] || { echo "::error::ssh exited with ${SSH_EXIT:-unknown}"; exit 1; }

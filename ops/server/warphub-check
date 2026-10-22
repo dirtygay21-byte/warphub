@@ -1,0 +1,44 @@
+#!/bin/bash
+# WarpHub read-only server check. Installed on the server as /usr/local/bin/warphub-check and run by
+# GitHub Actions (.github/workflows/server-check.yml) through a key that may run only this script.
+# It changes nothing and never prints passwords or .env contents.
+set +e
+for d in /root/.bun/bin /root/.nvm/versions/node/*/bin /usr/local/bin /usr/bin; do [ -d "$d" ] && PATH="$d:$PATH"; done
+export PATH
+B=/var/www/warphub.ru/server
+W=/var/www/warphub.ru/client/dist
+
+echo "WarpHub server check — $(hostname) — $(date -u '+%Y-%m-%d %H:%M UTC')"
+echo "== 1 data files (sha256, first 16)"
+sha256sum $B/roster-data/index.json $B/roster-data/f/SM.json $B/roster-data/aos/index.json $B/roster-data/aos/f/FY.json 2>&1 | awk '{print substr($1,1,16), $2}'
+echo "== 2 client"
+ls -l --time-style=long-iso $W/index.html 2>&1
+echo "AoS-update marker files: $(grep -l 'уберите его из ростера' $W/assets/*.js 2>/dev/null | wc -l)"
+echo "card-packs marker files: $(grep -l 'Легенды Warp Hub' $W/assets/*.js 2>/dev/null | wc -l)"
+echo "== 3 backend folder"
+ls -l --time-style=long-iso $B 2>&1 | grep -v -i env
+ls $B/src/modules 2>&1 | tr '\n' ' '; echo
+ls $B/drizzle 2>&1 | grep sql | tail -3
+(cd $B 2>/dev/null && git log --oneline -1 2>&1 | head -1)
+echo "== 4 update from 19 Oct"
+ls -l --time-style=long-iso /root/warphub-backup /root/warphub-client-new/dist 2>&1 | head -12
+ls -l /root/*.zip 2>&1
+echo "== 5 pm2"
+pm2 list 2>&1
+for n in $(pm2 jlist 2>/dev/null | python3 -c 'import json,sys;print(" ".join(p["name"] for p in json.load(sys.stdin)))' 2>/dev/null); do
+  echo "-- $n"
+  pm2 describe "$n" 2>&1 | grep -E "│ (status|script path|script args|exec cwd|interpreter|interpreter args|uptime|restarts) "
+done
+echo "== 6 versions"
+which bun; bun --version 2>&1; node --version 2>&1
+echo "== 7 docker"
+docker ps --format '{{.Names}} | {{.Image}} | {{.Ports}}' 2>&1
+echo "== 8 migrations"
+PG=$(docker ps --format '{{.Names}} {{.Image}}' 2>/dev/null | awk '/postgres/{print $1; exit}')
+[ -n "$PG" ] && docker exec "$PG" psql -U postgres -d postgres -Atc "select count(*), max(created_at) from drizzle.__drizzle_migrations" 2>&1
+echo "== 9 open ports"
+ss -ltn | awk 'NR==1 || /:(22|80|443|4000|5432|9000|9001) /'
+ufw status 2>&1 | head -15
+echo "== 10 disk"
+df -h / /var/www 2>&1 | uniq
+echo "== end"
