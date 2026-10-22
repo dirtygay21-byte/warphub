@@ -5,24 +5,36 @@
 set +e
 for d in /root/.bun/bin /root/.nvm/versions/node/*/bin /usr/local/bin /usr/bin; do [ -d "$d" ] && PATH="$d:$PATH"; done
 export PATH
-B=/var/www/warphub.ru/server
 W=/var/www/warphub.ru/client/dist
+# backend folder = working directory of the PM2 process warphub-api (fallback: server-new)
+B=$(pm2 jlist 2>/dev/null | python3 -c 'import json,sys
+for p in json.load(sys.stdin):
+    if p.get("name")=="warphub-api": print(p.get("pm2_env",{}).get("pm_cwd","")); break' 2>/dev/null)
+[ -d "$B" ] || B=/var/www/warphub.ru/server-new
+# roster data folder: ROSTER_DATA_DIR from .env (only that line is read), else $B/roster-data (backend/src/modules/roster/data.ts)
+D=$(grep -E '^ROSTER_DATA_DIR=' "$B/.env" 2>/dev/null | cut -d= -f2-)
+[ -n "$D" ] || D=$B/roster-data
 
-echo "WarpHub server check — $(hostname) — $(date -u '+%Y-%m-%d %H:%M UTC')"
-echo "== 1 data files (sha256, first 16)"
-sha256sum $B/roster-data/index.json $B/roster-data/f/SM.json $B/roster-data/aos/index.json $B/roster-data/aos/f/FY.json 2>&1 | awk '{print substr($1,1,16), $2}'
-echo "== 2 client"
+echo "WarpHub server check v2 — $(hostname) — $(date -u '+%Y-%m-%d %H:%M UTC')"
+echo "backend folder: $B"
+echo "roster data folder: $D"
+echo "== 1 roster data (sha256 first 16, modified)"
+for f in index.json battlefield.json f/SM.json aos/index.json aos/f/FY.json aos/f/BoC.json; do
+  [ -f "$D/$f" ] && echo "$(sha256sum "$D/$f" | cut -c1-16) $(date -u -r "$D/$f" '+%Y-%m-%d %H:%M') $f" || echo "missing $f"
+done
+echo "== 2 backend code fingerprint (sha256 first 16 per file)"
+ls -l --time-style=long-iso "$B" 2>&1 | grep -v -i env
+(cd "$B" 2>/dev/null && find package.json bun.lock drizzle src -type f 2>/dev/null | grep -v node_modules | sort | xargs sha256sum 2>/dev/null | awk '{print substr($1,1,16), $2}')
+(cd "$B" 2>/dev/null && git log --oneline -1 2>&1 | head -1)
+echo "== 3 client"
 ls -l --time-style=long-iso $W/index.html 2>&1
+ls $W/assets 2>&1 | tr '\n' ' '; echo
 echo "AoS-update marker files: $(grep -l 'уберите его из ростера' $W/assets/*.js 2>/dev/null | wc -l)"
 echo "card-packs marker files: $(grep -l 'Легенды Warp Hub' $W/assets/*.js 2>/dev/null | wc -l)"
-echo "== 3 backend folder"
-ls -l --time-style=long-iso $B 2>&1 | grep -v -i env
-ls $B/src/modules 2>&1 | tr '\n' ' '; echo
-ls $B/drizzle 2>&1 | grep sql | tail -3
-(cd $B 2>/dev/null && git log --oneline -1 2>&1 | head -1)
-echo "== 4 update from 19 Oct"
-ls -l --time-style=long-iso /root/warphub-backup /root/warphub-client-new/dist 2>&1 | head -12
-ls -l /root/*.zip 2>&1
+echo "== 4 other WarpHub folders"
+ls -l --time-style=long-iso /var/www/warphub.ru 2>&1
+echo "old /server roster data: $(sha256sum /var/www/warphub.ru/server/roster-data/aos/index.json 2>/dev/null | cut -c1-16)"
+ls -l --time-style=long-iso /root/warphub-backup 2>&1 | tail -n +2
 echo "== 5 pm2"
 pm2 list 2>&1
 for n in $(pm2 jlist 2>/dev/null | python3 -c 'import json,sys;print(" ".join(p["name"] for p in json.load(sys.stdin)))' 2>/dev/null); do
@@ -35,10 +47,16 @@ echo "== 7 docker"
 docker ps --format '{{.Names}} | {{.Image}} | {{.Ports}}' 2>&1
 echo "== 8 migrations"
 PG=$(docker ps --format '{{.Names}} {{.Image}}' 2>/dev/null | awk '/postgres/{print $1; exit}')
-[ -n "$PG" ] && docker exec "$PG" psql -U postgres -d postgres -Atc "select count(*), max(created_at) from drizzle.__drizzle_migrations" 2>&1
-echo "== 9 open ports"
-ss -ltn | awk 'NR==1 || /:(22|80|443|4000|5432|9000|9001) /'
+[ -n "$PG" ] && docker exec "$PG" psql -U postgres -d postgres -Atc "select id, hash, created_at from drizzle.__drizzle_migrations order by id" 2>&1 | awk -F'|' '{print $1, substr($2,1,12), $3}'
+echo "== 9 nginx"
+ls -l /etc/nginx/sites-enabled/ 2>&1
+for f in /etc/nginx/sites-available/warphub.ru.conf /etc/nginx/sites-available/s3.warphub.ru.conf; do
+  echo "-- $f"; grep -nE "^\s*(listen|server_name|root|location|proxy_pass)\b" "$f" 2>&1
+done
+echo "== 10 open ports and firewall"
+ss -ltnp | awk 'NR==1 || /:(22|80|443|3000|4000|5432|9000|9001) /' | sed -E 's/,fd=[0-9]+//g'
 ufw status 2>&1 | head -15
-echo "== 10 disk"
-df -h / /var/www 2>&1 | uniq
+iptables -S INPUT 2>/dev/null | head -10
+echo "== 11 disk"
+df -h / 2>&1
 echo "== end"
