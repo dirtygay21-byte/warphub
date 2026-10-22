@@ -1,0 +1,89 @@
+# Validation only: tests, type check, lint and build. No secrets, no deployment.
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  roster-data:
+    name: Roster data tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 40K tests rebuild their baseline from git history (scripts/baseline-40k.mjs)
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - name: Tests (engines, data; CSV cross-checks skip without the export)
+        working-directory: tools/roster-data
+        run: bun test tests/
+      - name: AoS data is stable under repair
+        working-directory: tools/roster-data
+        run: node scripts/repair-aos-data.mjs --check
+
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - name: Install
+        working-directory: backend
+        run: bun install --frozen-lockfile
+      - name: Tests (e2e tests skip without WARPHUB_E2E=1)
+        working-directory: backend
+        run: bun test tests
+
+  client:
+    name: Client type check, lint, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - name: Install
+        working-directory: client
+        run: bun install --frozen-lockfile
+      - name: Type check
+        working-directory: client
+        run: bunx tsc -p tsconfig.app.json --noEmit
+      - name: Lint
+        if: ${{ !cancelled() }}
+        working-directory: client
+        # ESLint problems are also reported as annotations (summary first, then up to 9 problems),
+        # so they can be read from the GitHub API without the full log.
+        run: |
+          bunx eslint . -f json -o eslint-report.json || true
+          node -e '
+            const fs = require("fs");
+            if (!fs.existsSync("eslint-report.json")) { console.log("::error::ESLint did not produce a report (configuration or crash) — see the log"); process.exit(1); }
+            const files = JSON.parse(fs.readFileSync("eslint-report.json", "utf8"));
+            const root = process.env.GITHUB_WORKSPACE + "/";
+            const probs = files.flatMap((f) => f.messages.map((m) => ({ ...m, file: f.filePath.replace(root, "") })));
+            const errors = probs.filter((m) => m.severity === 2), warnings = probs.filter((m) => m.severity === 1);
+            const byRule = {};
+            for (const m of probs) byRule[(m.ruleId ?? "fatal") + (m.severity === 2 ? "" : " (warn)")] = (byRule[(m.ruleId ?? "fatal") + (m.severity === 2 ? "" : " (warn)")] ?? 0) + 1;
+            const summary = `ESLint: ${errors.length} errors, ${warnings.length} warnings in ${files.filter((f) => f.messages.length).length} files. By rule: ` + Object.entries(byRule).sort((a, b) => b[1] - a[1]).map(([r, n]) => `${r} ${n}`).join("; ");
+            console.log(summary);
+            console.log(`::${errors.length ? "error" : "notice"}::${summary}`);
+            for (const m of [...errors, ...warnings].slice(0, 9)) console.log(`::${m.severity === 2 ? "error" : "warning"} file=${m.file},line=${m.line ?? 1},col=${m.column ?? 1}::${m.ruleId ?? "fatal"}: ${String(m.message).replace(/\r?\n/g, " ")}`);
+            for (const m of probs) console.log(`${m.file}:${m.line}:${m.column} ${m.severity === 2 ? "error" : "warn"} ${m.ruleId ?? "fatal"} ${m.message}`);
+            process.exit(errors.length ? 1 : 0);
+          '
+      - name: Build (tsc -b && vite build)
+        if: ${{ !cancelled() }}
+        working-directory: client
+        run: bun run build

@@ -129,6 +129,8 @@ function cardsState() {
   };
 }
 
+// the request body is untyped JSON from the app (JSON.parse); fields are checked where they are used
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function handleMinigames(method: string, path: string, q: URLSearchParams, body: any): Result | null {
   let m: RegExpMatchArray | null;
   if (method === "GET" && path === "/minigames/cards") return { body: cardsState() };

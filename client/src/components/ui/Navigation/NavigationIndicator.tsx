@@ -23,10 +23,9 @@ export default function NavigationIndicator({
 
   useEffect(() => {
     const activeItem = document.getElementById(`navigation-item-${activePage}`);
-    if (activeItem) {
-      updateStyles(activeItem);
-    }
 
+    // ResizeObserver reports the observed element once right after observe(), so the indicator
+    // is positioned on the next frame without a synchronous setState inside the effect.
     observer.current = new ResizeObserver((entries) => {
       entries.forEach(() => {
         updateStyles(activeItem);
