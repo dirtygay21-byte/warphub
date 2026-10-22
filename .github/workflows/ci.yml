@@ -1,0 +1,68 @@
+# Validation only: tests, type check, lint and build. No secrets, no deployment.
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  roster-data:
+    name: Roster data tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - name: Tests (engines, data; CSV cross-checks skip without the export)
+        working-directory: tools/roster-data
+        run: bun test tests/
+      - name: AoS data is stable under repair
+        working-directory: tools/roster-data
+        run: node scripts/repair-aos-data.mjs --check
+
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - name: Install
+        working-directory: backend
+        run: bun install --frozen-lockfile
+      - name: Tests (e2e tests skip without WARPHUB_E2E=1)
+        working-directory: backend
+        run: bun test tests
+
+  client:
+    name: Client type check, lint, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - name: Install
+        working-directory: client
+        run: bun install --frozen-lockfile
+      - name: Type check
+        working-directory: client
+        run: bunx tsc -p tsconfig.app.json --noEmit
+      - name: Lint
+        if: ${{ !cancelled() }}
+        working-directory: client
+        run: bun run lint
+      - name: Build (tsc -b && vite build)
+        if: ${{ !cancelled() }}
+        working-directory: client
+        run: bun run build
