@@ -42,10 +42,10 @@ jobs:
   build:
     name: Test and package
     if: ${{ inputs.mode == 'dry-run' || inputs.mode == 'apply' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref }}
           fetch-depth: 0
@@ -93,7 +93,7 @@ jobs:
           find . -type f ! -name SHA256SUMS | sort | xargs sha256sum > SHA256SUMS
           tar -czf ../package.tgz .
           cd .. && ls -l package.tgz && sha256sum package.tgz
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: warphub-package-${{ github.run_id }}
           path: package.tgz
@@ -103,10 +103,10 @@ jobs:
     name: Server (${{ inputs.mode }})
     needs: [build]
     if: ${{ always() && (needs.build.result == 'success' || needs.build.result == 'skipped') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         if: ${{ needs.build.result == 'success' }}
         with:
           name: warphub-package-${{ github.run_id }}
