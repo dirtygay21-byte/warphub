@@ -1,0 +1,209 @@
+#!/bin/bash
+# WarpHub deploy script. Installed on the server as /usr/local/bin/warphub-deploy and run by GitHub Actions
+# (.github/workflows/deploy.yml) through a key that may run only this script. The package arrives on stdin.
+#
+#   warphub-deploy dry-run <parts> <migrate>   check the package, show what would change; installs nothing
+#   warphub-deploy apply   <parts> <migrate>   back up, install, health-check; puts the backup back on failure
+#   warphub-deploy rollback <deploy-id>         restore the parts saved by that deploy (no package needed)
+#   warphub-deploy list                         list deploy backups
+#   <parts>   = comma list of data, client, backend   (data = roster data, client = Mini App, backend = API code)
+#   <migrate> = yes | no   (yes needs the backend part; a database dump is taken first)
+#
+# It writes only to the WarpHub backend folder, the Mini App folder and /root/warphub-backup/deploy-*,
+# and restarts only the PM2 process warphub-api (only when backend code changed). It never reads or prints .env
+# values except PORT and ROSTER_DATA_DIR.
+set -uo pipefail
+for d in /root/.bun/bin /root/.nvm/versions/node/*/bin /usr/local/bin /usr/bin; do [ -d "$d" ] && PATH="$d:$PATH"; done
+export PATH
+
+ROOT=""
+# local testing only (never over SSH): WARPHUB_TEST_ROOT=<dir> prefixes every path
+if [ -z "${SSH_CONNECTION:-}" ] && [ -n "${WARPHUB_TEST_ROOT:-}" ]; then ROOT=$WARPHUB_TEST_ROOT; fi
+B=$ROOT/var/www/warphub.ru/server-new
+W=$ROOT/var/www/warphub.ru/client/dist
+BACKUPS=$ROOT/root/warphub-backup
+WORK=$ROOT/root/warphub-deploy-work
+PM2_NAME=warphub-api
+KEEP=5
+MAX_BYTES=300000000
+
+say() { echo "$*"; [ -n "${LOG:-}" ] && echo "$*" >> "$LOG"; }
+die() { say "ERROR: $*"; exit 1; }
+
+# ---------- arguments: from the SSH command (forced command) or the command line ----------
+CMD=${SSH_ORIGINAL_COMMAND:-"warphub-deploy $*"}
+if [[ "$CMD" =~ ^warphub-deploy\ (dry-run|apply)\ ((data|client|backend)(,(data|client|backend)){0,2})\ (yes|no)$ ]]; then
+  MODE=${BASH_REMATCH[1]}; PARTS=${BASH_REMATCH[2]}; MIGRATE=${BASH_REMATCH[6]}
+elif [[ "$CMD" =~ ^warphub-deploy\ rollback\ ([0-9]{8}-[0-9]{6})$ ]]; then
+  MODE=rollback; RB_ID=${BASH_REMATCH[1]}; PARTS=""; MIGRATE=no
+elif [[ "$CMD" =~ ^warphub-deploy\ list$ ]]; then
+  MODE=list; PARTS=""; MIGRATE=no
+else
+  die "unsupported command: $CMD"
+fi
+has() { [[ ",$PARTS," == *",$1,"* ]]; }
+[ "$MIGRATE" = yes ] && ! has backend && die "migrate=yes needs the backend part"
+
+exec 9>"${ROOT:-}/tmp/warphub-deploy.lock" || die "cannot open the lock file"
+flock -n 9 || die "another deploy is running"
+
+say "WarpHub deploy — $(hostname) — $(date -u '+%Y-%m-%d %H:%M:%S UTC') — mode=$MODE parts=${PARTS:-none} migrate=$MIGRATE"
+
+# ---------- environment checks ----------
+pm2_cwd() {
+  pm2 jlist 2>/dev/null | python3 -c 'import json,sys
+for p in json.load(sys.stdin):
+    if p.get("name")=="'"$PM2_NAME"'": print(p.get("pm2_env",{}).get("pm_cwd","")); break' 2>/dev/null
+}
+[ -d "$B/src" ] || die "backend folder $B not found"
+[ -d "$W" ] || die "Mini App folder $W not found"
+CWD=$(pm2_cwd)
+[ "$CWD" = "$B" ] || die "PM2 process $PM2_NAME runs in '$CWD', expected $B — stopping"
+grep -qE '^ROSTER_DATA_DIR=' "$B/.env" 2>/dev/null && die "ROSTER_DATA_DIR is set in .env — this script only supports $B/roster-data"
+D=$B/roster-data
+PORT=$(grep -E '^PORT=' "$B/.env" 2>/dev/null | head -1 | cut -d= -f2- | tr -dc '0-9'); PORT=${PORT:-4000}
+
+# ---------- list / rollback ----------
+if [ "$MODE" = list ]; then
+  ls -1d "$BACKUPS"/deploy-* 2>/dev/null | while read -r d; do echo "$(basename "$d")  parts: $(cat "$d/parts" 2>/dev/null)  commit: $(cat "$d/commit" 2>/dev/null)  result: $(cat "$d/result" 2>/dev/null)"; done
+  exit 0
+fi
+
+health() { # $1 = expected sha256 of roster-data/aos/index.json (or empty)
+  local ok=1 code body i
+  for i in $(seq 1 20); do body=$(curl -s -m 3 "http://127.0.0.1:$PORT/health" 2>/dev/null); [ "$body" = '{"ok":true}' ] && break; sleep 1; done
+  [ "$body" = '{"ok":true}' ] && say "health: /health ok" || { say "health: /health FAILED ($body)"; ok=0; }
+  code=$(curl -s -m 3 -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/roster/access" 2>/dev/null)
+  [ "$code" = 401 ] && say "health: /roster/access 401 ok" || { say "health: /roster/access returned $code (expected 401)"; ok=0; }
+  [ -f "$W/index.html" ] && say "health: Mini App index.html present" || { say "health: Mini App index.html MISSING"; ok=0; }
+  if [ -n "${1:-}" ]; then
+    [ "$(sha256sum "$D/aos/index.json" | cut -d' ' -f1)" = "$1" ] && say "health: roster data matches package" || { say "health: roster data does NOT match package"; ok=0; }
+  fi
+  [ "$ok" = 1 ]
+}
+
+# the Mini App folder itself is kept (Nginx root; its owner, group and ACLs belong to the existing setup):
+# only its contents are replaced, and the new files get the folder's owner and group
+replace_contents() { # $1 = source dir, $2 = target dir
+  find "$2" -mindepth 1 -delete && cp -a "$1/." "$2/" && chown -R --reference="$2" "$2" 2>/dev/null
+  find "$2" -mindepth 1 -type d -exec chmod a+rx {} + ; find "$2" -type f -exec chmod a+r {} +
+}
+
+restore_from() { # $1 = backup dir; restores the parts saved there
+  local bk=$1 p
+  for p in $(tr ',' ' ' < "$bk/parts"); do
+    case $p in
+      data)    [ -d "$bk/roster-data" ] && { rm -rf "$D.restore"; cp -a "$bk/roster-data" "$D.restore" && rm -rf "$D" && mv "$D.restore" "$D"; say "restored: roster data"; } ;;
+      client)  [ -d "$bk/client-dist" ] && { replace_contents "$bk/client-dist" "$W"; say "restored: Mini App"; } ;;
+      backend) if [ -d "$bk/backend" ]; then
+                 for x in src drizzle; do [ -d "$bk/backend/$x" ] && { rm -rf "$B/$x"; cp -a "$bk/backend/$x" "$B/$x"; }; done
+                 for x in package.json bun.lock tsconfig.json drizzle.config.ts env.d.ts; do [ -f "$bk/backend/$x" ] && cp -a "$bk/backend/$x" "$B/$x"; done
+                 [ -f "$bk/lock-changed" ] && (cd "$B" && bun install --frozen-lockfile >/dev/null 2>&1)
+                 pm2 restart "$PM2_NAME" >/dev/null 2>&1 && say "restored: backend code, $PM2_NAME restarted"
+               fi ;;
+    esac
+  done
+}
+
+if [ "$MODE" = rollback ]; then
+  BK=$BACKUPS/deploy-$RB_ID
+  [ -f "$BK/parts" ] || die "no deploy backup $RB_ID"
+  LOG=$BK/rollback-$(date -u +%Y%m%d-%H%M%S).log
+  restore_from "$BK"
+  [ -f "$BK/db.sql" ] && say "note: a database dump from before this deploy is at $BK/db.sql (not restored automatically)"
+  health "" && { say "ROLLBACK OK"; exit 0; } || { say "ROLLBACK FINISHED WITH FAILED HEALTH CHECKS"; exit 1; }
+fi
+
+# ---------- receive and verify the package ----------
+ID=$(date -u +%Y%m%d-%H%M%S)
+PKG=$WORK/$ID
+mkdir -p "$PKG" || die "cannot create $PKG"
+trap 'rm -rf "$PKG"' EXIT
+head -c "$MAX_BYTES" > "$PKG.tgz"
+SIZE=$(stat -c %s "$PKG.tgz")
+[ "$SIZE" -gt 0 ] && [ "$SIZE" -lt "$MAX_BYTES" ] || die "package missing or too large ($SIZE bytes)"
+BAD=$(tar -tzf "$PKG.tgz" 2>/dev/null | grep -vE '^\./?$|^\./(manifest\.txt|SHA256SUMS|roster-data(/.*)?|client-dist(/.*)?|backend(/.*)?)$' | head -5)
+[ -z "$BAD" ] || die "unexpected paths in package: $BAD"
+tar -tzf "$PKG.tgz" | grep -q '\.\.' && die "package contains '..' paths"
+tar -xzf "$PKG.tgz" -C "$PKG" --no-same-owner --no-same-permissions || die "cannot extract package"
+rm -f "$PKG.tgz"
+(cd "$PKG" && sha256sum --quiet -c SHA256SUMS) || die "checksum verification failed"
+COMMIT=$(grep -E '^commit=' "$PKG/manifest.txt" | cut -d= -f2 | tr -dc '0-9a-f' | cut -c1-40)
+say "package: commit ${COMMIT:-unknown}, $(wc -l < "$PKG/SHA256SUMS") files, checksums ok"
+for p in $(tr ',' ' ' <<< "$PARTS"); do
+  case $p in
+    data)    [ -f "$PKG/roster-data/aos/index.json" ] && [ -f "$PKG/roster-data/index.json" ] || die "package has no roster data" ;;
+    client)  [ -f "$PKG/client-dist/index.html" ] || die "package has no Mini App build" ;;
+    backend) [ -f "$PKG/backend/src/index.ts" ] && [ -f "$PKG/backend/package.json" ] || die "package has no backend code" ;;
+  esac
+done
+NEED=$(du -sk "$PKG" | cut -f1); AVAIL=$(df -k --output=avail "$B" | tail -1 | tr -dc '0-9')
+[ "$AVAIL" -gt $((NEED * 4)) ] || die "not enough disk space: need ~$((NEED * 4 / 1024)) MB, have $((AVAIL / 1024)) MB"
+say "disk: $((AVAIL / 1024)) MB free, package $((NEED / 1024)) MB"
+
+changes() { # $1 = new dir, $2 = current dir
+  local out; out=$(diff -rq "$1" "$2" 2>&1 | sed -e "s#$PKG/##g" -e "s#$ROOT##g")
+  say "  $(printf '%s\n' "$out" | grep -c . ) differences"; printf '%s\n' "$out" | head -30 | sed 's/^/    /'
+}
+LOCK_CHANGED=no
+for p in $(tr ',' ' ' <<< "$PARTS"); do
+  case $p in
+    data)    say "data → $D"; changes "$PKG/roster-data" "$D" ;;
+    client)  say "client → $W"; changes "$PKG/client-dist" "$W" ;;
+    backend) say "backend → $B (src, drizzle, package.json, bun.lock, tsconfig.json, drizzle.config.ts, env.d.ts; .env and node_modules untouched)"
+             for x in src drizzle; do say "  $x:"; changes "$PKG/backend/$x" "$B/$x"; done
+             cmp -s "$PKG/backend/bun.lock" "$B/bun.lock" || LOCK_CHANGED=yes
+             say "  dependencies (bun.lock) changed: $LOCK_CHANGED"
+             NEW_MIG=$(comm -23 <(ls "$PKG/backend/drizzle" | grep '\.sql$' | sort) <(ls "$B/drizzle" | grep '\.sql$' | sort))
+             say "  new migration files: ${NEW_MIG:-none}"
+             [ -n "$NEW_MIG" ] && [ "$MIGRATE" = no ] && say "  WARNING: new migrations present but migrate=no" ;;
+  esac
+done
+
+if [ "$MODE" = dry-run ]; then say "DRY RUN — nothing was changed"; exit 0; fi
+
+# ---------- apply ----------
+BK=$BACKUPS/deploy-$ID
+mkdir -p "$BK" || die "cannot create backup folder"
+LOG=$BK/deploy.log
+echo "$PARTS" > "$BK/parts"; echo "$COMMIT" > "$BK/commit"; echo "started" > "$BK/result"
+[ "$LOCK_CHANGED" = yes ] && touch "$BK/lock-changed"
+for p in $(tr ',' ' ' <<< "$PARTS"); do
+  case $p in
+    data)    cp -a "$D" "$BK/roster-data" || die "backup of roster data failed" ;;
+    client)  cp -a "$W" "$BK/client-dist" || die "backup of Mini App failed" ;;
+    backend) mkdir -p "$BK/backend" && for x in src drizzle package.json bun.lock tsconfig.json drizzle.config.ts env.d.ts; do [ -e "$B/$x" ] && cp -a "$B/$x" "$BK/backend/$x"; done || die "backup of backend failed" ;;
+  esac
+done
+if [ "$MIGRATE" = yes ]; then
+  PG=$(docker ps --format '{{.Names}} {{.Image}}' | awk '/postgres/{print $1; exit}')
+  [ -n "$PG" ] && docker exec "$PG" pg_dump -U postgres postgres > "$BK/db.sql" && [ -s "$BK/db.sql" ] || die "database dump failed"
+  say "backup: database dump $(du -h "$BK/db.sql" | cut -f1)"
+fi
+say "backup: $BK"
+
+fail() { say "FAILED: $* — putting the backup back"; restore_from "$BK"; echo "rolled-back" > "$BK/result"
+         [ "$MIGRATE" = yes ] && say "note: migrations may have run; database dump is at $BK/db.sql (not restored automatically)"
+         health "" >/dev/null 2>&1 && say "after restore: health ok" || say "after restore: health checks FAIL — manual attention needed"; exit 1; }
+
+own_like() { chown -R --reference="$2" "$1" 2>/dev/null; chmod --reference="$2" "$1" 2>/dev/null; return 0; }
+for p in $(tr ',' ' ' <<< "$PARTS"); do
+  case $p in
+    data)    rm -rf "$D.new" && cp -a "$PKG/roster-data" "$D.new" && own_like "$D.new" "$D" && rm -rf "$D" && mv "$D.new" "$D" || fail "installing roster data"
+             say "installed: roster data" ;;
+    client)  replace_contents "$PKG/client-dist" "$W" || fail "installing Mini App"
+             say "installed: Mini App" ;;
+    backend) for x in src drizzle; do rm -rf "$B/$x.new" && cp -a "$PKG/backend/$x" "$B/$x.new" && rm -rf "$B/$x" && mv "$B/$x.new" "$B/$x" || fail "installing backend $x"; done
+             for x in package.json bun.lock tsconfig.json drizzle.config.ts env.d.ts; do [ -f "$PKG/backend/$x" ] && { cp "$PKG/backend/$x" "$B/$x" || fail "installing $x"; }; done
+             if [ "$LOCK_CHANGED" = yes ]; then (cd "$B" && bun install --frozen-lockfile) >> "$LOG" 2>&1 || fail "bun install"; say "installed: dependencies"; fi
+             if [ "$MIGRATE" = yes ]; then (cd "$B" && bun run db:migrate) >> "$LOG" 2>&1 || fail "database migration"; say "migrations: applied"; fi
+             pm2 restart "$PM2_NAME" >> "$LOG" 2>&1 || fail "pm2 restart"
+             say "installed: backend code, $PM2_NAME restarted" ;;
+  esac
+done
+
+EXPECT=""; has data && EXPECT=$(sha256sum "$PKG/roster-data/aos/index.json" | cut -d' ' -f1)
+health "$EXPECT" || fail "health checks"
+echo "ok" > "$BK/result"
+ls -1d "$BACKUPS"/deploy-* 2>/dev/null | sort | head -n -"$KEEP" | while read -r old; do rm -rf "$old"; done
+say "DEPLOY OK — id $ID (rollback: warphub-deploy rollback $ID)"

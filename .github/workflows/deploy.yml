@@ -1,0 +1,166 @@
+# Manual deploy of the WarpHub Mini App. Started by hand: Actions → Deploy → Run workflow.
+# Builds and tests the chosen commit, packages only the chosen parts with checksums and sends the package
+# over SSH to /usr/local/bin/warphub-deploy (ops/server/warphub-deploy), the only command the deploy key may run.
+# The server output is posted as a comment on the "Deploys" issue.
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry-run = check only; apply = install; rollback = restore a deploy backup; list = show backups"
+        type: choice
+        options: [dry-run, apply, rollback, list]
+        default: dry-run
+      parts:
+        description: "What to update (data = roster data, client = Mini App, backend = API code)"
+        type: choice
+        options: ["data,client", "data", "client", "backend", "data,client,backend"]
+        default: "data,client"
+      ref:
+        description: "Commit or branch to deploy (apply: must be on main)"
+        type: string
+        default: main
+      migrate:
+        description: "Run database migrations (needs backend; a database dump is taken first)"
+        type: boolean
+        default: false
+      rollback_id:
+        description: "For rollback: deploy id, e.g. 20261023-101500 (see mode=list)"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Test and package
+    if: ${{ inputs.mode == 'dry-run' || inputs.mode == 'apply' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+      - name: Apply only from main
+        if: ${{ inputs.mode == 'apply' }}
+        run: |
+          git fetch origin main --quiet
+          git merge-base --is-ancestor HEAD origin/main || { echo "::error::apply is allowed only for commits on main"; exit 1; }
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+      - name: Roster data tests
+        working-directory: tools/roster-data
+        run: bun test tests/ && node scripts/repair-aos-data.mjs --check
+      - name: Backend tests
+        working-directory: backend
+        run: bun install --frozen-lockfile && bun test tests
+      - name: Client type check, lint, build
+        if: ${{ contains(inputs.parts, 'client') }}
+        working-directory: client
+        env:
+          CLIENT_ENV: ${{ secrets.CLIENT_ENV }}
+        run: |
+          [ -n "$CLIENT_ENV" ] || { echo "::error::Repository secret CLIENT_ENV (the production client .env) is not set"; exit 1; }
+          printf '%s\n' "$CLIENT_ENV" > .env
+          grep -qx 'VITE_EXECUTION_CONFIG=production' .env || { echo "::error::CLIENT_ENV must contain VITE_EXECUTION_CONFIG=production"; exit 1; }
+          bun install --frozen-lockfile
+          bunx tsc -p tsconfig.app.json --noEmit
+          bun run lint
+          bun run build
+          rm -f .env
+      - name: Package
+        env:
+          PARTS: ${{ inputs.parts }}
+        run: |
+          mkdir -p pkg
+          case ",$PARTS," in *,data,*) cp -a backend/roster-data pkg/roster-data ;; esac
+          case ",$PARTS," in *,client,*) cp -a client/dist pkg/client-dist ;; esac
+          case ",$PARTS," in *,backend,*)
+            mkdir -p pkg/backend
+            for x in src drizzle package.json bun.lock tsconfig.json drizzle.config.ts env.d.ts; do cp -a "backend/$x" pkg/backend/; done ;;
+          esac
+          cd pkg
+          { echo "commit=$(git rev-parse HEAD)"; echo "parts=$PARTS"; echo "created=$(date -u +%FT%TZ)"; } > manifest.txt
+          find . -type f ! -name SHA256SUMS | sort | xargs sha256sum > SHA256SUMS
+          tar -czf ../package.tgz .
+          cd .. && ls -l package.tgz && sha256sum package.tgz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: warphub-package-${{ github.run_id }}
+          path: package.tgz
+          retention-days: 30
+
+  deploy:
+    name: Server (${{ inputs.mode }})
+    needs: [build]
+    if: ${{ always() && (needs.build.result == 'success' || needs.build.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@v4
+        if: ${{ needs.build.result == 'success' }}
+        with:
+          name: warphub-package-${{ github.run_id }}
+      - name: Run warphub-deploy on the server
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_KNOWN_HOSTS: ${{ secrets.SERVER_KNOWN_HOSTS }}
+          MODE: ${{ inputs.mode }}
+          PARTS: ${{ inputs.parts }}
+          MIGRATE: ${{ inputs.migrate && 'yes' || 'no' }}
+          RB_ID: ${{ inputs.rollback_id }}
+        run: |
+          for v in DEPLOY_SSH_KEY SERVER_HOST SERVER_KNOWN_HOSTS; do
+            [ -n "${!v}" ] || { echo "::error::Repository secret $v is not set"; exit 1; }
+          done
+          case "$MODE" in
+            dry-run|apply) CMD="warphub-deploy $MODE $PARTS $MIGRATE"; IN=package.tgz ;;
+            rollback) [[ "$RB_ID" =~ ^[0-9]{8}-[0-9]{6}$ ]] || { echo "::error::rollback_id must look like 20261023-101500"; exit 1; }
+                      CMD="warphub-deploy rollback $RB_ID"; IN=/dev/null ;;
+            list) CMD="warphub-deploy list"; IN=/dev/null ;;
+          esac
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/warphub_deploy && chmod 600 ~/.ssh/warphub_deploy
+          printf '%s\n' "$SERVER_KNOWN_HOSTS" > ~/.ssh/known_hosts && chmod 600 ~/.ssh/known_hosts
+          set +e
+          ssh -i ~/.ssh/warphub_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+              -o UserKnownHostsFile=~/.ssh/known_hosts -o ConnectTimeout=20 -o BatchMode=yes \
+              "root@$SERVER_HOST" "$CMD" < "$IN" > output.txt 2>&1
+          echo "SSH_EXIT=$?" >> "$GITHUB_ENV"
+          rm -f ~/.ssh/warphub_deploy
+          echo "CMD=$CMD" >> "$GITHUB_ENV"
+
+      - name: Post the output on the "Deploys" issue
+        if: ${{ always() && hashFiles('output.txt') != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REF: ${{ inputs.ref }}
+        run: |
+          N=$(gh api "repos/$REPO/issues?state=open&per_page=100" --jq '[.[] | select(.title == "Deploys" and (.pull_request | not))][0].number // empty')
+          if [ -z "$N" ]; then
+            N=$(gh api -X POST "repos/$REPO/issues" -f title="Deploys" \
+                -f body="Output of the manual deploy workflow (.github/workflows/deploy.yml). One comment per run." --jq .number)
+          fi
+          {
+            echo "Run: $RUN_URL — \`$CMD\` — ref \`$REF\` — exit code ${SSH_EXIT:-unknown}"
+            echo
+            echo '```'
+            head -c 60000 output.txt
+            echo
+            echo '```'
+          } > comment.md
+          gh api -X POST "repos/$REPO/issues/$N/comments" -F body=@comment.md --jq .html_url
+          cat output.txt >> "$GITHUB_STEP_SUMMARY"
+          [ "${SSH_EXIT:-1}" = "0" ] || { echo "::error::warphub-deploy exited with ${SSH_EXIT:-unknown}"; exit 1; }
