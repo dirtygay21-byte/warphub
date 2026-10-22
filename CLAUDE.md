@@ -3,10 +3,15 @@
 Mini App WarpHub (Telegram) и скрытый раздел Roster Builder (Warhammer 40,000 и Age of Sigmar).
 Подробности по данным ростера: `tools/roster-data/README.md`.
 
-## Ветки и выкладка
+## Branches and deployment
 
-- Рабочая ветка — `release/all-in-one` (она на production). `main` не сливать без явного разрешения.
-- На production ничего не выкладывать и не перезапускать без явного разрешения владельца.
+- `main` is the stable branch: it matches production (or the next approved release). It is the GitHub default branch.
+- `roster-builder` is the long-lived Roster Builder development branch. Data and migration work goes in short-lived
+  branches from it (`data/<topic>`, e.g. `data/aos-stage-b`); after review it is merged into `roster-builder`, then into `main`.
+- Other work (bookings, mini-games, etc.) goes in short-lived branches from `main`.
+- `release/all-in-one` is the former production branch, frozen until the first deployment from `main`. Do not delete old branches.
+- Merging into `main`, pushing and deleting branches only with the owner's explicit permission.
+- Never deploy to or restart production without the owner's explicit permission.
 
 ## Данные ростера: порядок поиска источника (обязательно для любой работы с данными ростера)
 
