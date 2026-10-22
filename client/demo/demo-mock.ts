@@ -32,11 +32,16 @@ const disciplines = [
   { id: 1, slug: "dnd", title: "D&D", isActive: true, sortOrder: 2, scheduleWeekdays: [1, 2, 3, 4] },
   { id: 3, slug: "club", title: "Посещение клуба", isActive: true, sortOrder: 3, scheduleWeekdays: [5, 6, 7] },
 ];
-const svc = (o: Record<string, unknown>) => ({
+type Service = {
+  id: number; disciplineId: number; slug: string; title: string; duration: number; isActive: boolean; sortOrder: number;
+  visitorsCapacity: number | null; tableCapacityProfile: string | null; seatsPerTable: number | null;
+  poolCapacity: number | null; hasTrainer: boolean; description: string | null;
+};
+const svc = (o: Partial<Service> & Pick<Service, "id" | "disciplineId" | "slug" | "title" | "duration">): Service => ({
   isActive: true, sortOrder: 0, visitorsCapacity: null, tableCapacityProfile: null,
   seatsPerTable: null, poolCapacity: null, hasTrainer: false, description: null, ...o,
 });
-const services: any[] = [
+const services: Service[] = [
   svc({ id: 2, disciplineId: 2, slug: "wh_game", title: "Игра", duration: 180, seatsPerTable: 2, tableCapacityProfile: "small", sortOrder: 1, description: "Партия Warhammer 40,000 за столом клуба" }),
   svc({ id: 4, disciplineId: 2, slug: "wh_solo_training", title: "Индивидуальная тренировка", duration: 120, seatsPerTable: 1, hasTrainer: true, tableCapacityProfile: "small", sortOrder: 2, description: "Тренер разберёт правила и тактику" }),
   svc({ id: 3, disciplineId: 2, slug: "wh_group_training", title: "Групповая тренировка", duration: 120, seatsPerTable: 2, hasTrainer: true, tableCapacityProfile: "small", sortOrder: 3, description: "Два игрока и тренер" }),
@@ -63,9 +68,32 @@ const bookingOptions = {
 const user = { id: "demo-user", telegramId: 100000001, firstName: "Гость", lastName: "Демо", username: "demo", photoUrl: "" };
 const u = (firstName: string, username: string, telegramId: number) => ({ id: `id-${username}`, telegramId, firstName, lastName: null, username });
 const player = (firstName: string, army: string, points: number, level: string) => ({ firstName, army, points, experienceLevel: level, experienceLabel: levels[level] });
+type Player = ReturnType<typeof player>;
+type Session = {
+  tableId: number; startsAt: string; endsAt: string; players: Player[];
+  tableName?: string; occupied?: number; capacity?: number; freeSeats?: number;
+};
+type Segment = { startsAt: string; endsAt: string; freeSeats: number };
+type Slot = { table: { id: number; name: string; seatCapacity: number }; segments: Segment[] };
+type Details = Record<string, unknown> & { army?: string; points?: number; experienceLevel?: string };
+type Reservation = {
+  id: string; userId: string; serviceId: number; serviceSlug: string; serviceTitle: string;
+  tableId: number | null; tableName: string | null; partySize: number; seatClubArmyOptions: unknown; buyArmyOptions: null;
+  details: Details | null; startsAt: string; endsAt: string; startsAtLocal: string; endsAtLocal: string;
+  status: string; cancelledAt: string | null; createdAt: string; user: typeof user;
+};
+type DndGame = {
+  id: number; title: string; description: string; gameType: string; startsAt: string; endsAt: string | null;
+  capacity: number; occupied: number; imageUrl: string | null; status: string;
+};
+type Trial = {
+  id: string; playersCount: number; preferredTimes: string[]; preferredTimeLabels: string[];
+  experienceLevel: string | null; experienceLabel: string | null; isPrivate: boolean; notes: string | null;
+  status: string; gameId: number | null; createdAt: string; user?: ReturnType<typeof u>;
+};
 
 // Заранее занятые игры на первый открытый день, ближайшую пятницу и субботу
-const seededSessions = (date: string) => date === FIRST_OPEN || date === FRI || date === SAT
+const seededSessions = (date: string): Session[] => date === FIRST_OPEN || date === FRI || date === SAT
   ? [
       { tableId: 2, startsAt: at(date, 15), endsAt: at(date, 18), players: [player("Анна", "Necrons", 1000, "player"), player("Илья", "Orks", 1000, "beginner")] },
       { tableId: 1, startsAt: at(date, 18), endsAt: at(date, 21), players: [player("Егор", "Astra Militarum", 1500, "experienced")] },
@@ -73,22 +101,26 @@ const seededSessions = (date: string) => date === FIRST_OPEN || date === FRI || 
   : [];
 
 let nextId = 1;
-const myReservations: any[] = [];
-const myDndBookings: any[] = [];
-const myTrials: any[] = [];
+const myReservations: Reservation[] = [];
+const myDndBookings: (Record<string, unknown> & { id: string; gameId: number; quantity: number; status: string })[] = [];
+const myTrials: Trial[] = [];
 
-const dndGames: any[] = [
+const dndGames: DndGame[] = [
   { id: 1, title: "Затерянный храм", description: "Короткое приключение для новичков: древний храм, ловушки и сокровища. Персонажи готовы заранее.", gameType: "One-shot", startsAt: at(THU, 18), endsAt: at(THU, 22), capacity: 5, occupied: 3, imageUrl: null, status: "open" },
   { id: 2, title: "Пробная игра D&D", description: "Знакомство с правилами за одну встречу.", gameType: "Пробная игра", startsAt: at(SAT, 14), endsAt: at(SAT, 17), capacity: 6, occupied: 2, imageUrl: null, status: "open" },
   { id: 3, title: "Проклятие Страда", description: "Старт новой кампании.", gameType: "Кампания", startsAt: at(NEXT_SAT, 19), endsAt: null, capacity: 5, occupied: 5, imageUrl: null, status: "open" },
 ];
-const gameView = (g: any) => ({ ...g, available: Math.max(0, g.capacity - g.occupied), isBookable: g.status === "open" && g.capacity - g.occupied > 0 });
+const gameView = (g: DndGame) => ({ ...g, available: Math.max(0, g.capacity - g.occupied), isBookable: g.status === "open" && g.capacity - g.occupied > 0 });
 
 function availability(serviceId: number, date: string) {
-  const service = services.find((s) => s.id === serviceId);
+  // as in the original mock: the service is assumed to exist
+  const service = services.find((s) => s.id === serviceId)!;
   const nd = nextDay(date);
   const allowed = [5, 6, 7].includes(weekday(date));
-  const base: any = {
+  const base: {
+    date: string; dateAllowed: boolean; allowedWeekdays: number[];
+    service: Record<string, unknown>; slots: Slot[]; sessions: Session[];
+  } = {
     date, dateAllowed: allowed, allowedWeekdays: [5, 6, 7],
     service: {
       id: service.id, slug: service.slug, duration: service.duration, visitorsCapacity: service.visitorsCapacity,
@@ -113,23 +145,23 @@ function availability(serviceId: number, date: string) {
     base.slots = [{ table: { id: 0, name: "Клуб", seatCapacity: 25 }, segments: [{ startsAt: at(date, 12), endsAt: at(nd, 0), freeSeats: 22 }] }];
     return base;
   }
-  const cap = service.seatsPerTable;
+  const cap = service.seatsPerTable as number;
   const sessions = service.slug === "wh_game" ? seededSessions(date) : [];
   const mine = myReservations.filter((r) => r.serviceId === serviceId && r.startsAt.startsWith(date) && r.status !== "cancelled");
   base.sessions = sessions.map((s) => {
     const joined = mine.filter((r) => r.tableId === s.tableId && r.startsAtLocal === s.startsAt);
-    const players = [...s.players, ...joined.map((r) => player("Гость", r.details.army, r.details.points, r.details.experienceLevel))];
+    const players = [...s.players, ...joined.map((r) => player("Гость", r.details?.army as string, r.details?.points as number, r.details?.experienceLevel as string))];
     return { ...s, tableName: `Стол ${s.tableId}`, occupied: players.length, capacity: cap, freeSeats: Math.max(0, cap - players.length), players };
   });
   for (const r of mine) {
-    if (!base.sessions.some((s: any) => s.tableId === r.tableId && s.startsAt === r.startsAtLocal)) {
-      base.sessions.push({ tableId: r.tableId, tableName: `Стол ${r.tableId}`, startsAt: r.startsAtLocal, endsAt: r.endsAtLocal, occupied: 1, capacity: cap, freeSeats: cap - 1, players: [player("Гость", r.details.army, r.details.points, r.details.experienceLevel)] });
+    if (!base.sessions.some((s) => s.tableId === r.tableId && s.startsAt === r.startsAtLocal)) {
+      base.sessions.push({ tableId: r.tableId as number, tableName: `Стол ${r.tableId}`, startsAt: r.startsAtLocal, endsAt: r.endsAtLocal, occupied: 1, capacity: cap, freeSeats: cap - 1, players: [player("Гость", r.details?.army as string, r.details?.points as number, r.details?.experienceLevel as string)] });
     }
   }
-  const busy = (tableId: number) => base.sessions.filter((s: any) => s.tableId === tableId).map((s: any) => [s.startsAt, s.endsAt]);
+  const busy = (tableId: number) => base.sessions.filter((s) => s.tableId === tableId).map((s) => [s.startsAt, s.endsAt]);
   base.slots = [1, 2].map((tableId) => {
     const marks = busy(tableId).sort();
-    const segs: any[] = [];
+    const segs: Segment[] = [];
     let cursor = at(date, 12);
     for (const [s, e] of marks) {
       if (s > cursor) segs.push({ startsAt: cursor, endsAt: s, freeSeats: cap });
@@ -149,14 +181,14 @@ const toLocal = (iso: string) => {
 
 const adminDay = (date: string) => ({
   date, tables: [{ id: 1, name: "Стол 1" }, { id: 2, name: "Стол 2" }], paintingCapacity: 5,
-  sessions: (availability(2, date).sessions as any[]).map((s) => ({
+  sessions: availability(2, date).sessions.map((s) => ({
     serviceId: 2, serviceSlug: "wh_game", serviceTitle: "Игра", hasTrainer: false, ...s,
-    players: s.players.map((p: any, i: number) => ({ reservationId: `${s.tableId}-${i}`, status: i ? "pending" : "confirmed", partySize: 1, seatClubArmyOptions: [false], details: { kind: "wh_player", army: p.army, points: p.points, experienceLevel: p.experienceLevel }, user: u(p.firstName, p.firstName.toLowerCase(), 1000 + i) })),
+    players: s.players.map((p, i) => ({ reservationId: `${s.tableId}-${i}`, status: i ? "pending" : "confirmed", partySize: 1, seatClubArmyOptions: [false], details: { kind: "wh_player", army: p.army, points: p.points, experienceLevel: p.experienceLevel }, user: u(p.firstName, p.firstName.toLowerCase(), 1000 + i) })),
   })),
   painting: [weekday(date) >= 5 ? { reservationId: "pp1", status: "confirmed", partySize: 1, seatClubArmyOptions: null, details: { kind: "painting", faction: "Necrons", model: "Necron Warriors", paintSource: "club", needsHelp: true, comment: "Нужен грунт" }, user: u("Олег", "oleg", 5), serviceId: 6, serviceSlug: "wh_painting", serviceTitle: "Покраска миниатюр", startsAt: at(date, 14), endsAt: at(date, 16) } : null].filter(Boolean),
 });
 
-const trials: any[] = [
+const trials: Trial[] = [
   { id: "t1", playersCount: 3, preferredTimes: ["evening"], preferredTimeLabels: ["Вечер"], experienceLevel: null, experienceLabel: null, isPrivate: true, notes: "Хотим с друзьями", status: "new", gameId: null, createdAt: new Date().toISOString(), user: u("Егор", "egor", 3) },
   { id: "t2", playersCount: 1, preferredTimes: ["afternoon", "evening"], preferredTimeLabels: ["День", "Вечер"], experienceLevel: "beginner", experienceLabel: "Новичок", isPrivate: false, notes: null, status: "new", gameId: null, createdAt: new Date().toISOString(), user: u("Катя", "katya", 7) },
 ];
@@ -197,7 +229,7 @@ function handle(method: string, url: URL, bodyText: string | null): Result {
   }
 
   if (method === "POST" && path === "/reservations") {
-    const service = services.find((s) => s.id === body.serviceId);
+    const service = services.find((s) => s.id === body.serviceId)!;
     const start = new Date(body.startsAt);
     const end = new Date(start.getTime() + service.duration * 60e3);
     const startsAtLocal = toLocal(body.startsAt);
@@ -223,7 +255,7 @@ function handle(method: string, url: URL, bodyText: string | null): Result {
     return { body: r };
   }
   if (method === "POST" && (m = path.match(/^\/dnd\/games\/(\d+)\/bookings$/))) {
-    const g = dndGames.find((x) => x.id === Number(m![1]));
+    const g = dndGames.find((x) => x.id === Number(m![1]))!;
     if (body.quantity > g.capacity - g.occupied) return { status: 409, body: { error: "No places left in this game" } };
     g.occupied += body.quantity;
     const b = { id: `db-${nextId++}`, gameId: g.id, quantity: body.quantity, timeIsConvenient: body.timeIsConvenient, experienceLevel: body.experienceLevel, experienceLabel: levels[body.experienceLevel], status: "active", createdAt: new Date().toISOString(), cancelledAt: null };
@@ -232,7 +264,7 @@ function handle(method: string, url: URL, bodyText: string | null): Result {
   }
   if (method === "DELETE" && (m = path.match(/^\/dnd\/bookings\/(.+)$/))) {
     const b = myDndBookings.find((x) => x.id === m![1]);
-    if (b) { b.status = "cancelled"; const g = dndGames.find((x) => x.id === b.gameId); g.occupied -= b.quantity; }
+    if (b) { b.status = "cancelled"; const g = dndGames.find((x) => x.id === b.gameId)!; g.occupied -= b.quantity; }
     return { body: b };
   }
   if (method === "POST" && path === "/dnd/trial-requests") {
@@ -253,7 +285,7 @@ function handle(method: string, url: URL, bodyText: string | null): Result {
     return { body: { ...gameView(g), bookingsCount: 0, trialRequestsCount: 0, createdAt: "", updatedAt: "" } };
   }
   if (method === "PATCH" && (m = path.match(/^\/admin\/dnd\/games\/(\d+)$/))) {
-    const g = dndGames.find((x) => x.id === Number(m![1]));
+    const g = dndGames.find((x) => x.id === Number(m![1]))!;
     Object.assign(g, body);
     return { body: { ...gameView(g), bookingsCount: 0, trialRequestsCount: 0, createdAt: "", updatedAt: "" } };
   }
