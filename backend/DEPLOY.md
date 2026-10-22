@@ -1,306 +1,122 @@
-# WarpHub update — deployment guide
+# WarpHub deployment guide
 
-This guide installs the new version on your existing server. It only touches
-WarpHub: the `warphub-backend` folder, the client build, and the WarpHub
-database. Nothing else on the server is changed.
+How changes reach the live Mini App. Since 23 Oct 2026 deployment runs through GitHub Actions; the one-time
+setup (keys, scripts, secrets) is described in [`ops/README.md`](../ops/README.md).
 
-Time needed: about 30–45 minutes. Do it when the club is quiet (for example,
-a weekday morning). Users may see errors for 1–2 minutes during the restart.
-
-**If anything goes wrong, stop and go to section 9 ("Rolling back").**
+Nothing in this guide touches the other sites on the same server (`reflectahome.ru`, `questa-ekb.online`,
+PM2 `reflecta:3000`). Never deploy without the owner's explicit permission.
 
 ---
 
-## 0. Before you start
+## 1. What runs where (verified on the server, 23 Oct 2026)
 
-You need:
+| Part | Server path | Notes |
+|---|---|---|
+| Backend (API) | `/var/www/warphub.ru/server-new` | PM2 process `warphub-api`, started as `bun run src/index.ts`, Bun 1.3.14, port 4000 |
+| Roster data | `/var/www/warphub.ru/server-new/roster-data` | read per request — no restart needed after a data update |
+| Mini App | `/var/www/warphub.ru/client/dist` | Nginx root of `warphub.ru`; `/api` is proxied to `127.0.0.1:4000` |
+| Database, file storage | Docker containers `postgres`, `aistor-server` (MinIO) | migrations in `backend/drizzle` |
+| Backend settings | `/var/www/warphub.ru/server-new/.env` | never in git; names in `backend/.env.example` |
+| Mini App build settings | GitHub secret `CLIENT_ENV` (copy of the production client `.env`) | must contain `VITE_EXECUTION_CONFIG=production` |
 
-- **SSH access to the server** (login and password, or a key), and a program
-  to copy files. On Windows, **WinSCP** (copy files) and **PuTTY** or
-  **Windows Terminal** (run commands) are fine.
-- The two ZIP files: `warphub-backend-updated.zip` and `warphub-client-updated.zip`.
-- **@KorenevEgor's Telegram ID** (a number). The easiest way: open the Mini App
-  → **Профиль** — the **Telegram ID** row shows it. @KorenevEgor must also press
-  **Start** in @WarpHubBot once, otherwise the bot can't message him.
-
-In the commands below, text in `<angle brackets>` must be replaced with your
-own values. Lines starting with `#` are comments — don't type them.
+`/var/www/warphub.ru/server` is an old, unused copy — do not deploy there.
 
 ---
 
-## 1. Connect to the server
+## 2. Normal deployment (GitHub Actions)
 
-```bash
-ssh <user>@<server-address>
-```
+Only commits that are on `main` can be installed. The usual flow: work branch → pull request → CI passes →
+merge into `main` → deploy.
 
----
+1. GitHub → **Actions** → **Deploy** → **Run workflow**.
+2. Choose:
+   - `mode`: **`dry-run`** first (shows what would change, installs nothing), then **`apply`**;
+   - `parts`: what to update —
+     - `data` — roster data (40K and AoS); no restart;
+     - `client` — the Mini App; users get it the next time they open the app;
+     - `backend` — API code; restarts `warphub-api` (a few seconds of downtime);
+   - `ref`: `main` (or a commit on `main`);
+   - `migrate`: only when the change adds a database migration (needs `backend`; a database dump is taken first).
+3. Read the result in the issue **"Deploys"** (#8): every run adds a comment with the server output.
+   `apply` ends with `DEPLOY OK — id <id>`.
 
-## 2. Find where WarpHub lives
+What the server script does on `apply`: checks the package (allowed paths, SHA-256 of every file) → copies the
+parts it will replace to `/root/warphub-backup/deploy-<id>` → installs only the chosen parts (`.env` and
+`node_modules` are never replaced; `bun install` only if `bun.lock` changed) → runs health checks
+(`/health`, `/roster/access` = 401, `index.html`, data checksum) → **puts the backup back automatically** if a
+check fails. The last 5 deploy backups are kept.
 
-```bash
-# The backend process and its folder:
-pm2 list
-pm2 describe <backend-process-name> | grep -E "exec cwd|script path"
-```
+### Roll back
 
-Write down the **exec cwd** — this is the backend folder, called
-`<BACKEND_DIR>` below.
+1. **Deploy** → `mode`: `list` — the issue shows the deploy ids.
+2. **Deploy** → `mode`: `rollback`, `rollback_id`: the id (e.g. `20261022-212747`).
 
-```bash
-# The folder Nginx serves the Mini App from:
-grep -RnE "server_name|root " /etc/nginx/sites-enabled/ /etc/nginx/conf.d/ 2>/dev/null
-```
+A database dump taken before a migration is never restored automatically; its path is in the deploy output.
 
-Find the block for your Mini App domain and its `root ...;` line — this is
-`<CLIENT_WEB_DIR>` (often something like `/var/www/warphub` or `.../client/dist`).
+### Check what is running
 
-```bash
-# The database container and database name:
-docker ps --format "table {{.Names}}\t{{.Image}}"
-grep POSTGRES_URI <BACKEND_DIR>/.env
-```
+GitHub → **Actions** → **Server check** → **Run workflow**. The output (data and code fingerprints, Mini App
+build, PM2, migrations, Nginx, ports, disk) appears in the issue **"Server check"** (#5). It changes nothing.
 
-`POSTGRES_URI` looks like `postgresql://<db-user>:<password>@<host>:5432/<db-name>`.
-The container with `postgres` in its image is `<PG_CONTAINER>`.
+### After a deploy
 
----
-
-## 3. Back up everything (don't skip this)
-
-```bash
-mkdir -p ~/warphub-backup
-# Database
-docker exec <PG_CONTAINER> pg_dump -U <db-user> <db-name> > ~/warphub-backup/db-$(date +%F).sql
-ls -lh ~/warphub-backup/        # the .sql file must not be 0 bytes
-# Code
-cp -a <BACKEND_DIR> ~/warphub-backup/backend
-cp -a <CLIENT_WEB_DIR> ~/warphub-backup/client-web
-```
+- Close and reopen the Mini App in Telegram (Telegram caches it). Roster data can stay cached in an open app
+  for up to an hour.
+- For roster data: Roster Builder → the system → a faction → check a changed value.
 
 ---
 
-## 4. Check existing bookings that the update affects
+## 3. Manual fallback (only if GitHub Actions is unavailable)
 
-The update hides the **third table** and turns D&D table booking into D&D games.
-Upcoming bookings on those stay in the database but won't be visible to users.
-See whether there are any:
+Commands marked **PC** run in PowerShell on your computer; commands marked **server** run after
+`ssh root@81.177.159.105` (the prompt shows `root@nv-143060:~#`).
 
-```bash
-docker exec -i <PG_CONTAINER> psql -U <db-user> <db-name> <<'SQL'
-SELECT r.id, s.slug, t.name AS table, u.first_name, u.username, r.starts_at
-FROM reservations r
-JOIN services s ON s.id = r.service_id
-JOIN users u ON u.id = r.user_id
-LEFT JOIN tables t ON t.id = r.table_id
-WHERE r.status IN ('pending','confirmed') AND r.starts_at > now()
-  AND (r.table_id NOT IN (SELECT id FROM tables WHERE is_active ORDER BY id LIMIT 2)
-       OR s.slug = 'dnd_game')
-ORDER BY r.starts_at;
-SQL
-```
-
-If rows appear, write them down and contact those people (or move them to
-table 1/2 later in the admin panel). Empty output means nothing to do.
-
----
-
-## 5. Install the new backend
-
-1. Stop the backend for a moment:
+1. **PC** — build the packages from the commit to deploy (needs git; the client build needs `bun` and the
+   production client `.env`):
    ```bash
-   pm2 stop <backend-process-name>
+   git archive --format=zip -o warphub-roster-data.zip <commit>:backend/roster-data
+   git archive --format=zip -o warphub-client-src.zip <commit>:client
    ```
-2. Copy the contents of `warphub-backend-updated.zip` into `<BACKEND_DIR>`,
-   **replacing** files. With WinSCP, unzip on your computer and drag the
-   contents into the folder. **Don't delete** `.env` or `node_modules` on the
-   server; the ZIP contains neither.
-3. Add settings to `<BACKEND_DIR>/.env` (open with `nano <BACKEND_DIR>/.env`,
-   add the lines at the end, save with Ctrl+O, Enter, exit with Ctrl+X):
-   ```
-   # Extra admins (comma-separated Telegram IDs). The two existing admins stay.
-   ADMIN_TELEGRAM_IDS=<KorenevEgor's Telegram ID>
-   ```
-4. Install libraries, update the database, run the tests:
+   then upload with `scp -i <your key> <file> root@81.177.159.105:/root/`.
+2. **server** — back up what you replace:
    ```bash
-   cd <BACKEND_DIR>
-   bun install
-   bun run db:migrate
-   bun test
+   mkdir -p /root/warphub-backup/manual-$(date +%F)
+   cp -a /var/www/warphub.ru/server-new/roster-data /root/warphub-backup/manual-$(date +%F)/roster-data
+   cp -a /var/www/warphub.ru/client/dist /root/warphub-backup/manual-$(date +%F)/client-dist
    ```
-   - `db:migrate` should finish without red errors. It creates the tables for
-     the Roster Builder (`0011`), the mini-games (`0012`) and the card packs (`0013`).
-   - `bun test` should end with `55 pass`, `33 skip` and `0 fail`. The skipped
-     ones are end-to-end checks that only run on a test server (`WARPHUB_E2E=1`).
-5. Start it again and watch the log for 20–30 seconds:
+3. **server** — roster data: unzip into a new folder and swap it in:
    ```bash
-   pm2 start <backend-process-name>
-   pm2 logs <backend-process-name> --lines 50
+   rm -rf /root/rd-new && mkdir /root/rd-new && unzip -q /root/warphub-roster-data.zip -d /root/rd-new
+   rm -rf /var/www/warphub.ru/server-new/roster-data && mv /root/rd-new /var/www/warphub.ru/server-new/roster-data
    ```
-   You should see `Warphub API is running at ...` and no red errors.
-   > If PM2 runs the backend with `bun run build` / `dist/index.js` and that
-   > fails: the `scripts/build.ts` file was missing from the developer's
-   > archive. Starting with `bun run src/index.ts` works the same way:
-   > `pm2 delete <name> && pm2 start "bun run src/index.ts" --name <name> --cwd <BACKEND_DIR> && pm2 save`.
-   Press Ctrl+C to leave the log (the backend keeps running).
-6. Quick checks (`4000` is the `PORT` from `.env`):
-   ```bash
-   curl -s http://127.0.0.1:4000/health
-   curl -s http://127.0.0.1:4000/booking-options | head -c 200; echo
-   curl -s http://127.0.0.1:4000/dnd/games; echo
-   curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:4000/minigames
-   ```
-   Expected: `{"ok":true}`, some JSON with `experienceLevels`, `[]` (or your
-   D&D games), and `401` (mini-games need a Telegram login; `404` would mean the
-   old backend is still running).
-
-If step 4 or 5 shows errors, copy the red text and send it to me — or roll
-back (section 9).
+4. **server** — Mini App: unzip the client source into a fresh folder, add the production client `.env`, then
+   `bun install && bun run build`, and copy `dist/.` into `/var/www/warphub.ru/client/dist/` (empty that folder
+   first, keep the folder itself).
+5. **server** — backend code (only if it changed): copy `src`, `drizzle`, `package.json`, `bun.lock`,
+   `tsconfig.json`, `drizzle.config.ts`, `env.d.ts` into `/var/www/warphub.ru/server-new` (never `.env` or
+   `node_modules`), `bun install --frozen-lockfile` if `bun.lock` changed, `bun run db:migrate` only for new
+   migrations (after `docker exec postgres pg_dump -U postgres postgres > /root/warphub-backup/db-$(date +%F).sql`),
+   then `pm2 restart warphub-api`.
+6. **server** — check: `curl -s http://127.0.0.1:4000/health` → `{"ok":true}`;
+   `pm2 logs warphub-api --lines 50 --nostream` has no errors.
+7. Roll back by copying the backup folders back.
 
 ---
 
-## 6. Install the new client (Mini App screens)
+## 4. Settings you can change without a deploy
 
-> **Don't reuse an old `node_modules` folder.** The client archive the
-> developer sent contained `node_modules` built on Windows; those can't build
-> on a Linux server. `bun install` below downloads the right ones.
+Edit `/var/www/warphub.ru/server-new/.env`, then `pm2 restart warphub-api`.
 
-The client must be **built** (turned into ready web files) before Nginx can
-serve it.
-
-```bash
-mkdir -p ~/warphub-client-src
-# copy the contents of warphub-client-updated.zip into ~/warphub-client-src (WinSCP),
-# and copy your existing client .env file there too (it holds the API address)
-cd ~/warphub-client-src
-ls -a        # .env must be in the list
-grep VITE_EXECUTION_CONFIG .env   # must say: VITE_EXECUTION_CONFIG=production
-bun install
-bun run build
-ls dist      # index.html and an assets folder must be here
-```
-
-Then publish the build:
-
-```bash
-rm -rf <CLIENT_WEB_DIR>/*
-cp -a dist/. <CLIENT_WEB_DIR>/
-```
-
-No Nginx restart is needed.
-
-> If the client was previously built on another computer (not on the server),
-> run the same `bun install` and `bun run build` there, then upload the `dist`
-> folder contents to `<CLIENT_WEB_DIR>`.
-
----
-
-## 7. Check in Telegram
-
-Close and reopen the Mini App (Telegram caches it — pull to refresh, or
-restart Telegram if you see the old version).
-
-- [ ] Warhammer → Игра: Monday–Thursday can't be selected; only 2 slots appear.
-- [ ] Book a game (army, points, experience). You (as admin) get a bot message "стол ждёт соперника (1/2)".
-- [ ] From a second account: the game shows under "Ищут соперника" with your army → Присоединиться → 2/2. The first account gets a bot message.
-- [ ] Покраска миниатюр: shows "Занято N из 5", asks faction, model, paints, help.
-- [ ] D&D shows "Хочу попробовать" and "Игры по расписанию".
-- [ ] Admin → **D&D** → Новая игра: create the 3 games (title, type, date, time, places, picture, status "Запись открыта"). They appear for users.
-- [ ] Admin → **Столы WH** shows the day's tables with 1/2 games highlighted.
-- [ ] Мои записи shows the bookings and lets you edit army/points/experience.
-- [ ] A booking for Monday sent manually is rejected (the server checks this, not just the screen).
-
-**Mini-games** (Профиль → **Мини-игры**):
-
-- [ ] The hub shows 4 games: Зелёный рывок, Кости войны, Рой: инкубатор, Легенды Warp Hub.
-- [ ] Play «Рой: инкубатор» and tap fast — with 10+ taps you get a reward with a code like `WH-ABC234`, and the bot sends you the same code. **Мои награды** shows it.
-- [ ] Admin → **Награды** → Проверить код: type the code (without «WH-» is fine) → **Отметить использованной** → the player's card says «Использована».
-- [ ] «Легенды Warp Hub»: tap the pack → flip the 5 cards → "Получено +N очков"; the points chip shows the balance; a second pack the same day is refused with a countdown. Close and reopen the Mini App — the balance and **Коллекция** are still there (they are stored in the database).
-- [ ] Admin → Награды → **Очки игроков**: find the player by @username → write off 100 → the balance drops by 100 and the bot tells them.
-- [ ] The Roster Builder still opens (Профиль → «Roster Builder», or Admin → «Ростеры» for codes) with both **Warhammer 40,000** and **Age of Sigmar** — see section 10.
-
----
-
-## 8. Settings you can change later without code
-
-| What | Where |
+| What | Setting |
 |---|---|
-| Admins | `ADMIN_TELEGRAM_IDS` in backend `.env` → `pm2 restart <backend-process-name>` |
-| Turn bot notifications off (e.g. on a test server) | `TELEGRAM_NOTIFICATIONS=off` in backend `.env` → restart |
-| D&D games (title, date, places, picture, status) | Admin → D&D |
-| Experience levels, factions, paint and time options, max D&D players | `src/config/booking.ts` (one file) → restart |
-| Players per table, painting capacity | `services` table: `seats_per_table`, `pool_capacity` |
-| Mini-game rewards (thresholds, % / ₽ / points / badge), reward validity days, attempts per day, turning a game off | Admin → Награды → Настройки |
-| Card packs: points and drop chance per rarity, packs per day, cards per pack | Admin → Награды → Настройки → Легенды Warp Hub |
-| Writing off / adding a player's card points | Admin → Награды → Очки игроков |
+| Extra admins (Telegram IDs, comma-separated) | `ADMIN_TELEGRAM_IDS` |
+| Bot notifications off (e.g. on a test server) | `TELEGRAM_NOTIFICATIONS=off` |
+| Who can create Roster Builder access codes | `ROSTER_ADMIN_TELEGRAM_IDS` |
+| Access-code lifetime, hours (default 24) | `ROSTER_CODE_TTL_HOURS` |
 
-**Admins:** open the admin panel from **Профиль → Админ-панель** (or the
-`/admin` address — it now waits for the Telegram login instead of sending
-you to the home page).
+In the app (no restart): D&D games (Admin → D&D), mini-game rewards and card packs (Admin → Награды →
+Настройки), players' card points (Admin → Награды → Очки игроков), Roster Builder access codes
+(Admin → «Ростеры»).
 
----
-
-## 9. Rolling back
-
-```bash
-pm2 stop <backend-process-name>
-# code
-rm -rf <BACKEND_DIR> && cp -a ~/warphub-backup/backend <BACKEND_DIR>
-rm -rf <CLIENT_WEB_DIR>/* && cp -a ~/warphub-backup/client-web/. <CLIENT_WEB_DIR>/
-# database (replaces it with the backup copy!)
-docker exec -i <PG_CONTAINER> psql -U <db-user> -d postgres -c "DROP DATABASE <db-name> WITH (FORCE);" -c "CREATE DATABASE <db-name>;"
-docker exec -i <PG_CONTAINER> psql -U <db-user> <db-name> < ~/warphub-backup/db-<date>.sql
-pm2 start <backend-process-name>
-```
-
-Restoring the database removes any bookings made after the backup, so only
-do it if the new version really doesn't work.
-
----
-
-## 10. Roster Builder (hidden section, opened by a 4-digit code)
-
-Do this together with step 5 (backend) and step 6 (client); it adds no new services.
-
-1. **Data files.** The folder `backend/roster-data/` (about 20 MB: `index.json`,
-   `battlefield.json`, the `f/` folder and the `aos/` folder for Age of Sigmar) must be on the server inside
-   `<BACKEND_DIR>`, next to `src/`. It is part of the repository, so copying the
-   backend folder brings it along. If you keep it elsewhere, set
-   `ROSTER_DATA_DIR=/full/path/to/roster-data` in `.env`. If the folder is missing,
-   the backend log shows a `[roster] Нет данных Roster Builder …` warning at start.
-2. **Database.** `bun run db:migrate` from step 5 creates three new tables
-   (`roster_access_codes`, `roster_access`, `roster_code_attempts`). Without
-   drizzle-kit you can apply the file by hand:
-   ```bash
-   psql "$(grep ^POSTGRES_URI= .env | cut -d= -f2-)" -f drizzle/0011_roster_access.sql
-   ```
-3. **Who creates codes.** Add to `<BACKEND_DIR>/.env`:
-   ```
-   # Only these Telegram IDs can create codes (comma-separated).
-   # They must ALSO be admins (built-in admins or ADMIN_TELEGRAM_IDS) —
-   # the admin page is only open to admins. If unset, every admin can.
-   ROSTER_ADMIN_TELEGRAM_IDS=<KorenevEgor's Telegram ID>
-   # Optional: code lifetime in hours (default 24)
-   # ROSTER_CODE_TTL_HOURS=24
-   ```
-   Then `pm2 restart <backend-process-name>`.
-4. **Bot.** Open @WarpHubBot from that account and press **Start** once —
-   otherwise the bot can't send you codes (the admin page will then show the
-   code on screen instead).
-5. **Check:**
-   ```bash
-   curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:4000/roster/access
-   ```
-   `401` is correct (it requires login). `404` means the new backend isn't running.
-   Then check the data is found:
-   ```bash
-   ls <BACKEND_DIR>/roster-data/index.json <BACKEND_DIR>/roster-data/battlefield.json <BACKEND_DIR>/roster-data/aos/index.json
-   pm2 logs <backend-process-name> --lines 100 --nostream | grep "\[roster\]"
-   ```
-   All three files must be listed, and the second command must print nothing.
-6. **In Telegram:** Admin → «Ростеры» → «Создать код доступа». The code arrives
-   from the bot. Another person enters it in Профиль → «Есть код доступа?» and
-   gets a «Roster Builder» button in their profile. Access stays until you press
-   «Закрыть» next to their name on the same admin page.
-
-Updating Wahapedia data later: see `tools/roster-data/README.md`.
+Updating roster data from a new Wahapedia export: `tools/roster-data/README.md`, then a pull request and a
+`data` deploy.
