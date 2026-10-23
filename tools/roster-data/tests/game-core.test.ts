@@ -114,8 +114,14 @@ test('после раскрытия тип армии не меняется; д�
 });
 
 test('сдача: битва заканчивается досрочно', () => {
-  const s = ok(replay(log(...setupBodies(), { type: 'battle-ended', reason: 'concede' } as Body), catalog));
-  assert.deepEqual([s.stage, s.endReason], ['finished', 'concede']);
+  const s = ok(replay(log(...setupBodies(), { type: 'battle-ended', reason: 'concede', by: 'p2' } as Body), catalog));
+  assert.deepEqual([s.stage, s.endReason, s.concededBy], ['finished', 'concede', 'p2']);
+  const nobody = replay(log(...setupBodies(), { type: 'battle-ended', reason: 'concede' } as Body), catalog);
+  assert.ok(!nobody.ok && /кто сдался/.test(nobody.error));
+  const manual = ok(replay(log(...setupBodies(), { type: 'battle-ended', reason: 'manual' } as Body), catalog));
+  assert.deepEqual([manual.endReason, manual.concededBy], ['manual', null]);
+  const both = replay(log(...setupBodies(), { type: 'battle-ended', reason: 'manual', by: 'p1' } as Body), catalog);
+  assert.ok(!both.ok && /без сдавшегося/.test(both.error));
   const r = replay(log(...setupBodies(), { type: 'battle-ended', reason: 'rounds' } as Body), catalog);
   assert.ok(!r.ok && /сама/.test(r.error));
 });

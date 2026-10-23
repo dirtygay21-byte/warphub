@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { replay } from '../../../client/src/features/roster/game/reducer';
-import { totals } from '../../../client/src/features/roster/game/scoring';
+import { battleResult, totals } from '../../../client/src/features/roster/game/scoring';
 import type { GameState, Round } from '../../../client/src/features/roster/game/types';
 import { catalog, log, setupBodies, type Body } from './game-helpers';
 
@@ -127,4 +127,16 @@ test('полная игра на настоящих событиях: итоги
   const t2 = totals(s, 'p2', catalog);
   assert.deepEqual([t1.primary.total, t1.secondary.total, t1.total], [3, 3, 6]);
   assert.deepEqual([t2.primary.total, t2.secondary.total, t2.total, t2.secondary.byFixedCard.assassination], [3, 7, 10, 7]);
+});
+
+test('итог битвы (G3.6): победитель по ПО, ничья при равенстве; сдавшийся проигрывает независимо от ПО; Battle Ready — в итоге', () => {
+  const base = [...setupBodies()];
+  assert.equal(battleResult(ok(replay(log(...base), catalog)), catalog), null, 'битва идёт — итога нет');
+  const draw = battleResult(ok(replay(log(...base, B({ type: 'battle-ended', reason: 'manual' })), catalog)), catalog)!;
+  assert.deepEqual([draw.winner, draw.by, draw.totals], [null, 'vp', { p1: 0, p2: 0 }]);
+  const ready = B({ type: 'player-set', target: 'p2', patch: { battleReady: true } });
+  const vp = battleResult(ok(replay(log(...base, B({ type: 'battle-ended', reason: 'manual' }), ready), catalog)), catalog)!;
+  assert.deepEqual([vp.winner, vp.totals], ['p2', { p1: 0, p2: 10 }], 'Battle Ready 10 ПО после битвы');
+  const conceded = battleResult(ok(replay(log(...base, B({ type: 'battle-ended', reason: 'concede', by: 'p2' }), ready), catalog)), catalog)!;
+  assert.deepEqual([conceded.winner, conceded.by, conceded.totals.p2], ['p1', 'concede', 10], 'p2 сдался — победа p1, хотя у p2 больше ПО');
 });

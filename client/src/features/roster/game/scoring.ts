@@ -112,6 +112,17 @@ export function cardVp({ card, picks, round, mode, endOfBattle = false }: CardVp
   return { vp };
 }
 
+/**
+ * Итог битвы (G3.6): победитель по ПО (равенство — ничья). Если игрок сдался — победа сопернику независимо от ПО
+ * (решение владельца, 23.10.2026: в источниках правила о сдаче нет, принято турнирное соглашение). null — битва идёт.
+ */
+export function battleResult(state: GameState, catalog: GameCatalog): { winner: Seat | null; by: 'vp' | 'concede'; totals: Record<Seat, number> } | null {
+  if (state.stage !== 'finished') return null;
+  const t = { p1: totals(state, 'p1', catalog).total, p2: totals(state, 'p2', catalog).total };
+  if (state.concededBy) return { winner: state.concededBy === 'p1' ? 'p2' : 'p1', by: 'concede', totals: t };
+  return { winner: t.p1 === t.p2 ? null : t.p1 > t.p2 ? 'p1' : 'p2', by: 'vp', totals: t };
+}
+
 /** ПО за полностью покрашенную армию (Battle Ready) — правила колоды миссий и трекер wh-rules.ru. */
 export const BATTLE_READY_VP = 10;
 

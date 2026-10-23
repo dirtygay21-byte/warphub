@@ -155,7 +155,7 @@ export type GameEvent = EventBase &
     | { type: 'cp-changed'; target: Seat; delta: number; reason: 'base' | 'stratagem' | 'discard' | 'swap' | 'other'; note?: string }
     | { type: 'command-phase-ended' }
     | { type: 'turn-ended' }
-    | { type: 'battle-ended'; reason: 'rounds' | 'concede' | 'manual' }
+    | { type: 'battle-ended'; reason: 'rounds' | 'concede' | 'manual'; /** кто сдался (для concede) */ by?: Seat }
     | { type: 'event-reverted'; target: string }
   );
 
@@ -296,6 +296,8 @@ export interface GameState {
   discardCpTaken: boolean;
   /** почему битва закончилась (stage = finished) */
   endReason: 'rounds' | 'concede' | 'manual' | null;
+  /** кто сдался: решение владельца (G3.6) — победа достаётся сопернику независимо от ПО */
+  concededBy: Seat | null;
   /** номер последнего применённого события */
   lastSeq: number;
   /** id отменённых событий */

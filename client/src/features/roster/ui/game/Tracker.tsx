@@ -7,6 +7,7 @@ import { cx } from '../util';
 import { AdjustSheet } from './Adjust';
 import { CommandPhase } from './CommandPhase';
 import { EndOfTurn } from './EndOfTurn';
+import { EndEarly, Result } from './Result';
 import { SecondaryCard } from './SecondaryCard';
 import { Summary } from './StepStart';
 import type { GameHook } from './useGame';
@@ -50,6 +51,8 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
         <RoundDots round={state.round} finished={finished} />
       </div>
 
+      {finished && <Result game={game} />}
+
       <Scoreboard game={game} />
 
       {!finished && (
@@ -60,6 +63,7 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
             {nextLabel}
           </Button>
           {state.step === 'start' && <p className="text-center text-[11px] text-white/45">В начале фазы командования оба игрока получают 1 CP.</p>}
+          <EndEarly game={game} />
         </>
       )}
 
