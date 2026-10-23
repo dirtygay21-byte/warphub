@@ -9,6 +9,7 @@
     "data": "node --import tsx scripts/import-wahapedia.mjs --src ./wahapedia-csv --out ../../backend/roster-data",
     "data:fetch": "node --import tsx scripts/import-wahapedia.mjs --fetch --if-changed --src ./wahapedia-csv --out ../../backend/roster-data",
     "battlefield": "node --import tsx scripts/import-battlefield.ts --src ./40kdc-data",
+    "missions": "node scripts/build-missions.mjs --src ./40kdc-data",
     "data:aos": "node scripts/import-wahapedia-aos.mjs --src ./wahapedia-aos-csv --out ../../backend/roster-data/aos"
   },
   "dependencies": {},

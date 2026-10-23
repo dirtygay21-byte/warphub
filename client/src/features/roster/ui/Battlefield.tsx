@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { loadBattlefield, type BattlefieldData, type BfDeployment, type BfLayout, type Pt } from '../data';
+import { loadBattlefield, loadMissions, type BattlefieldData, type BfDeployment, type BfLayout, type MissionsData, type Pt } from '../data';
+import { CapsNote, MissionCardView, SecondaryList } from './MissionCard';
 import { openExternal, pushOverlay } from '../telegram';
-import { IconButton } from './kit';
+import { Icon, IconButton } from './kit';
 import { cx } from './util';
 
 const LETTERS = ['A', 'B', 'C'];
@@ -222,6 +223,14 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
   const [zoom, setZoom] = useState(false);
   const [showGuides, setShowGuides] = useState(true);
   const [selected, setSelected] = useState<number | null>(null);
+  // карты миссий грузятся отдельно; без них остаются названия миссий и ссылка на правила
+  const [missions, setMissions] = useState<MissionsData | null>(null);
+  const [side, setSide] = useState<'you' | 'foe'>('you');
+  const [showSecondary, setShowSecondary] = useState(false);
+
+  useEffect(() => {
+    loadMissions().then(setMissions, () => setMissions(null));
+  }, []);
 
   // открытая крупная карта закрывается кнопкой «Назад» Telegram
   useEffect(() => (zoom ? pushOverlay(() => (setZoom(false), setSelected(null))) : undefined), [zoom]);
@@ -265,6 +274,8 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
     return m ? data.missions[m.mission] ?? m.mission : '—';
   };
   const dName = (id: string) => data.dispositions.find((d) => d.id === id)!;
+  const primaryId = (side === 'you' ? data.matchups.find((x) => x.you === you && x.foe === foe) : data.matchups.find((x) => x.you === foe && x.foe === you))?.mission;
+  const primary = missions?.cards.find((c) => c.id === primaryId);
 
   return (
     <Shell onBack={onBack}>
@@ -296,19 +307,52 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
       <section className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-sm">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Основная миссия</p>
         <div className="mt-1.5 grid grid-cols-2 gap-2">
-          <div>
-            <p className="text-[11px] text-white/45">Вы · {dName(you).nameRu}</p>
-            <p className="font-semibold text-accent">{mission(you, foe)}</p>
-          </div>
-          <div>
-            <p className="text-[11px] text-white/45">Противник · {dName(foe).nameRu}</p>
-            <p className="font-semibold text-white/85">{mission(foe, you)}</p>
-          </div>
+          {(['you', 'foe'] as const).map((s) => {
+            const [a, b] = s === 'you' ? ([you, foe] as const) : ([foe, you] as const);
+            const active = missions != null && side === s;
+            return (
+              <button
+                key={s}
+                type="button"
+                disabled={!missions}
+                onClick={() => setSide(s)}
+                className={cx('min-w-0 rounded-xl border px-2.5 py-2 text-left transition', active ? 'border-accent bg-accent/15' : 'border-transparent', missions && !active && 'active:bg-white/10')}
+              >
+                <span className="block text-[11px] text-white/45">
+                  {s === 'you' ? 'Вы' : 'Противник'} · {dName(a).nameRu}
+                </span>
+                <span className={cx('block font-semibold', s === 'you' ? 'text-accent' : 'text-white/85')}>{mission(a, b)}</span>
+              </button>
+            );
+          })}
         </div>
+        {missions && primary && <MissionCardView card={primary} foeName={dName(side === 'you' ? foe : you).nameRu} className="mt-2.5" />}
+        {missions && <CapsNote caps={missions.caps} />}
         <button type="button" onClick={() => openExternal(MISSIONS_URL)} className="mt-2 text-xs font-semibold text-accent/90 underline-offset-2 active:underline">
           Карты миссий на Wahapedia →
         </button>
       </section>
+
+      {missions && (
+        <section className="mt-3">
+          <button
+            type="button"
+            onClick={() => setShowSecondary((v) => !v)}
+            className="flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10"
+          >
+            <span className="min-w-0 flex-1">
+              <span className="block text-[11px] font-semibold uppercase tracking-wider text-white/40">Вторичные миссии</span>
+              <span className="block text-sm font-semibold">{missions.cards.filter((c) => c.type === 'secondary').length} карт · одинаковы для атакующего и защитника</span>
+            </span>
+            <Icon name="down" className={cx('size-5 text-white/50 transition', showSecondary && 'rotate-180')} />
+          </button>
+          {showSecondary && (
+            <div className="mt-2">
+              <SecondaryList cards={missions.cards.filter((c) => c.type === 'secondary')} />
+            </div>
+          )}
+        </section>
+      )}
 
       {/* раскладки A / B / C */}
       <div className="mt-4 grid grid-cols-3 gap-1.5">
@@ -361,6 +405,12 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
           {data.source.credit}
         </button>{' '}
         v{data.source.version} (CC BY 4.0)
+        {missions && (
+          <>
+            <br />
+            Карты миссий: пересказ WarpHub на русском, структура и пары — {missions.source.name} v{missions.source.version}; сверено с картами GDM и wh-rules.ru.
+          </>
+        )}
       </p>
 
       {zoom && layout && dep && (

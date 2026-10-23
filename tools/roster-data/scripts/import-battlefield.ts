@@ -85,6 +85,17 @@ const dispositions = core('force-dispositions.json') as { id: string; name: stri
 const missions = core('missions.json') as { id: string; name: string }[];
 const matchups = core('mission-matchups.json') as { id: string; disposition: string; opponent_disposition: string; mission_id: string }[];
 
+/**
+ * Стороны атакующего и защитника, перепутанные в 40kdc-data 1.4.5 (конфликт источников, P2-T0b).
+ * Официальные карты деплоя (Mission Deck 2026-27) и game-datamissions.com: у Dawn of War и Sweeping Engagement
+ * атакующий стоит у края y = 0, а в 40kdc — у края y = 44. Форма зон та же, меняются только подписи сторон.
+ * Все 15 раскладок этих деплоев центрально-симметричны, поэтому для игры это поворот поля на 180°,
+ * но в системе координат 40kdc только эти два деплоя расходились с картами GW. Отчёт: battlefield-review.json.
+ */
+const SWAP_SIDES = new Set(['dawn-of-war', 'sweeping-engagement']);
+const side = (patternId: string, player: string) =>
+  !SWAP_SIDES.has(patternId) ? player : player === 'attacker' ? 'defender' : player === 'defender' ? 'attacker' : player;
+
 const usedPatterns = new Set(layoutsRaw.map((l) => l.deployment_pattern_id));
 const deployments = patterns
   .filter((p) => usedPatterns.has(p.id))
@@ -92,8 +103,8 @@ const deployments = patterns
     id: p.id,
     name: p.name,
     nameRu: DEPLOYMENT_RU[p.id] ?? p.name,
-    zones: (p.zones as Region[]).map((z) => ({ player: z.player, poly: pts(shapePoints(z.shape, z.position)) })),
-    territories: ((p.territories ?? []) as Region[]).map((z) => ({ player: z.player, poly: pts(shapePoints(z.shape, z.position)) })),
+    zones: (p.zones as Region[]).map((z) => ({ player: side(p.id, z.player), poly: pts(shapePoints(z.shape, z.position)) })),
+    territories: ((p.territories ?? []) as Region[]).map((z) => ({ player: side(p.id, z.player), poly: pts(shapePoints(z.shape, z.position)) })),
   }));
 
 const matchupById = new Map(matchups.map((m) => [m.id, m]));
@@ -190,7 +201,7 @@ const out = {
     credit: 'Powered by 40kdc-data',
     url: 'https://40kdc.alpacasoft.dev',
     license: 'CC BY 4.0 — Alpaca Software и участники 40kdc; геометрия раскладок — Battlemaster',
-    changes: 'Пересчитано в абсолютные многоугольники для WarpHub',
+    changes: 'Пересчитано в абсолютные многоугольники для WarpHub; стороны Dawn of War и Sweeping Engagement — по официальным картам деплоя',
   },
   board: { width: 60, height: 44 },
   dispositions: dispositions.map((d) => ({ id: d.id, name: d.name, nameRu: DISPOSITION_RU[d.id] ?? d.name })),
