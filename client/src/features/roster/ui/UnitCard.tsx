@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { paidWargear, type ComputedRoster, type ComputedUnit, type DataLookup, type Issue } from '../engine/compute';
+import { optionalWargear, paidWargear, type ComputedRoster, type ComputedUnit, type DataLookup, type Issue } from '../engine/compute';
 import type { Datasheet, Roster, RosterUnit, Weapon } from '../engine/types';
 import { optionsOf, whoText, type ParsedOption } from '../engine/wargear';
 import { linkLabel, OUTDATED_MARK, outdatedNote, ruleLabel, selectableEnhancement, visibleStratagem } from '../engine/source';
@@ -154,7 +154,7 @@ export function UnitCard({
               {c.unit.migration && !readOnly && (
                 <li>
                   <Button variant="outline" className="w-full" onClick={() => onPatch({ migration: null })}>
-                    {c.unit.migration.reason === 'options' ? 'Понятно — скрыть сообщение об изменённых вариантах' : 'Понятно — скрыть сообщение о замене инфолиста'}
+                    {c.unit.migration.reason === 'options' ? 'Понятно — скрыть сообщение об изменённых вариантах' : c.unit.migration.reason === 'size' ? 'Понятно — скрыть сообщение о размере отряда' : 'Понятно — скрыть сообщение о замене инфолиста'}
                   </Button>
                 </li>
               )}
@@ -197,7 +197,7 @@ export function UnitCard({
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">{w.label}</p>
                         <p className="text-xs text-white/45">
-                          +{w.cost} за шт.{w.unverified && <span className="text-warn"> · не проверено</span>} · считается по заменам в «Снаряжении»
+                          +{w.cost} за шт.{w.unverified && <span className="text-warn"> · не проверено</span>} · считается по «Снаряжению»
                         </p>
                       </div>
                       <span className={cx('text-sm font-semibold tabular-nums', c.paidAuto[w.label] ? 'text-accent' : 'text-white/40')}>
@@ -205,9 +205,15 @@ export function UnitCard({
                       </span>
                     </div>
                   ) : (
-                    <Row key={w.label} label={w.label} hint={`+${w.cost} за шт.`} warn={w.unverified ? 'не проверено' : undefined}>
-                      <Counter value={c.unit.wargear[w.label] ?? 0} max={Math.max(1, c.models)} onChange={(n) => onPatch({ wargear: { ...c.unit.wargear, [w.label]: n } })} />
-                    </Row>
+                    (() => {
+                      // предмет необязательной модели (Banner of Macragge у Chapter Ancient) — столько, сколько таких моделей
+                      const opt = optionalWargear(ds, w.label);
+                      return (
+                        <Row key={w.label} label={w.label} hint={`+${w.cost} за шт. · отмечается вручную${opt ? ` — если в отряде есть ${opt.subject}` : ''}`} warn={w.unverified ? 'не проверено' : undefined}>
+                          <Counter value={c.unit.wargear[w.label] ?? 0} max={opt ? opt.max : Math.max(1, c.models)} onChange={(n) => onPatch({ wargear: { ...c.unit.wargear, [w.label]: n } })} />
+                        </Row>
+                      );
+                    })()
                   ),
                 )}
               </div>

@@ -183,6 +183,88 @@
     "snapshot": "whrules-981-full.json",
     "fingerprint": "aebb093d50e8a4d7a5ab2fa315d7e13dd63bf0d79d23e2756e3f9c4d4ee49361"
    }
+  },
+  {
+   "id": "whrules-995-custodes",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "AC"
+   ],
+   "note": "Adeptus Custodes (новый кодекс) из полного снимка wh-rules.ru 995: инфолисты, детачменты, улучшения, стратагемы, правила армии; id сохранены (9 переименований по таблице сайта), 5 новых; прежние детачменты, улучшения и стратагемы — устаревшие (для старых ростеров). Одобрено владельцем 2026-10-23 (P1-T4c, решения 1–4).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-adeptus-custodes.json",
+    "fingerprint": "48cc0464bd8886d55c6b81f2d187d02bfb32e185d3dba3f6d0ff3c8985b8718b"
+   }
+  },
+  {
+   "id": "whrules-995-points",
+   "kind": "whrules-points",
+   "scope": [
+    "AS",
+    "AC",
+    "AdM",
+    "AE",
+    "AM",
+    "CD",
+    "QT",
+    "CSM",
+    "DG",
+    "DRU",
+    "EC",
+    "GC",
+    "GK",
+    "AoI",
+    "QI",
+    "LoV",
+    "NEC",
+    "ORK",
+    "SM",
+    "TAU",
+    "TS",
+    "TYR",
+    "WE"
+   ],
+   "note": "Очки отряда, ступени цены за копии, Legends, DP детачментов, очки улучшений и платное снаряжение по wh-rules.ru 995 (MFM 1.6) у сопоставленных записей; id и правила не меняются. Платное снаряжение — во всех ступенях цены за копии, как в конструкторе ростеров сайта (решение владельца 2026-10-23, P1-T5; прежнее «только последняя ступень» отменено). Не обновлены: юниты, которых нет на сайте или которые там в другой фракции, Legends/Forge World вне сайта (см. 40k/freshness-report.md).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995.json",
+    "fingerprint": "79a26d70ca87852ab8aabc06fb9f93d28a907a6c1b2a724e25af59b794c02aa4"
+   }
+  },
+  {
+   "id": "whrules-995-wargear",
+   "kind": "whrules-wargear",
+   "scope": [
+    "AC",
+    "AE",
+    "AM",
+    "AdM",
+    "CSM",
+    "DRU",
+    "GC",
+    "LoV",
+    "ORK",
+    "QI",
+    "QT",
+    "SM",
+    "TAU"
+   ],
+   "note": "Платное стандартное снаряжение по конструктору ростеров wh-rules.ru 995: paidDefaults у 15 инфолистов (лазпушка Leman Russ ×8, dark lance Ravager, heavy mining laser Achilles Ridgerunners, Praesidium Shield Shield-Captain, Heavy Laser Destroyer Repulsor Executioner, Banner of Macragge Victrix Honour Guard, missile pod / T'au flamer Crisis Fireknife / Starscythe). Одобрено владельцем 2026-10-23 (P1-T5). Отдельные варианты из конструктора (rosterOptions, P1-T5c): Watcher in the Dark у Deathwing Terminator Squad; опечатки Kâhl, Ynnari Incubi, Kroot War Shaper; Secutarii Peltasts — galvanic caster вместо arc lance. Конфликты P1-T5e: Chaos Acastus Knight Porphyrion — обе пушки вместе; Wolf Scouts — bolt pistol, Thunderclap и runic stave вместе (решение владельца, конструктор сайта); Kill Tank и Gargantuan Squiggoth — оружие, снаряжение и варианты из полного снимка Orks (whrules-995-full-orks.json). P1-T5d: стандартное снаряжение дополнено из текста loadout (loadoutRepair: способности снаряжения, предметы, которые заменяют варианты, перечень после переноса строки); удалены устаревшие/повторные варианты Astraeus и Thunderhawk Gunship; Knight Preceptor и Cultist Mob with Firearms — из полного снимка CSM и Imperial Knights.",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-roster.json",
+    "fingerprint": "e736162b51a3ab6fa2cd9ed5274925f9b94f527944770d5a867a4568327aadbf"
+   }
   }
  ]
 }

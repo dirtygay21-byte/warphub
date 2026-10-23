@@ -13,11 +13,15 @@
  *    запоминается в roster.appliedMigrations, повторное открытие и сохранение выборы не сбрасывает;
  *  - устаревшие детачменты и улучшения, которые есть в ростере, запоминаются в roster.legacyKept — после случайного
  *    удаления их можно вернуть (только в этом ростере);
+ *  - у файла может быть несколько обновлений (FactionData.migrations — список): они применяются по порядку, переводы
+ *    вариантов снаряжения каждого — один раз по его source;
+ *  - инфолист тот же, а сохранённого размера отряда в данных больше нет (кодекс изменил состав): размер откладывается
+ *    в unit.migration.dropped.size с причиной size, юнит получает первый доступный размер и предупреждение;
  *  - повторный запуск ничего не меняет.
  */
 import type { DataLookup } from './compute';
 import { remapPicks } from './options-remap';
-import type { CostBand, Datasheet, IdMigration, Roster, RosterUnit, UnitMigration } from './types';
+import type { CostBand, DataMigrations, Datasheet, FactionData, IdMigration, Roster, RosterUnit, UnitMigration } from './types';
 
 const MAX_CHAIN = 10;
 
@@ -86,12 +90,50 @@ export interface MigrationResult {
   changed: boolean;
 }
 
+export const SIZE_NOTE = 'Размер отряда изменился в обновлении данных: сохранённого размера больше нет.';
+
+/** Обновления файла фракции по порядку (запись одним объектом — как список из одного). */
+export const migrationsOf = (f: Pick<FactionData, 'migrations'>): DataMigrations[] => (!f.migrations ? [] : Array.isArray(f.migrations) ? f.migrations : [f.migrations]);
+
 /** Перевести ростер на текущие данные. Без изменений — возвращает тот же объект. */
 export function migrateRoster(roster: Roster, L: DataLookup): MigrationResult {
-  const mig = L.faction.migrations;
   let changed = false;
   let next = roster;
-  if (mig) {
+  for (const mig of migrationsOf(L.faction)) {
+    const r = migrateOnce(next, L, mig);
+    if (r.changed) {
+      next = r.roster;
+      changed = true;
+    }
+  }
+  // тот же инфолист, но сохранённого размера отряда больше нет
+  const units = next.units.map((u) => {
+    const ds = L.ds.get(u.datasheetId);
+    if (!ds || !u.size) return u;
+    const sizes = new Set(bandsOf(ds).flatMap((b) => b.options.map((o) => o.label)));
+    if (sizes.has(u.size)) return u;
+    const to = ds.costs[0]?.options[0]?.label;
+    if (!to) return u;
+    const prev = u.migration;
+    return { ...u, size: to, migration: { from: prev?.from ?? u.datasheetId, reason: prev?.reason ?? ('size' as const), note: prev?.note ?? SIZE_NOTE, dropped: { ...(prev?.dropped ?? {}), size: u.size } } };
+  });
+  if (units.some((u, i) => u !== next.units[i])) {
+    next = { ...next, units };
+    changed = true;
+  }
+  const kept = rememberLegacy(next, L);
+  if (kept) {
+    next = { ...next, legacyKept: kept };
+    changed = true;
+  }
+  return changed ? { roster: next, changed: true } : { roster, changed: false };
+}
+
+/** Одно обновление файла: замены id, переводы вариантов снаряжения (один раз по source), детачменты. */
+function migrateOnce(roster: Roster, L: DataLookup, mig: DataMigrations): MigrationResult {
+  let changed = false;
+  let next = roster;
+  {
     const notes = [...(roster.migrationNotes ?? [])];
     // перевод выборов снаряжения — только для ростеров, собранных до этого обновления
     const optionsDue = !!mig.options && !(roster.appliedMigrations ?? []).includes(mig.source);
@@ -137,11 +179,6 @@ export function migrateRoster(roster: Roster, L: DataLookup): MigrationResult {
     const applied = mig.options && optionsDue ? [...(roster.appliedMigrations ?? []), mig.source] : roster.appliedMigrations;
     if (applied !== roster.appliedMigrations) changed = true;
     if (changed) next = { ...roster, units, detachmentIds, migrationNotes: notes, ...(applied ? { appliedMigrations: applied } : {}) };
-  }
-  const kept = rememberLegacy(next, L);
-  if (kept) {
-    next = { ...next, legacyKept: kept };
-    changed = true;
   }
   return changed ? { roster: next, changed: true } : { roster, changed: false };
 }

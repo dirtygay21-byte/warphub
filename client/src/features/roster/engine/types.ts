@@ -64,6 +64,8 @@ export interface UnitAbility {
 export interface WargearOption {
   star: boolean;
   text: string;
+  /** откуда текст, если не из инфолиста: whrules-roster — формулировка конструктора ростеров wh-rules.ru (в тексте инфолиста вариантов нет) */
+  source?: string;
 }
 
 /** own — своя фракция; det:<id> — разрешён детачментом; ally:<key> — союзники. */
@@ -104,6 +106,8 @@ export interface Datasheet {
   abilities: UnitAbility[];
   weapons: Weapon[];
   defaultLoadout: LoadoutRule[];
+  /** стандартные платные предметы (costs[].wargear) тоже платные — как у конструктора ростеров wh-rules.ru (dw); иначе платят только сверх стандартного */
+  paidDefaults?: boolean;
   options: WargearOption[];
   /** id стратагем, доступных юниту (core + детачментов) */
   stratagems: string[];
@@ -215,8 +219,12 @@ export interface FactionData {
   stratagems: Stratagem[];
   enhancements: Enhancement[];
   allies: AllyGroup[];
-  /** замены id после обновления данных: сохранённые ростеры переводятся на новые записи (engine/migrate.ts) */
-  migrations?: DataMigrations;
+  /**
+   * замены id после обновления данных: сохранённые ростеры переводятся на новые записи (engine/migrate.ts).
+   * Несколько обновлений одного файла — список (по порядку применения); каждое со своим source применяется к ростеру
+   * один раз (переводы вариантов снаряжения) — прежняя запись одним объектом тоже поддерживается.
+   */
+  migrations?: DataMigrations | DataMigrations[];
   /** источник данных фракции, если он не основная выгрузка (для подписи «Данные: …») */
   source?: DataSource;
 }
@@ -230,9 +238,10 @@ export interface DataSource {
 
 /**
  * Причина замены: переименование, объединение нескольких инфолистов, общий инфолист вместо копии ордена, замена;
- * options — инфолист тот же, но его варианты снаряжения изменились (OptionRemap).
+ * options — инфолист тот же, но его варианты снаряжения изменились (OptionRemap);
+ * size — инфолист тот же, но сохранённого размера отряда в данных больше нет (кодекс изменил состав).
  */
-export type MigrationReason = 'renamed' | 'merged' | 'shared' | 'replaced' | 'options';
+export type MigrationReason = 'renamed' | 'merged' | 'shared' | 'replaced' | 'options' | 'size';
 export interface IdMigration {
   to: string;
   reason: MigrationReason;

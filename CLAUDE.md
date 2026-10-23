@@ -15,6 +15,13 @@ Mini App WarpHub (Telegram) и скрытый раздел Roster Builder (Warha
 
 ## Данные ростера: порядок поиска источника (обязательно для любой работы с данными ростера)
 
+> **Решение владельца от 23.10.2026: выгрузка Wahapedia приостановлена** — её данные устарели (40K от 28.09.2026, до MFM 1.5).
+> Пока решение не отменено, шаг 2 ниже для 40K пропускается: основной датированный источник обновлений 40K — wh-rules.ru
+> (снимки `tools/roster-data/40k/whrules-<версия>*.json` с fingerprint, применение через `40k/curated.json → updates`,
+> сверка — `scripts/whrules-compare.mjs`, отчёт `40k/freshness-report.{json,md}`). Остальные правила раздела действуют:
+> ничего не придумывать, источник и версию записывать, конфликты фиксировать. Для AoS у wh-rules.ru данных нет —
+> обновление данных AoS ждёт выбора источника.
+
 1. **Приложение.** Сначала смотреть, что уже есть в данных и коде:
    `backend/roster-data/` (40K) и `backend/roster-data/aos/` (AoS), импортёры `tools/roster-data/scripts/`,
    кураторские правки `tools/roster-data/aos/curated.json`, движки `client/src/features/roster/{engine,aos}/`.

@@ -1,4 +1,5 @@
-// Полный снимок данных wh-rules.ru для Space Marines, 5 орденов и Imperial Agents → 40k/whrules-<версия>-full.json.
+// Полный снимок данных wh-rules.ru → 40k/whrules-<версия>-full.json (Space Marines, 5 орденов и Imperial Agents — по умолчанию)
+// или 40k/whrules-<версия>-full-<фракция>.json (другие фракции: до запуска задать window.__whrulesFactions = ['adeptus-custodes']).
 //
 // Запуск: открыть https://wh-rules.ru/ru/patches и выполнить файл в консоли браузера. Результат:
 //   window.__whrulesFull     — компактный JSON снимка (одна строка);
@@ -13,7 +14,7 @@
 //   omitted  — что сознательно не снято (художественный текст flavor и русские переводы — приложению не нужны);
 //   fingerprint — SHA-256 от JSON.stringify(снимок без fingerprint).
 (async () => {
-  const FACTIONS = ['space-marines', 'black-templars', 'blood-angels', 'dark-angels', 'deathwatch', 'space-wolves', 'imperial-agents'];
+  const FACTIONS = window.__whrulesFactions ?? ['space-marines', 'black-templars', 'blood-angels', 'dark-angels', 'deathwatch', 'space-wolves', 'imperial-agents'];
   const sha = async (s) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map((b) => b.toString(16).padStart(2, '0')).join('');
   const assets = {};
   const read = async (f) => {
