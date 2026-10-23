@@ -327,7 +327,7 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
       const lost = droppedSummary(unit.migration.dropped);
       warn(
         'migrated',
-        unit.migration.reason === 'options'
+        unit.migration.reason === 'options' || unit.migration.reason === 'size'
           ? `«${ds.name}»: ${unit.migration.note}` + (lost.length ? ` Отложено — проверьте и выберите заново: ${lost.join(', ')}.` : '')
           : `«${ds.name}» (прежде ${unit.migration.from}): ${unit.migration.note}` + (lost.length ? ` Не перенесено — выберите заново: ${lost.join(', ')}.` : ''),
         [unit.uid],

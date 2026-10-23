@@ -6,7 +6,7 @@
   },
   "sources": [],
   "updates": {
-    "about": "Проверенные обновления поверх выгрузки Wahapedia (scripts/updates-40k.mjs: применяются в конце импорта и в scripts/repair-40k-data.mjs). Элемент: { id, kind, snapshot (файл в 40k/, проверяется fingerprint), enabled, scope (что обновлено), note }. Применённые записываются в index.json → updates. Снимки: 40k/whrules-<версия>.json (scripts/whrules-extract.js + scripts/whrules-save.mjs), полный — 40k/whrules-<версия>-full.json (scripts/whrules-extract-full.js + whrules-map.mjs --save-full). whrules-faction — scripts/whrules-convert.mjs (сухой прогон: bun scripts/whrules-convert.mjs --out <файл>); одобрено владельцем 2026-10-16 по отчёту сухого прогона v4. whrules-points — scripts/whrules-points.mjs (значения: очки, ступени цены, Legends, DP, очки улучшений, платное снаряжение; план — bun scripts/whrules-points.mjs → 40k/whrules-points-applied.json; only — ограничение по армии); одобрено владельцем 2026-10-23 (задача P1-T3).",
+    "about": "Проверенные обновления поверх выгрузки Wahapedia (scripts/updates-40k.mjs: применяются в конце импорта и в scripts/repair-40k-data.mjs). Элемент: { id, kind, snapshot (файл в 40k/, проверяется fingerprint), enabled, scope (что обновлено), note }. Применённые записываются в index.json → updates. Снимки: 40k/whrules-<версия>.json (scripts/whrules-extract.js + scripts/whrules-save.mjs), полный — 40k/whrules-<версия>-full.json (scripts/whrules-extract-full.js + whrules-map.mjs --save-full). whrules-faction — scripts/whrules-convert.mjs (сухой прогон: bun scripts/whrules-convert.mjs --out <файл>); одобрено владельцем 2026-10-16 по отчёту сухого прогона v4. whrules-points — scripts/whrules-points.mjs (значения: очки, ступени цены, Legends, DP, очки улучшений, платное снаряжение; план — bun scripts/whrules-points.mjs → 40k/whrules-points-applied.json; only — ограничение по армии); одобрено владельцем 2026-10-23 (задача P1-T3). whrules-faction-convert — полная конвертация одной фракции (scripts/whrules-convert.mjs → applyWhrulesFactionConvert; сухой прогон: bun scripts/whrules-convert.mjs --faction <фракция сайта> --army <id> --full <снимок> --out <файл>); поля faction, army, points (снимок /3 для сопоставления).",
     "items": [
       {
         "id": "whrules-981-space-marines",
@@ -18,6 +18,19 @@
           "AoI"
         ],
         "note": "Space Marines (с орденами) и Imperial Agents из wh-rules.ru 981; копии Imperial Agents в AC, AM, AS, AdM, GK, QI, TL"
+      },
+      {
+        "id": "whrules-995-custodes",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-adeptus-custodes.json",
+        "points": "whrules-995.json",
+        "faction": "adeptus-custodes",
+        "army": "AC",
+        "enabled": true,
+        "scope": [
+          "AC"
+        ],
+        "note": "Adeptus Custodes (новый кодекс) из полного снимка wh-rules.ru 995: инфолисты, детачменты, улучшения, стратагемы, правила армии; id сохранены (9 переименований по таблице сайта), 5 новых; прежние детачменты, улучшения и стратагемы — устаревшие (для старых ростеров). Одобрено владельцем 2026-10-23 (P1-T4c, решения 1–4)."
       },
       {
         "id": "whrules-995-points",
@@ -49,12 +62,7 @@
           "TYR",
           "WE"
         ],
-        "only": {
-          "AC": [
-            "points"
-          ]
-        },
-        "note": "Очки отряда, ступени цены за копии, Legends, DP детачментов, очки улучшений и платное снаряжение по wh-rules.ru 995 (MFM 1.6) у сопоставленных записей; id и правила не меняются. Платное снаряжение — только в последней ступени цены за копии (решение владельца 2026-10-23: так во всех 70 предметах выгрузки Wahapedia, сайт ступень не указывает). Adeptus Custodes — только цены отряда (кодекс — в полной конвертации). Не обновлены: юниты, которых нет на сайте или которые там в другой фракции, Legends/Forge World вне сайта (см. 40k/freshness-report.md)."
+        "note": "Очки отряда, ступени цены за копии, Legends, DP детачментов, очки улучшений и платное снаряжение по wh-rules.ru 995 (MFM 1.6) у сопоставленных записей; id и правила не меняются. Платное снаряжение — только в последней ступени цены за копии (решение владельца 2026-10-23: так во всех 70 предметах выгрузки Wahapedia, сайт ступень не указывает). Не обновлены: юниты, которых нет на сайте или которые там в другой фракции, Legends/Forge World вне сайта (см. 40k/freshness-report.md)."
       }
     ]
   }

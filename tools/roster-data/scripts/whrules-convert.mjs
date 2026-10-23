@@ -20,7 +20,7 @@ import { loadSnapshot } from './updates-40k.mjs';
 import { baseline40k } from './baseline-40k.mjs';
 import { buildOptionRemap } from '../../../client/src/features/roster/engine/options-remap.ts';
 import { optionsOf } from '../../../client/src/features/roster/engine/wargear.ts';
-import { FULL_FACTIONS, loadFull, loadRenames, mapFaction, mapSpaceMarines, newId, planFaction, planSpaceMarines, slugify } from './whrules-map.mjs';
+import { FULL_FACTIONS, checkFull, loadFull, loadRenames, mapFaction, mapSpaceMarines, newId, planFaction, planSpaceMarines, slugify } from './whrules-map.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DATA = path.join(HERE, '..', '..', '..', 'backend', 'roster-data');
@@ -982,8 +982,43 @@ export function applyWhrulesFaction(files, full, u) {
   return { changed, lines: [`обновлены: ${changedFiles.join(', ')}`, `проверки: ${r.checks.length} — все пройдены`] };
 }
 applyWhrulesFaction.load = (file, dir) => loadFull(file, dir);
+/**
+ * Обработчик curated.updates kind «whrules-faction-convert» (P1-T4d): полная конвертация одной фракции — u.faction
+ * (фракция сайта), u.army (файл армии), u.points (снимок очков /3 для сопоставления), snapshot — полный снимок фракции.
+ * Если армия уже на этой версии (source.dataVersion и запись в migrations с тем же source) — ничего не делает.
+ * Таблицы перевода выборов снаряжения добавляются к migrations файла отдельной записью (список по порядку обновлений):
+ * прежние записи (например, 981 для копий Imperial Agents) остаются и не применяются повторно.
+ * Любая проваленная проверка сухого прогона — исключение, файлы не меняются.
+ */
+export function applyWhrulesFactionConvert(files, full, u) {
+  const fname = `${u.army}.json`;
+  const A = files[fname];
+  if (!A) throw new Error(`whrules-faction-convert: нет ${fname}`);
+  const src = `wh-rules ${full.source.dataVersion} (MFM ${full.source.mfm}, ${full.source.date})`;
+  const list = !A.migrations ? [] : Array.isArray(A.migrations) ? A.migrations : [A.migrations];
+  if (String(A.source?.dataVersion) === String(full.source.dataVersion) && list.some((m) => m.source === src)) return { changed: 0, lines: [`${A.name} уже на wh-rules ${full.source.dataVersion}`] };
+  const r = dryRunFaction({ slug: u.faction, armyId: u.army, snapshot: u.points, fullFile: u.snapshot, army: A, full });
+  const failed = r.checks.filter((c) => !c.ok);
+  if (failed.length) throw new Error(`whrules-faction-convert: проверки не пройдены — ${failed.map((c) => c.check).join('; ')}`);
+  const next = plain(r._file);
+  next.migrations = [...list, { source: src, datasheets: {}, detachments: {}, enhancements: {}, options: r._optionsNew }];
+  files[fname] = next;
+  const s = r.summary;
+  return {
+    changed: 1,
+    lines: [
+      `${A.name}: инфолистов ${s.datasheets.after} (сохранены id ${s.datasheets.kept + s.datasheets.renamed}, новых ${s.datasheets.added}), детачментов ${s.detachments.current} (+${s.detachments.outdated} устаревших), улучшений ${s.enhancements.current}, стратагем ${s.stratagems.current}; переводов снаряжения ${Object.keys(r._optionsNew).length}`,
+      `проверки: ${r.checks.length} — все пройдены`,
+    ],
+  };
+}
+applyWhrulesFactionConvert.load = (file, dir) => {
+  const raw = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8'));
+  return checkFull(raw, Object.keys(raw.factions ?? {}));
+};
+
 /** Обработчики обновлений этого модуля — передаются в repair40kData (import-wahapedia.mjs, repair-40k-data.mjs). */
-export const WHRULES_APPLIERS = { 'whrules-faction': applyWhrulesFaction };
+export const WHRULES_APPLIERS = { 'whrules-faction': applyWhrulesFaction, 'whrules-faction-convert': applyWhrulesFactionConvert };
 
 /**
  * Сухой прогон. По умолчанию — данные из dir; files — { "<id>.json": данные } (например, данные до обновления
@@ -1040,9 +1075,9 @@ export function dryRun({ dir = DATA, files = null } = {}) {
  * Сухой прогон полной конвертации одной фракции (P1-T4c): отчёт для утверждения, данные не меняются.
  * snapshot — снимок очков /3 (сопоставление и переименования), fullFile — полный снимок фракции.
  */
-export function dryRunFaction({ slug, armyId, snapshot = 'whrules-995.json', fullFile, dir = DATA, army = null }) {
+export function dryRunFaction({ slug, armyId, snapshot = 'whrules-995.json', fullFile, dir = DATA, army = null, full: fullIn = null }) {
   const A = army ?? JSON.parse(fs.readFileSync(path.join(dir, 'f', `${armyId}.json`), 'utf8'));
-  const full = loadFull(fullFile, undefined, [slug]);
+  const full = fullIn ?? loadFull(fullFile, undefined, [slug]);
   const map = mapFaction(loadSnapshot(snapshot), slug, A);
   const plan = planFaction(map, full, A);
   const r = convertFaction({ full, slug, army: A, map, plan });

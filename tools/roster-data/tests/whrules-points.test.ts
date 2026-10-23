@@ -58,10 +58,10 @@ test('siteWargear: название предмета наше, если он т�
 
 // ---------- применённое обновление ----------
 
-test('обновление применено целиком: план по текущим данным пуст, кроме пропусков Custodes (кодекс)', () => {
+test('обновление применено целиком: план по текущим данным пуст (Custodes — после полной конвертации P1-T4)', () => {
   const plan = planPoints(structuredClone(NOW), SNAP, U);
-  assert.deepEqual([plan.units.length, plan.detachments.length, plan.enhancements.length], [0, 0, 0]);
-  assert.ok(plan.skipped.length > 0 && plan.skipped.every((x: { army: string }) => x.army === 'AC'));
+  assert.deepEqual([plan.units.length, plan.detachments.length, plan.enhancements.length, plan.skipped.length], [0, 0, 0, 0]);
+  assert.equal(U.only, undefined);
   const applied = readJson(path.join(import.meta.dirname, '..', '40k', 'whrules-points-applied.json'));
   assert.equal(applied.snapshot.fingerprint, SNAP.fingerprint);
   assert.deepEqual(applied.summary, { units: 239, values: 250, detachments: 8, enhancements: 3, copies: 217, skipped: 29, ambiguous: 0 });
@@ -74,8 +74,9 @@ test('проверочные значения: цены, ступени, улу�
   assert.equal(opts('TYR.json', 'Termagants'), '1-+: 55,110');
   assert.equal(opts('AM.json', 'Basilisk'), '1-2: 115 | 3-+: 145');
   assert.equal(NOW['ORK.json'].enhancements.find((e) => e.name === 'Dreadherder')!.cost, 30);
-  // Custodes: юниты со сменой состава не тронуты (Wardens по-прежнему 4/5 моделей)
-  assert.deepEqual((ds('AC.json', 'Custodian Wardens').costs as Band[])[0].options.map((o) => o.models), [4, 5]);
+  // Custodes после полной конвертации: новый состав (Wardens 2/3 модели), Praesidium Shield +25 с 2-й копии
+  assert.deepEqual((ds('AC.json', 'Custodian Wardens').costs as Band[])[0].options.map((o) => o.models), [2, 3]);
+  assert.deepEqual((ds('AC.json', 'Shield-Captain').costs as Band[]).map((b) => b.wargear), [[], [{ label: 'Praesidium Shield', cost: 25 }]]);
   // снаряжение: Storm Shield вместо Thunder Hammer, только с 3-й копии; Black Templars — своя цена
   const tas = ds('SM.json', 'Terminator Assault Squad').costs as Band[];
   assert.deepEqual(tas.map((b) => b.wargear), [[], [{ label: 'Storm Shield', cost: 5 }]]);
@@ -93,12 +94,12 @@ test('платное снаряжение у своих юнитов — тол�
       if (d.group !== 'own' || d.faction !== F.id) continue;
       const bands = d.costs as Band[];
       bands.slice(0, -1).forEach((b) => b.wargear.length && bad.push(`${F.id}/${d.name}`));
-      if (bands.some((b) => b.wargear.some((w) => w.unverified)) && F.id !== 'AC') bad.push(`${F.id}/${d.name}: unverified`);
+      if (bands.some((b) => b.wargear.some((w) => w.unverified))) bad.push(`${F.id}/${d.name}: unverified`);
     }
   assert.deepEqual(bad, []);
 });
 
-TB('сохранённые ростеры не теряют выбор: подписи размеров прежние, снаряжение убрано только у пяти предметов Space Marines', () => {
+TB('сохранённые ростеры не теряют выбор: подписи размеров прежние (кроме 8 юнитов Custodes — новый состав, предупреждение в ростере), снаряжение убрано только у известных предметов', () => {
   const lost: string[] = [];
   const removed = new Set<string>();
   for (const f of NAMES) {
@@ -107,13 +108,14 @@ TB('сохранённые ростеры не теряют выбор: подп
       const b = before.get(`${d.group}|${d.id}`) as { costs: Band[] } | undefined;
       if (!b) continue;
       const now = new Set((d.costs as Band[]).flatMap((x) => x.options.map((o) => o.label)));
-      for (const o of b.costs.flatMap((x) => x.options)) if (!now.has(o.label)) lost.push(`${f}/${d.name}: ${o.label}`);
+      for (const o of b.costs.flatMap((x) => x.options)) if (!now.has(o.label)) lost.push(`${f}/${d.id}`);
       const wNow = new Set((d.costs as Band[]).flatMap((x) => x.wargear.map((w) => w.label)));
       for (const w of b.costs.flatMap((x) => x.wargear)) if (!wNow.has(w.label)) removed.add(`${w.label}`);
     }
   }
-  assert.deepEqual(lost, []);
-  assert.deepEqual([...removed].sort(), ['Blades of honour', 'Heavy laser destroyer', 'Thunder Hammer', 'Twin lascannon']);
+  // размер отряда сменился только у 8 юнитов Custodes (кодекс): migrateRoster откладывает прежний размер с предупреждением
+  assert.deepEqual([...new Set(lost)].sort(), JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', '40k', 'whrules-995-dryrun-adeptus-custodes.json'), 'utf8')).savedRosters.sizeChanges.map((x: { id: string }) => `AC.json/${x.id}`).sort());
+  assert.deepEqual([...removed].sort(), ['Blades of honour', 'Heavy laser destroyer', 'Thunder Hammer', 'Twin arachnus heavy blaze cannon', 'Twin lascannon', 'Venatari lance']);
 });
 
 TB('итог ростера меняется ровно на изменение цены (Orks: 10 Boyz 90 → 85), выбранный размер сохраняется', () => {

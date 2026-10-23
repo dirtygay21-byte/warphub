@@ -154,7 +154,7 @@ export function UnitCard({
               {c.unit.migration && !readOnly && (
                 <li>
                   <Button variant="outline" className="w-full" onClick={() => onPatch({ migration: null })}>
-                    {c.unit.migration.reason === 'options' ? 'Понятно — скрыть сообщение об изменённых вариантах' : 'Понятно — скрыть сообщение о замене инфолиста'}
+                    {c.unit.migration.reason === 'options' ? 'Понятно — скрыть сообщение об изменённых вариантах' : c.unit.migration.reason === 'size' ? 'Понятно — скрыть сообщение о размере отряда' : 'Понятно — скрыть сообщение о замене инфолиста'}
                   </Button>
                 </li>
               )}

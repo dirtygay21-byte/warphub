@@ -204,19 +204,18 @@ TB('отчёт свежести (до P1-T3): снаряжение — верс�
   assert.deepEqual(REP.armies.TAU.datasheets.addons, { same: 1, changed: [] });
 });
 
-test('отчёт свежести по текущим данным (после P1-T3): в обновлённом объёме расхождений нет, остались только исключения', () => {
+test('отчёт свежести по текущим данным (после P1-T3 и P1-T4): в обновлённом объёме расхождений нет', () => {
   for (const [id, a] of Object.entries(NOW.armies) as [string, { summary: Record<string, Record<string, number>> }][]) {
     const s = a.summary;
-    if (id === 'AC') continue;
     assert.equal(s.datasheets.points + s.datasheets.tiers + s.datasheets.sizes + s.datasheets.legends, 0, `${id}: цены отряда`);
     assert.equal(s.detachments.dp, 0, `${id}: DP`);
     assert.equal(s.enhancements.points, 0, `${id}: улучшения`);
     assert.equal(s.wargear.priceChanged + s.wargear.onlyOurs + s.wargear.onlySite, 0, `${id}: снаряжение`);
     assert.equal(s.datasheets.unmatched, 0, `${id}: без пары`);
   }
-  // Custodes: цены обновлены только у юнитов без смены состава; кодекс — в полной конвертации
+  // Custodes после полной конвертации (P1-T4d): все инфолисты, детачменты и улучшения как на сайте
   const ac = NOW.armies.AC.summary;
-  assert.deepEqual([ac.datasheets.points, ac.datasheets.sizes, ac.datasheets.tiers, ac.datasheets.legends, ac.datasheets.renamed, ac.datasheets.newOnSite], [0, 5, 10, 6, 9, 5]);
+  assert.deepEqual([ac.datasheets.ours, ac.datasheets.same, ac.datasheets.renamed, ac.datasheets.newOnSite, ac.detachments.newOnSite, ac.detachments.missingOnSite], [36, 36, 0, 0, 0, 0]);
   assert.equal(NOW.armies.ORK.ourSource.dataVersion, 995);
 });
 

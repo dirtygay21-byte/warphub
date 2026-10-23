@@ -106,6 +106,19 @@ Wahapedia (например, более новые очки), применяют
 осталось на версии выгрузки. Применённые обновления записываются в `index.json → updates` (источник, версия данных,
 версия Munitorum Field Manual, дата). Включено одно обновление — `whrules-981-space-marines` (kind `whrules-faction`, `scripts/whrules-convert.mjs`): Space Marines с орденами и Imperial Agents из полного снимка wh-rules.ru 981, копии Imperial Agents в AC, AM, AS, AdM, GK, QI, TL. Обработчик использует движок клиента (TypeScript), поэтому импорт и repair запускаются через `bun` или `node --import tsx` (`npm run data` уже так). Сухой прогон: `bun scripts/whrules-convert.mjs --out <файл>` — считается от данных до обновления (`scripts/baseline-40k.mjs`: история git, коммит 4a91fa0); тесты — `tests/whrules-*.test.ts`, `tests/updates40k.test.ts`.
 
+**Полная конвертация одной фракции** (`40k/curated.json → updates`, kind `whrules-faction-convert`,
+`scripts/whrules-convert.mjs → applyWhrulesFactionConvert`; сейчас `whrules-995-custodes`, задача P1-T4). Полный снимок
+фракции (`scripts/whrules-extract-full.js` с `window.__whrulesFactions`, `whrules-map.mjs --save-full` →
+`40k/whrules-<версия>-full-<фракция>.json`), сопоставление `mapFaction` (`bun scripts/whrules-map.mjs --faction <slug>
+--army <id>`), план `planFaction`, конвертация `convertFaction` (общая часть с Space Marines — `makeConverter`), сухой
+прогон с проверками — `bun scripts/whrules-convert.mjs --faction <slug> --army <id> --full <снимок> --out <файл>`.
+id сопоставленных и переименованных (по таблице сайта) инфолистов сохраняются, новые — `whr:<фракция>:<slug>`; прежние
+детачменты, улучшения и стратагемы остаются устаревшими (старые ростеры открываются). Неразрывный дефис сайта (U+2011)
+заменяется обычным. Применяется до `whrules-points` (значения затем совпадают с сайтом). `migrations` файла — список
+обновлений по порядку (`client/src/features/roster/engine/migrate.ts → migrationsOf`): переводы вариантов снаряжения
+каждого применяются к ростеру один раз по его `source`. Если сохранённого размера отряда у того же инфолиста больше нет
+(новый кодекс), `migrateRoster` откладывает его (`unit.migration`, причина `size`) и показывает предупреждение.
+
 **Обновление значений по wh-rules.ru** (`40k/curated.json → updates`, kind `whrules-points`, `scripts/whrules-points.mjs`;
 сейчас `whrules-995-points`, задача P1-T3). У сопоставленных записей (та же функция сопоставления, что и отчёт свежести)
 меняет цены отряда и ступени цены за копии, Legends, DP детачментов, очки улучшений и платное снаряжение; id, профили,

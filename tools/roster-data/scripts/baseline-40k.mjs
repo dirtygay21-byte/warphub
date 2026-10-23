@@ -17,6 +17,8 @@ const git = (args) => execFileSync('git', ['-C', ROOT, ...args], { encoding: 'ut
 
 /** Данные до обновления whrules-995-points (P1-T3): коммит f8387fa — отчёт свежести P1-T2 построен по ним. */
 export const BEFORE_POINTS = { rev: 'f8387fa012dea556e89da258afc5de6c158a3a91', dir: 'backend/roster-data' };
+/** Данные до полной конвертации Adeptus Custodes (P1-T4d): коммит P1-T3 aa57845. */
+export const BEFORE_CONVERT_AC = { rev: 'aa57845690179942aef14308c16803b8cdf541cf', dir: 'backend/roster-data' };
 
 const cache = new Map();
 /** Данные 40K из коммита rev: { files: { "<id>.json": данные }, index } или null (нет git или коммита). */

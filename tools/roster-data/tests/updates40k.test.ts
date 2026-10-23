@@ -57,14 +57,14 @@ function copyData() {
 }
 const snapshotOf = (dir: string) => Object.fromEntries(['index.json', ...fs.readdirSync(path.join(dir, 'f')).map((f) => `f/${f}`)].map((f) => [f, fs.readFileSync(path.join(dir, f), 'utf8')]));
 
-test('включённые обновления whrules-981 и whrules-995-points уже применены: repair ничего не меняет (текущие curated и данные)', () => {
+test('включённые обновления whrules-981, whrules-995-custodes и whrules-995-points уже применены: repair ничего не меняет (текущие curated и данные)', () => {
   const dir = copyData();
   try {
     const before = snapshotOf(dir);
     const res = repair40kData(dir, curated, { appliers: WHRULES_APPLIERS });
     assert.deepEqual(res.changedFiles, []);
     assert.deepEqual(snapshotOf(dir), before);
-    assert.deepEqual(JSON.parse(before['index.json']).updates.map((u: { id: string }) => u.id), ['whrules-981-space-marines', 'whrules-995-points']);
+    assert.deepEqual(JSON.parse(before['index.json']).updates.map((u: { id: string }) => u.id), ['whrules-981-space-marines', 'whrules-995-custodes', 'whrules-995-points']);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

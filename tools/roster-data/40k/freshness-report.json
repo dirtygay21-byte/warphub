@@ -20,6 +20,13 @@
     "dataVersion": 981
    },
    {
+    "id": "whrules-995-custodes",
+    "scope": [
+     "AC"
+    ],
+    "dataVersion": 995
+   },
+   {
     "id": "whrules-995-points",
     "scope": [
      "AS",
@@ -382,16 +389,16 @@
    },
    "summary": {
     "datasheets": {
-     "ours": 31,
+     "ours": 36,
      "site": 36,
-     "matched": 31,
-     "same": 16,
+     "matched": 36,
+     "same": 36,
      "points": 0,
-     "sizes": 5,
-     "tiers": 10,
-     "legends": 6,
-     "renamed": 9,
-     "newOnSite": 5,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
      "removedOnSite": 0,
      "outdated": 0,
      "otherFactionOnSite": 0,
@@ -400,11 +407,11 @@
      "noPointsOnSite": 0
     },
     "wargear": {
-     "same": 0,
+     "same": 1,
      "priceChanged": 0,
-     "onlyOurs": 2,
-     "onlySite": 1,
-     "notAuto": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 1,
      "chapterVariants": 0
     },
     "addons": {
@@ -412,292 +419,152 @@
      "changed": 0
     },
     "detachments": {
-     "ours": 9,
+     "ours": 18,
      "site": 13,
-     "matched": 4,
-     "dp": 3,
-     "newOnSite": 9,
-     "missingOnSite": 5,
-     "outdated": 0
+     "matched": 13,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 5
     },
     "enhancements": {
-     "same": 1,
-     "points": 2,
-     "newOnSite": 5,
-     "missingOnSite": 10,
-     "possibleRenames": 1,
-     "outdated": 0
+     "same": 29,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 11
     }
    },
    "datasheets": {
     "pointsChanged": [],
-    "sizesChanged": [
-     {
-      "id": "000000882",
-      "name": "Custodian Guard",
-      "siteName": "Custodian Guard Sodality",
-      "ours": "1-3: 4=170,5=215 | 4-+: 4=180,5=225",
-      "site": "1-3: 3=240 | 4-+: 3=270"
-     },
-     {
-      "id": "000001450",
-      "name": "Custodian Wardens",
-      "siteName": "Custodian Wardens",
-      "ours": "1-1: 4=200,5=250 | 2-+: 4=220,5=270",
-      "site": "1-1: 2=200,3=295 | 2-+: 2=230,3=325"
-     },
-     {
-      "id": "000001453",
-      "name": "Allarus Custodians",
-      "siteName": "Allarus Custodians",
-      "ours": "1-2: 2=110,3=165,5=280,6=340 | 3-+: 2=140,3=195,5=310,6=370",
-      "site": "1-2: 2=180,3=270 | 3-+: 2=210,3=300"
-     },
-     {
-      "id": "000001561",
-      "name": "Venatari Custodians",
-      "siteName": "Venatari with Verutum Lances",
-      "ours": "1-2: 3=150,6=300 | 3-+: 3=160,6=310",
-      "site": "1-2: 3=270 | 3-+: 3=300"
-     },
-     {
-      "id": "000001563",
-      "name": "Sagittarum Custodians",
-      "siteName": "Sagittarum Custodians Sodality",
-      "ours": "1-+: 5=225",
-      "site": "1-+: 3=185"
-     }
-    ],
-    "tiersChanged": [
-     {
-      "id": "000000883",
-      "name": "Venerable Contemptor Dreadnought",
-      "siteName": "Venerable Contemptor Dreadnought",
-      "ours": "1-2: 1=170 | 3-+: 1=185",
-      "site": "1-+: 1=220"
-     },
-     {
-      "id": "000000884",
-      "name": "Venerable Land Raider",
-      "siteName": "Venerable Land Raider",
-      "ours": "1-1: 1=220 | 2-+: 1=240",
-      "site": "1-+: 1=230"
-     },
-     {
-      "id": "000001447",
-      "name": "Shield-captain",
-      "siteName": "Shield‑Captain",
-      "ours": "1-+: 1=110",
-      "site": "1-1: 1=180 | 2-+: 1=200"
-     },
-     {
-      "id": "000001448",
-      "name": "Shield-captain In Allarus Terminator Armour",
-      "siteName": "Shield‑Captain in Allarus Terminator Armour",
-      "ours": "1-+: 1=130",
-      "site": "1-1: 1=185 | 2-+: 1=205"
-     },
-     {
-      "id": "000001449",
-      "name": "Shield-captain On Dawneagle Jetbike",
-      "siteName": "Shield‑Captain on Dawneagle Jetbike",
-      "ours": "1-+: 1=140",
-      "site": "1-1: 1=205 | 2-+: 1=225"
-     },
-     {
-      "id": "000001454",
-      "name": "Vertus Praetors",
-      "siteName": "Vertus Praetors",
-      "ours": "1-2: 2=145,3=215 | 3-+: 2=170,3=240",
-      "site": "1-1: 2=220,3=330 | 2-+: 2=240,3=350"
-     },
-     {
-      "id": "000001558",
-      "name": "Aquilon Custodians",
-      "siteName": "Aquilon Terminators with Solarite Power Gauntlets",
-      "ours": "1-+: 3=195,6=390",
-      "site": "1-2: 3=285 | 3-+: 3=315"
-     },
-     {
-      "id": "000001559",
-      "name": "Custodian Guard With Adrasite And Pyrithite Spears",
-      "siteName": "Custodian Guard Sodality with Adrasite Spears",
-      "ours": "1-3: 5=250 | 4-+: 5=260",
-      "site": "1-+: 3=200"
-     },
-     {
-      "id": "000001560",
-      "name": "Agamatus Custodians",
-      "siteName": "Gyrfalcon Jetbike Sodality",
-      "ours": "1-+: 3=225,6=450",
-      "site": "1-1: 2=260 | 2-+: 2=280"
-     },
-     {
-      "id": "000002518",
-      "name": "Blade Champion",
-      "siteName": "Blade Champion",
-      "ours": "1-1: 1=110 | 2-+: 1=125",
-      "site": "1-2: 1=175 | 3-+: 1=195"
-     }
-    ],
-    "legendsChanged": [
-     {
-      "id": "000000883",
-      "name": "Venerable Contemptor Dreadnought",
-      "ours": false,
-      "site": true
-     },
-     {
-      "id": "000000884",
-      "name": "Venerable Land Raider",
-      "ours": false,
-      "site": true
-     },
-     {
-      "id": "000001559",
-      "name": "Custodian Guard With Adrasite And Pyrithite Spears",
-      "ours": false,
-      "site": true
-     },
-     {
-      "id": "000001563",
-      "name": "Sagittarum Custodians",
-      "ours": false,
-      "site": true
-     },
-     {
-      "id": "000002088",
-      "name": "Aleya",
-      "ours": false,
-      "site": true
-     },
-     {
-      "id": "000002519",
-      "name": "Valerian",
-      "ours": false,
-      "site": true
-     }
-    ],
-    "renamed": [
-     {
-      "id": "000000882",
-      "name": "Custodian Guard",
-      "to": "Custodian Guard Sodality",
-      "siteId": "custodian-guard-sodality"
-     },
-     {
-      "id": "000001558",
-      "name": "Aquilon Custodians",
-      "to": "Aquilon Terminators with Solarite Power Gauntlets",
-      "siteId": "aquilon-terminators-with-solarite-power-gauntlets"
-     },
-     {
-      "id": "000001559",
-      "name": "Custodian Guard With Adrasite And Pyrithite Spears",
-      "to": "Custodian Guard Sodality with Adrasite Spears",
-      "siteId": "custodian-guard-sodality-with-adrasite-spears"
-     },
-     {
-      "id": "000001560",
-      "name": "Agamatus Custodians",
-      "to": "Gyrfalcon Jetbike Sodality",
-      "siteId": "gyrfalcon-jetbike-sodality"
-     },
-     {
-      "id": "000001561",
-      "name": "Venatari Custodians",
-      "to": "Venatari with Verutum Lances",
-      "siteId": "venatari-with-verutum-lances"
-     },
-     {
-      "id": "000001563",
-      "name": "Sagittarum Custodians",
-      "to": "Sagittarum Custodians Sodality",
-      "siteId": "sagittarum-custodians-sodality"
-     },
-     {
-      "id": "000002521",
-      "name": "Prosecutors",
-      "to": "Prosecutor Squad",
-      "siteId": "prosecutor-squad"
-     },
-     {
-      "id": "000002522",
-      "name": "Vigilators",
-      "to": "Vigilator Squad",
-      "siteId": "vigilator-squad"
-     },
-     {
-      "id": "000002523",
-      "name": "Witchseekers",
-      "to": "Witchseeker Squad",
-      "siteId": "witchseeker-squad"
-     }
-    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
     "removedOnSite": [],
     "outdated": [],
     "otherFactionOnSite": [],
     "legendsNotOnSite": [],
     "unmatched": [],
-    "newOnSite": [
-     {
-      "siteId": "aquilon-terminators-with-solarite-power-talons",
-      "name": "Aquilon Terminators with Solarite Power Talons",
-      "faction": "adeptus-custodes",
-      "legends": false,
-      "points": "1-2: 3=275 | 3-+: 3=305"
-     },
-     {
-      "siteId": "caladius-annihilator-grav-tank",
-      "name": "Caladius Annihilator Grav‑Tank",
-      "faction": "adeptus-custodes",
-      "legends": false,
-      "points": "1-2: 1=250 | 3-+: 1=280"
-     },
-     {
-      "siteId": "custodian-guard-sodality-with-pyrithite-spears",
-      "name": "Custodian Guard Sodality with Pyrithite Spears",
-      "faction": "adeptus-custodes",
-      "legends": true,
-      "points": "1-+: 3=215"
-     },
-     {
-      "siteId": "sentinel-guard-sodality",
-      "name": "Sentinel Guard Sodality",
-      "faction": "adeptus-custodes",
-      "legends": false,
-      "points": "1-3: 3=240 | 4-+: 3=270"
-     },
-     {
-      "siteId": "venatari-with-kinetic-destroyers",
-      "name": "Venatari with Kinetic Destroyers",
-      "faction": "adeptus-custodes",
-      "legends": false,
-      "points": "1-2: 3=255 | 3-+: 3=280"
-     }
-    ],
+    "newOnSite": [],
     "noPointsOnSite": [],
-    "same": 16,
+    "same": 36,
     "pairs": [
+     {
+      "id": "000002088",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "aleya"
+     },
+     {
+      "id": "000001453",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "allarus-custodians"
+     },
+     {
+      "id": "000002524",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "anathema-psykana-rhino"
+     },
+     {
+      "id": "000001558",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "aquilon-terminators-with-solarite-power-gauntlets"
+     },
+     {
+      "id": "whr:adeptus-custodes:aquilon-terminators-with-solarite-power-talons",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "aquilon-terminators-with-solarite-power-talons"
+     },
+     {
+      "id": "000001680",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "ares-gunship"
+     },
+     {
+      "id": "000002518",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "blade-champion"
+     },
+     {
+      "id": "whr:adeptus-custodes:caladius-annihilator-grav-tank",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "caladius-annihilator-grav-tank"
+     },
+     {
+      "id": "000001460",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "caladius-grav-tank"
+     },
+     {
+      "id": "000001458",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "contemptor-achillus-dreadnought"
+     },
+     {
+      "id": "000001557",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "contemptor-galatus-dreadnought"
+     },
+     {
+      "id": "000001461",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "coronus-grav-carrier"
+     },
      {
       "id": "000000882",
       "siteFaction": "adeptus-custodes",
       "siteId": "custodian-guard-sodality"
      },
      {
-      "id": "000000883",
+      "id": "000001559",
       "siteFaction": "adeptus-custodes",
-      "siteId": "venerable-contemptor-dreadnought"
+      "siteId": "custodian-guard-sodality-with-adrasite-spears"
      },
      {
-      "id": "000000884",
+      "id": "whr:adeptus-custodes:custodian-guard-sodality-with-pyrithite-spears",
       "siteFaction": "adeptus-custodes",
-      "siteId": "venerable-land-raider"
+      "siteId": "custodian-guard-sodality-with-pyrithite-spears"
      },
      {
-      "id": "000001446",
+      "id": "000001450",
       "siteFaction": "adeptus-custodes",
-      "siteId": "trajann-valoris"
+      "siteId": "custodian-wardens"
+     },
+     {
+      "id": "000001560",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "gyrfalcon-jetbike-sodality"
+     },
+     {
+      "id": "000002520",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "knight-centura"
+     },
+     {
+      "id": "000001564",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "orion-assault-dropship"
+     },
+     {
+      "id": "000001562",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "pallas-grav-attack"
+     },
+     {
+      "id": "000002521",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "prosecutor-squad"
+     },
+     {
+      "id": "000001563",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "sagittarum-custodians-sodality"
+     },
+     {
+      "id": "whr:adeptus-custodes:sentinel-guard-sodality",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "sentinel-guard-sodality"
      },
      {
       "id": "000001447",
@@ -715,94 +582,14 @@
       "siteId": "shield-captain-on-dawneagle-jetbike"
      },
      {
-      "id": "000001450",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "custodian-wardens"
-     },
-     {
-      "id": "000001453",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "allarus-custodians"
-     },
-     {
-      "id": "000001454",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "vertus-praetors"
-     },
-     {
-      "id": "000001458",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "contemptor-achillus-dreadnought"
-     },
-     {
-      "id": "000001460",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "caladius-grav-tank"
-     },
-     {
-      "id": "000001461",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "coronus-grav-carrier"
-     },
-     {
       "id": "000001479",
       "siteFaction": "adeptus-custodes",
       "siteId": "telemon-heavy-dreadnought"
      },
      {
-      "id": "000001557",
+      "id": "000001446",
       "siteFaction": "adeptus-custodes",
-      "siteId": "contemptor-galatus-dreadnought"
-     },
-     {
-      "id": "000001558",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "aquilon-terminators-with-solarite-power-gauntlets"
-     },
-     {
-      "id": "000001559",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "custodian-guard-sodality-with-adrasite-spears"
-     },
-     {
-      "id": "000001560",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "gyrfalcon-jetbike-sodality"
-     },
-     {
-      "id": "000001561",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "venatari-with-verutum-lances"
-     },
-     {
-      "id": "000001562",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "pallas-grav-attack"
-     },
-     {
-      "id": "000001563",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "sagittarum-custodians-sodality"
-     },
-     {
-      "id": "000001564",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "orion-assault-dropship"
-     },
-     {
-      "id": "000001680",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "ares-gunship"
-     },
-     {
-      "id": "000002088",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "aleya"
-     },
-     {
-      "id": "000002518",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "blade-champion"
+      "siteId": "trajann-valoris"
      },
      {
       "id": "000002519",
@@ -810,14 +597,29 @@
       "siteId": "valerian"
      },
      {
-      "id": "000002520",
+      "id": "whr:adeptus-custodes:venatari-with-kinetic-destroyers",
       "siteFaction": "adeptus-custodes",
-      "siteId": "knight-centura"
+      "siteId": "venatari-with-kinetic-destroyers"
      },
      {
-      "id": "000002521",
+      "id": "000001561",
       "siteFaction": "adeptus-custodes",
-      "siteId": "prosecutor-squad"
+      "siteId": "venatari-with-verutum-lances"
+     },
+     {
+      "id": "000000883",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "venerable-contemptor-dreadnought"
+     },
+     {
+      "id": "000000884",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "venerable-land-raider"
+     },
+     {
+      "id": "000001454",
+      "siteFaction": "adeptus-custodes",
+      "siteId": "vertus-praetors"
      },
      {
       "id": "000002522",
@@ -828,47 +630,25 @@
       "id": "000002523",
       "siteFaction": "adeptus-custodes",
       "siteId": "witchseeker-squad"
-     },
-     {
-      "id": "000002524",
-      "siteFaction": "adeptus-custodes",
-      "siteId": "anathema-psykana-rhino"
      }
     ],
     "counts": {
-     "ours": 31,
+     "ours": 36,
      "site": 36,
-     "matched": 31
+     "matched": 36
     },
     "wargear": {
-     "same": 0,
+     "same": 1,
      "priceChanged": [],
-     "onlyOurs": [
-      {
-       "id": "000001460",
-       "unit": "Caladius Grav-tank",
-       "name": "Twin arachnus heavy blaze cannon",
-       "ours": 15,
-       "unverified": false
-      },
-      {
-       "id": "000001561",
-       "unit": "Venatari Custodians",
-       "name": "Venatari lance",
-       "ours": 5,
-       "unverified": false
-      }
-     ],
-     "onlySite": [
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [
       {
        "id": "000001447",
-       "unit": "Shield-captain",
-       "name": "Praesidium Shield",
-       "site": 25,
-       "auto": true
+       "unit": "Shield-Captain",
+       "name": "Praesidium Shield"
       }
      ],
-     "notAuto": [],
      "chapterVariants": []
     },
     "addons": {
@@ -877,27 +657,9 @@
     }
    },
    "detachments": {
-    "dpChanged": [
-     {
-      "id": "000000862",
-      "name": "Null Maiden Vigil",
-      "ours": 2,
-      "site": 1
-     },
-     {
-      "id": "000000863",
-      "name": "Auric Champions",
-      "ours": 2,
-      "site": 1
-     },
-     {
-      "id": "000001029",
-      "name": "Lions of the Emperor",
-      "ours": 3,
-      "site": 1
-     }
-    ],
-    "missingOnSite": [
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [
      {
       "id": "000000765",
       "name": "Shield Host"
@@ -919,127 +681,12 @@
       "name": "Tharanatoi Hammerblow"
      }
     ],
-    "outdated": [],
-    "newOnSite": [
-     {
-      "siteId": "dread-host",
-      "name": "Dread Host",
-      "faction": "adeptus-custodes",
-      "dp": 1,
-      "enhancements": 2
-     },
-     {
-      "siteId": "aquilan-shield",
-      "name": "Aquilan Shield",
-      "faction": "adeptus-custodes",
-      "dp": 1,
-      "enhancements": 2
-     },
-     {
-      "siteId": "emissaries-imperatus",
-      "name": "Emissaries Imperatus",
-      "faction": "adeptus-custodes",
-      "dp": 1,
-      "enhancements": 2
-     },
-     {
-      "siteId": "emperors-chosen",
-      "name": "Emperor’s Chosen",
-      "faction": "adeptus-custodes",
-      "dp": 1,
-      "enhancements": 2
-     },
-     {
-      "siteId": "solar-watch",
-      "name": "Solar Watch",
-      "faction": "adeptus-custodes",
-      "dp": 1,
-      "enhancements": 2
-     },
-     {
-      "siteId": "grav-assault-force",
-      "name": "Grav‑Assault Force",
-      "faction": "adeptus-custodes",
-      "dp": 1,
-      "enhancements": 2
-     },
-     {
-      "siteId": "honoured-companions",
-      "name": "Honoured Companions",
-      "faction": "adeptus-custodes",
-      "dp": 1,
-      "enhancements": 2
-     },
-     {
-      "siteId": "guardians-of-the-throne",
-      "name": "Guardians of the Throne",
-      "faction": "adeptus-custodes",
-      "dp": 3,
-      "enhancements": 4
-     },
-     {
-      "siteId": "shadowkeepers",
-      "name": "Shadowkeepers",
-      "faction": "adeptus-custodes",
-      "dp": 1,
-      "enhancements": 2
-     }
-    ],
+    "newOnSite": [],
     "enhancements": {
-     "pointsChanged": [
-      {
-       "id": "000008926003",
-       "detachment": "Null Maiden Vigil",
-       "name": "Huntress’ Eye",
-       "ours": 15,
-       "site": 10
-      },
-      {
-       "id": "000008926004",
-       "detachment": "Null Maiden Vigil",
-       "name": "Oblivion Knight",
-       "ours": 25,
-       "site": 15
-      }
-     ],
-     "newOnSite": [
-      {
-       "detachment": "Auric Champions",
-       "name": "Shroud of the Hidden Blade",
-       "site": 20
-      },
-      {
-       "detachment": "Lions of the Emperor",
-       "name": "Lightning Descent",
-       "site": 20
-      },
-      {
-       "detachment": "Lions of the Emperor",
-       "name": "Leonine Ferocity",
-       "site": 20
-      },
-      {
-       "detachment": "Might of the Moritoi",
-       "name": "Memento Moritoi (one per army) (Upgrade)",
-       "site": 30
-      },
-      {
-       "detachment": "Might of the Moritoi",
-       "name": "Augury Uplink (one per army) (Upgrade)",
-       "site": 30
-      }
-     ],
-     "missingOnSite": [
-      {
-       "detachment": "Null Maiden Vigil",
-       "name": "Enhanced Voidsheen Cloak",
-       "ours": 10
-      },
-      {
-       "detachment": "Null Maiden Vigil",
-       "name": "Raptor Blade",
-       "ours": 5
-      },
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [
       {
        "detachment": "Auric Champions",
        "name": "Blade Imperator",
@@ -1047,8 +694,23 @@
       },
       {
        "detachment": "Auric Champions",
+       "name": "Martial Philosopher",
+       "ours": 30
+      },
+      {
+       "detachment": "Auric Champions",
        "name": "Veiled Blade",
        "ours": 25
+      },
+      {
+       "detachment": "Might of the Moritoi",
+       "name": "Interred Expertise",
+       "ours": 25
+      },
+      {
+       "detachment": "Might of the Moritoi",
+       "name": "Auramite Sarcophagus",
+       "ours": 15
       },
       {
        "detachment": "Lions of the Emperor",
@@ -1071,32 +733,24 @@
        "ours": 30
       },
       {
-       "detachment": "Might of the Moritoi",
-       "name": "Interred Expertise",
-       "ours": 25
+       "detachment": "Null Maiden Vigil",
+       "name": "Enhanced Voidsheen Cloak",
+       "ours": 10
       },
       {
-       "detachment": "Might of the Moritoi",
-       "name": "Auramite Sarcophagus",
-       "ours": 15
+       "detachment": "Null Maiden Vigil",
+       "name": "Raptor Blade",
+       "ours": 5
       }
      ],
-     "outdated": [],
-     "possibleRenames": [
-      {
-       "detachment": "Auric Champions",
-       "ours": "Martial Philosopher",
-       "site": "Superior Creation",
-       "points": 30
-      }
-     ],
-     "same": 1
+     "possibleRenames": [],
+     "same": 29
     },
-    "same": 1,
+    "same": 13,
     "counts": {
-     "ours": 9,
+     "ours": 18,
      "site": 13,
-     "matched": 4
+     "matched": 13
     }
    }
   },

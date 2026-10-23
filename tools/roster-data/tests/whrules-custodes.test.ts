@@ -7,12 +7,18 @@ import path from 'node:path';
 import { checkFull, fullFileName, loadFull, mapFaction } from '../scripts/whrules-map.mjs';
 // @ts-expect-error — .mjs без типов
 import { loadSnapshot } from '../scripts/updates-40k.mjs';
+// @ts-expect-error — .mjs без типов
+import { BEFORE_CONVERT_AC, data40kAt } from '../scripts/baseline-40k.mjs';
 
 const DIR = path.join(import.meta.dirname, '..', '40k');
 const FULL_FILE = 'whrules-995-full-adeptus-custodes.json';
 const FULL = loadFull(FULL_FILE, DIR, ['adeptus-custodes']);
 const SNAP = loadSnapshot('whrules-995.json');
 const MAP = JSON.parse(fs.readFileSync(path.join(DIR, 'whrules-995-map-adeptus-custodes.json'), 'utf8'));
+// армия AC до полной конвертации (P1-T4d) — из истории git (коммит P1-T3); без git проверки по ней пропускаются
+const PRE = data40kAt(BEFORE_CONVERT_AC.rev);
+const TP = PRE ? test : test.skip;
+const preAC = () => structuredClone(PRE.files['AC.json']);
 
 test('полный снимок Custodes 995: схема, версия, fingerprint, имя файла; без фракции из списка — ошибка', () => {
   assert.equal(FULL.source.dataVersion, 995);
@@ -37,9 +43,8 @@ test('сопоставление Custodes: 22 тех же, 9 переимено�
   assert.equal(MAP.detachments.new.length, 9);
 });
 
-test('сохранённое сопоставление совпадает с пересчётом по данным до конвертации', () => {
-  // данные AC ещё не конвертированы — пересчёт по текущему AC.json даёт то же
-  const ac = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data', 'f', 'AC.json'), 'utf8'));
+TP('сохранённое сопоставление совпадает с пересчётом по данным до конвертации', () => {
+  const ac = preAC();
   const { counts, renamed, new: added, detachments } = mapFaction(SNAP, 'adeptus-custodes', ac);
   assert.deepEqual({ counts, renamed, new: added, detachments }, { counts: MAP.counts, renamed: MAP.renamed, new: MAP.new, detachments: MAP.detachments });
 });
@@ -50,8 +55,8 @@ import { convertFaction } from '../scripts/whrules-convert.mjs';
 // @ts-expect-error — .mjs без типов
 import { planFaction } from '../scripts/whrules-map.mjs';
 
-test('convertFaction (Custodes, сухой прогон в памяти): id сохранены, новые — whr:, прежние детачменты устаревшие, союзники не тронуты', () => {
-  const army = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data', 'f', 'AC.json'), 'utf8'));
+TP('convertFaction (Custodes, сухой прогон в памяти): id сохранены, новые — whr:, прежние детачменты устаревшие, союзники не тронуты', () => {
+  const army = preAC();
   const map = mapFaction(SNAP, 'adeptus-custodes', army);
   const plan = planFaction(map, FULL, army);
   const r = convertFaction({ full: FULL, slug: 'adeptus-custodes', army, map, plan });
@@ -66,7 +71,7 @@ test('convertFaction (Custodes, сухой прогон в памяти): id с�
   assert.equal(notOwn(r.file), notOwn(army));
   assert.deepEqual(r.unresolved, []);
   // конвертер не меняет переданные данные
-  assert.deepEqual(army, JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data', 'f', 'AC.json'), 'utf8')));
+  assert.deepEqual(army, preAC());
 });
 
 // ---------- P1-T4c: сухой прогон Custodes ----------
@@ -78,8 +83,8 @@ test('разметка правила армии Custodes («◈# …», «◈ W
   assert.deepEqual(plainHyphens({ name: 'Shield‑Captain', kw: ['GRAV‑ASSAULT'] }), { name: 'Shield-Captain', kw: ['GRAV-ASSAULT'] });
 });
 
-test('сухой прогон Custodes: все проверки пройдены, улучшения разобраны, размеры отряда со сменой — в отчёте', () => {
-  const r = dryRunFaction({ slug: 'adeptus-custodes', armyId: 'AC', fullFile: FULL_FILE });
+TP('сухой прогон Custodes: все проверки пройдены, улучшения разобраны, размеры отряда со сменой — в отчёте', () => {
+  const r = dryRunFaction({ slug: 'adeptus-custodes', armyId: 'AC', fullFile: FULL_FILE, army: preAC() });
   assert.deepEqual(r.checks.filter((c: { ok: boolean }) => !c.ok), []);
   assert.equal(r.summary.datasheets.after, 36);
   assert.deepEqual(r.enhancementEligibility.unmatched, []);
@@ -89,4 +94,15 @@ test('сухой прогон Custodes: все проверки пройдены
   assert.ok(r.unavailable.every((x: { field: string }) => x.field === 'damaged.text' || x.field.startsWith('costs.wargear.')));
   // ничего с неразрывным дефисом в сконвертированных данных
   assert.ok(!JSON.stringify(r._file.datasheets.filter((d: { group: string }) => d.group === 'own')).includes('‑'));
+});
+
+// ---------- P1-T4d: конвертация применена ----------
+test('Custodes на wh-rules 995: 36 своих инфолистов, отчёт свежести без расхождений, migrations — список 981 + 995', () => {
+  const ac = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data', 'f', 'AC.json'), 'utf8'));
+  assert.equal(ac.datasheets.filter((d: { group: string }) => d.group === 'own').length, 36);
+  assert.deepEqual(ac.source, { site: 'https://wh-rules.ru', dataVersion: 995, mfm: '1.6', date: '2026-10-16' });
+  assert.deepEqual(ac.migrations.map((m: { source: string }) => m.source), ['wh-rules 981 (MFM 1.6, 2026-10-14)', 'wh-rules 995 (MFM 1.6, 2026-10-16)']);
+  assert.ok(!JSON.stringify(ac.datasheets.filter((d: { group: string }) => d.group === 'own')).includes('\u2011'));
+  const wardens = ac.datasheets.find((d: { name: string; group: string }) => d.name === 'Custodian Wardens' && d.group === 'own');
+  assert.deepEqual(wardens.costs.map((b: { options: { label: string; cost: number }[] }) => b.options.map((o) => `${o.label}=${o.cost}`).join(',')), ['2 models=200,3 models=295', '2 models=230,3 models=325']);
 });
