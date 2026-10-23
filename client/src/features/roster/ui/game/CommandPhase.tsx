@@ -4,6 +4,7 @@ import { blockInRound, commandPhasePending, nextDraw, primaryAtOk, type Seat } f
 import { haptic } from '../../telegram';
 import { Button } from '../kit';
 import { cx } from '../util';
+import { CardLink } from './CardSheet';
 import { ScoreRows } from './ScoreRows';
 import type { GameHook } from './useGame';
 
@@ -98,9 +99,9 @@ function DrawnCard({ game, seat, card, n }: { game: GameHook; seat: Seat; card: 
   };
   return (
     <div className={cx('rounded-xl border px-3 py-2.5', swap?.required && !blocked ? 'border-warn/50 bg-warn/[0.06]' : 'border-white/10 bg-black/20')}>
-      <p className="text-sm font-bold">
-        {n != null && <span className="mr-1.5 text-[11px] font-semibold text-white/45">№{n}</span>}
-        {card.name}
+      <p className="flex items-baseline text-sm font-bold">
+        {n != null && <span className="mr-1.5 shrink-0 text-[11px] font-semibold text-white/45">№{n}</span>}
+        <CardLink id={card.id} seat={seat} name={card.name} />
       </p>
       {card.drawn && <p className="mt-1 text-[12px] leading-snug text-white/70">{card.drawn}</p>}
       {swap && (
@@ -122,7 +123,11 @@ function NoteEditor({ game, seat, cardId, name, rule, value }: { game: GameHook;
   const [text, setText] = useState(value);
   return (
     <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-2.5">
-      <p className="text-sm font-semibold">{name}: выбор</p>
+      <p className="text-sm font-semibold">
+        <CardLink id={cardId} seat={seat} name={name}>
+          {name}: выбор
+        </CardLink>
+      </p>
       <p className="mt-0.5 text-[11.5px] leading-snug text-white/55">{rule}</p>
       <div className="mt-2 flex gap-2">
         <input
@@ -159,14 +164,14 @@ function Swap({ game, seat }: { game: GameHook; seat: Seat }) {
       <p className="text-[11px] text-white/50">Один раз за битву: сбросить активную карту и взять новую сверху колоды. CP: {p.cp}</p>
       <div className="mt-2 flex flex-wrap gap-1.5">
         {p.active.map((a) => (
-          <button
-            key={a.id}
-            type="button"
-            onClick={() => setPick(pick === a.id ? null : a.id)}
-            className={cx('rounded-full border px-2.5 py-1 text-xs font-semibold', pick === a.id ? 'border-accent bg-accent/15 text-accent' : 'border-white/15 text-white/75')}
-          >
-            {name(a.id)}
-          </button>
+          <span key={a.id} className={cx('inline-flex items-center gap-1 rounded-full border pl-2.5 pr-1', pick === a.id ? 'border-accent bg-accent/15 text-accent' : 'border-white/15 text-white/75')}>
+            <button type="button" onClick={() => setPick(pick === a.id ? null : a.id)} className="py-1 text-xs font-semibold">
+              {name(a.id)}
+            </button>
+            <CardLink id={a.id} seat={seat} name={name(a.id)} className="py-1 pr-1">
+              {''}
+            </CardLink>
+          </span>
         ))}
       </div>
       <Button
@@ -202,7 +207,11 @@ function PrimaryNow({ game, seat }: { game: GameHook; seat: Seat }) {
   if (!blocks.length) return null;
   return (
     <div className="rounded-xl border border-accent/30 bg-accent/[0.05] px-3 py-2.5">
-      <p className="text-sm font-semibold">Основная миссия: {card.name}</p>
+      <p className="text-sm font-semibold">
+        <CardLink id={card.id} seat={seat} name={card.name}>
+          Основная миссия: {card.name}
+        </CardLink>
+      </p>
       <div className="mt-2">
         <ScoreRows
           card={card}

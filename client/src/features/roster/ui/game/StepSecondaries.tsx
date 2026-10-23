@@ -2,8 +2,8 @@ import { useState } from 'react';
 import type { SecondaryMode, Seat } from '../../game';
 import { haptic } from '../../telegram';
 import { Button, Icon, Segmented } from '../kit';
-import { MissionCardView } from '../MissionCard';
 import { cx } from '../util';
+import { useOpenCard } from './cardViewer';
 import { DeckList, SecondaryCard } from './SecondaryCard';
 import type { GameHook } from './useGame';
 
@@ -65,7 +65,7 @@ function Choose({ seat, game, onDone }: { seat: Seat; game: GameHook; onDone: ()
   const cap = game.data!.missions.caps.fixedSecondaryCard;
   const [mode, setMode] = useState<SecondaryMode>(p.secondaryMode ?? 'tactical');
   const [picked, setPicked] = useState<string[]>(p.fixed ? [...p.fixed] : []);
-  const [open, setOpen] = useState<string | null>(null);
+  const openCard = useOpenCard();
   const [deck, setDeck] = useState(false);
   const ready = mode === 'tactical' || picked.length === 2;
 
@@ -133,11 +133,11 @@ function Choose({ seat, game, onDone }: { seat: Seat; game: GameHook; onDone: ()
                       </span>
                       <span className="truncate text-sm font-semibold">{c.name}</span>
                     </button>
-                    <button type="button" onClick={() => setOpen(open === c.id ? null : c.id)} className="shrink-0 text-xs font-semibold text-accent/90">
-                      {open === c.id ? 'Скрыть' : 'Карта'}
+                    <button type="button" onClick={() => openCard?.(c.id)} className="flex shrink-0 items-center gap-1 text-xs font-semibold text-accent/90">
+                      Карта
+                      <Icon name="info" className="size-3.5" />
                     </button>
                   </div>
-                  {open === c.id && <MissionCardView card={c} className="mt-1.5" />}
                 </li>
               );
             })}
