@@ -24,6 +24,8 @@ export function initDecks(s: GameState, catalog: GameCatalog): void {
   for (const seat of ['p1', 'p2'] as const) {
     const p = s.players[seat];
     p.discarded = [];
+    p.discardLog = [];
+    p.drawn = 0;
     p.scored = [];
     p.swapUsed = false;
     if (p.secondaryMode === 'fixed' && p.fixed) {
@@ -64,7 +66,7 @@ export function drawCards(s: GameState, seat: Seat, cards: string[], source: 'ra
     if (top.join('|') !== cards.join('|')) return 'Случайная выдача должна совпадать с верхом колоды';
   } else if (cards.some((c) => !p.deck.includes(c))) return 'Этой карты нет в колоде';
   p.deck = p.deck.filter((c) => !cards.includes(c));
-  for (const id of cards) p.active.push({ id, round: s.round, source });
+  for (const id of cards) p.active.push({ id, round: s.round, source, n: ++p.drawn });
   s.drawsThisPhase += cards.length;
   return null;
 }
@@ -94,9 +96,12 @@ export function redrawWhenDrawn(
   if (!p.deck.includes(replacement)) return 'Этой карты нет в колоде';
   const old = p.active[i]!;
   p.deck = p.deck.filter((c) => c !== replacement);
-  p.active[i] = { id: replacement, round: s.round, source };
+  p.active[i] = { id: replacement, round: s.round, source, n: ++p.drawn };
   if (shuffleBack) reshuffle(p, s.seed, [...p.deck, old.id]);
-  else p.discarded.push(old.id);
+  else {
+    p.discarded.push(old.id);
+    p.discardLog.push({ id: old.id, round: s.round, ...(old.n != null ? { n: old.n } : {}), why: 'when-drawn', cp: 0 });
+  }
   return null;
 }
 
@@ -117,8 +122,10 @@ export function swapCard(s: GameState, seat: Seat, card: string, replacement: st
   if (source === 'random' && p.deck[0] !== replacement) return 'Случайная замена должна совпадать с верхом колоды';
   if (!p.deck.includes(replacement)) return 'Этой карты нет в колоде';
   p.deck = p.deck.filter((c) => c !== replacement);
-  p.active[i] = { id: replacement, round: s.round, source };
+  const old = p.active[i]!;
+  p.active[i] = { id: replacement, round: s.round, source, n: ++p.drawn };
   p.discarded.push(card);
+  p.discardLog.push({ id: card, round: s.round, ...(old.n != null ? { n: old.n } : {}), why: 'swap', cp: -1 });
   p.cp -= 1;
   p.swapUsed = true;
   return null;

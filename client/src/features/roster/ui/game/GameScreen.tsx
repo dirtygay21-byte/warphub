@@ -12,6 +12,7 @@ import { StepRoles } from './StepRoles';
 import { StepSecondaries } from './StepSecondaries';
 import { StepStart, Summary } from './StepStart';
 import { StepPlayers } from './StepPlayers';
+import { SecondaryCard } from './SecondaryCard';
 import { useGame, type GameHook } from './useGame';
 
 /**
@@ -184,6 +185,10 @@ function BattleStarted({ game, index }: { game: GameHook; index: DataIndex }) {
       <p className="rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-xs leading-snug text-white/55">
         Трекер партии — фазы, карты вторичных, подсчёт очков — следующий этап (G3). Подготовка записана; «Отменить» вернёт начало битвы.
       </p>
+      <p className="pt-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">Вторичные миссии</p>
+      {(['p1', 'p2'] as const).map((s) => (
+        <SecondaryCard key={s} game={game} seat={s} />
+      ))}
       <Summary game={game} index={index} />
     </section>
   );

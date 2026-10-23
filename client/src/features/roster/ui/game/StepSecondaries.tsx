@@ -4,6 +4,7 @@ import { haptic } from '../../telegram';
 import { Button, Icon, Segmented } from '../kit';
 import { MissionCardView } from '../MissionCard';
 import { cx } from '../util';
+import { DeckList, SecondaryCard } from './SecondaryCard';
 import type { GameHook } from './useGame';
 
 /**
@@ -32,6 +33,10 @@ export function StepSecondaries({ game, onNext }: { game: GameHook; onNext: () =
           <>
             <p className="font-display text-lg font-semibold uppercase">Оба игрока выбрали</p>
             <p className="mt-1 text-sm text-white/60">Положите телефон так, чтобы видели оба, и раскройте выбор.</p>
+            <div className="mt-3 space-y-2 text-left">
+              <SecondaryCard game={game} seat="p1" hidden />
+              <SecondaryCard game={game} seat="p2" hidden />
+            </div>
             <Button
               variant="primary"
               className="mt-3 w-full"
@@ -61,6 +66,7 @@ function Choose({ seat, game, onDone }: { seat: Seat; game: GameHook; onDone: ()
   const [mode, setMode] = useState<SecondaryMode>(p.secondaryMode ?? 'tactical');
   const [picked, setPicked] = useState<string[]>(p.fixed ? [...p.fixed] : []);
   const [open, setOpen] = useState<string | null>(null);
+  const [deck, setDeck] = useState(false);
   const ready = mode === 'tactical' || picked.length === 2;
 
   const toggle = (id: string) => {
@@ -93,10 +99,22 @@ function Choose({ seat, game, onDone }: { seat: Seat; game: GameHook; onDone: ()
         ]}
       />
       {mode === 'tactical' ? (
-        <p className="mt-2 text-xs leading-snug text-white/55">
-          Колода перемешивается; в начале каждой своей фазы командования вы тянете две карты. Выполненные засчитываются в конце хода,
-          ненужные можно сбросить за 1 CP в конце своего хода, одну карту за битву — заменить за 1 CP.
-        </p>
+        <>
+          <p className="mt-2 text-xs leading-snug text-white/55">
+            Колода перемешивается; в начале каждой своей фазы командования вы тянете две карты. Карта активна до выполнения или сброса.
+            Выполненные засчитываются в конце хода, указанного на карте; ненужные можно сбросить в конце своего хода (1 CP за ход), одну
+            карту за битву — заменить за 1 CP.
+          </p>
+          <button
+            type="button"
+            onClick={() => setDeck((v) => !v)}
+            className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] py-2 text-[13px] font-semibold active:bg-white/10"
+          >
+            Все карты колоды ({game.data!.missions.cards.filter((c) => c.type === 'secondary').length})
+            <Icon name="down" className={cx('size-4 text-white/50 transition', deck && 'rotate-180')} />
+          </button>
+          {deck && <DeckList cards={game.data!.missions.cards.filter((c) => c.type === 'secondary')} />}
+        </>
       ) : (
         <>
           <p className="mt-2 text-xs leading-snug text-white/55">
@@ -134,24 +152,13 @@ function Choose({ seat, game, onDone }: { seat: Seat; game: GameHook; onDone: ()
   );
 }
 
-/** После раскрытия: режим каждого игрока, фиксированные карты, колода по роли. */
+/** После раскрытия: карточки вторичных миссий обоих игроков (SecondaryCard). */
 function Revealed({ game, onNext }: { game: GameHook; onNext: () => void }) {
-  const state = game.state!;
-  const cardName = (id: string) => game.data!.missions.cards.find((c) => c.id === id)?.name ?? id;
   return (
     <div className="mt-3 space-y-2">
-      {(['p1', 'p2'] as const).map((s) => {
-        const p = state.players[s];
-        return (
-          <div key={s} className="rounded-xl border border-white/10 bg-black/20 px-3 py-2.5">
-            <p className="text-[11px] text-white/45">
-              {p.name} · {p.role === 'attacker' ? 'атакующий' : 'защитник'}
-            </p>
-            <p className="text-sm font-semibold">{p.secondaryMode === 'fixed' ? 'Фиксированные' : 'Тактические'}</p>
-            {p.fixed && <p className="mt-0.5 text-xs text-accent">{p.fixed.map(cardName).join(' · ')}</p>}
-          </div>
-        );
-      })}
+      {(['p1', 'p2'] as const).map((s) => (
+        <SecondaryCard key={s} game={game} seat={s} />
+      ))}
       <Button variant="primary" className="w-full" onClick={onNext}>
         Далее: первый ход
       </Button>

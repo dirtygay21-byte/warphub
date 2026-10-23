@@ -183,8 +183,20 @@ export interface ActiveCard {
   /** когда стала активной */
   round: Round;
   source: Source;
+  /** номер карты в порядке выхода из колоды (1, 2, …; только тактические) */
+  n?: number;
   /** заметка «при взятии» (маяк, заманчивая цель …) */
   note?: string;
+}
+
+/** Карта ушла в сброс: сброс в конце хода (cp +1 или 0), замена за 1 CP (−1) или правило «при взятии». */
+export interface DiscardEntry {
+  id: string;
+  round: Round;
+  n?: number;
+  why: 'discard' | 'swap' | 'when-drawn';
+  /** изменение CP этим действием */
+  cp: number;
 }
 
 export interface ScoredCard {
@@ -192,6 +204,8 @@ export interface ScoredCard {
   round: Round;
   /** чей ход шёл, когда карта засчитана (вторичные считаются в конце хода любого игрока) */
   turn: Seat;
+  /** номер карты в порядке выхода из колоды (тактические) */
+  n?: number;
   /** очки по карте до лимитов (лимиты раунда, битвы и фиксированной карты — в итогах, G1.6) */
   vp: number;
   picks: RowPick[];
@@ -205,7 +219,11 @@ export interface PlayerState extends PlayerSetup {
   /** сколько раз колоду перемешивали (часть seed для следующего перемешивания) */
   shuffles: number;
   active: ActiveCard[];
+  /** сколько карт вышло из колоды за битву (последний номер n) */
+  drawn: number;
   discarded: string[];
+  /** сброшенные карты по порядку: когда, почему, CP */
+  discardLog: DiscardEntry[];
   scored: ScoredCard[];
   /** замена карты за 1 CP — один раз за битву */
   swapUsed: boolean;

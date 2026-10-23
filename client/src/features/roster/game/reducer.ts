@@ -41,7 +41,9 @@ function newPlayer(seat: Seat, name: string): PlayerState {
     deck: [],
     shuffles: 0,
     active: [],
+    drawn: 0,
     discarded: [],
+    discardLog: [],
     scored: [],
     swapUsed: false,
     primaryScored: [],
@@ -322,7 +324,8 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
         if (!blockTurnOk(t, ownTurn, lastTurn))
           return fail(t === 'own' ? 'Этот блок засчитывается в конце вашего хода' : 'Этот блок засчитывается в конце хода противника (или в конце 5-го раунда)');
       }
-      p.scored.push({ id: ev.card, round: s.round, turn: s.activeSeat!, vp: r.vp, picks: ev.picks.map((x) => ({ ...x })) });
+      const n = p.active.find((a) => a.id === ev.card)!.n;
+      p.scored.push({ id: ev.card, round: s.round, turn: s.activeSeat!, ...(n != null ? { n } : {}), vp: r.vp, picks: ev.picks.map((x) => ({ ...x })) });
       // тактическая карта выполнена и уходит из игры; фиксированная остаётся активной всю битву
       if (p.secondaryMode === 'tactical') p.active = p.active.filter((a) => a.id !== ev.card);
       break;
@@ -333,7 +336,8 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       const p = s.players[ev.target];
       if (p.secondaryMode !== 'tactical') return fail('Фиксированные вторичные миссии не сбрасываются');
       if (s.stage !== 'battle' || s.activeSeat !== ev.target || s.step !== 'main') return fail('Сбросить карты можно в конце своего хода');
-      if (!p.active.some((a) => a.id === ev.card)) return fail('Этой карты нет среди активных');
+      const gone = p.active.find((a) => a.id === ev.card);
+      if (!gone) return fail('Этой карты нет среди активных');
       if (ev.forCp) {
         if (s.discardCpTaken) return fail('1 CP за сброс в этот ход уже получен');
         p.cp += 1;
@@ -341,6 +345,7 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       }
       p.active = p.active.filter((a) => a.id !== ev.card);
       p.discarded.push(ev.card);
+      p.discardLog.push({ id: ev.card, round: s.round, ...(gone.n != null ? { n: gone.n } : {}), why: 'discard', cp: ev.forCp ? 1 : 0 });
       break;
     }
     case 'cp-changed': {

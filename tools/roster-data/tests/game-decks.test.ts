@@ -121,3 +121,37 @@ test('другой seed — другие карты; одинаковый жур
   assert.notDeepEqual(nextDraw(a, 'p1'), nextDraw(b, 'p1'));
   assert.deepEqual(ok(run()), a);
 });
+
+test('порядок выхода из колоды (n) и журнал сброса: взятие, «при взятии», замена, сброс, выполнение (G2.11b)', () => {
+  const drawn = B({ type: 'cards-drawn', target: 'p1', cards: ['bring-it-down', 'behind-enemy-lines'], source: 'manual' });
+  const s0 = ok(run(drawn));
+  assert.deepEqual(s0.players.p1.active.map((a) => [a.id, a.n]), [['bring-it-down', 1], ['behind-enemy-lines', 2]]);
+  assert.equal(s0.players.p1.drawn, 2);
+  const fixed = ok(replay(log(...setupBodies()), catalog)).players.p2;
+  assert.ok(fixed.active.every((a) => a.n === undefined) && fixed.drawn === 0, 'фиксированные без номера');
+
+  // «при взятии» со сбросом: замена получает №3, сброшенная — в журнал
+  const redraw = B({ type: 'card-redrawn', target: 'p1', card: 'bring-it-down', replacement: s0.players.p1.deck[0], reason: 'when-drawn', shuffleBack: false, source: 'random' });
+  const s1 = ok(run(drawn, redraw));
+  assert.deepEqual(s1.players.p1.active.map((a) => a.n), [3, 2]);
+  assert.deepEqual(s1.players.p1.discardLog, [{ id: 'bring-it-down', round: 1, n: 1, why: 'when-drawn', cp: 0 }]);
+
+  // замена за 1 CP: №4, в журнале −1 CP
+  const swap = B({ type: 'card-redrawn', target: 'p1', card: 'behind-enemy-lines', replacement: s1.players.p1.deck[0], reason: 'swap', shuffleBack: false, source: 'random' });
+  const s2 = ok(run(drawn, redraw, swap));
+  assert.deepEqual(s2.players.p1.active.map((a) => a.n), [3, 4]);
+  assert.deepEqual(s2.players.p1.discardLog.at(-1), { id: 'behind-enemy-lines', round: 1, n: 2, why: 'swap', cp: -1 });
+
+  // сброс в конце хода: первый +1 CP, второй без CP; номер сохраняется
+  const [a, b] = s2.players.p1.active;
+  const end = B({ type: 'command-phase-ended' });
+  const s3 = ok(run(drawn, redraw, swap, end, B({ type: 'card-discarded', target: 'p1', card: a!.id, forCp: true }), B({ type: 'card-discarded', target: 'p1', card: b!.id, forCp: false })));
+  assert.deepEqual(s3.players.p1.discardLog.slice(2).map((d) => [d.n, d.why, d.cp]), [[3, 'discard', 1], [4, 'discard', 0]]);
+  assert.equal(s3.players.p1.discarded.length, 4);
+
+  // возврат в колоду («при взятии» с перемешиванием) в журнал сброса не попадает; следующая выдача продолжает нумерацию
+  const back = B({ type: 'card-redrawn', target: 'p1', card: 'behind-enemy-lines', replacement: s0.players.p1.deck[0], reason: 'when-drawn', shuffleBack: true, source: 'random' });
+  const s4 = ok(run(drawn, back));
+  assert.deepEqual(s4.players.p1.discardLog, []);
+  assert.deepEqual(s4.players.p1.active.map((x) => x.n), [1, 3]);
+});
