@@ -244,7 +244,19 @@ npm run battlefield      # → backend/roster-data/battlefield.json
   изменёнными вариантами переводятся записью `migrations` «wh-rules 995 wargear» (`buildOptionRemap`; что не переводится —
   откладывается с предупреждением). Название оружия с «and» внутри («dart-bow and tri-blade») — одно оружие; «X and three
   of the following» — наборы из трёх с повторами (Kill Tank); предмет стандартного снаряжения с именем профиля
-  («Kannon - Shell», «Combi-weapon - Damnatus») — оружие без профиля. Тесты — `tests/paid-wargear.test.ts`.
+  («Kannon - Shell», «Combi-weapon - Damnatus») — оружие без профиля.
+- Варианты, которые снимают отсутствующий предмет (P1-T5d; было 58 во всех армиях, осталось 1 — Venerable Dreadnought SM
+  Legends: текст инфолиста противоречит сам себе). Разбор (`wargear.ts`): «X or Y» — подпункты с общим лимитом (заменяется
+  то, что есть у модели); одинаковые апострофы; «have their X can be replaced» (Piranhas); снимаемый предмет назван иначе,
+  чем в стандартном снаряжении («Furioso fists» ↔ «Twin Furioso fists», «ranged weapon» ↔ единственное стрелковое) —
+  берётся единственный подходящий стандартный предмет. Данные (`whrules-995-wargear → loadoutRepair`,
+  `whrules-wargear.mjs → repairLoadout`): стандартное снаряжение заново из текста loadout с предметами без профиля оружия
+  (способности снаряжения и то, что заменяют варианты: slabshield, scattershield, crests, cluster bombs, collar of Khorne),
+  перечнем после переноса строки, «is additionally equipped with», склейкой «pan spectral» ↔ «Panspectral» и
+  «sniper rifle» ↔ «Scout sniper rifle» (`import-wahapedia.mjs → parseLoadout`) — только добавляет. rosterOptions `remove` —
+  устаревшие или повторные варианты, которых нет у конструктора (Thunderhawk Gunship, Astraeus); `datasheets` — Knight
+  Preceptor из полного снимка CSM и Imperial Knights, Cultist Mob with Firearms — стандартное снаряжение по конструктору
+  (`loadout: 'roster'`: у инфолиста сайта ошибка). Тесты — `tests/paid-wargear.test.ts`.
 - Правила детачментов, которые меняют игру, а не состав армии (ауры, стратагемы, перебросы), только показываются
   текстом — на ростер они не влияют.
 - Если у инфолиста Space Marines несколько таблиц цен (варианты орденов), берётся первая.

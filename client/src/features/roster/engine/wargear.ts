@@ -112,8 +112,10 @@ function parseItem(raw: string, known: Map<string, string>): Item | null {
     qty = toNum(m[1]!) ?? 1;
     s = m[2]!;
   }
+  const look = (k: string) => known.get(k) ?? known.get(k.replace(/es$/, '')) ?? known.get(k.replace(/s$/, '')) ?? null;
   const k = key(s);
-  const name = known.get(k) ?? known.get(k.replace(/es$/, '')) ?? known.get(k.replace(/s$/, '')) ?? null;
+  // название профиля оружия: «2 Plasma Eradicator - Standards» (Astraeus) — оружие «Plasma Eradicator»
+  const name = look(k) ?? (/\s-\s/.test(s) ? look(key(s.split(/\s+-\s+/)[0]!)) : null);
   return { weapon: name ?? s.replace(/^./, (c) => c.toUpperCase()), qty };
 }
 
@@ -417,6 +419,8 @@ export function parseOption(text: string, index: number, groups: string[], known
     sentenceLock = lockOf(sl[2]!, known);
     first = sl[1]!.replace(/\.$/, '');
   }
+  // опечатка выгрузки: «… can each have their Piranha burst cannon can be replaced with …»
+  first = first.replace(/(\bhave\s+(?:its|their)\s+.+?)\s+can be replaced with\b/i, '$1 replaced with');
   const rest = lines.slice(1);
   // сноска в той же записи (вставка из конструктора сайта): «* That model’s storm bolter cannot be replaced.»
   const inlineNote = rest.find((l) => /^\*/.test(l) && /cannot be replaced/i.test(l));
@@ -476,6 +480,20 @@ export function parseOption(text: string, index: number, groups: string[], known
     const a = parseSentence(`${m[1]} can ${m[2] ?? ''}have ${m[3]} replaced with ${m[4]}`, [], { ...ctx, key: `${index}.0`, share: String(index) });
     const b = parseSentence(`${m[1]} can ${m[2] ? 'each ' : ''}be equipped with ${m[5]}`, rest, { ...ctx, key: `${index}.1`, share: String(index) });
     return a && b ? [mark(a), mark(b)] : null;
+  }
+  // «… have its bolt revolver and plasma knife or its bolt shotgun replaced with …», «1 model’s gauss scalpel or tesla caster
+  // can be replaced with …»: заменяется то, что есть у модели, — подпункты с общим лимитом моделей
+  const alt =
+    first.match(/^(.+?\bhave\s+(?:its|their)\s+)(.+?)\s+or\s+(?:its\s+|their\s+|a\s+|an\s+)?(.+?)(\s+replaced with\b.*)$/i) ??
+    first.match(/^(.+?'s?\s+)(.+?)\s+or\s+(?:its\s+|their\s+|a\s+|an\s+)?(.+?)(\s+can\s+(?:each\s+)?be replaced with\b.*)$/i);
+  if (alt && !/\bone of the following\b/i.test(alt[2]!) && parseItems(alt[2]!, known) && parseItems(alt[3]!, known)) {
+    const out: ParsedOption[] = [];
+    for (const [k, what] of [alt[2]!, alt[3]!].entries()) {
+      const o = parseSentence(`${alt[1]}${what}${alt[4]}`, rest, { ...ctx, key: `${index}.${k}`, share: String(index) });
+      if (!o) return null;
+      out.push(mark(o));
+    }
+    return out;
   }
   const one = parseSentence(first, rest, { ...ctx, key: String(index) });
   return one ? [mark(one)] : null;
@@ -596,6 +614,28 @@ export function optionsOf(ds: Datasheet): OptionsInfo {
     // «each shuriken cannon it is equipped with»: на модели их несколько — каждая заменяется отдельно
     if (o.perInstance && o.from.length === 1) o.perModel = Math.max(1, perModelQty(ds, o.from[0]!.weapon));
   }
+  // снимаемый предмет назван иначе, чем в стандартном снаряжении («Furioso fists» ↔ «Twin Furioso fists», «twin hellstrike
+  // missile launchers» ↔ «Twin hellstrike launcher», «ranged weapon» ↔ единственное стрелковое оружие): если такого предмета
+  // нет ни в стандартном снаряжении, ни в вариантах, а подходит ровно один стандартный — берём его
+  const defaults = [...new Set(ds.defaultLoadout.flatMap((r) => r.items.map((it) => it.weapon)))];
+  const gained = new Set(parsed.flatMap((o) => o.choices.flat().map((it) => kv(it.weapon))));
+  const has = (w: string) => defaults.some((d) => kv(d) === kv(w)) || gained.has(kv(w));
+  const toks = (w: string) => new Set(key(w).split(/\s+/).map((t) => t.replace(/(?:es|s)$/, '')).filter(Boolean));
+  const alias = (w: string): string | null => {
+    const kind = key(w).match(/^(ranged|melee) weapons?$/)?.[1];
+    if (kind) {
+      const m = defaults.filter((d) => ds.weapons.find((x) => kv(x.name) === kv(d))?.profiles.every((p) => (kind === 'melee') === (p.type === 'Melee')));
+      return m.length === 1 ? m[0]! : null;
+    }
+    const a = toks(w);
+    if (a.size < 2) return null;
+    const m = defaults.filter((d) => {
+      const b = toks(d);
+      return [...a].every((t) => b.has(t)) || [...b].every((t) => a.has(t));
+    });
+    return m.length === 1 ? m[0]! : null;
+  };
+  for (const o of parsed) o.from = o.from.map((f) => (has(f.weapon) ? f : { ...f, weapon: alias(f.weapon) ?? f.weapon }));
   const info = { parsed, unparsed, notes };
   cache.set(ds, info);
   return info;
@@ -660,7 +700,7 @@ export interface LoadoutResult {
   limits: Record<string, number>;
 }
 
-const kv = (s: string) => s.toLowerCase();
+const kv = (s: string) => s.toLowerCase().replace(/[’‘`]/g, "'");
 
 /** Снаряжение = стандартное + замены; проверка лимитов и наличия заменяемого оружия. */
 export function applyPicks(ds: Datasheet, base: Record<string, number>, picks: Picks | undefined, models: number): LoadoutResult {

@@ -374,3 +374,51 @@ test('сохранённые выборы у инфолистов с измен�
   assert.ok(mig.options?.[kt.id], 'есть перевод для Kill Tank');
   assert.equal(mig.options![kt.id]!.keys['0'], null, 'прежняя «+ Big Shoota» без Deff Rolla — не переводится');
 });
+
+// ---------- P1-T5d: варианты, которые снимают отсутствующий предмет ----------
+
+test('каждый разобранный вариант снимает предмет, который у юнита есть (стандартный или из другого варианта); исключение — один инфолист Legends', () => {
+  const dir = path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data', 'f');
+  const k = (s: string) => s.toLowerCase().replace(/[’‘]/g, "'");
+  const bad: string[] = [];
+  for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json'))) {
+    const F = fac(f.replace(/\.json$/, ''));
+    for (const d of F.datasheets) {
+      if (d.group !== 'own' || d.faction !== F.id) continue;
+      const have = new Set([...d.defaultLoadout.flatMap((r) => r.items.map((i) => k(i.weapon))), ...optionsOf(d).parsed.flatMap((o) => o.choices.flat().map((i) => k(i.weapon)))]);
+      for (const o of optionsOf(d).parsed) for (const it of o.from) if (!have.has(k(it.weapon))) bad.push(`${F.id}/${d.name}${d.legends ? ' (Legends)' : ''}: ${it.weapon}`);
+    }
+  }
+  // Venerable Dreadnought (Space Marines, Legends, Wahapedia): в снаряжении Dreadnought Fist, а вариант заменяет
+  // Dreadnought combat weapon — текст инфолиста противоречит сам себе, на сайте этого инфолиста нет
+  assert.deepEqual([...new Set(bad)], ['SM/Venerable Dreadnought (Legends): Dreadnought combat weapon']);
+});
+
+test('предметы снаряжения без профиля оружия — в стандартном снаряжении и заменяются: Bullgryn slabshield, Wraithknight scattershield, Kâhl rampart crest', () => {
+  for (const [f, name, to] of [['AM', 'Bullgryn Squad', 'Brute shield'], ['AE', 'Wraithknight', 'Heavy wraithcannon'], ['LoV', 'Kâhl', 'Teleport crest']] as const) {
+    const ds = sheet(f, name);
+    const c = build(f, ds, { picks: pick(opt(ds, to), to, 1) }).last;
+    assert.deepEqual(c.loadoutInfo.problems, [], name);
+    assert.ok((c.loadout[to] ?? 0) >= 1, name);
+  }
+});
+
+test('«X or Y» — заменяется то, что есть у модели, общий лимит (Hearthkyn Warriors: Autoch-pattern bolter или ion blaster)', () => {
+  const ds = sheet('LoV', 'Hearthkyn Warriors');
+  const subs = optionsOf(ds).parsed.filter((o) => o.choices.some((c) => c[0]!.weapon === 'Plasma knife'));
+  assert.deepEqual(subs.map((o) => o.from[0]!.weapon).sort(), ['Autoch-pattern bolter', 'Ion blaster']);
+  assert.ok(subs[0]!.share && subs[0]!.share === subs[1]!.share);
+  const ok = build('LoV', ds, { picks: pick(subs.find((o) => o.from[0]!.weapon === 'Autoch-pattern bolter')!, 'Plasma knife', 1) }).last;
+  assert.deepEqual(ok.loadoutInfo.problems, []);
+});
+
+test('исправленное стандартное снаряжение: Cultist Mob with Firearms (по конструктору сайта), Knight Preceptor (Questoris multi-laser), Knight Paladin (rapid-fire battle cannon)', () => {
+  const cm = build('CSM', sheet('CSM', 'Cultist Mob with Firearms')).last;
+  assert.deepEqual([cm.loadout['Autopistol'], cm.loadout['Autogun'], cm.loadout['Close combat weapon']], [1, 9, 9]);
+  const kp = sheet('QI', 'Knight Preceptor');
+  assert.equal(build('QI', kp, { picks: pick(opt(kp, 'Meltagun'), 'Meltagun', 1) }).last.loadoutInfo.problems.length, 0);
+  assert.equal(build('QI', sheet('QI', 'Knight Paladin')).last.loadout['Rapid-fire battle cannon'], 1);
+  // устаревшие/повторные варианты убраны: у Thunderhawk Gunship нет «cluster bombs», у Astraeus — одна замена las-rippers
+  assert.ok(!sheet('SM', 'Thunderhawk Gunship', 'Space Marines').options.some((o) => /cluster bombs/i.test(o.text)));
+  assert.equal(sheet('SM', 'Astraeus').options.filter((o) => /las-rippers/i.test(o.text)).length, 1);
+});

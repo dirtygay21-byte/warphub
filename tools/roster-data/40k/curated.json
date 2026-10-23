@@ -75,15 +75,17 @@
           "AE",
           "AM",
           "AdM",
+          "CSM",
           "DRU",
           "GC",
           "LoV",
           "ORK",
+          "QI",
           "QT",
           "SM",
           "TAU"
         ],
-        "note": "Платное стандартное снаряжение по конструктору ростеров wh-rules.ru 995: paidDefaults у 15 инфолистов (лазпушка Leman Russ ×8, dark lance Ravager, heavy mining laser Achilles Ridgerunners, Praesidium Shield Shield-Captain, Heavy Laser Destroyer Repulsor Executioner, Banner of Macragge Victrix Honour Guard, missile pod / T'au flamer Crisis Fireknife / Starscythe). Одобрено владельцем 2026-10-23 (P1-T5). Отдельные варианты из конструктора (rosterOptions, P1-T5c): Watcher in the Dark у Deathwing Terminator Squad; опечатки Kâhl, Ynnari Incubi, Kroot War Shaper; Secutarii Peltasts — galvanic caster вместо arc lance. Конфликты P1-T5e: Chaos Acastus Knight Porphyrion — обе пушки вместе; Wolf Scouts — bolt pistol, Thunderclap и runic stave вместе (решение владельца, конструктор сайта); Kill Tank и Gargantuan Squiggoth — оружие, снаряжение и варианты из полного снимка Orks (whrules-995-full-orks.json).",
+        "note": "Платное стандартное снаряжение по конструктору ростеров wh-rules.ru 995: paidDefaults у 15 инфолистов (лазпушка Leman Russ ×8, dark lance Ravager, heavy mining laser Achilles Ridgerunners, Praesidium Shield Shield-Captain, Heavy Laser Destroyer Repulsor Executioner, Banner of Macragge Victrix Honour Guard, missile pod / T'au flamer Crisis Fireknife / Starscythe). Одобрено владельцем 2026-10-23 (P1-T5). Отдельные варианты из конструктора (rosterOptions, P1-T5c): Watcher in the Dark у Deathwing Terminator Squad; опечатки Kâhl, Ynnari Incubi, Kroot War Shaper; Secutarii Peltasts — galvanic caster вместо arc lance. Конфликты P1-T5e: Chaos Acastus Knight Porphyrion — обе пушки вместе; Wolf Scouts — bolt pistol, Thunderclap и runic stave вместе (решение владельца, конструктор сайта); Kill Tank и Gargantuan Squiggoth — оружие, снаряжение и варианты из полного снимка Orks (whrules-995-full-orks.json). P1-T5d: стандартное снаряжение дополнено из текста loadout (loadoutRepair: способности снаряжения, предметы, которые заменяют варианты, перечень после переноса строки); удалены устаревшие/повторные варианты Astraeus и Thunderhawk Gunship; Knight Preceptor и Cultist Mob with Firearms — из полного снимка CSM и Imperial Knights.",
         "rosterOptions": [
           {
             "army": "SM",
@@ -136,6 +138,18 @@
               "combat blade": "Combat Knife"
             },
             "why": "решение владельца 2026-10-23 (P1-T5e): как в конструкторе ростеров сайта — bolt pistol, Thunderclap и runic stave вместе (инфолист сайта: «одно из»); «combat blade» конструктора — Combat Knife инфолиста"
+          },
+          {
+            "army": "SM",
+            "id": "000002700",
+            "remove": "2 Astraeus las-rippers",
+            "why": "повтор варианта с опечаткой (у сайта в инфолисте две строки, у конструктора — одна «2 Astareus Las-rippers → 2 Plasma Eradicators») (P1-T5d)"
+          },
+          {
+            "army": "SM",
+            "id": "000000139",
+            "remove": "Thunderhawk cluster bombs",
+            "why": "устаревшая строка: у сайта Hellstrike Missile Battery уже в стандартном снаряжении, у конструктора варианта нет (P1-T5d)"
           }
         ],
         "datasheets": [
@@ -154,8 +168,23 @@
             "faction": "orks",
             "options": "roster",
             "why": "наша версия (Forge World) устарела: у сайта Kannon в стандартном снаряжении; варианты — как в конструкторе ростеров (Kannon → Supa-kannon), без второй строки инфолиста «one of kannon / supa-kannon» (P1-T5e)"
+          },
+          {
+            "army": "QI",
+            "id": "000001483",
+            "full": "whrules-995-full-chaos-space-marines+imperial-knights.json",
+            "faction": "imperial-knights",
+            "options": "datasheet",
+            "why": "у нас в стандартном снаряжении «Preceptor multi-laser», у сайта (инфолист и конструктор) — Questoris multi-laser, его и заменяет вариант (P1-T5d)"
+          },
+          {
+            "army": "CSM",
+            "id": "000003713",
+            "why": "у нас и в инфолисте сайта у каждого культиста autopistol и brutal assault weapon, а варианты заменяют autogun и close combat weapon; у конструктора ростеров сайта — Cultist Champion: autopistol, brutal assault weapon; Chaos Cultists: autogun, close combat weapon (P1-T5d)",
+            "loadout": "roster"
           }
-        ]
+        ],
+        "loadoutRepair": true
       }
     ]
   }

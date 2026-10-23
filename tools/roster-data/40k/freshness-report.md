@@ -1,6 +1,6 @@
 # Свежесть данных 40K — wh-rules.ru 995 (MFM 1.6, 2026-10-16)
 
-Снимок `whrules-995.json`, fingerprint `79a26d70ca87852a…`. Наши данные: Wahapedia 2026-09-28 02:38:04 + whrules-981-space-marines (SM, AoI) + whrules-995-custodes (AC) + whrules-995-points (AS, AC, AdM, AE, AM, CD, QT, CSM, DG, DRU, EC, GC, GK, AoI, QI, LoV, NEC, ORK, SM, TAU, TS, TYR, WE) + whrules-995-wargear (AC, AE, AM, AdM, DRU, GC, LoV, ORK, QT, SM, TAU).
+Снимок `whrules-995.json`, fingerprint `79a26d70ca87852a…`. Наши данные: Wahapedia 2026-09-28 02:38:04 + whrules-981-space-marines (SM, AoI) + whrules-995-custodes (AC) + whrules-995-points (AS, AC, AdM, AE, AM, CD, QT, CSM, DG, DRU, EC, GC, GK, AoI, QI, LoV, NEC, ORK, SM, TAU, TS, TYR, WE) + whrules-995-wargear (AC, AE, AM, AdM, CSM, DRU, GC, LoV, ORK, QI, QT, SM, TAU).
 Сравниваются размеры отряда и цены, платные добавки и платное снаряжение. Отчёт строит scripts/whrules-compare.mjs; данные приложения он не меняет.
 
 | Армия | Изм. на сайте | Инфолисты наши/сайт | Совпало | Очки | Размеры | Ступени | Legends | Переим. | Новые | Убраны | В др. фракции | Legends/FW нет | Не сопост. | Детачм. новые/нет/DP | Улучш. очки/новые/нет/переим.? | Снаряж. совп./цена/только у нас/только на сайте/не по выбору |
