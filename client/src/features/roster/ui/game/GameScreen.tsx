@@ -1,10 +1,12 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import type { DataIndex, Roster } from '../../engine/types';
-import { currentSetupStep, setupSteps, type SetupStepId } from '../../game';
+import { currentSetupStep, setupSteps, type Seat, type SetupStepId } from '../../game';
 import { pushOverlay } from '../../telegram';
 import { Battlefield } from '../Battlefield';
 import { Button, Icon, IconButton } from '../kit';
 import { cx } from '../util';
+import { CardSheet } from './CardSheet';
+import { CardViewerContext } from './cardViewer';
 import { rosterRef } from './players';
 import { StepDispositions } from './StepDispositions';
 import { StepLayout } from './StepLayout';
@@ -31,6 +33,10 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
   // просмотр поля боя открывается поверх игры: игра не теряется, «Назад» Telegram закрывает просмотр
   const [viewing, setViewing] = useState(false);
   useEffect(() => (viewing ? pushOverlay(() => setViewing(false)) : undefined), [viewing]);
+  // просмотр карты миссии из любого места подготовки и трекера (G3.8)
+  const [card, setCard] = useState<{ id: string; seat?: Seat } | null>(null);
+  const openCard = useCallback((id: string, seat?: Seat) => setCard({ id, seat }), []);
+  const closeCard = useCallback(() => setCard(null), []);
   if (viewing) return <Battlefield onBack={() => setViewing(false)} />;
 
   if (loadError) {
@@ -49,45 +55,48 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
   }
 
   return (
-    <Shell onBack={onBack} undo={state && game.canUndo ? game.undo : undefined}>
-      {!state ? (
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-          <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
-          <p className="mt-1 text-sm leading-snug text-white/60">
-            Подготовка по шагам правил Chapter Approved 2026–27: игроки и ростеры, типы армий, раскладка, атакующий и защитник, вторичные миссии,
-            первый ход. Затем — трекер партии.
-          </p>
-          <Button variant="primary" className="mt-3 w-full" onClick={start}>
-            Начать подготовку
-          </Button>
-        </section>
-      ) : (
-        state.stage === 'setup' ? <Setup game={game} rosters={rosters} index={index} /> : <Tracker game={game} index={index} />
-      )}
+    <CardViewerContext.Provider value={openCard}>
+      <Shell onBack={onBack} undo={state && game.canUndo ? game.undo : undefined}>
+        {!state ? (
+          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
+            <p className="mt-1 text-sm leading-snug text-white/60">
+              Подготовка по шагам правил Chapter Approved 2026–27: игроки и ростеры, типы армий, раскладка, атакующий и защитник, вторичные миссии,
+              первый ход. Затем — трекер партии.
+            </p>
+            <Button variant="primary" className="mt-3 w-full" onClick={start}>
+              Начать подготовку
+            </Button>
+          </section>
+        ) : (
+          state.stage === 'setup' ? <Setup game={game} rosters={rosters} index={index} /> : <Tracker game={game} index={index} />
+        )}
 
-      {game.error && (
-        <div className="sheet-enter fixed inset-x-0 bottom-0 z-40 border-t border-danger/40 bg-app-elevated px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
-          <div className="mx-auto flex max-w-lg items-start gap-2">
-            <Icon name="alert" className="mt-0.5 size-5 shrink-0 text-danger" />
-            <p className="min-w-0 flex-1 text-sm text-white/85">{game.error}</p>
-            <IconButton icon="close" label="Закрыть" onClick={game.clearError} className="size-8" />
+        {game.error && (
+          <div className="sheet-enter fixed inset-x-0 bottom-0 z-40 border-t border-danger/40 bg-app-elevated px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+            <div className="mx-auto flex max-w-lg items-start gap-2">
+              <Icon name="alert" className="mt-0.5 size-5 shrink-0 text-danger" />
+              <p className="min-w-0 flex-1 text-sm text-white/85">{game.error}</p>
+              <IconButton icon="close" label="Закрыть" onClick={game.clearError} className="size-8" />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <button
-        type="button"
-        onClick={() => setViewing(true)}
-        className="mt-6 flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10"
-      >
-        <Icon name="map" className="size-5 text-accent" />
-        <span className="min-w-0 flex-1">
-          <span className="block text-sm font-semibold">Поле боя</span>
-          <span className="block text-[11px] text-white/45">Просмотр без игры: зоны деплоя и раскладки террейна</span>
-        </span>
-        <Icon name="chevron" className="size-4 text-white/40" />
-      </button>
-    </Shell>
+        <button
+          type="button"
+          onClick={() => setViewing(true)}
+          className="mt-6 flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10"
+        >
+          <Icon name="map" className="size-5 text-accent" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-semibold">Поле боя</span>
+            <span className="block text-[11px] text-white/45">Просмотр без игры: зоны деплоя и раскладки террейна</span>
+          </span>
+          <Icon name="chevron" className="size-4 text-white/40" />
+        </button>
+        {card && <CardSheet game={game} id={card.id} seat={card.seat} onClose={closeCard} />}
+      </Shell>
+    </CardViewerContext.Provider>
   );
 }
 

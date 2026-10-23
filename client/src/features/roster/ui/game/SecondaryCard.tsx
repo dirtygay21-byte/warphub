@@ -2,8 +2,9 @@ import { useState, type ReactNode } from 'react';
 import type { MissionBlock, MissionCard } from '../../data';
 import { totals, type Seat } from '../../game';
 import { Icon } from '../kit';
-import { MissionCardView } from '../MissionCard';
 import { cx } from '../util';
+import { CardLink } from './CardSheet';
+import { useOpenCard } from './cardViewer';
 import type { GameHook } from './useGame';
 
 /** В конце чьего хода засчитывается блок (поле turn из missions.json, G2.11a). */
@@ -83,7 +84,7 @@ function Fixed({ game, seat }: { game: GameHook; seat: Seat }) {
         if (!card) return null;
         const vp = t?.secondary.byFixedCard[id] ?? 0;
         return (
-          <CardRow key={id} card={card} mode="fixed">
+          <CardRow key={id} card={card} seat={seat} mode="fixed">
             <Chip>Активна всю битву</Chip>
             {cap != null && (
               <Chip>
@@ -143,7 +144,7 @@ function Tactical({ game, seat }: { game: GameHook; seat: Seat }) {
             const card = byId(a.id);
             if (!card) return null;
             return (
-              <CardRow key={a.id} card={card} mode="tactical" n={a.n} note={a.note} showDrawn>
+              <CardRow key={a.id} card={card} seat={seat} mode="tactical" n={a.n} note={a.note} showDrawn>
                 <Chip>Взята: раунд {a.round}, ваш ход</Chip>
               </CardRow>
             );
@@ -162,7 +163,7 @@ function Tactical({ game, seat }: { game: GameHook; seat: Seat }) {
               {past.map((x, i) => (
                 <li key={`${x.id}-${i}`} className="flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2">
                   <span className="w-7 shrink-0 text-[11px] font-semibold text-white/45">{x.n != null ? `№${x.n}` : ''}</span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-semibold">{byId(x.id)?.name ?? x.id}</span>
+                  <CardLink id={x.id} seat={seat} name={byId(x.id)?.name ?? x.id} className="flex-1 text-sm font-semibold" />
                   <span className="shrink-0 text-[11px] text-white/50">{x.text}</span>
                 </li>
               ))}
@@ -174,14 +175,14 @@ function Tactical({ game, seat }: { game: GameHook; seat: Seat }) {
       <Toggle open={deck} onClick={() => setDeck((v) => !v)}>
         Все карты колоды ({all.length})
       </Toggle>
-      {deck && <DeckList cards={all} status={status} />}
+      {deck && <DeckList cards={all} status={status} seat={seat} />}
     </div>
   );
 }
 
 /** Все карты тактической колоды по алфавиту (не в порядке колоды): когда засчитывается, отметка, текст карты. */
-export function DeckList({ cards, status }: { cards: MissionCard[]; status?: (id: string) => string | null }) {
-  const [open, setOpen] = useState<string | null>(null);
+export function DeckList({ cards, status, seat }: { cards: MissionCard[]; status?: (id: string) => string | null; seat?: Seat }) {
+  const open = useOpenCard();
   const sorted = [...cards].sort((a, b) => a.name.localeCompare(b.name));
   return (
     <ul className="mt-1.5 space-y-1.5">
@@ -191,7 +192,7 @@ export function DeckList({ cards, status }: { cards: MissionCard[]; status?: (id
           <li key={c.id}>
             <button
               type="button"
-              onClick={() => setOpen(open === c.id ? null : c.id)}
+              onClick={() => open?.(c.id, seat)}
               className="flex w-full items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left active:bg-white/10"
             >
               <span className="min-w-0 flex-1">
@@ -199,9 +200,8 @@ export function DeckList({ cards, status }: { cards: MissionCard[]; status?: (id
                 <span className="block text-[11px] text-white/45">{turnsOf(c, 'tactical').map((t) => TURN_RU[t][1]).join(' · ')}</span>
               </span>
               {st && <span className="shrink-0 text-[11px] text-accent/90">{st}</span>}
-              <span className="shrink-0 text-xs font-semibold text-accent/90">{open === c.id ? 'Скрыть' : 'Карта'}</span>
+              <Icon name="info" className="size-4 shrink-0 text-accent/80" />
             </button>
-            {open === c.id && <MissionCardView card={c} className="mt-1.5" />}
           </li>
         );
       })}
@@ -212,6 +212,7 @@ export function DeckList({ cards, status }: { cards: MissionCard[]; status?: (id
 /** Карта игрока: номер, название, когда засчитывается, раунды, «при взятии», заметка; раскрывается в текст карты. */
 function CardRow({
   card,
+  seat,
   mode,
   n,
   note,
@@ -219,20 +220,19 @@ function CardRow({
   children,
 }: {
   card: MissionCard;
+  seat: Seat;
   mode: 'fixed' | 'tactical';
   n?: number;
   note?: string;
   showDrawn?: boolean;
   children?: ReactNode;
 }) {
-  const [open, setOpen] = useState(false);
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2.5">
-      <button type="button" onClick={() => setOpen((v) => !v)} className="flex w-full items-baseline gap-2 text-left">
+      <div className="flex w-full items-baseline gap-2">
         {n != null && <span className="shrink-0 text-[11px] font-semibold text-white/45">№{n}</span>}
-        <span className="min-w-0 flex-1 truncate text-sm font-bold">{card.name}</span>
-        <span className="shrink-0 text-xs font-semibold text-accent/90">{open ? 'Скрыть' : 'Карта'}</span>
-      </button>
+        <CardLink id={card.id} seat={seat} name={card.name} className="flex-1 text-sm font-bold" />
+      </div>
       <div className="mt-1.5 flex flex-wrap gap-1.5">
         {children}
         {turnsOf(card, mode).map((t) => (
@@ -258,7 +258,6 @@ function CardRow({
           {note}
         </p>
       )}
-      {open && <MissionCardView card={card} className="mt-2" />}
     </div>
   );
 }
