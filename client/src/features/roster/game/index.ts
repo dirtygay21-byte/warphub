@@ -6,3 +6,4 @@ export * from './decks';
 export * from './scoring';
 export * from './serialize';
 export * from './setup';
+export * from './autosave';
