@@ -1,0 +1,978 @@
+{
+ "schema": "battlefield-review/1",
+ "date": "2026-10-23",
+ "ours": {
+  "file": "backend/roster-data/battlefield.json",
+  "source": "40kdc-data 1.4.5"
+ },
+ "reference": {
+  "site": "https://game-datamissions.com/11th/layouts",
+  "what": "45 layout images with measurements (portrait); no structured data",
+  "note": "used for verification only; nothing copied into the app"
+ },
+ "method": "our layouts rendered in portrait (x,y)→(y,60−x) side by side with GDM images; visual comparison of deployment, attacker/defender side, objectives, terrain, guide numbers",
+ "summary": {
+  "layouts": 45,
+  "matchedImages": 45,
+  "terrainMatch": 45,
+  "objectivesMatch": 45,
+  "zoneSidesSwapped": 15,
+  "guideDiffs": 7,
+  "roundingOnly": "±0.1–0.3″ in a few guides (e.g. 16.6 vs 16.4), not listed"
+ },
+ "conflicts": [
+  {
+   "id": "zone-sides",
+   "deployments": [
+    "dawn-of-war",
+    "sweeping-engagement"
+   ],
+   "ours": "40kdc 1.4.5: attacker zone on the y=44 long edge",
+   "gdm": "attacker zone on the opposite long edge",
+   "status": "resolved 2026-10-23 (P2-T0b): GDM confirmed by the official deployment cards (Mission Deck 2026-27, wahapedia.ru/wh40k11ed/the-rules/mission-deck-2026-27, images CA7_DawnOfWar / CA7_SweepingEngagement): attacker on the left edge in portrait view, the same view in which Hammer and Anvil has the attacker on top. Fix: import-battlefield.ts SWAP_SIDES swaps attacker/defender labels for these two deployments; geometry unchanged.",
+   "gameImpact": "none in play terms: all 15 affected layouts are point-symmetric, so the old labels equal the official card rotated 180°; the fix aligns the data frame with the GW cards",
+   "test": "tools/roster-data/tests/battlefield.test.ts"
+  },
+  {
+   "id": "guide-distance",
+   "layouts": [
+    "bm-purge-vs-assets-03",
+    "bm-recon-vs-recon-03",
+    "bm-take-vs-prio-02",
+    "bm-take-vs-prio-03",
+    "bm-take-vs-purge-01",
+    "bm-take-vs-purge-02",
+    "bm-take-vs-purge-03"
+   ],
+   "diff": "1.7–2.0″ larger in ours",
+   "status": "open — different anchor point; minor"
+  }
+ ],
+ "layouts": [
+  {
+   "id": "bm-disrupt-vs-disrupt-01",
+   "pair": [
+    "disruption",
+    "disruption"
+   ],
+   "variant": 1,
+   "deployment": "crucible-of-battle",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/disruption-mirror-1.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-disrupt-vs-disrupt-02",
+   "pair": [
+    "disruption",
+    "disruption"
+   ],
+   "variant": 2,
+   "deployment": "tipping-point",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/disruption-mirror-2.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-disrupt-vs-disrupt-03",
+   "pair": [
+    "disruption",
+    "disruption"
+   ],
+   "variant": 3,
+   "deployment": "sweeping-engagement",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/disruption-mirror-3-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    }
+   ]
+  },
+  {
+   "id": "bm-disrupt-vs-assets-01",
+   "pair": [
+    "disruption",
+    "priority-assets"
+   ],
+   "variant": 1,
+   "deployment": "sweeping-engagement",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/disruption-vs-priority-assets-1-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    }
+   ]
+  },
+  {
+   "id": "bm-disrupt-vs-assets-02",
+   "pair": [
+    "disruption",
+    "priority-assets"
+   ],
+   "variant": 2,
+   "deployment": "tipping-point",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/disruption-vs-priority-assets-2.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-disrupt-vs-assets-03",
+   "pair": [
+    "disruption",
+    "priority-assets"
+   ],
+   "variant": 3,
+   "deployment": "search-and-destroy",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/disruption-vs-priority-assets-3.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-purge-vs-disrupt-01",
+   "pair": [
+    "disruption",
+    "purge-the-foe"
+   ],
+   "variant": 1,
+   "deployment": "search-and-destroy",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/disruption-vs-purge-the-foe-1.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-purge-vs-disrupt-02",
+   "pair": [
+    "disruption",
+    "purge-the-foe"
+   ],
+   "variant": 2,
+   "deployment": "tipping-point",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/disruption-vs-purge-the-foe-2.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-purge-vs-disrupt-03",
+   "pair": [
+    "disruption",
+    "purge-the-foe"
+   ],
+   "variant": 3,
+   "deployment": "sweeping-engagement",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/disruption-vs-purge-the-foe-3-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    }
+   ]
+  },
+  {
+   "id": "bm-disrupt-vs-recon-01",
+   "pair": [
+    "disruption",
+    "reconnaissance"
+   ],
+   "variant": 1,
+   "deployment": "tipping-point",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/disruption-vs-reconnaissance-1.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-disrupt-vs-recon-02",
+   "pair": [
+    "disruption",
+    "reconnaissance"
+   ],
+   "variant": 2,
+   "deployment": "dawn-of-war",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/disruption-vs-reconnaissance-2-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    }
+   ]
+  },
+  {
+   "id": "bm-disrupt-vs-recon-03",
+   "pair": [
+    "disruption",
+    "reconnaissance"
+   ],
+   "variant": 3,
+   "deployment": "search-and-destroy",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/disruption-vs-reconnaissance-3.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-take-vs-disrupt-01",
+   "pair": [
+    "disruption",
+    "take-and-hold"
+   ],
+   "variant": 1,
+   "deployment": "sweeping-engagement",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-vs-disruption-1-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    }
+   ]
+  },
+  {
+   "id": "bm-take-vs-disrupt-02",
+   "pair": [
+    "disruption",
+    "take-and-hold"
+   ],
+   "variant": 2,
+   "deployment": "crucible-of-battle",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-vs-disruption-2.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-take-vs-disrupt-03",
+   "pair": [
+    "disruption",
+    "take-and-hold"
+   ],
+   "variant": 3,
+   "deployment": "hammer-and-anvil",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-vs-disruption-3.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-assets-vs-assets-01",
+   "pair": [
+    "priority-assets",
+    "priority-assets"
+   ],
+   "variant": 1,
+   "deployment": "sweeping-engagement",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/priority-assets-mirror-1-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    }
+   ]
+  },
+  {
+   "id": "bm-assets-vs-assets-02",
+   "pair": [
+    "priority-assets",
+    "priority-assets"
+   ],
+   "variant": 2,
+   "deployment": "crucible-of-battle",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/priority-assets-mirror-2.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-assets-vs-assets-03",
+   "pair": [
+    "priority-assets",
+    "priority-assets"
+   ],
+   "variant": 3,
+   "deployment": "tipping-point",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/priority-assets-mirror-3.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-purge-vs-assets-01",
+   "pair": [
+    "priority-assets",
+    "purge-the-foe"
+   ],
+   "variant": 1,
+   "deployment": "dawn-of-war",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/purge-the-foe-vs-priority-assets-1-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    }
+   ]
+  },
+  {
+   "id": "bm-purge-vs-assets-02",
+   "pair": [
+    "priority-assets",
+    "purge-the-foe"
+   ],
+   "variant": 2,
+   "deployment": "search-and-destroy",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/purge-the-foe-vs-priority-assets-2.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-purge-vs-assets-03",
+   "pair": [
+    "priority-assets",
+    "purge-the-foe"
+   ],
+   "variant": 3,
+   "deployment": "hammer-and-anvil",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/purge-the-foe-vs-priority-assets-3.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "differs"
+   },
+   "differences": [
+    {
+     "kind": "guide-distance",
+     "severity": "minor",
+     "ours": 20.8,
+     "gdm": 19.1,
+     "note": "pair of mirrored guides on centre ruins; our anchor is a base vertex"
+    }
+   ]
+  },
+  {
+   "id": "bm-recon-vs-assets-01",
+   "pair": [
+    "priority-assets",
+    "reconnaissance"
+   ],
+   "variant": 1,
+   "deployment": "crucible-of-battle",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/priority-assets-vs-reconnaissance-1.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-recon-vs-assets-02",
+   "pair": [
+    "priority-assets",
+    "reconnaissance"
+   ],
+   "variant": 2,
+   "deployment": "tipping-point",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/priority-assets-vs-reconnaissance-2.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-recon-vs-assets-03",
+   "pair": [
+    "priority-assets",
+    "reconnaissance"
+   ],
+   "variant": 3,
+   "deployment": "sweeping-engagement",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/priority-assets-vs-reconnaissance-3-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    }
+   ]
+  },
+  {
+   "id": "bm-take-vs-prio-01",
+   "pair": [
+    "priority-assets",
+    "take-and-hold"
+   ],
+   "variant": 1,
+   "deployment": "crucible-of-battle",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-vs-priority-assets-1.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-take-vs-prio-02",
+   "pair": [
+    "priority-assets",
+    "take-and-hold"
+   ],
+   "variant": 2,
+   "deployment": "hammer-and-anvil",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-vs-priority-assets-2.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "differs"
+   },
+   "differences": [
+    {
+     "kind": "guide-distance",
+     "severity": "minor",
+     "ours": 27.8,
+     "gdm": 26.1,
+     "note": "pair of mirrored guides on centre ruins; our anchor is a base vertex"
+    }
+   ]
+  },
+  {
+   "id": "bm-take-vs-prio-03",
+   "pair": [
+    "priority-assets",
+    "take-and-hold"
+   ],
+   "variant": 3,
+   "deployment": "dawn-of-war",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-vs-priority-assets-3-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "differs"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    },
+    {
+     "kind": "guide-distance",
+     "severity": "minor",
+     "ours": 26.7,
+     "gdm": 25.0,
+     "note": "pair of mirrored guides on centre ruins; our anchor is a base vertex"
+    }
+   ]
+  },
+  {
+   "id": "bm-purge-vs-purge-01",
+   "pair": [
+    "purge-the-foe",
+    "purge-the-foe"
+   ],
+   "variant": 1,
+   "deployment": "search-and-destroy",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/purge-the-foe-mirror-1.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-purge-vs-purge-02",
+   "pair": [
+    "purge-the-foe",
+    "purge-the-foe"
+   ],
+   "variant": 2,
+   "deployment": "tipping-point",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/purge-the-foe-mirror-2.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-purge-vs-purge-03",
+   "pair": [
+    "purge-the-foe",
+    "purge-the-foe"
+   ],
+   "variant": 3,
+   "deployment": "sweeping-engagement",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/purge-the-foe-mirror-3-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    }
+   ]
+  },
+  {
+   "id": "bm-purge-vs-recon-01",
+   "pair": [
+    "purge-the-foe",
+    "reconnaissance"
+   ],
+   "variant": 1,
+   "deployment": "hammer-and-anvil",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/purge-the-foe-vs-reconnaissance-1.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-purge-vs-recon-02",
+   "pair": [
+    "purge-the-foe",
+    "reconnaissance"
+   ],
+   "variant": 2,
+   "deployment": "dawn-of-war",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/purge-the-foe-vs-reconnaissance-2-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    }
+   ]
+  },
+  {
+   "id": "bm-purge-vs-recon-03",
+   "pair": [
+    "purge-the-foe",
+    "reconnaissance"
+   ],
+   "variant": 3,
+   "deployment": "crucible-of-battle",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/purge-the-foe-vs-reconnaissance-3.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-take-vs-purge-01",
+   "pair": [
+    "purge-the-foe",
+    "take-and-hold"
+   ],
+   "variant": 1,
+   "deployment": "sweeping-engagement",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-vs-purge-the-foe-1-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "differs"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    },
+    {
+     "kind": "guide-distance",
+     "severity": "minor",
+     "ours": 18.4,
+     "gdm": 16.4,
+     "note": "pair of mirrored guides on centre ruins; our anchor is a base vertex"
+    }
+   ]
+  },
+  {
+   "id": "bm-take-vs-purge-02",
+   "pair": [
+    "purge-the-foe",
+    "take-and-hold"
+   ],
+   "variant": 2,
+   "deployment": "search-and-destroy",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-vs-purge-the-foe-2.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "differs"
+   },
+   "differences": [
+    {
+     "kind": "guide-distance",
+     "severity": "minor",
+     "ours": 16.9,
+     "gdm": 15.0,
+     "note": "pair of mirrored guides on centre ruins; our anchor is a base vertex"
+    }
+   ]
+  },
+  {
+   "id": "bm-take-vs-purge-03",
+   "pair": [
+    "purge-the-foe",
+    "take-and-hold"
+   ],
+   "variant": 3,
+   "deployment": "hammer-and-anvil",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-vs-purge-the-foe-3.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "differs"
+   },
+   "differences": [
+    {
+     "kind": "guide-distance",
+     "severity": "minor",
+     "ours": 24.0,
+     "gdm": 22.0,
+     "note": "pair of mirrored guides on centre ruins; our anchor is a base vertex"
+    }
+   ]
+  },
+  {
+   "id": "bm-recon-vs-recon-01",
+   "pair": [
+    "reconnaissance",
+    "reconnaissance"
+   ],
+   "variant": 1,
+   "deployment": "sweeping-engagement",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/reconnaissance-mirror-1-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    }
+   ]
+  },
+  {
+   "id": "bm-recon-vs-recon-02",
+   "pair": [
+    "reconnaissance",
+    "reconnaissance"
+   ],
+   "variant": 2,
+   "deployment": "crucible-of-battle",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/reconnaissance-mirror-2.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-recon-vs-recon-03",
+   "pair": [
+    "reconnaissance",
+    "reconnaissance"
+   ],
+   "variant": 3,
+   "deployment": "tipping-point",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/reconnaissance-mirror-3.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (6, roles and positions)",
+    "terrain": "match",
+    "guides": "differs"
+   },
+   "differences": [
+    {
+     "kind": "guide-distance",
+     "severity": "minor",
+     "ours": 26.9,
+     "gdm": 25.0,
+     "note": "pair of mirrored guides on centre ruins; our anchor is a base vertex"
+    }
+   ]
+  },
+  {
+   "id": "bm-take-vs-recon-01",
+   "pair": [
+    "reconnaissance",
+    "take-and-hold"
+   ],
+   "variant": 1,
+   "deployment": "tipping-point",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-vs-reconnaissance-1.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-take-vs-recon-02",
+   "pair": [
+    "reconnaissance",
+    "take-and-hold"
+   ],
+   "variant": 2,
+   "deployment": "dawn-of-war",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-vs-reconnaissance-2-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    }
+   ]
+  },
+  {
+   "id": "bm-take-vs-recon-03",
+   "pair": [
+    "reconnaissance",
+    "take-and-hold"
+   ],
+   "variant": 3,
+   "deployment": "search-and-destroy",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-vs-reconnaissance-3.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-take-vs-take-01",
+   "pair": [
+    "take-and-hold",
+    "take-and-hold"
+   ],
+   "variant": 1,
+   "deployment": "tipping-point",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-mirror-1.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  },
+  {
+   "id": "bm-take-vs-take-02",
+   "pair": [
+    "take-and-hold",
+    "take-and-hold"
+   ],
+   "variant": 2,
+   "deployment": "dawn-of-war",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-mirror-2-portrait.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": [
+    {
+     "kind": "zone-sides",
+     "severity": "major",
+     "ours": "attacker = long edge y=44 (40kdc)",
+     "gdm": "attacker = left edge in portrait view = y=0"
+    }
+   ]
+  },
+  {
+   "id": "bm-take-vs-take-03",
+   "pair": [
+    "take-and-hold",
+    "take-and-hold"
+   ],
+   "variant": 3,
+   "deployment": "search-and-destroy",
+   "gdmImage": "https://game-datamissions.com/assets/11th/layouts/with-measurements/take-and-hold-mirror-3.png",
+   "checks": {
+    "deployment": "match",
+    "objectives": "match (5, roles and positions)",
+    "terrain": "match",
+    "guides": "match ±0.3″"
+   },
+   "differences": []
+  }
+ ],
+ "note_display": "The app view (Battlefield.tsx disp(x,y) = (44−y, x)) shows every map rotated 180° relative to the official portrait cards (e.g. Hammer and Anvil attacker at the bottom). Game-equivalent; not changed."
+}
