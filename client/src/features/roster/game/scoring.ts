@@ -5,7 +5,7 @@
  * Строки внутри блока: обычная — самостоятельная награда; «или» (or) — вместо строки выше, из цепочки
  * «строка + её или» засчитывается одна; «+» (plus) — сверх строки выше, не чаще её.
  */
-import { ROUNDS, type BlockTurn, type CatalogBlock, type CatalogCard, type GameCatalog, type GameState, type PlayerTotals, type Round, type RowPick, type SecondaryMode, type Seat } from './types';
+import { ROUNDS, type BlockTurn, type PrimaryAt, type TurnStep, type CatalogBlock, type CatalogCard, type GameCatalog, type GameState, type PlayerTotals, type Round, type RowPick, type SecondaryMode, type Seat } from './types';
 
 /** Подходит ли блок карты к раунду. 'end' — только конец битвы. */
 export function blockInRound(rounds: string, round: Round, endOfBattle = false): boolean {
@@ -30,6 +30,23 @@ export function blockTurnOk(turn: BlockTurn | undefined, ownTurn: boolean, lastT
   if (turn === 'opponent') return !ownTurn;
   if (turn === 'opponent-or-r5') return !ownTurn || lastTurnOfBattle;
   return true;
+}
+
+/**
+ * Можно ли засчитать блок основной миссии сейчас (G3.1). end — битва окончена (только «Конец битвы»);
+ * step — шаг хода (command — идёт фаза командования, main — после неё, до конца хода); ownTurn — ход владельца.
+ * «Конец фазы командования» засчитывается, пока идёт ваша фаза командования; own-command-r5-turn в 5-м раунде —
+ * в конце вашего хода. Без at — как раньше (по раундам блока).
+ */
+export function primaryAtOk(at: PrimaryAt | undefined, ctx: { end: boolean; step: TurnStep; ownTurn: boolean; round: Round }): boolean {
+  if (!at) return true;
+  if (ctx.end) return at === 'battle-end';
+  if (at === 'battle-end') return false;
+  if (at === 'any-turn') return ctx.step === 'main';
+  if (!ctx.ownTurn) return false;
+  if (at === 'own-turn') return ctx.step === 'main';
+  if (at === 'own-command') return ctx.step === 'command';
+  return ctx.round === ROUNDS ? ctx.step === 'main' : ctx.step === 'command';
 }
 
 /** Группа «или»: индекс первой строки цепочки, к которой относится строка. */
@@ -71,7 +88,14 @@ export function cardVp({ card, picks, round, mode, endOfBattle = false }: CardVp
     if (seen.has(key)) return { error: 'Строка отмечена дважды' };
     seen.add(key);
     if (block.mode && mode && block.mode !== mode) return { error: `Этот блок — для ${block.mode === 'fixed' ? 'фиксированного' : 'тактического'} режима` };
-    if (!blockInRound(block.rounds, round, endOfBattle)) return { error: endOfBattle ? 'В конце битвы засчитываются только блоки «Конец битвы»' : 'Этот блок не действует в этом раунде' };
+    if (!blockInRound(block.rounds, round, endOfBattle))
+      return {
+        error: endOfBattle
+          ? 'В конце битвы засчитываются только блоки «Конец битвы»'
+          : block.rounds === 'end'
+            ? 'Этот блок засчитывается в конце битвы'
+            : 'Этот блок не действует в этом раунде',
+      };
     const g = `${p.block}:${orGroup(block, p.row)}`;
     if (groups.has(g)) return { error: 'Из строк, связанных «или», засчитывается одна' };
     groups.set(g, p.row);

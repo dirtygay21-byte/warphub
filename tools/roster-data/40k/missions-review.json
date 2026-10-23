@@ -844,5 +844,12 @@
   "drawnRequired": "Defend Stronghold: in round 1 the redraw is mandatory ('draw one new Secondary Mission card'); Forward Position, Behind Enemy Lines, Plunder, Cleanse, A Grievous Blow, Bring It Down — optional ('can')",
   "duration": "Tactical cards stay active across turns and rounds until achieved (scored, then out of play), discarded at the end of your turn (1CP per turn), or swapped once per battle (1CP); no hand limit",
   "gap": "Deck exhaustion is not covered by the rules; the engine draws the cards that remain (as the wh-rules.ru tracker)"
+ },
+ "primaryTiming": {
+  "task": "G3.1, 2026-10-23",
+  "field": "blocks[].at on every primary block: own-turn | own-command | own-command-r5-turn | any-turn | battle-end; derived from the card's WHEN text and checked by build-missions.mjs (PRIMARY_AT); battle-end only with rounds 'end'",
+  "counts": "own-turn 36, own-command-r5-turn 23, battle-end 12, own-command 2 (Immovable Object 2–4, Outmanoeuvre 2–3), any-turn 1 (Punishment)",
+  "engine": "primary-scored accepts a block only at its moment: own Command phase (step command), end of own turn / any turn (step main, before turn-ended), round 5 shift for own-command-r5-turn, battle-end only after the battle has ended",
+  "source": "card WHEN lines as verified in P2-T1 (game-datamissions.com cards, mission deck rules, wh-rules.ru)"
  }
 }

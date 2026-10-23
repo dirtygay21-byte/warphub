@@ -54,8 +54,12 @@ export interface CatalogBlock {
   mode?: SecondaryMode;
   /** вторичные: чей ход должен заканчиваться — см. blockTurnOk */
   turn?: BlockTurn;
+  /** основные: когда засчитывается — см. primaryAtOk */
+  at?: PrimaryAt;
   rows: CatalogRow[];
 }
+/** конец вашего хода | конец вашей фазы командования | то же, в 5-м раунде — конец вашего хода | конец любого хода | конец битвы */
+export type PrimaryAt = 'own-turn' | 'own-command' | 'own-command-r5-turn' | 'any-turn' | 'battle-end';
 /** own — ваш ход, opponent — ход противника, any — любой, opponent-or-r5 — ход противника или конец 5-го раунда (что раньше) */
 export type BlockTurn = 'own' | 'opponent' | 'any' | 'opponent-or-r5';
 export interface CatalogCard {

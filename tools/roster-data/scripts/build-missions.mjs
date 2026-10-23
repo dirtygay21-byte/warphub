@@ -51,6 +51,19 @@ export const SECONDARY_TURN = {
   'Пока карта активна': 'any',
 };
 
+/**
+ * Когда засчитывается блок основной миссии (G3.1): own-turn — конец вашего хода, own-command — конец вашей фазы
+ * командования, own-command-r5-turn — то же, но в 5-м раунде конец вашего хода, any-turn — конец любого хода,
+ * battle-end — конец битвы. Должно совпадать с текстом «when».
+ */
+export const PRIMARY_AT = {
+  'Конец вашего хода': 'own-turn',
+  'Конец вашей фазы командования': 'own-command',
+  'Конец вашей фазы командования (в 5-м раунде — конец вашего хода)': 'own-command-r5-turn',
+  'Конец любого хода': 'any-turn',
+  'Конец битвы': 'battle-end',
+};
+
 export function buildMissions({ cards, missions, matchups, ru, review, version }) {
   const kdcById = new Map(cards.map((c) => [c.id, c]));
   const errors = [];
@@ -72,6 +85,14 @@ export function buildMissions({ cards, missions, matchups, ru, review, version }
         const want = SECONDARY_TURN[b.when];
         if (!want) errors.push(`${id}: блок ${i} — неизвестное время «${b.when}»`);
         else if (b.turn !== want) errors.push(`${id}: блок ${i} — turn ${b.turn}, по тексту «${b.when}» нужно ${want}`);
+      }
+    }
+    if (t.type === 'primary') {
+      for (const [i, b] of t.blocks.entries()) {
+        const want = PRIMARY_AT[b.when];
+        if (!want) errors.push(`${id}: блок ${i} — неизвестное время «${b.when}»`);
+        else if (b.at !== want) errors.push(`${id}: блок ${i} — at ${b.at}, по тексту «${b.when}» нужно ${want}`);
+        else if ((want === 'battle-end') !== (b.rounds === 'end')) errors.push(`${id}: блок ${i} — «Конец битвы» и раунды 'end' должны совпадать`);
       }
     }
     if (t.drawnRequired && !t.drawn) errors.push(`${id}: drawnRequired без правила «при взятии»`);

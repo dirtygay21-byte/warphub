@@ -14,6 +14,7 @@ import {
   type GameEvent,
   type GameState,
   type PlayerState,
+  type PrimaryAt,
   type Round,
   type RollKey,
   type RollRef,
@@ -21,7 +22,7 @@ import {
   type Seat,
 } from './types';
 import { drawCards, initDecks, noteCard, redrawWhenDrawn, swapCard } from './decks';
-import { blockTurnOk, cardVp } from './scoring';
+import { blockTurnOk, cardVp, primaryAtOk } from './scoring';
 import { setupMissing } from './setup';
 import { layoutPick, rollOff } from './rng';
 
@@ -378,6 +379,12 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       const round: Round = end ? (ROUNDS as Round) : s.round;
       const r = cardVp({ card, picks: ev.picks, round, endOfBattle: end });
       if ('error' in r) return fail(r.error);
+      // когда: конец вашего хода, вашей фазы командования (в 5-м раунде — конец хода), любого хода, конец битвы
+      const ctx = { end, step: s.step, ownTurn: s.activeSeat === ev.target, round };
+      for (const pk of ev.picks) {
+        const at = card.blocks[pk.block]!.at;
+        if (!primaryAtOk(at, ctx)) return fail(`Этот блок засчитывается: ${AT_RU[at!]}`);
+      }
       const turn = end ? null : s.activeSeat;
       const p = s.players[ev.target];
       const same = p.primaryScored.filter((x) => x.round === round && x.turn === turn && x.end === end);
@@ -419,6 +426,14 @@ function applyRoll(s: GameState, key: RollKey, roll: RollRef | undefined): RollR
   s.rollCount[key] += 1;
   return result;
 }
+
+const AT_RU: Record<PrimaryAt, string> = {
+  'own-turn': 'в конце вашего хода',
+  'own-command': 'в конце вашей фазы командования',
+  'own-command-r5-turn': 'в конце вашей фазы командования (в 5-м раунде — в конце вашего хода)',
+  'any-turn': 'в конце любого хода',
+  'battle-end': 'в конце битвы',
+};
 
 /** Ход идёт, шаг подходящий, событие от активного игрока (или общее). */
 function turnCheck(s: GameState, seat: Seat | null, step: GameState['step']): string | null {

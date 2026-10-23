@@ -104,6 +104,8 @@ export interface MissionBlock {
   when: string;
   /** вторичные: чей ход должен заканчиваться (own | opponent | any | opponent-or-r5 — противника или конец 5-го раунда) */
   turn?: 'own' | 'opponent' | 'any' | 'opponent-or-r5';
+  /** основные: когда засчитывается (own-turn | own-command | own-command-r5-turn | any-turn | battle-end) */
+  at?: 'own-turn' | 'own-command' | 'own-command-r5-turn' | 'any-turn' | 'battle-end';
   rows: MissionRow[];
 }
 export interface MissionAction {
