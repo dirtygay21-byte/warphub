@@ -1,18 +1,27 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import type { DataIndex, Roster } from '../../engine/types';
 import { currentSetupStep, setupSteps, type SetupStepId } from '../../game';
 import { pushOverlay } from '../../telegram';
 import { Battlefield } from '../Battlefield';
 import { Button, Icon, IconButton } from '../kit';
 import { cx } from '../util';
+import { rosterRef } from './players';
+import { StepPlayers } from './StepPlayers';
 import { useGame, type GameHook } from './useGame';
 
 /**
  * «Начать игру»: подготовка к битве по шагам правил колоды миссий, затем трекер (G3).
- * Шаги G2.3–G2.8 подключаются в StepBody; сейчас — каркас: прогресс, ошибки движка, отмена.
+ * Шаги подключаются в StepBody (G2.3 — игроки; G2.4–G2.8 — следующие задачи).
+ * initialRosterId — ростер из меню «Начать игру с этим ростером»: он сразу выбирается первому игроку.
  */
-export function GameScreen({ onBack }: { onBack: () => void }) {
+export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack: () => void; rosters: Roster[]; index: DataIndex; initialRosterId?: string }) {
   const game = useGame();
   const { data, loadError, state } = game;
+  // ростер из меню «Начать игру с этим ростером» — первым событием подготовки
+  const start = () => {
+    const r = initialRosterId ? rosters.find((x) => x.id === initialRosterId) : undefined;
+    game.newGame({}, r ? [{ type: 'player-set', target: 'p1', patch: { roster: rosterRef(r, 'own') } }] : []);
+  };
   // просмотр раскладок и карт миссий открывается поверх игры: игра не теряется, «Назад» Telegram закрывает просмотр
   const [viewing, setViewing] = useState(false);
   useEffect(() => (viewing ? pushOverlay(() => setViewing(false)) : undefined), [viewing]);
@@ -42,12 +51,12 @@ export function GameScreen({ onBack }: { onBack: () => void }) {
             Подготовка по шагам правил Chapter Approved 2026–27: игроки и ростеры, типы армий, раскладка, атакующий и защитник, вторичные миссии,
             первый ход. Затем — трекер партии.
           </p>
-          <Button variant="primary" className="mt-3 w-full" onClick={() => game.newGame()}>
+          <Button variant="primary" className="mt-3 w-full" onClick={start}>
             Начать подготовку
           </Button>
         </section>
       ) : (
-        <Setup game={game} />
+        <Setup game={game} rosters={rosters} index={index} />
       )}
 
       {game.error && (
@@ -76,10 +85,13 @@ export function GameScreen({ onBack }: { onBack: () => void }) {
   );
 }
 
-function Setup({ game }: { game: GameHook }) {
+function Setup({ game, rosters, index }: { game: GameHook; rosters: Roster[]; index: DataIndex }) {
   const state = game.state!;
   const steps = setupSteps(state);
   const current = currentSetupStep(state);
+  // открытый шаг: сначала «Игроки» (он не блокирует движок), дальше — первый несделанный
+  const [open, setOpen] = useState<SetupStepId>('players');
+  const reachable = (id: SetupStepId) => id === 'players' || steps.find((x) => x.id === id)!.done || id === current;
   const doneCount = steps.filter((s) => s.done).length;
   return (
     <section>
@@ -94,13 +106,18 @@ function Setup({ game }: { game: GameHook }) {
       </div>
       <ol className="mt-3 space-y-2">
         {steps.map((s, i) => {
-          const active = s.id === current;
+          const active = s.id === open;
           return (
             <li
               key={s.id}
               className={cx('rounded-2xl border px-3 py-2.5', active ? 'border-accent/60 bg-accent/[0.07]' : 'border-white/10 bg-white/[0.03]')}
             >
-              <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                disabled={!reachable(s.id) || active}
+                onClick={() => setOpen(s.id)}
+                className="flex w-full items-center gap-2.5 text-left disabled:cursor-default"
+              >
                 <span
                   className={cx(
                     'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
@@ -110,8 +127,8 @@ function Setup({ game }: { game: GameHook }) {
                   {s.done ? <Icon name="check" className="size-3.5" strokeWidth={3} /> : i + 1}
                 </span>
                 <span className={cx('min-w-0 flex-1 text-sm font-semibold', !s.done && !active && 'text-white/60')}>{s.title}</span>
-              </div>
-              {active && <StepBody id={s.id} game={game} />}
+              </button>
+              {active && <StepBody id={s.id} game={game} rosters={rosters} index={index} onNext={() => setOpen(currentSetupStep(state) ?? 'first-turn')} />}
             </li>
           );
         })}
@@ -123,9 +140,10 @@ function Setup({ game }: { game: GameHook }) {
   );
 }
 
-/** Содержимое активного шага. Шаги подключаются задачами G2.3–G2.8. */
-function StepBody({ id }: { id: SetupStepId; game: GameHook }) {
-  return <p className="mt-2 pl-8 text-xs leading-snug text-white/45">Шаг «{id}» появится в следующих задачах (G2.3–G2.8).</p>;
+/** Содержимое открытого шага. Следующие шаги подключаются задачами G2.4–G2.8. */
+function StepBody({ id, game, rosters, index, onNext }: { id: SetupStepId; game: GameHook; rosters: Roster[]; index: DataIndex; onNext: () => void }) {
+  if (id === 'players') return <StepPlayers game={game} rosters={rosters} index={index} onNext={onNext} />;
+  return <p className="mt-2 pl-8 text-xs leading-snug text-white/45">Этот шаг появится в следующих задачах (G2.4–G2.8).</p>;
 }
 
 function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => void; children: ReactNode }) {

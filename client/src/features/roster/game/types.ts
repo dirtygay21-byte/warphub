@@ -91,6 +91,8 @@ export interface RosterRef {
   name?: string;
   factionId?: string;
   points?: number;
+  /** тип армии ростера (английское название, как в ростере: «Take and Hold») — подсказка для шага типов армий */
+  forceDisposition?: string | null;
 }
 
 export interface PlayerSetup {

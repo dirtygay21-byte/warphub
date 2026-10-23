@@ -234,7 +234,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
     return <Battlefield onBack={goBack} initialDisposition={route.disposition} />;
   }
   if (route.screen === 'game') {
-    return <GameScreen onBack={goBack} />;
+    return <GameScreen onBack={goBack} rosters={rosters} index={index} initialRosterId={route.rosterId} />;
   }
 
   if (route.screen === 'editor') {

@@ -18,7 +18,8 @@ export interface GameHook {
   /** последняя ошибка движка (событие не принято) — показывается на экране */
   error: string | null;
   clearError: () => void;
-  newGame: (names?: Partial<Record<Seat, string>>) => void;
+  /** новая игра; initial — первые события подготовки (например, ростер из меню) */
+  newGame: (names?: Partial<Record<Seat, string>>, initial?: EventBody[]) => void;
   /** отправить событие; seat — чьё (null — общее, один телефон). true — принято. */
   dispatch: (body: EventBody) => boolean;
   /** что снимет «Отменить» (null — нечего) */
@@ -56,12 +57,13 @@ export function useGame(): GameHook {
   }, []);
 
   const newGame = useCallback(
-    (names: Partial<Record<Seat, string>> = {}) => {
+    (names: Partial<Record<Seat, string>> = {}, initial: EventBody[] = []) => {
       if (!data) return;
       const ev = stamp({ type: 'game-created', schema: GAME_SCHEMA, seed: newSeed(), names: { p1: names.p1 ?? 'Игрок 1', p2: names.p2 ?? 'Игрок 2' } }, 1);
-      const r = replay([ev], data.catalog);
+      const list = [ev, ...initial.map((b, i) => stamp(b, i + 2))];
+      const r = replay(list, data.catalog);
       if (!r.ok) return reject(r.error);
-      setEvents([ev]);
+      setEvents(list);
       setState(r.state);
       setError(null);
     },
