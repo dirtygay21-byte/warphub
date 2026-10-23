@@ -9,12 +9,13 @@ import { rosterRef } from './players';
 import { StepDispositions } from './StepDispositions';
 import { StepLayout } from './StepLayout';
 import { StepRoles } from './StepRoles';
+import { StepSecondaries } from './StepSecondaries';
 import { StepPlayers } from './StepPlayers';
 import { useGame, type GameHook } from './useGame';
 
 /**
  * «Начать игру»: подготовка к битве по шагам правил колоды миссий, затем трекер (G3).
- * Шаги подключаются в StepBody (G2.3 игроки, G2.4 типы армий, G2.5 раскладка, G2.6 роли; G2.7–G2.8 — следующие).
+ * Шаги подключаются в StepBody (G2.3 игроки, G2.4 типы армий, G2.5 раскладка, G2.6 роли, G2.7 вторичные; G2.8 — первый ход).
  * initialRosterId — ростер из меню «Начать игру с этим ростером»: он сразу выбирается первому игроку.
  */
 export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack: () => void; rosters: Roster[]; index: DataIndex; initialRosterId?: string }) {
@@ -143,13 +144,14 @@ function Setup({ game, rosters, index }: { game: GameHook; rosters: Roster[]; in
   );
 }
 
-/** Содержимое открытого шага. Следующие шаги подключаются задачами G2.7–G2.8. */
+/** Содержимое открытого шага. Последний шаг («Первый ход») — задача G2.8. */
 function StepBody({ id, game, rosters, index, onNext }: { id: SetupStepId; game: GameHook; rosters: Roster[]; index: DataIndex; onNext: () => void }) {
   if (id === 'players') return <StepPlayers game={game} rosters={rosters} index={index} onNext={onNext} />;
   if (id === 'dispositions') return <StepDispositions game={game} onNext={onNext} />;
   if (id === 'layout') return <StepLayout game={game} onNext={onNext} />;
   if (id === 'roles') return <StepRoles game={game} onNext={onNext} />;
-  return <p className="mt-2 pl-8 text-xs leading-snug text-white/45">Этот шаг появится в следующих задачах (G2.7–G2.8).</p>;
+  if (id === 'secondaries') return <StepSecondaries game={game} onNext={onNext} />;
+  return <p className="mt-2 pl-8 text-xs leading-snug text-white/45">Этот шаг появится в задаче G2.8.</p>;
 }
 
 function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => void; children: ReactNode }) {
