@@ -208,6 +208,8 @@ export interface GameState {
   round: Round;
   activeSeat: Seat | null;
   step: TurnStep;
+  /** сколько тактических карт активный игрок уже вытянул в текущей фазе командования (правило: две) */
+  drawsThisPhase: number;
   /** почему битва закончилась (stage = finished) */
   endReason: 'rounds' | 'concede' | 'manual' | null;
   /** номер последнего применённого события */

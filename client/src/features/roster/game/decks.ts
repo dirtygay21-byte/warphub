@@ -1,0 +1,117 @@
+/**
+ * Колоды вторичных миссий (G1.4). Правила колоды миссий Chapter Approved 2026-27:
+ * - у атакующего и защитника свои колоды из одних и тех же 18 карт;
+ * - фиксированный режим: две выбранные карты активны всю битву;
+ * - тактический: колода перемешана; в начале своей фазы командования игрок тянет две карты (предела руки нет);
+ *   если в колоде меньше — тянет сколько осталось (так же считает трекер wh-rules.ru);
+ * - правила «при взятии»: взять новую карту и вернуть эту в колоду с перемешиванием — или сбросить эту.
+ * Порядок колоды — из seed игры (deckOrder), поэтому одинаковый журнал даёт одинаковые карты.
+ */
+import { deckOrder } from './rng';
+import type { GameCatalog, GameState, PlayerState, Seat } from './types';
+
+/** Сколько карт тянуть в начале фазы командования. */
+export const DRAW_PER_COMMAND = 2;
+
+/** id вторичных миссий в порядке каталога (основа колоды). */
+export function secondaryIds(catalog: GameCatalog): string[] {
+  return catalog.cards.filter((c) => c.type === 'secondary').map((c) => c.id);
+}
+
+/** Колода и активные карты игрока в начале битвы. */
+export function initDecks(s: GameState, catalog: GameCatalog): void {
+  const ids = secondaryIds(catalog);
+  for (const seat of ['p1', 'p2'] as const) {
+    const p = s.players[seat];
+    p.discarded = [];
+    p.scored = [];
+    p.swapUsed = false;
+    if (p.secondaryMode === 'fixed' && p.fixed) {
+      p.deck = [];
+      p.shuffles = 0;
+      p.active = p.fixed.map((id) => ({ id, round: 1, source: 'manual' as const }));
+    } else {
+      p.deck = deckOrder(s.seed, seat, 0, ids);
+      p.shuffles = 1;
+      p.active = [];
+    }
+  }
+}
+
+/** Сколько карт игрок ещё может вытянуть сейчас (0 — не его фаза командования, не тактический режим или колода пуста). */
+export function drawsLeft(s: GameState, seat: Seat): number {
+  const p = s.players[seat];
+  if (s.stage !== 'battle' || s.activeSeat !== seat || s.step !== 'command' || p.secondaryMode !== 'tactical') return 0;
+  return Math.min(DRAW_PER_COMMAND - s.drawsThisPhase, p.deck.length);
+}
+
+/** Что вытянет случайная выдача сейчас (верх колоды) — для экрана и для события cards-drawn. */
+export function nextDraw(s: GameState, seat: Seat): string[] {
+  return s.players[seat].deck.slice(0, drawsLeft(s, seat));
+}
+
+/** Убрать карты из колоды и сделать активными. Ошибка — строкой. */
+export function drawCards(s: GameState, seat: Seat, cards: string[], source: 'random' | 'manual'): string | null {
+  const p = s.players[seat];
+  if (p.secondaryMode !== 'tactical') return 'Карты тянут только в тактическом режиме';
+  if (s.stage !== 'battle' || s.activeSeat !== seat || s.step !== 'command') return 'Карты тянут в начале своей фазы командования';
+  const left = drawsLeft(s, seat);
+  if (!cards.length) return 'Не выбраны карты';
+  if (new Set(cards).size !== cards.length) return 'Одна и та же карта дважды';
+  if (cards.length > left) return left ? `Можно вытянуть ещё ${left}` : 'В этой фазе карты уже вытянуты';
+  if (source === 'random') {
+    const top = p.deck.slice(0, cards.length);
+    if (top.join('|') !== cards.join('|')) return 'Случайная выдача должна совпадать с верхом колоды';
+  } else if (cards.some((c) => !p.deck.includes(c))) return 'Этой карты нет в колоде';
+  p.deck = p.deck.filter((c) => !cards.includes(c));
+  for (const id of cards) p.active.push({ id, round: s.round, source });
+  s.drawsThisPhase += cards.length;
+  return null;
+}
+
+/**
+ * Правило «при взятии»: взять замену (верх колоды или выбранную вручную), а эту карту вернуть в колоду
+ * с перемешиванием (shuffleBack) или сбросить. Только для карты, вытянутой в текущей фазе командования.
+ */
+export function redrawWhenDrawn(
+  s: GameState,
+  seat: Seat,
+  card: string,
+  replacement: string,
+  shuffleBack: boolean,
+  source: 'random' | 'manual',
+  catalog: GameCatalog,
+): string | null {
+  const p = s.players[seat];
+  const i = p.active.findIndex((a) => a.id === card);
+  if (i < 0) return 'Этой карты нет среди активных';
+  if (s.stage !== 'battle' || s.activeSeat !== seat || s.step !== 'command' || p.active[i]!.round !== s.round)
+    return 'Правило «при взятии» действует сразу после взятия — в эту фазу командования';
+  if (p.secondaryMode !== 'tactical') return 'Правило «при взятии» — только в тактическом режиме';
+  if (!catalog.cards.find((c) => c.id === card)?.drawn) return 'У этой карты нет правила «при взятии»';
+  if (!p.deck.length) return 'В колоде не осталось карт для замены';
+  if (source === 'random' && p.deck[0] !== replacement) return 'Случайная замена должна совпадать с верхом колоды';
+  if (!p.deck.includes(replacement)) return 'Этой карты нет в колоде';
+  const old = p.active[i]!;
+  p.deck = p.deck.filter((c) => c !== replacement);
+  p.active[i] = { id: replacement, round: s.round, source };
+  if (shuffleBack) reshuffle(p, s.seed, [...p.deck, old.id]);
+  else p.discarded.push(old.id);
+  return null;
+}
+
+/** Перемешать колоду игрока заново (каждое перемешивание — новый номер, свой порядок). */
+function reshuffle(p: PlayerState, seed: string, cards: string[]): void {
+  p.deck = deckOrder(seed, p.seat, p.shuffles, cards);
+  p.shuffles += 1;
+}
+
+/** Заметка к активной карте («маяк» — такой-то отряд, заманчивая цель — такая-то). */
+export function noteCard(s: GameState, seat: Seat, card: string, note: string): string | null {
+  const a = s.players[seat].active.find((x) => x.id === card);
+  if (!a) return 'Этой карты нет среди активных';
+  const t = note.trim();
+  if (t.length > 200) return 'Заметка длиннее 200 символов';
+  a.note = t || undefined;
+  return null;
+}

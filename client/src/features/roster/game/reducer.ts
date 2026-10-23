@@ -17,6 +17,7 @@ import {
   type Round,
   type Seat,
 } from './types';
+import { drawCards, initDecks, noteCard, redrawWhenDrawn } from './decks';
 
 export const other = (s: Seat): Seat => (s === 'p1' ? 'p2' : 'p1');
 
@@ -98,6 +99,7 @@ export function createGame(ev: GameEvent): ApplyResult {
       round: 1,
       activeSeat: null,
       step: 'start',
+      drawsThisPhase: 0,
       endReason: null,
       lastSeq: 1,
       reverted: [],
@@ -207,12 +209,14 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       s.round = 1;
       s.activeSeat = s.firstTurn;
       s.step = 'start';
+      initDecks(s, catalog);
       break;
     }
     case 'command-phase-started': {
       const e = turnCheck(s, ev.seat, 'start');
       if (e) return fail(e);
       s.step = 'command';
+      s.drawsThisPhase = 0;
       break;
     }
     case 'command-phase-ended': {
@@ -247,9 +251,29 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       s.step = 'start';
       break;
     }
-    case 'cards-drawn':
-    case 'card-redrawn':
-    case 'card-noted':
+    case 'cards-drawn': {
+      if (!SEATS.includes(ev.target)) return fail('Неизвестное место игрока');
+      if (!own(ev.target)) return fail('Тянуть карты можно только себе');
+      const e = drawCards(s, ev.target, ev.cards, ev.source);
+      if (e) return fail(e);
+      break;
+    }
+    case 'card-redrawn': {
+      if (!SEATS.includes(ev.target)) return fail('Неизвестное место игрока');
+      if (!own(ev.target)) return fail('Менять можно только свои карты');
+      if (ev.reason !== 'when-drawn') return fail(`Событие «${ev.type}» (${ev.reason}) ещё не поддерживается`);
+      const e = redrawWhenDrawn(s, ev.target, ev.card, ev.replacement, ev.shuffleBack, ev.source, catalog);
+      if (e) return fail(e);
+      break;
+    }
+    case 'card-noted': {
+      if (s.stage !== 'battle') return fail('Битва не идёт');
+      if (!SEATS.includes(ev.target)) return fail('Неизвестное место игрока');
+      if (!own(ev.target)) return fail('Заметки — только к своим картам');
+      const e = noteCard(s, ev.target, ev.card, ev.note);
+      if (e) return fail(e);
+      break;
+    }
     case 'card-scored':
     case 'card-discarded':
     case 'primary-scored':
