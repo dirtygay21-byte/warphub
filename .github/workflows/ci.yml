@@ -46,6 +46,74 @@ jobs:
         working-directory: backend
         run: bun test tests
 
+  backend-e2e:
+    name: "Backend e2e: admins"
+    # Настоящий сервер + временный PostgreSQL на раннере GitHub; только новые сквозные тесты (tests/admins-e2e.test.ts).
+    # Все секреты — тестовые заглушки; уведомления выключены, наружу ничего не уходит.
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: wh_e2e
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      POSTGRES_URI: postgres://postgres:postgres@127.0.0.1:5432/wh_e2e
+      TELEGRAM_BOT_TOKEN: "123456:TEST_TOKEN_FOR_LOCAL_RUN"
+      JWT_SECRET: e2e-jwt-secret
+      BOT_INTERNAL_SECRET: e2e-internal-secret
+      S3_ACCESS_KEY: e2e
+      S3_SECRET_KEY: e2e
+      S3_BUCKET: e2e
+      S3_PUBLIC_URL: http://127.0.0.1/e2e
+      PORT: "4100"
+      TELEGRAM_NOTIFICATIONS: "off"
+      ADMIN_TELEGRAM_IDS: "777"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+      - name: Install
+        working-directory: backend
+        run: bun install --frozen-lockfile
+      - name: Database schema (from src/db/schema)
+        working-directory: backend
+        # drizzle-kit push создавал схему не полностью — генерируем полный SQL из схемы и применяем psql (ошибки видны)
+        run: |
+          bunx drizzle-kit generate --dialect postgresql --schema ./src/db/schema --out ./e2e-schema --name init
+          # drizzle-kit пишет числа в CHECK как параметры ($1); во всех проверках схемы это 0 (gt(x, 0))
+          sed -E -i 's/\$[0-9]+/0/g' e2e-schema/*.sql
+          for f in e2e-schema/*.sql; do
+            psql "$POSTGRES_URI" -v ON_ERROR_STOP=1 -q -f "$f" 2> psql.err || { sed 's/^/::error::schema: /' psql.err | head -5; exit 1; }
+          done
+      - name: Migration 0014 applies on top (idempotent)
+        run: psql "$POSTGRES_URI" -v ON_ERROR_STOP=1 -f backend/drizzle/0014_admin_users.sql
+      - name: Tables in the test database
+        run: |
+          T=$(psql "$POSTGRES_URI" -Atc "select string_agg(table_name, ' ' order by table_name) from information_schema.tables where table_schema='public'")
+          echo "::notice::tables - $T"
+      - name: Start the API
+        working-directory: backend
+        run: |
+          nohup bun run src/index.ts > api.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:4100/health >/dev/null && exit 0; sleep 1; done
+          cat api.log; exit 1
+      - name: E2E tests
+        working-directory: backend
+        run: WARPHUB_E2E=1 bun test tests/admins-e2e.test.ts
+      - name: API log on failure
+        if: failure()
+        working-directory: backend
+        # строки лога — ещё и аннотациями (их можно прочитать через API GitHub без полного лога)
+        run: |
+          tail -100 api.log
+          grep -inE "error|exception|fail|warn|missing|relation|column" api.log | tail -15 | cut -c1-400 | while IFS= read -r l; do echo "::error::api.log: $l"; done
+          tail -5 api.log | cut -c1-400 | while IFS= read -r l; do echo "::warning::api.log tail: $l"; done
+
   client:
     name: Client type check, lint, build
     runs-on: ubuntu-24.04

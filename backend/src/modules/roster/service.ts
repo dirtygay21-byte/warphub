@@ -1,5 +1,5 @@
 import { and, desc, eq, gt, isNull, sql } from 'drizzle-orm';
-import { getAdminTelegramIds, isAdminUser } from '../../config/admin';
+import { getBuiltinAdminIds, isAdminUser } from '../../config/admin';
 import { env } from '../../config/env';
 import { db } from '../../db';
 import { rosterAccessCodesTable, rosterAccessTable, rosterCodeAttemptsTable, usersTable } from '../../db/schema';
@@ -36,7 +36,8 @@ const codeFormatter = new Intl.DateTimeFormat('ru-RU', {
 });
 
 export function isRosterOwner(user: Pick<User, 'telegramId'>): boolean {
-  return rosterOwnerIds(getAdminTelegramIds()).includes(user.telegramId.toString());
+  // владельцы Roster Builder — только встроенные администраторы (добавленные в админке ими не становятся)
+  return rosterOwnerIds(getBuiltinAdminIds()).includes(user.telegramId.toString());
 }
 
 export async function hasRosterAccess(user: User): Promise<boolean> {
@@ -176,7 +177,7 @@ export async function redeemCode(user: User, input: string) {
     // сработал общий лимит на всех — похоже на перебор: сообщаем владельцу (не чаще раза в час)
     if (outcome.global && Date.now() - globalAlertAt > ATTEMPT_WINDOW_MS) {
       globalAlertAt = Date.now();
-      for (const id of rosterOwnerIds(getAdminTelegramIds())) {
+      for (const id of rosterOwnerIds(getBuiltinAdminIds())) {
         void sendTelegramMessage(id, '⚠️ Roster Builder: слишком много неверных кодов за последний час — ввод кодов временно приостановлен. Возможно, кто-то подбирает код.');
       }
     }
@@ -190,7 +191,7 @@ export async function redeemCode(user: User, input: string) {
     );
   }
 
-  for (const id of rosterOwnerIds(getAdminTelegramIds())) {
+  for (const id of rosterOwnerIds(getBuiltinAdminIds())) {
     void sendTelegramMessage(id, `✅ ${escapeHtml(formatUserName(user))} открыл Roster Builder по коду.`);
   }
   return { hasAccess: true };
