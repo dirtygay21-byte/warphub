@@ -1,0 +1,149 @@
+import { useEffect, useState, type ReactNode } from 'react';
+import { currentSetupStep, setupSteps, type SetupStepId } from '../../game';
+import { pushOverlay } from '../../telegram';
+import { Battlefield } from '../Battlefield';
+import { Button, Icon, IconButton } from '../kit';
+import { cx } from '../util';
+import { useGame, type GameHook } from './useGame';
+
+/**
+ * «Начать игру»: подготовка к битве по шагам правил колоды миссий, затем трекер (G3).
+ * Шаги G2.3–G2.8 подключаются в StepBody; сейчас — каркас: прогресс, ошибки движка, отмена.
+ */
+export function GameScreen({ onBack }: { onBack: () => void }) {
+  const game = useGame();
+  const { data, loadError, state } = game;
+  // просмотр раскладок и карт миссий открывается поверх игры: игра не теряется, «Назад» Telegram закрывает просмотр
+  const [viewing, setViewing] = useState(false);
+  useEffect(() => (viewing ? pushOverlay(() => setViewing(false)) : undefined), [viewing]);
+  if (viewing) return <Battlefield onBack={() => setViewing(false)} />;
+
+  if (loadError) {
+    return (
+      <Shell onBack={onBack}>
+        <p className="mt-10 text-center text-sm text-white/50">{loadError}</p>
+      </Shell>
+    );
+  }
+  if (!data) {
+    return (
+      <Shell onBack={onBack}>
+        <div className="mx-auto mt-16 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
+      </Shell>
+    );
+  }
+
+  return (
+    <Shell onBack={onBack} undo={state && game.canUndo ? game.undo : undefined}>
+      {!state ? (
+        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+          <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
+          <p className="mt-1 text-sm leading-snug text-white/60">
+            Подготовка по шагам правил Chapter Approved 2026–27: игроки и ростеры, типы армий, раскладка, атакующий и защитник, вторичные миссии,
+            первый ход. Затем — трекер партии.
+          </p>
+          <Button variant="primary" className="mt-3 w-full" onClick={() => game.newGame()}>
+            Начать подготовку
+          </Button>
+        </section>
+      ) : (
+        <Setup game={game} />
+      )}
+
+      {game.error && (
+        <div className="sheet-enter fixed inset-x-0 bottom-0 z-40 border-t border-danger/40 bg-app-elevated px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+          <div className="mx-auto flex max-w-lg items-start gap-2">
+            <Icon name="alert" className="mt-0.5 size-5 shrink-0 text-danger" />
+            <p className="min-w-0 flex-1 text-sm text-white/85">{game.error}</p>
+            <IconButton icon="close" label="Закрыть" onClick={game.clearError} className="size-8" />
+          </div>
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={() => setViewing(true)}
+        className="mt-6 flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10"
+      >
+        <Icon name="map" className="size-5 text-accent" />
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-semibold">Раскладки и карты миссий</span>
+          <span className="block text-[11px] text-white/45">Просмотр без игры: деплой, террейн, основные и вторичные миссии</span>
+        </span>
+        <Icon name="chevron" className="size-4 text-white/40" />
+      </button>
+    </Shell>
+  );
+}
+
+function Setup({ game }: { game: GameHook }) {
+  const state = game.state!;
+  const steps = setupSteps(state);
+  const current = currentSetupStep(state);
+  const doneCount = steps.filter((s) => s.done).length;
+  return (
+    <section>
+      <div className="flex items-baseline justify-between">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Подготовка к битве</p>
+        <p className="text-[11px] text-white/45">
+          {doneCount} из {steps.length}
+        </p>
+      </div>
+      <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-white/10">
+        <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
+      </div>
+      <ol className="mt-3 space-y-2">
+        {steps.map((s, i) => {
+          const active = s.id === current;
+          return (
+            <li
+              key={s.id}
+              className={cx('rounded-2xl border px-3 py-2.5', active ? 'border-accent/60 bg-accent/[0.07]' : 'border-white/10 bg-white/[0.03]')}
+            >
+              <div className="flex items-center gap-2.5">
+                <span
+                  className={cx(
+                    'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                    s.done ? 'bg-accent text-black' : active ? 'border border-accent text-accent' : 'border border-white/20 text-white/50',
+                  )}
+                >
+                  {s.done ? <Icon name="check" className="size-3.5" strokeWidth={3} /> : i + 1}
+                </span>
+                <span className={cx('min-w-0 flex-1 text-sm font-semibold', !s.done && !active && 'text-white/60')}>{s.title}</span>
+              </div>
+              {active && <StepBody id={s.id} game={game} />}
+            </li>
+          );
+        })}
+      </ol>
+      {current === null && (
+        <p className="mt-3 rounded-2xl border border-accent/30 bg-accent/10 px-3 py-2.5 text-sm text-white/85">Всё готово к битве — начало битвы появится на шаге «Первый ход» (G2.8).</p>
+      )}
+    </section>
+  );
+}
+
+/** Содержимое активного шага. Шаги подключаются задачами G2.3–G2.8. */
+function StepBody({ id }: { id: SetupStepId; game: GameHook }) {
+  return <p className="mt-2 pl-8 text-xs leading-snug text-white/45">Шаг «{id}» появится в следующих задачах (G2.3–G2.8).</p>;
+}
+
+function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => void; children: ReactNode }) {
+  return (
+    <div className="mx-auto min-h-dvh max-w-lg px-4 pb-24 pt-5 lg:max-w-4xl lg:pt-8">
+      <header className="mb-4 flex items-end gap-3">
+        <IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" />
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Chapter Approved 2026–27</p>
+          <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Начать игру</h1>
+        </div>
+        {undo && (
+          <button type="button" onClick={undo} className="mb-0.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/70 active:bg-white/10">
+            Отменить
+          </button>
+        )}
+      </header>
+      {children}
+    </div>
+  );
+}

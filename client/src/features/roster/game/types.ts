@@ -147,6 +147,9 @@ export type GameEvent = EventBase &
 
 export type GameEventType = GameEvent['type'];
 
+/** Событие без служебных полей (id, seq, at; seat — по желанию): то, что отправляет экран. */
+export type EventBody = GameEvent extends infer E ? (E extends GameEvent ? Omit<E, 'id' | 'seq' | 'at' | 'seat'> & { seat?: Seat | null } : never) : never;
+
 /** Ссылка на бросок «кто выше»: номер броска этого вида в игре (0, 1, …); кубики движок считает по seed. */
 export interface RollRef {
   attempt: number;
