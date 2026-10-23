@@ -17,7 +17,8 @@ import {
   type Round,
   type Seat,
 } from './types';
-import { drawCards, initDecks, noteCard, redrawWhenDrawn } from './decks';
+import { drawCards, initDecks, noteCard, redrawWhenDrawn, swapCard } from './decks';
+import { cardVp } from './scoring';
 
 export const other = (s: Seat): Seat => (s === 'p1' ? 'p2' : 'p1');
 
@@ -100,6 +101,7 @@ export function createGame(ev: GameEvent): ApplyResult {
       activeSeat: null,
       step: 'start',
       drawsThisPhase: 0,
+      discardCpTaken: false,
       endReason: null,
       lastSeq: 1,
       reverted: [],
@@ -239,6 +241,7 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
         s.activeSeat = null;
       }
       s.step = 'start';
+      s.discardCpTaken = false;
       break;
     }
     case 'battle-ended': {
@@ -261,9 +264,56 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
     case 'card-redrawn': {
       if (!SEATS.includes(ev.target)) return fail('Неизвестное место игрока');
       if (!own(ev.target)) return fail('Менять можно только свои карты');
-      if (ev.reason !== 'when-drawn') return fail(`Событие «${ev.type}» (${ev.reason}) ещё не поддерживается`);
-      const e = redrawWhenDrawn(s, ev.target, ev.card, ev.replacement, ev.shuffleBack, ev.source, catalog);
+      const e =
+        ev.reason === 'swap'
+          ? swapCard(s, ev.target, ev.card, ev.replacement, ev.shuffleBack, ev.source)
+          : ev.reason === 'when-drawn'
+            ? redrawWhenDrawn(s, ev.target, ev.card, ev.replacement, ev.shuffleBack, ev.source, catalog)
+            : 'Неизвестная причина замены';
       if (e) return fail(e);
+      break;
+    }
+    case 'card-scored': {
+      if (!SEATS.includes(ev.target)) return fail('Неизвестное место игрока');
+      if (!own(ev.target)) return fail('Засчитывать можно только свои карты');
+      if (s.stage !== 'battle' || s.step !== 'main') return fail('Вторичные миссии засчитываются в конце хода');
+      const p = s.players[ev.target];
+      if (!p.active.some((a) => a.id === ev.card)) return fail('Этой карты нет среди активных');
+      if (p.scored.some((x) => x.id === ev.card && x.round === s.round && x.turn === s.activeSeat)) return fail('Эта карта уже засчитана в этот ход');
+      const card = catalog.cards.find((c) => c.id === ev.card);
+      if (!card) return fail(`Нет карты ${ev.card}`);
+      const r = cardVp({ card, picks: ev.picks, round: s.round, mode: p.secondaryMode });
+      if ('error' in r) return fail(r.error);
+      p.scored.push({ id: ev.card, round: s.round, turn: s.activeSeat!, vp: r.vp, picks: ev.picks.map((x) => ({ ...x })) });
+      // тактическая карта выполнена и уходит из игры; фиксированная остаётся активной всю битву
+      if (p.secondaryMode === 'tactical') p.active = p.active.filter((a) => a.id !== ev.card);
+      break;
+    }
+    case 'card-discarded': {
+      if (!SEATS.includes(ev.target)) return fail('Неизвестное место игрока');
+      if (!own(ev.target)) return fail('Сбрасывать можно только свои карты');
+      const p = s.players[ev.target];
+      if (p.secondaryMode !== 'tactical') return fail('Фиксированные вторичные миссии не сбрасываются');
+      if (s.stage !== 'battle' || s.activeSeat !== ev.target || s.step !== 'main') return fail('Сбросить карты можно в конце своего хода');
+      if (!p.active.some((a) => a.id === ev.card)) return fail('Этой карты нет среди активных');
+      if (ev.forCp) {
+        if (s.discardCpTaken) return fail('1 CP за сброс в этот ход уже получен');
+        p.cp += 1;
+        s.discardCpTaken = true;
+      }
+      p.active = p.active.filter((a) => a.id !== ev.card);
+      p.discarded.push(ev.card);
+      break;
+    }
+    case 'cp-changed': {
+      if (!SEATS.includes(ev.target)) return fail('Неизвестное место игрока');
+      if (!own(ev.target)) return fail('CP можно менять только себе');
+      if (ev.reason === 'discard' || ev.reason === 'swap') return fail('CP за сброс и замену карты начисляются автоматически');
+      if (!['base', 'stratagem', 'other'].includes(ev.reason)) return fail('Неизвестная причина изменения CP');
+      if (!Number.isInteger(ev.delta) || ev.delta === 0 || Math.abs(ev.delta) > 10) return fail('Изменение CP — целое число от −10 до 10, не ноль');
+      const p = s.players[ev.target];
+      if (p.cp + ev.delta < 0) return fail(`Не хватает CP: есть ${p.cp}`);
+      p.cp += ev.delta;
       break;
     }
     case 'card-noted': {
@@ -274,11 +324,8 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       if (e) return fail(e);
       break;
     }
-    case 'card-scored':
-    case 'card-discarded':
     case 'primary-scored':
     case 'vp-adjusted':
-    case 'cp-changed':
     case 'event-reverted':
       return fail(`Событие «${ev.type}» ещё не поддерживается`);
     default:

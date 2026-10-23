@@ -100,6 +100,30 @@ export function redrawWhenDrawn(
   return null;
 }
 
+/**
+ * Замена карты за 1 CP (один раз за битву): в конце своей фазы командования сбросить одну активную карту
+ * и взять одну новую. Сброшенная карта в колоду не возвращается.
+ */
+export function swapCard(s: GameState, seat: Seat, card: string, replacement: string, shuffleBack: boolean, source: 'random' | 'manual'): string | null {
+  const p = s.players[seat];
+  if (p.secondaryMode !== 'tactical') return 'Замена — только в тактическом режиме';
+  if (s.stage !== 'battle' || s.activeSeat !== seat || s.step !== 'command') return 'Замена — в конце своей фазы командования';
+  if (p.swapUsed) return 'Замена за 1 CP уже использована в этой битве';
+  if (p.cp < 1) return 'Для замены нужен 1 CP';
+  if (shuffleBack) return 'При замене карта сбрасывается, а не возвращается в колоду';
+  const i = p.active.findIndex((a) => a.id === card);
+  if (i < 0) return 'Этой карты нет среди активных';
+  if (!p.deck.length) return 'В колоде не осталось карт для замены';
+  if (source === 'random' && p.deck[0] !== replacement) return 'Случайная замена должна совпадать с верхом колоды';
+  if (!p.deck.includes(replacement)) return 'Этой карты нет в колоде';
+  p.deck = p.deck.filter((c) => c !== replacement);
+  p.active[i] = { id: replacement, round: s.round, source };
+  p.discarded.push(card);
+  p.cp -= 1;
+  p.swapUsed = true;
+  return null;
+}
+
 /** Перемешать колоду игрока заново (каждое перемешивание — новый номер, свой порядок). */
 function reshuffle(p: PlayerState, seed: string, cards: string[]): void {
   p.deck = deckOrder(seed, p.seat, p.shuffles, cards);

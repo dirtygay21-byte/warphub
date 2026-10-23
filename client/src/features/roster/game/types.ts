@@ -165,7 +165,11 @@ export interface ActiveCard {
 export interface ScoredCard {
   id: string;
   round: Round;
+  /** чей ход шёл, когда карта засчитана (вторичные считаются в конце хода любого игрока) */
+  turn: Seat;
+  /** очки по карте до лимитов (лимиты раунда, битвы и фиксированной карты — в итогах, G1.6) */
   vp: number;
+  picks: RowPick[];
 }
 
 export interface PlayerState extends PlayerSetup {
@@ -210,6 +214,8 @@ export interface GameState {
   step: TurnStep;
   /** сколько тактических карт активный игрок уже вытянул в текущей фазе командования (правило: две) */
   drawsThisPhase: number;
+  /** 1 CP за сброс вторичных уже получен в этот ход (правило: один раз за ход, сколько карт ни сбрось) */
+  discardCpTaken: boolean;
   /** почему битва закончилась (stage = finished) */
   endReason: 'rounds' | 'concede' | 'manual' | null;
   /** номер последнего применённого события */
