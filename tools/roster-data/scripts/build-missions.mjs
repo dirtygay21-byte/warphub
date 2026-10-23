@@ -38,6 +38,58 @@ export function vpDiff(card, kdc) {
   return diff.sort((a, b) => a.vp - b.vp);
 }
 
+/**
+ * Чей ход должен заканчиваться, чтобы блок вторичной миссии засчитывался (G2.11a): own — ваш, opponent — противника,
+ * any — любой, opponent-or-r5 — противника или конец 5-го раунда (что раньше). Должно совпадать с текстом «when».
+ */
+export const SECONDARY_TURN = {
+  'Конец вашего хода': 'own',
+  'Конец любого хода': 'any',
+  'Конец хода любого игрока': 'any',
+  'Конец хода противника': 'opponent',
+  'Конец хода противника или конец 5-го раунда — что наступит раньше': 'opponent-or-r5',
+  'Пока карта активна': 'any',
+};
+
+/**
+ * Когда засчитывается блок основной миссии (G3.1): own-turn — конец вашего хода, own-command — конец вашей фазы
+ * командования, own-command-r5-turn — то же, но в 5-м раунде конец вашего хода, any-turn — конец любого хода,
+ * battle-end — конец битвы. Должно совпадать с текстом «when».
+ */
+export const PRIMARY_AT = {
+  'Конец вашего хода': 'own-turn',
+  'Конец вашей фазы командования': 'own-command',
+  'Конец вашей фазы командования (в 5-м раунде — конец вашего хода)': 'own-command-r5-turn',
+  'Конец любого хода': 'any-turn',
+  'Конец битвы': 'battle-end',
+};
+
+/**
+ * Правило «при взятии» в виде данных (G3.3): onDraw.action — reshuffle (взять новую, эту вернуть в колоду и перемешать),
+ * discard (сбросить эту и взять новую; условие подтверждает игрок — confirm), note (записать выбор: маяк, цель, охрана);
+ * round1 — только в 1-м раунде; ifActive — только если активна такая карта; required — обязательно.
+ * Проверяется по тексту «drawn», чтобы данные и текст не разошлись.
+ */
+export function onDrawErrors(id, t) {
+  const e = [];
+  const o = t.onDraw;
+  if (t.type !== 'secondary') return o ? [`${id}: onDraw у основной миссии`] : [];
+  if (!t.drawn) return o ? [`${id}: onDraw без текста «при взятии»`] : [];
+  if (!o) return [`${id}: у правила «при взятии» нет onDraw`];
+  const text = t.drawn;
+  if (!['reshuffle', 'discard', 'note'].includes(o.action)) e.push(`${id}: onDraw.action ${o.action}`);
+  if (o.action === 'reshuffle' && !/перемеша/.test(text)) e.push(`${id}: reshuffle, но в тексте нет «перемешать»`);
+  if (o.action === 'discard' && !/сбросить/.test(text)) e.push(`${id}: discard, но в тексте нет «сбросить»`);
+  if (o.action !== 'note' && /перемеша|сбросить/.test(text) === false) e.push(`${id}: замена без слов о замене`);
+  if (o.action === 'note' && /перемеша|сбросить эту/.test(text)) e.push(`${id}: note, но в тексте замена`);
+  if (!!o.round1 !== /первый раунд/.test(text)) e.push(`${id}: round1 не совпадает с текстом`);
+  if (!!o.required !== !!t.drawnRequired) e.push(`${id}: required не совпадает с drawnRequired`);
+  if (o.required && /можно/.test(text)) e.push(`${id}: required, но в тексте «можно»`);
+  if (o.action !== 'note' && !o.required && !/можно/.test(text)) e.push(`${id}: по желанию, но в тексте нет «можно»`);
+  if (o.ifActive && !new RegExp(o.ifActive, 'i').test(text.replace(/\s/g, '-'))) e.push(`${id}: ifActive ${o.ifActive} не в тексте`);
+  return e;
+}
+
 export function buildMissions({ cards, missions, matchups, ru, review, version }) {
   const kdcById = new Map(cards.map((c) => [c.id, c]));
   const errors = [];
@@ -54,6 +106,23 @@ export function buildMissions({ cards, missions, matchups, ru, review, version }
       const p = pair.get(id);
       if (!p || p[0] !== t.you || p[1] !== t.foe) errors.push(`${id}: пара ${t.you}/${t.foe}, в 40kdc ${p?.join('/')}`);
     }
+    if (t.type === 'secondary') {
+      for (const [i, b] of t.blocks.entries()) {
+        const want = SECONDARY_TURN[b.when];
+        if (!want) errors.push(`${id}: блок ${i} — неизвестное время «${b.when}»`);
+        else if (b.turn !== want) errors.push(`${id}: блок ${i} — turn ${b.turn}, по тексту «${b.when}» нужно ${want}`);
+      }
+    }
+    if (t.type === 'primary') {
+      for (const [i, b] of t.blocks.entries()) {
+        const want = PRIMARY_AT[b.when];
+        if (!want) errors.push(`${id}: блок ${i} — неизвестное время «${b.when}»`);
+        else if (b.at !== want) errors.push(`${id}: блок ${i} — at ${b.at}, по тексту «${b.when}» нужно ${want}`);
+        else if ((want === 'battle-end') !== (b.rounds === 'end')) errors.push(`${id}: блок ${i} — «Конец битвы» и раунды 'end' должны совпадать`);
+      }
+    }
+    if (t.drawnRequired && !t.drawn) errors.push(`${id}: drawnRequired без правила «при взятии»`);
+    for (const e of onDrawErrors(id, t)) errors.push(e);
     const d = vpDiff(t, k);
     if (d.length && allowed.get(id) !== JSON.stringify(d)) errors.push(`${id}: очки расходятся с 40kdc ${JSON.stringify(d)}`);
     out.push({ id, name: k.name, ...t });

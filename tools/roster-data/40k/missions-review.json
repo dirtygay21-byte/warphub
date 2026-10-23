@@ -834,5 +834,31 @@
    "beacon timing; attacker and defender secondaries identical (all 18)"
   ],
   "setupRules": "all setup / when drawn / designer note entries on wh-rules.ru are present in our texts"
+ },
+ "secondaryTiming": {
+  "task": "G2.11a, 2026-10-23",
+  "source": "wahapedia.ru/wh40k11ed/the-rules/mission-deck-2026-27: at the end of each player's turn both players score (active player first); each card's WHEN says whose turn: 'End of your turn', 'End of a turn', 'End of your opponent's turn or the end of the fifth battle round (whichever comes first)'",
+  "field": "blocks[].turn on every secondary block: own | opponent | any | opponent-or-r5; derived from the card's WHEN text and checked by build-missions.mjs (SECONDARY_TURN)",
+  "fixedWhileActive": "Assassination (Fixed) 'while active' scores per enemy CHARACTER destroyed this turn — any turn",
+  "round5": "opponent-or-r5 (Beacon, Burden of Trust, Defend Stronghold): the player going second scores at the end of their own round-5 turn — the opponent's round-5 turn has already passed",
+  "drawnRequired": "Defend Stronghold: in round 1 the redraw is mandatory ('draw one new Secondary Mission card'); Forward Position, Behind Enemy Lines, Plunder, Cleanse, A Grievous Blow, Bring It Down — optional ('can')",
+  "duration": "Tactical cards stay active across turns and rounds until achieved (scored, then out of play), discarded at the end of your turn (1CP per turn), or swapped once per battle (1CP); no hand limit",
+  "gap": "Deck exhaustion is not covered by the rules; the engine draws the cards that remain (as the wh-rules.ru tracker)"
+ },
+ "primaryTiming": {
+  "task": "G3.1, 2026-10-23",
+  "field": "blocks[].at on every primary block: own-turn | own-command | own-command-r5-turn | any-turn | battle-end; derived from the card's WHEN text and checked by build-missions.mjs (PRIMARY_AT); battle-end only with rounds 'end'",
+  "counts": "own-turn 36, own-command-r5-turn 23, battle-end 12, own-command 2 (Immovable Object 2–4, Outmanoeuvre 2–3), any-turn 1 (Punishment)",
+  "engine": "primary-scored accepts a block only at its moment: own Command phase (step command), end of own turn / any turn (step main, before turn-ended), round 5 shift for own-command-r5-turn, battle-end only after the battle has ended",
+  "source": "card WHEN lines as verified in P2-T1 (game-datamissions.com cards, mission deck rules, wh-rules.ru)"
+ },
+ "onDraw": {
+  "task": "G3.3, 2026-10-23",
+  "field": "onDraw on the 10 secondaries with a When Drawn rule: action reshuffle | discard | note, round1, ifActive, required, confirm; checked against the drawn text by build-missions.mjs (onDrawErrors)",
+  "reshuffle": "Defend Stronghold (round 1, mandatory), Forward Position and Behind Enemy Lines (round 1, optional), Plunder if Cleanse is active and Cleanse if Plunder is active (optional)",
+  "discard": "A Grievous Blow (no enemy unit with starting strength 13+), Bring It Down (no enemy model with W10+) — optional; the condition cannot be checked by the app, the player confirms it",
+  "note": "Beacon (your beacon unit), A Tempting Target (objective chosen by the opponent), Burden of Trust (guard units; also at the start of each of your turns)",
+  "engine": "command-phase-ended is rejected while a tactical player has cards left to draw (deck not empty) or a mandatory When Drawn redraw is pending; card-redrawn when-drawn must match the card's action and conditions",
+  "source": "Mission Deck 2026-27 rules: 'At the start of your Command phase, draw two Secondary Missions'; card When Drawn texts as verified in P2-T1"
  }
 }

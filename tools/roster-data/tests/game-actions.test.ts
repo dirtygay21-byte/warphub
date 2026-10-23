@@ -106,3 +106,9 @@ test('CP вручную: базовые, стратагемы, прочее; н�
   err(run(P2_MAIN, B({ type: 'cp-changed', target: 'p2', seat: 'p1', delta: 1, reason: 'base' })), /только себе/);
   err(run(P2_MAIN, B({ type: 'cp-changed', target: 'p2', delta: 0, reason: 'other' })), /не ноль/);
 });
+
+test('выполненная тактическая карта сохраняет свой номер выхода из колоды (G2.11b)', () => {
+  const s = ok(run(P1_MAIN, B({ type: 'card-scored', target: 'p1', card: 'assassination', picks: [{ block: 1, row: 0, count: 1 }] })));
+  assert.deepEqual(s.players.p1.scored.map((x) => [x.id, x.n]), [['assassination', 2]]);
+  assert.deepEqual(s.players.p1.active.map((x) => [x.id, x.n]), [['behind-enemy-lines', 1]]);
+});

@@ -27,6 +27,7 @@ const paths: Record<string, string> = {
   eye: 'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12zM12 15a3 3 0 100-6 3 3 0 000 6z',
   spark: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z',
   edit: 'M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4',
+  lock: 'M6 11h12v10H6zM8 11V7a4 4 0 018 0v4',
 };
 
 export function Icon({ name, className = 'size-5', strokeWidth = 2 }: { name: keyof typeof paths | string; className?: string; strokeWidth?: number }) {

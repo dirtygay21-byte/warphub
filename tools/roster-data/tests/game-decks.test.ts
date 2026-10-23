@@ -6,7 +6,7 @@ import { drawCards, drawsLeft, nextDraw, secondaryIds } from '../../../client/sr
 import { replay } from '../../../client/src/features/roster/game/reducer';
 import { deckOrder } from '../../../client/src/features/roster/game/rng';
 import type { GameState } from '../../../client/src/features/roster/game/types';
-import { catalog, log, setupBodies, type Body } from './game-helpers';
+import { catalog, log, rawLog, setupBodies, type Body } from './game-helpers';
 
 const ok = (r: ReturnType<typeof replay>): GameState => {
   assert.ok(r.ok, r.ok ? '' : `№${r.seq}: ${r.error}`);
@@ -120,4 +120,85 @@ test('другой seed — другие карты; одинаковый жур
   const b = ok(replay(log(...other, B({ type: 'command-phase-started' }), B({ type: 'command-phase-ended' }), B({ type: 'turn-ended' }), B({ type: 'command-phase-started' })), catalog));
   assert.notDeepEqual(nextDraw(a, 'p1'), nextDraw(b, 'p1'));
   assert.deepEqual(ok(run()), a);
+});
+
+test('порядок выхода из колоды (n) и журнал сброса: взятие, «при взятии», замена, сброс, выполнение (G2.11b)', () => {
+  const drawn = B({ type: 'cards-drawn', target: 'p1', cards: ['bring-it-down', 'behind-enemy-lines'], source: 'manual' });
+  const s0 = ok(run(drawn));
+  assert.deepEqual(s0.players.p1.active.map((a) => [a.id, a.n]), [['bring-it-down', 1], ['behind-enemy-lines', 2]]);
+  assert.equal(s0.players.p1.drawn, 2);
+  const fixed = ok(replay(log(...setupBodies()), catalog)).players.p2;
+  assert.ok(fixed.active.every((a) => a.n === undefined) && fixed.drawn === 0, 'фиксированные без номера');
+
+  // «при взятии» со сбросом: замена получает №3, сброшенная — в журнал
+  const redraw = B({ type: 'card-redrawn', target: 'p1', card: 'bring-it-down', replacement: s0.players.p1.deck[0], reason: 'when-drawn', shuffleBack: false, source: 'random' });
+  const s1 = ok(run(drawn, redraw));
+  assert.deepEqual(s1.players.p1.active.map((a) => a.n), [3, 2]);
+  assert.deepEqual(s1.players.p1.discardLog, [{ id: 'bring-it-down', round: 1, n: 1, why: 'when-drawn', cp: 0 }]);
+
+  // замена за 1 CP: №4, в журнале −1 CP
+  const swap = B({ type: 'card-redrawn', target: 'p1', card: 'behind-enemy-lines', replacement: s1.players.p1.deck[0], reason: 'swap', shuffleBack: false, source: 'random' });
+  const s2 = ok(run(drawn, redraw, swap));
+  assert.deepEqual(s2.players.p1.active.map((a) => a.n), [3, 4]);
+  assert.deepEqual(s2.players.p1.discardLog.at(-1), { id: 'behind-enemy-lines', round: 1, n: 2, why: 'swap', cp: -1 });
+
+  // сброс в конце хода: первый +1 CP, второй без CP; номер сохраняется
+  const [a, b] = s2.players.p1.active;
+  const end = B({ type: 'command-phase-ended' });
+  const s3 = ok(run(drawn, redraw, swap, end, B({ type: 'card-discarded', target: 'p1', card: a!.id, forCp: true }), B({ type: 'card-discarded', target: 'p1', card: b!.id, forCp: false })));
+  assert.deepEqual(s3.players.p1.discardLog.slice(2).map((d) => [d.n, d.why, d.cp]), [[3, 'discard', 1], [4, 'discard', 0]]);
+  assert.equal(s3.players.p1.discarded.length, 4);
+
+  // возврат в колоду («при взятии» с перемешиванием) в журнал сброса не попадает; следующая выдача продолжает нумерацию
+  const back = B({ type: 'card-redrawn', target: 'p1', card: 'behind-enemy-lines', replacement: s0.players.p1.deck[0], reason: 'when-drawn', shuffleBack: true, source: 'random' });
+  const s4 = ok(run(drawn, back));
+  assert.deepEqual(s4.players.p1.discardLog, []);
+  assert.deepEqual(s4.players.p1.active.map((x) => x.n), [1, 3]);
+});
+
+// G3.3: «при взятии» по данным карты и обязательные действия фазы командования (журнал без автоматического взятия)
+test('фаза командования не заканчивается без взятых карт и без обязательной замены Defend Stronghold', () => {
+  const raw = (...extra: Body[]) => replay(rawLog(...toP1Command(), ...extra), catalog);
+  const end = B({ type: 'command-phase-ended' });
+  err(raw(end), /Сначала возьмите карты вторичных миссий \(ещё 2\)/);
+  err(raw(B({ type: 'cards-drawn', target: 'p1', cards: ['plunder'], source: 'manual' }), end), /ещё 1/);
+  const ds = B({ type: 'cards-drawn', target: 'p1', cards: ['defend-stronghold', 'plunder'], source: 'manual' });
+  err(raw(ds, end), /Defend Stronghold.*обязательное/);
+  const s0 = ok(raw(ds));
+  const swap = B({ type: 'card-redrawn', target: 'p1', card: 'defend-stronghold', replacement: s0.players.p1.deck[0], reason: 'when-drawn', shuffleBack: true, source: 'random' });
+  const s = ok(raw(ds, swap, end));
+  assert.ok(s.players.p1.deck.includes('defend-stronghold'), 'вернулась в колоду');
+  // фиксированный игрок (p2) карты не тянет — его фаза заканчивается сразу
+  ok(replay(rawLog(...setupBodies(), B({ type: 'command-phase-started' }), end), catalog));
+});
+
+test('«при взятии» по данным: перемешать или сбросить — как на карте; только 1-й раунд; Plunder ↔ Cleanse; выбор — без замены', () => {
+  const raw = (...extra: Body[]) => replay(rawLog(...toP1Command(), ...extra), catalog);
+  const drawn = (...cards: string[]) => B({ type: 'cards-drawn', target: 'p1', cards, source: 'manual' });
+  const redraw = (card: string, shuffleBack: boolean, top: string) =>
+    B({ type: 'card-redrawn', target: 'p1', card, replacement: top, reason: 'when-drawn', shuffleBack, source: 'random' });
+  const top = (...extra: Body[]) => ok(raw(...extra)).players.p1.deck[0]!;
+
+  const fp = drawn('forward-position', 'outflank');
+  err(raw(fp, redraw('forward-position', false, top(fp))), /возвращается в колоду/);
+  ok(raw(fp, redraw('forward-position', true, top(fp))));
+  const bid = drawn('bring-it-down', 'outflank');
+  err(raw(bid, redraw('bring-it-down', true, top(bid))), /сбрасывается/);
+  const beacon = drawn('beacon', 'outflank');
+  err(raw(beacon, redraw('beacon', false, top(beacon))), /без замены/);
+  const pl = drawn('plunder', 'outflank');
+  err(raw(pl, redraw('plunder', true, top(pl))), /связанная карта/);
+  const plc = drawn('plunder', 'cleanse');
+  ok(raw(plc, redraw('plunder', true, top(plc))));
+
+  // 2-й раунд: Forward Position уже нельзя заменить
+  const r2 = [...toP1Command(), drawn('outflank', 'plunder'), B({ type: 'command-phase-ended' }), B({ type: 'turn-ended' })];
+  const r2p1 = [...r2, B({ type: 'command-phase-started' }), B({ type: 'command-phase-ended' }), B({ type: 'turn-ended' }), B({ type: 'command-phase-started' })];
+  const fp2 = drawn('forward-position', 'centre-ground');
+  const s2 = ok(replay(rawLog(...r2p1, fp2), catalog));
+  assert.equal(s2.round, 2);
+  err(replay(rawLog(...r2p1, fp2, redraw('forward-position', true, s2.players.p1.deck[0]!)), catalog), /только в первом раунде/);
+  // Defend Stronghold во 2-м раунде — без обязательной замены
+  const ds2 = drawn('defend-stronghold', 'centre-ground');
+  ok(replay(rawLog(...r2p1, ds2, B({ type: 'command-phase-ended' })), catalog));
 });

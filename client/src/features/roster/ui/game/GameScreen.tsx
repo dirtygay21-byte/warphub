@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import type { DataIndex, Roster } from '../../engine/types';
-import { currentSetupStep, setupSteps, totals, type SetupStepId } from '../../game';
+import { currentSetupStep, setupSteps, type SetupStepId } from '../../game';
 import { pushOverlay } from '../../telegram';
 import { Battlefield } from '../Battlefield';
 import { Button, Icon, IconButton } from '../kit';
@@ -10,13 +10,14 @@ import { StepDispositions } from './StepDispositions';
 import { StepLayout } from './StepLayout';
 import { StepRoles } from './StepRoles';
 import { StepSecondaries } from './StepSecondaries';
-import { StepStart, Summary } from './StepStart';
+import { StepStart } from './StepStart';
 import { StepPlayers } from './StepPlayers';
+import { Tracker } from './Tracker';
 import { useGame, type GameHook } from './useGame';
 
 /**
  * «Начать игру»: подготовка к битве по шагам правил колоды миссий, затем трекер (G3).
- * Шаги: игроки, типы армий, раскладка, роли, вторичные, первый ход и начало битвы (StepBody); после начала — BattleStarted до трекера G3.
+ * Шаги: игроки, типы армий, раскладка, роли, вторичные, первый ход и начало битвы (StepBody); после начала — трекер (Tracker).
  * initialRosterId — ростер из меню «Начать игру с этим ростером»: он сразу выбирается первому игроку.
  */
 export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack: () => void; rosters: Roster[]; index: DataIndex; initialRosterId?: string }) {
@@ -27,7 +28,7 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
     const r = initialRosterId ? rosters.find((x) => x.id === initialRosterId) : undefined;
     game.newGame({}, r ? [{ type: 'player-set', target: 'p1', patch: { roster: rosterRef(r, 'own') } }] : []);
   };
-  // просмотр раскладок и карт миссий открывается поверх игры: игра не теряется, «Назад» Telegram закрывает просмотр
+  // просмотр поля боя открывается поверх игры: игра не теряется, «Назад» Telegram закрывает просмотр
   const [viewing, setViewing] = useState(false);
   useEffect(() => (viewing ? pushOverlay(() => setViewing(false)) : undefined), [viewing]);
   if (viewing) return <Battlefield onBack={() => setViewing(false)} />;
@@ -61,7 +62,7 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
           </Button>
         </section>
       ) : (
-        state.stage === 'setup' ? <Setup game={game} rosters={rosters} index={index} /> : <BattleStarted game={game} index={index} />
+        state.stage === 'setup' ? <Setup game={game} rosters={rosters} index={index} /> : <Tracker game={game} index={index} />
       )}
 
       {game.error && (
@@ -81,8 +82,8 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
       >
         <Icon name="map" className="size-5 text-accent" />
         <span className="min-w-0 flex-1">
-          <span className="block text-sm font-semibold">Раскладки и карты миссий</span>
-          <span className="block text-[11px] text-white/45">Просмотр без игры: деплой, террейн, основные и вторичные миссии</span>
+          <span className="block text-sm font-semibold">Поле боя</span>
+          <span className="block text-[11px] text-white/45">Просмотр без игры: зоны деплоя и раскладки террейна</span>
         </span>
         <Icon name="chevron" className="size-4 text-white/40" />
       </button>
@@ -150,43 +151,6 @@ function StepBody({ id, game, rosters, index, onNext }: { id: SetupStepId; game:
   if (id === 'roles') return <StepRoles game={game} onNext={onNext} />;
   if (id === 'secondaries') return <StepSecondaries game={game} onNext={onNext} />;
   return <StepStart game={game} index={index} />;
-}
-
-/**
- * Битва началась: раунд, чей ход, CP и ПО игроков, сводка подготовки. Полноценный трекер (фазы, карты,
- * подсчёт) — этап G3; до него этот экран показывает, что подготовка записана и битва идёт.
- */
-function BattleStarted({ game, index }: { game: GameHook; index: DataIndex }) {
-  const state = game.state!;
-  const catalog = game.data!.catalog;
-  const active = state.activeSeat ? state.players[state.activeSeat].name : null;
-  return (
-    <section className="space-y-3">
-      <div className="rounded-2xl border border-accent/40 bg-accent/10 p-4">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">{state.stage === 'finished' ? 'Битва окончена' : 'Битва идёт'}</p>
-        <p className="font-display mt-1 text-2xl font-semibold uppercase leading-none">
-          {state.stage === 'finished' ? 'Итог' : `Раунд ${state.round}`}
-        </p>
-        {active && <p className="mt-1 text-sm text-white/75">Ход: {active}</p>}
-      </div>
-      <div className="grid grid-cols-2 gap-2">
-        {(['p1', 'p2'] as const).map((s) => {
-          const t = totals(state, s, catalog);
-          return (
-            <div key={s} className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
-              <p className="truncate text-[11px] text-white/45">{state.players[s].name}</p>
-              <p className="font-display text-2xl font-semibold leading-none">{t.total} ПО</p>
-              <p className="mt-1 text-[11px] text-white/55">CP: {state.players[s].cp}</p>
-            </div>
-          );
-        })}
-      </div>
-      <p className="rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-xs leading-snug text-white/55">
-        Трекер партии — фазы, карты вторичных, подсчёт очков — следующий этап (G3). Подготовка записана; «Отменить» вернёт начало битвы.
-      </p>
-      <Summary game={game} index={index} />
-    </section>
-  );
 }
 
 function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => void; children: ReactNode }) {
