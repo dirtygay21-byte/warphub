@@ -8,15 +8,15 @@ import { Button, Icon, Segmented, Sheet } from './kit';
 
 type Fmt = 'gw' | 'compact' | 'code';
 
-export function ExportSheet({ open, onClose, roster, L, cr, dataVersion }: { open: boolean; onClose: () => void; roster: Roster; L: DataLookup; cr: ComputedRoster; dataVersion: string | null }) {
+export function ExportSheet({ open, onClose, roster, L, cr, dataVersion, credit = null }: { open: boolean; onClose: () => void; roster: Roster; L: DataLookup; cr: ComputedRoster; dataVersion: string | null; credit?: string | null }) {
   const [fmt, setFmt] = useState<Fmt>('gw');
   const [copied, setCopied] = useState(false);
   const text = useMemo(() => {
     if (!open) return '';
-    if (fmt === 'gw') return exportGw(roster, L, cr, dataVersion);
+    if (fmt === 'gw') return exportGw(roster, L, cr, dataVersion, credit);
     if (fmt === 'compact') return exportCompact(roster, L, cr);
     return encodeRoster(roster);
-  }, [open, fmt, roster, L, cr, dataVersion]);
+  }, [open, fmt, roster, L, cr, dataVersion, credit]);
 
   const copy = async () => {
     try {
