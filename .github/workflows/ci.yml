@@ -97,7 +97,11 @@ jobs:
       - name: API log on failure
         if: failure()
         working-directory: backend
-        run: tail -100 api.log
+        # строки лога — ещё и аннотациями (их можно прочитать через API GitHub без полного лога)
+        run: |
+          tail -100 api.log
+          grep -inE "error|exception|fail|warn|missing|relation|column" api.log | tail -15 | cut -c1-400 | while IFS= read -r l; do echo "::error::api.log: $l"; done
+          tail -5 api.log | cut -c1-400 | while IFS= read -r l; do echo "::warning::api.log tail: $l"; done
 
   client:
     name: Client type check, lint, build
