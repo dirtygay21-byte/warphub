@@ -2,11 +2,11 @@
  "schema": "whrules-freshness/1",
  "snapshot": {
   "file": "whrules-995.json",
-  "schema": "whrules-points-snapshot/2",
+  "schema": "whrules-points-snapshot/3",
   "dataVersion": 995,
   "mfm": "1.6",
   "date": "2026-10-16",
-  "fingerprint": "ec8b68f3b2e21d6417ed26433fd02d5a40dafaeeb72b850717c94ae3f8190fde"
+  "fingerprint": "79a26d70ca87852ab8aabc06fb9f93d28a907a6c1b2a724e25af59b794c02aa4"
  },
  "ours": {
   "lastUpdate": "2026-09-28 02:38:04",
@@ -62,6 +62,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 4,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 8,
@@ -143,6 +155,18 @@
      "ours": 38,
      "site": 38,
      "matched": 38
+    },
+    "wargear": {
+     "same": 4,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -203,6 +227,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 0,
+     "priceChanged": 0,
+     "onlyOurs": 2,
+     "onlySite": 1,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 9,
@@ -553,6 +589,41 @@
      "ours": 31,
      "site": 36,
      "matched": 31
+    },
+    "wargear": {
+     "same": 0,
+     "priceChanged": [],
+     "onlyOurs": [
+      {
+       "id": "000001460",
+       "unit": "Caladius Grav-tank",
+       "name": "Twin arachnus heavy blaze cannon",
+       "ours": 15,
+       "unverified": false
+      },
+      {
+       "id": "000001561",
+       "unit": "Venatari Custodians",
+       "name": "Venatari lance",
+       "ours": 5,
+       "unverified": false
+      }
+     ],
+     "onlySite": [
+      {
+       "id": "000001447",
+       "unit": "Shield-captain",
+       "name": "Praesidium Shield",
+       "site": 25,
+       "auto": true
+      }
+     ],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -815,6 +886,18 @@
      "unmatched": 0,
      "noPointsOnSite": 0
     },
+    "wargear": {
+     "same": 2,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
+    },
     "detachments": {
      "ours": 10,
      "site": 10,
@@ -944,6 +1027,18 @@
      "ours": 38,
      "site": 38,
      "matched": 38
+    },
+    "wargear": {
+     "same": 2,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -1023,6 +1118,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 1,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 15,
@@ -1174,6 +1281,18 @@
      "ours": 99,
      "site": 99,
      "matched": 99
+    },
+    "wargear": {
+     "same": 1,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -1241,6 +1360,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 27,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 8,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 11,
@@ -1343,6 +1474,59 @@
      "ours": 135,
      "site": 135,
      "matched": 135
+    },
+    "wargear": {
+     "same": 27,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [
+      {
+       "id": "000000680",
+       "unit": "Leman Russ Commander",
+       "name": "Lascannon"
+      },
+      {
+       "id": "000000700",
+       "unit": "Leman Russ Battle Tank",
+       "name": "Lascannon"
+      },
+      {
+       "id": "000000701",
+       "unit": "Leman Russ Demolisher",
+       "name": "Lascannon"
+      },
+      {
+       "id": "000002741",
+       "unit": "Leman Russ Eradicator",
+       "name": "Lascannon"
+      },
+      {
+       "id": "000002742",
+       "unit": "Leman Russ Executioner",
+       "name": "Lascannon"
+      },
+      {
+       "id": "000002743",
+       "unit": "Leman Russ Exterminator",
+       "name": "Lascannon"
+      },
+      {
+       "id": "000002744",
+       "unit": "Leman Russ Punisher",
+       "name": "Lascannon"
+      },
+      {
+       "id": "000002745",
+       "unit": "Leman Russ Vanquisher",
+       "name": "Lascannon"
+      }
+     ],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -1410,6 +1594,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 0,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 9,
@@ -1533,6 +1729,18 @@
      "ours": 70,
      "site": 63,
      "matched": 63
+    },
+    "wargear": {
+     "same": 0,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -1593,6 +1801,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 2,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 8,
@@ -1666,6 +1886,18 @@
      "ours": 20,
      "site": 20,
      "matched": 20
+    },
+    "wargear": {
+     "same": 2,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -1733,6 +1965,18 @@
      "legendsNotOnSite": 15,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 3,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 17,
@@ -2211,6 +2455,18 @@
      "ours": 111,
      "site": 85,
      "matched": 85
+    },
+    "wargear": {
+     "same": 3,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -2271,6 +2527,18 @@
      "legendsNotOnSite": 15,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 2,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 9,
@@ -2592,6 +2860,18 @@
      "ours": 71,
      "site": 41,
      "matched": 41
+    },
+    "wargear": {
+     "same": 2,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -2652,6 +2932,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 4,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 1,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 9,
@@ -2769,6 +3061,24 @@
      "ours": 38,
      "site": 30,
      "matched": 30
+    },
+    "wargear": {
+     "same": 4,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [
+      {
+       "id": "000000665",
+       "unit": "Ravager",
+       "name": "Dark Lance"
+      }
+     ],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -2829,6 +3139,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 2,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 10,
@@ -2930,6 +3252,18 @@
      "ours": 23,
      "site": 23,
      "matched": 23
+    },
+    "wargear": {
+     "same": 2,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -3004,6 +3338,18 @@
      "unmatched": 0,
      "noPointsOnSite": 0
     },
+    "wargear": {
+     "same": 1,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 1,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
+    },
     "detachments": {
      "ours": 9,
      "site": 9,
@@ -3076,6 +3422,24 @@
      "ours": 25,
      "site": 25,
      "matched": 25
+    },
+    "wargear": {
+     "same": 1,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [
+      {
+       "id": "000001573",
+       "unit": "Achilles Ridgerunners",
+       "name": "Heavy mining laser"
+      }
+     ],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -3149,6 +3513,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 6,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 1,
+     "notAuto": 3,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 9,
@@ -3299,6 +3675,42 @@
      "ours": 31,
      "site": 31,
      "matched": 31
+    },
+    "wargear": {
+     "same": 6,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [
+      {
+       "id": "000000398",
+       "unit": "Stormraven Gunship",
+       "name": "Hurricane Bolter",
+       "site": 10,
+       "auto": true
+      }
+     ],
+     "notAuto": [
+      {
+       "id": "000000389",
+       "unit": "Nemesis Dreadknight",
+       "name": "Heavy psycannon"
+      },
+      {
+       "id": "000001360",
+       "unit": "Grand Master In Nemesis Dreadknight",
+       "name": "Sublimator"
+      },
+      {
+       "id": "000001360",
+       "unit": "Grand Master In Nemesis Dreadknight",
+       "name": "Heavy psycannon"
+      }
+     ],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -3359,6 +3771,18 @@
      "unmatched": 0,
      "noPointsOnSite": 0
     },
+    "wargear": {
+     "same": 2,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
+    },
     "detachments": {
      "ours": 5,
      "site": 5,
@@ -3395,6 +3819,18 @@
      "ours": 46,
      "site": 46,
      "matched": 46
+    },
+    "wargear": {
+     "same": 2,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -3455,6 +3891,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 1
+    },
+    "wargear": {
+     "same": 1,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 1,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 8,
@@ -3543,6 +3991,24 @@
      "ours": 25,
      "site": 23,
      "matched": 23
+    },
+    "wargear": {
+     "same": 1,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [
+      {
+       "id": "000000859",
+       "unit": "Knight Crusader",
+       "name": "Rapid-fire battle cannon"
+      }
+     ],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -3603,6 +4069,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 0,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 10,
@@ -3676,6 +4154,18 @@
      "ours": 22,
      "site": 22,
      "matched": 22
+    },
+    "wargear": {
+     "same": 0,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -3743,6 +4233,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 0,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 12,
@@ -3851,6 +4353,18 @@
      "ours": 64,
      "site": 64,
      "matched": 64
+    },
+    "wargear": {
+     "same": 0,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -3925,6 +4439,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 4,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 15,
@@ -4124,6 +4650,18 @@
      "ours": 67,
      "site": 67,
      "matched": 67
+    },
+    "wargear": {
+     "same": 4,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -4193,12 +4731,12 @@
     "datasheets": {
      "ours": 285,
      "site": 215,
-     "matched": 215,
-     "same": 218,
-     "points": 3,
+     "matched": 222,
+     "same": 222,
+     "points": 0,
      "sizes": 0,
-     "tiers": 1,
-     "legends": 1,
+     "tiers": 0,
+     "legends": 0,
      "renamed": 0,
      "newOnSite": 0,
      "removedOnSite": 0,
@@ -4207,6 +4745,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 5,
+     "priceChanged": 0,
+     "onlyOurs": 5,
+     "onlySite": 15,
+     "notAuto": 5,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 69,
@@ -4227,47 +4777,10 @@
     }
    },
    "datasheets": {
-    "pointsChanged": [
-     {
-      "id": "000002787",
-      "name": "Gladiator Lancer",
-      "siteName": "Gladiator Lancer",
-      "ours": "1-2: 1=165 | 3-+: 1=185",
-      "site": "1-2: 1=160 | 3-+: 1=180"
-     },
-     {
-      "id": "000002788",
-      "name": "Gladiator Valiant",
-      "siteName": "Gladiator Valiant",
-      "ours": "1-2: 1=145 | 3-+: 1=165",
-      "site": "1-2: 1=165 | 3-+: 1=185"
-     },
-     {
-      "id": "000002790",
-      "name": "Repulsor Executioner",
-      "siteName": "Repulsor Executioner",
-      "ours": "1-2: 1=265 | 3-+: 1=285",
-      "site": "1-2: 1=260 | 3-+: 1=280"
-     }
-    ],
+    "pointsChanged": [],
     "sizesChanged": [],
-    "tiersChanged": [
-     {
-      "id": "000002801",
-      "name": "Venerable Dreadnought",
-      "siteName": "Venerable Dreadnought",
-      "ours": "1-2: 1=130 | 3-+: 1=140",
-      "site": "1-+: 1=165"
-     }
-    ],
-    "legendsChanged": [
-     {
-      "id": "000002801",
-      "name": "Venerable Dreadnought",
-      "ours": false,
-      "site": true
-     }
-    ],
+    "tiersChanged": [],
+    "legendsChanged": [],
     "renamed": [],
     "removedOnSite": [],
     "outdated": [
@@ -4529,11 +5042,191 @@
     "unmatched": [],
     "newOnSite": [],
     "noPointsOnSite": [],
-    "same": 218,
+    "same": 222,
     "counts": {
      "ours": 285,
      "site": 215,
-     "matched": 215
+     "matched": 222
+    },
+    "wargear": {
+     "same": 5,
+     "priceChanged": [],
+     "onlyOurs": [
+      {
+       "id": "000001193",
+       "unit": "Centurion Devastator Squad",
+       "name": "Twin lascannon",
+       "ours": 5,
+       "unverified": true
+      },
+      {
+       "id": "000000118",
+       "unit": "Terminator Assault Squad",
+       "name": "Thunder Hammer",
+       "ours": 5,
+       "unverified": true
+      },
+      {
+       "id": "000004185",
+       "unit": "Victrix Honour Guard",
+       "name": "Blades of honour",
+       "ours": 10,
+       "unverified": true
+      },
+      {
+       "id": "000002790",
+       "unit": "Repulsor Executioner (Black Templars)",
+       "name": "Heavy laser destroyer",
+       "ours": 10,
+       "unverified": true
+      },
+      {
+       "id": "000003873",
+       "unit": "Deathwatch Terminator Squad (Deathwatch)",
+       "name": "Thunder Hammer",
+       "ours": 5,
+       "unverified": true
+      }
+     ],
+     "onlySite": [
+      {
+       "id": "000002270",
+       "unit": "Desolation Squad",
+       "name": "Vengor Launcher",
+       "site": 5,
+       "auto": true
+      },
+      {
+       "id": "000002568",
+       "unit": "Impulsor",
+       "name": "Orbital Comms Array",
+       "site": 10,
+       "auto": false
+      },
+      {
+       "id": "000001158",
+       "unit": "Invader ATVs",
+       "name": "Multi-melta",
+       "site": 5,
+       "auto": true
+      },
+      {
+       "id": "000000118",
+       "unit": "Terminator Assault Squad",
+       "name": "Storm Shield",
+       "site": 5,
+       "auto": true
+      },
+      {
+       "id": "000001183",
+       "unit": "Terminator Squad",
+       "name": "Cyclone Missile Launcher",
+       "site": 10,
+       "auto": true
+      },
+      {
+       "id": "000002787",
+       "unit": "Gladiator Lancer (Black Templars)",
+       "name": "Multi-melta",
+       "site": 10,
+       "auto": true
+      },
+      {
+       "id": "000002789",
+       "unit": "Gladiator Reaper (Black Templars)",
+       "name": "Multi-melta",
+       "site": 10,
+       "auto": true
+      },
+      {
+       "id": "000002788",
+       "unit": "Gladiator Valiant (Black Templars)",
+       "name": "Multi-melta",
+       "site": 10,
+       "auto": true
+      },
+      {
+       "id": "000002786",
+       "unit": "Impulsor (Black Templars)",
+       "name": "Multi-melta",
+       "site": 10,
+       "auto": true
+      },
+      {
+       "id": "000002786",
+       "unit": "Impulsor (Black Templars)",
+       "name": "Orbital Comms Array",
+       "site": 10,
+       "auto": true
+      },
+      {
+       "id": "000002791",
+       "unit": "Repulsor (Black Templars)",
+       "name": "Multi-melta",
+       "site": 10,
+       "auto": true
+      },
+      {
+       "id": "000002790",
+       "unit": "Repulsor Executioner (Black Templars)",
+       "name": "Multi-melta",
+       "site": 10,
+       "auto": true
+      },
+      {
+       "id": "000000230",
+       "unit": "Deathwing Terminator Squad (Dark Angels)",
+       "name": "Cyclone Missile Launcher",
+       "site": 10,
+       "auto": false
+      },
+      {
+       "id": "000003873",
+       "unit": "Deathwatch Terminator Squad (Deathwatch)",
+       "name": "Storm Shield",
+       "site": 5,
+       "auto": true
+      },
+      {
+       "id": "000003873",
+       "unit": "Deathwatch Terminator Squad (Deathwatch)",
+       "name": "Cyclone Missile Launcher",
+       "site": 10,
+       "auto": false
+      }
+     ],
+     "notAuto": [
+      {
+       "id": "000002568",
+       "unit": "Impulsor",
+       "name": "Orbital Comms Array"
+      },
+      {
+       "id": "000002722",
+       "unit": "Repulsor Executioner",
+       "name": "Heavy Laser Destroyer"
+      },
+      {
+       "id": "000004185",
+       "unit": "Victrix Honour Guard",
+       "name": "Banner of Macragge"
+      },
+      {
+       "id": "000000230",
+       "unit": "Deathwing Terminator Squad (Dark Angels)",
+       "name": "Cyclone Missile Launcher"
+      },
+      {
+       "id": "000003873",
+       "unit": "Deathwatch Terminator Squad (Deathwatch)",
+       "name": "Cyclone Missile Launcher"
+      }
+     ],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -4813,6 +5506,18 @@
      "unmatched": 0,
      "noPointsOnSite": 0
     },
+    "wargear": {
+     "same": 6,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 1,
+     "changed": 0
+    },
     "detachments": {
      "ours": 7,
      "site": 7,
@@ -4872,6 +5577,18 @@
      "ours": 62,
      "site": 63,
      "matched": 62
+    },
+    "wargear": {
+     "same": 6,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 1,
+     "changed": []
     }
    },
    "detachments": {
@@ -4932,6 +5649,18 @@
      "legendsNotOnSite": 15,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 3,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 9,
@@ -5192,6 +5921,18 @@
      "ours": 60,
      "site": 34,
      "matched": 34
+    },
+    "wargear": {
+     "same": 3,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -5252,6 +5993,18 @@
      "legendsNotOnSite": 0,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 2,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 10,
@@ -5360,6 +6113,18 @@
      "ours": 57,
      "site": 57,
      "matched": 57
+    },
+    "wargear": {
+     "same": 2,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -5420,6 +6185,18 @@
      "legendsNotOnSite": 15,
      "unmatched": 0,
      "noPointsOnSite": 0
+    },
+    "wargear": {
+     "same": 3,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
     },
     "detachments": {
      "ours": 8,
@@ -5696,6 +6473,18 @@
      "ours": 58,
      "site": 30,
      "matched": 30
+    },
+    "wargear": {
+     "same": 3,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    },
    "detachments": {
@@ -5750,6 +6539,18 @@
      "unmatched": 0,
      "noPointsOnSite": 0
     },
+    "wargear": {
+     "same": 0,
+     "priceChanged": 0,
+     "onlyOurs": 0,
+     "onlySite": 0,
+     "notAuto": 0,
+     "chapterVariants": 0
+    },
+    "addons": {
+     "same": 0,
+     "changed": 0
+    },
     "detachments": null,
     "enhancements": null
    },
@@ -5771,6 +6572,18 @@
      "ours": 4,
      "site": 4,
      "matched": 4
+    },
+    "wargear": {
+     "same": 0,
+     "priceChanged": [],
+     "onlyOurs": [],
+     "onlySite": [],
+     "notAuto": [],
+     "chapterVariants": []
+    },
+    "addons": {
+     "same": 0,
+     "changed": []
     }
    }
   }

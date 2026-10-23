@@ -1,4 +1,4 @@
-// Снимок очков всех фракций с https://wh-rules.ru для 40k/whrules-<версия>.json (схема whrules-points-snapshot/2).
+// Снимок очков всех фракций с https://wh-rules.ru для 40k/whrules-<версия>.json (схема whrules-points-snapshot/3).
 //
 // Запуск: открыть https://wh-rules.ru/ru/patches в браузере и выполнить весь этот файл в консоли (или через
 // инструмент выполнения JS на странице). Результат — строка JSON в window.__whrulesSnapshot (компактная, одна строка)
@@ -10,10 +10,12 @@
 // Фракции: по умолчанию все, что есть в сборке сайта (карта «./<фракция>.js»); можно ограничить, задав до запуска
 // window.__whrulesFactions = ['space-marines', …]. Неизвестная фракция — ошибка, а не пропуск.
 //
-// Что попадает в снимок (схема whrules-points-snapshot/2; /1 — то же для 7 фракций без детачментов и переименований):
+// Что попадает в снимок (схема whrules-points-snapshot/3; /2 — то же без платного снаряжения; /1 — 7 фракций без детачментов
+// и переименований):
 //   source   — сайт, версия данных приложения, версия Munitorum Field Manual, дата обновления, время снятия;
 //   assets   — SHA-256 текста каждого прочитанного модуля (по ним видно, что снимок сделан с той же сборки);
-//   factions — по фракции: name; инфолисты {id, name, legends, points[{models|label, points, note}]};
+//   factions — по фракции: name; инфолисты {id, name, legends, points[{models|label, points, note}], wargearPoints[{name, points}]}
+//              (запись points без models и note — платная добавка, например платформа Tidewall Shieldline);
 //              у орденов ещё pointsOverrides (свои цены общих юнитов) и sharedUnitIds (общие юниты Space Marines);
 //              detachments [{id, name, dp, enhancements[{name, points}]}] (текст правил не снимается);
 //              renames — таблица сайта «старый slug инфолиста → новый slug» или null (инфолист убран);
@@ -64,7 +66,7 @@
       name: meta.name,
       file: dsFile,
       metaFile,
-      datasheets: ds.default.map((d) => ({ id: d.id, name: d.name, legends: !!d.legends, points: (d.points ?? []).map((p) => ({ ...p })) })),
+      datasheets: ds.default.map((d) => ({ id: d.id, name: d.name, legends: !!d.legends, points: (d.points ?? []).map((p) => ({ ...p })), ...(d.wargearPoints?.length ? { wargearPoints: d.wargearPoints.map((w) => ({ ...w })) } : {}) })),
       ...(ds.pointsOverrides ? { pointsOverrides: ds.pointsOverrides } : {}),
       ...(ds.sharedUnitIds ? { sharedUnitIds: ds.sharedUnitIds } : {}),
       detachments: (meta.detachments ?? []).map((d) => ({
@@ -98,7 +100,7 @@
   patches.sort((a, b) => a.date.localeCompare(b.date) || String(a.id).localeCompare(String(b.id)));
   const latest = patches.filter((p) => p.labels?.app).at(-1);
   const content = {
-    schema: 'whrules-points-snapshot/2',
+    schema: 'whrules-points-snapshot/3',
     source: {
       site: 'https://wh-rules.ru',
       pages: ['https://wh-rules.ru/ru/patches', ...FACTIONS.map((s) => `https://wh-rules.ru/ru/factions/${s}/datasheets`)],

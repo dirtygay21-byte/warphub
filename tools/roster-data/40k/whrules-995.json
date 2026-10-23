@@ -1,5 +1,5 @@
 {
- "schema": "whrules-points-snapshot/2",
+ "schema": "whrules-points-snapshot/3",
  "source": {
   "site": "https://wh-rules.ru",
   "pages": [
@@ -38,7 +38,7 @@
   "dataVersion": 995,
   "mfm": "1.6",
   "date": "2026-10-16",
-  "extractedAt": "2026-10-22T23:07:59.310Z"
+  "extractedAt": "2026-10-23T05:18:43.347Z"
  },
  "assets": {
   "909-jYk52MOm.js": "943fe90b0706923c0fd852f056846d89932b4c90ba3ded6d3a87537f30659c62",
@@ -338,6 +338,12 @@
        "points": 100,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Meltagun",
+       "points": 5
+      }
      ]
     },
     {
@@ -399,6 +405,12 @@
        "models": 1,
        "points": 115,
        "note": "4th+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Twin Multi-melta",
+       "points": 15
       }
      ]
     },
@@ -487,6 +499,12 @@
        "points": 175,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 10
+      }
      ]
     },
     {
@@ -544,6 +562,12 @@
        "models": 5,
        "points": 115,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 5
       }
      ]
     },
@@ -1224,6 +1248,12 @@
        "points": 200,
        "note": "2nd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Praesidium Shield",
+       "points": 25
+      }
      ]
     },
     {
@@ -1809,6 +1839,12 @@
        "points": 265,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Twin Cognis Lascannon",
+       "points": 10
+      }
      ]
     },
     {
@@ -2105,6 +2141,12 @@
       {
        "models": 1,
        "points": 160
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Ferrumite cannon",
+       "points": 10
       }
      ]
     },
@@ -3628,6 +3670,12 @@
        "points": 405,
        "note": "2nd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Heavy Wraithcannon",
+       "points": 10
+      }
      ]
     },
     {
@@ -4744,6 +4792,12 @@
        "models": 2,
        "points": 90
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Bombast field gun",
+       "points": 10
+      }
      ]
     },
     {
@@ -4969,6 +5023,12 @@
        "models": 4,
        "points": 70
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Krieg heavy flamer",
+       "points": 5
+      }
      ]
     },
     {
@@ -4985,6 +5045,20 @@
        "models": 1,
        "points": 175,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 5
+      },
+      {
+       "name": "Lascannon",
+       "points": 5
+      },
+      {
+       "name": "Plasma cannon",
+       "points": 5
       }
      ]
     },
@@ -5003,6 +5077,24 @@
        "points": 210,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Demolisher battle cannon",
+       "points": 15
+      },
+      {
+       "name": "Multi-melta",
+       "points": 5
+      },
+      {
+       "name": "Lascannon",
+       "points": 5
+      },
+      {
+       "name": "Plasma cannon",
+       "points": 5
+      }
      ]
     },
     {
@@ -5019,6 +5111,20 @@
        "models": 1,
        "points": 175,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 5
+      },
+      {
+       "name": "Lascannon",
+       "points": 5
+      },
+      {
+       "name": "Plasma cannon",
+       "points": 5
       }
      ]
     },
@@ -5037,6 +5143,20 @@
        "points": 160,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 5
+      },
+      {
+       "name": "Lascannon",
+       "points": 5
+      },
+      {
+       "name": "Plasma cannon",
+       "points": 5
+      }
      ]
     },
     {
@@ -5053,6 +5173,20 @@
        "models": 1,
        "points": 160,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 5
+      },
+      {
+       "name": "Lascannon",
+       "points": 5
+      },
+      {
+       "name": "Plasma cannon",
+       "points": 5
       }
      ]
     },
@@ -5071,6 +5205,20 @@
        "points": 175,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 5
+      },
+      {
+       "name": "Lascannon",
+       "points": 5
+      },
+      {
+       "name": "Plasma cannon",
+       "points": 5
+      }
      ]
     },
     {
@@ -5088,6 +5236,20 @@
        "points": 145,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 5
+      },
+      {
+       "name": "Lascannon",
+       "points": 5
+      },
+      {
+       "name": "Plasma cannon",
+       "points": 5
+      }
      ]
     },
     {
@@ -5104,6 +5266,20 @@
        "models": 1,
        "points": 145,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 5
+      },
+      {
+       "name": "Lascannon",
+       "points": 5
+      },
+      {
+       "name": "Plasma cannon",
+       "points": 5
       }
      ]
     },
@@ -6238,6 +6414,12 @@
        "points": 185,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 10
+      }
      ]
     },
     {
@@ -6255,6 +6437,12 @@
        "points": 185,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 10
+      }
      ]
     },
     {
@@ -6271,6 +6459,12 @@
        "models": 1,
        "points": 165,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 10
       }
      ]
     },
@@ -6300,6 +6494,16 @@
        "points": 80,
        "note": "4th+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 10
+      },
+      {
+       "name": "Orbital Comms Array",
+       "points": 10
+      }
      ]
     },
     {
@@ -6328,6 +6532,12 @@
        "points": 210,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 10
+      }
      ]
     },
     {
@@ -6344,6 +6554,12 @@
        "models": 1,
        "points": 285,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 10
       }
      ]
     },
@@ -8373,6 +8589,16 @@
        "points": 390,
        "note": "2nd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Despoiler gatling cannon",
+       "points": 25
+      },
+      {
+       "name": "Despoiler battle cannon",
+       "points": 10
+      }
      ]
     },
     {
@@ -9112,6 +9338,16 @@
        "points": 350,
        "note": "2nd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Heavy Reaper Autocannon",
+       "points": 15
+      },
+      {
+       "name": "Hades Lascannon",
+       "points": 15
+      }
      ]
     },
     {
@@ -9172,6 +9408,12 @@
        "models": 1,
        "points": 165,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Ectoplasma cannon",
+       "points": 5
       }
      ]
     },
@@ -10362,6 +10604,12 @@
        "points": 420,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Cyclone Missile Launcher",
+       "points": 10
+      }
      ]
     },
     {
@@ -11046,6 +11294,16 @@
        "points": 350,
        "note": "2nd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Heavy Reaper Autocannon",
+       "points": 15
+      },
+      {
+       "name": "Hades Lascannon",
+       "points": 15
+      }
      ]
     },
     {
@@ -11588,6 +11846,16 @@
        "models": 10,
        "points": 420,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Storm Shield",
+       "points": 5
+      },
+      {
+       "name": "Cyclone Missile Launcher",
+       "points": 10
       }
      ]
     },
@@ -12143,6 +12411,12 @@
        "models": 1,
        "points": 110
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Dark Lance",
+       "points": 5
+      }
      ]
     },
     {
@@ -12220,6 +12494,16 @@
        "points": 120,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Haywire blaster",
+       "points": 5
+      },
+      {
+       "name": "Dark Lance",
+       "points": 5
+      }
      ]
     },
     {
@@ -12274,6 +12558,12 @@
        "models": 2,
        "points": 150,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Twin haywire blaster",
+       "points": 5
       }
      ]
     },
@@ -12665,6 +12955,16 @@
        "models": 1,
        "points": 350,
        "note": "2nd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Heavy Reaper Autocannon",
+       "points": 15
+      },
+      {
+       "name": "Hades Lascannon",
+       "points": 15
       }
      ]
     },
@@ -13161,6 +13461,12 @@
        "models": 2,
        "points": 170,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Heavy mining laser",
+       "points": 10
       }
      ]
     },
@@ -13780,6 +14086,12 @@
        "models": 10,
        "points": 380
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Psycannon",
+       "points": 5
+      }
      ]
     },
     {
@@ -13818,6 +14130,16 @@
        "models": 1,
        "points": 225,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Sublimator",
+       "points": 15
+      },
+      {
+       "name": "Heavy psycannon",
+       "points": 15
       }
      ]
     },
@@ -13975,6 +14297,12 @@
        "points": 220,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Heavy psycannon",
+       "points": 15
+      }
      ]
     },
     {
@@ -14022,6 +14350,12 @@
        "points": 530,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Psycannon",
+       "points": 5
+      }
      ]
     },
     {
@@ -14048,6 +14382,12 @@
        "models": 10,
        "points": 240,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Psycannon",
+       "points": 5
       }
      ]
     },
@@ -14148,6 +14488,12 @@
        "models": 1,
        "points": 300,
        "note": "2nd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Hurricane Bolter",
+       "points": 10
       }
      ]
     },
@@ -14556,6 +14902,12 @@
        "points": 190,
        "note": "Agents of the Imperium (allied)"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Psycannon",
+       "points": 5
+      }
      ]
     },
     {
@@ -14894,6 +15246,12 @@
        "models": 1,
        "points": 115,
        "note": "4th+, Agents of the Imperium (allied)"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Twin Multi-melta",
+       "points": 15
       }
      ]
     },
@@ -15349,6 +15707,12 @@
        "models": 1,
        "points": 415,
        "note": "2nd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Rapid-fire battle cannon",
+       "points": 15
       }
      ]
     },
@@ -17951,6 +18315,12 @@
        "points": 160,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Zzap Gun",
+       "points": 10
+      }
      ]
     },
     {
@@ -18141,6 +18511,16 @@
        "points": 250,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Twin Killsaws",
+       "points": 5
+      },
+      {
+       "name": "Killsaw",
+       "points": 5
+      }
      ]
     },
     {
@@ -18265,6 +18645,12 @@
        "models": 10,
        "points": 260,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Paired Krumpas",
+       "points": 5
       }
      ]
     },
@@ -19266,6 +19652,12 @@
        "points": 150,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Vengor Launcher",
+       "points": 5
+      }
      ]
     },
     {
@@ -19506,6 +19898,12 @@
        "points": 80,
        "note": "4th+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Orbital Comms Array",
+       "points": 10
+      }
      ]
     },
     {
@@ -19643,6 +20041,12 @@
        "models": 2,
        "points": 140,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Multi-melta",
+       "points": 5
       }
      ]
     },
@@ -19976,6 +20380,12 @@
        "points": 190,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Macro plasma incinerator",
+       "points": 10
+      }
      ]
     },
     {
@@ -20035,6 +20445,12 @@
        "models": 1,
        "points": 280,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Heavy Laser Destroyer",
+       "points": 10
       }
      ]
     },
@@ -20312,6 +20728,12 @@
        "points": 380,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Storm Shield",
+       "points": 5
+      }
      ]
     },
     {
@@ -20338,6 +20760,12 @@
        "models": 10,
        "points": 420,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Cyclone Missile Launcher",
+       "points": 10
       }
      ]
     },
@@ -20468,6 +20896,12 @@
        "models": 6,
        "points": 280,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Banner of Macragge",
+       "points": 15
       }
      ]
     },
@@ -21270,6 +21704,12 @@
        "points": 260,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Storm Shield",
+       "points": 5
+      }
      ]
     },
     {
@@ -21444,6 +21884,12 @@
        "models": 10,
        "points": 405,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Storm Shield",
+       "points": 5
       }
      ]
     },
@@ -21894,6 +22340,12 @@
        "points": 275,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "High-yield Missile Pods",
+       "points": 5
+      }
      ]
     },
     {
@@ -21992,6 +22444,12 @@
        "points": 110,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Missile pod",
+       "points": 5
+      }
      ]
     },
     {
@@ -22008,6 +22466,12 @@
        "models": 3,
        "points": 110,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "T'au flamer",
+       "points": 5
       }
      ]
     },
@@ -22103,6 +22567,12 @@
        "models": 1,
        "points": 165,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Cyclic Ion Raker",
+       "points": 15
       }
      ]
     },
@@ -22341,6 +22811,12 @@
        "points": 100,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Ion Rifle",
+       "points": 5
+      }
      ]
     },
     {
@@ -22427,6 +22903,12 @@
        "models": 1,
        "points": 220,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Ion Accelerator",
+       "points": 25
       }
      ]
     },
@@ -22985,6 +23467,16 @@
        "points": 350,
        "note": "2nd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Hades Lascannon",
+       "points": 15
+      },
+      {
+       "name": "Heavy Reaper Autocannon",
+       "points": 15
+      }
      ]
     },
     {
@@ -23038,6 +23530,12 @@
        "models": 1,
        "points": 145,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Ectoplasma cannon",
+       "points": 5
       }
      ]
     },
@@ -24341,6 +24839,16 @@
        "points": 180,
        "note": "3rd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Acid spray",
+       "points": 10
+      },
+      {
+       "name": "Rupture Cannon",
+       "points": 20
+      }
      ]
     },
     {
@@ -24850,6 +25358,16 @@
        "points": 310,
        "note": "2nd+"
       }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Hades Lascannon",
+       "points": 15
+      },
+      {
+       "name": "Heavy Reaper Autocannon",
+       "points": 15
+      }
      ]
     },
     {
@@ -24935,6 +25453,12 @@
        "models": 1,
        "points": 155,
        "note": "3rd+"
+      }
+     ],
+     "wargearPoints": [
+      {
+       "name": "Ectoplasma cannon",
+       "points": 5
       }
      ]
     },
@@ -39494,5 +40018,5 @@
    "points": []
   }
  ],
- "fingerprint": "ec8b68f3b2e21d6417ed26433fd02d5a40dafaeeb72b850717c94ae3f8190fde"
+ "fingerprint": "79a26d70ca87852ab8aabc06fb9f93d28a907a6c1b2a724e25af59b794c02aa4"
 }

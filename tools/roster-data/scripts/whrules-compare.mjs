@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Отчёт свежести данных 40K: сравнение backend/roster-data со снимком очков wh-rules.ru (схема whrules-points-snapshot/2).
+ * Отчёт свежести данных 40K: сравнение backend/roster-data со снимком очков wh-rules.ru (схема whrules-points-snapshot/2 или /3).
  * Только чтение данных приложения: пишет лишь отчёт.
  *
  *   node scripts/whrules-compare.mjs [--snapshot whrules-995.json] [--out 40k/freshness-report.json]
@@ -8,9 +8,13 @@
  * Что сравнивается по каждой армии (только свои инфолисты — group "own"; союзники и копии по детачментам — в своих фракциях):
  *  - инфолисты: сопоставление по slug названия (id сайта или slug его названия), затем по таблице переименований сайта
  *    (renames: старый slug → новый или null — убран). Похожие названия не угадываются: они в unmatched;
- *  - очки: полосы цен сайта переводятся тем же costsOf, что и обновление Space Marines, и сравниваются с нашими
- *    (только размеры отряда; платное снаряжение на сайте не указано). Вид расхождения: points (те же размеры, другая цена),
- *    sizes (другие размеры), tiers (другие ступени цены за копии);
+ *  - очки: полосы цен сайта переводятся тем же costsOf, что и обновление Space Marines, и сравниваются с нашими по размерам
+ *    отряда (число моделей, а если его нет — подпись состава: «1 Sword Brother, 4 Neophytes, 5 Initiates»). Вид расхождения:
+ *    points (те же размеры, другая цена), sizes (другие размеры), tiers (другие ступени цены за копии);
+ *  - платные добавки: запись очков сайта без числа моделей и без пометки (платформа Tidewall Shieldline) ↔ наши addons — по цене;
+ *  - платное снаряжение (схема /3, wargearPoints сайта ↔ наши costs[].wargear): та же цена, другая цена, только у нас,
+ *    только на сайте; для предметов сайта — считает ли движок их сам по выбранным заменам (paidFromPicks) или только счётчиком;
+ *    у Space Marines — отдельно цены снаряжения орденов, если у одноимённого инфолиста ордена они другие;
  *  - Legends;
  *  - детачменты (по slug названия): новые, пропавшие, DP; улучшения в сопоставленных детачментах: очки, новые, пропавшие.
  * Space Marines сравниваются с объединением space-marines и пяти орденов (общий юнит — по цене space-marines);
@@ -22,6 +26,7 @@ import { fileURLToPath } from 'node:url';
 import { loadSnapshot } from './updates-40k.mjs';
 import { costsOf } from './whrules-convert.mjs';
 import { slugify } from './whrules-map.mjs';
+import { paidFromPicks } from '../../../client/src/features/roster/engine/compute.ts';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DATA = path.join(HERE, '..', '..', '..', 'backend', 'roster-data');
@@ -56,10 +61,12 @@ export const ARMIES = {
 /** Фракции сайта, которые у нас только союзники: { фракция сайта: [наша фракция инфолистов, группа] }. */
 export const ALLY_ONLY = { 'titan-legions': ['TL', 'ally:titanicus'] };
 
-/** Канон цен: «1-2: 4=170,5=215 | 3-+: …» — только размеры отряда (models), без снаряжения и доп. моделей. */
+/** Размер отряда для сравнения: число моделей или нормализованная подпись состава (если числа нет). */
+const sizeOf = (o) => (o.models != null ? String(o.models) : o.label ? `[${String(o.label).toLowerCase().replace(/\s+/g, ' ').trim()}]` : null);
+/** Канон цен: «1-2: 4=170,5=215 | 3-+: …» — только размеры отряда, без снаряжения и доп. моделей. */
 export function costKey(bands) {
   return (bands ?? [])
-    .map((b) => ({ t: `${b.from}-${b.to ?? '+'}`, o: (b.options ?? []).filter((o) => o.models != null).map((o) => `${o.models}=${o.cost}`).sort((x, y) => parseInt(x) - parseInt(y) || x.localeCompare(y)) }))
+    .map((b) => ({ t: `${b.from}-${b.to ?? '+'}`, o: (b.options ?? []).filter((o) => sizeOf(o) != null).map((o) => `${sizeOf(o)}=${o.cost}`).sort((x, y) => (parseInt(x) || 0) - (parseInt(y) || 0) || x.localeCompare(y)) }))
     .filter((b) => b.o.length)
     .sort((a, b) => a.t.localeCompare(b.t, 'en', { numeric: true }))
     .map((b) => `${b.t}: ${b.o.join(',')}`)
@@ -76,6 +83,33 @@ export function costDiff(ours, site) {
   return { kind, ours: a, site: b };
 }
 
+/** Очки сайта → { bands, addons }: запись без числа моделей и без пометки — платная добавка, а не размер отряда. */
+export function siteCosts(points) {
+  const isAddon = (p) => p.models == null && !p.note && !p.label;
+  return { bands: costsOf(points.filter((p) => !isAddon(p))), addons: points.filter(isAddon).map((p) => p.points) };
+}
+
+/** Ключ предмета снаряжения — как в движке (compute.ts → wkey): без регистра, ’ = ', без окончания s/es. */
+export const wargearKey = (s) => String(s).toLowerCase().replace(/[’']/g, "'").replace(/e?s$/, '');
+
+/** Сравнение платного снаряжения юнита. ourDs — наш инфолист, siteW — wargearPoints сайта. */
+export function compareWargear(ourDs, siteW = []) {
+  const ours = new Map();
+  for (const b of ourDs.costs ?? []) for (const w of b.wargear ?? []) if (!ours.has(wargearKey(w.label))) ours.set(wargearKey(w.label), w);
+  const site = new Map(siteW.map((w) => [wargearKey(w.name), w]));
+  const unit = { picks: {} };
+  const auto = (name) => paidFromPicks(ourDs, unit, name) !== null;
+  const r = { same: [], priceChanged: [], onlyOurs: [], onlySite: [] };
+  for (const [k, w] of ours) {
+    const x = site.get(k);
+    if (!x) r.onlyOurs.push({ name: w.label, ours: w.cost, unverified: !!w.unverified });
+    else if (x.points !== w.cost) r.priceChanged.push({ name: x.name, ours: w.cost, site: x.points, auto: auto(x.name) });
+    else r.same.push({ name: x.name, points: x.points, auto: auto(x.name) });
+  }
+  for (const [k, x] of site) if (!ours.has(k)) r.onlySite.push({ name: x.name, site: x.points, auto: auto(x.name) });
+  return r;
+}
+
 /** Ключ названия без пометки в скобках: «False Majesty (Aura)» = «False Majesty», «'Ardboyz (Upgrade)» = «'Ardboyz». */
 export const bareSlug = (name) => slugify(String(name).replace(/\s*\([^)]*\)/g, '')).replace(/^the-/, '');
 
@@ -89,8 +123,13 @@ function elsewhere(snap, slugs, slug) {
 /** Инфолисты сайта армии: по id, плюс индекс slug названия. Общий юнит берётся из первой фракции, где он есть. */
 function siteIndex(snap, slugs) {
   const byId = new Map();
+  // одноимённые инфолисты орденов (тот же id в другой фракции сайта) — для сравнения их цен снаряжения
+  const variants = new Map();
   for (const s of slugs)
-    for (const d of snap.factions[s]?.datasheets ?? []) if (!byId.has(d.id)) byId.set(d.id, { ...d, siteFaction: s });
+    for (const d of snap.factions[s]?.datasheets ?? []) {
+      if (!byId.has(d.id)) byId.set(d.id, { ...d, siteFaction: s });
+      else variants.set(d.id, [...(variants.get(d.id) ?? []), { ...d, siteFaction: s }]);
+    }
   const bySlug = new Map();
   for (const d of byId.values()) {
     if (!bySlug.has(d.id)) bySlug.set(d.id, d);
@@ -99,18 +138,30 @@ function siteIndex(snap, slugs) {
   }
   const renames = {};
   for (const s of slugs) Object.assign(renames, snap.factions[s]?.renames ?? {});
-  return { byId, bySlug, renames };
+  return { byId, bySlug, renames, variants };
 }
 
 /** Сравнение одной армии. ours — данные фракции (f/<id>.json). */
 export function compareArmy(ours, snap, slugs, { group = 'own', faction = ours.id } = {}) {
-  const { byId, bySlug, renames } = siteIndex(snap, slugs);
+  const { byId, bySlug, renames, variants } = siteIndex(snap, slugs);
   const own = ours.datasheets.filter((d) => d.group === group && d.faction === faction);
+  // версия ордена: наш инфолист с источником «Black Templars» сравнивается с инфолистом фракции сайта black-templars
+  const factionOfSource = new Map(slugs.map((s) => [String(snap.factions[s]?.name ?? '').toLowerCase(), s]));
+  const ownVersion = (d) => {
+    const s = factionOfSource.get(String(d.source ?? '').toLowerCase());
+    if (!s || s === slugs[0]) return null;
+    const slug = slugify(d.name);
+    return snap.factions[s].datasheets.find((x) => x.id === slug || slugify(x.name) === slug) ?? null;
+  };
+  const ourVersions = new Set(own.map((d) => `${slugify(d.name)}|${String(d.source ?? '').toLowerCase()}`));
   const seen = new Set();
   const r = { pointsChanged: [], sizesChanged: [], tiersChanged: [], legendsChanged: [], renamed: [], removedOnSite: [], outdated: [], otherFactionOnSite: [], legendsNotOnSite: [], unmatched: [], newOnSite: [], noPointsOnSite: [], same: 0 };
+  const wg = { same: 0, priceChanged: [], onlyOurs: [], onlySite: [], notAuto: [], chapterVariants: [] };
+  const addons = { same: 0, changed: [] };
   for (const d of own) {
     const slug = slugify(d.name);
-    let site = bySlug.get(slug);
+    const ver = ownVersion(d);
+    let site = ver ? { ...ver, siteFaction: factionOfSource.get(String(d.source).toLowerCase()) } : bySlug.get(slug);
     let renamedTo = null;
     if (!site && slug in renames) {
       if (renames[slug] === null) {
@@ -129,19 +180,41 @@ export function compareArmy(ours, snap, slugs, { group = 'own', faction = ours.i
       else r.unmatched.push({ id: d.id, name: d.name, source: d.source ?? null });
       continue;
     }
-    seen.add(site.id);
+    seen.add(ver ? `${site.siteFaction}:${site.id}` : site.id);
     if (renamedTo) r.renamed.push({ id: d.id, name: d.name, to: renamedTo, siteId: site.id });
     if (!!d.legends !== !!site.legends) r.legendsChanged.push({ id: d.id, name: d.name, ours: !!d.legends, site: !!site.legends });
+    // платное снаряжение: сравнивается у всех сопоставленных, даже без очков отряда
+    const w = compareWargear(d, site.wargearPoints);
+    wg.same += w.same.length;
+    const unitName = ver ? `${d.name} (${d.source})` : d.name;
+    for (const x of w.priceChanged) wg.priceChanged.push({ id: d.id, unit: unitName, ...x });
+    for (const x of w.onlyOurs) wg.onlyOurs.push({ id: d.id, unit: unitName, ...x });
+    for (const x of w.onlySite) wg.onlySite.push({ id: d.id, unit: unitName, ...x });
+    for (const x of [...w.same, ...w.priceChanged, ...w.onlySite]) if (!x.auto) wg.notAuto.push({ id: d.id, unit: unitName, name: x.name });
+    for (const v of ver ? [] : variants.get(site.id) ?? []) {
+      // у нас есть свой инфолист этой версии ордена — он сравнивается отдельно
+      if (ourVersions.has(`${slug}|${String(snap.factions[v.siteFaction]?.name ?? '').toLowerCase()}`)) continue;
+      const key = (list) => (list ?? []).map((x) => `${wargearKey(x.name)}=${x.points}`).sort().join(',');
+      if (key(v.wargearPoints) !== key(site.wargearPoints)) wg.chapterVariants.push({ id: d.id, unit: d.name, faction: v.siteFaction, site: v.wargearPoints ?? [], base: site.wargearPoints ?? [] });
+    }
     if (!site.points.length) {
       r.noPointsOnSite.push({ id: d.id, name: d.name });
       continue;
     }
-    const diff = costDiff(d.costs, costsOf(site.points));
+    const sc = siteCosts(site.points);
+    const ourAddons = [...new Set((d.costs ?? []).flatMap((b) => (b.addons ?? []).map((a) => a.cost)))].sort().join(',');
+    if (ourAddons || sc.addons.length) {
+      if (ourAddons === [...new Set(sc.addons)].sort().join(',')) addons.same++;
+      else addons.changed.push({ id: d.id, name: d.name, ours: (d.costs ?? []).flatMap((b) => b.addons ?? []), site: sc.addons });
+    }
+    const diff = costDiff(d.costs, sc.bands);
     if (!diff) r.same++;
-    else r[`${diff.kind}Changed`].push({ id: d.id, name: d.name, siteName: site.name, ours: diff.ours, site: diff.site });
+    else r[`${diff.kind}Changed`].push({ id: d.id, name: d.name, ...(ver ? { version: d.source } : {}), siteName: site.name, ours: diff.ours, site: diff.site });
   }
-  for (const d of byId.values()) if (!seen.has(d.id)) r.newOnSite.push({ siteId: d.id, name: d.name, faction: d.siteFaction, legends: !!d.legends, points: costKey(costsOf(d.points)) });
+  for (const d of byId.values()) if (!seen.has(d.id) && !seen.has(`${d.siteFaction}:${d.id}`)) r.newOnSite.push({ siteId: d.id, name: d.name, faction: d.siteFaction, legends: !!d.legends, points: costKey(siteCosts(d.points).bands), ...(d.wargearPoints ? { wargear: d.wargearPoints } : {}) });
   r.counts = { ours: own.length, site: byId.size, matched: seen.size };
+  r.wargear = wg;
+  r.addons = addons;
   return r;
 }
 
@@ -201,6 +274,8 @@ const n = (r) => r.length;
 export function summaryOf(a, det) {
   return {
     datasheets: { ...a.counts, same: a.same, points: n(a.pointsChanged), sizes: n(a.sizesChanged), tiers: n(a.tiersChanged), legends: n(a.legendsChanged), renamed: n(a.renamed), newOnSite: n(a.newOnSite), removedOnSite: n(a.removedOnSite), outdated: n(a.outdated), otherFactionOnSite: n(a.otherFactionOnSite), legendsNotOnSite: n(a.legendsNotOnSite), unmatched: n(a.unmatched), noPointsOnSite: n(a.noPointsOnSite) },
+    wargear: { same: a.wargear.same, priceChanged: n(a.wargear.priceChanged), onlyOurs: n(a.wargear.onlyOurs), onlySite: n(a.wargear.onlySite), notAuto: n(a.wargear.notAuto), chapterVariants: n(a.wargear.chapterVariants) },
+    addons: { same: a.addons.same, changed: n(a.addons.changed) },
     detachments: det ? { ...det.counts, dp: n(det.dpChanged), newOnSite: n(det.newOnSite), missingOnSite: n(det.missingOnSite), outdated: n(det.outdated) } : null,
     enhancements: det ? { same: det.enhancements.same, points: n(det.enhancements.pointsChanged), newOnSite: n(det.enhancements.newOnSite), missingOnSite: n(det.enhancements.missingOnSite), possibleRenames: n(det.enhancements.possibleRenames), outdated: n(det.enhancements.outdated) } : null,
   };
@@ -250,30 +325,32 @@ export function buildReport(files, index, snap, snapshotFile) {
   };
 }
 
+const wgCell = (w) => `${w.same}/${w.priceChanged}/${w.onlyOurs}/${w.onlySite}/${w.notAuto}`;
+
 /** Короткая сводка по армиям (Markdown). */
 export function reportMarkdown(rep) {
   const lines = [
     `# Свежесть данных 40K — wh-rules.ru ${rep.snapshot.dataVersion} (MFM ${rep.snapshot.mfm}, ${rep.snapshot.date})`,
     '',
     `Снимок \`${rep.snapshot.file}\`, fingerprint \`${rep.snapshot.fingerprint.slice(0, 16)}…\`. Наши данные: Wahapedia ${rep.ours.lastUpdate}${rep.ours.updates.map((u) => ` + ${u.id} (${u.scope.join(', ')})`).join('')}.`,
-    'Сравниваются только размеры отряда и цены (снаряжения на сайте нет). Отчёт строит scripts/whrules-compare.mjs; данные приложения он не меняет.',
+    'Сравниваются размеры отряда и цены, платные добавки и платное снаряжение. Отчёт строит scripts/whrules-compare.mjs; данные приложения он не меняет.',
     '',
-    '| Армия | Изм. на сайте | Инфолисты наши/сайт | Совпало | Очки | Размеры | Ступени | Legends | Переим. | Новые | Убраны | В др. фракции | Legends/FW нет | Не сопост. | Детачм. новые/нет/DP | Улучш. очки/новые/нет/переим.? |',
-    '|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|',
+    '| Армия | Изм. на сайте | Инфолисты наши/сайт | Совпало | Очки | Размеры | Ступени | Legends | Переим. | Новые | Убраны | В др. фракции | Legends/FW нет | Не сопост. | Детачм. новые/нет/DP | Улучш. очки/новые/нет/переим.? | Снаряж. совп./цена/только у нас/только на сайте/не по выбору |',
+    '|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|',
   ];
   for (const [id, a] of Object.entries(rep.armies)) {
     if (a.missingInApp) {
-      lines.push(`| ${id} | — | нет в приложении | | | | | | | | | | | | | |`);
+      lines.push(`| ${id} | — | нет в приложении | | | | | | | | | | | | | | |`);
       continue;
     }
     const s = a.summary.datasheets;
     const d = a.summary.detachments;
     const e = a.summary.enhancements;
-    lines.push(`| ${a.name} | ${a.siteChangesSince.items} | ${s.ours}/${s.site} | ${s.same} | ${s.points} | ${s.sizes} | ${s.tiers} | ${s.legends} | ${s.renamed} | ${s.newOnSite} | ${s.removedOnSite + s.outdated} | ${s.otherFactionOnSite} | ${s.legendsNotOnSite} | ${s.unmatched} | ${d.newOnSite}/${d.missingOnSite}/${d.dp} | ${e.points}/${e.newOnSite}/${e.missingOnSite}/${e.possibleRenames} |`);
+    lines.push(`| ${a.name} | ${a.siteChangesSince.items} | ${s.ours}/${s.site} | ${s.same} | ${s.points} | ${s.sizes} | ${s.tiers} | ${s.legends} | ${s.renamed} | ${s.newOnSite} | ${s.removedOnSite + s.outdated} | ${s.otherFactionOnSite} | ${s.legendsNotOnSite} | ${s.unmatched} | ${d.newOnSite}/${d.missingOnSite}/${d.dp} | ${e.points}/${e.newOnSite}/${e.missingOnSite}/${e.possibleRenames} | ${wgCell(a.summary.wargear)} |`);
   }
   for (const [slug, a] of Object.entries(rep.allies)) {
     const s = a.summary.datasheets;
-    lines.push(`| ${slug} (союзник ${a.ourFaction}) | — | ${s.ours}/${s.site} | ${s.same} | ${s.points} | ${s.sizes} | ${s.tiers} | ${s.legends} | ${s.renamed} | ${s.newOnSite} | ${s.removedOnSite + s.outdated} | ${s.otherFactionOnSite} | ${s.legendsNotOnSite} | ${s.unmatched} | — | — |`);
+    lines.push(`| ${slug} (союзник ${a.ourFaction}) | — | ${s.ours}/${s.site} | ${s.same} | ${s.points} | ${s.sizes} | ${s.tiers} | ${s.legends} | ${s.renamed} | ${s.newOnSite} | ${s.removedOnSite + s.outdated} | ${s.otherFactionOnSite} | ${s.legendsNotOnSite} | ${s.unmatched} | — | — | ${wgCell(a.summary.wargear)} |`);
   }
   if (rep.notInApp.length) lines.push('', `Нет в приложении: ${rep.notInApp.join(', ')}.`);
   lines.push(
@@ -283,8 +360,22 @@ export function reportMarkdown(rep) {
     '«Legends/FW нет» — наши Legends и Forge World, которых на сайте нет. «Не сопост.» — без пары, требуют проверки вручную.',
     'Детачменты и улучшения: «нет» — наших нет на сайте (уже помеченные устаревшими не считаются); «переим.?» — в том же детачменте',
     'пропало одно наше и появилось одно на сайте с той же ценой (например, «The Ephemeral Tome» → «Ephemeral Tome»): отмечено для проверки, не объединено.',
-    '',
+    'Снаряжение: «не по выбору» — предмет сайта не совпал с названием в вариантах замены инфолиста: движок посчитает его только ручным счётчиком.',
   );
+  // подробности по снаряжению: всё, что расходится
+  const wl = [];
+  for (const [id, a] of Object.entries(rep.armies)) {
+    if (a.missingInApp) continue;
+    const w = a.datasheets.wargear;
+    const yn = (x) => (x.auto ? 'да' : 'нет');
+    for (const x of w.priceChanged) wl.push(`| ${id} | ${x.unit} | ${x.name} | ${x.ours} → ${x.site} | ${yn(x)} |`);
+    for (const x of w.onlyOurs) wl.push(`| ${id} | ${x.unit} | ${x.name} | ${x.ours} → нет на сайте${x.unverified ? ' (у нас «не проверено»)' : ''} | — |`);
+    for (const x of w.onlySite) wl.push(`| ${id} | ${x.unit} | ${x.name} | нет → ${x.site} | ${yn(x)} |`);
+    for (const x of w.chapterVariants) wl.push(`| ${id} | ${x.unit} (${x.faction}) | ${x.site.map((y) => `${y.name} ${y.points}`).join(', ') || '—'} | цена ордена; у space-marines: ${x.base.map((y) => `${y.name} ${y.points}`).join(', ') || '—'} | — |`);
+    for (const x of a.datasheets.addons.changed) wl.push(`| ${id} | ${x.name} | добавка | ${x.ours.map((y) => `${y.label} ${y.cost}`).join(', ') || 'нет'} → ${x.site.join(', ') || 'нет'} | — |`);
+  }
+  if (wl.length) lines.push('', '## Платное снаряжение и добавки: расхождения', '', '| Армия | Юнит | Предмет | Наше → сайт | По выбору замен |', '|---|---|---|---|---|', ...wl);
+  lines.push('');
   return lines.join('\n');
 }
 
@@ -296,7 +387,8 @@ function main() {
   const snapFile = arg('--snapshot', 'whrules-995.json');
   const out = path.resolve(arg('--out', path.join(HERE, '..', '40k', 'freshness-report.json')));
   const snap = loadSnapshot(snapFile);
-  if (snap.schema !== 'whrules-points-snapshot/2') throw new Error(`нужен снимок схемы /2 (все фракции), а не ${snap.schema}`);
+  if (!['whrules-points-snapshot/2', 'whrules-points-snapshot/3'].includes(snap.schema)) throw new Error(`нужен снимок схемы /2 или /3 (все фракции), а не ${snap.schema}`);
+  if (snap.schema !== 'whrules-points-snapshot/3') console.warn('снимок /2: платного снаряжения в нём нет — раздел снаряжения будет пустым');
   const index = JSON.parse(fs.readFileSync(path.join(DATA, 'index.json'), 'utf8'));
   const files = Object.fromEntries(fs.readdirSync(path.join(DATA, 'f')).filter((f) => f.endsWith('.json')).map((f) => [f, JSON.parse(fs.readFileSync(path.join(DATA, 'f', f), 'utf8'))]));
   const rep = buildReport(files, index, snap, snapFile);

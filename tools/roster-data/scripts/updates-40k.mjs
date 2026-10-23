@@ -25,6 +25,8 @@ export const SNAPSHOT_DIR = path.join(HERE, '..', '40k');
 export const WHRULES_SCHEMA = 'whrules-points-snapshot/1';
 /** /2 — все фракции сайта, у каждой ещё name, detachments (улучшения с очками) и renames; поля /1 те же. */
 export const WHRULES_SCHEMA_V2 = 'whrules-points-snapshot/2';
+/** /3 — то же, что /2, плюс у инфолистов wargearPoints [{ name, points }] (платное снаряжение). */
+export const WHRULES_SCHEMA_V3 = 'whrules-points-snapshot/3';
 const sha256 = (s) => crypto.createHash('sha256').update(s, 'utf8').digest('hex');
 
 /** Обработчики обновлений по kind: (files, snapshot, update) => { changed: число изменённых значений, lines: [] }. */
@@ -32,16 +34,18 @@ export const APPLIERS = {};
 
 /** Проверка снимка wh-rules: схема, обязательные поля, fingerprint. Ошибка — исключение. */
 export function checkWhrulesSnapshot(snap) {
-  if (snap?.schema !== WHRULES_SCHEMA && snap?.schema !== WHRULES_SCHEMA_V2) throw new Error(`снимок: схема ${snap?.schema}, ожидается ${WHRULES_SCHEMA} или ${WHRULES_SCHEMA_V2}`);
+  if (![WHRULES_SCHEMA, WHRULES_SCHEMA_V2, WHRULES_SCHEMA_V3].includes(snap?.schema)) throw new Error(`снимок: схема ${snap?.schema}, ожидается ${WHRULES_SCHEMA}, ${WHRULES_SCHEMA_V2} или ${WHRULES_SCHEMA_V3}`);
   const s = snap.source ?? {};
   for (const k of ['site', 'dataVersion', 'mfm', 'date', 'extractedAt']) if (s[k] == null || s[k] === '') throw new Error(`снимок: нет source.${k}`);
   if (!snap.assets || !Object.values(snap.assets).every((h) => /^[0-9a-f]{64}$/.test(h))) throw new Error('снимок: нет SHA-256 модулей источника');
   if (!snap.factions || !Object.values(snap.factions).every((f) => Array.isArray(f.datasheets))) throw new Error('снимок: нет инфолистов');
   if (!Array.isArray(snap.patches)) throw new Error('снимок: нет истории обновлений');
-  if (snap.schema === WHRULES_SCHEMA_V2)
+  if (snap.schema === WHRULES_SCHEMA_V2 || snap.schema === WHRULES_SCHEMA_V3)
     for (const [slug, f] of Object.entries(snap.factions)) {
       if (!f.name || !Array.isArray(f.detachments) || !f.renames || typeof f.renames !== 'object') throw new Error(`снимок: у ${slug} нет name, detachments или renames`);
       if (f.detachments.some((d) => !d.id || !d.name || !Array.isArray(d.enhancements))) throw new Error(`снимок: детачмент ${slug} без id, имени или улучшений`);
+      if (f.datasheets.some((d) => d.wargearPoints && (!Array.isArray(d.wargearPoints) || d.wargearPoints.some((w) => !w.name || typeof w.points !== 'number'))))
+        throw new Error(`снимок: платное снаряжение ${slug} без названия или очков`);
     }
   const { fingerprint, ...content } = snap;
   if (sha256(JSON.stringify(content)) !== fingerprint) throw new Error('снимок: fingerprint не совпадает — файл изменён после снятия');

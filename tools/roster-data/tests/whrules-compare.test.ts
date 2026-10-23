@@ -1,4 +1,5 @@
-// P1-T1: снимок очков всех фракций wh-rules.ru (схема /2, данные 995) и отчёт свежести данных 40K. Только чтение данных.
+// P1-T1/P1-T2: снимок очков всех фракций wh-rules.ru (схема /3, данные 995) и отчёт свежести данных 40K, включая платное
+// снаряжение. Только чтение данных.
 // Запуск: bun test tests/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -7,7 +8,7 @@ import path from 'node:path';
 // @ts-expect-error — .mjs без типов
 import { checkWhrulesSnapshot, loadSnapshot } from '../scripts/updates-40k.mjs';
 // @ts-expect-error — .mjs без типов
-import { ARMIES, bareSlug, buildReport, compareArmy, compareDetachments, costDiff, costKey } from '../scripts/whrules-compare.mjs';
+import { ARMIES, bareSlug, buildReport, compareArmy, compareDetachments, compareWargear, costDiff, costKey, siteCosts, wargearKey } from '../scripts/whrules-compare.mjs';
 
 const DATA = path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data');
 const SNAP = loadSnapshot('whrules-995.json');
@@ -15,12 +16,15 @@ const readJson = (p: string) => JSON.parse(fs.readFileSync(p, 'utf8'));
 
 // ---------- снимок ----------
 
-test('снимок wh-rules 995: схема /2, fingerprint, версия источника, все 30 фракций', () => {
-  assert.equal(SNAP.schema, 'whrules-points-snapshot/2');
+test('снимок wh-rules 995: схема /3, fingerprint, версия источника, все 30 фракций, платное снаряжение', () => {
+  assert.equal(SNAP.schema, 'whrules-points-snapshot/3');
   assert.equal(SNAP.source.dataVersion, 995);
   assert.equal(SNAP.source.mfm, '1.6');
   assert.equal(SNAP.source.date, '2026-10-16');
-  assert.equal(SNAP.fingerprint, 'ec8b68f3b2e21d6417ed26433fd02d5a40dafaeeb72b850717c94ae3f8190fde');
+  assert.equal(SNAP.fingerprint, '79a26d70ca87852ab8aabc06fb9f93d28a907a6c1b2a724e25af59b794c02aa4');
+  const withWargear = Object.values(SNAP.factions).flatMap((f: { datasheets: { wargearPoints?: unknown[] }[] }) => f.datasheets.filter((d) => d.wargearPoints?.length));
+  assert.equal(withWargear.length, 68);
+  assert.deepEqual(SNAP.factions['space-marines'].datasheets.find((d: { id: string }) => d.id === 'terminator-assault-squad').wargearPoints, [{ name: 'Storm Shield', points: 5 }]);
   assert.equal(Object.keys(SNAP.factions).length, 30);
   assert.equal(SNAP.factions['adeptus-custodes'].datasheets.length, 36);
   assert.equal(SNAP.factions['adeptus-custodes'].detachments.length, 13);
@@ -37,6 +41,9 @@ test('проверка схемы /2: у фракции обязательны n
   const noDet = structuredClone(rest);
   delete noDet.factions.orks.detachments;
   assert.throws(() => checkWhrulesSnapshot({ ...noDet, fingerprint: 'x' }), /detachments/);
+  const badWg = structuredClone(rest);
+  badWg.factions['space-marines'].datasheets.find((d: { id: string }) => d.id === 'terminator-assault-squad').wargearPoints = [{ name: 'Storm Shield' }];
+  assert.throws(() => checkWhrulesSnapshot({ ...badWg, fingerprint: 'x' }), /снаряжение/);
   assert.equal(loadSnapshot('whrules-981.json').schema, 'whrules-points-snapshot/1');
 });
 
@@ -44,15 +51,35 @@ test('проверка схемы /2: у фракции обязательны n
 
 const band = (from: number, to: number | null, ...opts: [number, number][]) => ({ from, to, options: opts.map(([models, cost]) => ({ label: `${models} models`, models, cost })), addons: [], wargear: [] });
 
-test('costKey/costDiff: points, sizes, tiers; снаряжение и строки без числа моделей не сравниваются', () => {
+test('costKey/costDiff: points, sizes, tiers; размер без числа моделей сравнивается по подписи', () => {
   const ours = [band(1, 2, [5, 75], [10, 150]), band(3, null, [5, 85], [10, 160])];
   assert.equal(costKey(ours), '1-2: 5=75,10=150 | 3-+: 5=85,10=160');
   assert.equal(costDiff(ours, structuredClone(ours)), null);
   assert.equal(costDiff(ours, [band(1, 2, [5, 80], [10, 150]), band(3, null, [5, 85], [10, 160])]).kind, 'points');
   assert.equal(costDiff(ours, [band(1, 2, [3, 75], [6, 150]), band(3, null, [3, 85], [6, 160])]).kind, 'sizes');
   assert.equal(costDiff(ours, [band(1, null, [5, 75], [10, 150])]).kind, 'tiers');
-  const withExtra = [{ ...band(1, null, [1, 85]), options: [{ label: '1 model', models: 1, cost: 85 }, { label: 'Shield', cost: 20 }] }];
-  assert.equal(costDiff([band(1, null, [1, 85])], withExtra), null);
+  const withLabel = [{ ...band(1, null, [1, 85]), options: [{ label: '1 model', models: 1, cost: 85 }, { label: 'Retinue', cost: 20 }] }];
+  assert.equal(costDiff([band(1, null, [1, 85])], withLabel)?.kind, 'sizes');
+});
+
+test('размеры по подписи состава сравниваются (Crusader Squad), запись очков без моделей и пометки — добавка (Tidewall)', () => {
+  const crusader = [{ from: 1, to: null, options: [{ label: '1 Sword Brother, 4 Neophytes, 5 Initiates', cost: 160 }], addons: [], wargear: [] }];
+  assert.equal(costKey(crusader), '1-+: [1 sword brother, 4 neophytes, 5 initiates]=160');
+  assert.equal(costDiff(crusader, siteCosts([{ points: 160, note: '1 Sword Brother, 4 Neophytes, 5 Initiates' }]).bands), null);
+  assert.equal(costDiff(crusader, siteCosts([{ points: 170, note: '1 Sword Brother, 4 Neophytes, 5 Initiates' }]).bands)?.kind, 'points');
+  const tidewall = siteCosts([{ models: 1, points: 85 }, { points: 20 }]);
+  assert.equal(costKey(tidewall.bands), '1-+: 1=85');
+  assert.deepEqual(tidewall.addons, [20]);
+});
+
+test('compareWargear: та же цена, другая цена, только у нас, только на сайте; ключ как в движке (регистр, окончание s)', () => {
+  assert.equal(wargearKey('Storm Shields'), wargearKey('storm shield'));
+  const ds = { options: [], composition: ['1 model'], loadout: '', weapons: [], defaultLoadout: [], stats: [], costs: [{ from: 1, to: null, options: [], addons: [], wargear: [{ label: 'Thunder Hammer', cost: 5, unverified: true }, { label: 'Lascannon', cost: 5 }, { label: 'Multi-melta', cost: 10 }] }] };
+  const r = compareWargear(ds, [{ name: 'Storm Shield', points: 5 }, { name: 'lascannon', points: 5 }, { name: 'Multi-melta', points: 15 }]);
+  assert.deepEqual(r.same.map((x: { name: string }) => x.name), ['lascannon']);
+  assert.deepEqual(r.priceChanged.map((x: { name: string; ours: number; site: number }) => `${x.name} ${x.ours}→${x.site}`), ['Multi-melta 10→15']);
+  assert.deepEqual(r.onlyOurs, [{ name: 'Thunder Hammer', ours: 5, unverified: true }]);
+  assert.deepEqual(r.onlySite.map((x: { name: string }) => x.name), ['Storm Shield']);
 });
 
 test('bareSlug: пометка в скобках и артикль The не мешают сопоставлению', () => {
@@ -153,6 +180,21 @@ test('отчёт свежести: проверочные расхождения
   assert.equal(REP.armies.AC.summary.datasheets.renamed, 9);
   assert.equal(REP.armies.SM.ourSource.dataVersion, 981);
   assert.equal(REP.armies.ORK.ourSource.site, 'wahapedia');
+});
+
+test('отчёт свежести: снаряжение — версии орденов сравниваются со своими инфолистами сайта', () => {
+  const w = REP.armies.SM.datasheets.wargear;
+  const row = (unit: string, name: string) => w.onlySite.find((x: { unit: string; name: string }) => x.unit === unit && x.name === name);
+  assert.equal(row('Gladiator Lancer (Black Templars)', 'Multi-melta').site, 10);
+  assert.equal(row('Terminator Assault Squad', 'Storm Shield').site, 5);
+  assert.ok(w.onlyOurs.some((x: { unit: string; name: string; unverified: boolean }) => x.unit === 'Terminator Assault Squad' && x.name === 'Thunder Hammer' && x.unverified));
+  assert.ok(!w.onlySite.some((x: { unit: string }) => x.unit === 'Gladiator Lancer'), 'версия Space Marines не путается с Black Templars');
+  // у Gladiator Lancer Black Templars своя цена отряда (165), у Space Marines — 160: обе совпадают с сайтом
+  const pts = REP.armies.SM.datasheets.pointsChanged.map((x: { name: string }) => x.name);
+  assert.ok(!pts.includes('Gladiator Lancer'));
+  assert.equal(REP.armies.SM.datasheets.newOnSite.length, 0);
+  assert.equal(REP.armies.AM.summary.wargear.same, 27);
+  assert.deepEqual(REP.armies.TAU.datasheets.addons, { same: 1, changed: [] });
 });
 
 test('сохранённый отчёт 40k/freshness-report.json построен по этому снимку', () => {
