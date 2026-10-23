@@ -43,3 +43,28 @@ test('сохранённое сопоставление совпадает с п
   const { counts, renamed, new: added, detachments } = mapFaction(SNAP, 'adeptus-custodes', ac);
   assert.deepEqual({ counts, renamed, new: added, detachments }, { counts: MAP.counts, renamed: MAP.renamed, new: MAP.new, detachments: MAP.detachments });
 });
+
+// ---------- P1-T4b: общий конвертер, одна фракция ----------
+// @ts-expect-error — .mjs без типов
+import { convertFaction } from '../scripts/whrules-convert.mjs';
+// @ts-expect-error — .mjs без типов
+import { planFaction } from '../scripts/whrules-map.mjs';
+
+test('convertFaction (Custodes, сухой прогон в памяти): id сохранены, новые — whr:, прежние детачменты устаревшие, союзники не тронуты', () => {
+  const army = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data', 'f', 'AC.json'), 'utf8'));
+  const map = mapFaction(SNAP, 'adeptus-custodes', army);
+  const plan = planFaction(map, FULL, army);
+  const r = convertFaction({ full: FULL, slug: 'adeptus-custodes', army, map, plan });
+  const own = r.file.datasheets.filter((d: { group: string }) => d.group === 'own');
+  assert.equal(own.length, 36);
+  const ids = new Set(own.map((d: { id: string }) => d.id));
+  for (const d of army.datasheets.filter((x: { group: string }) => x.group === 'own')) assert.ok(ids.has(d.id), `id ${d.id} ${d.name} сохранён`);
+  assert.equal(own.filter((d: { id: string }) => d.id.startsWith('whr:adeptus-custodes:')).length, 5);
+  assert.deepEqual(r.file.detachments.filter((d: { outdated?: string }) => d.outdated).map((d: { name: string }) => d.name).sort(), ['Shield Host', 'Silent Hunters', 'Solar Spearhead', 'Talons Of The Emperor', 'Tharanatoi Hammerblow']);
+  assert.equal(r.file.detachments.filter((d: { outdated?: string }) => !d.outdated).length, 13);
+  const notOwn = (F: { datasheets: { group: string }[] }) => JSON.stringify(F.datasheets.filter((d) => d.group !== 'own'));
+  assert.equal(notOwn(r.file), notOwn(army));
+  assert.deepEqual(r.unresolved, []);
+  // конвертер не меняет переданные данные
+  assert.deepEqual(army, JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data', 'f', 'AC.json'), 'utf8')));
+});

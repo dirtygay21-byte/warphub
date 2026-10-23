@@ -238,6 +238,28 @@ export function mapFaction(snapshot, slug, army) {
 export const outdatedText = (source) => `* Данные устарели — инфолист не обновлён: его нет в собранном источнике wh-rules.ru (версия ${source.dataVersion}).`;
 
 /**
+ * План перевода одной фракции на полный снимок (P1-T4): id сопоставленных и переименованных сохраняются, новые — whr:…;
+ * записи без покрытия источником (removed/unmatched) остаются доступными для старых ростеров и помечаются «*» (outdated).
+ * Объединений и замен id здесь нет (у Custodes их нет) — для них нужен отдельный, явно утверждённый список, как у SM.
+ */
+export function planFaction(map, full, army) {
+  const src = `wh-rules ${full.source.dataVersion} (MFM ${full.source.mfm}, ${full.source.date})`;
+  if (map.ambiguous.length) throw new Error(`план ${army.id}: неоднозначные сопоставления — ${map.ambiguous.map((x) => x.site.name).join(', ')}`);
+  const sel = (id) => army.datasheets.find((x) => x.id === id);
+  const outdated = [...map.removed, ...map.unmatched]
+    .map((r) => ({ id: r.ours.id, name: r.ours.name, legends: !!sel(r.ours.id)?.legends, forgeWorld: !!sel(r.ours.id)?.forgeWorld, siteSlug: r.siteSlug, removedOnSite: map.removed.includes(r) }))
+    .sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id));
+  return {
+    source: src,
+    keep: map.matched.length + map.renamed.length,
+    newIds: map.new.map((x) => x.proposedId),
+    migrations: { source: src, datasheets: {}, detachments: {}, enhancements: {} },
+    outdated,
+    outdatedNote: outdatedText(full.source),
+  };
+}
+
+/**
  * План перевода Space Marines на источник (задача SM-3): стратегия id, таблица замен для сохранённых ростеров
  * и список инфолистов без покрытия источником. Только вычисление — данные не меняются.
  *

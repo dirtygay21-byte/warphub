@@ -116,10 +116,10 @@ export function coreParts(s) {
  * (Transhuman Strategist, Librarius, Curse of the Wulfen…). Одинаковые разделы разных фракций — одно правило,
  * разные тексты — отдельные id по фракции. Возвращает { rules: {id:{name,text,factions}}, byFaction: {f: {name:id}} }.
  */
-export function armyRulesOf(full) {
+export function armyRulesOf(full, factions = FULL_FACTIONS) {
   const DOCTRINES = /^(Assault|Devastator|Tactical) Doctrine$/;
   const texts = {}; // name → Map(text → [factions])
-  for (const f of FULL_FACTIONS) {
+  for (const f of factions) {
     const r = full.factions[f].armyRule;
     if (!r) continue;
     const parts = r.body.split(/\n(?=### )/);
@@ -276,22 +276,26 @@ const whrLink = (f) => `https://wh-rules.ru/ru/factions/${f}/datasheets`;
  * Конвертация. Возвращает { sm, aoi, prov, legacy, unavailable, unresolved } — данные в памяти, ничего не пишет.
  * current: { SM, AoI } — текущие данные (для сохранения id, наследуемых полей и пометок).
  */
-export function convertSpaceMarines({ full, map, plan, current }) {
-  const { SM, AoI } = current;
-  const src = { site: full.source.site, dataVersion: full.source.dataVersion, mfm: full.source.mfm, date: full.source.date };
+/**
+ * Общая часть конвертации полного снимка для любой фракции (задача P1-T4b): инфолист, Leader, детачменты с улучшениями
+ * и стратагемами, привязки, прежние (устаревшие) записи. Space Marines (convertSpaceMarines) и одна фракция
+ * (convertFaction) собирают свои файлы из этих частей.
+ *  full — полный снимок; olds — текущие данные затрагиваемых файлов (id, наследуемые поля, словарь правил);
+ *  ourIdOf — Map «<фракция сайта>|<slug>» → наш id (сопоставление); armyFactions — фракции сайта для правил армии;
+ *  factionOf(f) — id нашей фракции для записей фракции сайта f; sourceOf(f) — подпись источника («Space Marines»).
+ */
+export function makeConverter({ full, olds, ourIdOf, armyFactions, factionOf, sourceOf }) {
   const prov = {}; // id → { поле: 'whrules' | 'derived' | 'legacy' | 'unavailable' }
   const legacy = []; // { id, name, field, value, why }
   const unavailable = []; // { id, name, field, why }
   const unresolved = [];
   const P = (id, field, kind) => ((prov[id] ??= {})[field] = kind);
-  const ourById = new Map([...SM.datasheets, ...AoI.datasheets].map((d) => [d.id, d]));
-  const ourIdOf = new Map([...map.matched, ...map.renamed].map((x) => [`${x.site.faction}|${x.site.id}`, x.ours.id]));
-  for (const x of map.agents.matched) ourIdOf.set(`imperial-agents|${x.site.id}`, x.ours.id);
+  const ourById = new Map(olds.flatMap((fd) => fd.datasheets).map((d) => [d.id, d]));
   const idOf = (f, slug) => ourIdOf.get(`${f}|${slug}`) ?? newId(f, slug);
-  const ruleSet = armyRulesOf(full);
+  const ruleSet = armyRulesOf(full, armyFactions);
   // общие правила (Core и прочие) — словарь текущих данных по названию
   const dict = new Map();
-  for (const fd of [SM, AoI]) for (const [id, r] of Object.entries(fd.rules)) if (!dict.has(r.name)) dict.set(r.name, id);
+  for (const fd of olds) for (const [id, r] of Object.entries(fd.rules)) if (!dict.has(r.name)) dict.set(r.name, id);
 
   const convertDs = (f, site, group) => {
     const id = idOf(f, site.id);
@@ -368,11 +372,11 @@ export function convertSpaceMarines({ full, map, plan, current }) {
       return { name: p.name, M: p.m, T: p.t, Sv: p.sv, inv: (p.inv ?? '').replace(/\+$/, ''), W: p.w, Ld: p.ld, OC: p.oc, base };
     });
     const rec = {
-      id, name: site.name, faction: 'SM', role: old?.role && old.name === site.name ? old.role : roleOf(kw),
+      id, name: site.name, faction: factionOf(f), role: old?.role && old.name === site.name ? old.role : roleOf(kw),
       keywords: kw, factionKeywords: fk,
       support: core.some((c) => c.name === 'Support'),
       legends: !!site.legends, forgeWorld: !!old?.forgeWorld,
-      source: (chapter ?? (f === 'imperial-agents' ? 'Imperial Agents' : 'Space Marines')) + (site.legends ? ' (Warhammer Legends)' : ''),
+      source: sourceOf(f) + (site.legends ? ' (Warhammer Legends)' : ''),
       link: whrLink(f),
       character: kw.includes('Character'), epicHero: kw.includes('Epic Hero'), battleline: kw.includes('Battleline'),
       dedicatedTransport: kw.includes('Dedicated Transport'), titanic: kw.includes('Titanic'),
@@ -387,7 +391,6 @@ export function convertSpaceMarines({ full, map, plan, current }) {
       stratagems: [], detachmentAbilities: [], enhancements: [],
       group,
     };
-    if (f === 'imperial-agents') rec.faction = 'AoI';
     Object.defineProperty(rec, '_site', { value: { f, slug: site.id, leader: site.leader } });
     // ключевые слова для сопоставлений; название инфолиста — тоже (цели вида «DARNATH LYSANDER unit»)
     Object.defineProperty(rec, '_kw', { value: new Set([...kw, ...fk, site.name].map((k) => k.toUpperCase())) });
@@ -396,26 +399,7 @@ export function convertSpaceMarines({ full, map, plan, current }) {
     return rec;
   };
 
-  // --- Space Marines: кодекс + ордена (общие инфолисты не дублируются: sharedUnitIds) ---
-  const smDs = [];
-  for (const f of SM_FAMILY) for (const s of full.factions[f].datasheets) smDs.push(convertDs(f, s, 'own'));
-  // цены ордена для общих инфолистов (pointsOverrides)
-  for (const f of SM_FAMILY) {
-    for (const [slug, pts] of Object.entries(full.factions[f].pointsOverrides ?? {})) {
-      const ds = smDs.find((d) => d._site.f === 'space-marines' && d._site.slug === slug);
-      if (!ds) {
-        unresolved.push({ where: `${f}.pointsOverrides`, value: slug, why: 'общий инфолист не найден' });
-        continue;
-      }
-      (ds.costVariants ??= []).push({ chapter: CHAPTER_OF[f], costs: costsOf(pts) });
-      P(ds.id, 'costVariants', 'whrules');
-    }
-  }
-  // Imperial Agents
-  const aoiDs = full.factions['imperial-agents'].datasheets.map((s) => convertDs('imperial-agents', s, 'own'));
-
   // --- Leader: названия → id (свой орден → кодекс → оставшиеся записи без покрытия) ---
-  const retainedOutdated = plan.outdated.map((o) => ourById.get(o.id)).filter(Boolean);
   const resolveLeads = (list, pool) => {
     for (const d of list) {
       const L = d._site.leader;
@@ -442,9 +426,6 @@ export function convertSpaceMarines({ full, map, plan, current }) {
       }
     }
   };
-  resolveLeads(smDs, [...smDs, ...retainedOutdated]);
-  resolveLeads(aoiDs, aoiDs);
-
   // --- детачменты, улучшения, стратагемы ---
   const buildDets = (factions, fid, allDs, oldFaction) => {
     const vocab = new Set(allDs.flatMap((d) => [...d._kw]));
@@ -500,9 +481,6 @@ export function convertSpaceMarines({ full, map, plan, current }) {
     }
     return { dets, enhs, strats, vocab };
   };
-  const smB = buildDets(SM_FAMILY, 'SM', [...smDs, ...retainedOutdated.map((d) => Object.defineProperty({ ...d }, '_kw', { value: new Set([...d.keywords, ...d.factionKeywords, d.name].map((k) => k.toUpperCase())) }))], SM);
-  const aoiB = buildDets(['imperial-agents'], 'AoI', aoiDs, AoI);
-
   // привязки к инфолистам: стратагемы и улучшения — по ключевым словам цели («… model only», «One friendly X unit»),
   // правила детачментов — все детачменты фракции; основные стратагемы — как в текущих данных
   const link = (list, B, oldFaction) => {
@@ -515,9 +493,6 @@ export function convertSpaceMarines({ full, map, plan, current }) {
       P(d.id, 'enhancements', 'derived');
     }
   };
-  link(smDs, smB, SM);
-  link(aoiDs, aoiB, AoI);
-
   // --- прежние детачменты, улучшения и стратагемы, которых нет в снимке (решение владельца): сохраняются как
   // устаревшие — у открытых ростеров работают, для новых недоступны (client: engine/source.ts, compute.ts) ---
   const legacyContent = (oldFaction, B) => {
@@ -532,8 +507,6 @@ export function convertSpaceMarines({ full, map, plan, current }) {
     const strats = oldFaction.stratagems.filter((x) => x.detachment && !newStr.has(keyOf(x, detName(x.detachment)))).map((x) => ({ ...x, outdated: OUTDATED_RULE_TEXT }));
     return { dets, enhs, strats, ids: { det: new Set(dets.flatMap((d) => d.abilities.map((a) => a.id))), enh: new Set(enhs.map((e) => e.id)), strat: new Set(strats.map((x) => x.id)) } };
   };
-  const smLegacy = legacyContent(SM, smB);
-  const aoiLegacy = legacyContent(AoI, aoiB);
   // списки инфолистов: к новым записям добавляются прежние устаревшие, на которые инфолист уже ссылался —
   // так юнит в старом ростере сохраняет своё улучшение и стратагемы устаревшего детачмента
   const keepLegacyLinks = (list, lg) => {
@@ -545,6 +518,54 @@ export function convertSpaceMarines({ full, map, plan, current }) {
       d.detachmentAbilities = [...new Set([...d.detachmentAbilities, ...old.detachmentAbilities.filter((x) => lg.ids.det.has(x))])];
     }
   };
+  return { prov, legacy, unavailable, unresolved, P, ourById, ruleSet, convertDs, resolveLeads, buildDets, link, legacyContent, keepLegacyLinks };
+}
+
+export function convertSpaceMarines({ full, map, plan, current }) {
+  const { SM, AoI } = current;
+  const src = { site: full.source.site, dataVersion: full.source.dataVersion, mfm: full.source.mfm, date: full.source.date };
+  const ourIdOf = new Map([...map.matched, ...map.renamed].map((x) => [`${x.site.faction}|${x.site.id}`, x.ours.id]));
+  for (const x of map.agents.matched) ourIdOf.set(`imperial-agents|${x.site.id}`, x.ours.id);
+  const K = makeConverter({
+    full,
+    olds: [SM, AoI],
+    ourIdOf,
+    armyFactions: FULL_FACTIONS,
+    factionOf: (f) => (f === 'imperial-agents' ? 'AoI' : 'SM'),
+    sourceOf: (f) => CHAPTER_OF[f] ?? (f === 'imperial-agents' ? 'Imperial Agents' : 'Space Marines'),
+  });
+  const { prov, legacy, unavailable, unresolved, P, ourById, ruleSet, convertDs, resolveLeads, buildDets, link, legacyContent, keepLegacyLinks } = K;
+
+  // --- Space Marines: кодекс + ордена (общие инфолисты не дублируются: sharedUnitIds) ---
+  const smDs = [];
+  for (const f of SM_FAMILY) for (const s of full.factions[f].datasheets) smDs.push(convertDs(f, s, 'own'));
+  // цены ордена для общих инфолистов (pointsOverrides)
+  for (const f of SM_FAMILY) {
+    for (const [slug, pts] of Object.entries(full.factions[f].pointsOverrides ?? {})) {
+      const ds = smDs.find((d) => d._site.f === 'space-marines' && d._site.slug === slug);
+      if (!ds) {
+        unresolved.push({ where: `${f}.pointsOverrides`, value: slug, why: 'общий инфолист не найден' });
+        continue;
+      }
+      (ds.costVariants ??= []).push({ chapter: CHAPTER_OF[f], costs: costsOf(pts) });
+      P(ds.id, 'costVariants', 'whrules');
+    }
+  }
+  // Imperial Agents
+  const aoiDs = full.factions['imperial-agents'].datasheets.map((s) => convertDs('imperial-agents', s, 'own'));
+
+  const retainedOutdated = plan.outdated.map((o) => ourById.get(o.id)).filter(Boolean);
+  resolveLeads(smDs, [...smDs, ...retainedOutdated]);
+  resolveLeads(aoiDs, aoiDs);
+
+  const smB = buildDets(SM_FAMILY, 'SM', [...smDs, ...retainedOutdated.map((d) => Object.defineProperty({ ...d }, '_kw', { value: new Set([...d.keywords, ...d.factionKeywords, d.name].map((k) => k.toUpperCase())) }))], SM);
+  const aoiB = buildDets(['imperial-agents'], 'AoI', aoiDs, AoI);
+
+  link(smDs, smB, SM);
+  link(aoiDs, aoiB, AoI);
+
+  const smLegacy = legacyContent(SM, smB);
+  const aoiLegacy = legacyContent(AoI, aoiB);
   keepLegacyLinks(smDs, smLegacy);
   keepLegacyLinks(aoiDs, aoiLegacy);
 
@@ -609,6 +630,56 @@ export function convertSpaceMarines({ full, map, plan, current }) {
   aoi.migrations = { source: plan.migrations.source, datasheets: {}, detachments: {}, enhancements: {}, options: optionRemaps(aoi.datasheets, AoI.datasheets) };
   // данные, заданные в curated (ордена Space Marines и т.п.), здесь не участвуют
   return { sm, aoi, aoiCopy: aoiAlly, prov, legacy, unavailable, unresolved, legacyRules: { sm: smLegacy, aoi: aoiLegacy }, vocab: { sm: smB.vocab, aoi: aoiB.vocab } };
+}
+
+/**
+ * Конвертация одной фракции сайта в файл армии (P1-T4: Adeptus Custodes). full — полный снимок с фракцией slug,
+ * army — текущие данные армии, map — mapFaction, plan — planFaction. Ничего не пишет. Свои инфолисты, детачменты,
+ * улучшения, стратагемы и правила армии — из снимка; союзники и копии по детачментам (group ≠ "own") — как были;
+ * прежние детачменты/улучшения/стратагемы, которых нет в снимке, остаются устаревшими (как у Space Marines).
+ * Цены и платное снаряжение здесь — из снимка и наследия, окончательные значения ставит обновление whrules-points.
+ * Возвращает { file, optionsNew, prov, legacy, unavailable, unresolved, legacyRules, vocab }: optionsNew — таблицы
+ * перевода выборов снаряжения своих инфолистов (как их объединить с migrations файла — решается при применении).
+ */
+export function convertFaction({ full, slug, army, map, plan }) {
+  const site = full.factions[slug];
+  if (!site) throw new Error(`convertFaction: в снимке нет ${slug}`);
+  const src = { site: full.source.site, dataVersion: full.source.dataVersion, mfm: full.source.mfm, date: full.source.date };
+  const ourIdOf = new Map([...map.matched, ...map.renamed].map((x) => [`${slug}|${x.site.id}`, x.ours.id]));
+  const ownOld = army.datasheets.filter((d) => d.group === 'own' && d.faction === army.id);
+  const K = makeConverter({ full, olds: [army], ourIdOf, armyFactions: [slug], factionOf: () => army.id, sourceOf: () => site.name ?? army.name });
+  const ds = site.datasheets.map((s) => K.convertDs(slug, s, 'own'));
+  const outdatedIds = new Set(plan.outdated.map((o) => o.id));
+  const retained = ownOld.filter((d) => outdatedIds.has(d.id)).map((d) => {
+    const r = { ...d, outdated: plan.outdatedNote };
+    Object.defineProperty(r, '_kw', { value: new Set([...d.keywords, ...d.factionKeywords, d.name].map((k) => k.toUpperCase())) });
+    K.P(d.id, '*', 'legacy');
+    return r;
+  });
+  K.resolveLeads(ds, [...ds, ...retained]);
+  const B = K.buildDets([slug], army.id, [...ds, ...retained], army);
+  K.link(ds, B, army);
+  K.link(retained, B, army);
+  const lg = K.legacyContent(army, B);
+  K.keepLegacyLinks(ds, lg);
+  K.keepLegacyLinks(retained, lg);
+  const ruleIds = new Set(Object.values(K.ruleSet.byFaction[slug] ?? {}));
+  const rules = {};
+  for (const id of ruleIds) rules[id] = { name: K.ruleSet.rules[id].name, text: K.ruleSet.rules[id].text };
+  const others = army.datasheets.filter((d) => !(d.group === 'own' && d.faction === army.id));
+  for (const d of [...ds, ...retained, ...others]) for (const a of d.abilities) if (a.ref && !rules[a.ref]) rules[a.ref] = army.rules[a.ref];
+  const file = {
+    ...army,
+    armyRules: [...ruleIds],
+    rules,
+    datasheets: [...ds, ...retained, ...others],
+    detachments: [...B.dets, ...lg.dets],
+    stratagems: [...army.stratagems.filter((s) => !s.detachment), ...B.strats, ...lg.strats],
+    enhancements: [...B.enhs, ...lg.enhs],
+    source: src,
+  };
+  const optionsNew = optionRemaps(ds, ownOld);
+  return { file, optionsNew, prov: K.prov, legacy: K.legacy, unavailable: K.unavailable, unresolved: K.unresolved, legacyRules: lg, vocab: B.vocab };
 }
 
 /** Свойства-помощники конвертера (_site, _kw) не сериализуются; копия без них — как будет записано в файл. */
