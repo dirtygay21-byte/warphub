@@ -40,6 +40,7 @@ beforeAll(async () => {
   if (!E2E) return;
   for (const [name, id] of Object.entries(ID)) {
     const r = await api('POST', '/auth/telegram', undefined, { initData: initData({ id, first_name: name[0]!.toUpperCase() + name.slice(1), username: name }) });
+    if (r.status !== 200) console.error(`::error::login ${name} → ${r.status}: ${JSON.stringify(r.json).slice(0, 600)}`);
     expect(r.status).toBe(200);
     T[name] = r.json.token;
   }
