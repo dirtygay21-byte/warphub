@@ -8,6 +8,9 @@ import path from 'node:path';
 // @ts-expect-error — .mjs без типов
 import { checkWhrulesSnapshot, loadSnapshot } from '../scripts/updates-40k.mjs';
 // @ts-expect-error — .mjs без типов
+// @ts-expect-error — .mjs без типов
+import { BEFORE_POINTS, data40kAt } from '../scripts/baseline-40k.mjs';
+// @ts-expect-error — .mjs без типов
 import { ARMIES, bareSlug, buildReport, compareArmy, compareDetachments, compareWargear, costDiff, costKey, siteCosts, wargearKey } from '../scripts/whrules-compare.mjs';
 
 const DATA = path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data');
@@ -145,7 +148,7 @@ test('compareDetachments: DP, пропавшие (кроме помеченны�
   assert.deepEqual(r.dpChanged, [{ id: 'd1', name: 'Host', ours: 1, site: 2 }]);
   assert.deepEqual(r.missingOnSite.map((x: { name: string }) => x.name), ['Gone']);
   assert.deepEqual(r.outdated.map((x: { name: string }) => x.name), ['Kept']);
-  assert.deepEqual(r.enhancements.pointsChanged, [{ detachment: 'Host', name: 'Blade', ours: 15, site: 20 }]);
+  assert.deepEqual(r.enhancements.pointsChanged, [{ id: 'e1', detachment: 'Host', name: 'Blade', ours: 15, site: 20 }]);
   assert.equal(r.enhancements.same, 1);
 });
 
@@ -153,9 +156,13 @@ test('compareDetachments: DP, пропавшие (кроме помеченны�
 
 const index = readJson(path.join(DATA, 'index.json'));
 const files = Object.fromEntries(fs.readdirSync(path.join(DATA, 'f')).filter((f) => f.endsWith('.json')).map((f) => [f, readJson(path.join(DATA, 'f', f))]));
-const REP = buildReport(files, index, SNAP, 'whrules-995.json');
+const NOW = buildReport(files, index, SNAP, 'whrules-995.json');
+// отчёт P1-T2 — по данным до обновления whrules-995-points (история git); без git эти проверки пропускаются
+const BEFORE = data40kAt(BEFORE_POINTS.rev);
+const REP = BEFORE ? buildReport(BEFORE.files, BEFORE.index, SNAP, 'whrules-995.json') : null;
+const TB = BEFORE ? test : test.skip;
 
-test('отчёт свежести: все 23 армии приложения, у каждого нашего инфолиста есть категория, без «не сопоставлено»', () => {
+TB('отчёт свежести (до P1-T3): все 23 армии приложения, у каждого нашего инфолиста есть категория, без «не сопоставлено»', () => {
   assert.equal(Object.keys(ARMIES).length, 23);
   for (const [id, a] of Object.entries(REP.armies) as [string, { missingInApp?: boolean; summary: { datasheets: Record<string, number> } }][]) {
     assert.ok(!a.missingInApp, `${id} нет в приложении`);
@@ -167,7 +174,7 @@ test('отчёт свежести: все 23 армии приложения, у
   assert.deepEqual(REP.notInApp, ['chaos-titan-legions']);
 });
 
-test('отчёт свежести: проверочные расхождения видны (Custodes, Orks, Death Guard, Tyranids), источник SM — wh-rules 981', () => {
+TB('отчёт свежести (до P1-T3): проверочные расхождения видны (Custodes, Orks, Death Guard, Tyranids), источник SM — wh-rules 981', () => {
   const find = (army: string, name: string) => {
     const d = REP.armies[army].datasheets;
     return [...d.pointsChanged, ...d.sizesChanged, ...d.tiersChanged].find((x: { name: string }) => x.name === name);
@@ -182,7 +189,7 @@ test('отчёт свежести: проверочные расхождения
   assert.equal(REP.armies.ORK.ourSource.site, 'wahapedia');
 });
 
-test('отчёт свежести: снаряжение — версии орденов сравниваются со своими инфолистами сайта', () => {
+TB('отчёт свежести (до P1-T3): снаряжение — версии орденов сравниваются со своими инфолистами сайта', () => {
   const w = REP.armies.SM.datasheets.wargear;
   const row = (unit: string, name: string) => w.onlySite.find((x: { unit: string; name: string }) => x.unit === unit && x.name === name);
   assert.equal(row('Gladiator Lancer (Black Templars)', 'Multi-melta').site, 10);
@@ -195,6 +202,22 @@ test('отчёт свежести: снаряжение — версии орд�
   assert.equal(REP.armies.SM.datasheets.newOnSite.length, 0);
   assert.equal(REP.armies.AM.summary.wargear.same, 27);
   assert.deepEqual(REP.armies.TAU.datasheets.addons, { same: 1, changed: [] });
+});
+
+test('отчёт свежести по текущим данным (после P1-T3): в обновлённом объёме расхождений нет, остались только исключения', () => {
+  for (const [id, a] of Object.entries(NOW.armies) as [string, { summary: Record<string, Record<string, number>> }][]) {
+    const s = a.summary;
+    if (id === 'AC') continue;
+    assert.equal(s.datasheets.points + s.datasheets.tiers + s.datasheets.sizes + s.datasheets.legends, 0, `${id}: цены отряда`);
+    assert.equal(s.detachments.dp, 0, `${id}: DP`);
+    assert.equal(s.enhancements.points, 0, `${id}: улучшения`);
+    assert.equal(s.wargear.priceChanged + s.wargear.onlyOurs + s.wargear.onlySite, 0, `${id}: снаряжение`);
+    assert.equal(s.datasheets.unmatched, 0, `${id}: без пары`);
+  }
+  // Custodes: цены обновлены только у юнитов без смены состава; кодекс — в полной конвертации
+  const ac = NOW.armies.AC.summary;
+  assert.deepEqual([ac.datasheets.points, ac.datasheets.sizes, ac.datasheets.tiers, ac.datasheets.legends, ac.datasheets.renamed, ac.datasheets.newOnSite], [0, 5, 10, 6, 9, 5]);
+  assert.equal(NOW.armies.ORK.ourSource.dataVersion, 995);
 });
 
 test('сохранённый отчёт 40k/freshness-report.json построен по этому снимку', () => {

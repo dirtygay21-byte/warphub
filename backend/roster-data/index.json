@@ -183,6 +183,44 @@
     "snapshot": "whrules-981-full.json",
     "fingerprint": "aebb093d50e8a4d7a5ab2fa315d7e13dd63bf0d79d23e2756e3f9c4d4ee49361"
    }
+  },
+  {
+   "id": "whrules-995-points",
+   "kind": "whrules-points",
+   "scope": [
+    "AS",
+    "AC",
+    "AdM",
+    "AE",
+    "AM",
+    "CD",
+    "QT",
+    "CSM",
+    "DG",
+    "DRU",
+    "EC",
+    "GC",
+    "GK",
+    "AoI",
+    "QI",
+    "LoV",
+    "NEC",
+    "ORK",
+    "SM",
+    "TAU",
+    "TS",
+    "TYR",
+    "WE"
+   ],
+   "note": "Очки отряда, ступени цены за копии, Legends, DP детачментов, очки улучшений и платное снаряжение по wh-rules.ru 995 (MFM 1.6) у сопоставленных записей; id и правила не меняются. Платное снаряжение — только в последней ступени цены за копии (решение владельца 2026-10-23: так во всех 70 предметах выгрузки Wahapedia, сайт ступень не указывает). Adeptus Custodes — только цены отряда (кодекс — в полной конвертации). Не обновлены: юниты, которых нет на сайте или которые там в другой фракции, Legends/Forge World вне сайта (см. 40k/freshness-report.md).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995.json",
+    "fingerprint": "79a26d70ca87852ab8aabc06fb9f93d28a907a6c1b2a724e25af59b794c02aa4"
+   }
   }
  ]
 }

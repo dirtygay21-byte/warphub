@@ -13,8 +13,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { repair40kData } from './updates-40k.mjs';
-// обработчик whrules-faction использует движок клиента (TypeScript): запуск через bun или node --import tsx
-const { WHRULES_APPLIERS } = await import('./whrules-convert.mjs');
+// обработчики whrules-faction и whrules-points используют движок клиента (TypeScript): запуск через bun или node --import tsx
+const { WHRULES_APPLIERS } = await import('./whrules-points.mjs');
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);

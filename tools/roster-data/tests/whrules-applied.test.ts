@@ -1,5 +1,5 @@
-// Обновление whrules-981-space-marines применено: данные в backend/roster-data ровно те, что даёт одобренный
-// сухой прогон на данных до обновления (история git, scripts/baseline-40k.mjs), и ничего сверх этого.
+// Обновления 40K применены: данные в backend/roster-data ровно те, что дают одобренный сухой прогон whrules-981-space-marines
+// на данных до обновления (история git, scripts/baseline-40k.mjs) и поверх него whrules-995-points (P1-T3), и ничего сверх этого.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -8,26 +8,35 @@ import path from 'node:path';
 import { baseline40k } from '../scripts/baseline-40k.mjs';
 // @ts-expect-error — модуль .mjs без типов
 import { dryRun } from '../scripts/whrules-convert.mjs';
+// @ts-expect-error — модуль .mjs без типов
+import { applyWhrulesPoints } from '../scripts/whrules-points.mjs';
+// @ts-expect-error — модуль .mjs без типов
+import { loadSnapshot } from '../scripts/updates-40k.mjs';
 
 const DATA = path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data');
 const BASE = baseline40k();
 const TB = BASE ? test : test.skip;
 const R = BASE ? dryRun({ files: BASE.files }) : null;
 const disk = (f: string) => JSON.parse(fs.readFileSync(path.join(DATA, f), 'utf8'));
+const curated = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', '40k', 'curated.json'), 'utf8'));
+const POINTS = curated.updates.items.find((u: { id: string }) => u.id === 'whrules-995-points');
+// ожидаемые файлы: сухой прогон 981 на данных до обновления, затем обновление значений 995
+const EXPECT: Record<string, unknown> | null = BASE ? structuredClone({ ...BASE.files, ...R._files.files }) : null;
+if (EXPECT) applyWhrulesPoints(EXPECT, loadSnapshot(POINTS.snapshot), POINTS);
 
 TB('изменённые файлы совпадают с одобренным сухим прогоном; остальные файлы — как до обновления', () => {
   const names = fs.readdirSync(path.join(DATA, 'f')).filter((f) => f.endsWith('.json')).sort();
   assert.deepEqual(names, Object.keys(BASE.files).sort(), 'состав файлов');
   const changed = Object.keys(R._files.files).sort();
   assert.deepEqual(changed, ['AC.json', 'AM.json', 'AS.json', 'AdM.json', 'AoI.json', 'GK.json', 'QI.json', 'SM.json', 'TL.json']);
-  for (const f of names) {
-    const want = R._files.files[f] ?? BASE.files[f];
-    assert.equal(JSON.stringify(disk(`f/${f}`)), JSON.stringify(want), f);
-  }
+  for (const f of names) assert.equal(JSON.stringify(disk(`f/${f}`)), JSON.stringify(EXPECT![f]), f);
 });
 
-TB('index.json: добавлена только запись updates — та, что в одобренном отчёте', () => {
+TB('index.json: добавлены только записи updates — 981 из одобренного отчёта и 995-points', () => {
   const { updates, ...rest } = disk('index.json');
   assert.deepEqual(rest, BASE.index);
-  assert.deepEqual(updates, [R.scope.indexUpdate]);
+  assert.equal(updates.length, 2);
+  assert.deepEqual(updates[0], R.scope.indexUpdate);
+  const snap = loadSnapshot(POINTS.snapshot);
+  assert.deepEqual(updates[1], { id: POINTS.id, kind: POINTS.kind, scope: POINTS.scope, note: POINTS.note, source: { site: snap.source.site, dataVersion: 995, mfm: '1.6', date: '2026-10-16', snapshot: POINTS.snapshot, fingerprint: snap.fingerprint } });
 });

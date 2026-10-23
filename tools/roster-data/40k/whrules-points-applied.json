@@ -1,0 +1,4483 @@
+{
+ "schema": "whrules-points-applied/1",
+ "snapshot": {
+  "file": "whrules-995.json",
+  "dataVersion": 995,
+  "mfm": "1.6",
+  "date": "2026-10-16",
+  "fingerprint": "79a26d70ca87852ab8aabc06fb9f93d28a907a6c1b2a724e25af59b794c02aa4"
+ },
+ "update": "whrules-995-points",
+ "only": {
+  "AC": [
+   "points"
+  ]
+ },
+ "summary": {
+  "units": 239,
+  "values": 250,
+  "detachments": 8,
+  "enhancements": 3,
+  "copies": 217,
+  "skipped": 29,
+  "ambiguous": 0
+ },
+ "units": [
+  {
+   "army": "AS",
+   "id": "000000898",
+   "name": "Saint Celestine",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 3=150",
+   "after": "1-+: 3=135",
+   "siteFaction": "Adepta Sororitas"
+  },
+  {
+   "army": "AS",
+   "id": "000002479",
+   "name": "Morvenn Vahl",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=200",
+   "after": "1-+: 1=215",
+   "siteFaction": "Adepta Sororitas"
+  },
+  {
+   "army": "AS",
+   "id": "000002483",
+   "name": "Paragon Warsuits",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 3=180 | 3-+: 3=190",
+   "after": "1-2: 3=165 | 3-+: 3=175",
+   "siteFaction": "Adepta Sororitas"
+  },
+  {
+   "army": "AS",
+   "id": "000002484",
+   "name": "Castigator",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=165 | 3-+: 1=175",
+   "after": "1-2: 1=165 | 3-+: 1=185",
+   "siteFaction": "Adepta Sororitas"
+  },
+  {
+   "army": "AS",
+   "id": "000004189",
+   "name": "Celestian Insidiants",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 10=120",
+   "after": "1-+: 10=115",
+   "siteFaction": "Adepta Sororitas"
+  },
+  {
+   "army": "AS",
+   "id": "000000912",
+   "name": "Exorcist",
+   "kinds": [
+    "tiers"
+   ],
+   "costs": true,
+   "before": "1-1: 1=180 | 2-+: 1=220",
+   "after": "1-2: 1=175 | 3-+: 1=215",
+   "siteFaction": "Adepta Sororitas"
+  },
+  {
+   "army": "AC",
+   "id": "000001446",
+   "name": "Trajann Valoris",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=135",
+   "after": "1-+: 1=265",
+   "siteFaction": "Adeptus Custodes"
+  },
+  {
+   "army": "AC",
+   "id": "000001458",
+   "name": "Contemptor-achillus Dreadnought",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=155 | 3-+: 1=170",
+   "after": "1-2: 1=230 | 3-+: 1=260",
+   "siteFaction": "Adeptus Custodes"
+  },
+  {
+   "army": "AC",
+   "id": "000001460",
+   "name": "Caladius Grav-tank",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=210 | 3-+: 1=225",
+   "after": "1-2: 1=230 | 3-+: 1=260",
+   "siteFaction": "Adeptus Custodes"
+  },
+  {
+   "army": "AC",
+   "id": "000001461",
+   "name": "Coronus Grav-carrier",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=180 | 3-+: 1=200",
+   "after": "1-2: 1=225 | 3-+: 1=245",
+   "siteFaction": "Adeptus Custodes"
+  },
+  {
+   "army": "AC",
+   "id": "000001479",
+   "name": "Telemon Heavy Dreadnought",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-1: 1=225 | 2-+: 1=245",
+   "after": "1-1: 1=280 | 2-+: 1=310",
+   "siteFaction": "Adeptus Custodes"
+  },
+  {
+   "army": "AC",
+   "id": "000001557",
+   "name": "Contemptor-galatus Dreadnought",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=165 | 3-+: 1=180",
+   "after": "1-2: 1=220 | 3-+: 1=250",
+   "siteFaction": "Adeptus Custodes"
+  },
+  {
+   "army": "AC",
+   "id": "000001562",
+   "name": "Pallas Grav-attack",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=100",
+   "after": "1-+: 1=135",
+   "siteFaction": "Adeptus Custodes"
+  },
+  {
+   "army": "AC",
+   "id": "000002519",
+   "name": "Valerian",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=110",
+   "after": "1-+: 1=130",
+   "siteFaction": "Adeptus Custodes"
+  },
+  {
+   "army": "AC",
+   "id": "000002521",
+   "name": "Prosecutors",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 4=45,5=50,9=75,10=85",
+   "after": "1-+: 4=45,5=50,9=80,10=90",
+   "siteFaction": "Adeptus Custodes"
+  },
+  {
+   "army": "AC",
+   "id": "000002523",
+   "name": "Witchseekers",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 4=50,5=55,9=90,10=100",
+   "after": "1-+: 4=55,5=60,9=100,10=110",
+   "siteFaction": "Adeptus Custodes"
+  },
+  {
+   "army": "AC",
+   "id": "000002524",
+   "name": "Anathema Psykana Rhino",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-3: 1=65 | 4-+: 1=75",
+   "after": "1-3: 1=70 | 4-+: 1=80",
+   "siteFaction": "Adeptus Custodes"
+  },
+  {
+   "army": "AdM",
+   "id": "000000841",
+   "name": "Kataphron Breachers",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 3=150,6=310",
+   "after": "1-+: 3=140,6=290",
+   "siteFaction": "Adeptus Mechanicus"
+  },
+  {
+   "army": "AdM",
+   "id": "000000843",
+   "name": "Fulgurite Electro-priests",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=70,10=140",
+   "after": "1-+: 5=65,10=130",
+   "siteFaction": "Adeptus Mechanicus"
+  },
+  {
+   "army": "AdM",
+   "id": "000000844",
+   "name": "Corpuscarii Electro-priests",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=65,10=130",
+   "after": "1-+: 5=60,10=120",
+   "siteFaction": "Adeptus Mechanicus"
+  },
+  {
+   "army": "AdM",
+   "id": "000000846",
+   "name": "Cybernetica Datasmith",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=25",
+   "after": "1-+: 1=20",
+   "siteFaction": "Adeptus Mechanicus"
+  },
+  {
+   "army": "AdM",
+   "id": "000000854",
+   "name": "Onager Dunecrawler",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=155",
+   "after": "1-+: 1=150",
+   "siteFaction": "Adeptus Mechanicus"
+  },
+  {
+   "army": "AdM",
+   "id": "000002081",
+   "name": "Serberys Sulphurhounds",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 3=55,6=100",
+   "after": "1-+: 3=55,6=95",
+   "siteFaction": "Adeptus Mechanicus"
+  },
+  {
+   "army": "AdM",
+   "id": "000002082",
+   "name": "Serberys Raiders",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 3=60,6=110",
+   "after": "1-+: 3=60,6=105",
+   "siteFaction": "Adeptus Mechanicus"
+  },
+  {
+   "army": "AdM",
+   "id": "000003694",
+   "name": "Sydonian Dragoons With Radium Jezzails",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=55,2=100,3=150",
+   "after": "1-+: 1=55,2=95,3=140",
+   "siteFaction": "Adeptus Mechanicus"
+  },
+  {
+   "army": "AdM",
+   "id": "000003695",
+   "name": "Sydonian Skatros",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=50",
+   "after": "1-+: 1=45",
+   "siteFaction": "Adeptus Mechanicus"
+  },
+  {
+   "army": "AdM",
+   "id": "000004119",
+   "name": "Servitor Battleclade",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 9=65 | 3-+: 9=75",
+   "after": "1-2: 9=75 | 3-+: 9=85",
+   "siteFaction": "Adeptus Mechanicus"
+  },
+  {
+   "army": "AdM",
+   "id": "000004211",
+   "name": "Hastarii Exterminators",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=105 | 3-+: 5=120",
+   "after": "1-2: 5=100 | 3-+: 5=115",
+   "siteFaction": "Adeptus Mechanicus"
+  },
+  {
+   "army": "AdM",
+   "id": "000004212",
+   "name": "Hastarii Fusiliers",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=115 | 3-+: 5=130",
+   "after": "1-2: 5=105 | 3-+: 5=120",
+   "siteFaction": "Adeptus Mechanicus"
+  },
+  {
+   "army": "AdM",
+   "id": "000000845",
+   "name": "Kastelan Robots",
+   "kinds": [
+    "tiers"
+   ],
+   "costs": true,
+   "before": "1-1: 2=150,4=300 | 2-+: 2=180,4=330",
+   "after": "1-2: 2=150,4=300 | 3-+: 2=180,4=330",
+   "siteFaction": "Adeptus Mechanicus"
+  },
+  {
+   "army": "AE",
+   "id": "000000577",
+   "name": "Autarch",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=75",
+   "after": "1-+: 1=70",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000000582",
+   "name": "Farseer",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=65",
+   "after": "1-+: 1=60",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000000584",
+   "name": "Warlock Conclave",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 2=55,4=120",
+   "after": "1-+: 2=55,4=110",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000000596",
+   "name": "Fire Dragons",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=120,10=240 | 3-+: 5=130,10=250",
+   "after": "1-2: 5=110,10=240 | 3-+: 5=120,10=250",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000002533",
+   "name": "Shroud Runners",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 3=90,6=175",
+   "after": "1-+: 3=90,6=165",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000002537",
+   "name": "Death Jester",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=70",
+   "after": "1-+: 1=65",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000002538",
+   "name": "Solitaire",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=115",
+   "after": "1-+: 1=105",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000002539",
+   "name": "Skyweavers",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 2=95,4=190",
+   "after": "1-+: 2=90,4=180",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000002542",
+   "name": "Yvraine",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=100",
+   "after": "1-+: 1=90",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000002544",
+   "name": "The Yncarne",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=245",
+   "after": "1-+: 1=230",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000004194",
+   "name": "Kharseth",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=85",
+   "after": "1-+: 1=80",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000004236",
+   "name": "Leystalker",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=80",
+   "after": "1-+: 1=75",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000004237",
+   "name": "Stonesinger",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=60",
+   "after": "1-+: 1=55",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000000611",
+   "name": "Night Spinner",
+   "kinds": [
+    "tiers"
+   ],
+   "costs": true,
+   "before": "1-1: 1=170 | 2-+: 1=190",
+   "after": "1-2: 1=165 | 3-+: 1=195",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000003910",
+   "name": "D-cannon Platform",
+   "kinds": [
+    "tiers"
+   ],
+   "costs": true,
+   "before": "1-1: 1=110 | 2-+: 1=125",
+   "after": "1-2: 1=110 | 3-+: 1=130",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AE",
+   "id": "000004235",
+   "name": "Dragon Knights",
+   "kinds": [
+    "tiers"
+   ],
+   "costs": true,
+   "before": "1-+: 3=90,6=180",
+   "after": "1-2: 3=85,6=180 | 3-+: 3=95,6=190",
+   "siteFaction": "Aeldari"
+  },
+  {
+   "army": "AM",
+   "id": "000000694",
+   "name": "Hellhound",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=125 | 3-+: 1=135",
+   "after": "1-2: 1=115 | 3-+: 1=125",
+   "siteFaction": "Astra Militarum"
+  },
+  {
+   "army": "AM",
+   "id": "000002605",
+   "name": "Lord Solar Leontus",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=130",
+   "after": "1-+: 1=120",
+   "siteFaction": "Astra Militarum"
+  },
+  {
+   "army": "AM",
+   "id": "000003890",
+   "name": "Lord Marshal Dreir",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=75",
+   "after": "1-+: 1=70",
+   "siteFaction": "Astra Militarum"
+  },
+  {
+   "army": "AM",
+   "id": "000004216",
+   "name": "Commissar Yarrick",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=120",
+   "after": "1-+: 1=110",
+   "siteFaction": "Astra Militarum"
+  },
+  {
+   "army": "AM",
+   "id": "000000695",
+   "name": "Basilisk",
+   "kinds": [
+    "tiers"
+   ],
+   "costs": true,
+   "before": "1-1: 1=115 | 2-+: 1=135",
+   "after": "1-2: 1=115 | 3-+: 1=145",
+   "siteFaction": "Astra Militarum"
+  },
+  {
+   "army": "AM",
+   "id": "000000697",
+   "name": "Wyvern",
+   "kinds": [
+    "tiers"
+   ],
+   "costs": true,
+   "before": "1-1: 1=95 | 2-+: 1=115",
+   "after": "1-2: 1=95 | 3-+: 1=125",
+   "siteFaction": "Astra Militarum"
+  },
+  {
+   "army": "AM",
+   "id": "000000698",
+   "name": "Manticore",
+   "kinds": [
+    "tiers"
+   ],
+   "costs": true,
+   "before": "1-1: 1=150 | 2-+: 1=170",
+   "after": "1-2: 1=150 | 3-+: 1=180",
+   "siteFaction": "Astra Militarum"
+  },
+  {
+   "army": "AM",
+   "id": "000000699",
+   "name": "Deathstrike",
+   "kinds": [
+    "tiers"
+   ],
+   "costs": true,
+   "before": "1-1: 1=125 | 2-+: 1=135",
+   "after": "1-2: 1=125 | 3-+: 1=145",
+   "siteFaction": "Astra Militarum"
+  },
+  {
+   "army": "AM",
+   "id": "000000723",
+   "name": "Bullgryn Squad",
+   "kinds": [
+    "tiers"
+   ],
+   "costs": true,
+   "before": "1-1: 3=90,6=200 | 2-+: 3=105,6=215",
+   "after": "1-2: 3=90,6=200 | 3-+: 3=120,6=230",
+   "siteFaction": "Astra Militarum"
+  },
+  {
+   "army": "CD",
+   "id": "000001105",
+   "name": "Skarbrand",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=315",
+   "after": "1-+: 1=330",
+   "siteFaction": "Chaos Daemons"
+  },
+  {
+   "army": "CD",
+   "id": "000001112",
+   "name": "Flesh Hounds",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=75,10=150",
+   "after": "1-+: 5=80,10=150",
+   "siteFaction": "Chaos Daemons"
+  },
+  {
+   "army": "CD",
+   "id": "000001115",
+   "name": "Bloodcrushers",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 3=95,6=200 | 3-+: 3=135,6=240",
+   "after": "1-2: 3=95,6=210 | 3-+: 3=135,6=250",
+   "siteFaction": "Chaos Daemons"
+  },
+  {
+   "army": "CD",
+   "id": "000001143",
+   "name": "Fiends",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 3=90,6=190 | 3-+: 3=105,6=205",
+   "after": "1-2: 3=90,6=190 | 3-+: 3=115,6=215",
+   "siteFaction": "Chaos Daemons"
+  },
+  {
+   "army": "QT",
+   "id": "000001659",
+   "name": "Knight Tyrant",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-1: 1=400 | 2-+: 1=420",
+   "after": "1-1: 1=390 | 2-+: 1=410",
+   "siteFaction": "Chaos Knights"
+  },
+  {
+   "army": "QT",
+   "id": "000001660",
+   "name": "Knight Desecrator",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=355 | 3-+: 1=370",
+   "after": "1-2: 1=350 | 3-+: 1=370",
+   "siteFaction": "Chaos Knights"
+  },
+  {
+   "army": "QT",
+   "id": "000001661",
+   "name": "Knight Rampager",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=355 | 3-+: 1=370",
+   "after": "1-2: 1=350 | 3-+: 1=370",
+   "siteFaction": "Chaos Knights"
+  },
+  {
+   "army": "QT",
+   "id": "000002567",
+   "name": "Knight Abominant",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=355 | 3-+: 1=370",
+   "after": "1-2: 1=350 | 3-+: 1=370",
+   "siteFaction": "Chaos Knights"
+  },
+  {
+   "army": "QT",
+   "id": "000004134",
+   "name": "Knight Ruinator",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=340 | 3-+: 1=355",
+   "after": "1-2: 1=325 | 3-+: 1=345",
+   "siteFaction": "Chaos Knights"
+  },
+  {
+   "army": "CSM",
+   "id": "000000924",
+   "name": "Abaddon The Despoiler",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=295",
+   "after": "1-+: 1=300",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000925",
+   "name": "Huron Blackheart",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=130",
+   "after": "1-+: 1=135",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000926",
+   "name": "Cypher",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=90",
+   "after": "1-+: 1=95",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000928",
+   "name": "Fabius Bile",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 2=100",
+   "after": "1-+: 2=110",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000929",
+   "name": "Chaos Lord",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=90",
+   "after": "1-+: 1=95",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000930",
+   "name": "Chaos Lord In Terminator Armour",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=85",
+   "after": "1-+: 1=90",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000936",
+   "name": "Dark Apostle",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 3=65",
+   "after": "1-+: 3=70",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000937",
+   "name": "Heretic Astartes Daemon Prince",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=165",
+   "after": "1-+: 1=155",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000938",
+   "name": "Sorcerer",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=60",
+   "after": "1-+: 1=65",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000939",
+   "name": "Sorcerer In Terminator Armour",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=80",
+   "after": "1-+: 1=85",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000944",
+   "name": "Warpsmith",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=60",
+   "after": "1-+: 1=65",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000952",
+   "name": "Chosen",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=135,10=270 | 3-+: 5=145,10=280",
+   "after": "1-2: 5=140,10=280 | 3-+: 5=150,10=290",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000953",
+   "name": "Possessed",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=120,10=250 | 3-+: 5=130,10=260",
+   "after": "1-2: 5=130,10=260 | 3-+: 5=150,10=280",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000954",
+   "name": "Helbrute",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=130",
+   "after": "1-+: 1=125",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000957",
+   "name": "Chaos Bikers",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 3=70,6=130",
+   "after": "1-+: 3=80,6=150",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000958",
+   "name": "Raptors",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=110,10=210 | 3-+: 5=120,10=220",
+   "after": "1-2: 5=115,10=225 | 3-+: 5=125,10=235",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000959",
+   "name": "Warp Talons",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=125,10=280 | 3-+: 5=135,10=290",
+   "after": "1-2: 5=130,10=290 | 3-+: 5=140,10=300",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000963",
+   "name": "Chaos Predator Destructor",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=150 | 3-+: 1=160",
+   "after": "1-2: 1=145 | 3-+: 1=155",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000964",
+   "name": "Chaos Vindicator",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=185 | 3-+: 1=195",
+   "after": "1-2: 1=180 | 3-+: 1=190",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000966",
+   "name": "Havocs",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=125 | 3-+: 5=135",
+   "after": "1-2: 5=135 | 3-+: 5=145",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000967",
+   "name": "Forgefiend",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=160 | 3-+: 1=170",
+   "after": "1-2: 1=155 | 3-+: 1=165",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000968",
+   "name": "Maulerfiend",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=130",
+   "after": "1-+: 1=125",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000001556",
+   "name": "Haarken Worldclaimer",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=90",
+   "after": "1-+: 1=95",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000001581",
+   "name": "Master Of Possession",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=60",
+   "after": "1-+: 1=65",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000001583",
+   "name": "Lord Discordant On Helstalker",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=160",
+   "after": "1-+: 1=155",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000001584",
+   "name": "Master Of Executions",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=70",
+   "after": "1-+: 1=75",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000002570",
+   "name": "Legionaries",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=90,10=170",
+   "after": "1-+: 5=95,10=180",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000002571",
+   "name": "Accursed Cultists",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 8=90,16=195 | 3-+: 8=110,16=215",
+   "after": "1-2: 8=90,16=185 | 3-+: 8=110,16=205",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000002572",
+   "name": "Chaos Predator Annihilator",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=145 | 3-+: 1=155",
+   "after": "1-2: 1=140 | 3-+: 1=150",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000002590",
+   "name": "Traitor Guardsmen Squad",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 10=70",
+   "after": "1-+: 10=65",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000002730",
+   "name": "Heretic Astartes Daemon Prince With Wings",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=180",
+   "after": "1-+: 1=170",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000003711",
+   "name": "Chaos Lord with Jump Pack",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=80",
+   "after": "1-+: 1=85",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000003876",
+   "name": "Nemesis Claw",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=100,10=180",
+   "after": "1-+: 5=105,10=190",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000004190",
+   "name": "Masters of the Maelstrom",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=145",
+   "after": "1-+: 5=150",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000004191",
+   "name": "Red Corsairs Raiders",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=110,10=210 | 3-+: 5=120,10=220",
+   "after": "1-2: 5=120,10=220 | 3-+: 5=130,10=230",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000004192",
+   "name": "Red Corsairs Reave-Captain",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=60",
+   "after": "1-+: 1=65",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000004205",
+   "name": "Kravek Morne",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=120",
+   "after": "1-+: 1=130",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000004206",
+   "name": "Mutilators",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 3=165 | 3-+: 3=175",
+   "after": "1-2: 3=165 | 3-+: 3=185",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "CSM",
+   "id": "000000947",
+   "name": "Chaos Terminator Squad",
+   "kinds": [
+    "tiers"
+   ],
+   "costs": true,
+   "before": "1-+: 5=175,10=350",
+   "after": "1-2: 5=185,10=370 | 3-+: 5=215,10=400",
+   "siteFaction": "Chaos Space Marines"
+  },
+  {
+   "army": "DG",
+   "id": "000001044",
+   "name": "Plague Marines",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=90,7=125,10=180",
+   "after": "1-+: 5=90,7=125,10=175",
+   "siteFaction": "Death Guard"
+  },
+  {
+   "army": "DG",
+   "id": "000001046",
+   "name": "Helbrute",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=110",
+   "after": "1-+: 1=105",
+   "siteFaction": "Death Guard"
+  },
+  {
+   "army": "DG",
+   "id": "000001050",
+   "name": "Chaos Predator Annihilator",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=135 | 3-+: 1=145",
+   "after": "1-2: 1=130 | 3-+: 1=140",
+   "siteFaction": "Death Guard"
+  },
+  {
+   "army": "DG",
+   "id": "000001052",
+   "name": "Daemon Prince of Nurgle",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=195",
+   "after": "1-+: 1=185",
+   "siteFaction": "Death Guard"
+  },
+  {
+   "army": "DG",
+   "id": "000001053",
+   "name": "Typhus",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=100",
+   "after": "1-+: 1=90",
+   "siteFaction": "Death Guard"
+  },
+  {
+   "army": "DG",
+   "id": "000001054",
+   "name": "Lord of Contagion",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=120",
+   "after": "1-+: 1=110",
+   "siteFaction": "Death Guard"
+  },
+  {
+   "army": "DG",
+   "id": "000001371",
+   "name": "Deathshroud Terminators",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 3=160,6=305 | 3-+: 3=170,6=315",
+   "after": "1-2: 3=150,6=305 | 3-+: 3=160,6=315",
+   "siteFaction": "Death Guard"
+  },
+  {
+   "army": "DG",
+   "id": "000002460",
+   "name": "Lord of Virulence",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=100",
+   "after": "1-+: 1=90",
+   "siteFaction": "Death Guard"
+  },
+  {
+   "army": "DG",
+   "id": "000002461",
+   "name": "Chaos Predator Destructor",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=145 | 3-+: 1=155",
+   "after": "1-2: 1=140 | 3-+: 1=150",
+   "siteFaction": "Death Guard"
+  },
+  {
+   "army": "DG",
+   "id": "000002749",
+   "name": "Daemon Prince of Nurgle with Wings",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=170",
+   "after": "1-+: 1=160",
+   "siteFaction": "Death Guard"
+  },
+  {
+   "army": "DG",
+   "id": "000001372",
+   "name": "Blightlord Terminators",
+   "kinds": [
+    "tiers"
+   ],
+   "costs": true,
+   "before": "1-+: 3=115,5=180,10=360",
+   "after": "1-2: 3=115,5=185,10=370 | 3-+: 3=145,5=215,10=400",
+   "siteFaction": "Death Guard"
+  },
+  {
+   "army": "DG",
+   "id": "000001376",
+   "name": "Plagueburst Crawler",
+   "kinds": [
+    "tiers"
+   ],
+   "costs": true,
+   "before": "1-1: 1=170 | 2-+: 1=200",
+   "after": "1-2: 1=170 | 3-+: 1=200",
+   "siteFaction": "Death Guard"
+  },
+  {
+   "army": "DRU",
+   "id": "000000650",
+   "name": "Wracks",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=60,8=100,10=120",
+   "after": "1-+: 5=55,8=90,10=110",
+   "siteFaction": "Drukhari"
+  },
+  {
+   "army": "DRU",
+   "id": "000000663",
+   "name": "Talos",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=75,2=150 | 3-+: 1=85,2=160",
+   "after": "1-2: 1=70,2=140 | 3-+: 1=80,2=150",
+   "siteFaction": "Drukhari"
+  },
+  {
+   "army": "EC",
+   "id": "000004078",
+   "name": "Lord Exultant",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=90 | 3-+: 1=100",
+   "after": "1-2: 1=95 | 3-+: 1=105",
+   "siteFaction": "Emperor’s Children"
+  },
+  {
+   "army": "EC",
+   "id": "000004079",
+   "name": "Tormentors",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=80,10=160",
+   "after": "1-+: 5=85,10=170",
+   "siteFaction": "Emperor’s Children"
+  },
+  {
+   "army": "EC",
+   "id": "000004080",
+   "name": "Infractors",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=85,10=160",
+   "after": "1-+: 5=95,10=175",
+   "siteFaction": "Emperor’s Children"
+  },
+  {
+   "army": "EC",
+   "id": "000004081",
+   "name": "Chaos Terminators",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=145",
+   "after": "1-+: 5=155",
+   "siteFaction": "Emperor’s Children"
+  },
+  {
+   "army": "EC",
+   "id": "000004082",
+   "name": "Chaos Land Raider",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=220 | 3-+: 1=240",
+   "after": "1-2: 1=210 | 3-+: 1=230",
+   "siteFaction": "Emperor’s Children"
+  },
+  {
+   "army": "EC",
+   "id": "000004083",
+   "name": "Lucius the Eternal",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=120",
+   "after": "1-+: 1=130",
+   "siteFaction": "Emperor’s Children"
+  },
+  {
+   "army": "EC",
+   "id": "000004086",
+   "name": "Daemon Prince of Slaanesh",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-1: 1=170 | 2-+: 1=185",
+   "after": "1-1: 1=165 | 2-+: 1=180",
+   "siteFaction": "Emperor’s Children"
+  },
+  {
+   "army": "EC",
+   "id": "000004087",
+   "name": "Daemon Prince of Slaanesh with Wings",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-1: 1=205 | 2-+: 1=235",
+   "after": "1-1: 1=205 | 2-+: 1=225",
+   "siteFaction": "Emperor’s Children"
+  },
+  {
+   "army": "EC",
+   "id": "000004088",
+   "name": "Noise Marines",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 6=145 | 3-+: 6=160",
+   "after": "1-2: 6=160 | 3-+: 6=175",
+   "siteFaction": "Emperor’s Children"
+  },
+  {
+   "army": "GC",
+   "id": "000000509",
+   "name": "Primus",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=70",
+   "after": "1-+: 1=60",
+   "siteFaction": "Genestealer Cults"
+  },
+  {
+   "army": "GC",
+   "id": "000000511",
+   "name": "Acolyte Hybrids With Autopistols",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=70,10=130",
+   "after": "1-+: 5=65,10=120",
+   "siteFaction": "Genestealer Cults"
+  },
+  {
+   "army": "GC",
+   "id": "000000521",
+   "name": "Goliath Rockgrinder",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=120 | 3-+: 1=130",
+   "after": "1-2: 1=110 | 3-+: 1=120",
+   "siteFaction": "Genestealer Cults"
+  },
+  {
+   "army": "GC",
+   "id": "000001569",
+   "name": "Sanctus",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=65",
+   "after": "1-+: 1=60",
+   "siteFaction": "Genestealer Cults"
+  },
+  {
+   "army": "GC",
+   "id": "000001571",
+   "name": "Nexos",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=60",
+   "after": "1-+: 1=50",
+   "siteFaction": "Genestealer Cults"
+  },
+  {
+   "army": "GK",
+   "id": "000000374",
+   "name": "Grand Master Voldus",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=125",
+   "after": "1-+: 1=130",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000000375",
+   "name": "Grand Master",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=95",
+   "after": "1-+: 1=100",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000000376",
+   "name": "Brother-captain",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=95",
+   "after": "1-+: 1=100",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000000379",
+   "name": "Brotherhood Champion",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=70",
+   "after": "1-+: 1=75",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000000380",
+   "name": "Castellan Crowe",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=100",
+   "after": "1-+: 1=105",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000000381",
+   "name": "Strike Squad",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=115,10=230",
+   "after": "1-+: 5=125,10=250",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000000382",
+   "name": "Brotherhood Terminator Squad",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 4=140,5=175,8=300,10=360",
+   "after": "1-+: 4=150,5=185,8=315,10=380",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000000383",
+   "name": "Purifier Squad",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=130,10=260 | 3-+: 5=140,10=270",
+   "after": "1-2: 5=145,10=290 | 3-+: 5=155,10=300",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000000384",
+   "name": "Paladin Squad",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 4=170,5=215,8=360,10=460 | 3-+: 4=210,5=255,8=400,10=500",
+   "after": "1-2: 4=185,5=230,8=385,10=490 | 3-+: 4=225,5=270,8=425,10=530",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000000387",
+   "name": "Interceptor Squad",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=125,10=250 | 3-+: 5=135,10=260",
+   "after": "1-2: 5=135,10=270 | 3-+: 5=145,10=280",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000000388",
+   "name": "Purgation Squad",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=105,10=210 | 3-+: 5=115,10=220",
+   "after": "1-2: 5=115,10=230 | 3-+: 5=125,10=240",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000000389",
+   "name": "Nemesis Dreadknight",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=195 | 3-+: 1=210",
+   "after": "1-2: 1=205 | 3-+: 1=220",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000000399",
+   "name": "Brotherhood Techmarine",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=70",
+   "after": "1-+: 1=75",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000001360",
+   "name": "Grand Master In Nemesis Dreadknight",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=200 | 3-+: 1=215",
+   "after": "1-2: 1=210 | 3-+: 1=225",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000001361",
+   "name": "Brotherhood Librarian",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-1: 1=90 | 2-+: 1=100",
+   "after": "1-1: 1=95 | 2-+: 1=105",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000001362",
+   "name": "Brotherhood Chaplain",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=65",
+   "after": "1-+: 1=70",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "GK",
+   "id": "000000398",
+   "name": "Stormraven Gunship",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[],[]]",
+   "wargearAfter": "[[],[\"Hurricane Bolter=10\"]]",
+   "siteFaction": "Grey Knights"
+  },
+  {
+   "army": "AoI",
+   "id": "000003813",
+   "name": "Grey Knights Terminator Squad",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[\"Psycannon=5?\"]]",
+   "wargearAfter": "[[\"Psycannon=5\"]]",
+   "siteFaction": "Imperial Agents"
+  },
+  {
+   "army": "AoI",
+   "id": "000003819",
+   "name": "Sisters of Battle Immolator",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[\"Twin multi-melta=15?\"],[\"Twin multi-melta=15?\"]]",
+   "wargearAfter": "[[],[\"Twin multi-melta=15\"]]",
+   "siteFaction": "Imperial Agents"
+  },
+  {
+   "army": "QI",
+   "id": "000000857",
+   "name": "Knight Warden",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=375 | 3-+: 1=390",
+   "after": "1-2: 1=365 | 3-+: 1=380",
+   "siteFaction": "Imperial Knights"
+  },
+  {
+   "army": "QI",
+   "id": "000000862",
+   "name": "Cerastus Knight Atrapos",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-1: 1=405 | 2-+: 1=425",
+   "after": "1-1: 1=420 | 2-+: 1=440",
+   "siteFaction": "Imperial Knights"
+  },
+  {
+   "army": "QI",
+   "id": "000001486",
+   "name": "Knight Valiant",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=400 | 3-+: 1=415",
+   "after": "1-2: 1=390 | 3-+: 1=405",
+   "siteFaction": "Imperial Knights"
+  },
+  {
+   "army": "QI",
+   "id": "000004149",
+   "name": "Knight Defender",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-1: 1=400 | 2-+: 1=420",
+   "after": "1-1: 1=385 | 2-+: 1=405",
+   "siteFaction": "Imperial Knights"
+  },
+  {
+   "army": "LoV",
+   "id": "000002593",
+   "name": "Ûthar the Destined",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=90",
+   "after": "1-+: 1=100",
+   "siteFaction": "Leagues of Votann"
+  },
+  {
+   "army": "LoV",
+   "id": "000002600",
+   "name": "Cthonian Beserks",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=95,10=190",
+   "after": "1-+: 5=90,10=180",
+   "siteFaction": "Leagues of Votann"
+  },
+  {
+   "army": "LoV",
+   "id": "000002601",
+   "name": "Hernkyn Pioneers",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 3=80,6=160 | 3-+: 3=90,6=170",
+   "after": "1-2: 3=85,6=170 | 3-+: 3=95,6=180",
+   "siteFaction": "Leagues of Votann"
+  },
+  {
+   "army": "LoV",
+   "id": "000002604",
+   "name": "Hekaton Land Fortress",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-1: 1=250 | 2-+: 1=265",
+   "after": "1-1: 1=250 | 2-+: 1=270",
+   "siteFaction": "Leagues of Votann"
+  },
+  {
+   "army": "LoV",
+   "id": "000004146",
+   "name": "Kapricus Defenders",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=70,2=140 | 3-+: 1=80,2=150",
+   "after": "1-2: 1=75,2=150 | 3-+: 1=95,2=170",
+   "siteFaction": "Leagues of Votann"
+  },
+  {
+   "army": "NEC",
+   "id": "000000532",
+   "name": "Trazyn The Infinite",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=65",
+   "after": "1-+: 1=60",
+   "siteFaction": "Necrons"
+  },
+  {
+   "army": "NEC",
+   "id": "000000535",
+   "name": "Immortals",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=70,10=140",
+   "after": "1-+: 5=65,10=130",
+   "siteFaction": "Necrons"
+  },
+  {
+   "army": "NEC",
+   "id": "000000553",
+   "name": "Annihilation Barge",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=95",
+   "after": "1-+: 1=100",
+   "siteFaction": "Necrons"
+  },
+  {
+   "army": "NEC",
+   "id": "000000554",
+   "name": "Doomsday Ark",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=210 | 3-+: 1=230",
+   "after": "1-2: 1=200 | 3-+: 1=230",
+   "siteFaction": "Necrons"
+  },
+  {
+   "army": "NEC",
+   "id": "000000556",
+   "name": "Tesseract Vault",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-1: 1=465 | 2-+: 1=485",
+   "after": "1-1: 1=465 | 2-+: 1=505",
+   "siteFaction": "Necrons"
+  },
+  {
+   "army": "NEC",
+   "id": "000002115",
+   "name": "Canoptek Doomstalker",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=140",
+   "after": "1-+: 1=130",
+   "siteFaction": "Necrons"
+  },
+  {
+   "army": "NEC",
+   "id": "000002353",
+   "name": "Psychomancer",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=55",
+   "after": "1-+: 1=65",
+   "siteFaction": "Necrons"
+  },
+  {
+   "army": "NEC",
+   "id": "000002359",
+   "name": "Lokhust Destroyers",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=40,2=55,3=80,6=175 | 3-+: 1=70,2=85,3=110,6=205",
+   "after": "1-2: 1=40,2=55,3=80,6=190 | 3-+: 1=70,2=85,3=110,6=220",
+   "siteFaction": "Necrons"
+  },
+  {
+   "army": "NEC",
+   "id": "000004177",
+   "name": "Canoptek Tomb Crawlers",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 2=50",
+   "after": "1-+: 2=60",
+   "siteFaction": "Necrons"
+  },
+  {
+   "army": "NEC",
+   "id": "000004186",
+   "name": "Nekrosor Ammentar",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=185",
+   "after": "1-+: 1=195",
+   "siteFaction": "Necrons"
+  },
+  {
+   "army": "ORK",
+   "id": "000000002",
+   "name": "Warboss In Mega Armour",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=125 | 3-+: 1=140",
+   "after": "1-2: 1=115 | 3-+: 1=130",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000000004",
+   "name": "Weirdboy",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=65",
+   "after": "1-+: 1=60",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000000008",
+   "name": "Ghazghkull Thraka",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=300",
+   "after": "1-+: 1=290",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000000012",
+   "name": "Mek",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=45",
+   "after": "1-+: 1=55",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000000016",
+   "name": "Boyz",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-3: 10=90,20=180 | 4-+: 10=100,20=190",
+   "after": "1-3: 10=85,20=170 | 4-+: 10=95,20=180",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000000020",
+   "name": "Tankbustas",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 6=145 | 3-+: 6=155",
+   "after": "1-2: 6=160 | 3-+: 6=170",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000000021",
+   "name": "Nobz",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=125,10=250 | 3-+: 5=155,10=280",
+   "after": "1-2: 5=115,10=230 | 3-+: 5=145,10=260",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000000024",
+   "name": "Meganobz",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 2=75,3=110,5=185,6=225 | 3-+: 2=115,3=150,5=225,6=265",
+   "after": "1-2: 2=70,3=105,5=175,6=210 | 3-+: 2=110,3=145,5=215,6=250",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000000028",
+   "name": "Deffkoptas",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 3=80,6=160 | 3-+: 3=90,6=170",
+   "after": "1-2: 3=85,6=170 | 3-+: 3=95,6=180",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000000039",
+   "name": "Battlewagon",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=150 | 3-+: 1=160",
+   "after": "1-2: 1=160 | 3-+: 1=180",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000000041",
+   "name": "Killa Kans",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 3=130,6=260 | 3-+: 3=150,6=280",
+   "after": "1-2: 3=130,6=275 | 3-+: 3=170,6=315",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000000045",
+   "name": "Flash Gitz",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=105,10=210 | 3-+: 5=135,10=240",
+   "after": "1-2: 5=110,10=220 | 3-+: 5=150,10=260",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000000059",
+   "name": "Gargantuan Squiggoth",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-1: 1=500 | 2-+: 1=550",
+   "after": "1-1: 1=500 | 2-+: 1=600",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000001536",
+   "name": "Big Mek With Shokk Attack Gun",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-1: 1=95 | 2-+: 1=105",
+   "after": "1-1: 1=110 | 2-+: 1=125",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000002494",
+   "name": "Beast Snagga Boyz",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-3: 10=85,20=170 | 4-+: 10=95,20=180",
+   "after": "1-3: 10=80,20=160 | 4-+: 10=90,20=170",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000002496",
+   "name": "Squighog Boyz",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 4=140,8=280 | 3-+: 4=160,8=300",
+   "after": "1-2: 4=130,8=260 | 3-+: 4=160,8=290",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000002497",
+   "name": "Kill Rig",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=175 | 3-+: 1=185",
+   "after": "1-2: 1=175 | 3-+: 1=195",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000002498",
+   "name": "Hunta Rig",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=165 | 3-+: 1=175",
+   "after": "1-2: 1=165 | 3-+: 1=185",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000003707",
+   "name": "Big Mek",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=85 | 3-+: 1=95",
+   "after": "1-2: 1=100 | 3-+: 1=115",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000003861",
+   "name": "Breaka Boyz",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 6=135 | 3-+: 6=145",
+   "after": "1-2: 6=120 | 3-+: 6=130",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000004227",
+   "name": "Bannernob",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=35",
+   "after": "1-+: 1=30",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000004229",
+   "name": "Big Mek Dakkarig",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=135 | 3-+: 1=145",
+   "after": "1-2: 1=160 | 3-+: 1=180",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "ORK",
+   "id": "000004242",
+   "name": "Nazdreg",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=175",
+   "after": "1-+: 1=165",
+   "siteFaction": "Orks"
+  },
+  {
+   "army": "SM",
+   "id": "000001193",
+   "name": "Centurion Devastator Squad",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[\"Twin lascannon=5?\"]]",
+   "wargearAfter": "[[]]",
+   "siteFaction": "Space Marines"
+  },
+  {
+   "army": "SM",
+   "id": "000002270",
+   "name": "Desolation Squad",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[],[]]",
+   "wargearAfter": "[[],[\"Vengor Launcher=5\"]]",
+   "siteFaction": "Space Marines"
+  },
+  {
+   "army": "SM",
+   "id": "000002568",
+   "name": "Impulsor",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[],[]]",
+   "wargearAfter": "[[],[\"Orbital Comms Array=10\"]]",
+   "siteFaction": "Space Marines"
+  },
+  {
+   "army": "SM",
+   "id": "000001158",
+   "name": "Invader ATVs",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[],[]]",
+   "wargearAfter": "[[],[\"Multi-melta=5\"]]",
+   "siteFaction": "Space Marines"
+  },
+  {
+   "army": "SM",
+   "id": "000002717",
+   "name": "Redemptor Dreadnought",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[\"Macro plasma incinerator=10?\"],[\"Macro plasma incinerator=10?\"]]",
+   "wargearAfter": "[[],[\"Macro plasma incinerator=10\"]]",
+   "siteFaction": "Space Marines"
+  },
+  {
+   "army": "SM",
+   "id": "000002722",
+   "name": "Repulsor Executioner",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[\"Heavy laser destroyer=10?\"],[\"Heavy laser destroyer=10?\"]]",
+   "wargearAfter": "[[],[\"Heavy laser destroyer=10\"]]",
+   "siteFaction": "Space Marines"
+  },
+  {
+   "army": "SM",
+   "id": "000000118",
+   "name": "Terminator Assault Squad",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[\"Thunder Hammer=5?\"],[\"Thunder Hammer=5?\"]]",
+   "wargearAfter": "[[],[\"Storm Shield=5\"]]",
+   "siteFaction": "Space Marines"
+  },
+  {
+   "army": "SM",
+   "id": "000001183",
+   "name": "Terminator Squad",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[],[]]",
+   "wargearAfter": "[[],[\"Cyclone Missile Launcher=10\"]]",
+   "siteFaction": "Space Marines"
+  },
+  {
+   "army": "SM",
+   "id": "000004185",
+   "name": "Victrix Honour Guard",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[\"Banner of Macragge=15?\",\"Blades of honour=10?\"],[\"Banner of Macragge=15?\",\"Blades of honour=10?\"]]",
+   "wargearAfter": "[[],[\"Banner of Macragge=15\"]]",
+   "siteFaction": "Space Marines"
+  },
+  {
+   "army": "SM",
+   "id": "000002787",
+   "name": "Gladiator Lancer",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[],[]]",
+   "wargearAfter": "[[],[\"Multi-melta=10\"]]",
+   "siteFaction": "Black Templars"
+  },
+  {
+   "army": "SM",
+   "id": "000002789",
+   "name": "Gladiator Reaper",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[],[]]",
+   "wargearAfter": "[[],[\"Multi-melta=10\"]]",
+   "siteFaction": "Black Templars"
+  },
+  {
+   "army": "SM",
+   "id": "000002788",
+   "name": "Gladiator Valiant",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[],[]]",
+   "wargearAfter": "[[],[\"Multi-melta=10\"]]",
+   "siteFaction": "Black Templars"
+  },
+  {
+   "army": "SM",
+   "id": "000002786",
+   "name": "Impulsor",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[],[]]",
+   "wargearAfter": "[[],[\"Multi-melta=10\",\"Orbital Comms Array=10\"]]",
+   "siteFaction": "Black Templars"
+  },
+  {
+   "army": "SM",
+   "id": "000002791",
+   "name": "Repulsor",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[],[]]",
+   "wargearAfter": "[[],[\"Multi-melta=10\"]]",
+   "siteFaction": "Black Templars"
+  },
+  {
+   "army": "SM",
+   "id": "000002790",
+   "name": "Repulsor Executioner",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[\"Heavy laser destroyer=10?\"],[\"Heavy laser destroyer=10?\"]]",
+   "wargearAfter": "[[],[\"Multi-melta=10\"]]",
+   "siteFaction": "Black Templars"
+  },
+  {
+   "army": "SM",
+   "id": "000000230",
+   "name": "Deathwing Terminator Squad",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[],[]]",
+   "wargearAfter": "[[],[\"Cyclone Missile Launcher=10\"]]",
+   "siteFaction": "Dark Angels"
+  },
+  {
+   "army": "SM",
+   "id": "000003873",
+   "name": "Deathwatch Terminator Squad",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[\"Thunder Hammer=5?\"],[\"Thunder Hammer=5?\"]]",
+   "wargearAfter": "[[],[\"Cyclone Missile Launcher=10\",\"Storm Shield=5\"]]",
+   "siteFaction": "Deathwatch"
+  },
+  {
+   "army": "SM",
+   "id": "000000322",
+   "name": "Thunderwolf Cavalry",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[\"Storm Shield=5?\"],[\"Storm Shield=5?\"]]",
+   "wargearAfter": "[[],[\"Storm Shield=5\"]]",
+   "siteFaction": "Space Wolves"
+  },
+  {
+   "army": "SM",
+   "id": "000000318",
+   "name": "Wolf Guard Terminators",
+   "kinds": [
+    "wargear"
+   ],
+   "wargearBefore": "[[\"Storm Shield=5?\"],[\"Storm Shield=5?\"]]",
+   "wargearAfter": "[[],[\"Storm Shield=5\"]]",
+   "siteFaction": "Space Wolves"
+  },
+  {
+   "army": "TAU",
+   "id": "000000412",
+   "name": "Breacher Team",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 10=90",
+   "after": "1-+: 10=80",
+   "siteFaction": "T’au Empire"
+  },
+  {
+   "army": "TAU",
+   "id": "000004203",
+   "name": "The Twin Lance",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 2=230",
+   "after": "1-+: 2=240",
+   "siteFaction": "T’au Empire"
+  },
+  {
+   "army": "TS",
+   "id": "000001016",
+   "name": "Sorcerer",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=95 | 3-+: 1=105",
+   "after": "1-2: 1=100 | 3-+: 1=110",
+   "siteFaction": "Thousand Sons"
+  },
+  {
+   "army": "TS",
+   "id": "000001017",
+   "name": "Sorcerer In Terminator Armour",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=100 | 3-+: 1=110",
+   "after": "1-2: 1=110 | 3-+: 1=120",
+   "siteFaction": "Thousand Sons"
+  },
+  {
+   "army": "TS",
+   "id": "000001020",
+   "name": "Rubric Marines",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-3: 5=100,10=190 | 4-+: 5=110,10=200",
+   "after": "1-3: 5=115,10=210 | 4-+: 5=125,10=220",
+   "siteFaction": "Thousand Sons"
+  },
+  {
+   "army": "TS",
+   "id": "000001032",
+   "name": "Ahriman",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=100",
+   "after": "1-+: 1=105",
+   "siteFaction": "Thousand Sons"
+  },
+  {
+   "army": "TS",
+   "id": "000001033",
+   "name": "Exalted Sorcerer",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=95",
+   "after": "1-+: 1=100",
+   "siteFaction": "Thousand Sons"
+  },
+  {
+   "army": "TS",
+   "id": "000001035",
+   "name": "Scarab Occult Terminators",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=180,10=385 | 3-+: 5=195,10=400",
+   "after": "1-2: 5=200,10=425 | 3-+: 5=240,10=465",
+   "siteFaction": "Thousand Sons"
+  },
+  {
+   "army": "TS",
+   "id": "000002500",
+   "name": "Infernal Master",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=100",
+   "after": "1-+: 1=105",
+   "siteFaction": "Thousand Sons"
+  },
+  {
+   "army": "TS",
+   "id": "000002755",
+   "name": "Exalted Sorcerer on Disc of Tzeentch",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=90",
+   "after": "1-+: 1=95",
+   "siteFaction": "Thousand Sons"
+  },
+  {
+   "army": "TYR",
+   "id": "000000462",
+   "name": "Old One Eye",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=140",
+   "after": "1-+: 1=130",
+   "siteFaction": "Tyranids"
+  },
+  {
+   "army": "TYR",
+   "id": "000000465",
+   "name": "Tervigon",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=160",
+   "after": "1-+: 1=150",
+   "siteFaction": "Tyranids"
+  },
+  {
+   "army": "TYR",
+   "id": "000000468",
+   "name": "Termagants",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 10=60,20=110",
+   "after": "1-+: 10=55,20=110",
+   "siteFaction": "Tyranids"
+  },
+  {
+   "army": "TYR",
+   "id": "000000484",
+   "name": "Gargoyles",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 10=80,20=155",
+   "after": "1-+: 10=75,20=150",
+   "siteFaction": "Tyranids"
+  },
+  {
+   "army": "TYR",
+   "id": "000000493",
+   "name": "Trygon",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=140",
+   "after": "1-+: 1=135",
+   "siteFaction": "Tyranids"
+  },
+  {
+   "army": "TYR",
+   "id": "000000494",
+   "name": "Mawloc",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=135",
+   "after": "1-+: 1=130",
+   "siteFaction": "Tyranids"
+  },
+  {
+   "army": "TYR",
+   "id": "000002529",
+   "name": "Parasite Of Mortrex",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=70",
+   "after": "1-+: 1=65",
+   "siteFaction": "Tyranids"
+  },
+  {
+   "army": "TYR",
+   "id": "000002686",
+   "name": "Barbgaunts",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 5=55,10=110",
+   "after": "1-+: 5=50,10=100",
+   "siteFaction": "Tyranids"
+  },
+  {
+   "army": "TYR",
+   "id": "000002688",
+   "name": "Neurotyrant",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=130",
+   "after": "1-+: 1=120",
+   "siteFaction": "Tyranids"
+  },
+  {
+   "army": "TYR",
+   "id": "000004225",
+   "name": "The Red Terror",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=130",
+   "after": "1-+: 1=120",
+   "siteFaction": "Tyranids"
+  },
+  {
+   "army": "WE",
+   "id": "000002627",
+   "name": "Khorne Berzerkers",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 10=160,20=320",
+   "after": "1-+: 10=170,20=330",
+   "siteFaction": "World Eaters"
+  },
+  {
+   "army": "WE",
+   "id": "000002628",
+   "name": "Jakhals",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 10=65,20=130",
+   "after": "1-+: 10=65,20=120",
+   "siteFaction": "World Eaters"
+  },
+  {
+   "army": "WE",
+   "id": "000002629",
+   "name": "Chaos Terminators",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 5=165,10=330 | 3-+: 5=175,10=340",
+   "after": "1-2: 5=175,10=350 | 3-+: 5=185,10=360",
+   "siteFaction": "World Eaters"
+  },
+  {
+   "army": "WE",
+   "id": "000002630",
+   "name": "Eightbound",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 3=125,6=255 | 3-+: 3=140,6=270",
+   "after": "1-2: 3=125,6=250 | 3-+: 3=140,6=265",
+   "siteFaction": "World Eaters"
+  },
+  {
+   "army": "WE",
+   "id": "000002631",
+   "name": "Exalted Eightbound",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 3=130,6=265 | 3-+: 3=145,6=280",
+   "after": "1-2: 3=130,6=260 | 3-+: 3=145,6=275",
+   "siteFaction": "World Eaters"
+  },
+  {
+   "army": "WE",
+   "id": "000002634",
+   "name": "Chaos Land Raider",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-2: 1=220 | 3-+: 1=240",
+   "after": "1-2: 1=200 | 3-+: 1=220",
+   "siteFaction": "World Eaters"
+  },
+  {
+   "army": "WE",
+   "id": "000004076",
+   "name": "Goremongers",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 8=75",
+   "after": "1-+: 8=70",
+   "siteFaction": "World Eaters"
+  },
+  {
+   "army": "WE",
+   "id": "000004103",
+   "name": "Slaughterbound",
+   "kinds": [
+    "points"
+   ],
+   "costs": true,
+   "before": "1-+: 1=100",
+   "after": "1-+: 1=90",
+   "siteFaction": "World Eaters"
+  }
+ ],
+ "detachments": [
+  {
+   "army": "AdM",
+   "id": "000000823",
+   "name": "Cohort Cybernetica",
+   "before": 2,
+   "after": 1
+  },
+  {
+   "army": "AdM",
+   "id": "000001143",
+   "name": "Eradication Cohort",
+   "before": 3,
+   "after": 2
+  },
+  {
+   "army": "AdM",
+   "id": "000001159",
+   "name": "Lords of the Forge",
+   "before": 1,
+   "after": 2
+  },
+  {
+   "army": "AE",
+   "id": "000001017",
+   "name": "Warhost",
+   "before": 3,
+   "after": 2
+  },
+  {
+   "army": "EC",
+   "id": "000001036",
+   "name": "Carnival of Excess",
+   "before": 2,
+   "after": 3
+  },
+  {
+   "army": "EC",
+   "id": "000001038",
+   "name": "Slaanesh’s Chosen",
+   "before": 2,
+   "after": 1
+  },
+  {
+   "army": "NEC",
+   "id": "000000816",
+   "name": "Canoptek Court",
+   "before": 3,
+   "after": 2
+  },
+  {
+   "army": "WE",
+   "id": "000000777",
+   "name": "Berzerker Warband",
+   "before": 3,
+   "after": 2
+  }
+ ],
+ "enhancements": [
+  {
+   "army": "ORK",
+   "id": "000008877003",
+   "detachment": "Dread Mob",
+   "name": "Dreadherder",
+   "before": 20,
+   "after": 30
+  },
+  {
+   "army": "ORK",
+   "id": "000010799002",
+   "detachment": "Blitz Brigade",
+   "name": "Targetin' Gizmos",
+   "before": 10,
+   "after": 25
+  },
+  {
+   "army": "ORK",
+   "id": "000011132003",
+   "detachment": "Wreckas",
+   "name": "Supa-snazz Dakka",
+   "before": 20,
+   "after": 25
+  }
+ ],
+ "copies": [
+  {
+   "file": "QT",
+   "group": "det:000000989",
+   "id": "000003851",
+   "name": "Accursed Cultists"
+  },
+  {
+   "file": "QT",
+   "group": "det:000000989",
+   "id": "000003853",
+   "name": "Traitor Guardsmen Squad"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000001105",
+   "name": "Skarbrand"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000001112",
+   "name": "Flesh Hounds"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000001115",
+   "name": "Bloodcrushers"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000001143",
+   "name": "Fiends"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004036",
+   "name": "Chaos Lord"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004037",
+   "name": "Chaos Lord In Terminator Armour"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004038",
+   "name": "Chaos Lord with Jump Pack"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004043",
+   "name": "Chaos Terminator Squad"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004044",
+   "name": "Chosen"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004052",
+   "name": "Accursed Cultists"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004054",
+   "name": "Traitor Guardsmen Squad"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004062",
+   "name": "Dark Apostle"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004063",
+   "name": "Havocs"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004064",
+   "name": "Legionaries"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004065",
+   "name": "Master Of Possession"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004066",
+   "name": "Possessed"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004067",
+   "name": "Raptors"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004068",
+   "name": "Sorcerer"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004072",
+   "name": "Sorcerer In Terminator Armour"
+  },
+  {
+   "file": "QT",
+   "group": "ally:daemons",
+   "id": "000004073",
+   "name": "Warp Talons"
+  },
+  {
+   "file": "GC",
+   "group": "det:000001002",
+   "id": "000003878",
+   "name": "Parasite Of Mortrex"
+  },
+  {
+   "file": "GC",
+   "group": "det:000001002",
+   "id": "000003881",
+   "name": "Gargoyles"
+  },
+  {
+   "file": "GC",
+   "group": "det:000001002",
+   "id": "000003884",
+   "name": "Mawloc"
+  },
+  {
+   "file": "GC",
+   "group": "det:000001002",
+   "id": "000003887",
+   "name": "Trygon"
+  },
+  {
+   "file": "GC",
+   "group": "det:000000888",
+   "id": "000003966",
+   "name": "Basilisk"
+  },
+  {
+   "file": "GC",
+   "group": "det:000000888",
+   "id": "000003970",
+   "name": "Deathstrike"
+  },
+  {
+   "file": "GC",
+   "group": "det:000000888",
+   "id": "000003974",
+   "name": "Hellhound"
+  },
+  {
+   "file": "GC",
+   "group": "det:000000888",
+   "id": "000003986",
+   "name": "Manticore"
+  },
+  {
+   "file": "GC",
+   "group": "det:000000888",
+   "id": "000003992",
+   "name": "Wyvern"
+  },
+  {
+   "file": "GC",
+   "group": "det:000001002",
+   "id": "000004226",
+   "name": "The Red Terror"
+  },
+  {
+   "file": "AoI",
+   "group": "ally:freeblades",
+   "id": "000000857",
+   "name": "Knight Warden"
+  },
+  {
+   "file": "AoI",
+   "group": "ally:freeblades",
+   "id": "000000862",
+   "name": "Cerastus Knight Atrapos"
+  },
+  {
+   "file": "AoI",
+   "group": "ally:freeblades",
+   "id": "000001486",
+   "name": "Knight Valiant"
+  },
+  {
+   "file": "AoI",
+   "group": "ally:freeblades",
+   "id": "000004149",
+   "name": "Knight Defender"
+  },
+  {
+   "file": "EC",
+   "group": "ally:dreadblades",
+   "id": "000001659",
+   "name": "Knight Tyrant"
+  },
+  {
+   "file": "EC",
+   "group": "ally:dreadblades",
+   "id": "000001660",
+   "name": "Knight Desecrator"
+  },
+  {
+   "file": "EC",
+   "group": "ally:dreadblades",
+   "id": "000001661",
+   "name": "Knight Rampager"
+  },
+  {
+   "file": "EC",
+   "group": "ally:dreadblades",
+   "id": "000002567",
+   "name": "Knight Abominant"
+  },
+  {
+   "file": "EC",
+   "group": "ally:dreadblades",
+   "id": "000004134",
+   "name": "Knight Ruinator"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000001105",
+   "name": "Skarbrand"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000001112",
+   "name": "Flesh Hounds"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000001115",
+   "name": "Bloodcrushers"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000001143",
+   "name": "Fiends"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004036",
+   "name": "Chaos Lord"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004037",
+   "name": "Chaos Lord In Terminator Armour"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004038",
+   "name": "Chaos Lord with Jump Pack"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004043",
+   "name": "Chaos Terminator Squad"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004044",
+   "name": "Chosen"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004052",
+   "name": "Accursed Cultists"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004054",
+   "name": "Traitor Guardsmen Squad"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004062",
+   "name": "Dark Apostle"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004063",
+   "name": "Havocs"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004064",
+   "name": "Legionaries"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004065",
+   "name": "Master Of Possession"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004066",
+   "name": "Possessed"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004067",
+   "name": "Raptors"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004068",
+   "name": "Sorcerer"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004072",
+   "name": "Sorcerer In Terminator Armour"
+  },
+  {
+   "file": "EC",
+   "group": "ally:daemons",
+   "id": "000004073",
+   "name": "Warp Talons"
+  },
+  {
+   "file": "DRU",
+   "group": "det:000000993",
+   "id": "000004158",
+   "name": "Death Jester"
+  },
+  {
+   "file": "DRU",
+   "group": "det:000000993",
+   "id": "000004160",
+   "name": "Solitaire"
+  },
+  {
+   "file": "DRU",
+   "group": "det:000000993",
+   "id": "000004163",
+   "name": "Skyweavers"
+  },
+  {
+   "file": "DRU",
+   "group": "ally:corsairs",
+   "id": "000002537",
+   "name": "Death Jester"
+  },
+  {
+   "file": "DRU",
+   "group": "ally:corsairs",
+   "id": "000002538",
+   "name": "Solitaire"
+  },
+  {
+   "file": "DRU",
+   "group": "ally:corsairs",
+   "id": "000002539",
+   "name": "Skyweavers"
+  },
+  {
+   "file": "DRU",
+   "group": "ally:corsairs",
+   "id": "000004194",
+   "name": "Kharseth"
+  },
+  {
+   "file": "AM",
+   "group": "ally:freeblades",
+   "id": "000000857",
+   "name": "Knight Warden"
+  },
+  {
+   "file": "AM",
+   "group": "ally:freeblades",
+   "id": "000000862",
+   "name": "Cerastus Knight Atrapos"
+  },
+  {
+   "file": "AM",
+   "group": "ally:freeblades",
+   "id": "000001486",
+   "name": "Knight Valiant"
+  },
+  {
+   "file": "AM",
+   "group": "ally:freeblades",
+   "id": "000004149",
+   "name": "Knight Defender"
+  },
+  {
+   "file": "AC",
+   "group": "ally:freeblades",
+   "id": "000000857",
+   "name": "Knight Warden"
+  },
+  {
+   "file": "AC",
+   "group": "ally:freeblades",
+   "id": "000000862",
+   "name": "Cerastus Knight Atrapos"
+  },
+  {
+   "file": "AC",
+   "group": "ally:freeblades",
+   "id": "000001486",
+   "name": "Knight Valiant"
+  },
+  {
+   "file": "AC",
+   "group": "ally:freeblades",
+   "id": "000004149",
+   "name": "Knight Defender"
+  },
+  {
+   "file": "GK",
+   "group": "ally:freeblades",
+   "id": "000000857",
+   "name": "Knight Warden"
+  },
+  {
+   "file": "GK",
+   "group": "ally:freeblades",
+   "id": "000000862",
+   "name": "Cerastus Knight Atrapos"
+  },
+  {
+   "file": "GK",
+   "group": "ally:freeblades",
+   "id": "000001486",
+   "name": "Knight Valiant"
+  },
+  {
+   "file": "GK",
+   "group": "ally:freeblades",
+   "id": "000004149",
+   "name": "Knight Defender"
+  },
+  {
+   "file": "SM",
+   "group": "ally:freeblades",
+   "id": "000000857",
+   "name": "Knight Warden"
+  },
+  {
+   "file": "SM",
+   "group": "ally:freeblades",
+   "id": "000000862",
+   "name": "Cerastus Knight Atrapos"
+  },
+  {
+   "file": "SM",
+   "group": "ally:freeblades",
+   "id": "000001486",
+   "name": "Knight Valiant"
+  },
+  {
+   "file": "SM",
+   "group": "ally:freeblades",
+   "id": "000004149",
+   "name": "Knight Defender"
+  },
+  {
+   "file": "TL",
+   "group": "ally:freeblades",
+   "id": "000000857",
+   "name": "Knight Warden"
+  },
+  {
+   "file": "TL",
+   "group": "ally:freeblades",
+   "id": "000000862",
+   "name": "Cerastus Knight Atrapos"
+  },
+  {
+   "file": "TL",
+   "group": "ally:freeblades",
+   "id": "000001486",
+   "name": "Knight Valiant"
+  },
+  {
+   "file": "TL",
+   "group": "ally:freeblades",
+   "id": "000004149",
+   "name": "Knight Defender"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004036",
+   "name": "Chaos Lord"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004037",
+   "name": "Chaos Lord In Terminator Armour"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004038",
+   "name": "Chaos Lord with Jump Pack"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004043",
+   "name": "Chaos Terminator Squad"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004044",
+   "name": "Chosen"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004052",
+   "name": "Accursed Cultists"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004054",
+   "name": "Traitor Guardsmen Squad"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004062",
+   "name": "Dark Apostle"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004063",
+   "name": "Havocs"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004064",
+   "name": "Legionaries"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004065",
+   "name": "Master Of Possession"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004066",
+   "name": "Possessed"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004067",
+   "name": "Raptors"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004068",
+   "name": "Sorcerer"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004072",
+   "name": "Sorcerer In Terminator Armour"
+  },
+  {
+   "file": "CD",
+   "group": "det:000001027",
+   "id": "000004073",
+   "name": "Warp Talons"
+  },
+  {
+   "file": "CD",
+   "group": "ally:dreadblades",
+   "id": "000001659",
+   "name": "Knight Tyrant"
+  },
+  {
+   "file": "CD",
+   "group": "ally:dreadblades",
+   "id": "000001660",
+   "name": "Knight Desecrator"
+  },
+  {
+   "file": "CD",
+   "group": "ally:dreadblades",
+   "id": "000001661",
+   "name": "Knight Rampager"
+  },
+  {
+   "file": "CD",
+   "group": "ally:dreadblades",
+   "id": "000002567",
+   "name": "Knight Abominant"
+  },
+  {
+   "file": "CD",
+   "group": "ally:dreadblades",
+   "id": "000004134",
+   "name": "Knight Ruinator"
+  },
+  {
+   "file": "AS",
+   "group": "ally:freeblades",
+   "id": "000000857",
+   "name": "Knight Warden"
+  },
+  {
+   "file": "AS",
+   "group": "ally:freeblades",
+   "id": "000000862",
+   "name": "Cerastus Knight Atrapos"
+  },
+  {
+   "file": "AS",
+   "group": "ally:freeblades",
+   "id": "000001486",
+   "name": "Knight Valiant"
+  },
+  {
+   "file": "AS",
+   "group": "ally:freeblades",
+   "id": "000004149",
+   "name": "Knight Defender"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:dreadblades",
+   "id": "000001659",
+   "name": "Knight Tyrant"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:dreadblades",
+   "id": "000001660",
+   "name": "Knight Desecrator"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:dreadblades",
+   "id": "000001661",
+   "name": "Knight Rampager"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:dreadblades",
+   "id": "000002567",
+   "name": "Knight Abominant"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:dreadblades",
+   "id": "000004134",
+   "name": "Knight Ruinator"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000001105",
+   "name": "Skarbrand"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000001112",
+   "name": "Flesh Hounds"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000001115",
+   "name": "Bloodcrushers"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000001143",
+   "name": "Fiends"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004036",
+   "name": "Chaos Lord"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004037",
+   "name": "Chaos Lord In Terminator Armour"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004038",
+   "name": "Chaos Lord with Jump Pack"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004043",
+   "name": "Chaos Terminator Squad"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004044",
+   "name": "Chosen"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004052",
+   "name": "Accursed Cultists"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004054",
+   "name": "Traitor Guardsmen Squad"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004062",
+   "name": "Dark Apostle"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004063",
+   "name": "Havocs"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004064",
+   "name": "Legionaries"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004065",
+   "name": "Master Of Possession"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004066",
+   "name": "Possessed"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004067",
+   "name": "Raptors"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004068",
+   "name": "Sorcerer"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004072",
+   "name": "Sorcerer In Terminator Armour"
+  },
+  {
+   "file": "CSM",
+   "group": "ally:daemons",
+   "id": "000004073",
+   "name": "Warp Talons"
+  },
+  {
+   "file": "WE",
+   "group": "ally:dreadblades",
+   "id": "000001659",
+   "name": "Knight Tyrant"
+  },
+  {
+   "file": "WE",
+   "group": "ally:dreadblades",
+   "id": "000001660",
+   "name": "Knight Desecrator"
+  },
+  {
+   "file": "WE",
+   "group": "ally:dreadblades",
+   "id": "000001661",
+   "name": "Knight Rampager"
+  },
+  {
+   "file": "WE",
+   "group": "ally:dreadblades",
+   "id": "000002567",
+   "name": "Knight Abominant"
+  },
+  {
+   "file": "WE",
+   "group": "ally:dreadblades",
+   "id": "000004134",
+   "name": "Knight Ruinator"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000001105",
+   "name": "Skarbrand"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000001112",
+   "name": "Flesh Hounds"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000001115",
+   "name": "Bloodcrushers"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000001143",
+   "name": "Fiends"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004036",
+   "name": "Chaos Lord"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004037",
+   "name": "Chaos Lord In Terminator Armour"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004038",
+   "name": "Chaos Lord with Jump Pack"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004043",
+   "name": "Chaos Terminator Squad"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004044",
+   "name": "Chosen"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004052",
+   "name": "Accursed Cultists"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004054",
+   "name": "Traitor Guardsmen Squad"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004062",
+   "name": "Dark Apostle"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004063",
+   "name": "Havocs"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004064",
+   "name": "Legionaries"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004065",
+   "name": "Master Of Possession"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004066",
+   "name": "Possessed"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004067",
+   "name": "Raptors"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004068",
+   "name": "Sorcerer"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004072",
+   "name": "Sorcerer In Terminator Armour"
+  },
+  {
+   "file": "WE",
+   "group": "ally:daemons",
+   "id": "000004073",
+   "name": "Warp Talons"
+  },
+  {
+   "file": "DG",
+   "group": "ally:dreadblades",
+   "id": "000001659",
+   "name": "Knight Tyrant"
+  },
+  {
+   "file": "DG",
+   "group": "ally:dreadblades",
+   "id": "000001660",
+   "name": "Knight Desecrator"
+  },
+  {
+   "file": "DG",
+   "group": "ally:dreadblades",
+   "id": "000001661",
+   "name": "Knight Rampager"
+  },
+  {
+   "file": "DG",
+   "group": "ally:dreadblades",
+   "id": "000002567",
+   "name": "Knight Abominant"
+  },
+  {
+   "file": "DG",
+   "group": "ally:dreadblades",
+   "id": "000004134",
+   "name": "Knight Ruinator"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000001105",
+   "name": "Skarbrand"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000001112",
+   "name": "Flesh Hounds"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000001115",
+   "name": "Bloodcrushers"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000001143",
+   "name": "Fiends"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004036",
+   "name": "Chaos Lord"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004037",
+   "name": "Chaos Lord In Terminator Armour"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004038",
+   "name": "Chaos Lord with Jump Pack"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004043",
+   "name": "Chaos Terminator Squad"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004044",
+   "name": "Chosen"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004052",
+   "name": "Accursed Cultists"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004054",
+   "name": "Traitor Guardsmen Squad"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004062",
+   "name": "Dark Apostle"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004063",
+   "name": "Havocs"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004064",
+   "name": "Legionaries"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004065",
+   "name": "Master Of Possession"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004066",
+   "name": "Possessed"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004067",
+   "name": "Raptors"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004068",
+   "name": "Sorcerer"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004072",
+   "name": "Sorcerer In Terminator Armour"
+  },
+  {
+   "file": "DG",
+   "group": "ally:daemons",
+   "id": "000004073",
+   "name": "Warp Talons"
+  },
+  {
+   "file": "TS",
+   "group": "ally:dreadblades",
+   "id": "000001659",
+   "name": "Knight Tyrant"
+  },
+  {
+   "file": "TS",
+   "group": "ally:dreadblades",
+   "id": "000001660",
+   "name": "Knight Desecrator"
+  },
+  {
+   "file": "TS",
+   "group": "ally:dreadblades",
+   "id": "000001661",
+   "name": "Knight Rampager"
+  },
+  {
+   "file": "TS",
+   "group": "ally:dreadblades",
+   "id": "000002567",
+   "name": "Knight Abominant"
+  },
+  {
+   "file": "TS",
+   "group": "ally:dreadblades",
+   "id": "000004134",
+   "name": "Knight Ruinator"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000001105",
+   "name": "Skarbrand"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000001112",
+   "name": "Flesh Hounds"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000001115",
+   "name": "Bloodcrushers"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000001143",
+   "name": "Fiends"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004036",
+   "name": "Chaos Lord"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004037",
+   "name": "Chaos Lord In Terminator Armour"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004038",
+   "name": "Chaos Lord with Jump Pack"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004043",
+   "name": "Chaos Terminator Squad"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004044",
+   "name": "Chosen"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004052",
+   "name": "Accursed Cultists"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004054",
+   "name": "Traitor Guardsmen Squad"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004062",
+   "name": "Dark Apostle"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004063",
+   "name": "Havocs"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004064",
+   "name": "Legionaries"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004065",
+   "name": "Master Of Possession"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004066",
+   "name": "Possessed"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004067",
+   "name": "Raptors"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004068",
+   "name": "Sorcerer"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004072",
+   "name": "Sorcerer In Terminator Armour"
+  },
+  {
+   "file": "TS",
+   "group": "ally:daemons",
+   "id": "000004073",
+   "name": "Warp Talons"
+  },
+  {
+   "file": "AdM",
+   "group": "ally:freeblades",
+   "id": "000000857",
+   "name": "Knight Warden"
+  },
+  {
+   "file": "AdM",
+   "group": "ally:freeblades",
+   "id": "000000862",
+   "name": "Cerastus Knight Atrapos"
+  },
+  {
+   "file": "AdM",
+   "group": "ally:freeblades",
+   "id": "000001486",
+   "name": "Knight Valiant"
+  },
+  {
+   "file": "AdM",
+   "group": "ally:freeblades",
+   "id": "000004149",
+   "name": "Knight Defender"
+  }
+ ],
+ "skipped": [
+  {
+   "army": "AC",
+   "id": "000000883",
+   "name": "Venerable Contemptor Dreadnought",
+   "kind": "tiers",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000000884",
+   "name": "Venerable Land Raider",
+   "kind": "tiers",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000001447",
+   "name": "Shield-captain",
+   "kind": "tiers",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000001448",
+   "name": "Shield-captain In Allarus Terminator Armour",
+   "kind": "tiers",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000001449",
+   "name": "Shield-captain On Dawneagle Jetbike",
+   "kind": "tiers",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000001454",
+   "name": "Vertus Praetors",
+   "kind": "tiers",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000001558",
+   "name": "Aquilon Custodians",
+   "kind": "tiers",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000001559",
+   "name": "Custodian Guard With Adrasite And Pyrithite Spears",
+   "kind": "tiers",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000001560",
+   "name": "Agamatus Custodians",
+   "kind": "tiers",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000002518",
+   "name": "Blade Champion",
+   "kind": "tiers",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000000882",
+   "name": "Custodian Guard",
+   "kind": "sizes",
+   "why": "другие размеры отряда — смена состава, полная конвертация",
+   "before": "1-3: 4=170,5=215 | 4-+: 4=180,5=225",
+   "after": "1-3: 3=240 | 4-+: 3=270"
+  },
+  {
+   "army": "AC",
+   "id": "000001450",
+   "name": "Custodian Wardens",
+   "kind": "sizes",
+   "why": "другие размеры отряда — смена состава, полная конвертация",
+   "before": "1-1: 4=200,5=250 | 2-+: 4=220,5=270",
+   "after": "1-1: 2=200,3=295 | 2-+: 2=230,3=325"
+  },
+  {
+   "army": "AC",
+   "id": "000001453",
+   "name": "Allarus Custodians",
+   "kind": "sizes",
+   "why": "другие размеры отряда — смена состава, полная конвертация",
+   "before": "1-2: 2=110,3=165,5=280,6=340 | 3-+: 2=140,3=195,5=310,6=370",
+   "after": "1-2: 2=180,3=270 | 3-+: 2=210,3=300"
+  },
+  {
+   "army": "AC",
+   "id": "000001561",
+   "name": "Venatari Custodians",
+   "kind": "sizes",
+   "why": "другие размеры отряда — смена состава, полная конвертация",
+   "before": "1-2: 3=150,6=300 | 3-+: 3=160,6=310",
+   "after": "1-2: 3=270 | 3-+: 3=300"
+  },
+  {
+   "army": "AC",
+   "id": "000001563",
+   "name": "Sagittarum Custodians",
+   "kind": "sizes",
+   "why": "другие размеры отряда — смена состава, полная конвертация",
+   "before": "1-+: 5=225",
+   "after": "1-+: 3=185"
+  },
+  {
+   "army": "AC",
+   "id": "000000883",
+   "name": "Venerable Contemptor Dreadnought",
+   "kind": "legends",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000000884",
+   "name": "Venerable Land Raider",
+   "kind": "legends",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000001559",
+   "name": "Custodian Guard With Adrasite And Pyrithite Spears",
+   "kind": "legends",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000001563",
+   "name": "Sagittarum Custodians",
+   "kind": "legends",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000002088",
+   "name": "Aleya",
+   "kind": "legends",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000002519",
+   "name": "Valerian",
+   "kind": "legends",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000001447",
+   "name": "Shield-captain",
+   "kind": "wargear",
+   "why": "армия AC: только points",
+   "before": "",
+   "after": "Praesidium Shield=25"
+  },
+  {
+   "army": "AC",
+   "id": "000001460",
+   "name": "Caladius Grav-tank",
+   "kind": "wargear",
+   "why": "армия AC: только points",
+   "before": "Twin arachnus heavy blaze cannon=15",
+   "after": ""
+  },
+  {
+   "army": "AC",
+   "id": "000001561",
+   "name": "Venatari Custodians",
+   "kind": "wargear",
+   "why": "армия AC: только points",
+   "before": "Venatari lance=5",
+   "after": ""
+  },
+  {
+   "army": "AC",
+   "id": "000000862",
+   "name": "Null Maiden Vigil",
+   "kind": "dp",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000000863",
+   "name": "Auric Champions",
+   "kind": "dp",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000001029",
+   "name": "Lions of the Emperor",
+   "kind": "dp",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000008926003",
+   "name": "Huntress’ Eye",
+   "kind": "enhancements",
+   "why": "армия AC: только points"
+  },
+  {
+   "army": "AC",
+   "id": "000008926004",
+   "name": "Oblivion Knight",
+   "kind": "enhancements",
+   "why": "армия AC: только points"
+  }
+ ],
+ "ambiguous": []
+}

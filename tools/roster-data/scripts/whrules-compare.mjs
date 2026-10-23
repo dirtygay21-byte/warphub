@@ -155,7 +155,7 @@ export function compareArmy(ours, snap, slugs, { group = 'own', faction = ours.i
   };
   const ourVersions = new Set(own.map((d) => `${slugify(d.name)}|${String(d.source ?? '').toLowerCase()}`));
   const seen = new Set();
-  const r = { pointsChanged: [], sizesChanged: [], tiersChanged: [], legendsChanged: [], renamed: [], removedOnSite: [], outdated: [], otherFactionOnSite: [], legendsNotOnSite: [], unmatched: [], newOnSite: [], noPointsOnSite: [], same: 0 };
+  const r = { pointsChanged: [], sizesChanged: [], tiersChanged: [], legendsChanged: [], renamed: [], removedOnSite: [], outdated: [], otherFactionOnSite: [], legendsNotOnSite: [], unmatched: [], newOnSite: [], noPointsOnSite: [], same: 0, pairs: [] };
   const wg = { same: 0, priceChanged: [], onlyOurs: [], onlySite: [], notAuto: [], chapterVariants: [] };
   const addons = { same: 0, changed: [] };
   for (const d of own) {
@@ -181,6 +181,7 @@ export function compareArmy(ours, snap, slugs, { group = 'own', faction = ours.i
       continue;
     }
     seen.add(ver ? `${site.siteFaction}:${site.id}` : site.id);
+    r.pairs.push({ id: d.id, siteFaction: site.siteFaction, siteId: site.id });
     if (renamedTo) r.renamed.push({ id: d.id, name: d.name, to: renamedTo, siteId: site.id });
     if (!!d.legends !== !!site.legends) r.legendsChanged.push({ id: d.id, name: d.name, ours: !!d.legends, site: !!site.legends });
     // платное снаряжение: сравнивается у всех сопоставленных, даже без очков отряда
@@ -239,7 +240,7 @@ export function compareDetachments(ours, snap, slugs) {
     for (const e of ourEnh) {
       const x = siteEnh.get(bareSlug(e.name));
       if (!x) (e.outdated ? r.enhancements.outdated : r.enhancements.missingOnSite).push({ detachment: d.name, name: e.name, ours: e.cost });
-      else if (x.points != null && x.points !== e.cost) r.enhancements.pointsChanged.push({ detachment: d.name, name: e.name, ours: e.cost, site: x.points });
+      else if (x.points != null && x.points !== e.cost) r.enhancements.pointsChanged.push({ id: e.id, detachment: d.name, name: e.name, ours: e.cost, site: x.points });
       else r.enhancements.same++;
       siteEnh.delete(bareSlug(e.name));
     }

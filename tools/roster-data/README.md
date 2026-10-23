@@ -106,6 +106,18 @@ Wahapedia (например, более новые очки), применяют
 осталось на версии выгрузки. Применённые обновления записываются в `index.json → updates` (источник, версия данных,
 версия Munitorum Field Manual, дата). Включено одно обновление — `whrules-981-space-marines` (kind `whrules-faction`, `scripts/whrules-convert.mjs`): Space Marines с орденами и Imperial Agents из полного снимка wh-rules.ru 981, копии Imperial Agents в AC, AM, AS, AdM, GK, QI, TL. Обработчик использует движок клиента (TypeScript), поэтому импорт и repair запускаются через `bun` или `node --import tsx` (`npm run data` уже так). Сухой прогон: `bun scripts/whrules-convert.mjs --out <файл>` — считается от данных до обновления (`scripts/baseline-40k.mjs`: история git, коммит 4a91fa0); тесты — `tests/whrules-*.test.ts`, `tests/updates40k.test.ts`.
 
+**Обновление значений по wh-rules.ru** (`40k/curated.json → updates`, kind `whrules-points`, `scripts/whrules-points.mjs`;
+сейчас `whrules-995-points`, задача P1-T3). У сопоставленных записей (та же функция сопоставления, что и отчёт свежести)
+меняет цены отряда и ступени цены за копии, Legends, DP детачментов, очки улучшений и платное снаряжение; id, профили,
+оружие и правила не трогает. Подписи размеров и названия снаряжения остаются нашими — сохранённые ростеры хранят по ним
+выбор. Другой размер отряда — смена состава: не применяется (полная конвертация). Копии юнита в других файлах (союзники,
+инфолисты детачментов с тем же названием и прежними ценами) получают те же значения; цены союзника Agents of the Imperium
+(`ally:agents`) не трогаются. `only` в элементе curated ограничивает армию (Adeptus Custodes: только цены отряда — кодекс в
+полной конвертации). **Платное снаряжение — только в последней ступени цены за копии** (решение владельца 2026-10-23: так у
+всех 70 предметов выгрузки Wahapedia; сайт пишет только «+N, за штуку»). План/отчёт — `bun scripts/whrules-points.mjs` →
+`40k/whrules-points-applied.json` (что изменится, копии, пропуски); применение — `bun scripts/repair-40k-data.mjs`
+(и в конце импорта). Тесты — `tests/whrules-points.test.ts`.
+
 **Снимок wh-rules.ru** (`40k/whrules-<версия>.json`, сейчас `whrules-981.json`: данные приложения 981, MFM 1.6,
 14.10.2026). Схема `whrules-points-snapshot/1`: `source` (сайт, версия данных, MFM, дата, время снятия), `assets`
 (SHA-256 каждого прочитанного JS-модуля сайта), `factions` (Space Marines, 5 орденов, Imperial Agents: инфолисты
