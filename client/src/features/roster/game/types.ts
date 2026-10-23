@@ -8,8 +8,10 @@
  *   каждое устройство пишет события своего места, сервер упорядочивает журнал (seq) и раздаёт его обоим.
  * - Случайность — из seed игры (хранится в событии game-created): одинаковый журнал → одинаковые карты на любом
  *   устройстве. Вытянутые карты записываются в событие явно, чтобы второй телефон и сервер могли их проверить.
- * - Тайный выбор (тип армии, режим вторичных) записывается сразу; на двух телефонах его будет скрывать
- *   событие choices-revealed (до него сервер не отдаёт чужой выбор). На одном телефоне оно идёт автоматически.
+ * - Тайный выбор — два шага, как в правилах колоды миссий: тип армии (раскрытие dispositions-revealed) и режим
+ *   вторичных (secondaries-revealed). На двух телефонах сервер не отдаёт чужой выбор до раскрытия; на одном —
+ *   игроки выбирают по очереди, передавая телефон.
+ * - Броски кубиков «кто выше» записываются с номером броска; движок сверяет результат с seed.
  * - Движок не загружает данные сам: получает каталог карт (GameCatalog) — подходит missions.json как есть,
  *   а значит, движок можно будет запустить и на сервере для проверки ходов.
  */
@@ -122,10 +124,11 @@ export type GameEvent = EventBase &
     | { type: 'game-created'; schema: number; seed: string; names: Record<Seat, string> }
     | { type: 'player-set'; target: Seat; patch: Partial<Pick<PlayerSetup, 'name' | 'roster' | 'disposition' | 'battleReady'>> }
     | { type: 'layout-set'; layoutId: string; source: Source }
-    | { type: 'roles-set'; attacker: Seat; source: Source }
+    | { type: 'dispositions-revealed' }
+    | { type: 'roles-set'; attacker: Seat; source: Source; roll?: RollRef }
     | { type: 'secondary-chosen'; target: Seat; mode: SecondaryMode; fixed: [string, string] | null }
-    | { type: 'choices-revealed' }
-    | { type: 'first-turn-set'; first: Seat; source: Source }
+    | { type: 'secondaries-revealed' }
+    | { type: 'first-turn-set'; first: Seat; source: Source; roll?: RollRef }
     | { type: 'battle-started' }
     | { type: 'command-phase-started' }
     | { type: 'cards-drawn'; target: Seat; cards: string[]; source: Source }
@@ -143,6 +146,17 @@ export type GameEvent = EventBase &
   );
 
 export type GameEventType = GameEvent['type'];
+
+/** Ссылка на бросок «кто выше»: номер броска этого вида в игре (0, 1, …); кубики движок считает по seed. */
+export interface RollRef {
+  attempt: number;
+}
+export type RollKey = 'roles' | 'first-turn';
+export interface RollResult {
+  attempt: number;
+  rolls: { p1: number; p2: number }[];
+  winner: Seat;
+}
 
 /** Выбранная строка карты: блок, строка и сколько раз она выполнена («за каждую цель» — count > 1). */
 export interface RowPick {
@@ -225,7 +239,13 @@ export interface GameState {
   primary: Record<Seat, string | null>;
   layoutId: string | null;
   deploymentId: string | null;
-  choicesRevealed: boolean;
+  /** типы армий раскрыты (после этого — основные миссии, раскладка, атакующий и защитник) */
+  dispositionsRevealed: boolean;
+  /** режимы вторичных раскрыты (после этого — первый ход) */
+  secondariesRevealed: boolean;
+  /** последние броски «кто выше» и сколько бросков каждого вида уже было (следующий — с этим номером) */
+  rolls: Partial<Record<RollKey, RollResult>>;
+  rollCount: Record<RollKey, number>;
   firstTurn: Seat | null;
   round: Round;
   activeSeat: Seat | null;

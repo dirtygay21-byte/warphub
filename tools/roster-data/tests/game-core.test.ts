@@ -1,7 +1,8 @@
 // «Начать игру», G1.3: ядро игры — применение событий и проигрывание журнала (game/reducer.ts). Запуск: npm test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { applyEvent, createGame, layoutsFor, replay, setupMissing } from '../../../client/src/features/roster/game/reducer';
+import { applyEvent, createGame, layoutsFor, replay } from '../../../client/src/features/roster/game/reducer';
+import { setupMissing } from '../../../client/src/features/roster/game/setup';
 import type { GameEvent, GameState } from '../../../client/src/features/roster/game/types';
 import { catalog, created, log, setupBodies, type Body } from './game-helpers';
 
@@ -79,31 +80,34 @@ test('отклоняется: порядок журнала, повтор id, ч
 });
 
 test('подготовка: проверки выбора', () => {
-  const s = ok(replay(log(created), catalog));
-  const next = (b: Body) => ({ seat: null, ...b, id: 'n', seq: s.lastSeq + 1, at: 'now' }) as GameEvent;
-  const bad = (b: Body, re: RegExp) => {
-    const r = applyEvent(s, next(b), catalog);
+  const at = (n: number) => ok(replay(log(...setupBodies().slice(0, n)), catalog));
+  const bad = (s: GameState, b: Body, re: RegExp) => {
+    const r = applyEvent(s, { seat: null, ...b, id: 'n', seq: s.lastSeq + 1, at: 'now' } as GameEvent, catalog);
     assert.ok(!r.ok && re.test(r.error), r.ok ? 'принято' : r.error);
   };
-  bad({ type: 'player-set', target: 'p1', patch: { disposition: 'nope' } } as Body, /Неизвестный тип армии/);
-  bad({ type: 'secondary-chosen', target: 'p1', mode: 'fixed', fixed: ['assassination', 'assassination'] } as Body, /две разные/);
-  bad({ type: 'secondary-chosen', target: 'p1', mode: 'fixed', fixed: ['assassination', 'cleanse'] } as Body, /нельзя взять фиксированной/);
-  bad({ type: 'secondary-chosen', target: 'p1', mode: 'fixed', fixed: ['assassination', 'death-trap'] } as Body, /Нет вторичной/);
-  bad({ type: 'choices-revealed' } as Body, /не выбран тип армии/);
-  bad({ type: 'layout-set', layoutId: 'bm-take-vs-take-01', source: 'manual' } as Body, /Сначала выберите типы армий/);
-  bad({ type: 'battle-started' } as Body, /Не готово/);
-  bad({ type: 'battle-ended', reason: 'manual' } as Body, /не идёт/);
+  const fresh = at(1);
+  bad(fresh, { type: 'player-set', target: 'p1', patch: { disposition: 'nope' } } as Body, /Неизвестный тип армии/);
+  bad(fresh, { type: 'dispositions-revealed' } as Body, /не выбран тип армии/);
+  bad(fresh, { type: 'secondaries-revealed' } as Body, /не выбран режим/);
+  bad(fresh, { type: 'layout-set', layoutId: 'bm-take-vs-take-01', source: 'manual' } as Body, /Сначала раскройте типы армий/);
+  bad(fresh, { type: 'battle-started' } as Body, /Не готово/);
+  bad(fresh, { type: 'battle-ended', reason: 'manual' } as Body, /не идёт/);
+  bad(fresh, { type: 'secondary-chosen', target: 'p1', mode: 'tactical', fixed: null } as Body, /Сначала определите атакующего/);
+  bad(at(4), { type: 'roles-set', attacker: 'p1', source: 'manual' } as Body, /Сначала выберите раскладку/);
+  bad(at(4), { type: 'layout-set', layoutId: 'bm-take-vs-take-01', source: 'manual' } as Body, /не подходит к паре/);
+  const roles = at(6);
+  bad(roles, { type: 'secondary-chosen', target: 'p1', mode: 'fixed', fixed: ['assassination', 'assassination'] } as Body, /две разные/);
+  bad(roles, { type: 'secondary-chosen', target: 'p1', mode: 'fixed', fixed: ['assassination', 'cleanse'] } as Body, /нельзя взять фиксированной/);
+  bad(roles, { type: 'secondary-chosen', target: 'p1', mode: 'fixed', fixed: ['assassination', 'death-trap'] } as Body, /Нет вторичной/);
+  bad(roles, { type: 'first-turn-set', first: 'p1', source: 'manual' } as Body, /Сначала раскройте вторичные/);
 });
 
-test('после раскрытия тип армии не меняется; смена пары сбрасывает раскладку', () => {
+test('после раскрытия тип армии не меняется; до раскрытия смена пары меняет основные миссии', () => {
   const bodies = setupBodies();
-  const revealed = ok(replay(log(...bodies.slice(0, 6)), catalog));
+  const revealed = ok(replay(log(...bodies.slice(0, 4)), catalog));
   const r = applyEvent(revealed, { seat: null, type: 'player-set', target: 'p1', patch: { disposition: 'disruption' }, id: 'z', seq: revealed.lastSeq + 1, at: 'now' } as GameEvent, catalog);
   assert.ok(!r.ok && /раскрыт/.test(r.error));
-  // до раскрытия: раскладка выбрана, затем меняется тип армии — раскладка сбрасывается
-  const pre = log(created, bodies[1]!, bodies[2]!, { type: 'layout-set', layoutId: bodies[6]!.layoutId, source: 'manual' } as Body, { type: 'player-set', target: 'p2', patch: { disposition: 'disruption' } } as Body);
-  const s = ok(replay(pre, catalog));
-  assert.equal(s.layoutId, null);
+  const s = ok(replay(log(created, bodies[1]!, bodies[2]!, { type: 'player-set', target: 'p2', patch: { disposition: 'disruption' } } as Body), catalog));
   assert.deepEqual(s.primary, { p1: 'determined-acquisition', p2: 'death-trap' });
 });
 

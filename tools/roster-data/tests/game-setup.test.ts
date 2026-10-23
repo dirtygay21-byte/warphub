@@ -1,0 +1,74 @@
+// «Начать игру», G2.1: шаги подготовки в порядке правил, два раскрытия (типы армий, вторичные),
+// броски «кто выше» с проверкой по seed (game/setup.ts, game/reducer.ts). Запуск: npm test
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { replay } from '../../../client/src/features/roster/game/reducer';
+import { rollOff } from '../../../client/src/features/roster/game/rng';
+import { currentSetupStep, setupMissing, setupSteps } from '../../../client/src/features/roster/game/setup';
+import type { GameState } from '../../../client/src/features/roster/game/types';
+import { catalog, log, setupBodies, type Body } from './game-helpers';
+
+const ok = (r: ReturnType<typeof replay>): GameState => {
+  assert.ok(r.ok, r.ok ? '' : `№${r.seq}: ${r.error}`);
+  return r.state;
+};
+const err = (r: ReturnType<typeof replay>, re: RegExp) => assert.ok(!r.ok && re.test(r.error), r.ok ? 'принято' : r.error);
+const B = (b: object) => b as Body;
+const upTo = (n: number, ...extra: Body[]) => replay(log(...setupBodies().slice(0, n), ...extra), catalog);
+const R = (attempt: number) => ({ attempt });
+const ROLES = rollOff('seed-1', 'roles', 0);
+const FIRST = rollOff('seed-1', 'first-turn', 0);
+
+test('шаги подготовки идут в порядке правил колоды миссий', () => {
+  const steps = [
+    [1, 'dispositions'], [3, 'dispositions'], [4, 'layout'], [5, 'roles'], [6, 'secondaries'],
+    [8, 'secondaries'], [9, 'first-turn'], [10, null],
+  ] as const;
+  for (const [n, exp] of steps) assert.equal(currentSetupStep(ok(upTo(n))), exp, `после ${n} событий`);
+  assert.deepEqual(setupSteps(ok(upTo(1))).map((x) => x.id), ['players', 'dispositions', 'layout', 'roles', 'secondaries', 'first-turn']);
+  assert.deepEqual(setupMissing(ok(upTo(3))), ['раскрытие типов армий', 'раскладка', 'атакующий и защитник', 'Аня: режим вторичных миссий', 'Борис: режим вторичных миссий', 'кто ходит первым']);
+  assert.deepEqual(setupMissing(ok(upTo(10))), []);
+});
+
+test('раскрытия: после раскрытия выбор не меняется', () => {
+  err(upTo(4, B({ type: 'player-set', target: 'p1', patch: { disposition: 'disruption' } })), /уже раскрыт/);
+  err(upTo(4, B({ type: 'dispositions-revealed' })), /уже раскрыты/);
+  err(upTo(9, B({ type: 'secondary-chosen', target: 'p1', mode: 'tactical', fixed: null })), /уже раскрыт/);
+  err(upTo(9, B({ type: 'secondaries-revealed' })), /уже раскрыты/);
+  err(upTo(9, B({ type: 'roles-set', attacker: 'p2', source: 'manual' })), /не поменять/);
+  err(upTo(3, B({ type: 'dispositions-revealed', seat: 'p1' })), /общее событие/);
+  // до раскрытия вторичных атакующего можно переопределить
+  assert.equal(ok(upTo(6, B({ type: 'roles-set', attacker: 'p2', source: 'manual' }))).players.p2.role, 'attacker');
+});
+
+test('бросок за атакующего: кубики по seed, победитель выбирает; номер броска ведёт движок', () => {
+  const s = ok(upTo(5, B({ type: 'roles-set', attacker: 'p2', source: 'random', roll: R(0) })));
+  assert.deepEqual(s.rolls.roles, { attempt: 0, rolls: ROLES.rolls, winner: ROLES.winner });
+  assert.equal(s.rollCount.roles, 1);
+  assert.equal(s.players.p2.role, 'attacker', 'победитель вправе выбрать любую роль для любого');
+  err(upTo(5, B({ type: 'roles-set', attacker: 'p1', source: 'random', roll: R(1) })), /Ожидался бросок №1/);
+  err(upTo(5, B({ type: 'roles-set', attacker: 'p1', source: 'random' })), /нужен бросок/);
+  err(upTo(5, B({ type: 'roles-set', attacker: 'p1', source: 'manual', roll: R(0) })), /ручной/);
+  const loser = ROLES.winner === 'p1' ? 'p2' : 'p1';
+  err(upTo(5, B({ type: 'roles-set', attacker: 'p1', source: 'random', roll: R(0), seat: loser })), /победитель броска/);
+  ok(upTo(5, B({ type: 'roles-set', attacker: 'p1', source: 'random', roll: R(0), seat: ROLES.winner })));
+  // переброс по договорённости — следующий номер, новые кубики
+  const again = ok(upTo(5, B({ type: 'roles-set', attacker: 'p1', source: 'random', roll: R(0) }), B({ type: 'roles-set', attacker: 'p1', source: 'random', roll: R(1) })));
+  assert.deepEqual(again.rolls.roles?.rolls, rollOff('seed-1', 'roles', 1).rolls);
+});
+
+test('отмена броска возвращает счётчик: повторный бросок даёт те же кубики', () => {
+  const evs = log(...setupBodies().slice(0, 5), B({ type: 'roles-set', attacker: 'p1', source: 'random', roll: R(0) }));
+  const undone = ok(replay(log(...evs.map((e) => B(e)), B({ type: 'event-reverted', target: evs.at(-1)!.id })), catalog));
+  assert.deepEqual([undone.rollCount.roles, undone.rolls.roles], [0, undefined]);
+  err(replay(log(...evs.map((e) => B(e)), B({ type: 'event-reverted', target: evs.at(-1)!.id }), B({ type: 'roles-set', attacker: 'p1', source: 'random', roll: R(1) })), catalog), /Ожидался бросок №1/);
+});
+
+test('бросок за первый ход: победитель ходит первым', () => {
+  const s = ok(upTo(9, B({ type: 'first-turn-set', first: FIRST.winner, source: 'random', roll: R(0) })));
+  assert.equal(s.firstTurn, FIRST.winner);
+  assert.deepEqual(s.rolls['first-turn']?.rolls, FIRST.rolls);
+  err(upTo(9, B({ type: 'first-turn-set', first: FIRST.winner === 'p1' ? 'p2' : 'p1', source: 'random', roll: R(0) })), /победитель броска/);
+  // вручную (договорились) — любой
+  assert.equal(ok(upTo(9, B({ type: 'first-turn-set', first: 'p1', source: 'manual' }))).firstTurn, 'p1');
+});
