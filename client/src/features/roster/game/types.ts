@@ -103,8 +103,14 @@ export interface RosterRef {
   name?: string;
   factionId?: string;
   points?: number;
-  /** тип армии ростера (английское название, как в ростере: «Take and Hold») — подсказка для шага типов армий */
+  /** тип армии, выбранный в ростере (английское название, как в ростере: «Take and Hold») — выбор по умолчанию */
   forceDisposition?: string | null;
+  /** типы армий, которые дают детачменты ростера (id из battlefield.json) — из них игрок выбирает (G2.12) */
+  dispositions?: string[];
+  /** названия детачментов ростера — для показа */
+  detachments?: string[];
+  /** код ростера (WH1.…): ростер можно открыть в режиме мастера и передать второму телефону */
+  code?: string;
 }
 
 export interface PlayerSetup {

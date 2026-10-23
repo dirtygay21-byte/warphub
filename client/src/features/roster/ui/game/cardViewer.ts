@@ -10,3 +10,13 @@ export const CardViewerContext = createContext<OpenCard | null>(null);
 export function useOpenCard(): OpenCard | null {
   return useContext(CardViewerContext);
 }
+
+/** Открыть ростер игрока в просмотре (режим мастера, G2.12); null — режим мастера выключен. */
+export type OpenRoster = (seat: Seat) => void;
+
+export const RosterViewerContext = createContext<OpenRoster | null>(null);
+
+/** Функция открытия ростера; null — режим мастера выключен или ростера нет. */
+export function useOpenRoster(): OpenRoster | null {
+  return useContext(RosterViewerContext);
+}

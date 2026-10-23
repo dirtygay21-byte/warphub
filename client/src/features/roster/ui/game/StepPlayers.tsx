@@ -5,19 +5,26 @@ import { SEATS, type RosterRef, type Seat } from '../../game';
 import { haptic } from '../../telegram';
 import { Button, Segmented } from '../kit';
 import { cx, fmtPts } from '../util';
-import { rosterRef } from './players';
+import { rosterRefFor } from './players';
+import { RosterButton } from './RosterViewer';
 import type { GameHook } from './useGame';
 
-type Source = RosterRef['source'];
+type Source = 'own' | 'code';
 
-/** Шаг «Игроки»: имена и ростеры (свой из Roster Builder, код ростера соперника или только фракция). */
+/**
+ * Шаг «Игроки и ростеры» (G2.12): у каждого игрока обязателен ростер — свой из Roster Builder или код ростера
+ * соперника. Из ростера берутся детачменты и типы армий, которые они дают (из них игрок выберет тип армии).
+ */
 export function StepPlayers({ game, rosters, index, onNext }: { game: GameHook; rosters: Roster[]; index: DataIndex; onNext: () => void }) {
+  const state = game.state!;
+  const missing = SEATS.filter((s) => state.players[s].roster.source === 'none');
   return (
     <div className="mt-3 space-y-3">
       {SEATS.map((seat) => (
         <PlayerCard key={seat} seat={seat} game={game} rosters={rosters} index={index} />
       ))}
-      <Button variant="primary" className="w-full" onClick={onNext}>
+      {missing.length > 0 && <p className="text-xs text-warn">Нужен ростер: {missing.map((s) => state.players[s].name).join(', ')}</p>}
+      <Button variant="primary" className="w-full" disabled={missing.length > 0} onClick={onNext}>
         Далее: типы армий
       </Button>
     </div>
@@ -26,14 +33,30 @@ export function StepPlayers({ game, rosters, index, onNext }: { game: GameHook; 
 
 function PlayerCard({ seat, game, rosters, index }: { seat: Seat; game: GameHook; rosters: Roster[]; index: DataIndex }) {
   const p = game.state!.players[seat];
+  const locked = game.state!.dispositionsRevealed;
   const [name, setName] = useState(p.name);
-  const [source, setSource] = useState<Source>(p.roster.source);
+  const [source, setSource] = useState<Source>(p.roster.source === 'code' || !rosters.length ? 'code' : 'own');
   const [code, setCode] = useState('');
-  const [codeErr, setCodeErr] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const factionName = (id?: string) => index.factions.find((f) => f.id === id)?.name ?? id ?? '—';
-  const setRoster = (roster: RosterRef): boolean => {
-    const ok = game.dispatch({ type: 'player-set', target: seat, patch: { roster } });
-    if (ok) haptic.select();
+  const dName = (id: string) => game.data!.battlefield.dispositions.find((d) => d.id === id)?.nameRu ?? id;
+
+  // ростер → снимок для игры (детачменты, типы армий, код); ошибка — под карточкой
+  const pick = async (r: Roster, src: Source): Promise<boolean> => {
+    setBusy(true);
+    const ref = await rosterRefFor(r, src, game.data!.battlefield);
+    setBusy(false);
+    if (typeof ref === 'string') {
+      setErr(ref);
+      haptic.error();
+      return false;
+    }
+    const ok = game.dispatch({ type: 'player-set', target: seat, patch: { roster: ref } });
+    if (ok) {
+      setErr(null);
+      haptic.select();
+    }
     return ok;
   };
 
@@ -43,20 +66,19 @@ function PlayerCard({ seat, game, rosters, index }: { seat: Seat; game: GameHook
     else setName(p.name);
   };
 
-  const loadCode = () => {
+  const loadCode = async () => {
     const c = code.trim();
-    if (c.startsWith('AOS1.')) return setCodeErr('Это ростер Age of Sigmar — для этих миссий нужен ростер Warhammer 40,000.');
+    if (c.startsWith('AOS1.')) return setErr('Это ростер Age of Sigmar — для этих миссий нужен ростер Warhammer 40,000.');
+    let r: Roster;
     try {
-      const r = decodeRoster(c, index.factions.map((f) => f.id));
-      if (setRoster(rosterRef(r, 'code'))) {
-        setCode('');
-        setCodeErr(null);
-      }
+      r = decodeRoster(c, index.factions.map((f) => f.id));
     } catch (e) {
       const msg = e instanceof Error && e.message.startsWith('Ростер для') ? e.message : null;
-      setCodeErr(msg ?? 'Не получилось прочитать код. Скопируйте его целиком (начинается с WH1.).');
+      setErr(msg ?? 'Не получилось прочитать код. Скопируйте его целиком (начинается с WH1.).');
       haptic.error();
+      return;
     }
+    if (await pick(r, 'code')) setCode('');
   };
 
   return (
@@ -73,81 +95,87 @@ function PlayerCard({ seat, game, rosters, index }: { seat: Seat; game: GameHook
         />
       </label>
 
-      <Segmented<Source>
-        className="mt-2.5"
-        value={source}
-        onChange={setSource}
-        options={[
-          { value: 'own', label: 'Мой ростер', disabled: !rosters.length },
-          { value: 'code', label: 'Код ростера' },
-          { value: 'none', label: 'Без ростера' },
-        ]}
-      />
+      <RosterSummary roster={p.roster} seat={seat} factionName={factionName} dName={dName} />
 
-      {source === 'own' && (
-        <ul className="mt-2 max-h-64 space-y-1.5 overflow-y-auto">
-          {rosters.map((r) => {
-            const active = p.roster.source === 'own' && p.roster.rosterId === r.id;
-            return (
-              <li key={r.id}>
-                <button
-                  type="button"
-                  onClick={() => setRoster(rosterRef(r, 'own'))}
-                  className={cx(
-                    'w-full rounded-lg border px-3 py-2 text-left transition',
-                    active ? 'border-accent bg-accent/10' : 'border-white/10 bg-white/[0.03] active:bg-white/10',
-                  )}
-                >
-                  <span className="block truncate text-sm font-semibold">{r.name}</span>
-                  <span className="block text-[11px] text-white/45">
-                    {factionName(r.factionId)}
-                    {r.summary ? ` · ${fmtPts(r.summary.points)} очк.` : ''}
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-
-      {source === 'code' && (
-        <div className="mt-2">
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            rows={3}
-            placeholder="WH1.eyJ2Ijox…"
-            className="w-full rounded-lg border border-white/10 bg-white/[0.04] p-2.5 font-mono text-xs text-white outline-none focus:border-accent"
+      {locked ? (
+        <p className="mt-2 text-[11px] text-white/45">Типы армий раскрыты — ростер больше не меняется.</p>
+      ) : (
+        <>
+          <Segmented<Source>
+            className="mt-2.5"
+            value={source}
+            onChange={setSource}
+            options={[
+              { value: 'own', label: 'Мой ростер', disabled: !rosters.length },
+              { value: 'code', label: 'Код ростера' },
+            ]}
           />
-          {codeErr && <p className="mt-1.5 text-xs text-danger">{codeErr}</p>}
-          <Button className="mt-1.5 w-full" disabled={!code.trim()} onClick={loadCode}>
-            Загрузить ростер соперника
-          </Button>
-        </div>
-      )}
 
-      {source === 'none' && (
-        <select
-          value={p.roster.source === 'none' ? (p.roster.factionId ?? '') : ''}
-          onChange={(e) => setRoster({ source: 'none', factionId: e.target.value || undefined })}
-          className="mt-2 w-full rounded-lg border border-white/10 bg-app-elevated px-3 py-2 text-sm text-white outline-none focus:border-accent"
-        >
-          <option value="">Фракция не указана</option>
-          {index.factions.map((f) => (
-            <option key={f.id} value={f.id}>
-              {f.name}
-            </option>
-          ))}
-        </select>
-      )}
+          {source === 'own' && (
+            <ul className="mt-2 max-h-64 space-y-1.5 overflow-y-auto">
+              {rosters.map((r) => {
+                const active = p.roster.source === 'own' && p.roster.rosterId === r.id;
+                return (
+                  <li key={r.id}>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void pick(r, 'own')}
+                      className={cx(
+                        'w-full rounded-lg border px-3 py-2 text-left transition disabled:opacity-60',
+                        active ? 'border-accent bg-accent/10' : 'border-white/10 bg-white/[0.03] active:bg-white/10',
+                      )}
+                    >
+                      <span className="block truncate text-sm font-semibold">{r.name}</span>
+                      <span className="block text-[11px] text-white/45">
+                        {factionName(r.factionId)}
+                        {r.summary ? ` · ${fmtPts(r.summary.points)} очк.` : ''}
+                        {r.forceDisposition ? ` · ${r.forceDisposition}` : ''}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
 
-      <p className="mt-2 text-xs text-white/55">
-        {p.roster.source === 'none'
-          ? p.roster.factionId
-            ? `Без ростера · ${factionName(p.roster.factionId)}`
-            : 'Без ростера'
-          : `${p.roster.source === 'own' ? 'Ростер' : 'Ростер по коду'}: ${p.roster.name ?? '—'} · ${factionName(p.roster.factionId)}${p.roster.points ? ` · ${fmtPts(p.roster.points)} очк.` : ''}`}
-      </p>
+          {source === 'code' && (
+            <div className="mt-2">
+              <textarea
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                rows={3}
+                placeholder="WH1.eyJ2Ijox…"
+                className="w-full rounded-lg border border-white/10 bg-white/[0.04] p-2.5 font-mono text-xs text-white outline-none focus:border-accent"
+              />
+              <p className="mt-1 text-[11px] text-white/45">Код ростера: Roster Builder → ростер → «Экспорт» → код.</p>
+              <Button className="mt-1.5 w-full" disabled={!code.trim() || busy} onClick={() => void loadCode()}>
+                Загрузить ростер по коду
+              </Button>
+            </div>
+          )}
+        </>
+      )}
+      {err && <p className="mt-1.5 text-xs text-danger">{err}</p>}
     </section>
+  );
+}
+
+/** Выбранный ростер: название, фракция, очки, детачменты, типы армий; кнопка просмотра в режиме мастера. */
+function RosterSummary({ roster, seat, factionName, dName }: { roster: RosterRef; seat: Seat; factionName: (id?: string) => string; dName: (id: string) => string }) {
+  if (roster.source === 'none') return <p className="mt-2 text-xs text-warn">Ростер не выбран.</p>;
+  return (
+    <div className="mt-2 rounded-lg border border-accent/30 bg-accent/[0.06] px-2.5 py-2 text-xs leading-relaxed">
+      <div className="flex items-start gap-2">
+        <p className="min-w-0 flex-1 text-sm font-semibold">{roster.name ?? '—'}</p>
+        <RosterButton seat={seat} />
+      </div>
+      <p className="text-white/60">
+        {roster.source === 'own' ? 'Свой ростер' : 'Ростер по коду'} · {factionName(roster.factionId)}
+        {roster.points ? ` · ${fmtPts(roster.points)} очк.` : ''}
+      </p>
+      {roster.detachments?.length ? <p className="text-white/70">Детачмент: {roster.detachments.join(', ')}</p> : null}
+      {roster.dispositions?.length ? <p className="text-white/70">Типы армий: {roster.dispositions.map(dName).join(', ')}</p> : null}
+    </div>
   );
 }
