@@ -1,10 +1,11 @@
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import type { DataIndex } from '../../engine/types';
 import { commandPhasePending, ROUNDS, totals, type Seat } from '../../game';
 import { haptic } from '../../telegram';
 import { Button, Icon } from '../kit';
 import { cx } from '../util';
 import { CommandPhase } from './CommandPhase';
+import { EndOfTurn } from './EndOfTurn';
 import { SecondaryCard } from './SecondaryCard';
 import { Summary } from './StepStart';
 import type { GameHook } from './useGame';
@@ -53,7 +54,7 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
       {!finished && (
         <>
           {state.step === 'command' && <CommandPhase game={game} />}
-          {state.step === 'main' && <Slot title="Конец хода">Подсчёт основной и вторичных миссий и сброс карт появятся здесь.</Slot>}
+          {state.step === 'main' && <EndOfTurn game={game} />}
           <Button variant="primary" className="h-12 w-full" disabled={!!pending} onClick={next}>
             {nextLabel}
           </Button>
@@ -161,15 +162,6 @@ function RoundTable({ game }: { game: GameHook }) {
       <p className="mt-1.5 text-[10.5px] leading-snug text-white/40">
         основная / вторичные. Лимит за раунд: {caps.primaryRound} и {caps.secondaryRound}; за битву: {caps.primaryGame} и {caps.secondaryGame}.
       </p>
-    </div>
-  );
-}
-
-function Slot({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="rounded-xl border border-dashed border-white/15 px-3 py-2.5">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{title}</p>
-      <p className="mt-0.5 text-xs text-white/45">{children}</p>
     </div>
   );
 }
