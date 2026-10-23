@@ -1,9 +1,10 @@
 import { useState, type ReactNode } from 'react';
 import type { DataIndex } from '../../engine/types';
-import { ROUNDS, totals, type Seat } from '../../game';
+import { commandPhasePending, ROUNDS, totals, type Seat } from '../../game';
 import { haptic } from '../../telegram';
 import { Button, Icon } from '../kit';
 import { cx } from '../util';
+import { CommandPhase } from './CommandPhase';
 import { SecondaryCard } from './SecondaryCard';
 import { Summary } from './StepStart';
 import type { GameHook } from './useGame';
@@ -20,6 +21,7 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
   const finished = state.stage === 'finished';
   const active = state.activeSeat;
   const [summary, setSummary] = useState(false);
+  const pending = state.step === 'command' && active ? commandPhasePending(state, active, game.data!.catalog) : null;
   const lastTurn = state.round === ROUNDS && active != null && active !== state.firstTurn;
 
   const next = () => {
@@ -50,9 +52,9 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
 
       {!finished && (
         <>
-          {state.step === 'command' && <Slot title="Фаза командования">Взятие карт, «при взятии» и замена за 1 CP появятся здесь.</Slot>}
+          {state.step === 'command' && <CommandPhase game={game} />}
           {state.step === 'main' && <Slot title="Конец хода">Подсчёт основной и вторичных миссий и сброс карт появятся здесь.</Slot>}
-          <Button variant="primary" className="h-12 w-full" onClick={next}>
+          <Button variant="primary" className="h-12 w-full" disabled={!!pending} onClick={next}>
             {nextLabel}
           </Button>
           {state.step === 'start' && <p className="text-center text-[11px] text-white/45">В начале фазы командования оба игрока получают 1 CP.</p>}

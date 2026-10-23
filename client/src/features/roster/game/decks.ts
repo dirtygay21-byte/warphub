@@ -90,7 +90,13 @@ export function redrawWhenDrawn(
   if (s.stage !== 'battle' || s.activeSeat !== seat || s.step !== 'command' || p.active[i]!.round !== s.round)
     return 'Правило «при взятии» действует сразу после взятия — в эту фазу командования';
   if (p.secondaryMode !== 'tactical') return 'Правило «при взятии» — только в тактическом режиме';
-  if (!catalog.cards.find((c) => c.id === card)?.drawn) return 'У этой карты нет правила «при взятии»';
+  const od = catalog.cards.find((c) => c.id === card)?.onDraw;
+  if (!od) return 'У этой карты нет правила «при взятии»';
+  if (od.action === 'note') return 'Правило этой карты — выбор при взятии, без замены';
+  if (od.action === 'reshuffle' && !shuffleBack) return 'По карте эта карта возвращается в колоду и перемешивается';
+  if (od.action === 'discard' && shuffleBack) return 'По карте эта карта сбрасывается';
+  if (od.round1 && s.round !== 1) return 'Это правило «при взятии» действует только в первом раунде';
+  if (od.ifActive && !p.active.some((a) => a.id === od.ifActive)) return 'Это правило «при взятии» действует, только если активна связанная карта';
   if (!p.deck.length) return 'В колоде не осталось карт для замены';
   if (source === 'random' && p.deck[0] !== replacement) return 'Случайная замена должна совпадать с верхом колоды';
   if (!p.deck.includes(replacement)) return 'Этой карты нет в колоде';
@@ -128,6 +134,26 @@ export function swapCard(s: GameState, seat: Seat, card: string, replacement: st
   p.discardLog.push({ id: card, round: s.round, ...(old.n != null ? { n: old.n } : {}), why: 'swap', cp: -1 });
   p.cp -= 1;
   p.swapUsed = true;
+  return null;
+}
+
+/**
+ * Что мешает закончить фазу командования (G3.3): тактический игрок не взял карты, хотя колода не пуста;
+ * обязательное «при взятии» (Defend Stronghold в 1-м раунде) не выполнено. null — можно.
+ */
+export function commandPhasePending(s: GameState, seat: Seat, catalog: GameCatalog): string | null {
+  const p = s.players[seat];
+  if (p.secondaryMode !== 'tactical') return null;
+  const left = drawsLeft(s, seat);
+  if (left > 0) return `Сначала возьмите карты вторичных миссий (ещё ${left})`;
+  if (!p.deck.length) return null;
+  for (const a of p.active) {
+    const od = catalog.cards.find((c) => c.id === a.id)?.onDraw;
+    if (od?.required && a.round === s.round && (!od.round1 || s.round === 1)) {
+      const name = catalog.cards.find((c) => c.id === a.id)?.name ?? a.id;
+      return `«${name}»: обязательное правило «при взятии» — возьмите новую карту`;
+    }
+  }
   return null;
 }
 

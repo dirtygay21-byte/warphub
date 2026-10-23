@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { buildMissions, vpDiff } from '../scripts/build-missions.mjs';
+import { buildMissions, onDrawErrors, vpDiff } from '../scripts/build-missions.mjs';
 
 const ROOT = path.join(import.meta.dirname, '..', '..', '..');
 const read = (...p: string[]) => JSON.parse(fs.readFileSync(path.join(ROOT, ...p), 'utf8'));
@@ -80,4 +80,19 @@ test('missions.json совпадает со сборкой из 40kdc-data (ес
     version: missions.source.version,
   });
   assert.deepEqual(rebuilt, missions);
+});
+
+test('«при взятии» в данных (onDraw, G3.3): у всех 10 карт с правилом, совпадает с текстом; проверка ловит расхождение', () => {
+  const withRule = missions.cards.filter((c: { type: string; drawn?: string }) => c.type === 'secondary' && c.drawn);
+  assert.equal(withRule.length, 10);
+  for (const c of missions.cards) assert.deepEqual(onDrawErrors(c.id, c), [], c.id);
+  const actions = Object.fromEntries(withRule.map((c: { id: string; onDraw: { action: string } }) => [c.id, c.onDraw.action]));
+  assert.deepEqual(actions, {
+    'a-grievous-blow': 'discard', 'a-tempting-target': 'note', beacon: 'note', 'behind-enemy-lines': 'reshuffle', 'bring-it-down': 'discard',
+    'burden-of-trust': 'note', cleanse: 'reshuffle', 'defend-stronghold': 'reshuffle', 'forward-position': 'reshuffle', plunder: 'reshuffle',
+  });
+  const ds = missions.cards.find((c: { id: string }) => c.id === 'defend-stronghold');
+  assert.match(onDrawErrors('x', { ...ds, onDraw: { ...ds.onDraw, action: 'discard' } }).join(), /discard, но в тексте нет/);
+  assert.match(onDrawErrors('x', { ...ds, onDraw: { ...ds.onDraw, required: false } }).join(), /required не совпадает/);
+  assert.match(onDrawErrors('x', { ...ds, onDraw: undefined }).join(), /нет onDraw/);
 });

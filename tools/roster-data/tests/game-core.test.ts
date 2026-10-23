@@ -50,12 +50,14 @@ test('полная битва: 5 раундов по 2 хода, первым х
   assert.deepEqual([s.stage, s.round, s.activeSeat, s.step], ['battle', 1, 'p2', 'start']);
   s = ok(replay(events.slice(0, setupBodies().length + 3), catalog));
   assert.deepEqual([s.round, s.activeSeat], [1, 'p1']);
-  s = ok(replay(events.slice(0, setupBodies().length + 6), catalog));
+  // с G3.3 тактический p1 обязан взять карты: журнал вставляет взятие перед концом его фазы командования (+1 событие)
+  s = ok(replay(events.slice(0, setupBodies().length + 7), catalog));
   assert.deepEqual([s.round, s.activeSeat], [2, 'p2']);
+  assert.equal(s.players.p1.active.length, 2);
   s = ok(replay(events, catalog));
   assert.deepEqual([s.stage, s.endReason, s.activeSeat], ['finished', 'rounds', null]);
   assert.equal(s.lastSeq, events.length);
-  const after = applyEvent(s, { ...log(...bodies, ...turn())[events.length]! }, catalog);
+  const after = applyEvent(s, { ...log(...bodies, ...turn()).at(-3)! }, catalog);
   assert.ok(!after.ok && /закончена/.test(after.error));
 });
 

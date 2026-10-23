@@ -6,7 +6,7 @@ import { drawCards, drawsLeft, nextDraw, secondaryIds } from '../../../client/sr
 import { replay } from '../../../client/src/features/roster/game/reducer';
 import { deckOrder } from '../../../client/src/features/roster/game/rng';
 import type { GameState } from '../../../client/src/features/roster/game/types';
-import { catalog, log, setupBodies, type Body } from './game-helpers';
+import { catalog, log, rawLog, setupBodies, type Body } from './game-helpers';
 
 const ok = (r: ReturnType<typeof replay>): GameState => {
   assert.ok(r.ok, r.ok ? '' : `№${r.seq}: ${r.error}`);
@@ -154,4 +154,51 @@ test('порядок выхода из колоды (n) и журнал сбро
   const s4 = ok(run(drawn, back));
   assert.deepEqual(s4.players.p1.discardLog, []);
   assert.deepEqual(s4.players.p1.active.map((x) => x.n), [1, 3]);
+});
+
+// G3.3: «при взятии» по данным карты и обязательные действия фазы командования (журнал без автоматического взятия)
+test('фаза командования не заканчивается без взятых карт и без обязательной замены Defend Stronghold', () => {
+  const raw = (...extra: Body[]) => replay(rawLog(...toP1Command(), ...extra), catalog);
+  const end = B({ type: 'command-phase-ended' });
+  err(raw(end), /Сначала возьмите карты вторичных миссий \(ещё 2\)/);
+  err(raw(B({ type: 'cards-drawn', target: 'p1', cards: ['plunder'], source: 'manual' }), end), /ещё 1/);
+  const ds = B({ type: 'cards-drawn', target: 'p1', cards: ['defend-stronghold', 'plunder'], source: 'manual' });
+  err(raw(ds, end), /Defend Stronghold.*обязательное/);
+  const s0 = ok(raw(ds));
+  const swap = B({ type: 'card-redrawn', target: 'p1', card: 'defend-stronghold', replacement: s0.players.p1.deck[0], reason: 'when-drawn', shuffleBack: true, source: 'random' });
+  const s = ok(raw(ds, swap, end));
+  assert.ok(s.players.p1.deck.includes('defend-stronghold'), 'вернулась в колоду');
+  // фиксированный игрок (p2) карты не тянет — его фаза заканчивается сразу
+  ok(replay(rawLog(...setupBodies(), B({ type: 'command-phase-started' }), end), catalog));
+});
+
+test('«при взятии» по данным: перемешать или сбросить — как на карте; только 1-й раунд; Plunder ↔ Cleanse; выбор — без замены', () => {
+  const raw = (...extra: Body[]) => replay(rawLog(...toP1Command(), ...extra), catalog);
+  const drawn = (...cards: string[]) => B({ type: 'cards-drawn', target: 'p1', cards, source: 'manual' });
+  const redraw = (card: string, shuffleBack: boolean, top: string) =>
+    B({ type: 'card-redrawn', target: 'p1', card, replacement: top, reason: 'when-drawn', shuffleBack, source: 'random' });
+  const top = (...extra: Body[]) => ok(raw(...extra)).players.p1.deck[0]!;
+
+  const fp = drawn('forward-position', 'outflank');
+  err(raw(fp, redraw('forward-position', false, top(fp))), /возвращается в колоду/);
+  ok(raw(fp, redraw('forward-position', true, top(fp))));
+  const bid = drawn('bring-it-down', 'outflank');
+  err(raw(bid, redraw('bring-it-down', true, top(bid))), /сбрасывается/);
+  const beacon = drawn('beacon', 'outflank');
+  err(raw(beacon, redraw('beacon', false, top(beacon))), /без замены/);
+  const pl = drawn('plunder', 'outflank');
+  err(raw(pl, redraw('plunder', true, top(pl))), /связанная карта/);
+  const plc = drawn('plunder', 'cleanse');
+  ok(raw(plc, redraw('plunder', true, top(plc))));
+
+  // 2-й раунд: Forward Position уже нельзя заменить
+  const r2 = [...toP1Command(), drawn('outflank', 'plunder'), B({ type: 'command-phase-ended' }), B({ type: 'turn-ended' })];
+  const r2p1 = [...r2, B({ type: 'command-phase-started' }), B({ type: 'command-phase-ended' }), B({ type: 'turn-ended' }), B({ type: 'command-phase-started' })];
+  const fp2 = drawn('forward-position', 'centre-ground');
+  const s2 = ok(replay(rawLog(...r2p1, fp2), catalog));
+  assert.equal(s2.round, 2);
+  err(replay(rawLog(...r2p1, fp2, redraw('forward-position', true, s2.players.p1.deck[0]!)), catalog), /только в первом раунде/);
+  // Defend Stronghold во 2-м раунде — без обязательной замены
+  const ds2 = drawn('defend-stronghold', 'centre-ground');
+  ok(replay(rawLog(...r2p1, ds2, B({ type: 'command-phase-ended' })), catalog));
 });

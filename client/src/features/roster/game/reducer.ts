@@ -21,7 +21,7 @@ import {
   type RollResult,
   type Seat,
 } from './types';
-import { drawCards, initDecks, noteCard, redrawWhenDrawn, swapCard } from './decks';
+import { commandPhasePending, drawCards, initDecks, noteCard, redrawWhenDrawn, swapCard } from './decks';
 import { blockTurnOk, cardVp, primaryAtOk } from './scoring';
 import { setupMissing } from './setup';
 import { layoutPick, rollOff } from './rng';
@@ -257,6 +257,8 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
     case 'command-phase-ended': {
       const e = turnCheck(s, ev.seat, 'command');
       if (e) return fail(e);
+      const pending = commandPhasePending(s, s.activeSeat!, catalog);
+      if (pending) return fail(pending);
       s.step = 'main';
       break;
     }

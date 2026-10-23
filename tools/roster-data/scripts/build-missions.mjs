@@ -64,6 +64,32 @@ export const PRIMARY_AT = {
   'Конец битвы': 'battle-end',
 };
 
+/**
+ * Правило «при взятии» в виде данных (G3.3): onDraw.action — reshuffle (взять новую, эту вернуть в колоду и перемешать),
+ * discard (сбросить эту и взять новую; условие подтверждает игрок — confirm), note (записать выбор: маяк, цель, охрана);
+ * round1 — только в 1-м раунде; ifActive — только если активна такая карта; required — обязательно.
+ * Проверяется по тексту «drawn», чтобы данные и текст не разошлись.
+ */
+export function onDrawErrors(id, t) {
+  const e = [];
+  const o = t.onDraw;
+  if (t.type !== 'secondary') return o ? [`${id}: onDraw у основной миссии`] : [];
+  if (!t.drawn) return o ? [`${id}: onDraw без текста «при взятии»`] : [];
+  if (!o) return [`${id}: у правила «при взятии» нет onDraw`];
+  const text = t.drawn;
+  if (!['reshuffle', 'discard', 'note'].includes(o.action)) e.push(`${id}: onDraw.action ${o.action}`);
+  if (o.action === 'reshuffle' && !/перемеша/.test(text)) e.push(`${id}: reshuffle, но в тексте нет «перемешать»`);
+  if (o.action === 'discard' && !/сбросить/.test(text)) e.push(`${id}: discard, но в тексте нет «сбросить»`);
+  if (o.action !== 'note' && /перемеша|сбросить/.test(text) === false) e.push(`${id}: замена без слов о замене`);
+  if (o.action === 'note' && /перемеша|сбросить эту/.test(text)) e.push(`${id}: note, но в тексте замена`);
+  if (!!o.round1 !== /первый раунд/.test(text)) e.push(`${id}: round1 не совпадает с текстом`);
+  if (!!o.required !== !!t.drawnRequired) e.push(`${id}: required не совпадает с drawnRequired`);
+  if (o.required && /можно/.test(text)) e.push(`${id}: required, но в тексте «можно»`);
+  if (o.action !== 'note' && !o.required && !/можно/.test(text)) e.push(`${id}: по желанию, но в тексте нет «можно»`);
+  if (o.ifActive && !new RegExp(o.ifActive, 'i').test(text.replace(/\s/g, '-'))) e.push(`${id}: ifActive ${o.ifActive} не в тексте`);
+  return e;
+}
+
 export function buildMissions({ cards, missions, matchups, ru, review, version }) {
   const kdcById = new Map(cards.map((c) => [c.id, c]));
   const errors = [];
@@ -96,6 +122,7 @@ export function buildMissions({ cards, missions, matchups, ru, review, version }
       }
     }
     if (t.drawnRequired && !t.drawn) errors.push(`${id}: drawnRequired без правила «при взятии»`);
+    for (const e of onDrawErrors(id, t)) errors.push(e);
     const d = vpDiff(t, k);
     if (d.length && allowed.get(id) !== JSON.stringify(d)) errors.push(`${id}: очки расходятся с 40kdc ${JSON.stringify(d)}`);
     out.push({ id, name: k.name, ...t });

@@ -74,10 +74,16 @@ test('«конец хода противника или конец 5-го рау
   const mine = [...p1Command(1), draw('beacon'), endCmd];
   err(run(...mine, score('beacon', 0)), /хода противника/);
   ok(run(...mine, endTurn, start, endCmd, score('beacon', 0)));
-  // 4-й раунд, ход p1 — ещё не конец битвы
-  err(run(...p1Command(4), draw('beacon'), endCmd, score('beacon', 0)), /хода противника/);
+  // карта взята в 1-м раунде и остаётся активной; 4-й раунд, ход p1 — ещё не конец битвы
+  const toP1Main = (round: number) => {
+    const out = [...mine, endTurn];
+    for (let r = 2; r < round; r++) out.push(...fullTurn, ...fullTurn);
+    out.push(...fullTurn, start, endCmd);
+    return out;
+  };
+  err(run(...toP1Main(4), score('beacon', 0)), /хода противника/);
   // 5-й раунд: p1 ходит вторым, ход противника уже прошёл — засчитывается в конце своего хода
-  ok(run(...p1Command(5), draw('beacon'), endCmd, score('beacon', 0)));
+  ok(run(...toP1Main(5), score('beacon', 0)));
 });
 
 test('Display of Might: 2 ПО — в конце своего хода, 5 ПО — в конце хода противника', () => {

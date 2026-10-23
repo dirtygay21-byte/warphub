@@ -73,6 +73,8 @@ export interface CatalogCard {
   drawn?: string;
   /** правило «при взятии» обязательное */
   drawnRequired?: boolean;
+  /** «при взятии» в виде данных — см. redrawWhenDrawn */
+  onDraw?: { action: 'reshuffle' | 'discard' | 'note'; round1?: boolean; ifActive?: string; required?: boolean; confirm?: boolean };
   blocks: CatalogBlock[];
 }
 export interface GameCatalog {

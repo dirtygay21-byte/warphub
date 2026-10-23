@@ -118,6 +118,13 @@ export interface MissionAction {
   effect: string;
   restriction?: string;
 }
+export interface OnDraw {
+  action: 'reshuffle' | 'discard' | 'note';
+  round1?: boolean;
+  ifActive?: string;
+  required?: boolean;
+  confirm?: boolean;
+}
 export interface MissionCard {
   id: string;
   name: string;
@@ -129,6 +136,8 @@ export interface MissionCard {
   drawn?: string;
   /** правило «при взятии» обязательное (Defend Stronghold в 1-м раунде), иначе — по желанию */
   drawnRequired?: boolean;
+  /** «при взятии» в виде данных: reshuffle | discard | note; round1, ifActive (id карты), required, confirm */
+  onDraw?: OnDraw;
   note?: string;
   blocks: MissionBlock[];
   actions?: MissionAction[];
