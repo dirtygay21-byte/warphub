@@ -10,7 +10,7 @@ import path from 'node:path';
 // @ts-expect-error — .mjs без типов
 import { apply40kUpdates, checkWhrulesSnapshot, loadSnapshot, repair40kData } from '../scripts/updates-40k.mjs';
 // @ts-expect-error — модуль .mjs без типов
-import { WHRULES_APPLIERS } from '../scripts/whrules-convert.mjs';
+import { WHRULES_APPLIERS } from '../scripts/whrules-points.mjs';
 
 const ROOT = path.join(import.meta.dirname, '..', '..', '..');
 const DATA = path.join(ROOT, 'backend', 'roster-data');
@@ -57,14 +57,14 @@ function copyData() {
 }
 const snapshotOf = (dir: string) => Object.fromEntries(['index.json', ...fs.readdirSync(path.join(dir, 'f')).map((f) => `f/${f}`)].map((f) => [f, fs.readFileSync(path.join(dir, f), 'utf8')]));
 
-test('включённое обновление whrules-981 уже применено: repair ничего не меняет (текущие curated и данные)', () => {
+test('включённые обновления whrules-981, whrules-995-custodes, whrules-995-points и whrules-995-wargear уже применены: repair ничего не меняет (текущие curated и данные)', () => {
   const dir = copyData();
   try {
     const before = snapshotOf(dir);
     const res = repair40kData(dir, curated, { appliers: WHRULES_APPLIERS });
     assert.deepEqual(res.changedFiles, []);
     assert.deepEqual(snapshotOf(dir), before);
-    assert.deepEqual(JSON.parse(before['index.json']).updates.map((u: { id: string }) => u.id), ['whrules-981-space-marines']);
+    assert.deepEqual(JSON.parse(before['index.json']).updates.map((u: { id: string }) => u.id), ['whrules-981-space-marines', 'whrules-995-custodes', 'whrules-995-points', 'whrules-995-wargear']);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

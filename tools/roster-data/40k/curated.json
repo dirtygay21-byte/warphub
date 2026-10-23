@@ -6,15 +6,185 @@
   },
   "sources": [],
   "updates": {
-    "about": "Проверенные обновления поверх выгрузки Wahapedia (scripts/updates-40k.mjs: применяются в конце импорта и в scripts/repair-40k-data.mjs). Элемент: { id, kind, snapshot (файл в 40k/, проверяется fingerprint), enabled, scope (что обновлено), note }. Применённые записываются в index.json → updates. Снимки: 40k/whrules-<версия>.json (scripts/whrules-extract.js + scripts/whrules-save.mjs), полный — 40k/whrules-<версия>-full.json (scripts/whrules-extract-full.js + whrules-map.mjs --save-full). whrules-faction — scripts/whrules-convert.mjs (сухой прогон: bun scripts/whrules-convert.mjs --out <файл>); одобрено владельцем 2026-10-16 по отчёту сухого прогона v4.",
+    "about": "Проверенные обновления поверх выгрузки Wahapedia (scripts/updates-40k.mjs: применяются в конце импорта и в scripts/repair-40k-data.mjs). Элемент: { id, kind, snapshot (файл в 40k/, проверяется fingerprint), enabled, scope (что обновлено), note }. Применённые записываются в index.json → updates. Снимки: 40k/whrules-<версия>.json (scripts/whrules-extract.js + scripts/whrules-save.mjs), полный — 40k/whrules-<версия>-full.json (scripts/whrules-extract-full.js + whrules-map.mjs --save-full). whrules-faction — scripts/whrules-convert.mjs (сухой прогон: bun scripts/whrules-convert.mjs --out <файл>); одобрено владельцем 2026-10-16 по отчёту сухого прогона v4. whrules-points — scripts/whrules-points.mjs (значения: очки, ступени цены, Legends, DP, очки улучшений, платное снаряжение; план — bun scripts/whrules-points.mjs → 40k/whrules-points-applied.json; only — ограничение по армии); одобрено владельцем 2026-10-23 (задача P1-T3). whrules-faction-convert — полная конвертация одной фракции (scripts/whrules-convert.mjs → applyWhrulesFactionConvert; сухой прогон: bun scripts/whrules-convert.mjs --faction <фракция сайта> --army <id> --full <снимок> --out <файл>); поля faction, army, points (снимок /3 для сопоставления). whrules-wargear — scripts/whrules-wargear.mjs: какие стандартные предметы платные (paidDefaults) по снимку конструктора ростеров сайта 40k/whrules-<версия>-roster.json (scripts/whrules-extract-roster.js + whrules-save.mjs); points — снимок очков для сопоставления; одобрено владельцем 2026-10-23 (задача P1-T5).",
     "items": [
       {
         "id": "whrules-981-space-marines",
         "kind": "whrules-faction",
         "snapshot": "whrules-981-full.json",
         "enabled": true,
-        "scope": ["SM", "AoI"],
+        "scope": [
+          "SM",
+          "AoI"
+        ],
         "note": "Space Marines (с орденами) и Imperial Agents из wh-rules.ru 981; копии Imperial Agents в AC, AM, AS, AdM, GK, QI, TL"
+      },
+      {
+        "id": "whrules-995-custodes",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-adeptus-custodes.json",
+        "points": "whrules-995.json",
+        "faction": "adeptus-custodes",
+        "army": "AC",
+        "enabled": true,
+        "scope": [
+          "AC"
+        ],
+        "note": "Adeptus Custodes (новый кодекс) из полного снимка wh-rules.ru 995: инфолисты, детачменты, улучшения, стратагемы, правила армии; id сохранены (9 переименований по таблице сайта), 5 новых; прежние детачменты, улучшения и стратагемы — устаревшие (для старых ростеров). Одобрено владельцем 2026-10-23 (P1-T4c, решения 1–4)."
+      },
+      {
+        "id": "whrules-995-points",
+        "kind": "whrules-points",
+        "snapshot": "whrules-995.json",
+        "enabled": true,
+        "scope": [
+          "AS",
+          "AC",
+          "AdM",
+          "AE",
+          "AM",
+          "CD",
+          "QT",
+          "CSM",
+          "DG",
+          "DRU",
+          "EC",
+          "GC",
+          "GK",
+          "AoI",
+          "QI",
+          "LoV",
+          "NEC",
+          "ORK",
+          "SM",
+          "TAU",
+          "TS",
+          "TYR",
+          "WE"
+        ],
+        "note": "Очки отряда, ступени цены за копии, Legends, DP детачментов, очки улучшений и платное снаряжение по wh-rules.ru 995 (MFM 1.6) у сопоставленных записей; id и правила не меняются. Платное снаряжение — во всех ступенях цены за копии, как в конструкторе ростеров сайта (решение владельца 2026-10-23, P1-T5; прежнее «только последняя ступень» отменено). Не обновлены: юниты, которых нет на сайте или которые там в другой фракции, Legends/Forge World вне сайта (см. 40k/freshness-report.md)."
+      },
+      {
+        "id": "whrules-995-wargear",
+        "kind": "whrules-wargear",
+        "snapshot": "whrules-995-roster.json",
+        "points": "whrules-995.json",
+        "enabled": true,
+        "scope": [
+          "AC",
+          "AE",
+          "AM",
+          "AdM",
+          "CSM",
+          "DRU",
+          "GC",
+          "LoV",
+          "ORK",
+          "QI",
+          "QT",
+          "SM",
+          "TAU"
+        ],
+        "note": "Платное стандартное снаряжение по конструктору ростеров wh-rules.ru 995: paidDefaults у 15 инфолистов (лазпушка Leman Russ ×8, dark lance Ravager, heavy mining laser Achilles Ridgerunners, Praesidium Shield Shield-Captain, Heavy Laser Destroyer Repulsor Executioner, Banner of Macragge Victrix Honour Guard, missile pod / T'au flamer Crisis Fireknife / Starscythe). Одобрено владельцем 2026-10-23 (P1-T5). Отдельные варианты из конструктора (rosterOptions, P1-T5c): Watcher in the Dark у Deathwing Terminator Squad; опечатки Kâhl, Ynnari Incubi, Kroot War Shaper; Secutarii Peltasts — galvanic caster вместо arc lance. Конфликты P1-T5e: Chaos Acastus Knight Porphyrion — обе пушки вместе; Wolf Scouts — bolt pistol, Thunderclap и runic stave вместе (решение владельца, конструктор сайта); Kill Tank и Gargantuan Squiggoth — оружие, снаряжение и варианты из полного снимка Orks (whrules-995-full-orks.json). P1-T5d: стандартное снаряжение дополнено из текста loadout (loadoutRepair: способности снаряжения, предметы, которые заменяют варианты, перечень после переноса строки); удалены устаревшие/повторные варианты Astraeus и Thunderhawk Gunship; Knight Preceptor и Cultist Mob with Firearms — из полного снимка CSM и Imperial Knights.",
+        "rosterOptions": [
+          {
+            "army": "SM",
+            "id": "000000230",
+            "add": true,
+            "site": "Watcher in the Dark",
+            "why": "Deathwing Terminator Squad: в тексте инфолиста сайта варианта нет, в конструкторе ростеров есть (0 очков); способность Watcher in the Dark у отряда есть"
+          },
+          {
+            "army": "LoV",
+            "id": "000002594",
+            "replace": "Autoch-pattem",
+            "site": "Autoch-pattern combi-bolter can be replaced",
+            "why": "опечатка «Autoch-pattem»: вариант не снимал стандартный combi-bolter"
+          },
+          {
+            "army": "AE",
+            "id": "000003918",
+            "replace": "demilklaives",
+            "site": "demiklaives",
+            "why": "опечатка «demilklaives»: выбор давал оружие без профиля"
+          },
+          {
+            "army": "TAU",
+            "id": "000003703",
+            "replace": "tri-bade",
+            "site": "tri-blade can be replaced",
+            "why": "опечатка «tri-bade»: вариант не снимал стандартный dart-bow and tri-blade"
+          },
+          {
+            "army": "AdM",
+            "id": "000001526",
+            "replace": "arc lance",
+            "site": "galvanic caster can be replaced",
+            "why": "наш вариант меняет arc lance, которого у Peltast Alpha нет (стандартное — galvanic caster); у сайта — galvanic caster"
+          },
+          {
+            "army": "QT",
+            "id": "000001099",
+            "replace": "can each be replaced",
+            "site": "2 Acastus autocannons can be replaced",
+            "why": "у нас «can each be replaced» (каждая — на 2 lascannons); инфолист и конструктор сайта — обе пушки вместе (P1-T5e)"
+          },
+          {
+            "army": "SM",
+            "id": "000004182",
+            "replace": "Plasma Pistol and Combat Knife replaced with one of the following",
+            "site": "plasma pistol and combat blade can be replaced",
+            "names": {
+              "combat blade": "Combat Knife"
+            },
+            "why": "решение владельца 2026-10-23 (P1-T5e): как в конструкторе ростеров сайта — bolt pistol, Thunderclap и runic stave вместе (инфолист сайта: «одно из»); «combat blade» конструктора — Combat Knife инфолиста"
+          },
+          {
+            "army": "SM",
+            "id": "000002700",
+            "remove": "2 Astraeus las-rippers",
+            "why": "повтор варианта с опечаткой (у сайта в инфолисте две строки, у конструктора — одна «2 Astareus Las-rippers → 2 Plasma Eradicators») (P1-T5d)"
+          },
+          {
+            "army": "SM",
+            "id": "000000139",
+            "remove": "Thunderhawk cluster bombs",
+            "why": "устаревшая строка: у сайта Hellstrike Missile Battery уже в стандартном снаряжении, у конструктора варианта нет (P1-T5d)"
+          }
+        ],
+        "datasheets": [
+          {
+            "army": "ORK",
+            "id": "000000056",
+            "full": "whrules-995-full-orks.json",
+            "faction": "orks",
+            "options": "datasheet",
+            "why": "наша версия (Wahapedia, Legends) устарела: у сайта Dual Big Shoota и Skorcha в стандартном снаряжении, Deff Rolla и три из Kannon / Lobba / Zzap Gun, до 5 Big Shootas (P1-T5e)"
+          },
+          {
+            "army": "ORK",
+            "id": "000000059",
+            "full": "whrules-995-full-orks.json",
+            "faction": "orks",
+            "options": "roster",
+            "why": "наша версия (Forge World) устарела: у сайта Kannon в стандартном снаряжении; варианты — как в конструкторе ростеров (Kannon → Supa-kannon), без второй строки инфолиста «one of kannon / supa-kannon» (P1-T5e)"
+          },
+          {
+            "army": "QI",
+            "id": "000001483",
+            "full": "whrules-995-full-chaos-space-marines+imperial-knights.json",
+            "faction": "imperial-knights",
+            "options": "datasheet",
+            "why": "у нас в стандартном снаряжении «Preceptor multi-laser», у сайта (инфолист и конструктор) — Questoris multi-laser, его и заменяет вариант (P1-T5d)"
+          },
+          {
+            "army": "CSM",
+            "id": "000003713",
+            "why": "у нас и в инфолисте сайта у каждого культиста autopistol и brutal assault weapon, а варианты заменяют autogun и close combat weapon; у конструктора ростеров сайта — Cultist Champion: autopistol, brutal assault weapon; Chaos Cultists: autogun, close combat weapon (P1-T5d)",
+            "loadout": "roster"
+          }
+        ],
+        "loadoutRepair": true
       }
     ]
   }

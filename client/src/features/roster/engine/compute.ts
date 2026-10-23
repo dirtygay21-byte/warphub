@@ -2,7 +2,7 @@ import { ALLY_RULES, BATTLE_SIZES, LIMITS, sizeIndex } from './rules';
 import type { CostBand, Datasheet, Detachment, DetachmentGrant, Enhancement, FactionData, Roster, RosterUnit, UnitMatcher } from './types';
 import { droppedSummary } from './migrate';
 import { dispositionsOf } from './source';
-import { applyPicks, hasPicks, modelGroups, optionsOf, ruleCount, type LoadoutResult } from './wargear';
+import { applyPicks, hasPicks, modelGroups, optionalRule, optionsOf, ruleCount, type LoadoutResult } from './wargear';
 
 export type IssueLevel = 'error' | 'warning';
 export interface Issue {
@@ -125,24 +125,45 @@ export function unitLoadout(ds: Datasheet, unit: RosterUnit, models: number): Re
 
 const wkey = (s: string) => s.toLowerCase().replace(/[’']/g, "'").replace(/e?s$/, '');
 
-/** Сколько платного снаряжения (band.wargear) добавили выбранные замены; null — предмет не из вариантов. */
-export function paidFromPicks(ds: Datasheet, unit: RosterUnit, label: string): number | null {
+/**
+ * Сколько штук платного предмета (band.wargear) оплачивается — как в конструкторе ростеров wh-rules.ru: платится каждая
+ * штука итогового снаряжения (стандартное − снятое заменами + выбранное); стандартные штуки — только если у инфолиста
+ * paidDefaults (лазпушка Leman Russ, missile pod Crisis Fireknife), иначе платят только сверх стандартного (третья
+ * multi-melta Gladiator Valiant BT). null — снаряжение предмета не видит (paidIsAuto): ручной счётчик.
+ */
+export function paidFromLoadout(ds: Datasheet, unit: RosterUnit, loadout: Record<string, number>, label: string, models: number): number | null {
+  if (!paidIsAuto(ds, label)) return null;
   const k = wkey(label);
-  let inOptions = false;
-  let n = 0;
-  for (const o of optionsOf(ds).parsed) {
-    o.choices.forEach((choice, ci) => {
-      for (const it of choice) {
-        if (wkey(it.weapon) !== k) continue;
-        inOptions = true;
-        n += it.qty * Math.max(0, unit.picks?.[o.key]?.[ci] ?? 0);
-      }
-    });
-  }
-  return inOptions ? n : null;
+  const count = (lo: Record<string, number>) => Object.entries(lo).reduce((s, [w, q]) => s + (wkey(w) === k ? q : 0), 0);
+  const free = ds.paidDefaults ? 0 : count(defaultLoadout(ds, unit, models));
+  return Math.max(0, count(loadout) - free);
 }
 
-/** Платное снаряжение юнита: из выбранных замен или ручного счётчика. */
+/** Виден ли платный предмет снаряжению: есть в разобранных вариантах или в стандартном снаряжении обязательной модели. */
+export function paidIsAuto(ds: Datasheet, label: string): boolean {
+  const k = wkey(label);
+  if (optionsOf(ds).parsed.some((o) => [...o.from, ...o.choices.flat()].some((it) => wkey(it.weapon) === k))) return true;
+  // в стандартном снаряжении — у обязательной модели (у необязательной, «0-1 Chapter Ancient», — ручной счётчик)
+  return ds.defaultLoadout.some((r) => !optionalRule(ds, r) && r.items.some((it) => wkey(it.weapon) === k));
+}
+
+/**
+ * Ручной счётчик платного предмета необязательной модели («0-1 Chapter Ancient» — Banner of Macragge): у кого он
+ * и сколько штук возможно. null — предмет не из стандартного снаряжения необязательной модели.
+ */
+export function optionalWargear(ds: Datasheet, label: string): { subject: string; max: number } | null {
+  const k = wkey(label);
+  const groups = modelGroups(ds, 0);
+  for (const r of ds.defaultLoadout) {
+    const it = r.items.find((x) => wkey(x.weapon) === k);
+    if (!it || !optionalRule(ds, r)) continue;
+    const g = groups.find((x) => x.name.toLowerCase() === r.subject.toLowerCase().replace(/^(?:the|every|each)\s+/, '').replace(/\s+models?$/, '')) ?? null;
+    return { subject: r.subject, max: (g?.max ?? 1) * it.qty };
+  }
+  return null;
+}
+
+/** Платное снаряжение юнита: по итоговому снаряжению или ручному счётчику. */
 export function paidWargear(c: Pick<ComputedUnit, 'band' | 'paidAuto' | 'unit'>): Record<string, number> {
   const out: Record<string, number> = {};
   for (const w of c.band?.wargear ?? []) {
@@ -230,17 +251,17 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
     const opt = band?.options.find((o) => o.label === unit.size) ?? band?.options[0];
     let extras = 0;
     for (const a of band?.addons ?? []) extras += (unit.addons[a.label] ?? 0) * a.cost;
-    // платное снаряжение: если предмет есть в вариантах замены — считаем по выбранным заменам, иначе — по счётчику
+    const loadoutInfo: LoadoutResult = ds ? unitLoadoutFull(ds, unit, opt?.models ?? 0) : { loadout: {}, problems: [], max: {}, limits: {} };
+    // платное снаряжение: по итоговому снаряжению (paidFromLoadout), иначе — по ручному счётчику
     const paidAuto: Record<string, number> = {};
     for (const w of band?.wargear ?? []) {
-      const auto = ds ? paidFromPicks(ds, unit, w.label) : null;
+      const auto = ds ? paidFromLoadout(ds, unit, loadoutInfo.loadout, w.label, opt?.models ?? 0) : null;
       if (auto !== null) paidAuto[w.label] = auto;
       extras += (auto ?? unit.wargear[w.label] ?? 0) * w.cost;
     }
     const enhancement = unit.enhancementId ? L.enh.get(unit.enhancementId) : undefined;
     const enhancementCost = enhancement?.cost ?? 0;
     const base = opt?.cost ?? 0;
-    const loadoutInfo: LoadoutResult = ds ? unitLoadoutFull(ds, unit, opt?.models ?? 0) : { loadout: {}, problems: [], max: {}, limits: {} };
     return {
       unit,
       ds,
@@ -327,7 +348,7 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
       const lost = droppedSummary(unit.migration.dropped);
       warn(
         'migrated',
-        unit.migration.reason === 'options'
+        unit.migration.reason === 'options' || unit.migration.reason === 'size'
           ? `«${ds.name}»: ${unit.migration.note}` + (lost.length ? ` Отложено — проверьте и выберите заново: ${lost.join(', ')}.` : '')
           : `«${ds.name}» (прежде ${unit.migration.from}): ${unit.migration.note}` + (lost.length ? ` Не перенесено — выберите заново: ${lost.join(', ')}.` : ''),
         [unit.uid],
@@ -337,6 +358,10 @@ export function computeRoster(roster: Roster, L: DataLookup): ComputedRoster {
     if (ds.legends) warn('legends', `«${ds.name}» — Warhammer Legends, обычно не допускается на турнирах.`, [unit.uid]);
     if (c.band && !c.band.options.some((o) => o.label === unit.size)) err('size', `«${ds.name}»: выберите размер отряда.`, [unit.uid]);
     for (const p of c.loadoutInfo.problems) err('loadout', `«${ds.name}»: ${p}.`, [unit.uid]);
+    // ручной счётчик, сохранённый до автоматического подсчёта: теперь в цене количество из снаряжения
+    for (const [label, n] of Object.entries(c.paidAuto))
+      if ((unit.wargear[label] ?? 0) > 0 && unit.wargear[label] !== n)
+        warn('wargear-auto', `«${ds.name}»: ${label} теперь считается по снаряжению (${n} шт.), а не по ручному счётчику (${unit.wargear[label]} шт.) — проверьте замены в «Снаряжении».`, [unit.uid]);
     if (unit.weapons && !unit.picks) warn('loadout-legacy', `«${ds.name}»: снаряжение было задано вручную в старой версии — оно не проверено. Откройте «Снаряжение» и нажмите «Вернуть стандартное», затем выберите замены заново.`, [unit.uid]);
 
     if (ds.group.startsWith('det:')) {

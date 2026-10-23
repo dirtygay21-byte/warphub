@@ -21,7 +21,8 @@ function unitLines(c: ComputedUnit, roster: Roster, extra: string[] = []): strin
   for (const [label, n] of Object.entries(c.unit.addons)) if (n > 0) lines.push(`• ${n}x ${label}`);
   const weapons = Object.entries(c.loadout).filter(([, n]) => n > 0);
   for (const [label, n] of weapons) lines.push(`◦ ${n}x ${label}`);
-  for (const [label, n] of Object.entries(paidWargear(c))) if (!c.loadout[label]) lines.push(`• ${n}x ${label} (paid)`);
+  const inLoadout = new Set(weapons.map(([w]) => w.toLowerCase()));
+  for (const [label, n] of Object.entries(paidWargear(c))) if (!inLoadout.has(label.toLowerCase())) lines.push(`• ${n}x ${label} (paid)`);
   if (c.enhancement) lines.push(`• Enhancement: ${c.enhancement.name}${c.enhancement.upgrade ? ' (Upgrade)' : ''}`);
   return lines;
 }

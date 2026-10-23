@@ -506,11 +506,26 @@ export function parseLoadout(text, weapons) {
       names.find((x) => x.n === n.replace(/s$/, '')) ||
       names.find((x) => x.n.replace(/s$/, '') === n.replace(/s$/, ''));
     if (exact) return exact.w;
+    // предмет назван профилем оружия: «1 Kannon - Shell» (wh-rules, Gargantuan Squiggoth) — оружие «Kannon»
+    if (/\s-\s/.test(item)) {
+      const base = find(item.split(/\s+-\s+/)[0]);
+      if (base) return base;
+    }
     // сокращённое название в тексте: «Perdition» ↔ оружие «Perdition Pistol» — только если такое оружие одно
     const pre = names.filter((x) => x.n.startsWith(n + ' '));
-    return pre.length === 1 ? pre[0].w : undefined;
+    if (pre.length === 1) return pre[0].w;
+    // «pan spectral scanner» ↔ «Panspectral scanner»: без пробелов и дефисов
+    const flat = (x) => x.replace(/[\s-]+/g, '');
+    const glued = names.filter((x) => flat(x.n) === flat(n));
+    if (glued.length === 1) return glued[0].w;
+    // «sniper rifle» ↔ оружие «Scout sniper rifle» — только если такое оружие одно
+    const suf = names.filter((x) => x.n.endsWith(' ' + n) || x.n.replace(/s$/, '').endsWith(' ' + n.replace(/s$/, '')));
+    return suf.length === 1 ? suf[0].w : undefined;
   };
-  for (const m of text.matchAll(/(^|\n|\.\s*)([^.\n:]*?)\s+(?:is|are) equipped with:\s*([^.\n]+)/gi)) {
+  // перечень, продолженный на следующей строке: «1 chastiser gatling cannon;\n1 frag bombard; …» (Knight Destrier)
+  text = text.replace(/;[ \t]*\n\s*/g, '; ');
+  // «The Hesyr is additionally equipped with: weavefield crest» (Einhyr Hearthguard)
+  for (const m of text.matchAll(/(^|\n|\.\s*)([^.\n:]*?)\s+(?:is|are) (?:additionally )?equipped with:\s*([^.\n]+)/gi)) {
     const subj = m[2].trim();
     let who;
     if (/^(this model|this unit)$/i.test(subj)) who = 'one';
@@ -874,7 +889,7 @@ async function main() {
   }, null, 1));
   // проверенные обновления поверх выгрузки (40k/curated.json → updates) — та же функция, что в repair-40k-data.mjs
   // обработчик whrules-faction (scripts/whrules-convert.mjs) использует движок клиента — импорт запускается через bun или node --import tsx
-  const { WHRULES_APPLIERS } = await import('./whrules-convert.mjs');
+  const { WHRULES_APPLIERS } = await import('./whrules-points.mjs');
   report.info.push(...repair40kData(OUT, curated, { appliers: WHRULES_APPLIERS }).lines);
   for (const d of all.values())
     for (const v of d.costVariants ?? []) if (!v.chapter) report.warnings.push(`${d.faction}: «${d.name}» (${d.id}) — дополнительная таблица цен без ордена (40k/curated.json → chapterCosts); применяется обычная цена`);

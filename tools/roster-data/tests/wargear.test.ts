@@ -99,7 +99,7 @@ test('«Вернуть стандартное»: после возврата к 
   assert.deepEqual(c.loadout, defaultLoadout(mega, { addons: {} }, c.models));
 });
 
-test('платное снаряжение считается по заменам: Killsaw +5 за штуку с 3-й копии Meganobz', () => {
+test('платное снаряжение считается по заменам: Killsaw +5 за штуку на каждой копии Meganobz (как в конструкторе wh-rules)', () => {
   const mega = ork('Meganobz');
   const ks = optWith(mega, 'Power Klaw', 'Killsaw');
   let r = roster();
@@ -112,9 +112,9 @@ test('платное снаряжение считается по заменам
   assert.equal(after.units[2]!.total - before.units[2]!.total, 2 * cost);
   assert.equal(after.points - before.points, 2 * cost, 'итог ростера изменился сразу');
   assert.equal(after.units[2]!.paidAuto['Killsaw'], 2);
-  // у первых двух копий доплаты нет — цена не меняется
+  // первая копия платит так же (ступень цены за копии меняет только базовую цену)
   r = updateUnit(r, r.units[0]!.uid, { picks: pick(ks, 'Killsaw', 2) });
-  assert.equal(computeRoster(r, L).units[0]!.total, before.units[0]!.total);
+  assert.equal(computeRoster(r, L).units[0]!.total, before.units[0]!.total + 2 * cost);
   assert.match(exportGw(r, L, computeRoster(r, L), null), /2x Killsaw/);
 });
 

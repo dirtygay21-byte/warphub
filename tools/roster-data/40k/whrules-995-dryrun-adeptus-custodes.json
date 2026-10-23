@@ -1,0 +1,4641 @@
+{
+ "faction": "adeptus-custodes",
+ "army": "AC",
+ "source": {
+  "site": "https://wh-rules.ru",
+  "dataVersion": 995,
+  "mfm": "1.6",
+  "date": "2026-10-16"
+ },
+ "snapshots": {
+  "full": {
+   "file": "whrules-995-full-adeptus-custodes.json",
+   "fingerprint": "48cc0464bd8886d55c6b81f2d187d02bfb32e185d3dba3f6d0ff3c8985b8718b"
+  },
+  "points": "whrules-995.json"
+ },
+ "summary": {
+  "datasheets": {
+   "before": 31,
+   "after": 36,
+   "kept": 22,
+   "renamed": 9,
+   "added": 5,
+   "outdated": 0,
+   "changed": 31,
+   "unchanged": 0
+  },
+  "fieldsChanged": {
+   "keywords": 31,
+   "legends": 6,
+   "leads": 8,
+   "composition": 31,
+   "stats": 28,
+   "loadout": 31,
+   "abilities": 31,
+   "stratagems": 31,
+   "enhancements": 21,
+   "costs": 16,
+   "weapons": 30,
+   "defaultLoadout": 28,
+   "options": 25,
+   "factionKeywords": 5,
+   "transport": 3,
+   "name": 18,
+   "damaged": 9,
+   "support": 1
+  },
+  "detachments": {
+   "current": 13,
+   "outdated": 5
+  },
+  "enhancements": {
+   "current": 29,
+   "outdated": 27
+  },
+  "stratagems": {
+   "current": 41,
+   "outdated": 41,
+   "core": 10
+  },
+  "armyRules": {
+   "before": [
+    "Martial Ka’tah"
+   ],
+   "after": [
+    "Martial Ka’tah",
+    "Aegis of the Emperor",
+    "Aquila Commander",
+    "Daughters of the Abyss",
+    "Anathema Psykana",
+    "Special Move Types"
+   ]
+  },
+  "sizeChanges": 8,
+  "optionsUnparsed": 0,
+  "optionsTotal": 24,
+  "legacy": 2,
+  "unavailable": 12,
+  "unresolved": 0,
+  "checksFailed": 0
+ },
+ "ids": {
+  "renamed": [
+   {
+    "id": "000001558",
+    "from": "Aquilon Custodians",
+    "to": "Aquilon Terminators with Solarite Power Gauntlets"
+   },
+   {
+    "id": "000000882",
+    "from": "Custodian Guard",
+    "to": "Custodian Guard Sodality"
+   },
+   {
+    "id": "000001559",
+    "from": "Custodian Guard With Adrasite And Pyrithite Spears",
+    "to": "Custodian Guard Sodality with Adrasite Spears"
+   },
+   {
+    "id": "000001560",
+    "from": "Agamatus Custodians",
+    "to": "Gyrfalcon Jetbike Sodality"
+   },
+   {
+    "id": "000002521",
+    "from": "Prosecutors",
+    "to": "Prosecutor Squad"
+   },
+   {
+    "id": "000001563",
+    "from": "Sagittarum Custodians",
+    "to": "Sagittarum Custodians Sodality"
+   },
+   {
+    "id": "000001561",
+    "from": "Venatari Custodians",
+    "to": "Venatari with Verutum Lances"
+   },
+   {
+    "id": "000002522",
+    "from": "Vigilators",
+    "to": "Vigilator Squad"
+   },
+   {
+    "id": "000002523",
+    "from": "Witchseekers",
+    "to": "Witchseeker Squad"
+   }
+  ],
+  "added": [
+   {
+    "id": "whr:adeptus-custodes:aquilon-terminators-with-solarite-power-talons",
+    "name": "Aquilon Terminators with Solarite Power Talons"
+   },
+   {
+    "id": "whr:adeptus-custodes:caladius-annihilator-grav-tank",
+    "name": "Caladius Annihilator Grav‑Tank"
+   },
+   {
+    "id": "whr:adeptus-custodes:custodian-guard-sodality-with-pyrithite-spears",
+    "name": "Custodian Guard Sodality with Pyrithite Spears"
+   },
+   {
+    "id": "whr:adeptus-custodes:sentinel-guard-sodality",
+    "name": "Sentinel Guard Sodality"
+   },
+   {
+    "id": "whr:adeptus-custodes:venatari-with-kinetic-destroyers",
+    "name": "Venatari with Kinetic Destroyers"
+   }
+  ],
+  "outdated": []
+ },
+ "datasheets": {
+  "added": [
+   {
+    "id": "whr:adeptus-custodes:aquilon-terminators-with-solarite-power-talons",
+    "name": "Aquilon Terminators with Solarite Power Talons",
+    "legends": false
+   },
+   {
+    "id": "whr:adeptus-custodes:caladius-annihilator-grav-tank",
+    "name": "Caladius Annihilator Grav-Tank",
+    "legends": false
+   },
+   {
+    "id": "whr:adeptus-custodes:custodian-guard-sodality-with-pyrithite-spears",
+    "name": "Custodian Guard Sodality with Pyrithite Spears",
+    "legends": true
+   },
+   {
+    "id": "whr:adeptus-custodes:sentinel-guard-sodality",
+    "name": "Sentinel Guard Sodality",
+    "legends": false
+   },
+   {
+    "id": "whr:adeptus-custodes:venatari-with-kinetic-destroyers",
+    "name": "Venatari with Kinetic Destroyers",
+    "legends": false
+   }
+  ],
+  "removed": [],
+  "changed": [
+   {
+    "id": "000002088",
+    "name": "Aleya",
+    "fields": {
+     "keywords": {
+      "from": [
+       "Anathema Psykana",
+       "Imperium",
+       "Epic Hero",
+       "Character",
+       "Infantry",
+       "Aleya"
+      ],
+      "to": [
+       "Anathema Psykana",
+       "Character",
+       "Epic Hero",
+       "Imperium",
+       "Infantry"
+      ]
+     },
+     "legends": {
+      "from": false,
+      "to": true
+     },
+     "leads": {
+      "from": 3,
+      "to": 3
+     },
+     "composition": {
+      "from": [
+       "1 Aleya – EPIC HERO"
+      ],
+      "to": [
+       "1 Aleya model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Aleya: M6\" T3 Sv3+/5++ W4 Ld6+ OC1"
+      ],
+      "to": [
+       "Aleya: M7\" T3 Sv3+/5++ W4 Ld6+ OC1"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: Somnus.",
+      "to": "This model is equipped with: 1 Somnus."
+     },
+     "abilities": {
+      "from": [
+       "core:Feel No Pain 5+",
+       "core:Leader",
+       "core:Scouts 6\"",
+       "datasheet:Tactical Perception",
+       "datasheet:Tenacious Spirit",
+       "datasheet:Daughter of the Abyss"
+      ],
+      "to": [
+       "core:Feel No Pain 5+",
+       "core:Leader",
+       "core:Scouts 6\"",
+       "faction:Daughters of the Abyss",
+       "datasheet:Tactical Perception",
+       "datasheet:Tenacious Spirit"
+      ]
+     },
+     "stratagems": {
+      "from": 39,
+      "to": 59
+     },
+     "enhancements": {
+      "from": 0,
+      "to": 20
+     }
+    }
+   },
+   {
+    "id": "000001453",
+    "name": "Allarus Custodians",
+    "fields": {
+     "keywords": {
+      "from": [
+       "Infantry",
+       "Imperium",
+       "Terminator",
+       "Allarus Custodians"
+      ],
+      "to": [
+       "Imperium",
+       "Infantry",
+       "Terminator"
+      ]
+     },
+     "costs": {
+      "from": [
+       "1-2: 2 models=110, 3 models=165, 5 models=280, 6 models=340",
+       "3+: 2 models=140, 3 models=195, 5 models=310, 6 models=370"
+      ],
+      "to": [
+       "1-2: 2 models=180, 3 models=270",
+       "3+: 2 models=210, 3 models=300"
+      ]
+     },
+     "composition": {
+      "from": [
+       "2-6 Allarus Custodians"
+      ],
+      "to": [
+       "2-3 Allarus Custodian models"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Allarus Custodians: M5\" T7 Sv2+/4++ W4 Ld6+ OC2"
+      ],
+      "to": [
+       "Allarus Custodians: M7\" T8 Sv2+/4++ W6 Ld5+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "Every model is equipped with: balistus grenade launcher; guardian spear.",
+      "to": "Every model is equipped with: 1 Balistus Grenade Launcher; 1 Guardian Spear."
+     },
+     "abilities": {
+      "from": [
+       "core:Deep Strike",
+       "faction:Martial Ka’tah",
+       "wargear:Vexilla",
+       "datasheet:Slayers of Tyrants",
+       "datasheet:From Golden Light"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "faction:Aegis of the Emperor",
+       "faction:Martial Ka’tah",
+       "datasheet:Slayer of Tyrants",
+       "wargear:Vexilla"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Balistus grenade launcher 18 AD6 2 S4 AP-1 D1 [blast]",
+       "Castellan axe 24 A2 2 S4 AP-1 D2 [assault]",
+       "Guardian spear 24 A2 2 S4 AP-1 D2 [assault]",
+       "Misericordia Melee A5 2 S5 AP-2 D1"
+      ],
+      "to": [
+       "Balistus Grenade Launcher 18 A3 2 S5 AP-1 D1 [assault, blast 1]",
+       "Guardian Spear 24 A2 2 S5 AP-1 D2 [assault, rapid fire 2]",
+       "Castellan Axe 24 A2 2 S5 AP-1 D2 [assault, rapid fire 2]",
+       "Guardian Spear Melee A6 2 S8 AP-2 D2",
+       "Castellan Axe Melee A3 2 S10 AP-2 D4"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "2 вариантов",
+      "to": "2 вариантов"
+     },
+     "stratagems": {
+      "from": 36,
+      "to": 58
+     }
+    }
+   },
+   {
+    "id": "000002524",
+    "name": "Anathema Psykana Rhino",
+    "fields": {
+     "keywords": {
+      "from": [
+       "Transport",
+       "Vehicle",
+       "Rhino",
+       "Anathema Psykana",
+       "Imperium",
+       "Smoke",
+       "Dedicated Transport",
+       "Frame"
+      ],
+      "to": [
+       "Anathema Psykana",
+       "Dedicated Transport",
+       "Frame",
+       "Imperium",
+       "Smoke",
+       "Transport",
+       "Vehicle"
+      ]
+     },
+     "factionKeywords": {
+      "from": [
+       "Adeptus Custodes"
+      ],
+      "to": [
+       "Anathema Psykana"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Anathema Psykana Rhino"
+      ],
+      "to": [
+       "1 Anathema Psykana Rhino model"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: storm bolter; armoured tracks.",
+      "to": "This model is equipped with: 1 Armoured Tracks; 1 Storm Bolter."
+     },
+     "transport": {
+      "from": "This model has a transport capacity of 12 Anathema Psykana Infantry models.",
+      "to": "This model has a transport capacity of 12 ANATHEMA PSYKANA INFANTRY models."
+     },
+     "abilities": {
+      "from": [
+       "core:Deadly Demise D3",
+       "core:Firing Deck 2",
+       "datasheet:Daughters of the Abyss",
+       "datasheet:Self Repair",
+       "wargear:One Shot"
+      ],
+      "to": [
+       "core:Deadly Demise D3",
+       "core:Firing Deck 2",
+       "faction:Daughters of the Abyss",
+       "datasheet:Assault Vehicle"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Hunter-killer missile 48 A1 2 S14 AP-3 DD6 [one shot]",
+       "Storm bolter 24 A2 3 S4 AP0 D1 [rapid fire 2]",
+       "Armoured tracks Melee A3 4 S6 AP0 D1"
+      ],
+      "to": [
+       "Hunter-killer Missile 48 A1 2 S14 AP-3 DD3+3 [one shot]",
+       "Storm Bolter 24 A2 3 S5 AP-1 D1 [rapid fire 2]",
+       "Armoured Tracks Melee A3 4 S6 AP0 D1"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "1 вариантов"
+     },
+     "stratagems": {
+      "from": 27,
+      "to": 27
+     }
+    }
+   },
+   {
+    "id": "000001558",
+    "name": "Aquilon Terminators with Solarite Power Gauntlets",
+    "fields": {
+     "name": {
+      "from": "Aquilon Custodians",
+      "to": "Aquilon Terminators with Solarite Power Gauntlets"
+     },
+     "keywords": {
+      "from": [
+       "Terminator",
+       "Imperium",
+       "Aquilon Custodians",
+       "Infantry"
+      ],
+      "to": [
+       "Imperium",
+       "Infantry",
+       "Terminator"
+      ]
+     },
+     "costs": {
+      "from": [
+       "1+: 3 models=195, 6 models=390"
+      ],
+      "to": [
+       "1-2: 3 models=285",
+       "3+: 3 models=315"
+      ]
+     },
+     "composition": {
+      "from": [
+       "3-6 Aquilon Custodians"
+      ],
+      "to": [
+       "3 Aquilon Terminator models"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Aquilon Custodians: M5\" T7 Sv2+/4++ W4 Ld6+ OC2"
+      ],
+      "to": [
+       "Aquilon Custodians: M7\" T8 Sv2+/4++ W6 Ld5+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "Every model is equipped with: lastrum storm bolter; solerite power gauntlet.",
+      "to": "Every model is equipped with: 1 Adrathic Combi-destructor; 1 Solarite Power Gauntlet."
+     },
+     "abilities": {
+      "from": [
+       "core:Deep Strike",
+       "faction:Martial Ka’tah",
+       "datasheet:Heavy Assault Infantry",
+       "datasheet:From Golden Light",
+       "datasheet:LIONS OF THE EMPEROR"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "faction:Aegis of the Emperor",
+       "faction:Martial Ka’tah",
+       "datasheet:Dread Foe"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Infernus firepike 12 AD6 N/A S6 AP-1 D1 [ignores cover, torrent]",
+       "Lastrum storm bolter 24 A2 2 S5 AP-1 D1 [rapid fire 2]",
+       "Twin adrathic destructor 18 A1 2 S6 AP-2 D3 [twin-linked]",
+       "Solerite power gauntlet Melee A5 2 S8 AP-2 D2",
+       "Solerite power talon Melee A7 2 S7 AP-2 D1"
+      ],
+      "to": [
+       "Adrathic Combi-destructor 12 A2 2 S5 AP-2 D3",
+       "Solarite Power Gauntlet Melee A5 2 S10 AP-2 D3"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "2 вариантов",
+      "to": "0 вариантов"
+     },
+     "stratagems": {
+      "from": 32,
+      "to": 58
+     }
+    }
+   },
+   {
+    "id": "000001680",
+    "name": "Ares Gunship",
+    "fields": {
+     "keywords": {
+      "from": [
+       "Ares Gunship",
+       "Vehicle",
+       "Imperium",
+       "Fly",
+       "Aircraft"
+      ],
+      "to": [
+       "Aircraft",
+       "Fly",
+       "Imperium",
+       "Vehicle"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Ares Gunship"
+      ],
+      "to": [
+       "1 Ares Gunship model"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: 2 arachnus heavy blaze cannons; arachnus magna-blaze cannon; armoured hull.",
+      "to": "This model is equipped with: 2 Arachnus Heavy Blaze Cannon; 1 Arachnus Magna-blaze Cannon; 1 Armoured Hull."
+     },
+     "damaged": {
+      "from": {
+       "w": "1-7",
+       "text": "While this model has 1-7 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll."
+      },
+      "to": {
+       "w": "1-7",
+       "text": ""
+      }
+     },
+     "abilities": {
+      "from": [
+       "core:Deadly Demise D6",
+       "faction:Martial Ka’tah",
+       "datasheet:Infernus Firebombs"
+      ],
+      "to": [
+       "core:Deadly Demise D6",
+       "core:Damaged 7",
+       "faction:Aegis of the Emperor",
+       "datasheet:Infernus Firebombs"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Arachnus heavy blaze cannon 36 A4 2 S12 AP-3 DD6+1",
+       "Arachnus magna-blaze cannon 48 A3 2 S18 AP-4 DD6+6",
+       "Armoured hull Melee A9 4 S9 AP0 D1"
+      ],
+      "to": [
+       "Arachnus Heavy Blaze Cannon 36 A4 2 S12 AP-3 DD3+3",
+       "Arachnus Magna-blaze Cannon 48 A3 2 S18 AP-3 DD6+6",
+       "Armoured Hull Melee A9 4 S9 AP0 D1"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "0 вариантов"
+     },
+     "stratagems": {
+      "from": 27,
+      "to": 47
+     }
+    }
+   },
+   {
+    "id": "000002518",
+    "name": "Blade Champion",
+    "fields": {
+     "keywords": {
+      "from": [
+       "Imperium",
+       "Blade Champion",
+       "Infantry",
+       "Character"
+      ],
+      "to": [
+       "Character",
+       "Imperium",
+       "Infantry"
+      ]
+     },
+     "costs": {
+      "from": [
+       "1: 1 model=110",
+       "2+: 1 model=125"
+      ],
+      "to": [
+       "1-2: 1 model=175",
+       "3+: 1 model=195"
+      ]
+     },
+     "leads": {
+      "from": 4,
+      "to": 3
+     },
+     "composition": {
+      "from": [
+       "1 Blade Champion"
+      ],
+      "to": [
+       "1 Blade Champion model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Blade Champion: M6\" T6 Sv2+/4++ W6 Ld6+ OC2"
+      ],
+      "to": [
+       "Blade Champion: M8\" T7 Sv2+/4++ W7 Ld5+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: vaultswords.",
+      "to": "This model is equipped with: 1 Vaultswords."
+     },
+     "abilities": {
+      "from": [
+       "core:Deep Strike",
+       "core:Leader",
+       "faction:Martial Ka’tah",
+       "datasheet:Swift Onslaught",
+       "datasheet:Martial Inspiration"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "core:Leader",
+       "faction:Martial Ka’tah",
+       "faction:Aegis of the Emperor",
+       "datasheet:Swift Onslaught",
+       "datasheet:Sword of the Throne"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Vaultswords – Behemor Melee A6 2 S7 AP-2 D2 [precision]",
+       "Vaultswords – Hurricanus Melee A9 2 S5 AP-1 D1 [sustained hits 1]",
+       "Vaultswords – Victus Melee A5 2 S6 AP-3 D3 [devastating wounds]"
+      ],
+      "to": [
+       "Vaultswords – behemor Melee A5 2 S10 AP-3 D3 [devastating wounds]",
+       "Vaultswords – hurricanis Melee A10 2 S6 AP-2 D1 [cleave 1, sustained hits 1]",
+       "Vaultswords – victus Melee A8 2 S8 AP-3 D2 [precision]"
+      ]
+     },
+     "stratagems": {
+      "from": 40,
+      "to": 60
+     },
+     "enhancements": {
+      "from": 17,
+      "to": 32
+     }
+    }
+   },
+   {
+    "id": "000001460",
+    "name": "Caladius Grav-Tank",
+    "fields": {
+     "name": {
+      "from": "Caladius Grav-tank",
+      "to": "Caladius Grav-Tank"
+     },
+     "keywords": {
+      "from": [
+       "Caladius Grav-tank",
+       "Vehicle",
+       "Fly",
+       "Frame",
+       "Imperium"
+      ],
+      "to": [
+       "Caladius",
+       "Fly",
+       "Frame",
+       "Grav-assault",
+       "Imperium",
+       "Vehicle"
+      ]
+     },
+     "costs": {
+      "from": [
+       "1-2: 1 model=230",
+       "3+: 1 model=260 | снаряжение: Twin arachnus heavy blaze cannon+15"
+      ],
+      "to": [
+       "1-2: 1 model=230",
+       "3+: 1 model=260"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Caladius Grav-tank"
+      ],
+      "to": [
+       "1 Caladius Grav-tank model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Caladius Grav-tank: M10\" T11 Sv2+/5++ W14 Ld6+ OC4"
+      ],
+      "to": [
+       "Caladius Grav-Tank: M10\" T11 Sv2+/5++ W14 Ld5+ OC4"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: twin iliastus accelerator cannon; twin lastrum bolt cannon; armoured hull.",
+      "to": "This model is equipped with: 1 Armoured Hull; 1 Iliastus Accelerator Cannon; 1 Twin Lastrum Bolt Cannon."
+     },
+     "damaged": {
+      "from": {
+       "w": "1-5",
+       "text": "While this model has 1-5 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll."
+      },
+      "to": {
+       "w": "1-5",
+       "text": ""
+      }
+     },
+     "abilities": {
+      "from": [
+       "core:Deadly Demise D3",
+       "faction:Martial Ka’tah",
+       "datasheet:Advanced Firepower"
+      ],
+      "to": [
+       "core:Deadly Demise D3",
+       "core:Deep Strike",
+       "core:Damaged 5",
+       "faction:Aegis of the Emperor",
+       "datasheet:Destructor Optics"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Twin arachnus heavy blaze cannon 48 A4 2 S12 AP-3 DD6+2 [twin-linked]",
+       "Twin iliastus accelerator cannon 48 A4 2 S10 AP-1 D3 [rapid fire 4, twin-linked]",
+       "Twin lastrum bolt cannon 36 A3 2 S6 AP-1 D1 [sustained hits 1]",
+       "Armoured hull Melee A4 4 S6 AP0 D1"
+      ],
+      "to": [
+       "Twin Neutronium Cascade Projectors 12 A3 N/A S7 AP-2 D1 [blast 1, torrent, twin-linked]",
+       "Iliastus Accelerator Cannon 48 A4 2 S10 AP-1 D3 [rapid fire 4, sustained hits 1: non-monster/vehicle]",
+       "Twin Lastrum Bolt Cannon 36 A3 2 S6 AP-2 D2 [sustained hits 1, twin-linked]",
+       "Armoured Hull Melee A4 4 S6 AP0 D1"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "1 вариантов"
+     },
+     "stratagems": {
+      "from": 27,
+      "to": 50
+     },
+     "enhancements": {
+      "from": 3,
+      "to": 4
+     }
+    }
+   },
+   {
+    "id": "000001458",
+    "name": "Contemptor-Achillus Dreadnought",
+    "fields": {
+     "name": {
+      "from": "Contemptor-achillus Dreadnought",
+      "to": "Contemptor-Achillus Dreadnought"
+     },
+     "keywords": {
+      "from": [
+       "Imperium",
+       "Contemptor-Achillus Dreadnought",
+       "Vehicle",
+       "Walker"
+      ],
+      "to": [
+       "Dreadnought",
+       "Imperium",
+       "Vehicle",
+       "Walker"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Contemptor-Achillus Dreadnought"
+      ],
+      "to": [
+       "1 Contemptor-Achillus Dreadnought model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Contemptor-achillus Dreadnought: M6\" T9 Sv2+/5++ W10 Ld6+ OC3"
+      ],
+      "to": [
+       "Contemptor-Achillus Dreadnought: M9\" T10 Sv2+/5++ W12 Ld5+ OC3"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: 2 lastrum storm bolters; Achillus dreadspear.",
+      "to": "This model is equipped with: 1 Dreadspear; 2 Lastrum Storm Bolter."
+     },
+     "damaged": {
+      "from": null,
+      "to": {
+       "w": "1-4",
+       "text": ""
+      }
+     },
+     "abilities": {
+      "from": [
+       "core:Deadly Demise 1",
+       "faction:Martial Ka’tah",
+       "datasheet:Dread Foe"
+      ],
+      "to": [
+       "core:Deadly Demise D3",
+       "core:Damaged 4",
+       "faction:Martial Ka’tah",
+       "faction:Aegis of the Emperor",
+       "datasheet:Unyielding Ancient"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Achillus dreadspear 12 A1 2 S9 AP-2 D3",
+       "Infernus incinerator 12 AD6 N/A S6 AP-1 D1 [torrent, ignores cover]",
+       "Lastrum storm bolter 24 A2 2 S5 AP-1 D1 [rapid fire 2]",
+       "Twin adrathic destructor 18 A1 2 S6 AP-2 D3 [twin-linked]"
+      ],
+      "to": [
+       "Dreadspear 18 A2 2 S10 AP-3 DD3+2",
+       "Lastrum Storm Bolter 24 A3 2 S5 AP-1 D1 [rapid fire 3]",
+       "Twin Infernus Incinerator 12 A3 N/A S6 AP-1 D1 [blast 2, torrent, twin-linked]",
+       "Adrathic Combi-destructor 12 A2 2 S5 AP-2 D3",
+       "Dreadspear Melee A5 2 S12 AP-3 DD3+3 [lance]"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "1 вариантов"
+     },
+     "stratagems": {
+      "from": 30,
+      "to": 52
+     },
+     "enhancements": {
+      "from": 5,
+      "to": 7
+     }
+    }
+   },
+   {
+    "id": "000001557",
+    "name": "Contemptor-Galatus Dreadnought",
+    "fields": {
+     "name": {
+      "from": "Contemptor-galatus Dreadnought",
+      "to": "Contemptor-Galatus Dreadnought"
+     },
+     "keywords": {
+      "from": [
+       "Walker",
+       "Contemptor-Galatus Dreadnought",
+       "Vehicle",
+       "Imperium"
+      ],
+      "to": [
+       "Dreadnought",
+       "Imperium",
+       "Vehicle",
+       "Walker"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Contemptor-Galatus Dreadnought"
+      ],
+      "to": [
+       "1 Contemptor-Galatus Dreadnought model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Contemptor-galatus Dreadnought: M6\" T9 Sv2+/4++ W10 Ld6+ OC3"
+      ],
+      "to": [
+       "Contemptor-Galatus Dreadnought: M9\" T10 Sv2+/4++ W12 Ld5+ OC3"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: Galatus warblade.",
+      "to": "This model is equipped with: 1 Warblade."
+     },
+     "damaged": {
+      "from": null,
+      "to": {
+       "w": "1-4",
+       "text": ""
+      }
+     },
+     "abilities": {
+      "from": [
+       "core:Deadly Demise 1",
+       "faction:Martial Ka’tah",
+       "datasheet:Galatus Shield"
+      ],
+      "to": [
+       "core:Deadly Demise D3",
+       "core:Damaged 4",
+       "faction:Aegis of the Emperor",
+       "faction:Martial Ka’tah",
+       "datasheet:Unyielding Ancient"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Galatus warblade 12 AD6 N/A S6 AP-1 D1 [ignores cover, torrent, twin-linked]"
+      ],
+      "to": [
+       "Warblade 12 A4 N/A S6 AP-1 D2 [blast 2, torrent, twin-linked]",
+       "Warblade Melee A8 2 S10 AP-2 D3 [cleave 1, sustained hits 1: non-monster/vehicle]"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "0 вариантов"
+     },
+     "stratagems": {
+      "from": 30,
+      "to": 52
+     },
+     "enhancements": {
+      "from": 5,
+      "to": 7
+     }
+    }
+   },
+   {
+    "id": "000001461",
+    "name": "Coronus Grav-Carrier",
+    "fields": {
+     "name": {
+      "from": "Coronus Grav-carrier",
+      "to": "Coronus Grav-Carrier"
+     },
+     "keywords": {
+      "from": [
+       "Coronus Grav-carrier",
+       "Vehicle",
+       "Transport",
+       "Fly",
+       "Frame",
+       "Imperium"
+      ],
+      "to": [
+       "Fly",
+       "Frame",
+       "Grav-assault",
+       "Imperium",
+       "Transport",
+       "Vehicle"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Coronus Grav-carrier"
+      ],
+      "to": [
+       "1 Coronus Grav-carrier model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Coronus Grav-carrier: M12\" T12 Sv2+/5++ W16 Ld6+ OC5"
+      ],
+      "to": [
+       "Coronus Grav-Carrier: M12\" T12 Sv2+/5++ W16 Ld5+ OC5"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: twin arachnus blaze cannon; twin lastrum bolt cannon; armoured hull.",
+      "to": "This model is equipped with: 1 Armoured Hull; 1 Twin Arachnus Blaze Cannon; 1 Twin Lastrum Bolt Cannon."
+     },
+     "transport": {
+      "from": "This model has a transport capacity of 8 Adeptus Custodes Infantry models.",
+      "to": "This model has a transport capacity of 8 ADEPTUS CUSTODES INFANTRY models. It cannot transport JUMP PACK models."
+     },
+     "damaged": {
+      "from": {
+       "w": "1-5",
+       "text": "While this model has 1-5 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll."
+      },
+      "to": {
+       "w": "1-6",
+       "text": ""
+      }
+     },
+     "abilities": {
+      "from": [
+       "core:Deadly Demise D6",
+       "faction:Martial Ka’tah",
+       "datasheet:Fire Support"
+      ],
+      "to": [
+       "core:Damaged 6",
+       "core:Deep Strike",
+       "core:Deadly Demise D6",
+       "faction:Aegis of the Emperor",
+       "datasheet:Assault Vehicle",
+       "datasheet:Repulsor Suspensor Technology (Once per phase, per unit)"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Twin arachnus blaze cannon 24 A8 2 S5 AP-1 D1 [devastating wounds, twin-linked]",
+       "Twin lastrum bolt cannon 36 A3 2 S6 AP-1 D1 [sustained hits 1]",
+       "Armoured hull Melee A6 4 S8 AP0 D1"
+      ],
+      "to": [
+       "Twin Arachnus Blaze Cannon 24 A2 2 S10 AP-3 DD3+2 [twin-linked]",
+       "Twin Lastrum Bolt Cannon 36 A3 2 S6 AP-2 D2 [sustained hits 1, twin-linked]",
+       "Twin Neutronium Cascade Projectors 12 A3 N/A S7 AP-2 D1 [blast 1, torrent, twin-linked]",
+       "Armoured Hull Melee A6 4 S8 AP0 D1"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "1 вариантов"
+     },
+     "stratagems": {
+      "from": 27,
+      "to": 50
+     },
+     "enhancements": {
+      "from": 3,
+      "to": 5
+     }
+    }
+   },
+   {
+    "id": "000000882",
+    "name": "Custodian Guard Sodality",
+    "fields": {
+     "name": {
+      "from": "Custodian Guard",
+      "to": "Custodian Guard Sodality"
+     },
+     "keywords": {
+      "from": [
+       "Custodian Guard",
+       "Imperium",
+       "Battleline",
+       "Infantry"
+      ],
+      "to": [
+       "Battleline",
+       "Imperium",
+       "Infantry",
+       "Trusted Sentinel"
+      ]
+     },
+     "costs": {
+      "from": [
+       "1-3: 4 models=170, 5 models=215",
+       "4+: 4 models=180, 5 models=225"
+      ],
+      "to": [
+       "1-3: 3 models=240",
+       "4+: 3 models=270"
+      ]
+     },
+     "composition": {
+      "from": [
+       "4-5 Custodian Guard"
+      ],
+      "to": [
+       "3 Custodian Guard models"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Custodian Guard: M6\" T6 Sv2+/4++ W3 Ld6+ OC2"
+      ],
+      "to": [
+       "Custodian Guard: M8\" T7 Sv2+/4++ W5 Ld5+ OC3"
+      ]
+     },
+     "loadout": {
+      "from": "Every model is equipped with: guardian spear.",
+      "to": "Every model is equipped with: 1 Guardian Spear."
+     },
+     "abilities": {
+      "from": [
+       "core:Deep Strike",
+       "faction:Martial Ka’tah",
+       "wargear:Praesidium Shield",
+       "wargear:Vexilla",
+       "datasheet:Stand Vigil",
+       "datasheet:Sentinel Storm"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "faction:Martial Ka’tah",
+       "faction:Aegis of the Emperor",
+       "datasheet:Impenetrable Defence",
+       "wargear:Vexilla"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Guardian spear 24 A2 2 S4 AP-1 D2 [assault]",
+       "Sentinel blade 12 A2 2 S4 AP-1 D2 [assault, pistol]",
+       "Misericordia Melee A5 2 S5 AP-2 D1"
+      ],
+      "to": [
+       "Guardian Spear 24 A2 2 S5 AP-1 D2 [assault, rapid fire 2]",
+       "Guardian Spear Melee A6 2 S8 AP-2 D2"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "2 вариантов",
+      "to": "1 вариантов"
+     },
+     "stratagems": {
+      "from": 32,
+      "to": 57
+     },
+     "enhancements": {
+      "from": 1,
+      "to": 3
+     }
+    }
+   },
+   {
+    "id": "000001559",
+    "name": "Custodian Guard Sodality with Adrasite Spears",
+    "fields": {
+     "name": {
+      "from": "Custodian Guard With Adrasite And Pyrithite Spears",
+      "to": "Custodian Guard Sodality with Adrasite Spears"
+     },
+     "keywords": {
+      "from": [
+       "Infantry",
+       "Imperium",
+       "Custodian Guard with Adrasite and Pyrithite Spears"
+      ],
+      "to": [
+       "Imperium",
+       "Infantry",
+       "Trusted Sentinel"
+      ]
+     },
+     "legends": {
+      "from": false,
+      "to": true
+     },
+     "costs": {
+      "from": [
+       "1-3: 5 models=250",
+       "4+: 5 models=260"
+      ],
+      "to": [
+       "1+: 3 models=200"
+      ]
+     },
+     "composition": {
+      "from": [
+       "5 Custodian Guard with Adrasite and Pyrithite Spears"
+      ],
+      "to": [
+       "3 Custodian Guard models"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Custodian Guard With Adrasite And Pyrithite Spears: M6\" T6 Sv2+/4++ W3 Ld6+ OC2"
+      ],
+      "to": [
+       "Custodian Guard: M8\" T7 Sv2+/4++ W5 Ld5+ OC3"
+      ]
+     },
+     "loadout": {
+      "from": "Every model is equipped with: adrasite spear.",
+      "to": "Every model is equipped with: 1 Adrasite Spear."
+     },
+     "abilities": {
+      "from": [
+       "core:Deep Strike",
+       "faction:Martial Ka’tah",
+       "datasheet:Stand Vigil",
+       "datasheet:No Foe Shall Stand",
+       "datasheet:CUSTODIAN GUARD"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "faction:Martial Ka’tah",
+       "faction:Aegis of the Emperor",
+       "datasheet:Stand Vigil"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Adrasite spear 18 A1 2 S5 AP-2 D3",
+       "Pyrithite spear 12 A1 2 S9 AP-4 DD6 [melta 2]"
+      ],
+      "to": [
+       "Adrasite Spear 18 A2 2 S8 AP-2 D3",
+       "Adrasite Spear Melee A6 2 S8 AP-2 D2"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "0 вариантов"
+     },
+     "stratagems": {
+      "from": 28,
+      "to": 56
+     },
+     "enhancements": {
+      "from": 1,
+      "to": 3
+     }
+    }
+   },
+   {
+    "id": "000001450",
+    "name": "Custodian Wardens",
+    "fields": {
+     "keywords": {
+      "from": [
+       "Imperium",
+       "Infantry",
+       "Custodian Wardens"
+      ],
+      "to": [
+       "Imperium",
+       "Infantry",
+       "Trusted Sentinel"
+      ]
+     },
+     "costs": {
+      "from": [
+       "1: 4 models=200, 5 models=250",
+       "2+: 4 models=220, 5 models=270"
+      ],
+      "to": [
+       "1: 2 models=200, 3 models=295",
+       "2+: 2 models=230, 3 models=325"
+      ]
+     },
+     "composition": {
+      "from": [
+       "4-5 Custodian Wardens"
+      ],
+      "to": [
+       "2-3 Custodian Warden models"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Custodian Wardens: M6\" T6 Sv2+/4++ W3 Ld6+ OC2"
+      ],
+      "to": [
+       "Custodian Wardens: M8\" T7 Sv2+/4++ W6 Ld5+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "Every model is equipped with: guardian spear.",
+      "to": "Every model is equipped with: 1 Guardian Spear."
+     },
+     "abilities": {
+      "from": [
+       "core:Deep Strike",
+       "faction:Martial Ka’tah",
+       "wargear:Vexilla",
+       "datasheet:Resolute Will",
+       "datasheet:Living Fortress"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "faction:Martial Ka’tah",
+       "faction:Aegis of the Emperor",
+       "datasheet:Living Fortress",
+       "wargear:Vexilla"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Castellan axe 24 A2 2 S4 AP-1 D2 [assault]",
+       "Guardian spear 24 A2 2 S4 AP-1 D2 [assault]"
+      ],
+      "to": [
+       "Guardian Spear 24 A2 2 S5 AP-1 D2 [assault, rapid fire 2]",
+       "Castellan Axe 24 A2 2 S5 AP-1 D2 [assault, rapid fire 2]",
+       "Guardian Spear Melee A6 2 S8 AP-2 D2",
+       "Castellan Axe Melee A3 2 S10 AP-2 D4"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "2 вариантов",
+      "to": "2 вариантов"
+     },
+     "stratagems": {
+      "from": 31,
+      "to": 56
+     },
+     "enhancements": {
+      "from": 1,
+      "to": 3
+     }
+    }
+   },
+   {
+    "id": "000001560",
+    "name": "Gyrfalcon Jetbike Sodality",
+    "fields": {
+     "name": {
+      "from": "Agamatus Custodians",
+      "to": "Gyrfalcon Jetbike Sodality"
+     },
+     "keywords": {
+      "from": [
+       "Mounted",
+       "Fly",
+       "Imperium",
+       "Frame",
+       "Agamatus Custodians"
+      ],
+      "to": [
+       "Fly",
+       "Imperium",
+       "Mounted"
+      ]
+     },
+     "costs": {
+      "from": [
+       "1+: 3 models=225, 6 models=450"
+      ],
+      "to": [
+       "1: 2 models=260",
+       "2+: 2 models=280"
+      ]
+     },
+     "composition": {
+      "from": [
+       "3-6 Agamatus Custodians"
+      ],
+      "to": [
+       "2 Gyrfalcon Jetbiker models"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Agamatus Custodians: M12\" T6 Sv2+/4++ W4 Ld6+ OC2"
+      ],
+      "to": [
+       "Agamatus Custodians: M12\" T8 Sv2+/4++ W9 Ld5+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "Every model is equipped with: lastrum bolt cannon; interceptor lance.",
+      "to": "Every model is equipped with: 1 Lastrum Bolt Cannon; 1 Solarite Power Lance."
+     },
+     "abilities": {
+      "from": [
+       "faction:Martial Ka’tah",
+       "datasheet:Turbo-boost",
+       "datasheet:Implacable Vanguard",
+       "datasheet:JETBIKE OUTRIDERS"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "faction:Martial Ka’tah",
+       "faction:Aegis of the Emperor",
+       "datasheet:Death Blow"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Adrathic devastator 18 A1 2 S7 AP-2 D3",
+       "Lastrum bolt cannon 36 A3 2 S6 AP-1 D1 [sustained hits 1]",
+       "Twin las-pulsar 24 A2 2 S9 AP-1 D2 [twin-linked]",
+       "Interceptor lance Melee A5 2 S7 AP-2 D2 [lance]"
+      ],
+      "to": [
+       "Adrathic Devastator 18 A3 2 S8 AP-2 D3",
+       "Arachnus Volley Cannon 24 A8 2 S5 AP-1 D1 [devastating wounds, sustained hits 1]",
+       "Twin Corvae Las-pulser 18 A1 2 S10 AP-3 DD3+2 [twin-linked]",
+       "Lastrum Bolt Cannon 36 A3 2 S6 AP-2 D2 [sustained hits 1]",
+       "Solarite Power Lance Melee A5 2 S8 AP-2 D3 [lance]"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "1 вариантов"
+     },
+     "stratagems": {
+      "from": 26,
+      "to": 48
+     },
+     "enhancements": {
+      "from": 1,
+      "to": 2
+     }
+    }
+   },
+   {
+    "id": "000002520",
+    "name": "Knight-Centura",
+    "fields": {
+     "name": {
+      "from": "Knight-centura",
+      "to": "Knight-Centura"
+     },
+     "keywords": {
+      "from": [
+       "Character",
+       "Infantry",
+       "Imperium",
+       "Anathema Psykana",
+       "Knight-Centura"
+      ],
+      "to": [
+       "Anathema Psykana",
+       "Character",
+       "Imperium",
+       "Infantry"
+      ]
+     },
+     "factionKeywords": {
+      "from": [
+       "Adeptus Custodes"
+      ],
+      "to": [
+       "Anathema Psykana"
+      ]
+     },
+     "support": {
+      "from": false,
+      "to": true
+     },
+     "leads": {
+      "from": 3,
+      "to": 3
+     },
+     "composition": {
+      "from": [
+       "1 Knight-Centura"
+      ],
+      "to": [
+       "1 Knight-Centura model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Knight-centura: M6\" T3 Sv3+/5++ W4 Ld6+ OC1"
+      ],
+      "to": [
+       "Knight-Centura: M7\" T3 Sv3+/5++ W4 Ld6+ OC1"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: executioner greatblade.",
+      "to": "This model is equipped with: 1 Executioner Greatblade."
+     },
+     "abilities": {
+      "from": [
+       "core:Leader",
+       "core:Scouts 6\"",
+       "datasheet:Seeker’s Instincts",
+       "datasheet:Daughter of the Abyss",
+       "datasheet:Corner the Quarry"
+      ],
+      "to": [
+       "core:Scouts 7\"",
+       "core:Support",
+       "faction:Daughters of the Abyss",
+       "datasheet:Seeker’s Instincts",
+       "datasheet:Corner the Quarry"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Master-crafted boltgun 24 A1 2 S4 AP0 D2 [rapid fire 1]",
+       "Witchseeker flamer 12 AD6 N/A S4 AP0 D1 [ignores cover, torrent]",
+       "Close combat weapon Melee A3 2 S3 AP0 D1",
+       "Executioner greatblade Melee A3 2 S5 AP-2 D2 [anti-psyker 5+, devastating wounds]"
+      ],
+      "to": [
+       "Master-crafted Boltgun 24 A2 2 S5 AP-1 D2 [anti-psyker 4+, assault, rapid fire 1]",
+       "Master-crafted Flamer 12 A4 N/A S4 AP-1 D1 [anti-psyker 4+, assault, blast 2, torrent]",
+       "Executioner Greatblade Melee A4 2 S5 AP-2 D2 [anti-psyker 5+, cleave 1, devastating wounds: psyker]",
+       "Gun Stock Melee A3 2 S3 AP0 D1"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "1 вариантов"
+     },
+     "stratagems": {
+      "from": 39,
+      "to": 35
+     },
+     "enhancements": {
+      "from": 21,
+      "to": 18
+     }
+    }
+   },
+   {
+    "id": "000001564",
+    "name": "Orion Assault Dropship",
+    "fields": {
+     "keywords": {
+      "from": [
+       "Vehicle",
+       "Transport",
+       "Fly",
+       "Imperium",
+       "Orion Assault Dropship"
+      ],
+      "to": [
+       "Fly",
+       "Imperium",
+       "Transport",
+       "Vehicle"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Orion Assault Dropship"
+      ],
+      "to": [
+       "1 Orion Assault Dropship model"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: 2 arachnus heavy blaze cannons; 2 twin lastrum bolt cannons; 2 spiculus heavy bolt launchers; armoured hull.",
+      "to": "This model is equipped with: 2 Arachnus Heavy Blaze Cannon; 1 Armoured Hull; 2 Spiculus Heavy Bolt Launcher; 2 Twin Lastrum Bolt Cannon."
+     },
+     "transport": {
+      "from": "This model has a transport capacity of 12 Adeptus Custodes Infantry models. This model can also transport 1 Venerable Contemptor Dreadnought, 1 Contemptor-Achillus Dreadnought or 1 Contemptor Galatus-Dreadnought; while doing so, its transport capacity is reduced to 6 ADEPTUS CUSTODES INFANTRY models.",
+      "to": "This model has a transport capacity of 12 Adeptus Custodes Infantry models. Or 1 Dreadnought models. While transporting 1 DREADNOUGHT unit, this unit also has a transport capacity of 6 ADEPTUS CUSTODES INFANTRY models."
+     },
+     "damaged": {
+      "from": {
+       "w": "1-7",
+       "text": "While this model has 1-7 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll."
+      },
+      "to": {
+       "w": "1-7",
+       "text": ""
+      }
+     },
+     "abilities": {
+      "from": [
+       "core:Deadly Demise D6",
+       "core:Hover",
+       "faction:Martial Ka’tah",
+       "datasheet:Assault Dropship"
+      ],
+      "to": [
+       "core:Damaged 7",
+       "core:Deadly Demise D6",
+       "core:Hover",
+       "faction:Aegis of the Emperor",
+       "datasheet:Assault Dropship"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Arachnus heavy blaze cannon 36 A4 2 S12 AP-3 DD6+1",
+       "Spiculus heavy bolt launcher 36 AD6+6 2 S7 AP-1 D2 [blast]",
+       "Twin lastrum bolt cannon 36 A3 2 S6 AP-1 D1 [sustained hits 1]",
+       "Armoured hull Melee A9 4 S9 AP0 D1"
+      ],
+      "to": [
+       "Arachnus Heavy Blaze Cannon 36 A4 2 S12 AP-3 DD3+3",
+       "Spiculus Heavy Bolt Launcher 36 A8 2 S7 AP-1 D2 [blast 2]",
+       "Twin Lastrum Bolt Cannon 36 A3 2 S6 AP-2 D2 [sustained hits 1, twin-linked]",
+       "Armoured Hull Melee A9 4 S9 AP0 D1"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "0 вариантов"
+     },
+     "stratagems": {
+      "from": 27,
+      "to": 47
+     }
+    }
+   },
+   {
+    "id": "000001562",
+    "name": "Pallas Grav-Attack",
+    "fields": {
+     "name": {
+      "from": "Pallas Grav-attack",
+      "to": "Pallas Grav-Attack"
+     },
+     "keywords": {
+      "from": [
+       "Vehicle",
+       "Frame",
+       "Imperium",
+       "Pallas Grav-attack",
+       "Fly"
+      ],
+      "to": [
+       "Fly",
+       "Frame",
+       "Grav-assault",
+       "Imperium",
+       "Vehicle"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Pallas Grav-attack"
+      ],
+      "to": [
+       "1 Pallas Grav-attack model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Pallas Grav-attack: M12\" T8 Sv2+/5++ W9 Ld6+ OC2"
+      ],
+      "to": [
+       "Pallas Grav-attack: M12\" T9 Sv2+/5++ W10 Ld5+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: twin arachnus blaze cannon; armoured hull.",
+      "to": "This model is equipped with: 1 Armoured Hull; 1 Twin Arachnus Blaze Cannon."
+     },
+     "abilities": {
+      "from": [
+       "core:Deadly Demise D3",
+       "faction:Martial Ka’tah",
+       "datasheet:Merciless Hunter"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "core:Deadly Demise 1",
+       "faction:Aegis of the Emperor",
+       "datasheet:Mobile Hunter"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Twin arachnus blaze cannon 24 A8 2 S5 AP-1 D1 [devastating wounds, twin-linked]",
+       "Armoured hull Melee A3 4 S6 AP0 D1"
+      ],
+      "to": [
+       "Twin Arachnus Blaze Cannon 24 A2 2 S10 AP-3 DD3+2 [twin-linked]",
+       "Twin Iliastus Accelerator Fusil 48 A2 2 S10 AP-1 D3 [rapid fire 2, twin-linked]",
+       "Armoured Hull Melee A3 4 S6 AP0 D1"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "1 вариантов"
+     },
+     "stratagems": {
+      "from": 27,
+      "to": 50
+     },
+     "enhancements": {
+      "from": 3,
+      "to": 4
+     }
+    }
+   },
+   {
+    "id": "000002521",
+    "name": "Prosecutor Squad",
+    "fields": {
+     "name": {
+      "from": "Prosecutors",
+      "to": "Prosecutor Squad"
+     },
+     "keywords": {
+      "from": [
+       "Infantry",
+       "Imperium",
+       "Anathema Psykana",
+       "Prosecutors"
+      ],
+      "to": [
+       "Anathema Psykana",
+       "Imperium",
+       "Infantry"
+      ]
+     },
+     "factionKeywords": {
+      "from": [
+       "Adeptus Custodes"
+      ],
+      "to": [
+       "Anathema Psykana"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Prosecutor Sister Superior",
+       "3-9 Prosecutors"
+      ],
+      "to": [
+       "4-10 Prosecutor models"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Prosecutors: M6\" T3 Sv3+ W1 Ld6+ OC2"
+      ],
+      "to": [
+       "Prosecutors: M7\" T3 Sv3+ W1 Ld6+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "Every model is equipped with: boltgun; close combat weapon.",
+      "to": "Every model is equipped with: 1 Boltgun; 1 Gun Stock."
+     },
+     "abilities": {
+      "from": [
+       "datasheet:Daughters of the Abyss",
+       "datasheet:Purity of Execution"
+      ],
+      "to": [
+       "faction:Daughters of the Abyss",
+       "datasheet:Purity of Execution"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Boltgun 24 A1 3 S4 AP0 D1 [rapid fire 1]",
+       "Close combat weapon Melee A2 3 S3 AP0 D1"
+      ],
+      "to": [
+       "Boltgun 24 A1 3 S5 AP-1 D1 [anti-psyker 4+, assault, rapid fire 1]",
+       "Gun Stock Melee A2 3 S3 AP0 D1"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "stratagems": {
+      "from": 33,
+      "to": 30
+     }
+    }
+   },
+   {
+    "id": "000001563",
+    "name": "Sagittarum Custodians Sodality",
+    "fields": {
+     "name": {
+      "from": "Sagittarum Custodians",
+      "to": "Sagittarum Custodians Sodality"
+     },
+     "keywords": {
+      "from": [
+       "Sagittarum Custodians",
+       "Imperium",
+       "Infantry"
+      ],
+      "to": [
+       "Imperium",
+       "Infantry",
+       "Trusted Sentinel"
+      ]
+     },
+     "legends": {
+      "from": false,
+      "to": true
+     },
+     "costs": {
+      "from": [
+       "1+: 5 models=225"
+      ],
+      "to": [
+       "1+: 3 models=185"
+      ]
+     },
+     "composition": {
+      "from": [
+       "5 Sagittarum Custodians"
+      ],
+      "to": [
+       "3 Sagittarum Custodian models"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Sagittarum Custodians: M6\" T6 Sv2+/4++ W3 Ld6+ OC2"
+      ],
+      "to": [
+       "Sagittarum Custodian: M8\" T7 Sv2+/4++ W5 Ld5+ OC3"
+      ]
+     },
+     "loadout": {
+      "from": "Every model is equipped with: adrastus bolt caliver; misericordia.",
+      "to": "Every model is equipped with: 1 Adrastus Bolt Caliver; 1 Misericordia."
+     },
+     "abilities": {
+      "from": [
+       "core:Deep Strike",
+       "faction:Martial Ka’tah",
+       "datasheet:Saturation Volleys",
+       "datasheet:Disintegration Beams",
+       "datasheet:CUSTODIAN GUARD"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "faction:Martial Ka’tah",
+       "faction:Aegis of the Emperor",
+       "datasheet:Disintegration Beams (Once per battle, per unit)",
+       "datasheet:Saturation Volleys"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Adrastus bolt caliver 36 A3 2 S5 AP-1 D2 [sustained hits 1]",
+       "Misericordia Melee A4 2 S5 AP-2 D1"
+      ],
+      "to": [
+       "Adrastus Bolt Caliver 36 A3 2 S7 AP-2 D2 [sustained hits 1]",
+       "Misericordia Melee A4 2 S6 AP-2 D1"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "0 вариантов"
+     },
+     "stratagems": {
+      "from": 28,
+      "to": 56
+     },
+     "enhancements": {
+      "from": 1,
+      "to": 3
+     }
+    }
+   },
+   {
+    "id": "000001447",
+    "name": "Shield-Captain",
+    "fields": {
+     "name": {
+      "from": "Shield-captain",
+      "to": "Shield-Captain"
+     },
+     "keywords": {
+      "from": [
+       "Infantry",
+       "Character",
+       "Imperium",
+       "Shield-Captain"
+      ],
+      "to": [
+       "Character",
+       "Imperium",
+       "Infantry",
+       "Shield-Captain"
+      ]
+     },
+     "costs": {
+      "from": [
+       "1+: 1 model=110"
+      ],
+      "to": [
+       "1: 1 model=180",
+       "2+: 1 model=200"
+      ]
+     },
+     "leads": {
+      "from": 4,
+      "to": 6
+     },
+     "composition": {
+      "from": [
+       "1 Shield-Captain"
+      ],
+      "to": [
+       "1 Shield-Captain model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Shield-captain: M6\" T6 Sv2+/4++ W6 Ld6+ OC2"
+      ],
+      "to": [
+       "Shield-Captain: M8\" T7 Sv2+/4++ W8 Ld5+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: guardian spear.",
+      "to": "This model is equipped with: 1 Praesidium Shield; 1 Pyrithite Spear."
+     },
+     "abilities": {
+      "from": [
+       "core:Deep Strike",
+       "core:Leader",
+       "faction:Martial Ka’tah",
+       "datasheet:Master of the Stances",
+       "datasheet:Strategic Mastery",
+       "wargear:Praesidium shield"
+      ],
+      "to": [
+       "core:Leader",
+       "core:Deep Strike",
+       "faction:Aquila Commander",
+       "faction:Aegis of the Emperor",
+       "faction:Martial Ka’tah",
+       "datasheet:Vengeful Surge (Once per battle, per unit)",
+       "datasheet:Master of Ka’tahs (Once per battle round, per unit)",
+       "wargear:Praesidium Shield"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Castellan axe 24 A2 2 S4 AP-1 D2 [assault]",
+       "Guardian spear 24 A2 2 S4 AP-1 D2 [assault]",
+       "Pyrithite spear 12 A1 2 S9 AP-4 DD6 [melta 2]",
+       "Sentinel blade 12 A2 2 S4 AP-1 D2 [assault, pistol]"
+      ],
+      "to": [
+       "Pyrithite Spear 12 A1 2 S10 AP-3 DD3+2 [assault, melta 2]",
+       "Castellan Axe 24 A2 2 S5 AP-1 D2 [assault, rapid fire 2]",
+       "Guardian Spear 24 A2 2 S5 AP-1 D2 [assault, rapid fire 2]",
+       "Pyrithite Spear Melee A8 2 S8 AP-2 D2 [cleave 1]",
+       "Eternity-pattern Paragon Blade Melee A6 2 S10 AP-3 D3 [precision]",
+       "Castellan Axe Melee A5 2 S10 AP-2 D4",
+       "Guardian Spear Melee A8 2 S8 AP-2 D2 [cleave 1]"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "2 вариантов"
+     },
+     "stratagems": {
+      "from": 40,
+      "to": 60
+     },
+     "enhancements": {
+      "from": 21,
+      "to": 37
+     }
+    }
+   },
+   {
+    "id": "000001448",
+    "name": "Shield-Captain in Allarus Terminator Armour",
+    "fields": {
+     "name": {
+      "from": "Shield-captain In Allarus Terminator Armour",
+      "to": "Shield-Captain in Allarus Terminator Armour"
+     },
+     "keywords": {
+      "from": [
+       "Terminator",
+       "Infantry",
+       "Character",
+       "Imperium",
+       "Shield-Captain"
+      ],
+      "to": [
+       "Character",
+       "Imperium",
+       "Infantry",
+       "Shield-Captain",
+       "Terminator"
+      ]
+     },
+     "costs": {
+      "from": [
+       "1+: 1 model=130"
+      ],
+      "to": [
+       "1: 1 model=185",
+       "2+: 1 model=205"
+      ]
+     },
+     "leads": {
+      "from": 2,
+      "to": 3
+     },
+     "composition": {
+      "from": [
+       "1 Shield-Captain in Allarus Terminator Armour"
+      ],
+      "to": [
+       "1 Shield-Captain in Allarus Terminator Armour model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Shield-captain In Allarus Terminator Armour: M5\" T7 Sv2+/4++ W7 Ld6+ OC2"
+      ],
+      "to": [
+       "Shield-Captain in Allarus Terminator Armour: M7\" T8 Sv2+/4++ W9 Ld5+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: balistus grenade launcher; guardian spear.",
+      "to": "This model is equipped with: 1 Balistus Grenade Launcher; 1 Guardian Spear."
+     },
+     "abilities": {
+      "from": [
+       "core:Deep Strike",
+       "core:Leader",
+       "faction:Martial Ka’tah",
+       "datasheet:Auramite and Adamantine",
+       "datasheet:Strategic Mastery"
+      ],
+      "to": [
+       "core:Leader",
+       "core:Deep Strike",
+       "faction:Aquila Commander",
+       "faction:Martial Ka’tah",
+       "faction:Aegis of the Emperor",
+       "datasheet:Archeotech Teleport-shunter (Once per battle, per unit)",
+       "datasheet:Master of Ka’tahs (Once per battle round, per unit)"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Balistus grenade launcher 18 AD6 2 S4 AP-1 D1 [blast]",
+       "Castellan axe 24 A2 2 S4 AP-1 D2 [assault]",
+       "Guardian spear 24 A2 2 S4 AP-1 D2 [assault]"
+      ],
+      "to": [
+       "Castellan Axe 24 A2 2 S5 AP-1 D2 [assault, rapid fire 2]",
+       "Balistus Grenade Launcher 18 A3 2 S5 AP-1 D1 [assault, blast 1]",
+       "Guardian Spear 24 A2 2 S5 AP-1 D2 [assault, rapid fire 2]",
+       "Castellan Axe Melee A5 2 S10 AP-2 D4",
+       "Guardian Spear Melee A8 2 S8 AP-2 D2 [cleave 1]"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "1 вариантов"
+     },
+     "stratagems": {
+      "from": 42,
+      "to": 65
+     },
+     "enhancements": {
+      "from": 23,
+      "to": 41
+     }
+    }
+   },
+   {
+    "id": "000001449",
+    "name": "Shield-Captain on Dawneagle Jetbike",
+    "fields": {
+     "name": {
+      "from": "Shield-captain On Dawneagle Jetbike",
+      "to": "Shield-Captain on Dawneagle Jetbike"
+     },
+     "keywords": {
+      "from": [
+       "Fly",
+       "Shield-Captain",
+       "Dawneagle Jetbike",
+       "Character",
+       "Imperium",
+       "Mounted"
+      ],
+      "to": [
+       "Character",
+       "Fly",
+       "Imperium",
+       "Mounted",
+       "Shield-Captain"
+      ]
+     },
+     "costs": {
+      "from": [
+       "1+: 1 model=140"
+      ],
+      "to": [
+       "1: 1 model=205",
+       "2+: 1 model=225"
+      ]
+     },
+     "leads": {
+      "from": 2,
+      "to": 2
+     },
+     "composition": {
+      "from": [
+       "1 Shield-Captain on Dawneagle Jetbike"
+      ],
+      "to": [
+       "1 Shield-Captain on Dawneagle Jetbike model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Shield-captain On Dawneagle Jetbike: M12\" T7 Sv2+/4++ W8 Ld6+ OC2"
+      ],
+      "to": [
+       "Shield-Captain on Dawneagle Jetbike: M12\" T8 Sv2+/4++ W10 Ld5+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: salvo launcher; interceptor lance.",
+      "to": "This model is equipped with: 1 Interceptor Lance; 1 Salvo Launcher."
+     },
+     "abilities": {
+      "from": [
+       "core:Leader",
+       "faction:Martial Ka’tah",
+       "datasheet:Sweeping Advance",
+       "datasheet:Strategic Mastery"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "core:Leader",
+       "faction:Martial Ka’tah",
+       "faction:Aquila Commander",
+       "faction:Aegis of the Emperor",
+       "datasheet:Master of Ka’tahs (Once per battle round, per unit)",
+       "datasheet:Sweeping Advance (Once per battle, per unit)"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Vertus hurricane bolter 18 A3 2 S4 AP-1 D2 [rapid fire 3, twin-linked]",
+       "Salvo launcher 24 A1 2 S10 AP-3 DD6+1 [twin-linked]",
+       "Interceptor lance Melee A6 2 S7 AP-2 D2 [lance]"
+      ],
+      "to": [
+       "Hurricane Bolter 18 A3 2 S5 AP-1 D2 [rapid fire 3, twin-linked]",
+       "Salvo Launcher 24 A2 2 S10 AP-2 DD3+2",
+       "Interceptor Lance Melee A8 2 S8 AP-2 D2 [lance]"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "1 вариантов"
+     },
+     "stratagems": {
+      "from": 35,
+      "to": 56
+     },
+     "enhancements": {
+      "from": 18,
+      "to": 30
+     }
+    }
+   },
+   {
+    "id": "000001479",
+    "name": "Telemon Heavy Dreadnought",
+    "fields": {
+     "keywords": {
+      "from": [
+       "Walker",
+       "Vehicle",
+       "Imperium",
+       "Telemon Heavy Dreadnought"
+      ],
+      "to": [
+       "Dreadnought",
+       "Imperium",
+       "Vehicle",
+       "Walker"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Telemon Heavy Dreadnought"
+      ],
+      "to": [
+       "1 Telemon Heavy Dreadnought model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Telemon Heavy Dreadnought: M8\" T10 Sv2+/4++ W12 Ld6+ OC4"
+      ],
+      "to": [
+       "Telemon Dreadnought: M10\" T11 Sv2+/4++ W14 Ld5+ OC4"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: 2 iliastus accelerator culverins; spiculus bolt launcher; armoured feet.",
+      "to": "This model is equipped with: 1 Dual Caestus Fists; 1 Spiculus Bolt Launcher; 2 Twin Neutronium Cascade Projectors."
+     },
+     "damaged": {
+      "from": {
+       "w": "1-4",
+       "text": "While this model has 1-4 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll."
+      },
+      "to": {
+       "w": "1-5",
+       "text": ""
+      }
+     },
+     "abilities": {
+      "from": [
+       "core:Deadly Demise D3",
+       "faction:Martial Ka’tah",
+       "datasheet:Guardian Eternal",
+       "datasheet:Devoted to Destruction"
+      ],
+      "to": [
+       "core:Deadly Demise D3",
+       "core:Damaged 5",
+       "faction:Aegis of the Emperor",
+       "faction:Martial Ka’tah",
+       "datasheet:Guardian Eternal"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Arachnus storm cannon 24 A12 2 S6 AP-1 D1 [devastating wounds]",
+       "Iliastus accelerator culverin 48 A4 2 S9 AP-1 D3",
+       "Spiculus bolt launcher 36 AD6+3 2 S5 AP0 D1 [blast]",
+       "Twin plasma projector 12 AD3 N/A S7 AP-2 D1 [torrent, twin-linked]",
+       "Armoured feet Melee A5 2 S7 AP0 D1",
+       "Telemon caestus Melee A5 2 S12 AP-2 D3"
+      ],
+      "to": [
+       "Spiculus Bolt Launcher 36 A6 2 S5 AP-1 D1 [blast 2]",
+       "Twin Neutronium Cascade Projectors 12 A3 N/A S7 AP-2 D1 [blast 1, torrent, twin-linked]",
+       "Adrathic Desolator 24 A4 2 S10 AP-2 D4",
+       "Arachnus Storm Cannon 24 A12 2 S6 AP-1 D1 [devastating wounds, sustained hits 1]",
+       "Iliastus Accelerator Culverin 48 A3 2 S10 AP-1 D3 [rapid fire 3]",
+       "Dual Caestus Fists Melee A7 2 S14 AP-3 D4 [twin-linked]",
+       "Caestus Fist Melee A5 2 S14 AP-3 D4"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "1 вариантов"
+     },
+     "stratagems": {
+      "from": 31,
+      "to": 53
+     },
+     "enhancements": {
+      "from": 5,
+      "to": 7
+     }
+    }
+   },
+   {
+    "id": "000001446",
+    "name": "Trajann Valoris",
+    "fields": {
+     "keywords": {
+      "from": [
+       "Infantry",
+       "Character",
+       "Epic Hero",
+       "Imperium",
+       "Trajann Valoris"
+      ],
+      "to": [
+       "Character",
+       "Epic Hero",
+       "Imperium",
+       "Infantry"
+      ]
+     },
+     "leads": {
+      "from": 4,
+      "to": 9
+     },
+     "composition": {
+      "from": [
+       "1 Trajann Valoris – EPIC HERO"
+      ],
+      "to": [
+       "1 Trajann Valoris model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Trajann Valoris: M6\" T6 Sv2+/4++ W7 Ld5+ OC2"
+      ],
+      "to": [
+       "Trajann Valoris: M8\" T7 Sv2+/4++ W10 Ld5+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: Watcher’s Axe.",
+      "to": "This model is equipped with: 1 Eagle’s Scream; 1 Watcher’s Axe."
+     },
+     "abilities": {
+      "from": [
+       "core:Deep Strike",
+       "core:Feel No Pain 5+",
+       "core:Leader",
+       "faction:Martial Ka’tah",
+       "datasheet:Captain-General",
+       "datasheet:Moment Shackle",
+       "datasheet:SUPREME COMMANDER"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "core:Leader",
+       "core:Feel No Pain 5+",
+       "faction:Aquila Commander",
+       "faction:Aegis of the Emperor",
+       "faction:Martial Ka’tah",
+       "datasheet:Captain-General (Aura)",
+       "datasheet:Moment Shackle (Once per battle, per army)",
+       "datasheet:SUPREME COMMANDER"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Eagle's Scream 24 A2 2 S5 AP-2 D3 [assault]",
+       "Watcher’s Axe Melee A6 2 S10 AP-2 D3"
+      ],
+      "to": [
+       "Eagle’s Scream 24 A2 2 S6 AP-2 D2 [assault, rapid fire 2]",
+       "Watcher’s Axe Melee A6 2 S12 AP-3 D4 [cleave 1]"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "stratagems": {
+      "from": 40,
+      "to": 60
+     },
+     "enhancements": {
+      "from": 0,
+      "to": 18
+     }
+    }
+   },
+   {
+    "id": "000002519",
+    "name": "Valerian",
+    "fields": {
+     "keywords": {
+      "from": [
+       "Valerian",
+       "Shield-Captain",
+       "Imperium",
+       "Epic Hero",
+       "Character",
+       "Infantry"
+      ],
+      "to": [
+       "Character",
+       "Epic Hero",
+       "Imperium",
+       "Infantry",
+       "Shield-Captain"
+      ]
+     },
+     "legends": {
+      "from": false,
+      "to": true
+     },
+     "leads": {
+      "from": 4,
+      "to": 6
+     },
+     "composition": {
+      "from": [
+       "1 Valerian – EPIC HERO"
+      ],
+      "to": [
+       "1 Valerian model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Valerian: M6\" T6 Sv2+/4++ W6 Ld6+ OC2"
+      ],
+      "to": [
+       "Valerian: M8\" T7 Sv2+/4++ W8 Ld5+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: Gnosis.",
+      "to": "This model is equipped with: 1 Gnosis."
+     },
+     "abilities": {
+      "from": [
+       "core:Deep Strike",
+       "core:Feel No Pain 6+",
+       "core:Leader",
+       "faction:Martial Ka’tah",
+       "datasheet:Golden Laurels",
+       "datasheet:Hero of Lion’s Gate"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "core:Feel No Pain 6+",
+       "core:Leader",
+       "faction:Aegis of the Emperor",
+       "faction:Aquila Commander",
+       "faction:Martial Ka’tah",
+       "datasheet:Golden Laurels",
+       "datasheet:Hero of Lion's Gate (Once per battle, per unit)"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Gnosis 24 A3 2 S4 AP-1 D2 [assault]"
+      ],
+      "to": [
+       "Gnosis 24 A3 2 S6 AP-1 D2 [assault, rapid fire 2]",
+       "Gnosis Melee A7 2 S8 AP-3 D3"
+      ]
+     },
+     "stratagems": {
+      "from": 40,
+      "to": 60
+     },
+     "enhancements": {
+      "from": 0,
+      "to": 19
+     }
+    }
+   },
+   {
+    "id": "000001561",
+    "name": "Venatari with Verutum Lances",
+    "fields": {
+     "name": {
+      "from": "Venatari Custodians",
+      "to": "Venatari with Verutum Lances"
+     },
+     "keywords": {
+      "from": [
+       "Venatari Custodians",
+       "Infantry",
+       "Fly",
+       "Jump Pack",
+       "Imperium"
+      ],
+      "to": [
+       "Explosives",
+       "Fly",
+       "Imperium",
+       "Infantry",
+       "Jump Pack"
+      ]
+     },
+     "costs": {
+      "from": [
+       "1-2: 3 models=150, 6 models=300",
+       "3+: 3 models=160, 6 models=310 | снаряжение: Venatari lance+5"
+      ],
+      "to": [
+       "1-2: 3 models=270",
+       "3+: 3 models=300"
+      ]
+     },
+     "composition": {
+      "from": [
+       "3-6 Venatari Custodians"
+      ],
+      "to": [
+       "3 Venatari models"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Venatari Custodians: M10\" T6 Sv2+/4++ W3 Ld6+ OC2"
+      ],
+      "to": [
+       "Venatari: M12\" T7 Sv2+/4++ W5 Ld5+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "Every model is equipped with: Venatari lance.",
+      "to": "Every model is equipped with: 1 Verutum Lance."
+     },
+     "abilities": {
+      "from": [
+       "core:Deep Strike",
+       "faction:Martial Ka’tah",
+       "wargear:Tarsis Buckler",
+       "datasheet:Strike from the Skies",
+       "datasheet:Swooping Dive",
+       "datasheet:JUMP PACKS"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "faction:Aegis of the Emperor",
+       "faction:Martial Ka’tah",
+       "datasheet:Take Wing",
+       "datasheet:Swift Ruin (Once per phase, per army)",
+       "datasheet:Neutronium Cascade Mine (Once per battle, per unit)"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Kinetic destroyer 12 A2 2 S6 AP-1 D1 [pistol, sustained hits 1]",
+       "Venatari lance 24 A2 2 S4 AP-1 D2 [assault]",
+       "Tarsis buckler Melee A5 2 S5 AP-2 D1"
+      ],
+      "to": [
+       "Verutum Lance 18 A1 2 S10 AP-2 D3 [assault]",
+       "Verutum Lance Melee A5 2 S7 AP-2 D2 [lance, precision]"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "0 вариантов"
+     },
+     "stratagems": {
+      "from": 28,
+      "to": 52
+     },
+     "enhancements": {
+      "from": 1,
+      "to": 2
+     }
+    }
+   },
+   {
+    "id": "000000883",
+    "name": "Venerable Contemptor Dreadnought",
+    "fields": {
+     "keywords": {
+      "from": [
+       "Vehicle",
+       "Imperium",
+       "Venerable Contemptor Dreadnought",
+       "Walker"
+      ],
+      "to": [
+       "Imperium",
+       "Vehicle",
+       "Walker"
+      ]
+     },
+     "legends": {
+      "from": false,
+      "to": true
+     },
+     "costs": {
+      "from": [
+       "1-2: 1 model=170",
+       "3+: 1 model=185"
+      ],
+      "to": [
+       "1+: 1 model=220"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Venerable Contemptor Dreadnought"
+      ],
+      "to": [
+       "1 Venerable Contemptor Dreadnought model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Venerable Contemptor Dreadnought: M6\" T9 Sv2+/5++ W10 Ld6+ OC3"
+      ],
+      "to": [
+       "Venerable Contemptor Dreadnought: M9\" T10 Sv2+/4++ W12 Ld5+ OC3"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: combi-bolter; multi-melta; Contemptor combat weapon.",
+      "to": "This model is equipped with: 1 Combi-bolter; 1 Contemptor Fist; 1 Multi-melta."
+     },
+     "damaged": {
+      "from": null,
+      "to": {
+       "w": "1-4",
+       "text": ""
+      }
+     },
+     "abilities": {
+      "from": [
+       "core:Deadly Demise 1",
+       "faction:Martial Ka’tah",
+       "datasheet:Unyielding Ancient"
+      ],
+      "to": [
+       "core:Damaged 4",
+       "core:Deadly Demise D3",
+       "faction:Aegis of the Emperor",
+       "faction:Martial Ka’tah",
+       "datasheet:Unyielding Ancient (Once per battle, per unit)"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Combi-bolter 24 A2 2 S4 AP0 D1 [rapid fire 2]",
+       "Kheres-pattern assault cannon 24 A6 2 S7 AP-1 D1 [devastating wounds]",
+       "Multi-melta 18 A2 2 S9 AP-4 DD6 [melta 2]",
+       "Contemptor combat weapon Melee A5 2 S12 AP-2 D3"
+      ],
+      "to": [
+       "Kheres-pattern Assault Cannon 24 A6 2 S7 AP-2 D2 [sustained hits 1]",
+       "Combi-bolter 24 A2 2 S5 AP-1 D1 [rapid fire 2]",
+       "Multi-melta 18 A2 2 S10 AP-3 DD3+2 [melta 3]",
+       "Contemptor Fist Melee A5 2 S12 AP-3 DD3+3"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "1 вариантов"
+     },
+     "stratagems": {
+      "from": 30,
+      "to": 49
+     }
+    }
+   },
+   {
+    "id": "000000884",
+    "name": "Venerable Land Raider",
+    "fields": {
+     "keywords": {
+      "from": [
+       "Venerable Land Raider",
+       "Vehicle",
+       "Frame",
+       "Imperium",
+       "Transport",
+       "Smoke"
+      ],
+      "to": [
+       "Frame",
+       "Imperium",
+       "Smoke",
+       "Transport",
+       "Vehicle"
+      ]
+     },
+     "legends": {
+      "from": false,
+      "to": true
+     },
+     "costs": {
+      "from": [
+       "1: 1 model=220",
+       "2+: 1 model=240"
+      ],
+      "to": [
+       "1+: 1 model=230"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Venerable Land Raider"
+      ],
+      "to": [
+       "1 Venerable Land Raider model"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Venerable Land Raider: M10\" T12 Sv2+ W16 Ld6+ OC5"
+      ],
+      "to": [
+       "Venerable Land Raider: M10\" T12 Sv2+ W16 Ld7+ OC1"
+      ]
+     },
+     "loadout": {
+      "from": "This model is equipped with: 2 godhammer lascannons; twin heavy bolter; armoured tracks.",
+      "to": "This model is equipped with: 1 Armoured Tracks; 2 Godhammer Lascannon; 1 Twin Heavy Bolter."
+     },
+     "damaged": {
+      "from": {
+       "w": "1-5",
+       "text": "While this model has 1-5 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll."
+      },
+      "to": {
+       "w": "1-5",
+       "text": ""
+      }
+     },
+     "abilities": {
+      "from": [
+       "core:Deadly Demise D6",
+       "faction:Martial Ka’tah",
+       "datasheet:Assault Ramp",
+       "wargear:One Shot"
+      ],
+      "to": [
+       "core:Deadly Demise D6",
+       "core:Damaged 5",
+       "faction:Aegis of the Emperor",
+       "datasheet:Assault Ramp"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Godhammer lascannon 48 A2 2 S12 AP-3 DD6+1",
+       "Hunter-killer missile 48 A1 2 S14 AP-3 DD6 [one shot]",
+       "Storm bolter 24 A2 2 S4 AP0 D1 [rapid fire 2]",
+       "Twin heavy bolter 36 A3 2 S5 AP-1 D2 [sustained hits 1, twin-linked]",
+       "Armoured tracks Melee A6 4 S8 AP0 D1"
+      ],
+      "to": [
+       "Godhammer Lascannon 48 A2 2 S12 AP-3 DD3+3",
+       "Twin Heavy Bolter 36 A3 2 S5 AP-1 D2 [rapid fire 2, sustained hits 1, twin-linked]",
+       "Storm Bolter 24 A2 2 S5 AP-1 D1 [rapid fire 2]",
+       "Hunter-killer Missile 48 A1 2 S14 AP-3 DD3+3 [one shot]",
+       "Armoured Tracks Melee A6 4 S8 AP0 D1"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "2 вариантов",
+      "to": "2 вариантов"
+     },
+     "stratagems": {
+      "from": 28,
+      "to": 47
+     }
+    }
+   },
+   {
+    "id": "000001454",
+    "name": "Vertus Praetors",
+    "fields": {
+     "keywords": {
+      "from": [
+       "Fly",
+       "Imperium",
+       "Vertus Praetors",
+       "Mounted"
+      ],
+      "to": [
+       "Fly",
+       "Imperium",
+       "Mounted"
+      ]
+     },
+     "costs": {
+      "from": [
+       "1-2: 2 models=145, 3 models=215",
+       "3+: 2 models=170, 3 models=240"
+      ],
+      "to": [
+       "1: 2 models=220, 3 models=330",
+       "2+: 2 models=240, 3 models=350"
+      ]
+     },
+     "composition": {
+      "from": [
+       "2-3 Vertus Praetors"
+      ],
+      "to": [
+       "2-3 Vertus Praetor models"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Vertus Praetors: M12\" T7 Sv2+/4++ W5 Ld6+ OC2"
+      ],
+      "to": [
+       "Vertus Praetors: M12\" T8 Sv2+/4++ W7 Ld5+ OC2"
+      ]
+     },
+     "loadout": {
+      "from": "Every model is equipped with: salvo launcher; interceptor lance.",
+      "to": "Every model is equipped with: 1 Interceptor Lance; 1 Salvo Launcher."
+     },
+     "abilities": {
+      "from": [
+       "faction:Martial Ka’tah",
+       "datasheet:Turbo-boost",
+       "datasheet:Quicksilver Execution"
+      ],
+      "to": [
+       "core:Deep Strike",
+       "faction:Aegis of the Emperor",
+       "faction:Martial Ka’tah",
+       "datasheet:Quicksilver Execution"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Salvo launcher 24 A1 2 S10 AP-3 DD6+1 [twin-linked]",
+       "Vertus hurricane bolter 18 A3 2 S4 AP-1 D2 [rapid fire 3, twin-linked]",
+       "Interceptor lance Melee A5 2 S7 AP-2 D2 [lance]"
+      ],
+      "to": [
+       "Salvo Launcher 24 A2 2 S10 AP-2 DD3+2",
+       "Hurricane Bolter 18 A3 2 S5 AP-1 D2 [rapid fire 3, twin-linked]",
+       "Interceptor Lance Melee A6 2 S8 AP-2 D2 [lance]"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "1 вариантов"
+     },
+     "stratagems": {
+      "from": 26,
+      "to": 48
+     },
+     "enhancements": {
+      "from": 1,
+      "to": 2
+     }
+    }
+   },
+   {
+    "id": "000002522",
+    "name": "Vigilator Squad",
+    "fields": {
+     "name": {
+      "from": "Vigilators",
+      "to": "Vigilator Squad"
+     },
+     "keywords": {
+      "from": [
+       "Infantry",
+       "Anathema Psykana",
+       "Vigilators",
+       "Imperium"
+      ],
+      "to": [
+       "Anathema Psykana",
+       "Imperium",
+       "Infantry"
+      ]
+     },
+     "factionKeywords": {
+      "from": [
+       "Adeptus Custodes"
+      ],
+      "to": [
+       "Anathema Psykana"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Vigilator Sister Superior",
+       "3-9 Vigilators"
+      ],
+      "to": [
+       "4-10 Vigilator models"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Vigilators: M6\" T3 Sv3+ W1 Ld6+ OC1"
+      ],
+      "to": [
+       "Vigilators: M7\" T3 Sv3+ W1 Ld6+ OC1"
+      ]
+     },
+     "loadout": {
+      "from": "Every model is equipped with: executioner greatblade.",
+      "to": "Every model is equipped with: 1 Executioner Greatblade."
+     },
+     "abilities": {
+      "from": [
+       "datasheet:Daughters of the Abyss",
+       "datasheet:Deft Parry"
+      ],
+      "to": [
+       "faction:Daughters of the Abyss",
+       "datasheet:Deft Parry"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Executioner greatblade Melee A2 3 S5 AP-2 D2 [anti-psyker 5+, devastating wounds]"
+      ],
+      "to": [
+       "Executioner Greatblade Melee A3 3 S5 AP-2 D2 [anti-psyker 5+, devastating wounds: psyker]"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "stratagems": {
+      "from": 33,
+      "to": 30
+     }
+    }
+   },
+   {
+    "id": "000002523",
+    "name": "Witchseeker Squad",
+    "fields": {
+     "name": {
+      "from": "Witchseekers",
+      "to": "Witchseeker Squad"
+     },
+     "keywords": {
+      "from": [
+       "Anathema Psykana",
+       "Infantry",
+       "Witchseekers",
+       "Imperium"
+      ],
+      "to": [
+       "Anathema Psykana",
+       "Imperium",
+       "Infantry"
+      ]
+     },
+     "factionKeywords": {
+      "from": [
+       "Adeptus Custodes"
+      ],
+      "to": [
+       "Anathema Psykana"
+      ]
+     },
+     "composition": {
+      "from": [
+       "1 Witchseeker Sister Superior",
+       "3-9 Witchseekers"
+      ],
+      "to": [
+       "4-10 Witchseeker models"
+      ]
+     },
+     "stats": {
+      "from": [
+       "Witchseekers: M6\" T3 Sv3+ W1 Ld6+ OC1"
+      ],
+      "to": [
+       "Witchseekers: M7\" T3 Sv3+ W1 Ld6+ OC1"
+      ]
+     },
+     "loadout": {
+      "from": "Every model is equipped with: Witchseeker flamer; close combat weapon.",
+      "to": "Every model is equipped with: 1 Flamer; 1 Gun Stock."
+     },
+     "abilities": {
+      "from": [
+       "core:Scouts 6\"",
+       "datasheet:Daughters of the Abyss",
+       "datasheet:Sanctified Flames"
+      ],
+      "to": [
+       "core:Scouts 7\"",
+       "faction:Daughters of the Abyss",
+       "datasheet:Sanctified Flames"
+      ]
+     },
+     "weapons": {
+      "from": [
+       "Witchseeker flamer 12 AD6 N/A S4 AP0 D1 [ignores cover, torrent]",
+       "Close combat weapon Melee A2 3 S3 AP0 D1"
+      ],
+      "to": [
+       "Flamer 12 A3 N/A S4 AP-1 D1 [anti-psyker 4+, assault, blast 1, torrent]",
+       "Gun Stock Melee A2 3 S3 AP0 D1"
+      ]
+     },
+     "defaultLoadout": {
+      "from": "1 правил",
+      "to": "1 правил"
+     },
+     "options": {
+      "from": "1 вариантов",
+      "to": "0 вариантов"
+     },
+     "stratagems": {
+      "from": 32,
+      "to": 30
+     }
+    }
+   }
+  ],
+  "unchanged": 0,
+  "byField": {
+   "keywords": 31,
+   "legends": 6,
+   "leads": 8,
+   "composition": 31,
+   "stats": 28,
+   "loadout": 31,
+   "abilities": 31,
+   "stratagems": 31,
+   "enhancements": 21,
+   "costs": 16,
+   "weapons": 30,
+   "defaultLoadout": 28,
+   "options": 25,
+   "factionKeywords": 5,
+   "transport": 3,
+   "name": 18,
+   "damaged": 9,
+   "support": 1
+  }
+ },
+ "savedRosters": {
+  "sizeChanges": [
+   {
+    "id": "000001453",
+    "name": "Allarus Custodians",
+    "was": "Allarus Custodians",
+    "gone": [
+     "5 models",
+     "6 models"
+    ],
+    "now": [
+     "2 models",
+     "3 models"
+    ]
+   },
+   {
+    "id": "000001558",
+    "name": "Aquilon Terminators with Solarite Power Gauntlets",
+    "was": "Aquilon Custodians",
+    "gone": [
+     "6 models"
+    ],
+    "now": [
+     "3 models"
+    ]
+   },
+   {
+    "id": "000000882",
+    "name": "Custodian Guard Sodality",
+    "was": "Custodian Guard",
+    "gone": [
+     "4 models",
+     "5 models"
+    ],
+    "now": [
+     "3 models"
+    ]
+   },
+   {
+    "id": "000001559",
+    "name": "Custodian Guard Sodality with Adrasite Spears",
+    "was": "Custodian Guard With Adrasite And Pyrithite Spears",
+    "gone": [
+     "5 models"
+    ],
+    "now": [
+     "3 models"
+    ]
+   },
+   {
+    "id": "000001450",
+    "name": "Custodian Wardens",
+    "was": "Custodian Wardens",
+    "gone": [
+     "4 models",
+     "5 models"
+    ],
+    "now": [
+     "2 models",
+     "3 models"
+    ]
+   },
+   {
+    "id": "000001560",
+    "name": "Gyrfalcon Jetbike Sodality",
+    "was": "Agamatus Custodians",
+    "gone": [
+     "3 models",
+     "6 models"
+    ],
+    "now": [
+     "2 models"
+    ]
+   },
+   {
+    "id": "000001563",
+    "name": "Sagittarum Custodians Sodality",
+    "was": "Sagittarum Custodians",
+    "gone": [
+     "5 models"
+    ],
+    "now": [
+     "3 models"
+    ]
+   },
+   {
+    "id": "000001561",
+    "name": "Venatari with Verutum Lances",
+    "was": "Venatari Custodians",
+    "gone": [
+     "6 models"
+    ],
+    "now": [
+     "3 models"
+    ]
+   }
+  ],
+  "optionsMigrations": 25,
+  "outdatedDetachments": [
+   "Shield Host",
+   "Talons Of The Emperor",
+   "Solar Spearhead",
+   "Silent Hunters",
+   "Tharanatoi Hammerblow"
+  ],
+  "outdatedEnhancements": [
+   "Interred Expertise (Might of the Moritoi)",
+   "Mnemo-Locked Shrine Cipher (Tharanatoi Hammerblow)",
+   "Enhanced Voidsheen Cloak (Null Maiden Vigil)",
+   "Adamantine Talisman (Solar Spearhead)",
+   "Superior Creation (Lions of the Emperor)",
+   "Aegis Projector (Talons Of The Emperor)",
+   "Blade Imperator (Auric Champions)",
+   "Auric Mantle (Shield Host)",
+   "Encircling Hunter (Silent Hunters)",
+   "Psyk-Out Grenades (Silent Hunters)",
+   "Efficient Aggression (Tharanatoi Hammerblow)",
+   "Auramite Sarcophagus (Might of the Moritoi)",
+   "Praesidius (Lions of the Emperor)",
+   "Augury Uplink (Solar Spearhead)",
+   "Champion of the Imperium (Talons Of The Emperor)",
+   "Castellan’s Mark (Shield Host)",
+   "Martial Philosopher (Auric Champions)",
+   "From the Hall of Armouries (Shield Host)",
+   "Gift of Terran Artifice (Talons Of The Emperor)",
+   "Fierce Conqueror (Lions of the Emperor)",
+   "Honoured Fallen (Aura) (Solar Spearhead)",
+   "Raptor Blade (Null Maiden Vigil)",
+   "Veteran of the Kataphraktoi (Solar Spearhead)",
+   "Veiled Blade (Auric Champions)",
+   "Panoptispex (Shield Host)",
+   "Admonimortis (Lions of the Emperor)",
+   "Radiant Mantle (Talons Of The Emperor)"
+  ]
+ },
+ "detachments": {
+  "kept": [
+   {
+    "name": "Auric Champions",
+    "id": "000000863",
+    "sameId": true
+   },
+   {
+    "name": "Might of the Moritoi",
+    "id": "000001164",
+    "sameId": true
+   },
+   {
+    "name": "Lions of the Emperor",
+    "id": "000001029",
+    "sameId": true
+   },
+   {
+    "name": "Null Maiden Vigil",
+    "id": "000000862",
+    "sameId": true
+   }
+  ],
+  "added": [
+   {
+    "name": "Dread Host",
+    "id": "whr:adeptus-custodes:det:dread-host"
+   },
+   {
+    "name": "Aquilan Shield",
+    "id": "whr:adeptus-custodes:det:aquilan-shield"
+   },
+   {
+    "name": "Emissaries Imperatus",
+    "id": "whr:adeptus-custodes:det:emissaries-imperatus"
+   },
+   {
+    "name": "Emperor’s Chosen",
+    "id": "whr:adeptus-custodes:det:emperors-chosen"
+   },
+   {
+    "name": "Solar Watch",
+    "id": "whr:adeptus-custodes:det:solar-watch"
+   },
+   {
+    "name": "Grav-Assault Force",
+    "id": "whr:adeptus-custodes:det:grav-assault-force"
+   },
+   {
+    "name": "Honoured Companions",
+    "id": "whr:adeptus-custodes:det:honoured-companions"
+   },
+   {
+    "name": "Guardians of the Throne",
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne"
+   },
+   {
+    "name": "Shadowkeepers",
+    "id": "whr:adeptus-custodes:det:shadowkeepers"
+   }
+  ],
+  "removed": [
+   {
+    "name": "Shield Host",
+    "id": "000000765"
+   },
+   {
+    "name": "Talons Of The Emperor",
+    "id": "000000861"
+   },
+   {
+    "name": "Solar Spearhead",
+    "id": "000000986"
+   },
+   {
+    "name": "Silent Hunters",
+    "id": "000001165"
+   },
+   {
+    "name": "Tharanatoi Hammerblow",
+    "id": "000001166"
+   }
+  ]
+ },
+ "enhancements": {
+  "kept": [
+   {
+    "name": "Inspirational Exemplar",
+    "id": "000008930003",
+    "sameId": true
+   },
+   {
+    "name": "Oblivion Knight",
+    "id": "000008926004",
+    "sameId": true
+   },
+   {
+    "name": "Huntress’ Eye",
+    "id": "000008926003",
+    "sameId": true
+   }
+  ],
+  "added": [
+   {
+    "name": "Flawless Bladework",
+    "id": "whr:adeptus-custodes:det:dread-host:enh:flawless-bladework"
+   },
+   {
+    "name": "Auric Exemplar",
+    "id": "whr:adeptus-custodes:det:dread-host:enh:auric-exemplar"
+   },
+   {
+    "name": "Shroud of the Hidden Blade",
+    "id": "000000863:enh:shroud-of-the-hidden-blade"
+   },
+   {
+    "name": "Superior Creation",
+    "id": "000000863:enh:superior-creation"
+   },
+   {
+    "name": "Not a Shell Wasted",
+    "id": "whr:adeptus-custodes:det:aquilan-shield:enh:not-a-shell-wasted"
+   },
+   {
+    "name": "Pareldor’s Caducatrix",
+    "id": "whr:adeptus-custodes:det:aquilan-shield:enh:pareldors-caducatrix"
+   },
+   {
+    "name": "Edge of the Blade",
+    "id": "whr:adeptus-custodes:det:emissaries-imperatus:enh:edge-of-the-blade"
+   },
+   {
+    "name": "Auriferous Orb",
+    "id": "whr:adeptus-custodes:det:emissaries-imperatus:enh:auriferous-orb"
+   },
+   {
+    "name": "From the Hall of Armouries",
+    "id": "whr:adeptus-custodes:det:emperors-chosen:enh:from-the-hall-of-armouries"
+   },
+   {
+    "name": "Radiant Mantle",
+    "id": "whr:adeptus-custodes:det:emperors-chosen:enh:radiant-mantle"
+   },
+   {
+    "name": "Sally Forth",
+    "id": "whr:adeptus-custodes:det:solar-watch:enh:sally-forth"
+   },
+   {
+    "name": "Auric Eagle",
+    "id": "whr:adeptus-custodes:det:solar-watch:enh:auric-eagle"
+   },
+   {
+    "name": "Memento Moritoi (one per army)",
+    "id": "000001164:enh:memento-moritoi-one-per-army"
+   },
+   {
+    "name": "Augury Uplink (one per army)",
+    "id": "000001164:enh:augury-uplink-one-per-army"
+   },
+   {
+    "name": "Anti-gravitic Mobility",
+    "id": "whr:adeptus-custodes:det:grav-assault-force:enh:anti-gravitic-mobility"
+   },
+   {
+    "name": "Combat Deployment",
+    "id": "whr:adeptus-custodes:det:grav-assault-force:enh:combat-deployment"
+   },
+   {
+    "name": "Arae-Shrike",
+    "id": "whr:adeptus-custodes:det:honoured-companions:enh:arae-shrike"
+   },
+   {
+    "name": "Celeritous Sentries",
+    "id": "whr:adeptus-custodes:det:honoured-companions:enh:celeritous-sentries"
+   },
+   {
+    "name": "Lightning Descent",
+    "id": "000001029:enh:lightning-descent"
+   },
+   {
+    "name": "Leonine Ferocity",
+    "id": "000001029:enh:leonine-ferocity"
+   },
+   {
+    "name": "Bane of Abominations",
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:enh:bane-of-abominations"
+   },
+   {
+    "name": "Emperor’s Light",
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:enh:emperors-light"
+   },
+   {
+    "name": "Castellan’s Mark",
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:enh:castellans-mark"
+   },
+   {
+    "name": "Eagle’s Eye",
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:enh:eagles-eye"
+   },
+   {
+    "name": "Unstoppable Destroyer",
+    "id": "whr:adeptus-custodes:det:shadowkeepers:enh:unstoppable-destroyer"
+   },
+   {
+    "name": "Genalchemic Warding",
+    "id": "whr:adeptus-custodes:det:shadowkeepers:enh:genalchemic-warding"
+   }
+  ],
+  "removed": [
+   {
+    "name": "Interred Expertise",
+    "id": "000010992002"
+   },
+   {
+    "name": "Mnemo-Locked Shrine Cipher",
+    "id": "000011000002"
+   },
+   {
+    "name": "Enhanced Voidsheen Cloak",
+    "id": "000008926002"
+   },
+   {
+    "name": "Adamantine Talisman",
+    "id": "000009753002"
+   },
+   {
+    "name": "Superior Creation",
+    "id": "000009987002"
+   },
+   {
+    "name": "Aegis Projector",
+    "id": "000008921002"
+   },
+   {
+    "name": "Blade Imperator",
+    "id": "000008930002"
+   },
+   {
+    "name": "Auric Mantle",
+    "id": "000008395002"
+   },
+   {
+    "name": "Encircling Hunter",
+    "id": "000010996002"
+   },
+   {
+    "name": "Psyk-Out Grenades",
+    "id": "000010996003"
+   },
+   {
+    "name": "Efficient Aggression",
+    "id": "000011000003"
+   },
+   {
+    "name": "Auramite Sarcophagus",
+    "id": "000010992003"
+   },
+   {
+    "name": "Praesidius",
+    "id": "000009987003"
+   },
+   {
+    "name": "Augury Uplink",
+    "id": "000009753003"
+   },
+   {
+    "name": "Champion of the Imperium",
+    "id": "000008921003"
+   },
+   {
+    "name": "Castellan’s Mark",
+    "id": "000008395003"
+   },
+   {
+    "name": "Martial Philosopher",
+    "id": "000008930004"
+   },
+   {
+    "name": "From the Hall of Armouries",
+    "id": "000008395004"
+   },
+   {
+    "name": "Gift of Terran Artifice",
+    "id": "000008921004"
+   },
+   {
+    "name": "Fierce Conqueror",
+    "id": "000009987004"
+   },
+   {
+    "name": "Honoured Fallen (Aura)",
+    "id": "000009753004"
+   },
+   {
+    "name": "Raptor Blade",
+    "id": "000008926005"
+   },
+   {
+    "name": "Veteran of the Kataphraktoi",
+    "id": "000009753005"
+   },
+   {
+    "name": "Veiled Blade",
+    "id": "000008930005"
+   },
+   {
+    "name": "Panoptispex",
+    "id": "000008395005"
+   },
+   {
+    "name": "Admonimortis",
+    "id": "000009987005"
+   },
+   {
+    "name": "Radiant Mantle",
+    "id": "000008921005"
+   }
+  ]
+ },
+ "stratagems": {
+  "kept": [
+   {
+    "name": "UNLEASH THE LIONS",
+    "id": "000009988005",
+    "sameId": true
+   },
+   {
+    "name": "ANATHEMA BLADEMASTERY",
+    "id": "000008927004",
+    "sameId": true
+   },
+   {
+    "name": "PSY-CHAFF VOLLEY",
+    "id": "000008927005",
+    "sameId": true
+   },
+   {
+    "name": "PURGATION SWEEP",
+    "id": "000008927006",
+    "sameId": true
+   }
+  ],
+  "added": [
+   {
+    "name": "GOLDEN LIGHT OF THE MOIRAIDES",
+    "id": "whr:adeptus-custodes:det:dread-host:strat:golden-light-of-the-moiraides"
+   },
+   {
+    "name": "PRETERNATURAL RAPIDITY",
+    "id": "whr:adeptus-custodes:det:dread-host:strat:preternatural-rapidity"
+   },
+   {
+    "name": "LIGHTNING WRATH",
+    "id": "whr:adeptus-custodes:det:dread-host:strat:lightning-wrath"
+   },
+   {
+    "name": "GILDED CHAMPION",
+    "id": "000000863:strat:gilded-champion"
+   },
+   {
+    "name": "DUTY UNTO DEATH",
+    "id": "000000863:strat:duty-unto-death"
+   },
+   {
+    "name": "RAPID REACTIONS",
+    "id": "whr:adeptus-custodes:det:aquilan-shield:strat:rapid-reactions"
+   },
+   {
+    "name": "MANOEUVRE AND FIRE",
+    "id": "whr:adeptus-custodes:det:aquilan-shield:strat:manoeuvre-and-fire"
+   },
+   {
+    "name": "TIP OF THE TALON",
+    "id": "whr:adeptus-custodes:det:aquilan-shield:strat:tip-of-the-talon"
+   },
+   {
+    "name": "BEARERS OF HIS LIGHT",
+    "id": "whr:adeptus-custodes:det:emissaries-imperatus:strat:bearers-of-his-light"
+   },
+   {
+    "name": "SLAYERS OF NIGHTMARES",
+    "id": "whr:adeptus-custodes:det:emissaries-imperatus:strat:slayers-of-nightmares"
+   },
+   {
+    "name": "SELFLESS SERVICE",
+    "id": "whr:adeptus-custodes:det:emissaries-imperatus:strat:selfless-service"
+   },
+   {
+    "name": "IN AURAMITE CLAD",
+    "id": "whr:adeptus-custodes:det:emperors-chosen:strat:in-auramite-clad"
+   },
+   {
+    "name": "IMPENETRABLE BASTION",
+    "id": "whr:adeptus-custodes:det:emperors-chosen:strat:impenetrable-bastion"
+   },
+   {
+    "name": "SUPERHUMAN FOCUS",
+    "id": "whr:adeptus-custodes:det:emperors-chosen:strat:superhuman-focus"
+   },
+   {
+    "name": "INEXORABLE",
+    "id": "whr:adeptus-custodes:det:solar-watch:strat:inexorable"
+   },
+   {
+    "name": "AT SPEAR’S LENGTH",
+    "id": "whr:adeptus-custodes:det:solar-watch:strat:at-spears-length"
+   },
+   {
+    "name": "GRAVIMETRIC GRENADE",
+    "id": "whr:adeptus-custodes:det:solar-watch:strat:gravimetric-grenade"
+   },
+   {
+    "name": "UNCEASING ONSLAUGHT",
+    "id": "000001164:strat:unceasing-onslaught"
+   },
+   {
+    "name": "HONOURED INTERRED",
+    "id": "000001164:strat:honoured-interred"
+   },
+   {
+    "name": "UNSTOPPABLE MOMENTUM",
+    "id": "000001164:strat:unstoppable-momentum"
+   },
+   {
+    "name": "VICTORY BEFORE DEATH",
+    "id": "whr:adeptus-custodes:det:grav-assault-force:strat:victory-before-death"
+   },
+   {
+    "name": "ADVANCED STABILISERS",
+    "id": "whr:adeptus-custodes:det:grav-assault-force:strat:advanced-stabilisers"
+   },
+   {
+    "name": "INEVITABLE ANNIHILATION",
+    "id": "whr:adeptus-custodes:det:grav-assault-force:strat:inevitable-annihilation"
+   },
+   {
+    "name": "EMPEROR’S DOMAIN",
+    "id": "whr:adeptus-custodes:det:honoured-companions:strat:emperors-domain"
+   },
+   {
+    "name": "AVENGE THE FALLEN",
+    "id": "whr:adeptus-custodes:det:honoured-companions:strat:avenge-the-fallen"
+   },
+   {
+    "name": "SWIFT AS THE EAGLE",
+    "id": "whr:adeptus-custodes:det:honoured-companions:strat:swift-as-the-eagle"
+   },
+   {
+    "name": "VIGIL UNENDING",
+    "id": "000001029:strat:vigil-unending"
+   },
+   {
+    "name": "FURY OF THE EMPEROR",
+    "id": "000001029:strat:fury-of-the-emperor"
+   },
+   {
+    "name": "PRIME TARGET",
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:strat:prime-target"
+   },
+   {
+    "name": "SHIELD OF HONOUR",
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:strat:shield-of-honour"
+   },
+   {
+    "name": "SUPERHUMAN FOCUS",
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:strat:superhuman-focus"
+   },
+   {
+    "name": "SWIFT AS THE EAGLE",
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:strat:swift-as-the-eagle"
+   },
+   {
+    "name": "IN AURAMITE CLAD",
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:strat:in-auramite-clad"
+   },
+   {
+    "name": "UNLIMITED ENDURANCE",
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:strat:unlimited-endurance"
+   },
+   {
+    "name": "GRIM RESPONSIBILITY",
+    "id": "whr:adeptus-custodes:det:shadowkeepers:strat:grim-responsibility"
+   },
+   {
+    "name": "NO ESCAPE",
+    "id": "whr:adeptus-custodes:det:shadowkeepers:strat:no-escape"
+   },
+   {
+    "name": "INDOMITABLE GUARDIANS",
+    "id": "whr:adeptus-custodes:det:shadowkeepers:strat:indomitable-guardians"
+   }
+  ],
+  "removed": [
+   {
+    "name": "SLAYER OF CHAMPIONS",
+    "id": "000008931002"
+   },
+   {
+    "name": "SHOULDER THE MANTLE",
+    "id": "000008931007"
+   },
+   {
+    "name": "VIGIL UNENDING",
+    "id": "000008931006"
+   },
+   {
+    "name": "EARNING OF A NAME",
+    "id": "000008931005"
+   },
+   {
+    "name": "THE EMPEROR’S AUSPICE",
+    "id": "000008931004"
+   },
+   {
+    "name": "SUPERHUMAN RESERVES",
+    "id": "000008931003"
+   },
+   {
+    "name": "PEERLESS WARRIOR",
+    "id": "000009988004"
+   },
+   {
+    "name": "SWIFT AS THE EAGLE",
+    "id": "000009988007"
+   },
+   {
+    "name": "MANOEUVRE AND FIRE",
+    "id": "000009988006"
+   },
+   {
+    "name": "DEFIANT TO THE LAST",
+    "id": "000009988003"
+   },
+   {
+    "name": "GILDED CHAMPION",
+    "id": "000009988002"
+   },
+   {
+    "name": "PRIORITISED ERADICATION",
+    "id": "000010993004"
+   },
+   {
+    "name": "FLAWLESS CONSTRUCTION",
+    "id": "000010993002"
+   },
+   {
+    "name": "UNSTOPPABLE ADVANCE",
+    "id": "000010993003"
+   },
+   {
+    "name": "WITCH HUNTERS",
+    "id": "000008927003"
+   },
+   {
+    "name": "PSYCHIC ABOMINATIONS",
+    "id": "000008927007"
+   },
+   {
+    "name": "DESPERATION’S PRICE",
+    "id": "000008927002"
+   },
+   {
+    "name": "ARCHEOTECH MUNITIONS",
+    "id": "000008394007"
+   },
+   {
+    "name": "ARCANE GENETIC ALCHEMY",
+    "id": "000008394002"
+   },
+   {
+    "name": "VIGILANCE ETERNAL",
+    "id": "000008394006"
+   },
+   {
+    "name": "MULTIPOTENTIALITY",
+    "id": "000008394005"
+   },
+   {
+    "name": "UNWAVERING SENTINELS",
+    "id": "000008394004"
+   },
+   {
+    "name": "AVENGE THE FALLEN",
+    "id": "000008394003"
+   },
+   {
+    "name": "UMBRAL PROSECUTION",
+    "id": "000010997003"
+   },
+   {
+    "name": "DEATHSONG SCYTHES",
+    "id": "000010997002"
+   },
+   {
+    "name": "SYNCHRONISED INFERNO",
+    "id": "000010997004"
+   },
+   {
+    "name": "WRATHFUL ADVANCE",
+    "id": "000009754004"
+   },
+   {
+    "name": "EMPEROR’S VENGEANCE",
+    "id": "000009754003"
+   },
+   {
+    "name": "FLAWLESS CONSTRUCTION",
+    "id": "000009754002"
+   },
+   {
+    "name": "UNSTOPPABLE",
+    "id": "000009754005"
+   },
+   {
+    "name": "RELENTLESS PERSECUTION",
+    "id": "000009754006"
+   },
+   {
+    "name": "PUNISHMENT INESCAPABLE",
+    "id": "000009754007"
+   },
+   {
+    "name": "EMPYRIC SEVERANCE",
+    "id": "000008922004"
+   },
+   {
+    "name": "EMPEROR’S EXECUTIONERS",
+    "id": "000008922005"
+   },
+   {
+    "name": "TALONED PINCER",
+    "id": "000008922006"
+   },
+   {
+    "name": "TALONS INTERLOCKED",
+    "id": "000008922003"
+   },
+   {
+    "name": "SHIELD OF HONOUR",
+    "id": "000008922007"
+   },
+   {
+    "name": "HUNT AS ONE",
+    "id": "000008922002"
+   },
+   {
+    "name": "ELECTROEXORCIST SATURATION",
+    "id": "000011001004"
+   },
+   {
+    "name": "UNLEASH THE LIONS",
+    "id": "000011001003"
+   },
+   {
+    "name": "HARDENED RESOLVE",
+    "id": "000011001002"
+   }
+  ]
+ },
+ "options": [
+  {
+   "id": "000002088",
+   "name": "Aleya",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "000001453",
+   "name": "Allarus Custodians",
+   "options": 2,
+   "parsed": 2,
+   "unparsed": []
+  },
+  {
+   "id": "000002524",
+   "name": "Anathema Psykana Rhino",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000001558",
+   "name": "Aquilon Terminators with Solarite Power Gauntlets",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "whr:adeptus-custodes:aquilon-terminators-with-solarite-power-talons",
+   "name": "Aquilon Terminators with Solarite Power Talons",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000001680",
+   "name": "Ares Gunship",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "000002518",
+   "name": "Blade Champion",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "whr:adeptus-custodes:caladius-annihilator-grav-tank",
+   "name": "Caladius Annihilator Grav-Tank",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000001460",
+   "name": "Caladius Grav-Tank",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000001458",
+   "name": "Contemptor-Achillus Dreadnought",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000001557",
+   "name": "Contemptor-Galatus Dreadnought",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "000001461",
+   "name": "Coronus Grav-Carrier",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000000882",
+   "name": "Custodian Guard Sodality",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000001559",
+   "name": "Custodian Guard Sodality with Adrasite Spears",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "whr:adeptus-custodes:custodian-guard-sodality-with-pyrithite-spears",
+   "name": "Custodian Guard Sodality with Pyrithite Spears",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "000001450",
+   "name": "Custodian Wardens",
+   "options": 2,
+   "parsed": 2,
+   "unparsed": []
+  },
+  {
+   "id": "000001560",
+   "name": "Gyrfalcon Jetbike Sodality",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000002520",
+   "name": "Knight-Centura",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000001564",
+   "name": "Orion Assault Dropship",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "000001562",
+   "name": "Pallas Grav-Attack",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000002521",
+   "name": "Prosecutor Squad",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "000001563",
+   "name": "Sagittarum Custodians Sodality",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "whr:adeptus-custodes:sentinel-guard-sodality",
+   "name": "Sentinel Guard Sodality",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000001447",
+   "name": "Shield-Captain",
+   "options": 2,
+   "parsed": 2,
+   "unparsed": []
+  },
+  {
+   "id": "000001448",
+   "name": "Shield-Captain in Allarus Terminator Armour",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000001449",
+   "name": "Shield-Captain on Dawneagle Jetbike",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000001479",
+   "name": "Telemon Heavy Dreadnought",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000001446",
+   "name": "Trajann Valoris",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "000002519",
+   "name": "Valerian",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "whr:adeptus-custodes:venatari-with-kinetic-destroyers",
+   "name": "Venatari with Kinetic Destroyers",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "000001561",
+   "name": "Venatari with Verutum Lances",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "000000883",
+   "name": "Venerable Contemptor Dreadnought",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000000884",
+   "name": "Venerable Land Raider",
+   "options": 2,
+   "parsed": 2,
+   "unparsed": []
+  },
+  {
+   "id": "000001454",
+   "name": "Vertus Praetors",
+   "options": 1,
+   "parsed": 1,
+   "unparsed": []
+  },
+  {
+   "id": "000002522",
+   "name": "Vigilator Squad",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  },
+  {
+   "id": "000002523",
+   "name": "Witchseeker Squad",
+   "options": 0,
+   "parsed": 0,
+   "unparsed": []
+  }
+ ],
+ "enhancementEligibility": {
+  "explicit": [
+   {
+    "id": "whr:adeptus-custodes:det:dread-host:enh:flawless-bladework",
+    "name": "Flawless Bladework",
+    "detachment": "Dread Host",
+    "restriction": "ADEPTUS CUSTODES model only.",
+    "eligible": 7,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:dread-host:enh:auric-exemplar",
+    "name": "Auric Exemplar",
+    "detachment": "Dread Host",
+    "restriction": "ADEPTUS CUSTODES model only.",
+    "eligible": 7,
+    "upgrade": false
+   },
+   {
+    "id": "000000863:enh:shroud-of-the-hidden-blade",
+    "name": "Shroud of the Hidden Blade",
+    "detachment": "Auric Champions",
+    "restriction": "ADEPTUS CUSTODES model only.",
+    "eligible": 7,
+    "upgrade": false
+   },
+   {
+    "id": "000000863:enh:superior-creation",
+    "name": "Superior Creation",
+    "detachment": "Auric Champions",
+    "restriction": "ADEPTUS CUSTODES INFANTRY model only.",
+    "eligible": 6,
+    "upgrade": false
+   },
+   {
+    "id": "000008930003",
+    "name": "Inspirational Exemplar",
+    "detachment": "Auric Champions",
+    "restriction": "ADEPTUS CUSTODES INFANTRY model only.",
+    "eligible": 6,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:aquilan-shield:enh:not-a-shell-wasted",
+    "name": "Not a Shell Wasted",
+    "detachment": "Aquilan Shield",
+    "restriction": "ADEPTUS CUSTODES INFANTRY model only.",
+    "eligible": 6,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:aquilan-shield:enh:pareldors-caducatrix",
+    "name": "Pareldor’s Caducatrix",
+    "detachment": "Aquilan Shield",
+    "restriction": "ADEPTUS CUSTODES model only.",
+    "eligible": 7,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:emissaries-imperatus:enh:edge-of-the-blade",
+    "name": "Edge of the Blade",
+    "detachment": "Emissaries Imperatus",
+    "restriction": "ADEPTUS CUSTODES model only.",
+    "eligible": 7,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:emissaries-imperatus:enh:auriferous-orb",
+    "name": "Auriferous Orb",
+    "detachment": "Emissaries Imperatus",
+    "restriction": "ADEPTUS CUSTODES model only.",
+    "eligible": 7,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:emperors-chosen:enh:from-the-hall-of-armouries",
+    "name": "From the Hall of Armouries",
+    "detachment": "Emperor’s Chosen",
+    "restriction": "ADEPTUS CUSTODES model only.",
+    "eligible": 7,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:emperors-chosen:enh:radiant-mantle",
+    "name": "Radiant Mantle",
+    "detachment": "Emperor’s Chosen",
+    "restriction": "ADEPTUS CUSTODES INFANTRY model only.",
+    "eligible": 6,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:solar-watch:enh:sally-forth",
+    "name": "Sally Forth",
+    "detachment": "Solar Watch",
+    "restriction": "ADEPTUS CUSTODES SHIELD-CAPTAIN model only.",
+    "eligible": 4,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:solar-watch:enh:auric-eagle",
+    "name": "Auric Eagle",
+    "detachment": "Solar Watch",
+    "restriction": "ADEPTUS CUSTODES INFANTRY/MOUNTED unit only (excluding TERMINATOR units).",
+    "eligible": 10,
+    "upgrade": true,
+    "behaviour": "Upgrade: юниты-не персонажи с этими ключевыми словами (до 3 юнитов)",
+    "eligibleNames": [
+     "Custodian Guard Sodality",
+     "Custodian Guard Sodality with Adrasite Spears",
+     "Custodian Guard Sodality with Pyrithite Spears",
+     "Custodian Wardens",
+     "Gyrfalcon Jetbike Sodality",
+     "Sagittarum Custodians Sodality",
+     "Sentinel Guard Sodality",
+     "Venatari with Kinetic Destroyers",
+     "Venatari with Verutum Lances",
+     "Vertus Praetors"
+    ]
+   },
+   {
+    "id": "000001164:enh:memento-moritoi-one-per-army",
+    "name": "Memento Moritoi (one per army)",
+    "detachment": "Might of the Moritoi",
+    "restriction": "ADEPTUS CUSTODES DREADNOUGHT model only.",
+    "eligible": 3,
+    "upgrade": true,
+    "behaviour": "Upgrade: юниты-не персонажи с этими ключевыми словами (до 3 юнитов)",
+    "eligibleNames": [
+     "Contemptor-Achillus Dreadnought",
+     "Contemptor-Galatus Dreadnought",
+     "Telemon Heavy Dreadnought"
+    ]
+   },
+   {
+    "id": "000001164:enh:augury-uplink-one-per-army",
+    "name": "Augury Uplink (one per army)",
+    "detachment": "Might of the Moritoi",
+    "restriction": "ADEPTUS CUSTODES DREADNOUGHT model only.",
+    "eligible": 3,
+    "upgrade": true,
+    "behaviour": "Upgrade: юниты-не персонажи с этими ключевыми словами (до 3 юнитов)",
+    "eligibleNames": [
+     "Contemptor-Achillus Dreadnought",
+     "Contemptor-Galatus Dreadnought",
+     "Telemon Heavy Dreadnought"
+    ]
+   },
+   {
+    "id": "whr:adeptus-custodes:det:grav-assault-force:enh:anti-gravitic-mobility",
+    "name": "Anti-gravitic Mobility",
+    "detachment": "Grav-Assault Force",
+    "restriction": "GRAV-ASSAULT unit only.",
+    "eligible": 4,
+    "upgrade": true,
+    "behaviour": "Upgrade: юниты-не персонажи с этими ключевыми словами (до 3 юнитов)",
+    "eligibleNames": [
+     "Caladius Annihilator Grav-Tank",
+     "Caladius Grav-Tank",
+     "Coronus Grav-Carrier",
+     "Pallas Grav-Attack"
+    ]
+   },
+   {
+    "id": "whr:adeptus-custodes:det:grav-assault-force:enh:combat-deployment",
+    "name": "Combat Deployment",
+    "detachment": "Grav-Assault Force",
+    "restriction": "GRAV-ASSAULT TRANSPORT model only.",
+    "eligible": 1,
+    "upgrade": true,
+    "behaviour": "Upgrade: юниты-не персонажи с этими ключевыми словами (до 3 юнитов)",
+    "eligibleNames": [
+     "Coronus Grav-Carrier"
+    ]
+   },
+   {
+    "id": "whr:adeptus-custodes:det:honoured-companions:enh:arae-shrike",
+    "name": "Arae-Shrike",
+    "detachment": "Honoured Companions",
+    "restriction": "ADEPTUS CUSTODES INFANTRY model only.",
+    "eligible": 6,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:honoured-companions:enh:celeritous-sentries",
+    "name": "Celeritous Sentries",
+    "detachment": "Honoured Companions",
+    "restriction": "TRUSTED SENTINEL unit only.",
+    "eligible": 6,
+    "upgrade": true,
+    "behaviour": "Upgrade: юниты-не персонажи с этими ключевыми словами (до 3 юнитов)",
+    "eligibleNames": [
+     "Custodian Guard Sodality",
+     "Custodian Guard Sodality with Adrasite Spears",
+     "Custodian Guard Sodality with Pyrithite Spears",
+     "Custodian Wardens",
+     "Sagittarum Custodians Sodality",
+     "Sentinel Guard Sodality"
+    ]
+   },
+   {
+    "id": "000001029:enh:lightning-descent",
+    "name": "Lightning Descent",
+    "detachment": "Lions of the Emperor",
+    "restriction": "SHIELD-CAPTAIN IN ALLARUS TERMINATOR ARMOUR model only.",
+    "eligible": 1,
+    "upgrade": false
+   },
+   {
+    "id": "000001029:enh:leonine-ferocity",
+    "name": "Leonine Ferocity",
+    "detachment": "Lions of the Emperor",
+    "restriction": "SHIELD-CAPTAIN IN ALLARUS TERMINATOR ARMOUR model only.",
+    "eligible": 1,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:enh:bane-of-abominations",
+    "name": "Bane of Abominations",
+    "detachment": "Guardians of the Throne",
+    "restriction": "ADEPTUS CUSTODES model only.",
+    "eligible": 7,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:enh:emperors-light",
+    "name": "Emperor’s Light",
+    "detachment": "Guardians of the Throne",
+    "restriction": "ADEPTUS CUSTODES model only.",
+    "eligible": 7,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:enh:castellans-mark",
+    "name": "Castellan’s Mark",
+    "detachment": "Guardians of the Throne",
+    "restriction": "ADEPTUS CUSTODES model only.",
+    "eligible": 7,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:guardians-of-the-throne:enh:eagles-eye",
+    "name": "Eagle’s Eye",
+    "detachment": "Guardians of the Throne",
+    "restriction": "ADEPTUS CUSTODES model only.",
+    "eligible": 7,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:shadowkeepers:enh:unstoppable-destroyer",
+    "name": "Unstoppable Destroyer",
+    "detachment": "Shadowkeepers",
+    "restriction": "ADEPTUS CUSTODES INFANTRY model only.",
+    "eligible": 6,
+    "upgrade": false
+   },
+   {
+    "id": "whr:adeptus-custodes:det:shadowkeepers:enh:genalchemic-warding",
+    "name": "Genalchemic Warding",
+    "detachment": "Shadowkeepers",
+    "restriction": "ADEPTUS CUSTODES model only.",
+    "eligible": 7,
+    "upgrade": false
+   },
+   {
+    "id": "000008926004",
+    "name": "Oblivion Knight",
+    "detachment": "Null Maiden Vigil",
+    "restriction": "ANATHEMA PSYKANA model only.",
+    "eligible": 2,
+    "upgrade": false
+   },
+   {
+    "id": "000008926003",
+    "name": "Huntress’ Eye",
+    "detachment": "Null Maiden Vigil",
+    "restriction": "ANATHEMA PSYKANA model only.",
+    "eligible": 2,
+    "upgrade": false
+   }
+  ],
+  "ambiguous": [],
+  "unmatched": []
+ },
+ "legacy": [
+  {
+   "id": "000002524",
+   "name": "Anathema Psykana Rhino",
+   "field": "stats.Anathema Psykana Rhino.base",
+   "value": "Use model",
+   "why": "база в снимке «нет» — оставлено текущее значение"
+  },
+  {
+   "id": "000000884",
+   "name": "Venerable Land Raider",
+   "field": "stats.Venerable Land Raider.base",
+   "value": "Use model",
+   "why": "база в снимке «Hull» — оставлено текущее значение"
+  }
+ ],
+ "unavailable": [
+  {
+   "id": "000001680",
+   "name": "Ares Gunship",
+   "field": "damaged.text",
+   "why": "текста правила Damaged нет в снимке (есть только «Damaged N»)"
+  },
+  {
+   "id": "whr:adeptus-custodes:caladius-annihilator-grav-tank",
+   "name": "Caladius Annihilator Grav-Tank",
+   "field": "damaged.text",
+   "why": "текста правила Damaged нет в снимке (есть только «Damaged N»)"
+  },
+  {
+   "id": "000001460",
+   "name": "Caladius Grav-Tank",
+   "field": "damaged.text",
+   "why": "текста правила Damaged нет в снимке (есть только «Damaged N»)"
+  },
+  {
+   "id": "000001460",
+   "name": "Caladius Grav-Tank",
+   "field": "costs.wargear.Twin arachnus heavy blaze cannon",
+   "why": "предмета нет в инфолисте снимка — прежняя добавка/снаряжение убраны"
+  },
+  {
+   "id": "000001458",
+   "name": "Contemptor-Achillus Dreadnought",
+   "field": "damaged.text",
+   "why": "текста правила Damaged нет в снимке (есть только «Damaged N»)"
+  },
+  {
+   "id": "000001557",
+   "name": "Contemptor-Galatus Dreadnought",
+   "field": "damaged.text",
+   "why": "текста правила Damaged нет в снимке (есть только «Damaged N»)"
+  },
+  {
+   "id": "000001461",
+   "name": "Coronus Grav-Carrier",
+   "field": "damaged.text",
+   "why": "текста правила Damaged нет в снимке (есть только «Damaged N»)"
+  },
+  {
+   "id": "000001564",
+   "name": "Orion Assault Dropship",
+   "field": "damaged.text",
+   "why": "текста правила Damaged нет в снимке (есть только «Damaged N»)"
+  },
+  {
+   "id": "000001479",
+   "name": "Telemon Heavy Dreadnought",
+   "field": "damaged.text",
+   "why": "текста правила Damaged нет в снимке (есть только «Damaged N»)"
+  },
+  {
+   "id": "000001561",
+   "name": "Venatari with Verutum Lances",
+   "field": "costs.wargear.Venatari lance",
+   "why": "предмета нет в инфолисте снимка — прежняя добавка/снаряжение убраны"
+  },
+  {
+   "id": "000000883",
+   "name": "Venerable Contemptor Dreadnought",
+   "field": "damaged.text",
+   "why": "текста правила Damaged нет в снимке (есть только «Damaged N»)"
+  },
+  {
+   "id": "000000884",
+   "name": "Venerable Land Raider",
+   "field": "damaged.text",
+   "why": "текста правила Damaged нет в снимке (есть только «Damaged N»)"
+  }
+ ],
+ "unresolved": [],
+ "checks": [
+  {
+   "check": "id инфолистов уникальны",
+   "ok": true,
+   "details": [],
+   "count": 0
+  },
+  {
+   "check": "связи Leader указывают на существующие инфолисты",
+   "ok": true,
+   "details": [],
+   "count": 0
+  },
+  {
+   "check": "id детачментов уникальны",
+   "ok": true,
+   "details": [],
+   "count": 0
+  },
+  {
+   "check": "улучшения и стратагемы ссылаются на существующие детачменты",
+   "ok": true,
+   "details": [],
+   "count": 0
+  },
+  {
+   "check": "id улучшений и стратагем уникальны",
+   "ok": true,
+   "details": [],
+   "count": 0
+  },
+  {
+   "check": "списки стратагем и улучшений своих инфолистов ссылаются на существующие",
+   "ok": true,
+   "details": [],
+   "count": 0
+  },
+  {
+   "check": "ссылки способностей на правила существуют",
+   "ok": true,
+   "details": [],
+   "count": 0
+  },
+  {
+   "check": "правила армии есть в словаре",
+   "ok": true,
+   "details": [],
+   "count": 0
+  },
+  {
+   "check": "в текстах не осталось разметки wh-rules",
+   "ok": true,
+   "details": [],
+   "count": 0
+  },
+  {
+   "check": "у каждого своего инфолиста есть цена",
+   "ok": true,
+   "details": [],
+   "count": 0
+  },
+  {
+   "check": "у каждого детачмента есть Force Disposition",
+   "ok": true,
+   "details": [],
+   "count": 0
+  },
+  {
+   "check": "все прежние id своих инфолистов сохранены",
+   "ok": true,
+   "details": [],
+   "count": 0
+  },
+  {
+   "check": "союзники и копии по детачментам не изменены",
+   "ok": true,
+   "details": [],
+   "count": 0
+  },
+  {
+   "check": "улучшения: обычные — только персонажам, Upgrade — только не персонажам",
+   "ok": true,
+   "details": [],
+   "count": 0
+  }
+ ]
+}

@@ -106,6 +106,44 @@ Wahapedia (например, более новые очки), применяют
 осталось на версии выгрузки. Применённые обновления записываются в `index.json → updates` (источник, версия данных,
 версия Munitorum Field Manual, дата). Включено одно обновление — `whrules-981-space-marines` (kind `whrules-faction`, `scripts/whrules-convert.mjs`): Space Marines с орденами и Imperial Agents из полного снимка wh-rules.ru 981, копии Imperial Agents в AC, AM, AS, AdM, GK, QI, TL. Обработчик использует движок клиента (TypeScript), поэтому импорт и repair запускаются через `bun` или `node --import tsx` (`npm run data` уже так). Сухой прогон: `bun scripts/whrules-convert.mjs --out <файл>` — считается от данных до обновления (`scripts/baseline-40k.mjs`: история git, коммит 4a91fa0); тесты — `tests/whrules-*.test.ts`, `tests/updates40k.test.ts`.
 
+**Полная конвертация одной фракции** (`40k/curated.json → updates`, kind `whrules-faction-convert`,
+`scripts/whrules-convert.mjs → applyWhrulesFactionConvert`; сейчас `whrules-995-custodes`, задача P1-T4). Полный снимок
+фракции (`scripts/whrules-extract-full.js` с `window.__whrulesFactions`, `whrules-map.mjs --save-full` →
+`40k/whrules-<версия>-full-<фракция>.json`), сопоставление `mapFaction` (`bun scripts/whrules-map.mjs --faction <slug>
+--army <id>`), план `planFaction`, конвертация `convertFaction` (общая часть с Space Marines — `makeConverter`), сухой
+прогон с проверками — `bun scripts/whrules-convert.mjs --faction <slug> --army <id> --full <снимок> --out <файл>`.
+id сопоставленных и переименованных (по таблице сайта) инфолистов сохраняются, новые — `whr:<фракция>:<slug>`; прежние
+детачменты, улучшения и стратагемы остаются устаревшими (старые ростеры открываются). Неразрывный дефис сайта (U+2011)
+заменяется обычным. Применяется до `whrules-points` (значения затем совпадают с сайтом). `migrations` файла — список
+обновлений по порядку (`client/src/features/roster/engine/migrate.ts → migrationsOf`): переводы вариантов снаряжения
+каждого применяются к ростеру один раз по его `source`. Если сохранённого размера отряда у того же инфолиста больше нет
+(новый кодекс), `migrateRoster` откладывает его (`unit.migration`, причина `size`) и показывает предупреждение.
+
+**Обновление значений по wh-rules.ru** (`40k/curated.json → updates`, kind `whrules-points`, `scripts/whrules-points.mjs`;
+сейчас `whrules-995-points`, задача P1-T3). У сопоставленных записей (та же функция сопоставления, что и отчёт свежести)
+меняет цены отряда и ступени цены за копии, Legends, DP детачментов, очки улучшений и платное снаряжение; id, профили,
+оружие и правила не трогает. Подписи размеров и названия снаряжения остаются нашими — сохранённые ростеры хранят по ним
+выбор. Другой размер отряда — смена состава: не применяется (полная конвертация). Копии юнита в других файлах (союзники,
+инфолисты детачментов с тем же названием и прежними ценами) получают те же значения; цены союзника Agents of the Imperium
+(`ally:agents`) не трогаются. `only` в элементе curated ограничивает армию (Adeptus Custodes: только цены отряда — кодекс в
+полной конвертации). **Платное снаряжение — во всех ступенях цены за копии**: конструктор ростеров сайта добавляет его к
+каждой копии (решение владельца 2026-10-23, P1-T5; прежнее «только последняя ступень», как в выгрузке Wahapedia, отменено;
+`40k/whrules-points-applied.json` — запись применения P1-T3, пересчитанная с размещением P1-T5:
+`bun scripts/whrules-points.mjs --base f8387fa --only '{"AC":["points"]}'`). План/отчёт —
+`bun scripts/whrules-points.mjs` → `40k/whrules-points-applied.json` (что изменится, копии, пропуски); применение —
+`bun scripts/repair-40k-data.mjs` (и в конце импорта). Тесты — `tests/whrules-points.test.ts`.
+
+**Платное стандартное снаряжение** (`40k/curated.json → updates`, kind `whrules-wargear`, `scripts/whrules-wargear.mjs`,
+задача P1-T5). Источник — данные конструктора ростеров wh-rules.ru: снимок `40k/whrules-<версия>-roster.json` (схема
+`whrules-roster/1`; `scripts/whrules-extract-roster.js` в консоли сайта → `node scripts/whrules-save.mjs <файл>`). Сайт
+считает юнит так: база + ступень копии + очки платного стандартного снаряжения (`dw`, возврат `dr`, если вариант его снимает)
++ очки выбранных вариантов. У нас — по предметам: цена предмета из `costs[].wargear`, платится каждая штука итогового
+снаряжения; стандартные штуки — только у инфолистов с `paidDefaults` (у сайта есть `dw`: лазпушка Leman Russ, missile pod
+Crisis Fireknife; у Gladiator Valiant BT две стандартные multi-melta входят в базу). Обработчик ставит `paidDefaults` по
+сопоставлению `compareArmy` (снимок очков в поле `points`) и копиям с тем же id; платный стандартный предмет, которого нет в
+нашем стандартном снаряжении, — ошибка. План — `bun scripts/whrules-wargear.mjs`. Сверка — `tests/paid-wargear.test.ts`:
+все варианты сайта с очками (390) дают ту же доплату, стандартное снаряжение 15 юнитов с `dw` — ту же сумму.
+
 **Снимок wh-rules.ru** (`40k/whrules-<версия>.json`, сейчас `whrules-981.json`: данные приложения 981, MFM 1.6,
 14.10.2026). Схема `whrules-points-snapshot/1`: `source` (сайт, версия данных, MFM, дата, время снятия), `assets`
 (SHA-256 каждого прочитанного JS-модуля сайта), `factions` (Space Marines, 5 орденов, Imperial Agents: инфолисты
@@ -113,7 +151,21 @@ Wahapedia (например, более новые очки), применяют
 очков этих фракций), `fingerprint` (SHA-256 от `JSON.stringify` снимка без него). Как снять заново: открыть
 https://wh-rules.ru/ru/patches, выполнить `scripts/whrules-extract.js` в консоли браузера, сохранить строку
 `window.__whrulesSnapshot` в файл и запустить `node scripts/whrules-save.mjs <файл>` — он проверит схему и fingerprint.
-wh-rules.ru — вторичный источник (не GW): версии и даты сверены с Warhammer Community; стоимости снаряжения в нём нет.
+wh-rules.ru — вторичный источник (не GW): версии и даты сверены с Warhammer Community; стоимости снаряжения в снимке 981 нет (на сайте они появились позже — см. снимок /3 ниже).
+
+**Снимок всех фракций и отчёт свежести** (с 23.10.2026 выгрузка Wahapedia приостановлена — см. `CLAUDE.md`).
+`scripts/whrules-extract.js` снимает схему `whrules-points-snapshot/3`: все фракции сайта (или `window.__whrulesFactions`),
+у каждой — инфолисты с очками и платным снаряжением (`wargearPoints`, на сайте появилось после версии 981), детачменты с DP и
+улучшениями (очки), таблица переименований сайта; плюс история обновлений с числом изменений по фракциям. Запись очков без
+числа моделей и без пометки — платная добавка (платформа Tidewall Shieldline). Перенос — `window.__whrulesSnapshotGz` (gzip+base64) или `window.__whrulesSnapshot`, затем
+`node scripts/whrules-save.mjs <файл>` (проверка схемы и fingerprint) → `40k/whrules-<версия>.json` (сейчас `whrules-995.json`).
+Сверка с данными приложения — `bun scripts/whrules-compare.mjs [--snapshot whrules-995.json]` → `40k/freshness-report.json`
+(подробно) и `.md` (сводка по армиям). Только чтение: данные приложения не меняются. Инфолисты сопоставляются по slug названия и
+таблице переименований сайта; без пары — в отдельные категории (другая фракция сайта, Legends/Forge World, которых на сайте нет,
+уже помеченные устаревшими), догадок нет; версии орденов (источник «Black Templars» и т.п.) сравниваются с инфолистом своей
+фракции сайта. Цены сравниваются по размерам отряда (число моделей или подпись состава) и ступеням за копии; отдельно —
+платные добавки и платное снаряжение (та же цена / другая / только у нас / только на сайте и считает ли движок предмет сам —
+`paidIsAuto`). Тесты — `tests/whrules-compare.test.ts`.
 
 **Полный снимок wh-rules.ru** (`40k/whrules-981-full.json`, схема `whrules-full/1`): инфолисты целиком (профили, оружие,
 способности, состав, снаряжение, варианты, ключевые слова, лидер, транспорт, очки, Legends, источник), построения
@@ -166,7 +218,45 @@ npm run battlefield      # → backend/roster-data/battlefield.json
   кто может (лимиты «1 на каждые 10 моделей», «только Nob», «если в отряде 10+»), что заменяется и на что.
   Собрать незаконное снаряжение нельзя. Разобрано 99,2% инфолистов с вариантами; у остальных (~13, например
   «two different weapons from the following list») такие варианты показаны текстом и не выбираются.
-  Платное снаряжение (Killsaw +5 и т.п.) считается по выбранным заменам автоматически.
+  Платное снаряжение (Killsaw +5 и т.п.) считается автоматически, как в конструкторе ростеров wh-rules.ru
+  (`compute.ts → paidFromLoadout`, задача P1-T5): на каждой копии юнита платится каждая штука итогового снаряжения
+  (стандартное − снятое заменами + выбранное); стандартные штуки — только при `paidDefaults` (см. «Платное стандартное
+  снаряжение»). Ручной счётчик — только Banner of Macragge у Victrix Honour Guard: предмет необязательной модели «0-1 Chapter
+  Ancient», выбора состава у отряда нет (`compute.ts → optionalWargear`: счётчик не больше числа таких моделей, подсказка
+  «если в отряде есть Chapter Ancient»; у сайта в составе по умолчанию Ancient нет — +0). Сохранённый ручной счётчик,
+  расходящийся с автоматическим, даёт предупреждение `wargear-auto`. Конвертация wh-rules (`whrules-convert.mjs`) кладёт в
+  стандартное снаряжение и предметы без профиля оружия (Banner of Macragge, Praesidium Shield, Jump Pack). Варианты
+  «up to two of the following, but cannot take duplicates», «replaced with: X and Y» разбираются. Закрепление «X этой модели
+  нельзя заменить» (`ParsedOption.locks`) — в скобках («(that model’s Storm Bolter cannot be replaced)»: у модели с Cyclone
+  Missile Launcher Storm Bolter остаётся), отдельным предложением («… 1 power fist. That model’s boltgun cannot be replaced.»)
+  и сноской «*» — проверяется: такой предмет не снимает другой вариант (сверено со всеми `keep` конструктора сайта).
+  «You cannot select the same option more than once» — каждый вариант не больше раза (`oncePerUnit`; Raptors). Инфолистам,
+  у которых в тексте вариантов нет, а у конструктора сайта они есть (Impulsor, Repulsor, Repulsor Executioner Space Marines,
+  Venerable Dreadnought и Wulfen Space Wolves), обновление whrules-wargear добавляет формулировки конструктора
+  (`options[].source = 'whrules-roster'`). Отдельные варианты конструктора — `curated.json → whrules-995-wargear →
+  rosterOptions` (P1-T5c): `add` — недостающий вариант (Watcher in the Dark у Deathwing Terminator Squad: в тексте инфолиста
+  сайта его нет, в конструкторе — есть), `replace` — наш вариант с опечаткой или чужим оружием (Kâhl, Ynnari Incubi, Kroot War
+  Shaper, Secutarii Peltasts) заменяется формулировкой конструктора. Остальные расхождения формулировок с конструктором
+  разобраны в `40k/whrules-995-roster-options-review.json` (wording — то же другими словами; конфликты содержания решены в
+  P1-T5e — `resolved`: Chaos Acastus Knight Porphyrion — обе пушки вместе, Wolf Scouts — bolt pistol, Thunderclap и runic
+  stave вместе по конструктору (решение владельца), Kill Tank и Gargantuan Squiggoth — `whrules-995-wargear → datasheets`:
+  оружие, снаряжение и варианты из полного снимка `40k/whrules-995-full-orks.json`). Сохранённые выборы у инфолистов с
+  изменёнными вариантами переводятся записью `migrations` «wh-rules 995 wargear» (`buildOptionRemap`; что не переводится —
+  откладывается с предупреждением). Название оружия с «and» внутри («dart-bow and tri-blade») — одно оружие; «X and three
+  of the following» — наборы из трёх с повторами (Kill Tank); предмет стандартного снаряжения с именем профиля
+  («Kannon - Shell», «Combi-weapon - Damnatus») — оружие без профиля.
+- Варианты, которые снимают отсутствующий предмет (P1-T5d; было 58 во всех армиях, осталось 1 — Venerable Dreadnought SM
+  Legends: текст инфолиста противоречит сам себе). Разбор (`wargear.ts`): «X or Y» — подпункты с общим лимитом (заменяется
+  то, что есть у модели); одинаковые апострофы; «have their X can be replaced» (Piranhas); снимаемый предмет назван иначе,
+  чем в стандартном снаряжении («Furioso fists» ↔ «Twin Furioso fists», «ranged weapon» ↔ единственное стрелковое) —
+  берётся единственный подходящий стандартный предмет. Данные (`whrules-995-wargear → loadoutRepair`,
+  `whrules-wargear.mjs → repairLoadout`): стандартное снаряжение заново из текста loadout с предметами без профиля оружия
+  (способности снаряжения и то, что заменяют варианты: slabshield, scattershield, crests, cluster bombs, collar of Khorne),
+  перечнем после переноса строки, «is additionally equipped with», склейкой «pan spectral» ↔ «Panspectral» и
+  «sniper rifle» ↔ «Scout sniper rifle» (`import-wahapedia.mjs → parseLoadout`) — только добавляет. rosterOptions `remove` —
+  устаревшие или повторные варианты, которых нет у конструктора (Thunderhawk Gunship, Astraeus); `datasheets` — Knight
+  Preceptor из полного снимка CSM и Imperial Knights, Cultist Mob with Firearms — стандартное снаряжение по конструктору
+  (`loadout: 'roster'`: у инфолиста сайта ошибка). Тесты — `tests/paid-wargear.test.ts`.
 - Правила детачментов, которые меняют игру, а не состав армии (ауры, стратагемы, перебросы), только показываются
   текстом — на ростер они не влияют.
 - Если у инфолиста Space Marines несколько таблиц цен (варианты орденов), берётся первая.

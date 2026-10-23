@@ -202,3 +202,47 @@ TB('подпись ссылки на источник: wh-rules.ru для нов
   assert.equal(linkLabel('https://wh-rules.ru/ru/factions/space-marines/datasheets'), 'wh-rules.ru');
   assert.equal(linkLabel('https://wahapedia.ru/wh40k11ed/factions/space-marines/Tactical-Squad'), 'Wahapedia');
 });
+
+// ---------- P1-T4d: несколько обновлений файла, смена размера отряда у того же инфолиста ----------
+const AC_NOW = (): FactionData => JSON.parse(fs.readFileSync(path.join(DATA, 'f', 'AC.json'), 'utf8'));
+
+test('migrations списком: каждое обновление применяется по порядку, переводы вариантов — один раз по своему source', () => {
+  const F = AC_NOW();
+  assert.ok(Array.isArray(F.migrations) && F.migrations.length === 2);
+  const [m981, m995] = F.migrations as DataMigrations[];
+  const L = makeLookup(F);
+  // юнит Custodes с выбранными заменами, у которого варианты изменились в 995
+  const id = Object.keys(m995.options ?? {}).find((x) => L.ds.has(x) && Object.keys(m995.options![x]!.keys).length)!;
+  let r = addUnit(newRoster('AC'), L.ds.get(id)!);
+  const key = Object.keys(m995.options![id]!.keys)[0]!;
+  r = updateUnit(r, r.units[0]!.uid, { picks: { [key]: [1] } });
+  // ростер уже прошёл 981: его переводы не повторяются, 995 — применяется
+  r = { ...r, appliedMigrations: [m981.source] };
+  const a = migrateRoster(r, L);
+  assert.ok(a.changed);
+  assert.deepEqual(a.roster.appliedMigrations, [m981.source, m995.source]);
+  // повторное открытие ничего не меняет
+  assert.equal(migrateRoster(a.roster, L).changed, false);
+  // прежняя запись одним объектом по-прежнему работает
+  const single = { ...F, migrations: m995 };
+  assert.deepEqual(migrateRoster({ ...r, appliedMigrations: [] }, makeLookup(single)).roster.appliedMigrations, [m995.source]);
+});
+
+test('тот же инфолист, сохранённого размера нет (Custodian Wardens 4 → 2/3 модели): размер отложен, предупреждение, повтор — без изменений', () => {
+  const F = AC_NOW();
+  const L = makeLookup(F);
+  const wardens = F.datasheets.find((d) => d.name === 'Custodian Wardens' && d.group === 'own')!;
+  let r = addUnit(newRoster('AC'), wardens);
+  r = { ...r, units: [{ ...r.units[0]!, size: '4 models' }], appliedMigrations: (F.migrations as DataMigrations[]).map((m) => m.source) };
+  const a = migrateRoster(r, L);
+  assert.ok(a.changed);
+  const u = a.roster.units[0]!;
+  assert.equal(u.size, '2 models');
+  assert.equal(u.migration?.reason, 'size');
+  assert.equal(u.migration?.dropped.size, '4 models');
+  assert.deepEqual(droppedSummary(u.migration!.dropped), ['размер «4 models»']);
+  const c = computeRoster(a.roster, L);
+  assert.ok(c.issues.some((i) => i.code === 'migrated' && /Размер отряда изменился/.test(i.message) && /4 models/.test(i.message)));
+  assert.ok(!c.issues.some((i) => i.code === 'size'), 'размер выбран — ошибки «выберите размер» нет');
+  assert.equal(migrateRoster(a.roster, L).changed, false);
+});

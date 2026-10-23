@@ -60,6 +60,15 @@ export interface ParsedOption {
   pairs?: boolean;
   /** «each X it is equipped with» — каждая штука X на модели заменяется отдельно (perModel = их число на модели) */
   perInstance?: boolean;
+  /**
+   * по варианту замены: что остаётся у модели и не может быть заменено другим вариантом
+   * («1 Storm Bolter and 1 Cyclone Missile Launcher (that model’s Storm Bolter cannot be replaced)»)
+   */
+  locks?: Item[][];
+  /** каждый вариант — не больше одного раза на отряд («you cannot select the same option more than once») */
+  oncePerUnit?: boolean;
+  /** варианты со сноской «*» (их закрепление — в сноске «* That model’s X cannot be replaced», см. optionsOf) */
+  starred?: boolean[];
 }
 
 export interface OptionsInfo {
@@ -103,8 +112,10 @@ function parseItem(raw: string, known: Map<string, string>): Item | null {
     qty = toNum(m[1]!) ?? 1;
     s = m[2]!;
   }
+  const look = (k: string) => known.get(k) ?? known.get(k.replace(/es$/, '')) ?? known.get(k.replace(/s$/, '')) ?? null;
   const k = key(s);
-  const name = known.get(k) ?? known.get(k.replace(/es$/, '')) ?? known.get(k.replace(/s$/, '')) ?? null;
+  // название профиля оружия: «2 Plasma Eradicator - Standards» (Astraeus) — оружие «Plasma Eradicator»
+  const name = look(k) ?? (/\s-\s/.test(s) ? look(key(s.split(/\s+-\s+/)[0]!)) : null);
   return { weapon: name ?? s.replace(/^./, (c) => c.toUpperCase()), qty };
 }
 
@@ -115,6 +126,11 @@ function parseItems(raw: string, known: Map<string, string>): Item[] | null {
     .split(/,\s*(?:and\s+)?|\s+and\s+/i)
     .map((p) => p.trim())
     .filter(Boolean);
+  // название оружия с «and» внутри — одно оружие: «dart-bow and tri-blade» (Kroot War Shaper)
+  for (let i = 0; i + 1 < parts.length; i++) {
+    const joined = `${parts[i]} and ${parts[i + 1]}`;
+    if (known.has(key(joined.replace(/^(?:\d+|one|a|an)\s+/i, '')))) parts.splice(i, 2, joined);
+  }
   const out: Item[] = [];
   for (const p of parts) {
     const it = parseItem(p, known);
@@ -136,14 +152,34 @@ interface Choices {
   perModel: number;
   noDup: boolean;
   pairs?: boolean;
+  locks?: Item[][];
+  oncePerUnit?: boolean;
+  starred?: boolean[];
+}
+
+/**
+ * «(that model’s Storm Bolter cannot be replaced)», «That model’s boltgun cannot be replaced.», сноска «* That model’s
+ * galvanic rifle cannot be replaced.» → предметы, которые остаются у модели и не заменяются другими вариантами.
+ */
+function lockOf(raw: string, known: Map<string, string>): Item[] {
+  const m = norm(raw).match(/(?:that|this|these|those) models?'?s?'?\s+(.+?)\s+cannot be replaced/i);
+  return (m && parseItems(m[1]!, known)) || [];
+}
+/** Пометки locks (только скобки в строке варианта) и сноски «*» по сырым строкам вариантов. */
+function withLocks(c: Choices, raws: string[], known: Map<string, string>): Choices {
+  const locks = raws.map((r) => (/\([^)]*cannot be replaced\)/i.test(r) ? lockOf(r.match(/\([^)]*cannot be replaced\)/i)![0], known) : []));
+  const starred = raws.map((r) => /\*/.test(r));
+  return { ...c, ...(locks.some((l) => l.length) ? { locks } : {}), ...(starred.some(Boolean) ? { starred } : {}) };
 }
 
 /** Правая часть: «1 Killsaw», «one of the following: • …», «up to two of the following …», «1 X and one of the following: …». */
 function parseChoices(head: string, rest: string[], known: Map<string, string>): Choices | null {
   let t = norm(head).replace(/^:\s*/, '');
+  const raws: string[] = [];
   const list = (prefix: Item[]) => {
     const out: Item[][] = [];
     for (const l of bullets(rest)) {
+      raws.push(l);
       const items = parseItems(l, known);
       if (!items) return null;
       out.push([...prefix, ...items]);
@@ -170,7 +206,7 @@ function parseChoices(head: string, rest: string[], known: Map<string, string>):
   if (m) {
     const n = toNum(m[1]!);
     const c = list([]);
-    return n && c ? { choices: c, perModel: n, noDup: !/can take duplicate/i.test(m[2]!), } : null;
+    return n && c ? withLocks({ choices: c, perModel: n, noDup: !/can take duplicate/i.test(m[2]!) }, raws, known) : null;
   }
   // «up to 2 missile drones»
   m = t.match(/^up to (\w+)\s+(.+)$/i);
@@ -184,12 +220,36 @@ function parseChoices(head: string, rest: string[], known: Map<string, string>):
   if (m) {
     const prefix = parseItems(m[1]!, known);
     const c = prefix && list(prefix);
-    return c ? { choices: c, perModel: 1, noDup: false } : null;
+    return c ? withLocks({ choices: c, perModel: 1, noDup: false }, raws, known) : null;
+  }
+  // «1 Deff Rolla and three of the following: • 1 Kannon • 1 Lobba • 1 Zzap Gun» (Kill Tank): варианты — все наборы из N
+  // пунктов с повторами (как прежние «3 Zzap Guns», каждый из которых можно было заменить)
+  m = t.match(/^(.+?)\s+and\s+(two|three|four|\d+) of the following\s*[:;]?\s*$/i);
+  if (m) {
+    const prefix = parseItems(m[1]!, known);
+    const n = toNum(m[2]!);
+    const items = bullets(rest).map((l) => parseItems(l, known));
+    if (!prefix || !n || !items.length || items.some((x) => !x || x.length !== 1)) return null;
+    const one = items.map((x) => x![0]!);
+    const out: Item[][] = [];
+    const walk = (from: number, acc: Item[]) => {
+      if (acc.length === n) {
+        const counts = new Map<string, Item>();
+        for (const it of acc) counts.set(it.weapon, { weapon: it.weapon, qty: (counts.get(it.weapon)?.qty ?? 0) + it.qty });
+        out.push([...prefix, ...counts.values()]);
+        return;
+      }
+      for (let i = from; i < one.length; i++) walk(i, [...acc, one[i]!]);
+    };
+    walk(0, []);
+    return { choices: out, perModel: 1, noDup: false };
   }
   // «one of the following (duplicates are not allowed)*:» / «on of the following;» / просто «:» и список
-  m = t.match(/^(?:(?:one|on|1) of the following)?((?:\s*\([^)]*\)|\s*\*+)*)\s*[:;]*\s*(.*)$/i);
+  // «one of the following options (you cannot select the same option more than once):»
+  m = t.match(/^(?:(?:one|on|1) of the following(?:\s+options)?)?((?:\s*\([^)]*\)|\s*\*+)*)\s*[:;]*\s*(.*)$/i);
   if (m && (rest.length || /of the following/i.test(t))) {
     const noDup = /duplicates are not allowed|cannot take duplicate/i.test(m[1]!);
+    const once = /cannot select the same option/i.test(m[1]!) ? { oncePerUnit: true } : {};
     const inline = m[2]!.trim();
     if (inline && /of the following/i.test(t)) {
       // «one of the following: 1 Kannon, 1 Supa-kannon»
@@ -198,12 +258,13 @@ function parseChoices(head: string, rest: string[], known: Map<string, string>):
         const items = parseItems(part, known);
         if (!items) return null;
         out.push(items);
+        raws.push(part);
       }
-      return { choices: out, perModel: 1, noDup };
+      return withLocks({ choices: out, perModel: 1, noDup, ...once }, raws, known);
     }
     if (!inline && rest.length) {
       const c = list([]);
-      return c ? { choices: c, perModel: 1, noDup } : null;
+      return c ? withLocks({ choices: c, perModel: 1, noDup, ...once }, raws, known) : null;
     }
   }
   if (rest.length && bullets(rest).length) {
@@ -211,7 +272,7 @@ function parseChoices(head: string, rest: string[], known: Map<string, string>):
     t = t.replace(/:$/, '');
   }
   const items = parseItems(t, known);
-  return items ? { choices: [items], perModel: 1, noDup: false } : null;
+  return items ? withLocks({ choices: [items], perModel: 1, noDup: false }, [t], known) : null;
 }
 
 /** Одно и то же имя в единственном/множественном числе: Boy/Boyz, Legionary/Legionaries, Nob/Nobz. */
@@ -283,9 +344,9 @@ function parseSentence(firstRaw: string, rest: string[], ctx: { key: string; ind
     first = /^can\b/i.test(cond[4]!) ? `${subj} ${cond[4]}` : `${subj}'s ${cond[4]}`;
   }
   const patterns: { re: RegExp; add?: boolean; instance?: boolean; haveN?: boolean }[] = [
-    { re: /^(.+?)\s+can\s+(?:each\s+)?have\s+(?:its|their|his|her)\s+(.+?)\s+replaced\s+(?:with\s+)?(.*)$/i },
-    { re: /^(.+?)'s?\s+(.+?)\s+can\s+each\s+(?:be\s+)?replaced\s+(?:with\s+)?(.*)$/i, instance: true },
-    { re: /^(.+?)'s?\s+(.+?)\s+can\s+(?:be\s+)?replaced?\s+(?:with\s+)?(.*)$/i },
+    { re: /^(.+?)\s+can\s+(?:each\s+)?have\s+(?:its|their|his|her)\s+(.+?)\s+replaced\s+(?:with\b\s*)?(.*)$/i },
+    { re: /^(.+?)'s?\s+(.+?)\s+can\s+each\s+(?:be\s+)?replaced\s+(?:with\b\s*)?(.*)$/i, instance: true },
+    { re: /^(.+?)'s?\s+(.+?)\s+can\s+(?:be\s+)?replaced?\s+(?:with\b\s*)?(.*)$/i },
     { re: /^(.+?)\s+can\s+(?:each\s+)?replace\s+(?:one of\s+)?(?:its|their|his|her)\s+(.+?)\s+with\s*(.*)$/i },
     { re: /^(.+?)\s+can\s+(?:each\s+)?be\s+equipped\s+(?:with\s+)?(.*)$/i, add: true },
     { re: /^(.+?)\s+can\s+have\s+((?:\d+|one|a|an)\s+.+)$/i, add: true },
@@ -336,6 +397,9 @@ function parseSentence(firstRaw: string, rest: string[], ctx: { key: string; ind
       share: ctx.share ?? null,
       ...(ch.pairs ? { pairs: true } : {}),
       ...(perInstance ? { perInstance: true } : {}),
+      ...(ch.locks ? { locks: ch.locks } : {}),
+      ...(ch.oncePerUnit ? { oncePerUnit: true } : {}),
+      ...(ch.starred ? { starred: ch.starred } : {}),
     };
   }
   return null;
@@ -344,12 +408,39 @@ function parseSentence(firstRaw: string, rest: string[], ctx: { key: string; ind
 /** Разобрать одну запись вариантов (может дать несколько вариантов — подпункты). */
 export function parseOption(text: string, index: number, groups: string[], known: Map<string, string>): ParsedOption[] | null | 'none' {
   const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
-  const first = norm(lines[0] ?? '').replace(/\*+$/, '');
+  let first = norm(lines[0] ?? '');
+  // вся фраза со сноской: «… can be equipped with 1 excruciator maul.*»
+  const starAll = /\*\s*$/.test(first);
+  first = first.replace(/\*+$/, '');
+  // отдельное предложение: «… replaced with 1 power fist. That model’s boltgun cannot be replaced.»
+  let sentenceLock: Item[] = [];
+  const sl = first.match(/^(.+?\.)\s*((?:that|this) model'?s?'?\s+.+?\s+cannot be replaced)\.?$/i);
+  if (sl) {
+    sentenceLock = lockOf(sl[2]!, known);
+    first = sl[1]!.replace(/\.$/, '');
+  }
+  // опечатка выгрузки: «… can each have their Piranha burst cannon can be replaced with …»
+  first = first.replace(/(\bhave\s+(?:its|their)\s+.+?)\s+can be replaced with\b/i, '$1 replaced with');
   const rest = lines.slice(1);
+  // сноска в той же записи (вставка из конструктора сайта): «* That model’s storm bolter cannot be replaced.»
+  const inlineNote = rest.find((l) => /^\*/.test(l) && /cannot be replaced/i.test(l));
   if (!first || /^none\.?$/i.test(first)) return 'none';
   // сноски и пояснения («* cannot be replaced», «X is equipped with: …») — не варианты
-  if (/^\*/.test(first) || /cannot (?:be (?:replaced|equipped|selected)|take|select)|is equipped with:|are equipped with:|^this weapon/i.test(first)) return 'none';
+  // пояснения в скобках («(that model’s Storm Bolter cannot be replaced)») и «but cannot take duplicates» — часть варианта, не сноска
+  const plain = first.replace(/\([^)]*\)/g, '').replace(/,?\s*but cannot take duplicates/i, '');
+  if (/^\*/.test(first) || /cannot (?:be (?:replaced|equipped|selected)|take|select)|is equipped with:|are equipped with:|^this weapon/i.test(plain)) return 'none';
   const ctx = { index, text, groups, known };
+  /** закрепления из отдельного предложения, сноски в той же записи и «*» после всей фразы */
+  const mark = (o: ParsedOption): ParsedOption => {
+    const n = o.choices.length;
+    const locks = o.choices.map((_, ci) => [...(o.locks?.[ci] ?? []), ...sentenceLock, ...(inlineNote && (starAll || o.starred?.[ci]) ? lockOf(inlineNote, known) : [])]);
+    const starred = o.choices.map((_, ci) => starAll || !!o.starred?.[ci]);
+    return {
+      ...o,
+      ...(locks.some((l) => l.length) ? { locks } : {}),
+      ...(starred.some(Boolean) && n ? { starred } : {}),
+    };
+  };
 
   // «If this unit contains 10 (or more / or fewer) models: • …» и «For every 5 models in this unit: • …»
   let m = first.match(/^(?:if this unit contains (\d+) (or more |or fewer )?models|for every (\d+) models in (?:this|the) unit)\s*:?$/i);
@@ -364,7 +455,7 @@ export function parseOption(text: string, index: number, groups: string[], known
     for (let k = 0; k < subs.length; k++) {
       const o = parseSentence(subs[k]!, [], { ...ctx, key: `${index}.${k}`, ...sub });
       if (!o) return null;
-      out.push(o);
+      out.push(mark(o));
     }
     return out.length ? out : null;
   }
@@ -388,10 +479,24 @@ export function parseOption(text: string, index: number, groups: string[], known
   if (m) {
     const a = parseSentence(`${m[1]} can ${m[2] ?? ''}have ${m[3]} replaced with ${m[4]}`, [], { ...ctx, key: `${index}.0`, share: String(index) });
     const b = parseSentence(`${m[1]} can ${m[2] ? 'each ' : ''}be equipped with ${m[5]}`, rest, { ...ctx, key: `${index}.1`, share: String(index) });
-    return a && b ? [a, b] : null;
+    return a && b ? [mark(a), mark(b)] : null;
+  }
+  // «… have its bolt revolver and plasma knife or its bolt shotgun replaced with …», «1 model’s gauss scalpel or tesla caster
+  // can be replaced with …»: заменяется то, что есть у модели, — подпункты с общим лимитом моделей
+  const alt =
+    first.match(/^(.+?\bhave\s+(?:its|their)\s+)(.+?)\s+or\s+(?:its\s+|their\s+|a\s+|an\s+)?(.+?)(\s+replaced with\b.*)$/i) ??
+    first.match(/^(.+?'s?\s+)(.+?)\s+or\s+(?:its\s+|their\s+|a\s+|an\s+)?(.+?)(\s+can\s+(?:each\s+)?be replaced with\b.*)$/i);
+  if (alt && !/\bone of the following\b/i.test(alt[2]!) && parseItems(alt[2]!, known) && parseItems(alt[3]!, known)) {
+    const out: ParsedOption[] = [];
+    for (const [k, what] of [alt[2]!, alt[3]!].entries()) {
+      const o = parseSentence(`${alt[1]}${what}${alt[4]}`, rest, { ...ctx, key: `${index}.${k}`, share: String(index) });
+      if (!o) return null;
+      out.push(mark(o));
+    }
+    return out;
   }
   const one = parseSentence(first, rest, { ...ctx, key: String(index) });
-  return one ? [one] : null;
+  return one ? [mark(one)] : null;
 }
 
 // ---------- состав отряда ----------
@@ -498,11 +603,39 @@ export function optionsOf(ds: Datasheet): OptionsInfo {
     else unparsed.push(i);
   });
   const footnotes = ds.options.filter((o) => /^\*/.test(o.text.trim())).map((o) => o.text);
+  // сноска отдельной записью: «* That model’s galvanic rifle cannot be replaced.» — закрепление для вариантов со «*»
+  const lockNote = footnotes.find((f) => /cannot be replaced/i.test(f));
   for (const o of parsed) {
+    if (lockNote && !o.pairs && o.starred?.some(Boolean)) {
+      const l = lockOf(lockNote, known);
+      o.locks = o.choices.map((_, ci) => [...(o.locks?.[ci] ?? []), ...(o.starred![ci] ? l : [])]);
+    }
     if (o.pairs) o.choices = o.choices.filter((c) => pairAllowed(ds, c, footnotes));
     // «each shuriken cannon it is equipped with»: на модели их несколько — каждая заменяется отдельно
     if (o.perInstance && o.from.length === 1) o.perModel = Math.max(1, perModelQty(ds, o.from[0]!.weapon));
   }
+  // снимаемый предмет назван иначе, чем в стандартном снаряжении («Furioso fists» ↔ «Twin Furioso fists», «twin hellstrike
+  // missile launchers» ↔ «Twin hellstrike launcher», «ranged weapon» ↔ единственное стрелковое оружие): если такого предмета
+  // нет ни в стандартном снаряжении, ни в вариантах, а подходит ровно один стандартный — берём его
+  const defaults = [...new Set(ds.defaultLoadout.flatMap((r) => r.items.map((it) => it.weapon)))];
+  const gained = new Set(parsed.flatMap((o) => o.choices.flat().map((it) => kv(it.weapon))));
+  const has = (w: string) => defaults.some((d) => kv(d) === kv(w)) || gained.has(kv(w));
+  const toks = (w: string) => new Set(key(w).split(/\s+/).map((t) => t.replace(/(?:es|s)$/, '')).filter(Boolean));
+  const alias = (w: string): string | null => {
+    const kind = key(w).match(/^(ranged|melee) weapons?$/)?.[1];
+    if (kind) {
+      const m = defaults.filter((d) => ds.weapons.find((x) => kv(x.name) === kv(d))?.profiles.every((p) => (kind === 'melee') === (p.type === 'Melee')));
+      return m.length === 1 ? m[0]! : null;
+    }
+    const a = toks(w);
+    if (a.size < 2) return null;
+    const m = defaults.filter((d) => {
+      const b = toks(d);
+      return [...a].every((t) => b.has(t)) || [...b].every((t) => a.has(t));
+    });
+    return m.length === 1 ? m[0]! : null;
+  };
+  for (const o of parsed) o.from = o.from.map((f) => (has(f.weapon) ? f : { ...f, weapon: alias(f.weapon) ?? f.weapon }));
   const info = { parsed, unparsed, notes };
   cache.set(ds, info);
   return info;
@@ -515,6 +648,15 @@ function ruleGroup(r: LoadoutRule, groups: ModelGroup[]): ModelGroup | null {
   const s = norm(r.subject).toLowerCase().replace(/^(?:every|each|the|this|one|1)\s+/, '').replace(/\s+models?$/, '');
   for (const g of groups) if (sameName(s, g.name.toLowerCase())) return g;
   return null;
+}
+
+/**
+ * Строка стандартного снаряжения относится к необязательной модели состава («0-1 Chapter Ancient model»): взята ли она,
+ * приложение не знает (выбора состава у таких отрядов нет), поэтому её платные предметы отмечаются вручную.
+ */
+export function optionalRule(ds: Pick<Datasheet, 'composition' | 'stats'>, r: LoadoutRule): boolean {
+  const g = ruleGroup(r, modelGroups(ds, 0));
+  return !!g && g.min === 0;
 }
 
 /** Сколько моделей получает строку стандартного снаряжения. */
@@ -558,7 +700,7 @@ export interface LoadoutResult {
   limits: Record<string, number>;
 }
 
-const kv = (s: string) => s.toLowerCase();
+const kv = (s: string) => s.toLowerCase().replace(/[’‘`]/g, "'");
 
 /** Снаряжение = стандартное + замены; проверка лимитов и наличия заменяемого оружия. */
 export function applyPicks(ds: Datasheet, base: Record<string, number>, picks: Picks | undefined, models: number): LoadoutResult {
@@ -568,6 +710,15 @@ export function applyPicks(ds: Datasheet, base: Record<string, number>, picks: P
   const pool = new Map<string, { name: string; n: number }>();
   for (const [w, n] of Object.entries(base)) pool.set(kv(w), { name: w, n });
   const have = (w: string) => pool.get(kv(w))?.n ?? 0;
+  const countsOf = (o: ParsedOption) => (picks?.[o.key] ?? []).map((n) => (n > 0 ? Math.floor(n) : 0));
+  // «(that model’s X cannot be replaced)»: X у моделей с этим вариантом остаётся — другие варианты его не снимают
+  const lockedBy = (o: ParsedOption, w: string) =>
+    countsOf(o).reduce((s, n, ci) => s + n * (o.locks?.[ci] ?? []).reduce((q, it) => q + (kv(it.weapon) === kv(w) ? it.qty : 0), 0), 0);
+  const lockedNames = new Map<string, string>();
+  for (const o of info.parsed) for (const l of o.locks ?? []) for (const it of l) lockedNames.set(kv(it.weapon), it.weapon);
+  const locked = (w: string) => info.parsed.reduce((s, o) => s + lockedBy(o, w), 0);
+  /** сколько штук X может снять вариант o: без закреплённых другими вариантами */
+  const free = (o: ParsedOption, w: string) => have(w) - (locked(w) - lockedBy(o, w));
   const take = (w: string, n: number) => {
     const p = pool.get(kv(w));
     if (!p || p.n < n) return false;
@@ -579,7 +730,6 @@ export function applyPicks(ds: Datasheet, base: Record<string, number>, picks: P
     if (p) p.n += n;
     else pool.set(kv(w), { name: w, n });
   };
-  const countsOf = (o: ParsedOption) => (picks?.[o.key] ?? []).map((n) => (n > 0 ? Math.floor(n) : 0));
   const sum = (a: number[]) => a.reduce((x, y) => x + y, 0);
 
   // лимиты: моделей на вариант, предметов на вариант (× perModel), общий лимит подпунктов
@@ -603,14 +753,21 @@ export function applyPicks(ds: Datasheet, base: Record<string, number>, picks: P
     const cap = limits[o.key]! * o.perModel;
     if (total > cap) problems.push(`«${name}»: выбрано ${total}, можно не больше ${cap}`);
     if (o.noDup && counts.some((n) => n > limits[o.key]!)) problems.push(`«${name}»: один и тот же вариант — не больше ${limits[o.key]}`);
+    if (o.oncePerUnit && counts.some((n) => n > 1)) problems.push(`«${name}»: каждый вариант — не больше одного раза на отряд`);
     counts.forEach((n, ci) => {
       const choice = o.choices[ci];
       if (!n || !choice) return;
-      for (const f of o.from) if (!take(f.weapon, f.qty * n)) problems.push(`«${name}»: в отряде нет ${f.qty * n}× ${f.weapon} для замены`);
+      for (const f of o.from) {
+        const need = f.qty * n;
+        if (have(f.weapon) >= need && free(o, f.weapon) < need) problems.push(`«${name}»: ${f.weapon} заменить нельзя — его оставляет другой выбранный вариант`);
+        if (!take(f.weapon, need)) problems.push(`«${name}»: в отряде нет ${need}× ${f.weapon} для замены`);
+      }
       for (const it of choice) give(it.weapon, it.qty * n);
     });
   }
   for (const [sh, used] of shareUsed) if (used > shareLimit.get(sh)!) problems.push(`Можно выбрать только один из взаимоисключающих вариантов (выбрано ${used})`);
+  // закреплённые предметы должны остаться в снаряжении («Storm Bolter этой модели нельзя заменить»)
+  for (const w of lockedNames.values()) if (locked(w) > have(w)) problems.push(`${w}: нужно ${locked(w)} шт. для выбранных вариантов (его нельзя заменить), в отряде ${have(w)}`);
 
   // максимум для каждого счётчика (с учётом остальных выборов)
   const max: Record<string, number[]> = {};
@@ -622,9 +779,15 @@ export function applyPicks(ds: Datasheet, base: Record<string, number>, picks: P
       const others = sum(counts) - mine;
       let m = lim * o.perModel - others;
       if (o.noDup) m = Math.min(m, lim);
+      if (o.oncePerUnit) m = Math.min(m, 1);
       if (o.share) m = Math.min(m, mine + shareLimit.get(o.share)! - shareUsed.get(o.share)!);
       if ((o.requires.some((r) => have(r.weapon) < 1) || o.forbids.some((r) => have(r.weapon) > 0)) && !mine) m = 0;
-      for (const f of o.from) m = Math.min(m, mine + Math.floor(have(f.weapon) / f.qty));
+      for (const f of o.from) m = Math.min(m, mine + Math.floor(Math.max(0, free(o, f.weapon)) / f.qty));
+      // вариант, который закрепляет предмет, — не больше, чем свободных штук этого предмета
+      for (const it of o.locks?.[ci] ?? []) {
+        const back = o.choices[ci]!.some((x) => kv(x.weapon) === kv(it.weapon)) && o.from.some((x) => kv(x.weapon) === kv(it.weapon));
+        if (!back) m = Math.min(m, mine + Math.floor(Math.max(0, have(it.weapon) - locked(it.weapon)) / it.qty));
+      }
       return Math.max(0, m);
     });
   }
