@@ -84,3 +84,59 @@ export function loadBattlefield(): Promise<BattlefieldData> {
   battlefieldPromise.catch(() => (battlefieldPromise = null));
   return battlefieldPromise;
 }
+
+// ---------- карты миссий Chapter Approved 2026-27 (missions.json: структура 40kdc-data, текст — пересказ WarpHub) ----------
+
+/** Раунды блока: any, '1', '1–2', '2+', '2–3', '2–4', '4+', '5', end (конец битвы). */
+export type MissionRounds = string;
+export interface MissionRow {
+  text: string;
+  vp: number;
+  /** «+N ПО» сверх строки выше (накопительно) */
+  plus?: boolean;
+  /** «или» — вместо строки выше, засчитывается одна */
+  or?: boolean;
+  max?: number;
+}
+export interface MissionBlock {
+  rounds: MissionRounds;
+  mode?: 'fixed' | 'tactical';
+  when: string;
+  rows: MissionRow[];
+}
+export interface MissionAction {
+  name: string;
+  nameRu: string;
+  starts: string;
+  units: string;
+  limit: string;
+  completes: string;
+  effect: string;
+  restriction?: string;
+}
+export interface MissionCard {
+  id: string;
+  name: string;
+  type: 'primary' | 'secondary';
+  you?: string;
+  foe?: string;
+  modes?: ('fixed' | 'tactical')[];
+  setup?: string;
+  drawn?: string;
+  note?: string;
+  blocks: MissionBlock[];
+  actions?: MissionAction[];
+}
+export interface MissionsData {
+  source: { name: string; version: string; url: string; license: string; deck: string; text: string };
+  caps: { primaryRound: number; primaryGame: number; secondaryRound: number; secondaryGame: number; fixedSecondaryCard?: number; endOfBattleOutsideRoundCap?: boolean };
+  cards: MissionCard[];
+}
+
+let missionsPromise: Promise<MissionsData> | null = null;
+
+export function loadMissions(): Promise<MissionsData> {
+  missionsPromise ??= apiRequest<MissionsData>('/roster/data/missions');
+  missionsPromise.catch(() => (missionsPromise = null));
+  return missionsPromise;
+}
