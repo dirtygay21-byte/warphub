@@ -33,7 +33,8 @@ const roleLabel = (c: ComputedUnit) => {
 };
 
 /** Формат, близкий к экспорту официального приложения Warhammer 40,000. */
-export function exportGw(roster: Roster, L: DataLookup, cr: ComputedRoster, dataVersion: string | null): string {
+/** credit — подпись версии данных (source.ts → factionCredit(…, 'en')); null — по источнику фракции или дате выгрузки. */
+export function exportGw(roster: Roster, L: DataLookup, cr: ComputedRoster, dataVersion: string | null, credit: string | null = null): string {
   const size = BATTLE_SIZES[roster.battleSize];
   const out: string[] = [];
   out.push(`${roster.name} (${pts(cr.points)} Points)`, '');
@@ -76,7 +77,7 @@ export function exportGw(roster: Roster, L: DataLookup, cr: ComputedRoster, data
     out.push(title);
     for (const c of list) out.push(...unitLines(c, roster), '');
   }
-  out.push(`Exported with WarpHub Roster Builder (data: ${L.faction.source ? sourceLabel(L.faction.source) : `Wahapedia ${dataVersion ?? '?'}`})`);
+  out.push(`Exported with WarpHub Roster Builder (data: ${credit ?? (L.faction.source ? sourceLabel(L.faction.source) : `Wahapedia ${dataVersion ?? '?'}`)})`);
   return out.join('\n');
 }
 
