@@ -32,11 +32,11 @@ export type Round = 1 | 2 | 3 | 4 | 5;
 export type Stage = 'setup' | 'battle' | 'finished';
 /**
  * Шаг внутри хода активного игрока:
- * command — идёт фаза командования (карты вытянуты, CP получены);
- * main — фазы после командования;
- * end — конец хода: окно подсчёта выполненных карт (сначала активный игрок, потом второй).
+ * start — ход начался, фаза командования ещё не начата;
+ * command — идёт фаза командования (карты вытянуты, CP получены; в конце — подсчёт основной миссии);
+ * main — фазы после командования; в конце хода (до turn-ended) — подсчёт выполненных карт обоими игроками.
  */
-export type TurnStep = 'command' | 'main' | 'end';
+export type TurnStep = 'start' | 'command' | 'main';
 
 // ---------- каталог: что движку нужно из missions.json и battlefield.json ----------
 
@@ -208,6 +208,8 @@ export interface GameState {
   round: Round;
   activeSeat: Seat | null;
   step: TurnStep;
+  /** почему битва закончилась (stage = finished) */
+  endReason: 'rounds' | 'concede' | 'manual' | null;
   /** номер последнего применённого события */
   lastSeq: number;
   /** id отменённых событий */
