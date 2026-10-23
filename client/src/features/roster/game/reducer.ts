@@ -15,10 +15,15 @@ import {
   type GameState,
   type PlayerState,
   type Round,
+  type RollKey,
+  type RollRef,
+  type RollResult,
   type Seat,
 } from './types';
 import { drawCards, initDecks, noteCard, redrawWhenDrawn, swapCard } from './decks';
 import { cardVp } from './scoring';
+import { setupMissing } from './setup';
+import { layoutPick, rollOff } from './rng';
 
 export const other = (s: Seat): Seat => (s === 'p1' ? 'p2' : 'p1');
 
@@ -61,21 +66,6 @@ export function layoutsFor(state: GameState, catalog: GameCatalog): GameCatalog[
   return catalog.layouts.filter((l) => l.pair.join('|') === key).sort((x, y) => x.variant - y.variant);
 }
 
-/** Чего не хватает для начала битвы (пусто — можно начинать). */
-export function setupMissing(state: GameState): string[] {
-  const miss: string[] = [];
-  for (const s of SEATS) {
-    const p = state.players[s];
-    if (!p.disposition) miss.push(`${p.name}: тип армии`);
-    if (!p.secondaryMode) miss.push(`${p.name}: режим вторичных миссий`);
-  }
-  if (!state.layoutId) miss.push('раскладка');
-  if (!state.players.p1.role) miss.push('атакующий и защитник');
-  if (!state.choicesRevealed) miss.push('раскрытие выбора');
-  if (!state.firstTurn) miss.push('кто ходит первым');
-  return miss;
-}
-
 const fail = (error: string): ApplyResult => ({ ok: false, error });
 
 /** Состояние из первого события журнала (game-created). */
@@ -96,7 +86,13 @@ export function createGame(ev: GameEvent): ApplyResult {
       primary: { p1: null, p2: null },
       layoutId: null,
       deploymentId: null,
-      choicesRevealed: false,
+      dispositionsRevealed: false,
+      secondariesRevealed: false,
+      rolls: {},
+      rollCount: { roles: 0, 'first-turn': 0 },
+      layoutDraws: 0,
+      rolesSource: null,
+      firstTurnSource: null,
       firstTurn: null,
       round: 1,
       activeSeat: null,
@@ -138,7 +134,7 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       const p = s.players[ev.target];
       const { name, roster, disposition, battleReady } = ev.patch;
       if ((roster !== undefined || disposition !== undefined) && !inSetup) return fail('Ростер и тип армии меняются только до начала битвы');
-      if (disposition !== undefined && s.choicesRevealed) return fail('Тип армии уже раскрыт');
+      if (disposition !== undefined && s.dispositionsRevealed) return fail('Тип армии уже раскрыт');
       if (disposition != null && !catalog.matchups.some((m) => m.you === disposition)) return fail(`Неизвестный тип армии: ${disposition}`);
       if (name !== undefined) p.name = name.trim() || p.name;
       if (roster !== undefined) p.roster = roster;
@@ -152,7 +148,8 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
     case 'secondary-chosen': {
       if (!inSetup) return fail('Вторичные миссии выбираются до начала битвы');
       if (!own(ev.target)) return fail('Можно выбрать только свои вторичные миссии');
-      if (s.choicesRevealed) return fail('Выбор вторичных уже раскрыт');
+      if (!s.players.p1.role) return fail('Сначала определите атакующего и защитника');
+      if (s.secondariesRevealed) return fail('Выбор вторичных уже раскрыт');
       const p = s.players[ev.target];
       if (ev.mode === 'fixed') {
         const f = ev.fixed;
@@ -170,38 +167,67 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       p.secondaryMode = ev.mode;
       break;
     }
-    case 'choices-revealed': {
-      if (!inSetup) return fail('Выбор раскрывается до начала битвы');
-      if (ev.seat !== null) return fail('Раскрытие выбора — общее событие');
-      if (s.choicesRevealed) return fail('Выбор уже раскрыт');
-      for (const p of Object.values(s.players)) {
-        if (!p.disposition) return fail(`${p.name}: не выбран тип армии`);
-        if (!p.secondaryMode) return fail(`${p.name}: не выбран режим вторичных миссий`);
-      }
-      s.choicesRevealed = true;
+    case 'dispositions-revealed': {
+      if (!inSetup) return fail('Типы армий раскрываются до начала битвы');
+      if (ev.seat !== null) return fail('Раскрытие — общее событие');
+      if (s.dispositionsRevealed) return fail('Типы армий уже раскрыты');
+      for (const p of Object.values(s.players)) if (!p.disposition) return fail(`${p.name}: не выбран тип армии`);
+      s.dispositionsRevealed = true;
       break;
     }
     case 'layout-set': {
       if (!inSetup) return fail('Раскладка выбирается до начала битвы');
+      if (!s.dispositionsRevealed) return fail('Сначала раскройте типы армий');
+      if (s.players.p1.role) return fail('Атакующий и защитник уже определены — раскладку не поменять');
       const opts = layoutsFor(s, catalog);
-      if (!opts.length) return fail('Сначала выберите типы армий обоих игроков');
       const l = opts.find((x) => x.id === ev.layoutId);
       if (!l) return fail('Эта раскладка не подходит к паре типов армий');
+      if (ev.source === 'random') {
+        if (!ev.roll || !Number.isInteger(ev.roll.attempt)) return fail('Для случайной раскладки нужен номер выбора');
+        if (ev.roll.attempt !== s.layoutDraws) return fail(`Ожидался случайный выбор №${s.layoutDraws + 1}`);
+        if (opts[layoutPick(s.seed, ev.roll.attempt, opts.length)]!.id !== l.id) return fail('Случайная раскладка не совпадает с жребием');
+        s.layoutDraws += 1;
+      } else if (ev.roll) return fail('Жребий указан, а выбор отмечен как ручной');
       s.layoutId = l.id;
       s.deploymentId = l.deployment;
       break;
     }
     case 'roles-set': {
       if (!inSetup) return fail('Атакующий и защитник определяются до начала битвы');
+      if (!s.layoutId) return fail('Сначала выберите раскладку');
+      if (s.secondariesRevealed) return fail('Вторичные уже раскрыты — атакующего и защитника не поменять');
       if (!SEATS.includes(ev.attacker)) return fail('Неизвестное место игрока');
+      if (ev.source === 'random') {
+        const r = applyRoll(s, 'roles', ev.roll);
+        if (typeof r === 'string') return fail(r);
+        // правило: победитель броска решает, кто атакующий, а кто защитник
+        if (ev.seat !== null && ev.seat !== r.winner) return fail('Атакующего и защитника выбирает победитель броска');
+      } else if (ev.roll) return fail('Бросок указан, а выбор отмечен как ручной');
       s.players[ev.attacker].role = 'attacker';
       s.players[other(ev.attacker)].role = 'defender';
+      s.rolesSource = ev.source;
+      break;
+    }
+    case 'secondaries-revealed': {
+      if (!inSetup) return fail('Вторичные раскрываются до начала битвы');
+      if (ev.seat !== null) return fail('Раскрытие — общее событие');
+      if (s.secondariesRevealed) return fail('Вторичные уже раскрыты');
+      for (const p of Object.values(s.players)) if (!p.secondaryMode) return fail(`${p.name}: не выбран режим вторичных миссий`);
+      s.secondariesRevealed = true;
       break;
     }
     case 'first-turn-set': {
       if (!inSetup) return fail('Первый ход определяется до начала битвы');
+      if (!s.secondariesRevealed) return fail('Сначала раскройте вторичные миссии');
       if (!SEATS.includes(ev.first)) return fail('Неизвестное место игрока');
+      if (ev.source === 'random') {
+        const r = applyRoll(s, 'first-turn', ev.roll);
+        if (typeof r === 'string') return fail(r);
+        // правило: победитель броска ходит первым
+        if (ev.first !== r.winner) return fail('Первым ходит победитель броска');
+      } else if (ev.roll) return fail('Бросок указан, а выбор отмечен как ручной');
       s.firstTurn = ev.first;
+      s.firstTurnSource = ev.source;
       break;
     }
     case 'battle-started': {
@@ -365,6 +391,20 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       return fail(`Неизвестное событие «${(ev as { type: string }).type}»`);
   }
   return { ok: true, state: s };
+}
+
+/**
+ * Бросок «кто выше» по seed: номер броска должен быть следующим для этого вида (отмена возвращает счётчик —
+ * повторный бросок после отмены даёт те же кубики). Результат записывается в состояние.
+ */
+function applyRoll(s: GameState, key: RollKey, roll: RollRef | undefined): RollResult | string {
+  if (!roll || !Number.isInteger(roll.attempt)) return 'Для случайного выбора нужен бросок';
+  if (roll.attempt !== s.rollCount[key]) return `Ожидался бросок №${s.rollCount[key] + 1}`;
+  const r = rollOff(s.seed, key, roll.attempt);
+  const result: RollResult = { attempt: roll.attempt, rolls: r.rolls, winner: r.winner };
+  s.rolls[key] = result;
+  s.rollCount[key] += 1;
+  return result;
 }
 
 /** Ход идёт, шаг подходящий, событие от активного игрока (или общее). */

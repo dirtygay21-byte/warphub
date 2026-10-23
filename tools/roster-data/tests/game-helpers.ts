@@ -15,7 +15,7 @@ export function log(...bodies: Body[]): GameEvent[] {
 }
 export const created: Body = { type: 'game-created', schema: 1, seed: 'seed-1', names: { p1: 'Аня', p2: 'Борис' } } as Body;
 
-/** Подготовка: Take and Hold против Purge the Foe, раскладка A, p1 — атакующий, p2 ходит первым. */
+/** Подготовка (порядок правил): Take and Hold против Purge the Foe, раскладка A, p1 — атакующий, p2 ходит первым. */
 export function setupBodies(): Body[] {
   const pair = ['purge-the-foe', 'take-and-hold'].join('|');
   const layout = bf.layouts.filter((l: { pair: string[] }) => l.pair.join('|') === pair).sort((a: { variant: number }, b: { variant: number }) => a.variant - b.variant)[0];
@@ -23,12 +23,13 @@ export function setupBodies(): Body[] {
     created,
     { type: 'player-set', target: 'p1', patch: { disposition: 'take-and-hold', roster: { source: 'own', rosterId: 'r1', name: 'Мои ультрамарины', factionId: 'SM', points: 2000 } } },
     { type: 'player-set', target: 'p2', patch: { disposition: 'purge-the-foe' } },
+    { type: 'dispositions-revealed' },
+    { type: 'layout-set', layoutId: layout.id, source: 'manual' },
+    { type: 'roles-set', attacker: 'p1', source: 'manual' },
     { type: 'secondary-chosen', target: 'p1', mode: 'tactical', fixed: null },
     { type: 'secondary-chosen', target: 'p2', mode: 'fixed', fixed: ['assassination', 'bring-it-down'] },
-    { type: 'choices-revealed' },
-    { type: 'layout-set', layoutId: layout.id, source: 'random' },
-    { type: 'roles-set', attacker: 'p1', source: 'random' },
-    { type: 'first-turn-set', first: 'p2', source: 'random' },
+    { type: 'secondaries-revealed' },
+    { type: 'first-turn-set', first: 'p2', source: 'manual' },
     { type: 'battle-started' },
   ] as Body[];
 }

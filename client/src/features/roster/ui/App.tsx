@@ -10,6 +10,7 @@ import { AosEditor } from './aos/AosEditor';
 import { Segmented } from './kit';
 import { RosterEditor } from './RosterEditor';
 import { Battlefield } from './Battlefield';
+import { GameScreen } from './game/GameScreen';
 import { Rules } from './Rules';
 
 type Route =
@@ -17,7 +18,8 @@ type Route =
   | { screen: 'editor'; id: string }
   | { screen: 'aos-editor'; id: string }
   | { screen: 'rules'; back: Route; factionId?: string; detachmentIds?: string[] }
-  | { screen: 'battlefield'; back: Route; disposition?: string | null };
+  | { screen: 'battlefield'; back: Route; disposition?: string | null }
+  | { screen: 'game'; back: Route; rosterId?: string };
 
 type GameSystem = '40k' | 'aos';
 const SYSTEM_KEY = 'warphub.roster.system';
@@ -231,6 +233,9 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   if (route.screen === 'battlefield') {
     return <Battlefield onBack={goBack} initialDisposition={route.disposition} />;
   }
+  if (route.screen === 'game') {
+    return <GameScreen onBack={goBack} rosters={rosters} index={index} initialRosterId={route.rosterId} />;
+  }
 
   if (route.screen === 'editor') {
     const roster = rosters.find((r) => r.id === route.id);
@@ -242,7 +247,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
           index={index}
           onBack={goList}
           onRules={() => setRoute({ screen: 'rules', back: route, factionId: roster.factionId, detachmentIds: roster.detachmentIds })}
-          onBattlefield={() => setRoute({ screen: 'battlefield', back: route, disposition: roster.forceDisposition })}
+          onStartGame={() => setRoute({ screen: 'game', back: route, rosterId: roster.id })}
           onChange={(r) => update((list) => list.map((x) => (x.id === r.id ? r : x)))}
           onDuplicate={(r) => {
             update((list) => [r, ...list]);
@@ -263,7 +268,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
       onExit={onExit}
       switcher={switcher}
       onRules={() => setRoute({ screen: 'rules', back: route })}
-      onBattlefield={() => setRoute({ screen: 'battlefield', back: route })}
+      onStartGame={() => setRoute({ screen: 'game', back: route })}
       index={index}
       rosters={rosters}
       onOpen={(id) => setRoute({ screen: 'editor', id })}

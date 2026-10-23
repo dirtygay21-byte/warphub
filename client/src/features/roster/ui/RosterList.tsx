@@ -14,7 +14,7 @@ export function RosterList({
   onExit,
   switcher,
   onRules,
-  onBattlefield,
+  onStartGame,
   index,
   rosters,
   onOpen,
@@ -25,7 +25,7 @@ export function RosterList({
   onExit: () => void;
   switcher?: ReactNode;
   onRules: () => void;
-  onBattlefield: () => void;
+  onStartGame: () => void;
   index: DataIndex;
   rosters: Roster[];
   onOpen: (id: string) => void;
@@ -53,7 +53,7 @@ export function RosterList({
 
       <div className="mb-5 grid grid-cols-2 gap-2">
         <ToolTile icon="book" title="Правила" sub="Стратагемы · Core Rules" onClick={onRules} />
-        <ToolTile icon="map" title="Поле боя" sub="Деплой · террейн" onClick={onBattlefield} />
+        <ToolTile icon="map" title="Начать игру" sub="Миссии · раскладки · трекер" onClick={onStartGame} />
       </div>
 
       {rosters.length === 0 ? (

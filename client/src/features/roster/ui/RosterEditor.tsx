@@ -31,7 +31,7 @@ export function RosterEditor({
   index,
   onBack,
   onRules,
-  onBattlefield,
+  onStartGame,
   onChange,
   onDuplicate,
   onDelete,
@@ -40,7 +40,7 @@ export function RosterEditor({
   index: DataIndex;
   onBack: () => void;
   onRules: () => void;
-  onBattlefield: () => void;
+  onStartGame: () => void;
   onChange: (r: Roster) => void;
   onDuplicate: (r: Roster) => void;
   onDelete: () => void;
@@ -91,7 +91,7 @@ export function RosterEditor({
       </div>
     );
   }
-  return <Editor roster={roster} L={L} cr={cr} index={index} onBack={onBack} onRules={onRules} onBattlefield={onBattlefield} onChange={onChange} onDuplicate={onDuplicate} onDelete={onDelete} />;
+  return <Editor roster={roster} L={L} cr={cr} index={index} onBack={onBack} onRules={onRules} onStartGame={onStartGame} onChange={onChange} onDuplicate={onDuplicate} onDelete={onDelete} />;
 }
 
 function Editor({
@@ -101,7 +101,7 @@ function Editor({
   index,
   onBack,
   onRules,
-  onBattlefield,
+  onStartGame,
   onChange,
   onDuplicate,
   onDelete,
@@ -112,7 +112,7 @@ function Editor({
   index: DataIndex;
   onBack: () => void;
   onRules: () => void;
-  onBattlefield: () => void;
+  onStartGame: () => void;
   onChange: (r: Roster) => void;
   onDuplicate: (r: Roster) => void;
   onDelete: () => void;
@@ -486,8 +486,8 @@ function Editor({
           <Button className="w-full justify-start" onClick={() => (setMenu(false), onRules())}>
             <Icon name="book" /> Стратагемы армии и правила
           </Button>
-          <Button className="w-full justify-start" onClick={() => (setMenu(false), onBattlefield())}>
-            <Icon name="map" /> Поле боя: деплой и террейн
+          <Button className="w-full justify-start" onClick={() => (setMenu(false), onStartGame())}>
+            <Icon name="map" /> Начать игру с этим ростером
           </Button>
           <Button className="w-full justify-start" onClick={() => (setMenu(false), onDuplicate(duplicateRoster(roster)))}>
             <Icon name="copy" /> Дублировать ростер

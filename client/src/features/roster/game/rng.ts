@@ -69,6 +69,14 @@ export function rollOff(seed: string, key: string, attempt = 0): { rolls: { p1: 
   }
 }
 
+/**
+ * Случайная раскладка: индекс среди раскладок пары (в порядке A, B, C) по seed и номеру выбора.
+ * Отмена возвращает номер — повторный случайный выбор даёт ту же раскладку.
+ */
+export function layoutPick(seed: string, attempt: number, count: number): number {
+  return pickIndex(makeRng(seed, 'layout', attempt), count);
+}
+
 /** Новый seed игры: 128 бит из криптографического генератора (браузер, Telegram WebView, Bun, Node). */
 export function newSeed(): string {
   const bytes = new Uint8Array(16);
