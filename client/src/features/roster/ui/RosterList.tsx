@@ -6,7 +6,7 @@ import { cloudEnabled } from '../storage';
 import { confirmAsk, haptic } from '../telegram';
 import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag } from './kit';
 import { cx, fmtPts } from './util';
-import { indexCredit } from '../engine/source';
+import { indexCredit, indexCreditDetails } from '../engine/source';
 
 const ALLEGIANCE_RU: Record<string, string> = { Imperium: 'Империум', Chaos: 'Хаос', Xenos: 'Ксеносы' };
 
@@ -36,6 +36,7 @@ export function RosterList({
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
   const [menu, setMenu] = useState<Roster | null>(null);
+  const [sources, setSources] = useState(false);
   const factionName = useMemo(() => Object.fromEntries(index.factions.map((f) => [f.id, f.name])), [index]);
 
   return (
@@ -66,15 +67,23 @@ export function RosterList({
       )}
 
       <p className="mt-8 text-center text-xs leading-relaxed text-white/35">
-        {indexCredit(index).map((line, i) => (
-          <span key={i}>
-            {i === 0 ? 'Данные: ' : ''}
-            {line}
-            <br />
-          </span>
-        ))}
+        <button type="button" onClick={() => setSources(true)} className="underline decoration-white/20 underline-offset-2 active:text-white/60">
+          {indexCredit(index)}
+        </button>
+        <br />
         {cloudEnabled() ? 'Ростеры синхронизируются через Telegram' : 'Ростеры хранятся в этом браузере'}
       </p>
+
+      <Sheet open={sources} onClose={() => setSources(false)} title="Версия данных">
+        <ul className="space-y-3 text-sm">
+          {indexCreditDetails(index).map((x) => (
+            <li key={x.title}>
+              <p className="font-semibold">{x.title}</p>
+              <p className="text-xs leading-relaxed text-white/55">{x.text}</p>
+            </li>
+          ))}
+        </ul>
+      </Sheet>
 
       <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
         <div className="mx-auto max-w-lg lg:flex lg:max-w-4xl lg:justify-end lg:px-4">

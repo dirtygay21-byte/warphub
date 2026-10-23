@@ -396,7 +396,7 @@ function Editor({
           ))
         )}
 
-        <p className="pt-2 text-center text-xs text-white/30">Данные: {factionCredit(L.faction, index)}</p>
+        <p className="pt-2 text-center text-xs text-white/30">{factionCredit(L.faction, index)}</p>
       </div>
 
       {/* ---- нижняя панель ---- */}
@@ -479,7 +479,7 @@ function Editor({
         )}
       </Sheet>
 
-      <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} L={L} cr={cr} dataVersion={index.lastUpdate} />
+      <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} L={L} cr={cr} dataVersion={index.lastUpdate} credit={factionCredit(L.faction, index, 'en')} />
 
       <Sheet open={menu} onClose={() => setMenu(false)} title="Ростер">
         <div className="space-y-2 pb-2">

@@ -196,13 +196,13 @@ TB('улучшения: явные ограничения снимка; обыч
   assert.ok(sm.enhancements.some((e) => e.name === 'Fervent Exemplars' && e.upgrade && !e.outdated));
 });
 
-TB('подпись источника: Space Marines и Imperial Agents — wh-rules.ru · версия 981 · 14.10.2026; остальные без изменений', () => {
+TB('подпись источника: Space Marines и Imperial Agents — wh-rules.ru 981 (MFM 1.6, 14.10.2026); остальные — выгрузка Wahapedia', () => {
   assert.equal(sourceLabel(sm.source!), 'wh-rules.ru · версия 981 · 14.10.2026');
-  assert.equal(factionCredit(aoi, { lastUpdate: '2026-09-28 02:38' }), 'wh-rules.ru · версия 981 · 14.10.2026');
+  const idx = { lastUpdate: '2026-09-28 02:38', factions: [{ id: 'SM', name: 'Space Marines', allegiance: '', units: 0, detachments: 0 }, { id: 'AoI', name: 'Imperial Agents', allegiance: '', units: 0, detachments: 0 }], updates: [R.scope.indexUpdate] };
+  assert.equal(factionCredit(aoi, idx), 'Очки и правила: MFM 1.6 · wh-rules.ru 981 · 14.10.2026');
   const other = JSON.parse(fs.readFileSync(path.join(DATA, 'f', 'NEC.json'), 'utf8')) as FactionData;
-  assert.equal(factionCredit(other, { lastUpdate: '2026-09-28 02:38' }), 'powered by Wahapedia · 2026-09-28');
-  const lines = indexCredit({ lastUpdate: '2026-09-28 02:38', factions: [{ id: 'SM', name: 'Space Marines', allegiance: '', units: 0, detachments: 0 }, { id: 'AoI', name: 'Imperial Agents', allegiance: '', units: 0, detachments: 0 }], updates: [R.scope.indexUpdate] });
-  assert.deepEqual(lines, ['powered by Wahapedia · обновлено 2026-09-28', 'Space Marines, Imperial Agents: wh-rules.ru · версия 981 · 14.10.2026']);
+  assert.equal(factionCredit(other, idx), 'powered by Wahapedia · 28.09.2026');
+  assert.equal(indexCredit(idx), 'Очки: MFM 1.6 · wh-rules.ru 981 · 14.10.2026');
 });
 
 TB('границы обновления: меняются только SM, AoI и копии Imperial Agents в AC, AM, AS, AdM, GK, QI, TL', () => {

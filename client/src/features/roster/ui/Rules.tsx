@@ -244,7 +244,7 @@ export function Rules({
                   </ul>
                 </section>
               ))}
-              <p className="text-center text-[11px] text-white/35">Данные: {factionCredit(faction, index)}</p>
+              <p className="text-center text-[11px] text-white/35">{factionCredit(faction, index)}</p>
             </div>
           )}
         </div>
