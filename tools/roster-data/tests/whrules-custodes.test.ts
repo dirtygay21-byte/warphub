@@ -68,3 +68,25 @@ test('convertFaction (Custodes, сухой прогон в памяти): id с�
   // конвертер не меняет переданные данные
   assert.deepEqual(army, JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data', 'f', 'AC.json'), 'utf8')));
 });
+
+// ---------- P1-T4c: сухой прогон Custodes ----------
+// @ts-expect-error — .mjs без типов
+import { dryRunFaction, mdToText, plainHyphens } from '../scripts/whrules-convert.mjs';
+
+test('разметка правила армии Custodes («◈# …», «◈ WHEN | …») и неразрывный дефис сайта', () => {
+  assert.equal(mdToText('◈# Conversai\n◈ WHEN | Your Command phase.\n◈ TARGET | One friendly **readied** unit.'), 'Conversai\nWHEN: Your Command phase.\nTARGET: One friendly readied unit.');
+  assert.deepEqual(plainHyphens({ name: 'Shield‑Captain', kw: ['GRAV‑ASSAULT'] }), { name: 'Shield-Captain', kw: ['GRAV-ASSAULT'] });
+});
+
+test('сухой прогон Custodes: все проверки пройдены, улучшения разобраны, размеры отряда со сменой — в отчёте', () => {
+  const r = dryRunFaction({ slug: 'adeptus-custodes', armyId: 'AC', fullFile: FULL_FILE });
+  assert.deepEqual(r.checks.filter((c: { ok: boolean }) => !c.ok), []);
+  assert.equal(r.summary.datasheets.after, 36);
+  assert.deepEqual(r.enhancementEligibility.unmatched, []);
+  assert.equal(r.summary.optionsUnparsed, 0);
+  assert.equal(r.summary.unresolved, 0);
+  assert.equal(r.savedRosters.sizeChanges.length, 8);
+  assert.ok(r.unavailable.every((x: { field: string }) => x.field === 'damaged.text' || x.field.startsWith('costs.wargear.')));
+  // ничего с неразрывным дефисом в сконвертированных данных
+  assert.ok(!JSON.stringify(r._file.datasheets.filter((d: { group: string }) => d.group === 'own')).includes('‑'));
+});

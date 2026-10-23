@@ -19,7 +19,8 @@ import { parseDetachmentRules, parseLoadout } from './import-wahapedia.mjs';
 import { loadSnapshot } from './updates-40k.mjs';
 import { baseline40k } from './baseline-40k.mjs';
 import { buildOptionRemap } from '../../../client/src/features/roster/engine/options-remap.ts';
-import { FULL_FACTIONS, loadFull, loadRenames, mapSpaceMarines, newId, planSpaceMarines, slugify } from './whrules-map.mjs';
+import { optionsOf } from '../../../client/src/features/roster/engine/wargear.ts';
+import { FULL_FACTIONS, loadFull, loadRenames, mapFaction, mapSpaceMarines, newId, planFaction, planSpaceMarines, slugify } from './whrules-map.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DATA = path.join(HERE, '..', '..', '..', 'backend', 'roster-data');
@@ -43,13 +44,17 @@ export function mdToText(s) {
     .replace(/\*\*([^*]*)\*\*/g, '$1')
     .replace(/__([^_]*)__/g, '$1')
     .replace(/^#{1,6}\s+/gm, '')
+    // блоки способностей правила армии (Custodes, Martial Ka’tah): «◈# Название», «◈ WHEN | текст»
+    .replace(/^◈#\s*/gm, '')
+    .replace(/^◈\s*([A-Z][A-Z ]*?)\s*\|\s*/gm, '$1: ')
+    .replace(/^◈\s*/gm, '')
     .replace(/▪/g, '•')
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
 // «**» без пары — сноска варианта снаряжения (как в текущих данных), не разметка
-const hasMd = (s) => /\[(gloss|core|rule|kw|ability):|\*\*[^*\n]+\*\*|^#{1,6}\s|▪/m.test(s ?? '');
+const hasMd = (s) => /\[(gloss|core|rule|kw|ability):|\*\*[^*\n]+\*\*|^#{1,6}\s|▪|◈/m.test(s ?? '');
 
 // ---------- цены ----------
 const ORD = (s) => +String(s).match(/\d+/)[0];
@@ -312,7 +317,9 @@ export function makeConverter({ full, olds, ourIdOf, armyFactions, factionOf, so
       abilities.push({ type: 'core', name: c.name, param: c.param, text: '', ...(ref ? { ref } : {}) });
       if (!ref && c.name !== 'Damaged') unavailable.push({ id, name: site.name, field: `abilities.core.${c.name}`, why: 'текста основного правила нет в снимке' });
     }
-    for (const n of splitList(site.faction)) {
+    for (const raw of splitList(site.faction)) {
+      // название правила армии на сайте бывает строчными («daughters of the abyss») — берётся название из правила
+      const n = ruleSet.byFaction[f]?.[raw] ? raw : (Object.keys(ruleSet.byFaction[f] ?? {}).find((k) => k.toLowerCase() === raw.toLowerCase()) ?? raw);
       const ref = ruleSet.byFaction[f]?.[n] ?? dict.get(n);
       abilities.push({ type: 'faction', name: n, param: '', text: '', ...(ref ? { ref } : {}) });
       if (!ruleSet.byFaction[f]?.[n]) {
@@ -641,9 +648,15 @@ export function convertSpaceMarines({ full, map, plan, current }) {
  * Возвращает { file, optionsNew, prov, legacy, unavailable, unresolved, legacyRules, vocab }: optionsNew — таблицы
  * перевода выборов снаряжения своих инфолистов (как их объединить с migrations файла — решается при применении).
  */
-export function convertFaction({ full, slug, army, map, plan }) {
+/** Неразрывный дефис сайта (U+2011, «Shield‑Captain») → обычный: названия, ключевые слова и ограничения улучшений
+ * должны совпадать с остальными данными («SHIELD-CAPTAIN model only»). Только для конвертации одной фракции:
+ * данные Space Marines (981) уже записаны с ним и не меняются. */
+export const plainHyphens = (x) => JSON.parse(JSON.stringify(x).replace(/\u2011/g, '-'));
+
+export function convertFaction({ full: fullIn, slug, army, map, plan }) {
+  if (!fullIn.factions[slug]) throw new Error(`convertFaction: в снимке нет ${slug}`);
+  const full = { ...fullIn, factions: { ...fullIn.factions, [slug]: plainHyphens(fullIn.factions[slug]) } };
   const site = full.factions[slug];
-  if (!site) throw new Error(`convertFaction: в снимке нет ${slug}`);
   const src = { site: full.source.site, dataVersion: full.source.dataVersion, mfm: full.source.mfm, date: full.source.date };
   const ourIdOf = new Map([...map.matched, ...map.renamed].map((x) => [`${slug}|${x.site.id}`, x.ours.id]));
   const ownOld = army.datasheets.filter((d) => d.group === 'own' && d.faction === army.id);
@@ -1023,9 +1036,118 @@ export function dryRun({ dir = DATA, files = null } = {}) {
   };
 }
 
+/**
+ * Сухой прогон полной конвертации одной фракции (P1-T4c): отчёт для утверждения, данные не меняются.
+ * snapshot — снимок очков /3 (сопоставление и переименования), fullFile — полный снимок фракции.
+ */
+export function dryRunFaction({ slug, armyId, snapshot = 'whrules-995.json', fullFile, dir = DATA, army = null }) {
+  const A = army ?? JSON.parse(fs.readFileSync(path.join(dir, 'f', `${armyId}.json`), 'utf8'));
+  const full = loadFull(fullFile, undefined, [slug]);
+  const map = mapFaction(loadSnapshot(snapshot), slug, A);
+  const plan = planFaction(map, full, A);
+  const r = convertFaction({ full, slug, army: A, map, plan });
+  const F = r.file;
+  const ownOf = (X) => X.datasheets.filter((d) => d.group === 'own' && d.faction === A.id);
+  const before = ownOf(A);
+  const after = ownOf(F);
+  const ds = diffDatasheets(before, after);
+  // сохранённые ростеры: подписи размеров, которых больше нет (выбранный размер сбросится — нужно предупреждение)
+  const sizes = [];
+  for (const n of after) {
+    const o = before.find((x) => x.id === n.id);
+    if (!o) continue;
+    const now = new Set(n.costs.flatMap((b) => b.options.map((x) => x.label)));
+    const gone = [...new Set(o.costs.flatMap((b) => b.options.map((x) => x.label)))].filter((l) => !now.has(l));
+    if (gone.length) sizes.push({ id: n.id, name: n.name, was: o.name, gone, now: [...now] });
+  }
+  // разбор вариантов снаряжения движком
+  const options = after.map((d) => {
+    const o = optionsOf(plain(d));
+    return { id: d.id, name: d.name, options: d.options.length, parsed: o.parsed.length, unparsed: o.unparsed.map((i) => d.options[i].text) };
+  });
+  const detName = (X) => (id) => X.detachments.find((d) => d.id === id)?.name ?? '';
+  const key = (X) => (x) => slugify(x.name) + '|' + slugify(detName(X)(x.detachment));
+  // проверки целостности (как у Space Marines)
+  const checks = [];
+  const C = (check, ok, details = []) => checks.push({ check, ok, details: details.slice(0, 40), count: details.length });
+  const ids = F.datasheets.map((d) => d.id);
+  C('id инфолистов уникальны', new Set(ids).size === ids.length, ids.filter((x, i) => ids.indexOf(x) !== i));
+  const all = new Set(ids);
+  C('связи Leader указывают на существующие инфолисты', F.datasheets.every((d) => d.leads.every((x) => all.has(x))), F.datasheets.flatMap((d) => d.leads.filter((x) => !all.has(x)).map((x) => `${d.name}→${x}`)));
+  const dets = new Set(F.detachments.map((d) => d.id));
+  C('id детачментов уникальны', dets.size === F.detachments.length);
+  C('улучшения и стратагемы ссылаются на существующие детачменты', [...F.enhancements, ...F.stratagems.filter((x) => x.detachment)].every((x) => dets.has(x.detachment)));
+  const eids = new Set(F.enhancements.map((e) => e.id));
+  const sids = new Set(F.stratagems.map((e) => e.id));
+  C('id улучшений и стратагем уникальны', eids.size === F.enhancements.length && sids.size === F.stratagems.length);
+  const dangling = after.flatMap((d) => [...d.stratagems.filter((x) => !sids.has(x)), ...d.enhancements.filter((x) => !eids.has(x))].map((x) => `${d.name}: ${x}`));
+  C('списки стратагем и улучшений своих инфолистов ссылаются на существующие', !dangling.length, dangling);
+  C('ссылки способностей на правила существуют', F.datasheets.every((d) => d.abilities.every((a) => !a.ref || F.rules[a.ref])), F.datasheets.flatMap((d) => d.abilities.filter((a) => a.ref && !F.rules[a.ref]).map((a) => `${d.name}: ${a.name}`)));
+  C('правила армии есть в словаре', F.armyRules.every((x) => F.rules[x]));
+  const md = [];
+  for (const d of after) for (const t of [d.loadout, d.transport, ...d.composition, ...d.options.map((o) => o.text), ...d.abilities.map((a) => a.text)]) if (hasMd(t)) md.push(d.name);
+  for (const x of [...F.stratagems, ...F.enhancements, ...F.detachments.flatMap((d) => d.abilities), ...Object.values(F.rules)]) if (hasMd(x?.text)) md.push(x.name);
+  C('в текстах не осталось разметки wh-rules', !md.length, [...new Set(md)]);
+  C('у каждого своего инфолиста есть цена', after.every((d) => d.costs.length), after.filter((d) => !d.costs.length).map((d) => d.name));
+  C('у каждого детачмента есть Force Disposition', F.detachments.every((d) => d.forceDispositions?.length || d.forceDisposition), F.detachments.filter((d) => !d.forceDispositions?.length && !d.forceDisposition).map((d) => d.name));
+  C('все прежние id своих инфолистов сохранены', before.every((d) => all.has(d.id)), before.filter((d) => !all.has(d.id)).map((d) => d.name));
+  const notOwn = (X) => norm(X.datasheets.filter((d) => !(d.group === 'own' && d.faction === A.id)));
+  C('союзники и копии по детачментам не изменены', notOwn(F) === notOwn(A));
+  const enhElig = enhancementEligibility(F, r.vocab);
+  const badEnh = [];
+  const E = new Map(F.enhancements.filter((e) => !e.outdated).map((e) => [e.id, e]));
+  for (const d of after) for (const x of d.enhancements) { const e = E.get(x); if (e && (e.upgrade ? d.character : !d.character)) badEnh.push(`${d.name}: ${e.name}`); }
+  C('улучшения: обычные — только персонажам, Upgrade — только не персонажам', !badEnh.length, badEnh);
+  return {
+    faction: slug,
+    army: A.id,
+    source: F.source,
+    snapshots: { full: { file: fullFile, fingerprint: full.fingerprint }, points: snapshot },
+    summary: {
+      datasheets: { before: before.length, after: after.length, kept: map.matched.length, renamed: map.renamed.length, added: ds.added.length, outdated: plan.outdated.length, changed: ds.changed.length, unchanged: ds.unchanged },
+      fieldsChanged: ds.byField,
+      detachments: { current: F.detachments.filter((d) => !d.outdated).length, outdated: F.detachments.filter((d) => d.outdated).length },
+      enhancements: { current: F.enhancements.filter((e) => !e.outdated).length, outdated: F.enhancements.filter((e) => e.outdated).length },
+      stratagems: { current: F.stratagems.filter((x) => x.detachment && !x.outdated).length, outdated: F.stratagems.filter((x) => x.outdated).length, core: F.stratagems.filter((x) => !x.detachment).length },
+      armyRules: { before: A.armyRules.map((id) => A.rules[id]?.name ?? id), after: F.armyRules.map((id) => F.rules[id].name) },
+      sizeChanges: sizes.length,
+      optionsUnparsed: options.reduce((n, o) => n + o.unparsed.length, 0),
+      optionsTotal: options.reduce((n, o) => n + o.options, 0),
+      legacy: r.legacy.length,
+      unavailable: r.unavailable.length,
+      unresolved: r.unresolved.length,
+      checksFailed: checks.filter((c) => !c.ok).length,
+    },
+    ids: { renamed: map.renamed.map((x) => ({ id: x.ours.id, from: x.ours.name, to: x.site.name })), added: map.new.map((x) => ({ id: x.proposedId, name: x.site.name })), outdated: plan.outdated },
+    datasheets: ds,
+    savedRosters: { sizeChanges: sizes, optionsMigrations: Object.keys(r.optionsNew).length, outdatedDetachments: F.detachments.filter((d) => d.outdated).map((d) => d.name), outdatedEnhancements: F.enhancements.filter((e) => e.outdated).map((e) => `${e.name} (${detName(F)(e.detachment)})`) },
+    detachments: diffNamed(A.detachments.filter((d) => d.faction === A.id), F.detachments.filter((d) => !d.outdated)),
+    enhancements: diffNamed(A.enhancements, F.enhancements.filter((e) => !e.outdated), key(F)),
+    stratagems: diffNamed(A.stratagems.filter((x) => x.detachment), F.stratagems.filter((x) => x.detachment && !x.outdated), key(F)),
+    options,
+    enhancementEligibility: enhElig,
+    legacy: r.legacy,
+    unavailable: r.unavailable,
+    unresolved: r.unresolved,
+    checks,
+    _file: F,
+    _optionsNew: r.optionsNew,
+  };
+}
+
 function main() {
   const args = process.argv.slice(2);
   const at = args.indexOf('--out');
+  const fi = args.indexOf('--faction');
+  if (fi >= 0) {
+    // bun scripts/whrules-convert.mjs --faction adeptus-custodes --army AC --full whrules-995-full-adeptus-custodes.json --out <файл>
+    const r = dryRunFaction({ slug: args[fi + 1], armyId: args[args.indexOf('--army') + 1], fullFile: args[args.indexOf('--full') + 1] });
+    const { _file, _optionsNew, ...report } = r;
+    if (at >= 0) fs.writeFileSync(args[at + 1], JSON.stringify(report, null, 1) + '\n');
+    console.log(JSON.stringify(report.summary, null, 1));
+    for (const c of report.checks) console.log(`${c.ok ? 'OK  ' : 'FAIL'} ${c.check}${c.ok ? '' : ' — ' + c.details.slice(0, 5).join('; ')}`);
+    return;
+  }
   // данные в backend/roster-data уже обновлены — сухой прогон считается от данных до обновления (история git)
   const base = baseline40k();
   const r = base ? dryRun({ files: base.files }) : dryRun();
