@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { loadBattlefield, loadMissions, type BattlefieldData, type BfDeployment, type BfLayout, type MissionsData, type Pt } from '../data';
-import { CapsNote, MissionCardView, SecondaryList } from './MissionCard';
+import { loadBattlefield, type BattlefieldData, type BfDeployment, type BfLayout, type Pt } from '../data';
 import { openExternal, pushOverlay } from '../telegram';
-import { Icon, IconButton } from './kit';
+import { IconButton } from './kit';
 import { cx } from './util';
 
 const LETTERS = ['A', 'B', 'C'];
-const MISSIONS_URL = 'https://wahapedia.ru/wh40k11ed/the-rules/mission-deck-2026-27/';
 
 // Цвета карты. Поле в дюймах: 60″ × 44″, на экране повёрнуто «портретом» (44 в ширину, 60 в высоту).
 const C = {
@@ -220,20 +218,6 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
   const [you, setYou] = useState<string | null>(null);
   const [foe, setFoe] = useState<string | null>(null);
   const [variant, setVariant] = useState(1);
-  const [zoom, setZoom] = useState(false);
-  const [showGuides, setShowGuides] = useState(true);
-  const [selected, setSelected] = useState<number | null>(null);
-  // карты миссий грузятся отдельно; без них остаются названия миссий и ссылка на правила
-  const [missions, setMissions] = useState<MissionsData | null>(null);
-  const [side, setSide] = useState<'you' | 'foe'>('you');
-  const [showSecondary, setShowSecondary] = useState(false);
-
-  useEffect(() => {
-    loadMissions().then(setMissions, () => setMissions(null));
-  }, []);
-
-  // открытая крупная карта закрывается кнопкой «Назад» Telegram
-  useEffect(() => (zoom ? pushOverlay(() => (setZoom(false), setSelected(null))) : undefined), [zoom]);
 
   useEffect(() => {
     loadBattlefield().then((d) => {
@@ -267,15 +251,7 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
   }
 
   const layout = pairLayouts.find((l) => l.variant === variant) ?? pairLayouts[0];
-  const pick = (v: number) => (setVariant(v), setSelected(null));
   const dep = layout ? data.deployments.find((d) => d.id === layout.deployment) : undefined;
-  const mission = (a: string, b: string) => {
-    const m = data.matchups.find((x) => x.you === a && x.foe === b);
-    return m ? data.missions[m.mission] ?? m.mission : '—';
-  };
-  const dName = (id: string) => data.dispositions.find((d) => d.id === id)!;
-  const primaryId = (side === 'you' ? data.matchups.find((x) => x.you === you && x.foe === foe) : data.matchups.find((x) => x.you === foe && x.foe === you))?.mission;
-  const primary = missions?.cards.find((c) => c.id === primaryId);
 
   return (
     <Shell onBack={onBack}>
@@ -304,56 +280,6 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
         </div>
       </section>
 
-      <section className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-sm">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Основная миссия</p>
-        <div className="mt-1.5 grid grid-cols-2 gap-2">
-          {(['you', 'foe'] as const).map((s) => {
-            const [a, b] = s === 'you' ? ([you, foe] as const) : ([foe, you] as const);
-            const active = missions != null && side === s;
-            return (
-              <button
-                key={s}
-                type="button"
-                disabled={!missions}
-                onClick={() => setSide(s)}
-                className={cx('min-w-0 rounded-xl border px-2.5 py-2 text-left transition', active ? 'border-accent bg-accent/15' : 'border-transparent', missions && !active && 'active:bg-white/10')}
-              >
-                <span className="block text-[11px] text-white/45">
-                  {s === 'you' ? 'Вы' : 'Противник'} · {dName(a).nameRu}
-                </span>
-                <span className={cx('block font-semibold', s === 'you' ? 'text-accent' : 'text-white/85')}>{mission(a, b)}</span>
-              </button>
-            );
-          })}
-        </div>
-        {missions && primary && <MissionCardView card={primary} foeName={dName(side === 'you' ? foe : you).nameRu} className="mt-2.5" />}
-        {missions && <CapsNote caps={missions.caps} />}
-        <button type="button" onClick={() => openExternal(MISSIONS_URL)} className="mt-2 text-xs font-semibold text-accent/90 underline-offset-2 active:underline">
-          Карты миссий на Wahapedia →
-        </button>
-      </section>
-
-      {missions && (
-        <section className="mt-3">
-          <button
-            type="button"
-            onClick={() => setShowSecondary((v) => !v)}
-            className="flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10"
-          >
-            <span className="min-w-0 flex-1">
-              <span className="block text-[11px] font-semibold uppercase tracking-wider text-white/40">Вторичные миссии</span>
-              <span className="block text-sm font-semibold">{missions.cards.filter((c) => c.type === 'secondary').length} карт · одинаковы для атакующего и защитника</span>
-            </span>
-            <Icon name="down" className={cx('size-5 text-white/50 transition', showSecondary && 'rotate-180')} />
-          </button>
-          {showSecondary && (
-            <div className="mt-2">
-              <SecondaryList cards={missions.cards.filter((c) => c.type === 'secondary')} />
-            </div>
-          )}
-        </section>
-      )}
-
       {/* раскладки A / B / C */}
       <div className="mt-4 grid grid-cols-3 gap-1.5">
         {pairLayouts.map((l, i) => {
@@ -362,7 +288,7 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
             <button
               key={l.id}
               type="button"
-              onClick={() => pick(l.variant)}
+              onClick={() => setVariant(l.variant)}
               className={cx(
                 'min-w-0 rounded-xl border px-2.5 py-2 text-left transition',
                 layout?.id === l.id ? 'border-accent bg-accent/15' : 'border-white/10 bg-white/[0.03] active:bg-white/10',
@@ -376,48 +302,48 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
         })}
       </div>
 
-      {layout && dep && (
-        <>
-          <div className="mt-3 flex items-center justify-between gap-2">
-            <div className="min-w-0">
-              <p className="font-display text-lg font-semibold uppercase leading-none">{dep.nameRu}</p>
-              <p className="mt-0.5 text-xs text-white/45">{dep.name}</p>
-            </div>
-            <GuidesToggle on={showGuides} onChange={setShowGuides} />
-          </div>
-          <button type="button" onClick={() => setZoom(true)} className="mt-2 block w-full rounded-2xl border border-white/10 bg-black/30 p-2" aria-label="Открыть карту крупно">
-            <BattleMap layout={layout} dep={dep} guides={showGuides ? 'all' : 'none'} className="mx-auto block w-full max-w-[420px]" />
-          </button>
-          <p className="mt-1.5 text-center text-[11px] leading-relaxed text-white/40">
-            Нажмите на карту, чтобы увеличить. На большой карте нажмите на элемент — останутся только его размеры.
-            <br />
-            Размеры — от края стола до отмеченной точки элемента · сетка 6″ · стол 44″ × 60″
-          </p>
-          <Legend />
-        </>
-      )}
+      {layout && dep && <MapPanel key={layout.id} layout={layout} dep={dep} letter={LETTERS[pairLayouts.indexOf(layout)] ?? ''} className="mt-3" />}
 
-      <p className="mt-6 text-center text-[11px] leading-relaxed text-white/35">
-        Раскладки Chapter Approved 2026–27 (Games Workshop), перерисованы по размерам.
+      <MapCredit data={data} />
+    </Shell>
+  );
+}
+
+/**
+ * Карта раскладки со всеми инструментами — одна на «Поле боя» и «Начать игру»: заголовок деплоя, переключатель размеров,
+ * карта (нажатие — крупно), подсказка, легенда; крупная карта на весь экран с выбором элемента и его размерами.
+ * «Назад» Telegram закрывает крупную карту. Состояние сбрасывается сменой key (новая раскладка).
+ */
+export function MapPanel({ layout, dep, letter, className }: { layout: BfLayout; dep: BfDeployment; letter: string; className?: string }) {
+  const [zoom, setZoom] = useState(false);
+  const [showGuides, setShowGuides] = useState(true);
+  const [selected, setSelected] = useState<number | null>(null);
+  useEffect(() => (zoom ? pushOverlay(() => (setZoom(false), setSelected(null))) : undefined), [zoom]);
+
+  return (
+    <div className={className}>
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <p className="font-display text-lg font-semibold uppercase leading-none">{dep.nameRu}</p>
+          <p className="mt-0.5 text-xs text-white/45">{dep.name}</p>
+        </div>
+        <GuidesToggle on={showGuides} onChange={setShowGuides} />
+      </div>
+      <button type="button" onClick={() => setZoom(true)} className="mt-2 block w-full rounded-2xl border border-white/10 bg-black/30 p-2" aria-label="Открыть карту крупно">
+        <BattleMap layout={layout} dep={dep} guides={showGuides ? 'all' : 'none'} className="mx-auto block w-full max-w-[420px]" />
+      </button>
+      <p className="mt-1.5 text-center text-[11px] leading-relaxed text-white/40">
+        Нажмите на карту, чтобы увеличить. На большой карте нажмите на элемент — останутся только его размеры.
         <br />
-        Геометрия: Battlemaster ·{' '}
-        <button type="button" className="font-semibold text-white/55 underline" onClick={() => openExternal(data.source.url)}>
-          {data.source.credit}
-        </button>{' '}
-        v{data.source.version} (CC BY 4.0)
-        {missions && (
-          <>
-            <br />
-            Карты миссий: пересказ WarpHub на русском, структура и пары — {missions.source.name} v{missions.source.version}; сверено с картами GDM и wh-rules.ru.
-          </>
-        )}
+        Размеры — от края стола до отмеченной точки элемента · сетка 6″ · стол 44″ × 60″
       </p>
+      <Legend />
 
-      {zoom && layout && dep && (
+      {zoom && (
         <div className="fade-enter fixed inset-0 z-50 flex flex-col bg-black">
           <div className="flex items-center gap-2 px-4 pb-2 pt-3">
             <p className="font-display min-w-0 flex-1 truncate text-lg font-semibold uppercase">
-              Раскладка {LETTERS[layout.variant - 1]} · {dep.nameRu}
+              Раскладка {letter} · {dep.nameRu}
             </p>
             <GuidesToggle on={showGuides} onChange={(v) => (setShowGuides(v), setSelected(null))} />
             <IconButton icon="close" label="Закрыть" onClick={() => (setZoom(false), setSelected(null))} className="size-9" />
@@ -435,7 +361,22 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
           {selected != null && <PieceInfo layout={layout} index={selected} onClose={() => setSelected(null)} />}
         </div>
       )}
-    </Shell>
+    </div>
+  );
+}
+
+/** Источник геометрии раскладок — под картой на обоих экранах. */
+export function MapCredit({ data }: { data: BattlefieldData }) {
+  return (
+    <p className="mt-6 text-center text-[11px] leading-relaxed text-white/35">
+      Раскладки Chapter Approved 2026–27 (Games Workshop), перерисованы по размерам.
+      <br />
+      Геометрия: Battlemaster ·{' '}
+      <button type="button" className="font-semibold text-white/55 underline" onClick={() => openExternal(data.source.url)}>
+        {data.source.credit}
+      </button>{' '}
+      v{data.source.version} (CC BY 4.0)
+    </p>
   );
 }
 

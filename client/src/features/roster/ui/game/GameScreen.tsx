@@ -27,7 +27,7 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
     const r = initialRosterId ? rosters.find((x) => x.id === initialRosterId) : undefined;
     game.newGame({}, r ? [{ type: 'player-set', target: 'p1', patch: { roster: rosterRef(r, 'own') } }] : []);
   };
-  // просмотр раскладок и карт миссий открывается поверх игры: игра не теряется, «Назад» Telegram закрывает просмотр
+  // просмотр поля боя открывается поверх игры: игра не теряется, «Назад» Telegram закрывает просмотр
   const [viewing, setViewing] = useState(false);
   useEffect(() => (viewing ? pushOverlay(() => setViewing(false)) : undefined), [viewing]);
   if (viewing) return <Battlefield onBack={() => setViewing(false)} />;
@@ -81,8 +81,8 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
       >
         <Icon name="map" className="size-5 text-accent" />
         <span className="min-w-0 flex-1">
-          <span className="block text-sm font-semibold">Раскладки и карты миссий</span>
-          <span className="block text-[11px] text-white/45">Просмотр без игры: деплой, террейн, основные и вторичные миссии</span>
+          <span className="block text-sm font-semibold">Поле боя</span>
+          <span className="block text-[11px] text-white/45">Просмотр без игры: зоны деплоя и раскладки террейна</span>
         </span>
         <Icon name="chevron" className="size-4 text-white/40" />
       </button>
