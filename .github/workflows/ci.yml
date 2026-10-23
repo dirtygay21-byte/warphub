@@ -85,6 +85,8 @@ jobs:
         run: bunx drizzle-kit push --force
       - name: Migration 0014 applies on top (idempotent)
         run: psql "$POSTGRES_URI" -v ON_ERROR_STOP=1 -f backend/drizzle/0014_admin_users.sql
+      - name: Tables in the test database
+        run: echo "::notice::tables: $(psql "$POSTGRES_URI" -Atc "select string_agg(table_name, ' ' order by table_name) from information_schema.tables where table_schema='public'")"
       - name: Start the API
         working-directory: backend
         run: |
