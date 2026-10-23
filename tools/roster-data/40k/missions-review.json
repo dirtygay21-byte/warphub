@@ -1,0 +1,838 @@
+{
+ "schema": "missions-review/1",
+ "date": "2026-10-23",
+ "task": "P2-T1",
+ "sources": {
+  "structure": "40kdc-data 1.4.5 (commit 709ecd9, 2026-09-22): data/core/mission-cards.json, missions.json, mission-matchups.json",
+  "cards": "game-datamissions.com card images (front and back; attacker and defender secondaries)",
+  "rules": "wahapedia.ru/wh40k11ed/the-rules/mission-deck-2026-27 (wording conflicts and caps)",
+  "whrules": "wh-rules.ru (site data 2026-10-23): assets/missions-*.js (structured cards, en+ru) and useTracker-*.js (caps constants)"
+ },
+ "caps": {
+  "primaryRound": 15,
+  "primaryGame": 45,
+  "secondaryRound": 15,
+  "secondaryGame": 45,
+  "fixedSecondaryCard": 20,
+  "battleReady": 10,
+  "endOfBattleOutsideRoundCap": true,
+  "checked": "40kdc: 15/45 for primary and secondary on all 25 missions. Mission deck rules (wahapedia.ru): primary 45 / up to 15 per round; secondary 45 / up to 15 per round; max 20 VP per Fixed secondary card; VP scored at the end of the battle are not subject to the 15 VP per round limit. wh-rules.ru tracker constants: PRIMARY_ROUND_CAP 15, PRIMARY_GAME_CAP 45, SECONDARY_GAME_CAP 45, FIXED_SECONDARY_CAP 20, BATTLE_READY_VP 10, TACTICAL_SECONDARY_CAP 5; end-of-battle primary VP counted outside the round cap.",
+  "notes": [
+   "wh-rules.ru tracker has no 15 VP per round secondary limit; the mission deck rules and 40kdc have it — kept.",
+   "wh-rules.ru caps a Tactical secondary at 5 VP per scoring; not stated in the rules, and every Tactical card in our data already pays at most 5 VP per scoring (flat values or MAX 5)."
+  ]
+ },
+ "secondarySides": "all 18 secondaries: attacker and defender card bodies identical on GDM (pixel comparison below the header)",
+ "summary": {
+  "cards": 43,
+  "primary": 25,
+  "secondary": 18,
+  "matchupsMatch": 25,
+  "pointsMatch": 42,
+  "conflicts": 7,
+  "whrulesMatch": "43/43 (2 equivalent forms)"
+ },
+ "conflicts": [
+  {
+   "card": "assassination",
+   "kind": "missing-award",
+   "vpDiff": [
+    {
+     "vp": 5,
+     "delta": 1
+    }
+   ],
+   "kdc": "tactical «all enemy CHARACTER models destroyed during the battle» (5 VP) only in its text, not in awards",
+   "card_text": "present on the card (GDM) and in the mission deck rules (wahapedia.ru)",
+   "decision": "follow the card"
+  },
+  {
+   "card": "forward-position",
+   "kind": "wording",
+   "kdc": "opponent home and/or AN expansion objective (count_min 1)",
+   "card_text": "opponent home and/or EACH expansion objective (GDM and mission deck rules)",
+   "decision": "follow the card"
+  },
+  {
+   "card": "beacon",
+   "kind": "subtype",
+   "kdc": "subtype attacker",
+   "card_text": "GDM attacker and defender versions identical (pixel comparison of the card body)",
+   "decision": "shown for both sides"
+  },
+  {
+   "card": "delaying-action",
+   "kind": "wording",
+   "kdc": "exclude home (ambiguous)",
+   "card_text": "excluding home objectives — both players (GDM and mission deck rules)",
+   "decision": "follow the card"
+  },
+  {
+   "card": "a-tempting-target, beacon, burden-of-trust",
+   "kind": "structure",
+   "kdc": "when-drawn rule not in when_drawn field",
+   "card_text": "when-drawn rule on the card",
+   "decision": "kept as «При взятии»; no rule change"
+  },
+  {
+   "card": "consecrate, punishment, surveil-the-foe",
+   "kind": "structure",
+   "kdc": "persistent rules modelled as actions",
+   "card_text": "rules printed above the scoring blocks",
+   "decision": "kept as setup text; no rule change"
+  },
+  {
+   "card": "a-grievous-blow, bring-it-down",
+   "kind": "structure",
+   "kdc": "vp_max 5 on a flat 5 VP tactical award",
+   "card_text": "flat 5 VP",
+   "decision": "equivalent; no max shown"
+  }
+ ],
+ "cards": [
+  {
+   "id": "a-grievous-blow",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/a-grievous-blow.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/a-grievous-blow.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "a-tempting-target",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/a-tempting-target.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/a-tempting-target.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "assassination",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/assassination.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/assassination.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "battlefield-dominance",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/take-and-hold/battlefield-dominance.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "beacon",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/beacon.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/beacon.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "behind-enemy-lines",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/behind-enemy-lines.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/behind-enemy-lines.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "bring-it-down",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/bring-it-down.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/bring-it-down.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "burden-of-trust",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/burden-of-trust.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/burden-of-trust.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "centre-ground",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/centre-ground.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/centre-ground.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "cleanse",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/cleanse.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/cleanse.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "consecrate",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/purge-the-foe/consecrate.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "death-trap",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/disruption/death-trap.png",
+    "https://game-datamissions.com/assets/11th/primary-missions/disruption/death-trap-back.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "defend-stronghold",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/defend-stronghold.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/defend-stronghold.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "delaying-action",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/disruption/delaying-action.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "destroyers-wrath",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/purge-the-foe/destroyers-wrath.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "determined-acquisition",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/take-and-hold/determined-acquisition.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "display-of-might",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/display-of-might.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/display-of-might.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "engage-on-all-fronts",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/engage-on-all-fronts.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/engage-on-all-fronts.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "extract-relic",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/priority-assets/extract-relic.png",
+    "https://game-datamissions.com/assets/11th/primary-missions/priority-assets/extract-relic-back.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "forward-position",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/forward-position.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/forward-position.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "gather-intel",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/reconnaissance/gather-intel.png",
+    "https://game-datamissions.com/assets/11th/primary-missions/reconnaissance/gather-intel-back.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "immovable-object",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/take-and-hold/immovable-object.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "inescapable-dominion",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/take-and-hold/inescapable-dominion.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "locate-and-deny",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/disruption/locate-and-deny.png",
+    "https://game-datamissions.com/assets/11th/primary-missions/disruption/locate-and-deny-back.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "meatgrinder",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/purge-the-foe/meatgrinder.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "no-prisoners",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/no-prisoners.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/no-prisoners.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "outflank",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/outflank.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/outflank.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "outmanoeuvre",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/disruption/outmanoeuvre.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "overwhelming-force",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/overwhelming-force.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/overwhelming-force.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "plunder",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/plunder.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/plunder.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "punishment",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/purge-the-foe/punishment.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "purge-and-secure",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/take-and-hold/purge-and-secure.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "reconnaissance-sweep",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/reconnaissance/reconnaissance-sweep.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "sabotage",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/priority-assets/sabotage.png",
+    "https://game-datamissions.com/assets/11th/primary-missions/priority-assets/sabotage-back.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "search-and-scour",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/reconnaissance/search-and-scour.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "secure-asset",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/priority-assets/secure-asset.png",
+    "https://game-datamissions.com/assets/11th/primary-missions/priority-assets/secure-asset-back.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "secure-no-mans-land",
+   "type": "secondary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/secondary-missions/attacker/secure-no-man-s-land.png",
+    "https://game-datamissions.com/assets/11th/secondary-missions/defender/secure-no-man-s-land.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "smoke-and-mirrors",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/disruption/smoke-and-mirrors.png",
+    "https://game-datamissions.com/assets/11th/primary-missions/disruption/smoke-and-mirrors-back.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "surveil-the-foe",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/reconnaissance/surveil-the-foe.png",
+    "https://game-datamissions.com/assets/11th/primary-missions/reconnaissance/surveil-the-foe-back.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "triangulation",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/reconnaissance/triangulation.png",
+    "https://game-datamissions.com/assets/11th/primary-missions/reconnaissance/triangulation-back.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "unstoppable-force",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/purge-the-foe/unstoppable-force.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "vanguard-operation",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/priority-assets/vanguard-operation.png",
+    "https://game-datamissions.com/assets/11th/primary-missions/priority-assets/vanguard-operation-back.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  },
+  {
+   "id": "vital-link",
+   "type": "primary",
+   "gdm": [
+    "https://game-datamissions.com/assets/11th/primary-missions/priority-assets/vital-link.png",
+    "https://game-datamissions.com/assets/11th/primary-missions/priority-assets/vital-link-back.png"
+   ],
+   "checked": [
+    "points",
+    "rounds and timing",
+    "bonuses (+) and «or»",
+    "maximums",
+    "actions",
+    "setup/when drawn"
+   ],
+   "status": "match"
+  }
+ ],
+ "whrulesCheck": {
+  "cards": 43,
+  "matchups": "25/25 match",
+  "timing": "43/43 match (every scoring block)",
+  "points": "41/43 identical; 2 written differently with the same result",
+  "equivalent": [
+   {
+    "card": "assassination",
+    "ours": "fixed: 3 VP per CHARACTER, +1 VP if W 4+ (GDM card, 40kdc)",
+    "whrules": "fixed: 4 VP if W 4+, or 3 VP otherwise",
+    "result": "same VP for every model"
+   },
+   {
+    "card": "defend-stronghold",
+    "ours": "3 VP home objective, +2 VP if no enemy in your deployment zone (GDM card, 40kdc)",
+    "whrules": "3 VP, or 5 VP with no enemy in your deployment zone",
+    "result": "same VP (3 or 5)"
+   }
+  ],
+  "confirms": [
+   "assassination tactical «all enemy CHARACTER models destroyed» 5 VP",
+   "forward-position «each expansion objective»",
+   "delaying-action «excluding home objectives» (both)",
+   "beacon timing; attacker and defender secondaries identical (all 18)"
+  ],
+  "setupRules": "all setup / when drawn / designer note entries on wh-rules.ru are present in our texts"
+ }
+}
