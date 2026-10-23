@@ -1,0 +1,820 @@
+{
+ "schema": "whrules-map/1",
+ "snapshot": {
+  "file": "whrules-995.json",
+  "fingerprint": "79a26d70ca87852ab8aabc06fb9f93d28a907a6c1b2a724e25af59b794c02aa4"
+ },
+ "faction": "adeptus-custodes",
+ "army": "AC",
+ "matched": [
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "aleya",
+    "name": "Aleya",
+    "legends": true
+   },
+   "ours": {
+    "id": "000002088",
+    "name": "Aleya",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "allarus-custodians",
+    "name": "Allarus Custodians",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001453",
+    "name": "Allarus Custodians",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "anathema-psykana-rhino",
+    "name": "Anathema Psykana Rhino",
+    "legends": false
+   },
+   "ours": {
+    "id": "000002524",
+    "name": "Anathema Psykana Rhino",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "ares-gunship",
+    "name": "Ares Gunship",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001680",
+    "name": "Ares Gunship",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "blade-champion",
+    "name": "Blade Champion",
+    "legends": false
+   },
+   "ours": {
+    "id": "000002518",
+    "name": "Blade Champion",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "caladius-grav-tank",
+    "name": "Caladius Grav‑Tank",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001460",
+    "name": "Caladius Grav-tank",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "contemptor-achillus-dreadnought",
+    "name": "Contemptor‑Achillus Dreadnought",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001458",
+    "name": "Contemptor-achillus Dreadnought",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "contemptor-galatus-dreadnought",
+    "name": "Contemptor‑Galatus Dreadnought",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001557",
+    "name": "Contemptor-galatus Dreadnought",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "coronus-grav-carrier",
+    "name": "Coronus Grav‑Carrier",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001461",
+    "name": "Coronus Grav-carrier",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "custodian-wardens",
+    "name": "Custodian Wardens",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001450",
+    "name": "Custodian Wardens",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "knight-centura",
+    "name": "Knight‑Centura",
+    "legends": false
+   },
+   "ours": {
+    "id": "000002520",
+    "name": "Knight-centura",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "orion-assault-dropship",
+    "name": "Orion Assault Dropship",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001564",
+    "name": "Orion Assault Dropship",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "pallas-grav-attack",
+    "name": "Pallas Grav‑Attack",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001562",
+    "name": "Pallas Grav-attack",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "shield-captain",
+    "name": "Shield‑Captain",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001447",
+    "name": "Shield-captain",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "shield-captain-in-allarus-terminator-armour",
+    "name": "Shield‑Captain in Allarus Terminator Armour",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001448",
+    "name": "Shield-captain In Allarus Terminator Armour",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "shield-captain-on-dawneagle-jetbike",
+    "name": "Shield‑Captain on Dawneagle Jetbike",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001449",
+    "name": "Shield-captain On Dawneagle Jetbike",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "telemon-heavy-dreadnought",
+    "name": "Telemon Heavy Dreadnought",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001479",
+    "name": "Telemon Heavy Dreadnought",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "trajann-valoris",
+    "name": "Trajann Valoris",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001446",
+    "name": "Trajann Valoris",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "valerian",
+    "name": "Valerian",
+    "legends": true
+   },
+   "ours": {
+    "id": "000002519",
+    "name": "Valerian",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "venerable-contemptor-dreadnought",
+    "name": "Venerable Contemptor Dreadnought",
+    "legends": true
+   },
+   "ours": {
+    "id": "000000883",
+    "name": "Venerable Contemptor Dreadnought",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "venerable-land-raider",
+    "name": "Venerable Land Raider",
+    "legends": true
+   },
+   "ours": {
+    "id": "000000884",
+    "name": "Venerable Land Raider",
+    "legends": false
+   }
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "vertus-praetors",
+    "name": "Vertus Praetors",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001454",
+    "name": "Vertus Praetors",
+    "legends": false
+   }
+  }
+ ],
+ "renamed": [
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "aquilon-terminators-with-solarite-power-gauntlets",
+    "name": "Aquilon Terminators with Solarite Power Gauntlets",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001558",
+    "name": "Aquilon Custodians",
+    "legends": false
+   },
+   "from": "aquilon-custodians"
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "custodian-guard-sodality",
+    "name": "Custodian Guard Sodality",
+    "legends": false
+   },
+   "ours": {
+    "id": "000000882",
+    "name": "Custodian Guard",
+    "legends": false
+   },
+   "from": "custodian-guard"
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "custodian-guard-sodality-with-adrasite-spears",
+    "name": "Custodian Guard Sodality with Adrasite Spears",
+    "legends": true
+   },
+   "ours": {
+    "id": "000001559",
+    "name": "Custodian Guard With Adrasite And Pyrithite Spears",
+    "legends": false
+   },
+   "from": "custodian-guard-with-adrasite-and-pyrithite-spears"
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "gyrfalcon-jetbike-sodality",
+    "name": "Gyrfalcon Jetbike Sodality",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001560",
+    "name": "Agamatus Custodians",
+    "legends": false
+   },
+   "from": "agamatus-custodians"
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "prosecutor-squad",
+    "name": "Prosecutor Squad",
+    "legends": false
+   },
+   "ours": {
+    "id": "000002521",
+    "name": "Prosecutors",
+    "legends": false
+   },
+   "from": "prosecutors"
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "sagittarum-custodians-sodality",
+    "name": "Sagittarum Custodians Sodality",
+    "legends": true
+   },
+   "ours": {
+    "id": "000001563",
+    "name": "Sagittarum Custodians",
+    "legends": false
+   },
+   "from": "sagittarum-custodians"
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "venatari-with-verutum-lances",
+    "name": "Venatari with Verutum Lances",
+    "legends": false
+   },
+   "ours": {
+    "id": "000001561",
+    "name": "Venatari Custodians",
+    "legends": false
+   },
+   "from": "venatari-custodians"
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "vigilator-squad",
+    "name": "Vigilator Squad",
+    "legends": false
+   },
+   "ours": {
+    "id": "000002522",
+    "name": "Vigilators",
+    "legends": false
+   },
+   "from": "vigilators"
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "witchseeker-squad",
+    "name": "Witchseeker Squad",
+    "legends": false
+   },
+   "ours": {
+    "id": "000002523",
+    "name": "Witchseekers",
+    "legends": false
+   },
+   "from": "witchseekers"
+  }
+ ],
+ "new": [
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "aquilon-terminators-with-solarite-power-talons",
+    "name": "Aquilon Terminators with Solarite Power Talons",
+    "legends": false
+   },
+   "proposedId": "whr:adeptus-custodes:aquilon-terminators-with-solarite-power-talons"
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "caladius-annihilator-grav-tank",
+    "name": "Caladius Annihilator Grav‑Tank",
+    "legends": false
+   },
+   "proposedId": "whr:adeptus-custodes:caladius-annihilator-grav-tank"
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "custodian-guard-sodality-with-pyrithite-spears",
+    "name": "Custodian Guard Sodality with Pyrithite Spears",
+    "legends": true
+   },
+   "proposedId": "whr:adeptus-custodes:custodian-guard-sodality-with-pyrithite-spears"
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "sentinel-guard-sodality",
+    "name": "Sentinel Guard Sodality",
+    "legends": false
+   },
+   "proposedId": "whr:adeptus-custodes:sentinel-guard-sodality"
+  },
+  {
+   "site": {
+    "faction": "adeptus-custodes",
+    "id": "venatari-with-kinetic-destroyers",
+    "name": "Venatari with Kinetic Destroyers",
+    "legends": false
+   },
+   "proposedId": "whr:adeptus-custodes:venatari-with-kinetic-destroyers"
+  }
+ ],
+ "removed": [],
+ "unmatched": [],
+ "ambiguous": [],
+ "review": [],
+ "detachments": {
+  "kept": [
+   {
+    "id": "000000862",
+    "name": "Null Maiden Vigil",
+    "site": "null-maiden-vigil",
+    "dp": [
+     2,
+     1
+    ],
+    "enhancements": {
+     "kept": [
+      {
+       "id": "000008926003",
+       "name": "Huntress’ Eye",
+       "ours": 15,
+       "site": 10
+      },
+      {
+       "id": "000008926004",
+       "name": "Oblivion Knight",
+       "ours": 25,
+       "site": 15
+      }
+     ],
+     "new": [],
+     "removed": [
+      {
+       "id": "000008926002",
+       "name": "Enhanced Voidsheen Cloak",
+       "ours": 10
+      },
+      {
+       "id": "000008926005",
+       "name": "Raptor Blade",
+       "ours": 5
+      }
+     ]
+    }
+   },
+   {
+    "id": "000000863",
+    "name": "Auric Champions",
+    "site": "auric-champions",
+    "dp": [
+     2,
+     1
+    ],
+    "enhancements": {
+     "kept": [
+      {
+       "id": "000008930003",
+       "name": "Inspirational Exemplar",
+       "ours": 10,
+       "site": 10
+      }
+     ],
+     "new": [
+      {
+       "name": "Shroud of the Hidden Blade",
+       "site": 20
+      },
+      {
+       "name": "Superior Creation",
+       "site": 30
+      }
+     ],
+     "removed": [
+      {
+       "id": "000008930002",
+       "name": "Blade Imperator",
+       "ours": 25
+      },
+      {
+       "id": "000008930004",
+       "name": "Martial Philosopher",
+       "ours": 30
+      },
+      {
+       "id": "000008930005",
+       "name": "Veiled Blade",
+       "ours": 25
+      }
+     ]
+    }
+   },
+   {
+    "id": "000001029",
+    "name": "Lions of the Emperor",
+    "site": "lions-of-the-emperor",
+    "dp": [
+     3,
+     1
+    ],
+    "enhancements": {
+     "kept": [],
+     "new": [
+      {
+       "name": "Lightning Descent",
+       "site": 20
+      },
+      {
+       "name": "Leonine Ferocity",
+       "site": 20
+      }
+     ],
+     "removed": [
+      {
+       "id": "000009987002",
+       "name": "Superior Creation",
+       "ours": 25
+      },
+      {
+       "id": "000009987003",
+       "name": "Praesidius",
+       "ours": 25
+      },
+      {
+       "id": "000009987004",
+       "name": "Fierce Conqueror",
+       "ours": 15
+      },
+      {
+       "id": "000009987005",
+       "name": "Admonimortis",
+       "ours": 30
+      }
+     ]
+    }
+   },
+   {
+    "id": "000001164",
+    "name": "Might of the Moritoi",
+    "site": "might-of-the-moritoi",
+    "dp": [
+     1,
+     1
+    ],
+    "enhancements": {
+     "kept": [],
+     "new": [
+      {
+       "name": "Memento Moritoi (one per army) (Upgrade)",
+       "site": 30
+      },
+      {
+       "name": "Augury Uplink (one per army) (Upgrade)",
+       "site": 30
+      }
+     ],
+     "removed": [
+      {
+       "id": "000010992002",
+       "name": "Interred Expertise",
+       "ours": 25
+      },
+      {
+       "id": "000010992003",
+       "name": "Auramite Sarcophagus",
+       "ours": 15
+      }
+     ]
+    }
+   }
+  ],
+  "new": [
+   {
+    "site": "dread-host",
+    "name": "Dread Host",
+    "dp": 1,
+    "enhancements": [
+     {
+      "name": "Flawless Bladework",
+      "points": 15
+     },
+     {
+      "name": "Auric Exemplar",
+      "points": 15
+     }
+    ]
+   },
+   {
+    "site": "aquilan-shield",
+    "name": "Aquilan Shield",
+    "dp": 1,
+    "enhancements": [
+     {
+      "name": "Not a Shell Wasted",
+      "points": 10
+     },
+     {
+      "name": "Pareldor’s Caducatrix",
+      "points": 30
+     }
+    ]
+   },
+   {
+    "site": "emissaries-imperatus",
+    "name": "Emissaries Imperatus",
+    "dp": 1,
+    "enhancements": [
+     {
+      "name": "Edge of the Blade",
+      "points": 15
+     },
+     {
+      "name": "Auriferous Orb",
+      "points": 20
+     }
+    ]
+   },
+   {
+    "site": "emperors-chosen",
+    "name": "Emperor’s Chosen",
+    "dp": 1,
+    "enhancements": [
+     {
+      "name": "From the Hall of Armouries",
+      "points": 15
+     },
+     {
+      "name": "Radiant Mantle",
+      "points": 40
+     }
+    ]
+   },
+   {
+    "site": "solar-watch",
+    "name": "Solar Watch",
+    "dp": 1,
+    "enhancements": [
+     {
+      "name": "Sally Forth",
+      "points": 30
+     },
+     {
+      "name": "Auric Eagle (Upgrade)",
+      "points": 15
+     }
+    ]
+   },
+   {
+    "site": "grav-assault-force",
+    "name": "Grav‑Assault Force",
+    "dp": 1,
+    "enhancements": [
+     {
+      "name": "Anti-gravitic Mobility (Upgrade)",
+      "points": 15
+     },
+     {
+      "name": "Combat Deployment (Upgrade)",
+      "points": 20
+     }
+    ]
+   },
+   {
+    "site": "honoured-companions",
+    "name": "Honoured Companions",
+    "dp": 1,
+    "enhancements": [
+     {
+      "name": "Arae-Shrike",
+      "points": 20
+     },
+     {
+      "name": "Celeritous Sentries (Upgrade)",
+      "points": 15
+     }
+    ]
+   },
+   {
+    "site": "guardians-of-the-throne",
+    "name": "Guardians of the Throne",
+    "dp": 3,
+    "enhancements": [
+     {
+      "name": "Bane of Abominations",
+      "points": 20
+     },
+     {
+      "name": "Emperor’s Light",
+      "points": 15
+     },
+     {
+      "name": "Castellan’s Mark",
+      "points": 25
+     },
+     {
+      "name": "Eagle’s Eye",
+      "points": 30
+     }
+    ]
+   },
+   {
+    "site": "shadowkeepers",
+    "name": "Shadowkeepers",
+    "dp": 1,
+    "enhancements": [
+     {
+      "name": "Unstoppable Destroyer",
+      "points": 25
+     },
+     {
+      "name": "Genalchemic Warding",
+      "points": 30
+     }
+    ]
+   }
+  ],
+  "removed": [
+   {
+    "id": "000000765",
+    "name": "Shield Host"
+   },
+   {
+    "id": "000000861",
+    "name": "Talons Of The Emperor"
+   },
+   {
+    "id": "000000986",
+    "name": "Solar Spearhead"
+   },
+   {
+    "id": "000001165",
+    "name": "Silent Hunters"
+   },
+   {
+    "id": "000001166",
+    "name": "Tharanatoi Hammerblow"
+   }
+  ]
+ },
+ "counts": {
+  "ours": 31,
+  "site": 36,
+  "matched": 22,
+  "renamed": 9,
+  "new": 5,
+  "removed": 0,
+  "unmatched": 0,
+  "ambiguous": 0,
+  "review": 0
+ }
+}
