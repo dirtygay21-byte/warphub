@@ -4,6 +4,7 @@ import { commandPhasePending, ROUNDS, totals, type Seat } from '../../game';
 import { haptic } from '../../telegram';
 import { Button, Icon } from '../kit';
 import { cx } from '../util';
+import { AdjustSheet } from './Adjust';
 import { CommandPhase } from './CommandPhase';
 import { EndOfTurn } from './EndOfTurn';
 import { SecondaryCard } from './SecondaryCard';
@@ -98,26 +99,36 @@ function RoundDots({ round, finished }: { round: number; finished: boolean }) {
 function Scoreboard({ game }: { game: GameHook }) {
   const state = game.state!;
   const catalog = game.data!.catalog;
+  const [open, setOpen] = useState<Seat | null>(null);
   return (
     <div className="grid grid-cols-2 gap-2">
+      {open && <AdjustSheet game={game} seat={open} onClose={() => setOpen(null)} />}
       {(['p1', 'p2'] as Seat[]).map((s) => {
         const p = state.players[s];
         const t = totals(state, s, catalog);
         const cut = t.primary.cut + t.secondary.cut;
         return (
-          <div key={s} className={cx('rounded-xl border bg-white/[0.03] px-3 py-2.5', state.activeSeat === s ? 'border-accent/50' : 'border-white/10')}>
-            <p className={cx('truncate text-[12px] font-semibold', roleText(p.role))}>{p.name}</p>
-            <p className="font-display mt-0.5 text-3xl font-semibold leading-none">
+          <button
+            key={s}
+            type="button"
+            onClick={() => setOpen(s)}
+            className={cx('rounded-xl border bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10', state.activeSeat === s ? 'border-accent/50' : 'border-white/10')}
+          >
+            <span className={cx('block truncate text-[12px] font-semibold', roleText(p.role))}>{p.name}</span>
+            <span className="block font-display mt-0.5 text-3xl font-semibold leading-none">
               {t.total}
               <span className="ml-1 text-sm text-white/50">ПО</span>
-            </p>
-            <p className="mt-1 text-[11px] leading-snug text-white/55">
+            </span>
+            <span className="block mt-1 text-[11px] leading-snug text-white/55">
               основная {t.primary.total} · вторичные {t.secondary.total}
               {t.battleReady ? ` · покраска ${t.battleReady}` : ''}
-            </p>
-            {cut > 0 && <p className="text-[11px] text-warn">сверх лимитов: {cut}</p>}
-            <p className="mt-1.5 inline-block rounded-full border border-white/15 px-2 py-0.5 text-[12px] font-semibold">CP: {p.cp}</p>
-          </div>
+            </span>
+            {cut > 0 && <span className="block text-[11px] text-warn">сверх лимитов: {cut}</span>}
+            <span className="mt-1.5 flex items-center justify-between gap-1">
+              <span className="rounded-full border border-white/15 px-2 py-0.5 text-[12px] font-semibold">CP: {p.cp}</span>
+              <span className="text-[11px] font-semibold text-accent/90">Изменить</span>
+            </span>
+          </button>
         );
       })}
     </div>
