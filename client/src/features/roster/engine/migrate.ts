@@ -101,7 +101,10 @@ export function migrateRoster(roster: Roster, L: DataLookup): MigrationResult {
   let next = roster;
   for (const mig of migrationsOf(L.faction)) {
     const r = migrateOnce(next, L, mig);
-    if (r.changed) (next = r.roster), (changed = true);
+    if (r.changed) {
+      next = r.roster;
+      changed = true;
+    }
   }
   // тот же инфолист, но сохранённого размера отряда больше нет
   const units = next.units.map((u) => {
