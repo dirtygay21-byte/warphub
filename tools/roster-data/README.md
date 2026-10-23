@@ -201,6 +201,19 @@ npm run battlefield      # → backend/roster-data/battlefield.json
 Резолвер геометрии взят из 40kdc-data (`vendor/40kdc-resolve.ts`, MIT). В приложении обязательна подпись
 «Powered by 40kdc-data» со ссылкой на https://40kdc.alpacasoft.dev — она стоит внизу экрана «Поле боя».
 
+## Карты миссий (Chapter Approved 2026-27)
+
+`backend/roster-data/missions.json` — 25 основных и 18 вторичных карт для экрана «Поле боя». Состав, id, пары типов армий
+и лимиты ПО — из 40kdc-data; тексты — свои, на русском (`40k/missions-ru.json`: смысл и числа как на карте, без
+художественного текста). Сверка — `40k/missions-review.json`: изображения карт game-datamissions.com, правила колоды
+миссий, данные wh-rules.ru. Конфликты (Assassination, Forward Position у 40kdc) решены по карте и записаны в отчёте.
+
+```bash
+npm run missions     # 40kdc-data в tools/roster-data/40kdc-data → backend/roster-data/missions.json
+```
+
+Сборка падает, если карта, пара или очки расходятся с 40kdc и это не записано в отчёте.
+
 ## Доступ по коду
 
 - Код создаёт владелец в админке (вкладка «Ростеры» → «Создать код доступа»). Бот присылает его в Telegram.
