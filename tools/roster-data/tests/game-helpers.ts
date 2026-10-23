@@ -45,14 +45,18 @@ export function log(...bodies: Body[]): GameEvent[] {
 }
 export const created: Body = { type: 'game-created', schema: 1, seed: 'seed-1', names: { p1: 'Аня', p2: 'Борис' } } as Body;
 
+/** Ростеры игроков (G2.12: обязательны; типы армий — из детачментов). */
+export const ROSTER_P1 = { source: 'own', rosterId: 'r1', name: 'Мои ультрамарины', factionId: 'SM', points: 2000, forceDisposition: 'Take and Hold', dispositions: ['take-and-hold', 'disruption'], detachments: ['Gladius Task Force'] } as const;
+export const ROSTER_P2 = { source: 'code', name: 'Орки соперника', factionId: 'ORK', points: 2000, forceDisposition: 'Purge the Foe', dispositions: ['purge-the-foe', 'disruption'], detachments: ['War Horde'], code: 'WH1.test' } as const;
+
 /** Подготовка (порядок правил): Take and Hold против Purge the Foe, раскладка A, p1 — атакующий, p2 ходит первым. */
 export function setupBodies(): Body[] {
   const pair = ['purge-the-foe', 'take-and-hold'].join('|');
   const layout = bf.layouts.filter((l: { pair: string[] }) => l.pair.join('|') === pair).sort((a: { variant: number }, b: { variant: number }) => a.variant - b.variant)[0];
   return [
     created,
-    { type: 'player-set', target: 'p1', patch: { disposition: 'take-and-hold', roster: { source: 'own', rosterId: 'r1', name: 'Мои ультрамарины', factionId: 'SM', points: 2000 } } },
-    { type: 'player-set', target: 'p2', patch: { disposition: 'purge-the-foe' } },
+    { type: 'player-set', target: 'p1', patch: { disposition: 'take-and-hold', roster: ROSTER_P1 } },
+    { type: 'player-set', target: 'p2', patch: { disposition: 'purge-the-foe', roster: ROSTER_P2 } },
     { type: 'dispositions-revealed' },
     { type: 'layout-set', layoutId: layout.id, source: 'manual' },
     { type: 'roles-set', attacker: 'p1', source: 'manual' },

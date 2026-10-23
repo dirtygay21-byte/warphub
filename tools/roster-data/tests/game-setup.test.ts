@@ -7,7 +7,7 @@ import { layoutPick, rollOff } from '../../../client/src/features/roster/game/rn
 import { layoutsFor } from '../../../client/src/features/roster/game/reducer';
 import { currentSetupStep, setupMissing, setupSteps } from '../../../client/src/features/roster/game/setup';
 import type { GameState } from '../../../client/src/features/roster/game/types';
-import { catalog, log, setupBodies, type Body } from './game-helpers';
+import { catalog, created, log, ROSTER_P1, setupBodies, type Body } from './game-helpers';
 
 const ok = (r: ReturnType<typeof replay>): GameState => {
   assert.ok(r.ok, r.ok ? '' : `№${r.seq}: ${r.error}`);
@@ -22,7 +22,7 @@ const FIRST = rollOff('seed-1', 'first-turn', 0);
 
 test('шаги подготовки идут в порядке правил колоды миссий', () => {
   const steps = [
-    [1, 'dispositions'], [3, 'dispositions'], [4, 'layout'], [5, 'roles'], [6, 'secondaries'],
+    [1, 'players'], [2, 'players'], [3, 'dispositions'], [4, 'layout'], [5, 'roles'], [6, 'secondaries'],
     [8, 'secondaries'], [9, 'first-turn'], [10, null],
   ] as const;
   for (const [n, exp] of steps) assert.equal(currentSetupStep(ok(upTo(n))), exp, `после ${n} событий`);
@@ -97,4 +97,21 @@ test('случайная раскладка: по seed и номеру выбо�
   // отмена возвращает номер выбора
   const evs = log(...setupBodies().slice(0, 4), B({ type: 'layout-set', layoutId: pick.id, source: 'random', roll: R(0) }));
   assert.equal(ok(replay(log(...evs.map((e) => B(e)), B({ type: 'event-reverted', target: evs.at(-1)!.id })), catalog)).layoutDraws, 0);
+});
+
+test('ростеры (G2.12): без ростера тип армии не выбрать; только типы детачментов ростера; новый ростер сбрасывает чужой тип', () => {
+  const none = ok(replay(log(created), catalog));
+  assert.deepEqual(setupSteps(none)[0]!.missing, ['Аня: ростер', 'Борис: ростер']);
+  err(replay(log(created, B({ type: 'player-set', target: 'p1', patch: { disposition: 'take-and-hold' } })), catalog), /Сначала выберите ростер/);
+  err(replay(log(created, B({ type: 'player-set', target: 'p1', patch: { roster: { ...ROSTER_P1, dispositions: [] } } })), catalog), /нет детачмента/);
+  err(replay(log(created, B({ type: 'player-set', target: 'p1', patch: { roster: { ...ROSTER_P1, dispositions: ['nope'] } } })), catalog), /Неизвестный тип армии/);
+  const withRoster = B({ type: 'player-set', target: 'p1', patch: { roster: ROSTER_P1 } });
+  err(replay(log(created, withRoster, B({ type: 'player-set', target: 'p1', patch: { disposition: 'purge-the-foe' } })), catalog), /не даёт ни один детачмент/);
+  const s = ok(replay(log(created, withRoster, B({ type: 'player-set', target: 'p1', patch: { disposition: 'disruption' } })), catalog));
+  assert.equal(s.players.p1.disposition, 'disruption');
+  // другой ростер без Disruption — тип армии сбрасывается
+  const other = ok(replay(log(created, withRoster, B({ type: 'player-set', target: 'p1', patch: { disposition: 'disruption' } }), B({ type: 'player-set', target: 'p1', patch: { roster: { ...ROSTER_P1, dispositions: ['take-and-hold'] } } })), catalog));
+  assert.equal(other.players.p1.disposition, null);
+  // после раскрытия ростер не меняется
+  err(upTo(4, B({ type: 'player-set', target: 'p1', patch: { roster: ROSTER_P1 } })), /уже раскрыты/);
 });

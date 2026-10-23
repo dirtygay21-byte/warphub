@@ -35,6 +35,7 @@ export function RosterEditor({
   onChange,
   onDuplicate,
   onDelete,
+  viewOnly = false,
 }: {
   roster: Roster;
   index: DataIndex;
@@ -44,6 +45,8 @@ export function RosterEditor({
   onChange: (r: Roster) => void;
   onDuplicate: (r: Roster) => void;
   onDelete: () => void;
+  /** только просмотр (режим мастера в игре): без редактирования, меню и переключателя режима */
+  viewOnly?: boolean;
 }) {
   const [faction, setFaction] = useState<FactionData | null>(null);
   const [loadErr, setLoadErr] = useState<string | null>(null);
@@ -91,7 +94,7 @@ export function RosterEditor({
       </div>
     );
   }
-  return <Editor roster={roster} L={L} cr={cr} index={index} onBack={onBack} onRules={onRules} onStartGame={onStartGame} onChange={onChange} onDuplicate={onDuplicate} onDelete={onDelete} />;
+  return <Editor roster={roster} L={L} cr={cr} index={index} onBack={onBack} onRules={onRules} onStartGame={onStartGame} onChange={onChange} onDuplicate={onDuplicate} onDelete={onDelete} viewOnly={viewOnly} />;
 }
 
 function Editor({
@@ -105,6 +108,7 @@ function Editor({
   onChange,
   onDuplicate,
   onDelete,
+  viewOnly = false,
 }: {
   roster: Roster;
   L: DataLookup;
@@ -116,6 +120,8 @@ function Editor({
   onChange: (r: Roster) => void;
   onDuplicate: (r: Roster) => void;
   onDelete: () => void;
+  /** только просмотр (режим мастера в игре): без редактирования, меню и переключателя режима */
+  viewOnly?: boolean;
 }) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [picker, setPicker] = useState(false);
@@ -126,7 +132,8 @@ function Editor({
   const [settingsOpen, setSettingsOpen] = useState(roster.detachmentIds.length === 0);
   const [flash, setFlash] = useState<string | null>(null);
   // режим просмотра: только чтение, без кнопок изменения
-  const [view, setView] = useState(false);
+  const [viewState, setView] = useState(viewOnly);
+  const view = viewOnly || viewState;
   const [detInfo, setDetInfo] = useState<string | null>(null);
   const [pointsInfo, setPointsInfo] = useState(false);
   const closeDetInfo = useCallback(() => setDetInfo(null), []);
@@ -176,12 +183,14 @@ function Editor({
           ) : (
             <NameInput value={roster.name} onChange={(name) => set({ name })} />
           )}
-          <IconButton
-            icon={view ? 'edit' : 'eye'}
-            label={view ? 'Редактировать' : 'Режим просмотра'}
-            onClick={() => (setView((v) => !v), setExpanded(null))}
-            className={cx('size-9', view && 'bg-accent/15 text-accent')}
-          />
+          {!viewOnly && (
+            <IconButton
+              icon={view ? 'edit' : 'eye'}
+              label={view ? 'Редактировать' : 'Режим просмотра'}
+              onClick={() => (setView((v) => !v), setExpanded(null))}
+              className={cx('size-9', view && 'bg-accent/15 text-accent')}
+            />
+          )}
           {!view && <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />}
         </div>
         <div className="mt-3 flex items-end justify-between gap-3">
@@ -402,7 +411,11 @@ function Editor({
       {/* ---- нижняя панель ---- */}
       <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
         <div className="mx-auto flex max-w-lg gap-2 lg:max-w-3xl lg:px-4">
-          {view ? (
+          {viewOnly ? (
+            <Button variant="outline" className="h-12 flex-1 text-base" onClick={onBack}>
+              <Icon name="back" /> <span className="whitespace-nowrap">К игре</span>
+            </Button>
+          ) : view ? (
             <Button variant="outline" className="h-12 flex-1 text-base" onClick={() => setView(false)}>
               <Icon name="edit" /> <span className="whitespace-nowrap">Редактировать</span>
             </Button>

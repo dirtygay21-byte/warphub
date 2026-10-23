@@ -5,6 +5,7 @@ import { haptic } from '../../telegram';
 import { Button } from '../kit';
 import { CardLink } from './CardSheet';
 import { Dice } from './Dice';
+import { RosterButton } from './RosterViewer';
 import type { GameHook } from './useGame';
 
 const LETTERS = ['A', 'B', 'C'];
@@ -93,9 +94,12 @@ export function Summary({ game, index }: { game: GameHook; index: DataIndex }) {
         const faction = fName(p.roster.factionId);
         return (
           <div key={s} className="mt-2 border-t border-white/10 pt-2 first:border-0 first:pt-0">
-            <p className="font-semibold">
-              {p.name}
-              <span className="font-normal text-white/50"> · {p.role === 'attacker' ? 'атакующий' : p.role === 'defender' ? 'защитник' : '—'}</span>
+            <p className="flex items-center gap-2 font-semibold">
+              <span className="min-w-0 flex-1">
+                {p.name}
+                <span className="font-normal text-white/50"> · {p.role === 'attacker' ? 'атакующий' : p.role === 'defender' ? 'защитник' : '—'}</span>
+              </span>
+              <RosterButton seat={s} />
             </p>
             <Row label="Армия">
               {p.roster.source !== 'none' && p.roster.name ? `${p.roster.name}${faction ? ` · ${faction}` : ''}` : (faction ?? 'без ростера')}
