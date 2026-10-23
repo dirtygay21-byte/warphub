@@ -6,8 +6,9 @@ import { Battlefield } from '../Battlefield';
 import { Button, Icon, IconButton } from '../kit';
 import { cx } from '../util';
 import { CardSheet } from './CardSheet';
-import { CardViewerContext } from './cardViewer';
-import { rosterRef } from './players';
+import { CardViewerContext, RosterViewerContext } from './cardViewer';
+import { rosterRefFor } from './players';
+import { RosterViewer } from './RosterViewer';
 import { StepDispositions } from './StepDispositions';
 import { StepLayout } from './StepLayout';
 import { StepRoles } from './StepRoles';
@@ -25,11 +26,24 @@ import { useGame, type GameHook } from './useGame';
 export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack: () => void; rosters: Roster[]; index: DataIndex; initialRosterId?: string }) {
   const game = useGame();
   const { data, loadError, state } = game;
-  // ростер из меню «Начать игру с этим ростером» — первым событием подготовки
-  const start = () => {
+  // ростер из меню «Начать игру с этим ростером» — первым событием подготовки (если в нём есть детачмент)
+  const [starting, setStarting] = useState(false);
+  const start = async () => {
     const r = initialRosterId ? rosters.find((x) => x.id === initialRosterId) : undefined;
-    game.newGame({}, r ? [{ type: 'player-set', target: 'p1', patch: { roster: rosterRef(r, 'own') } }] : []);
+    setStarting(true);
+    const ref = r && data ? await rosterRefFor(r, 'own', data.battlefield) : null;
+    setStarting(false);
+    game.newGame({}, ref && typeof ref !== 'string' ? [{ type: 'player-set', target: 'p1', patch: { roster: ref } }] : []);
   };
+  // режим мастера (G2.12): ростеры игроков можно открыть для просмотра; запоминается на этом телефоне
+  const [master, setMaster] = useState(readMaster);
+  const toggleMaster = () => {
+    writeMaster(!master);
+    setMaster(!master);
+  };
+  const [rosterSeat, setRosterSeat] = useState<Seat | null>(null);
+  const openRoster = useCallback((seat: Seat) => setRosterSeat(seat), []);
+  const closeRoster = useCallback(() => setRosterSeat(null), []);
   // просмотр поля боя открывается поверх игры: игра не теряется, «Назад» Telegram закрывает просмотр
   const [viewing, setViewing] = useState(false);
   useEffect(() => (viewing ? pushOverlay(() => setViewing(false)) : undefined), [viewing]);
@@ -38,6 +52,8 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
   const openCard = useCallback((id: string, seat?: Seat) => setCard({ id, seat }), []);
   const closeCard = useCallback(() => setCard(null), []);
   if (viewing) return <Battlefield onBack={() => setViewing(false)} />;
+  const shownRoster = rosterSeat && state ? state.players[rosterSeat].roster : null;
+  if (shownRoster && shownRoster.source !== 'none') return <RosterViewer rosterRef={shownRoster} rosters={rosters} index={index} onClose={closeRoster} />;
 
   if (loadError) {
     return (
@@ -56,46 +72,64 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
 
   return (
     <CardViewerContext.Provider value={openCard}>
-      <Shell onBack={onBack} undo={state && game.canUndo ? game.undo : undefined}>
-        {!state ? (
-          <StartCard game={game} onStart={start} />
-        ) : (
-          state.stage === 'setup' ? <Setup game={game} rosters={rosters} index={index} /> : <Tracker game={game} index={index} />
-        )}
+      <RosterViewerContext.Provider value={master ? openRoster : null}>
+        <Shell onBack={onBack} undo={state && game.canUndo ? game.undo : undefined} master={master} onMaster={toggleMaster}>
+          {!state ? (
+            <StartCard game={game} onStart={start} starting={starting} />
+          ) : (
+            state.stage === 'setup' ? <Setup game={game} rosters={rosters} index={index} /> : <Tracker game={game} index={index} />
+          )}
 
-        {game.error && (
-          <div className="sheet-enter fixed inset-x-0 bottom-0 z-40 border-t border-danger/40 bg-app-elevated px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
-            <div className="mx-auto flex max-w-lg items-start gap-2">
-              <Icon name="alert" className="mt-0.5 size-5 shrink-0 text-danger" />
-              <p className="min-w-0 flex-1 text-sm text-white/85">{game.error}</p>
-              <IconButton icon="close" label="Закрыть" onClick={game.clearError} className="size-8" />
+          {game.error && (
+            <div className="sheet-enter fixed inset-x-0 bottom-0 z-40 border-t border-danger/40 bg-app-elevated px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+              <div className="mx-auto flex max-w-lg items-start gap-2">
+                <Icon name="alert" className="mt-0.5 size-5 shrink-0 text-danger" />
+                <p className="min-w-0 flex-1 text-sm text-white/85">{game.error}</p>
+                <IconButton icon="close" label="Закрыть" onClick={game.clearError} className="size-8" />
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <button
-          type="button"
-          onClick={() => setViewing(true)}
-          className="mt-6 flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10"
-        >
-          <Icon name="map" className="size-5 text-accent" />
-          <span className="min-w-0 flex-1">
-            <span className="block text-sm font-semibold">Поле боя</span>
-            <span className="block text-[11px] text-white/45">Просмотр без игры: зоны деплоя и раскладки террейна</span>
-          </span>
-          <Icon name="chevron" className="size-4 text-white/40" />
-        </button>
-        {card && <CardSheet game={game} id={card.id} seat={card.seat} onClose={closeCard} />}
-      </Shell>
+          <button
+            type="button"
+            onClick={() => setViewing(true)}
+            className="mt-6 flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10"
+          >
+            <Icon name="map" className="size-5 text-accent" />
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-semibold">Поле боя</span>
+              <span className="block text-[11px] text-white/45">Просмотр без игры: зоны деплоя и раскладки террейна</span>
+            </span>
+            <Icon name="chevron" className="size-4 text-white/40" />
+          </button>
+          {card && <CardSheet game={game} id={card.id} seat={card.seat} onClose={closeCard} />}
+        </Shell>
+      </RosterViewerContext.Provider>
     </CardViewerContext.Provider>
   );
 }
+
+const MASTER_KEY = 'warphub.game.master';
+const readMaster = () => {
+  try {
+    return localStorage.getItem(MASTER_KEY) === '1';
+  } catch {
+    return false;
+  }
+};
+const writeMaster = (on: boolean) => {
+  try {
+    localStorage.setItem(MASTER_KEY, on ? '1' : '0');
+  } catch {
+    /* приватный режим — только на этот раз */
+  }
+};
 
 /**
  * Начало (G4b): сохранённая на устройстве игра — «Продолжить» (раунд, игроки, счёт) или «Новая игра» с подтверждением;
  * нечитаемое сохранение — причина и новая игра с откладыванием старого сохранения; иначе — новая игра.
  */
-function StartCard({ game, onStart }: { game: GameHook; onStart: () => void }) {
+function StartCard({ game, onStart, starting }: { game: GameHook; onStart: () => void; starting: boolean }) {
   const [confirm, setConfirm] = useState(false);
   const saved = game.saved;
   const intro = (
@@ -135,7 +169,7 @@ function StartCard({ game, onStart }: { game: GameHook; onStart: () => void }) {
             <div className="mt-3 space-y-2">
               <p className="text-xs text-warn">Сохранённая игра будет заменена новой. Начать?</p>
               <div className="grid grid-cols-2 gap-2">
-                <Button variant="danger" onClick={onStart}>
+                <Button variant="danger" disabled={starting} onClick={onStart}>
                   Да, новая игра
                 </Button>
                 <Button onClick={() => setConfirm(false)}>Нет</Button>
@@ -158,7 +192,7 @@ function StartCard({ game, onStart }: { game: GameHook; onStart: () => void }) {
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
         {intro}
-        <Button variant="primary" className="mt-3 w-full" onClick={onStart}>
+        <Button variant="primary" className="mt-3 w-full" disabled={starting} onClick={onStart}>
           Начать подготовку
         </Button>
       </div>
@@ -228,7 +262,7 @@ function StepBody({ id, game, rosters, index, onNext }: { id: SetupStepId; game:
   return <StepStart game={game} index={index} />;
 }
 
-function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => void; children: ReactNode }) {
+function Shell({ onBack, undo, master, onMaster, children }: { onBack: () => void; undo?: () => void; master?: boolean; onMaster?: () => void; children: ReactNode }) {
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-24 pt-5 lg:max-w-4xl lg:pt-8">
       <header className="mb-4 flex items-end gap-3">
@@ -237,6 +271,20 @@ function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => vo
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Chapter Approved 2026–27</p>
           <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Начать игру</h1>
         </div>
+        {onMaster && (
+          <button
+            type="button"
+            onClick={onMaster}
+            aria-pressed={master}
+            title="Режим мастера: открывать ростеры игроков"
+            className={cx(
+              'mb-0.5 rounded-full border px-3 py-1.5 text-xs font-semibold',
+              master ? 'border-accent bg-accent/15 text-accent' : 'border-white/15 text-white/70 active:bg-white/10',
+            )}
+          >
+            Мастер
+          </button>
+        )}
         {undo && (
           <button type="button" onClick={undo} className="mb-0.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/70 active:bg-white/10">
             Отменить

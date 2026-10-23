@@ -7,7 +7,7 @@ import { cx } from '../util';
 import type { GameHook } from './useGame';
 
 /**
- * Шаг «Типы армий» (правила: каждый игрок тайно выбирает тип армии, затем оба раскрывают).
+ * Шаг «Типы армий» (правила: каждый игрок тайно выбирает тип армии из тех, что дают детачменты его ростера, затем оба раскрывают).
  * На одном телефоне — по очереди, с экраном «передайте телефон»; на двух телефонах каждый выберет у себя
  * (выбор — отдельные события player-set, раскрытие — dispositions-revealed).
  */
@@ -57,9 +57,11 @@ export function StepDispositions({ game, onNext }: { game: GameHook; onNext: () 
 function Choose({ seat, game, onDone }: { seat: Seat; game: GameHook; onDone: () => void }) {
   const state = game.state!;
   const p = state.players[seat];
-  const list = game.data!.battlefield.dispositions;
+  // G2.12: только типы армий, которые дают детачменты ростера; выбранный в ростере — заранее
+  const allowed = p.roster.dispositions ?? [];
+  const list = game.data!.battlefield.dispositions.filter((d) => allowed.includes(d.id));
   const fromRoster = list.find((d) => d.name === p.roster.forceDisposition || d.id === p.roster.forceDisposition)?.id ?? null;
-  const [pick, setPick] = useState<string | null>(p.disposition ?? fromRoster);
+  const [pick, setPick] = useState<string | null>(p.disposition ?? fromRoster ?? (list.length === 1 ? list[0]!.id : null));
   const done = () => {
     if (!pick) return;
     if (pick === p.disposition || game.dispatch({ type: 'player-set', target: seat, patch: { disposition: pick } })) {
@@ -72,6 +74,11 @@ function Choose({ seat, game, onDone }: { seat: Seat; game: GameHook; onDone: ()
       <p className="text-sm">
         Выбирает <span className="font-semibold text-accent">{p.name}</span>
         <span className="text-white/50"> — втайне от соперника</span>
+      </p>
+      <p className="mt-0.5 text-[11px] text-white/45">
+        {list.length === 1
+          ? `Ростер «${p.roster.name ?? ''}» даёт один тип армии — подтвердите его.`
+          : `Типы армий, которые дают детачменты ростера «${p.roster.name ?? ''}».`}
       </p>
       <div className="mt-2 grid grid-cols-1 gap-1.5 min-[380px]:grid-cols-2">
         {list.map((d) => (

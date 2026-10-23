@@ -6,6 +6,8 @@ import { Button, Icon } from '../kit';
 import { cx } from '../util';
 import { AdjustSheet } from './Adjust';
 import { CardLink } from './CardSheet';
+import { useOpenRoster } from './cardViewer';
+import { RosterButton } from './RosterViewer';
 import { CommandPhase } from './CommandPhase';
 import { EndOfTurn } from './EndOfTurn';
 import { EndEarly, Result } from './Result';
@@ -55,6 +57,7 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
       {finished && <Result game={game} />}
 
       <Scoreboard game={game} />
+      <MasterRosters game={game} />
 
       {!finished && (
         <>
@@ -150,6 +153,24 @@ function Scoreboard({ game }: { game: GameHook }) {
           </button>
         );
       })}
+    </div>
+  );
+}
+
+/** Режим мастера: ростеры обоих игроков открываются для просмотра (без режима — ничего не показывается). */
+function MasterRosters({ game }: { game: GameHook }) {
+  const open = useOpenRoster();
+  if (!open) return null;
+  const state = game.state!;
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-accent/30 bg-accent/[0.05] px-3 py-2 text-xs">
+      <span className="font-semibold text-accent">Режим мастера</span>
+      {(['p1', 'p2'] as Seat[]).map((s) => (
+        <span key={s} className="flex items-center gap-1.5">
+          <span className="text-white/70">{state.players[s].name}:</span>
+          <RosterButton seat={s} />
+        </span>
+      ))}
     </div>
   );
 }

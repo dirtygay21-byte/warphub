@@ -138,10 +138,28 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       const p = s.players[ev.target];
       const { name, roster, disposition, battleReady } = ev.patch;
       if ((roster !== undefined || disposition !== undefined) && !inSetup) return fail('Ростер и тип армии меняются только до начала битвы');
-      if (disposition !== undefined && s.dispositionsRevealed) return fail('Тип армии уже раскрыт');
+      if ((roster !== undefined || disposition !== undefined) && s.dispositionsRevealed) return fail('Типы армий уже раскрыты — ростер и тип армии не меняются');
       if (disposition != null && !catalog.matchups.some((m) => m.you === disposition)) return fail(`Неизвестный тип армии: ${disposition}`);
+      // G2.12: ростер обязателен; типы армий — только те, что дают его детачменты
+      if (roster !== undefined && roster.source !== 'none') {
+        if (!roster.dispositions?.length) return fail('В ростере нет детачмента с типом армии (Force Disposition)');
+        const bad = roster.dispositions.find((d) => !catalog.matchups.some((m) => m.you === d));
+        if (bad) return fail(`Неизвестный тип армии в ростере: ${bad}`);
+      }
+      const nextRoster = roster ?? p.roster;
+      if (disposition != null) {
+        if (nextRoster.source === 'none') return fail('Сначала выберите ростер игрока');
+        if (!nextRoster.dispositions?.includes(disposition)) return fail('Этот тип армии не даёт ни один детачмент ростера');
+      }
       if (name !== undefined) p.name = name.trim() || p.name;
-      if (roster !== undefined) p.roster = roster;
+      if (roster !== undefined) {
+        p.roster = roster;
+        // прежний тип армии, которого новый ростер не даёт, сбрасывается
+        if (disposition === undefined && p.disposition && !roster.dispositions?.includes(p.disposition)) {
+          p.disposition = null;
+          refreshPrimary();
+        }
+      }
       if (battleReady !== undefined) p.battleReady = battleReady;
       if (disposition !== undefined) {
         p.disposition = disposition;

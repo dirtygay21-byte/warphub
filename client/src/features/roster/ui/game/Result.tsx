@@ -3,6 +3,7 @@ import { battleResult, BATTLE_READY_VP, totals, type Seat } from '../../game';
 import { haptic } from '../../telegram';
 import { Button, Icon } from '../kit';
 import { cx } from '../util';
+import { RosterButton } from './RosterViewer';
 import { ScoreRows } from './ScoreRows';
 import type { GameHook } from './useGame';
 
@@ -42,7 +43,10 @@ export function Result({ game }: { game: GameHook }) {
           const t = totals(state, s, catalog);
           return (
             <div key={s} className="rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-[12px] leading-relaxed">
-              <p className="truncate font-semibold">{name(s)}</p>
+              <p className="flex items-center gap-1.5 font-semibold">
+                <span className="min-w-0 flex-1 truncate">{name(s)}</span>
+                <RosterButton seat={s} />
+              </p>
               <p>
                 Основная: <b>{t.primary.total}</b>
                 {t.primary.end ? <span className="text-white/50"> (конец битвы {t.primary.end})</span> : null}

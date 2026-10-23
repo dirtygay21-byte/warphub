@@ -22,8 +22,8 @@ export function setupSteps(s: GameState): SetupStep[] {
   const sec = SEATS.filter((seat) => !s.players[seat].secondaryMode).map((seat) => `${name(seat)}: режим вторичных миссий`);
   const step = (id: SetupStepId, title: string, missing: string[]): SetupStep => ({ id, title, done: missing.length === 0, missing });
   return [
-    // ростер необязателен, имена есть всегда — шаг игроков никогда не блокирует
-    step('players', 'Игроки', []),
+    // G2.12: у каждого игрока должен быть ростер (свой или по коду)
+    step('players', 'Игроки и ростеры', SEATS.filter((seat) => s.players[seat].roster.source === 'none').map((seat) => `${name(seat)}: ростер`)),
     step('dispositions', 'Типы армий', s.dispositionsRevealed ? [] : disp.length ? disp : ['раскрытие типов армий']),
     step('layout', 'Раскладка', s.layoutId ? [] : ['раскладка']),
     step('roles', 'Атакующий и защитник', s.players.p1.role ? [] : ['атакующий и защитник']),
