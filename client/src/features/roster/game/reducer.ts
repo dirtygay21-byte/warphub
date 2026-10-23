@@ -359,7 +359,8 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       break;
     }
     case 'event-reverted':
-      return fail(`Событие «${ev.type}» ещё не поддерживается`);
+      // отмене нужна история состояний — её применяет replay (см. ниже)
+      return fail('Отмена применяется только при проигрывании журнала');
     default:
       return fail(`Неизвестное событие «${(ev as { type: string }).type}»`);
   }
@@ -377,18 +378,52 @@ function turnCheck(s: GameState, seat: Seat | null, step: GameState['step']): st
   return null;
 }
 
-/** Проиграть журнал целиком. Ошибка — с номером события, на котором журнал не применился. */
+/**
+ * Проиграть журнал целиком. Ошибка — с номером события, на котором журнал не применился.
+ *
+ * Отмена (event-reverted) — как стек: отменяется только последнее действующее событие (не отменённое и не
+ * создание игры); повторная отмена снимает следующее. Отменить можно своё событие или общее (seat = null).
+ * Журнал не переписывается: отменённое событие остаётся в нём, а состояние возвращается к снимку до него —
+ * поэтому повторное взятие карты после отмены даёт те же карты (колода из того же снимка).
+ */
 export function replay(events: readonly GameEvent[], catalog: GameCatalog): ApplyResult & { seq?: number } {
   if (!events.length) return fail('Журнал пуст');
   const ids = new Set<string>();
-  let res = createGame(events[0]!);
-  if (!res.ok) return { ...res, seq: events[0]!.seq };
+  const first = createGame(events[0]!);
+  if (!first.ok) return { ...first, seq: events[0]!.seq };
   ids.add(events[0]!.id);
+  // стек действующих событий: снимок состояния после каждого
+  const stack: { ev: GameEvent; state: GameState }[] = [{ ev: events[0]!, state: first.state }];
+  let state = first.state;
   for (const ev of events.slice(1)) {
     if (ids.has(ev.id)) return { ok: false, error: `Повтор события ${ev.id}`, seq: ev.seq };
     ids.add(ev.id);
-    res = applyEvent(res.state, ev, catalog);
+    if (ev.type === 'event-reverted') {
+      if (ev.seq !== state.lastSeq + 1) return { ok: false, error: `Нарушен порядок журнала: ожидалось событие №${state.lastSeq + 1}, пришло №${ev.seq}`, seq: ev.seq };
+      const top = stack.at(-1)!;
+      if (stack.length < 2) return { ok: false, error: 'Отменять нечего', seq: ev.seq };
+      if (top.ev.id !== ev.target) return { ok: false, error: 'Отменить можно только последнее действие', seq: ev.seq };
+      if (ev.seat !== null && top.ev.seat !== null && top.ev.seat !== ev.seat) return { ok: false, error: 'Отменить можно только своё действие', seq: ev.seq };
+      stack.pop();
+      state = { ...structuredClone(stack.at(-1)!.state), lastSeq: ev.seq, reverted: [...state.reverted, ev.target] };
+      continue;
+    }
+    const res = applyEvent(state, ev, catalog);
     if (!res.ok) return { ...res, seq: ev.seq };
+    state = res.state;
+    stack.push({ ev, state });
   }
-  return res;
+  return { ok: true, state };
+}
+
+/** Какое событие снимет следующая отмена (null — отменять нечего). seat — кто отменяет (null — общий телефон). */
+export function undoTarget(events: readonly GameEvent[], seat: Seat | null = null): GameEvent | null {
+  const active: GameEvent[] = [];
+  for (const ev of events) {
+    if (ev.type === 'event-reverted') active.pop();
+    else active.push(ev);
+  }
+  const top = active.length > 1 ? active.at(-1)! : null;
+  if (!top) return null;
+  return seat === null || top.seat === null || top.seat === seat ? top : null;
 }

@@ -123,8 +123,8 @@ test('чистота: исходное состояние не меняется 
   assert.notEqual(r.state, s);
 });
 
-test('отмена пока не поддерживается (G1.7)', () => {
+test('отмена через applyEvent напрямую не применяется — только при проигрывании журнала (G1.7)', () => {
   const s = ok(replay(log(...setupBodies()), catalog));
   const r = applyEvent(s, { seat: null, type: 'event-reverted', target: 'e5', id: 'q', seq: s.lastSeq + 1, at: 'now' } as GameEvent, catalog);
-  assert.ok(!r.ok && /ещё не поддерживается/.test(r.error));
+  assert.ok(!r.ok && /при проигрывании журнала/.test(r.error));
 });
