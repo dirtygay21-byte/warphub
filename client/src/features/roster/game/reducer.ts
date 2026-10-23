@@ -39,7 +39,8 @@ function newPlayer(seat: Seat, name: string): PlayerState {
     discarded: [],
     scored: [],
     swapUsed: false,
-    vp: { primary: new Array(ROUNDS).fill(0), primaryEnd: 0, secondary: new Array(ROUNDS).fill(0), fixedByCard: {} },
+    primaryScored: [],
+    adjustments: [],
   };
 }
 
@@ -114,7 +115,8 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
   if (ev.type === 'game-created') return fail('Игра уже создана');
   if (ev.seq !== state.lastSeq + 1) return fail(`Нарушен порядок журнала: ожидалось событие №${state.lastSeq + 1}, пришло №${ev.seq}`);
   if (ev.seat !== null && !SEATS.includes(ev.seat)) return fail('Неизвестное место игрока');
-  if (state.stage === 'finished' && ev.type !== 'player-set') return fail('Битва уже закончена');
+  // после битвы — только итоги: «Конец битвы» основной миссии, поправки ПО, имя и Battle Ready
+  if (state.stage === 'finished' && !['player-set', 'primary-scored', 'vp-adjusted'].includes(ev.type)) return fail('Битва уже закончена');
 
   const s = structuredClone(state) as GameState;
   s.lastSeq = ev.seq;
@@ -219,6 +221,8 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       if (e) return fail(e);
       s.step = 'command';
       s.drawsThisPhase = 0;
+      // Core Rules 08.02 «Получение базовых CP»: в каждую фазу командования оба игрока получают 1 CP
+      for (const seat of SEATS) s.players[seat].cp += 1;
       break;
     }
     case 'command-phase-ended': {
@@ -324,8 +328,36 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       if (e) return fail(e);
       break;
     }
-    case 'primary-scored':
-    case 'vp-adjusted':
+    case 'primary-scored': {
+      if (!SEATS.includes(ev.target)) return fail('Неизвестное место игрока');
+      if (!own(ev.target)) return fail('Засчитывать можно только свою основную миссию');
+      const end = s.stage === 'finished';
+      if (!end && (s.stage !== 'battle' || s.step === 'start')) return fail('Основная миссия засчитывается в фазе командования, в конце хода или в конце битвы');
+      const id = s.primary[ev.target];
+      const card = id ? catalog.cards.find((c) => c.id === id) : undefined;
+      if (!card) return fail('Основная миссия не определена');
+      const round: Round = end ? (ROUNDS as Round) : s.round;
+      const r = cardVp({ card, picks: ev.picks, round, endOfBattle: end });
+      if ('error' in r) return fail(r.error);
+      const turn = end ? null : s.activeSeat;
+      const p = s.players[ev.target];
+      const same = p.primaryScored.filter((x) => x.round === round && x.turn === turn && x.end === end);
+      if (ev.picks.some((k) => same.some((x) => x.picks.some((y) => y.block === k.block && y.row === k.row))))
+        return fail(end ? 'Эта строка уже засчитана в конце битвы' : 'Эта строка уже засчитана в этот ход');
+      p.primaryScored.push({ round, turn, end, vp: r.vp, picks: ev.picks.map((x) => ({ ...x })) });
+      break;
+    }
+    case 'vp-adjusted': {
+      if (!SEATS.includes(ev.target)) return fail('Неизвестное место игрока');
+      if (!own(ev.target)) return fail('Поправлять можно только свои ПО');
+      if (s.stage === 'setup') return fail('ПО поправляются во время или после битвы');
+      if (ev.kind !== 'primary' && ev.kind !== 'secondary') return fail('Неизвестный вид ПО');
+      if (!Number.isInteger(ev.delta) || ev.delta === 0 || Math.abs(ev.delta) > 50) return fail('Поправка — целое число от −50 до 50, не ноль');
+      const note = ev.note.trim();
+      if (!note || note.length > 200) return fail('Укажите причину поправки (до 200 символов)');
+      s.players[ev.target].adjustments.push({ round: s.stage === 'finished' ? (ROUNDS as Round) : s.round, kind: ev.kind, delta: ev.delta, note });
+      break;
+    }
     case 'event-reverted':
       return fail(`Событие «${ev.type}» ещё не поддерживается`);
     default:

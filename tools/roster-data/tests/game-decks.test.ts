@@ -102,7 +102,8 @@ test('«при взятии»: сброс вместо возврата; кар�
   assert.ok(!s.players.p1.deck.includes('bring-it-down'));
   err(run(drawn, B({ type: 'card-redrawn', target: 'p1', card: 'assassination', replacement: s0.players.p1.deck[0], reason: 'when-drawn', shuffleBack: true, source: 'random' })), /нет правила/);
   err(run(drawn, B({ type: 'command-phase-ended' }), B({ type: 'card-redrawn', target: 'p1', card: 'bring-it-down', replacement: s0.players.p1.deck[0], reason: 'when-drawn', shuffleBack: false, source: 'random' })), /сразу после взятия/);
-  err(run(drawn, B({ type: 'card-redrawn', target: 'p1', card: 'bring-it-down', replacement: s0.players.p1.deck[0], reason: 'swap', shuffleBack: false, source: 'random' })), /нужен 1 CP/);
+  // замена за 1 CP (G1.5) — отдельное правило: в эту же фазу допустима (CP уже есть из фаз командования)
+  ok(run(drawn, B({ type: 'card-redrawn', target: 'p1', card: 'bring-it-down', replacement: s0.players.p1.deck[0], reason: 'swap', shuffleBack: false, source: 'random' })));
 });
 
 test('заметка к активной карте; к чужой или неактивной — нет', () => {

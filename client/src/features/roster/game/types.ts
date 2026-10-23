@@ -184,16 +184,34 @@ export interface PlayerState extends PlayerSetup {
   scored: ScoredCard[];
   /** замена карты за 1 CP — один раз за битву */
   swapUsed: boolean;
-  vp: {
-    /** основная миссия по раундам (с лимитом за раунд) */
-    primary: number[];
-    /** основная «в конце битвы» (вне лимита раунда) */
-    primaryEnd: number;
-    /** вторичные по раундам (с лимитом за раунд) */
-    secondary: number[];
-    /** очки с каждой фиксированной карты (лимит на карту) */
-    fixedByCard: Record<string, number>;
-  };
+  /** основная миссия: засчитанные строки (сырые очки; лимиты — в totals) */
+  primaryScored: PrimaryEntry[];
+  /** ручные поправки ПО с пояснением */
+  adjustments: VpAdjustment[];
+}
+
+export interface PrimaryEntry {
+  round: Round;
+  turn: Seat | null;
+  /** блок «Конец битвы» (вне лимита раунда) */
+  end: boolean;
+  vp: number;
+  picks: RowPick[];
+}
+
+export interface VpAdjustment {
+  round: Round;
+  kind: 'primary' | 'secondary';
+  delta: number;
+  note: string;
+}
+
+/** Итоги игрока с лимитами (G1.6). cut — сколько ПО срезано лимитами. */
+export interface PlayerTotals {
+  primary: { byRound: number[]; end: number; total: number; cut: number };
+  secondary: { byRound: number[]; byFixedCard: Record<string, number>; total: number; cut: number };
+  battleReady: number;
+  total: number;
 }
 
 export interface GameState {

@@ -5,7 +5,7 @@
  * Строки внутри блока: обычная — самостоятельная награда; «или» (or) — вместо строки выше, из цепочки
  * «строка + её или» засчитывается одна; «+» (plus) — сверх строки выше, не чаще её.
  */
-import type { CatalogBlock, CatalogCard, Round, RowPick, SecondaryMode } from './types';
+import { ROUNDS, type CatalogBlock, type CatalogCard, type GameCatalog, type GameState, type PlayerTotals, type Round, type RowPick, type SecondaryMode, type Seat } from './types';
 
 /** Подходит ли блок карты к раунду. 'end' — только конец битвы. */
 export function blockInRound(rounds: string, round: Round, endOfBattle = false): boolean {
@@ -73,4 +73,66 @@ export function cardVp({ card, picks, round, mode, endOfBattle = false }: CardVp
     if (p.count > base) return { error: '«Сверх того» — не чаще строки выше' };
   }
   return { vp };
+}
+
+/** ПО за полностью покрашенную армию (Battle Ready) — правила колоды миссий и трекер wh-rules.ru. */
+export const BATTLE_READY_VP = 10;
+
+const clamp = (v: number, max: number) => Math.max(0, Math.min(v, max));
+
+/**
+ * Итоги игрока с лимитами правил колоды миссий (лимиты — из каталога, т. е. из missions.json):
+ * основная — не больше primaryRound за раунд и primaryGame за битву; ПО «в конце битвы» вне лимита раунда
+ * (если endOfBattleOutsideRoundCap), но в лимите битвы;
+ * вторичные — фиксированная карта не больше fixedSecondaryCard за битву (по порядку засчитывания),
+ * затем не больше secondaryRound за раунд и secondaryGame за битву;
+ * поправки (vp-adjusted) входят в свой раунд до лимитов.
+ */
+export function totals(state: GameState, seat: Seat, catalog: GameCatalog): PlayerTotals {
+  const p = state.players[seat];
+  const caps = catalog.caps;
+  const adj = (kind: 'primary' | 'secondary', r: number) => p.adjustments.filter((a) => a.kind === kind && a.round === r).reduce((t, a) => t + a.delta, 0);
+
+  // основная миссия
+  const endRaw = p.primaryScored.filter((e) => e.end).reduce((t, e) => t + e.vp, 0);
+  const endOutside = caps.endOfBattleOutsideRoundCap !== false;
+  const pRaw: number[] = [];
+  const pByRound: number[] = [];
+  for (let r = 1; r <= ROUNDS; r++) {
+    let raw = p.primaryScored.filter((e) => !e.end && e.round === r).reduce((t, e) => t + e.vp, 0) + adj('primary', r);
+    if (!endOutside && r === ROUNDS) raw += endRaw;
+    pRaw.push(raw);
+    pByRound.push(clamp(raw, caps.primaryRound));
+  }
+  const pEnd = endOutside ? Math.max(0, endRaw) : 0;
+  const pSum = pByRound.reduce((t, v) => t + v, 0) + pEnd;
+  const pTotal = Math.min(pSum, caps.primaryGame);
+  const pAll = pRaw.reduce((t, v) => t + Math.max(0, v), 0) + pEnd;
+
+  // вторичные
+  const fixedCap = p.secondaryMode === 'fixed' ? (caps.fixedSecondaryCard ?? Infinity) : Infinity;
+  const byFixedCard: Record<string, number> = {};
+  const sRawRound = new Array(ROUNDS).fill(0) as number[];
+  const sAfterCard = new Array(ROUNDS).fill(0) as number[];
+  for (const e of p.scored) {
+    sRawRound[e.round - 1]! += e.vp;
+    let take = e.vp;
+    if (p.secondaryMode === 'fixed') {
+      const used = byFixedCard[e.id] ?? 0;
+      take = Math.max(0, Math.min(e.vp, fixedCap - used));
+      byFixedCard[e.id] = used + take;
+    }
+    sAfterCard[e.round - 1]! += take;
+  }
+  const sByRound = sAfterCard.map((v, i) => clamp(v + adj('secondary', i + 1), caps.secondaryRound));
+  const sTotal = Math.min(sByRound.reduce((t, v) => t + v, 0), caps.secondaryGame);
+  const sAll = sRawRound.reduce((t, v, i) => t + Math.max(0, v + adj('secondary', i + 1)), 0);
+
+  const battleReady = p.battleReady ? BATTLE_READY_VP : 0;
+  return {
+    primary: { byRound: pByRound, end: pEnd, total: pTotal, cut: Math.max(0, pAll - pTotal) },
+    secondary: { byRound: sByRound, byFixedCard, total: sTotal, cut: Math.max(0, sAll - sTotal) },
+    battleReady,
+    total: pTotal + sTotal + battleReady,
+  };
 }

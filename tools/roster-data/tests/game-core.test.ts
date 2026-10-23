@@ -20,7 +20,7 @@ test('создание игры: этап подготовки, два игро�
   const s = ok(replay(log(created), catalog));
   assert.equal(s.stage, 'setup');
   assert.deepEqual([s.players.p1.name, s.players.p2.name], ['Аня', 'Борис']);
-  assert.equal(s.players.p1.vp.primary.length, 5);
+  assert.deepEqual([s.players.p1.primaryScored, s.players.p1.adjustments, s.players.p1.cp], [[], [], 0]);
   const bad = createGame({ ...log(created)[0]!, schema: 2 } as GameEvent);
   assert.ok(!bad.ok && /версия/.test(bad.error));
   assert.ok(!replay([], catalog).ok);
@@ -123,8 +123,8 @@ test('чистота: исходное состояние не меняется 
   assert.notEqual(r.state, s);
 });
 
-test('основная миссия и отмена пока не поддерживаются (G1.6–G1.7)', () => {
+test('отмена пока не поддерживается (G1.7)', () => {
   const s = ok(replay(log(...setupBodies()), catalog));
-  const r = applyEvent(s, { seat: null, type: 'primary-scored', target: 'p1', picks: [{ block: 0, row: 0, count: 1 }], id: 'q', seq: s.lastSeq + 1, at: 'now' } as GameEvent, catalog);
+  const r = applyEvent(s, { seat: null, type: 'event-reverted', target: 'e5', id: 'q', seq: s.lastSeq + 1, at: 'now' } as GameEvent, catalog);
   assert.ok(!r.ok && /ещё не поддерживается/.test(r.error));
 });

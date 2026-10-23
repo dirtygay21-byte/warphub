@@ -71,17 +71,17 @@ test('тактическая карта: засчитана — уходит и�
 test('сброс за CP: в конце своего хода, 1 CP один раз за ход; фиксированные не сбрасываются', () => {
   const d1 = B({ type: 'card-discarded', target: 'p1', card: 'assassination', forCp: true });
   const s = ok(run(P1_MAIN, d1));
-  assert.equal(s.players.p1.cp, 1);
+  assert.equal(s.players.p1.cp, 3, '2 базовых CP (две фазы командования) + 1 за сброс');
   assert.deepEqual(s.players.p1.discarded, ['assassination']);
   err(run(P1_MAIN, d1, B({ type: 'card-discarded', target: 'p1', card: 'behind-enemy-lines', forCp: true })), /уже получен/);
   const both = ok(run(P1_MAIN, d1, B({ type: 'card-discarded', target: 'p1', card: 'behind-enemy-lines', forCp: false })));
-  assert.equal(both.players.p1.cp, 1);
+  assert.equal(both.players.p1.cp, 3);
   assert.equal(both.players.p1.active.length, 0);
   err(run(P2_MAIN, B({ type: 'card-discarded', target: 'p2', card: 'assassination', forCp: true })), /не сбрасываются/);
   err(run(P1_COMMAND, DRAW, B({ type: 'card-discarded', target: 'p1', card: 'assassination', forCp: true })), /конце своего хода/);
   // в следующем своём ходу снова можно получить 1 CP
   const next = [B({ type: 'turn-ended' }), B({ type: 'command-phase-started' }), B({ type: 'command-phase-ended' }), B({ type: 'turn-ended' }), B({ type: 'command-phase-started' }), B({ type: 'command-phase-ended' })];
-  assert.equal(ok(run(P1_MAIN, d1, ...next, B({ type: 'card-discarded', target: 'p1', card: 'behind-enemy-lines', forCp: true }))).players.p1.cp, 2);
+  assert.equal(ok(run(P1_MAIN, d1, ...next, B({ type: 'card-discarded', target: 'p1', card: 'behind-enemy-lines', forCp: true }))).players.p1.cp, 6, '3 + 2 базовых + 1 за сброс в новом ходу');
 });
 
 test('замена за 1 CP: в фазе командования, один раз за битву, нужен CP; карта сбрасывается', () => {
@@ -91,17 +91,17 @@ test('замена за 1 CP: в фазе командования, один р�
   const swap = B({ type: 'card-redrawn', target: 'p1', card: 'assassination', replacement: top, reason: 'swap', shuffleBack: false, source: 'random' });
   const s = ok(run(P1_COMMAND, DRAW, cp, swap));
   assert.deepEqual(s.players.p1.active.map((a) => a.id), ['behind-enemy-lines', top]);
-  assert.deepEqual([s.players.p1.cp, s.players.p1.swapUsed, s.players.p1.discarded], [1, true, ['assassination']]);
+  assert.deepEqual([s.players.p1.cp, s.players.p1.swapUsed, s.players.p1.discarded], [3, true, ['assassination']], '2 базовых + 2 вручную − 1');
   err(run(P1_COMMAND, DRAW, cp, swap, B({ ...swap, card: 'behind-enemy-lines', replacement: s.players.p1.deck[0] })), /уже использована/);
-  err(run(P1_COMMAND, DRAW, swap), /нужен 1 CP/);
+  err(run(P1_COMMAND, DRAW, B({ type: 'cp-changed', target: 'p1', delta: -2, reason: 'stratagem' }), swap), /нужен 1 CP/);
   err(run(P1_COMMAND, DRAW, cp, B({ ...swap, shuffleBack: true })), /сбрасывается/);
   err(run(P1_COMMAND, DRAW, cp, B({ type: 'command-phase-ended' }), swap), /фазы командования/);
 });
 
 test('CP вручную: базовые, стратагемы, прочее; ниже нуля и чужие — нет; сброс и замена — только автоматически', () => {
   const s = ok(run(P2_MAIN, B({ type: 'cp-changed', target: 'p2', delta: 3, reason: 'base' }), B({ type: 'cp-changed', target: 'p2', delta: -2, reason: 'stratagem' })));
-  assert.equal(s.players.p2.cp, 1);
-  err(run(P2_MAIN, B({ type: 'cp-changed', target: 'p2', delta: -1, reason: 'stratagem' })), /Не хватает CP/);
+  assert.equal(s.players.p2.cp, 2, '1 базовый + 3 − 2');
+  err(run(P2_MAIN, B({ type: 'cp-changed', target: 'p2', delta: -2, reason: 'stratagem' })), /Не хватает CP/);
   err(run(P2_MAIN, B({ type: 'cp-changed', target: 'p2', delta: 1, reason: 'discard' })), /автоматически/);
   err(run(P2_MAIN, B({ type: 'cp-changed', target: 'p2', seat: 'p1', delta: 1, reason: 'base' })), /только себе/);
   err(run(P2_MAIN, B({ type: 'cp-changed', target: 'p2', delta: 0, reason: 'other' })), /не ноль/);
