@@ -125,7 +125,7 @@ export type GameEvent = EventBase &
   (
     | { type: 'game-created'; schema: number; seed: string; names: Record<Seat, string> }
     | { type: 'player-set'; target: Seat; patch: Partial<Pick<PlayerSetup, 'name' | 'roster' | 'disposition' | 'battleReady'>> }
-    | { type: 'layout-set'; layoutId: string; source: Source }
+    | { type: 'layout-set'; layoutId: string; source: Source; roll?: RollRef }
     | { type: 'dispositions-revealed' }
     | { type: 'roles-set'; attacker: Seat; source: Source; roll?: RollRef }
     | { type: 'secondary-chosen'; target: Seat; mode: SecondaryMode; fixed: [string, string] | null }
@@ -251,6 +251,8 @@ export interface GameState {
   /** последние броски «кто выше» и сколько бросков каждого вида уже было (следующий — с этим номером) */
   rolls: Partial<Record<RollKey, RollResult>>;
   rollCount: Record<RollKey, number>;
+  /** сколько раз раскладку уже тянули случайно (следующая случайная — с этим номером) */
+  layoutDraws: number;
   firstTurn: Seat | null;
   round: Round;
   activeSeat: Seat | null;

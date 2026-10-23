@@ -3,7 +3,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { replay } from '../../../client/src/features/roster/game/reducer';
-import { rollOff } from '../../../client/src/features/roster/game/rng';
+import { layoutPick, rollOff } from '../../../client/src/features/roster/game/rng';
+import { layoutsFor } from '../../../client/src/features/roster/game/reducer';
 import { currentSetupStep, setupMissing, setupSteps } from '../../../client/src/features/roster/game/setup';
 import type { GameState } from '../../../client/src/features/roster/game/types';
 import { catalog, log, setupBodies, type Body } from './game-helpers';
@@ -71,4 +72,26 @@ test('бросок за первый ход: победитель ходит п�
   err(upTo(9, B({ type: 'first-turn-set', first: FIRST.winner === 'p1' ? 'p2' : 'p1', source: 'random', roll: R(0) })), /победитель броска/);
   // вручную (договорились) — любой
   assert.equal(ok(upTo(9, B({ type: 'first-turn-set', first: 'p1', source: 'manual' }))).firstTurn, 'p1');
+});
+
+test('случайная раскладка: по seed и номеру выбора, проверяется движком; после ролей — не меняется', () => {
+  const s4 = ok(upTo(4));
+  const opts = layoutsFor(s4, catalog);
+  assert.equal(opts.length, 3);
+  const pick = opts[layoutPick('seed-1', 0, 3)]!;
+  const other = opts.find((l) => l.id !== pick.id)!;
+  const s = ok(upTo(4, B({ type: 'layout-set', layoutId: pick.id, source: 'random', roll: R(0) })));
+  assert.deepEqual([s.layoutId, s.layoutDraws], [pick.id, 1]);
+  err(upTo(4, B({ type: 'layout-set', layoutId: other.id, source: 'random', roll: R(0) })), /не совпадает с жребием/);
+  err(upTo(4, B({ type: 'layout-set', layoutId: pick.id, source: 'random', roll: R(1) })), /Ожидался случайный выбор №1/);
+  err(upTo(4, B({ type: 'layout-set', layoutId: pick.id, source: 'random' })), /номер выбора/);
+  err(upTo(4, B({ type: 'layout-set', layoutId: pick.id, source: 'manual', roll: R(0) })), /ручной/);
+  // повторный жребий — следующий номер; вручную — любая из трёх
+  const again = ok(upTo(4, B({ type: 'layout-set', layoutId: pick.id, source: 'random', roll: R(0) }), B({ type: 'layout-set', layoutId: opts[layoutPick('seed-1', 1, 3)]!.id, source: 'random', roll: R(1) })));
+  assert.equal(again.layoutDraws, 2);
+  assert.equal(ok(upTo(4, B({ type: 'layout-set', layoutId: other.id, source: 'manual' }))).layoutId, other.id);
+  err(upTo(6, B({ type: 'layout-set', layoutId: other.id, source: 'manual' })), /не поменять/);
+  // отмена возвращает номер выбора
+  const evs = log(...setupBodies().slice(0, 4), B({ type: 'layout-set', layoutId: pick.id, source: 'random', roll: R(0) }));
+  assert.equal(ok(replay(log(...evs.map((e) => B(e)), B({ type: 'event-reverted', target: evs.at(-1)!.id })), catalog)).layoutDraws, 0);
 });

@@ -23,7 +23,7 @@ import {
 import { drawCards, initDecks, noteCard, redrawWhenDrawn, swapCard } from './decks';
 import { cardVp } from './scoring';
 import { setupMissing } from './setup';
-import { rollOff } from './rng';
+import { layoutPick, rollOff } from './rng';
 
 export const other = (s: Seat): Seat => (s === 'p1' ? 'p2' : 'p1');
 
@@ -90,6 +90,7 @@ export function createGame(ev: GameEvent): ApplyResult {
       secondariesRevealed: false,
       rolls: {},
       rollCount: { roles: 0, 'first-turn': 0 },
+      layoutDraws: 0,
       firstTurn: null,
       round: 1,
       activeSeat: null,
@@ -175,8 +176,16 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
     case 'layout-set': {
       if (!inSetup) return fail('Раскладка выбирается до начала битвы');
       if (!s.dispositionsRevealed) return fail('Сначала раскройте типы армий');
-      const l = layoutsFor(s, catalog).find((x) => x.id === ev.layoutId);
+      if (s.players.p1.role) return fail('Атакующий и защитник уже определены — раскладку не поменять');
+      const opts = layoutsFor(s, catalog);
+      const l = opts.find((x) => x.id === ev.layoutId);
       if (!l) return fail('Эта раскладка не подходит к паре типов армий');
+      if (ev.source === 'random') {
+        if (!ev.roll || !Number.isInteger(ev.roll.attempt)) return fail('Для случайной раскладки нужен номер выбора');
+        if (ev.roll.attempt !== s.layoutDraws) return fail(`Ожидался случайный выбор №${s.layoutDraws + 1}`);
+        if (opts[layoutPick(s.seed, ev.roll.attempt, opts.length)]!.id !== l.id) return fail('Случайная раскладка не совпадает с жребием');
+        s.layoutDraws += 1;
+      } else if (ev.roll) return fail('Жребий указан, а выбор отмечен как ручной');
       s.layoutId = l.id;
       s.deploymentId = l.deployment;
       break;

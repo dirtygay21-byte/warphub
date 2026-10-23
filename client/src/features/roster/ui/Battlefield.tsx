@@ -96,7 +96,7 @@ function Guides({ guides }: { guides: Guide[] }) {
   );
 }
 
-function BattleMap({
+export function BattleMap({
   layout,
   dep,
   className,
@@ -481,7 +481,7 @@ function PieceInfo({ layout, index, onClose }: { layout: BfLayout; index: number
   );
 }
 
-function Legend() {
+export function Legend() {
   const item = (swatch: ReactNode, label: string) => (
     <span className="flex items-center gap-1.5">
       {swatch}
