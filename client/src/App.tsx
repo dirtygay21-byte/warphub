@@ -19,6 +19,7 @@ import News from "@/components/pages/News/News";
 import Profile from "@/components/pages/Profile/Profile";
 import RosterPage from "@/components/pages/Roster/RosterPage";
 import AdminRoster from "@/components/pages/Admin/Roster/AdminRoster";
+import AdminAdmins from "@/components/pages/Admin/Admins/AdminAdmins";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 export default function App() {
@@ -60,6 +61,7 @@ export default function App() {
             <Route path="dnd" element={<AdminDnd />} />
             <Route path="roster" element={<AdminRoster />} />
             <Route path="rewards" element={<AdminRewards />} />
+            <Route path="admins" element={<AdminAdmins />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -34,7 +34,9 @@ export default function Header() {
           ? "Roster"
           : pathname.includes("/rewards")
             ? "Rewards"
-            : "Reservations";
+            : pathname.includes("/admins")
+              ? "Admins"
+              : "Reservations";
 
   const adminTabs = [
     { id: "Reservations", label: "Записи", path: "/admin" },
@@ -43,6 +45,7 @@ export default function Header() {
     { id: "Rewards", label: "Награды", path: "/admin/rewards" },
     { id: "ContentManagement", label: "Контент", path: "/admin/content" },
     { id: "Roster", label: "Ростеры", path: "/admin/roster" },
+    { id: "Admins", label: "Админы", path: "/admin/admins" },
   ];
 
   // Обрабатываем нажатия на кнопку назад и чистим соответсвующий стейт
