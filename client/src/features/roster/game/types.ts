@@ -52,8 +52,16 @@ export interface CatalogBlock {
   /** 'any' | '1' | '1–2' | '2+' | '2–3' | '2–4' | '4+' | '5' | 'end' */
   rounds: string;
   mode?: SecondaryMode;
+  /** вторичные: чей ход должен заканчиваться — см. blockTurnOk */
+  turn?: BlockTurn;
+  /** основные: когда засчитывается — см. primaryAtOk */
+  at?: PrimaryAt;
   rows: CatalogRow[];
 }
+/** конец вашего хода | конец вашей фазы командования | то же, в 5-м раунде — конец вашего хода | конец любого хода | конец битвы */
+export type PrimaryAt = 'own-turn' | 'own-command' | 'own-command-r5-turn' | 'any-turn' | 'battle-end';
+/** own — ваш ход, opponent — ход противника, any — любой, opponent-or-r5 — ход противника или конец 5-го раунда (что раньше) */
+export type BlockTurn = 'own' | 'opponent' | 'any' | 'opponent-or-r5';
 export interface CatalogCard {
   id: string;
   name: string;
@@ -63,6 +71,10 @@ export interface CatalogCard {
   modes?: SecondaryMode[];
   /** правило «при взятии» есть на карте (подсказка и варианты на экране) */
   drawn?: string;
+  /** правило «при взятии» обязательное */
+  drawnRequired?: boolean;
+  /** «при взятии» в виде данных — см. redrawWhenDrawn */
+  onDraw?: { action: 'reshuffle' | 'discard' | 'note'; round1?: boolean; ifActive?: string; required?: boolean; confirm?: boolean };
   blocks: CatalogBlock[];
 }
 export interface GameCatalog {
@@ -143,7 +155,7 @@ export type GameEvent = EventBase &
     | { type: 'cp-changed'; target: Seat; delta: number; reason: 'base' | 'stratagem' | 'discard' | 'swap' | 'other'; note?: string }
     | { type: 'command-phase-ended' }
     | { type: 'turn-ended' }
-    | { type: 'battle-ended'; reason: 'rounds' | 'concede' | 'manual' }
+    | { type: 'battle-ended'; reason: 'rounds' | 'concede' | 'manual'; /** кто сдался (для concede) */ by?: Seat }
     | { type: 'event-reverted'; target: string }
   );
 
@@ -177,8 +189,20 @@ export interface ActiveCard {
   /** когда стала активной */
   round: Round;
   source: Source;
+  /** номер карты в порядке выхода из колоды (1, 2, …; только тактические) */
+  n?: number;
   /** заметка «при взятии» (маяк, заманчивая цель …) */
   note?: string;
+}
+
+/** Карта ушла в сброс: сброс в конце хода (cp +1 или 0), замена за 1 CP (−1) или правило «при взятии». */
+export interface DiscardEntry {
+  id: string;
+  round: Round;
+  n?: number;
+  why: 'discard' | 'swap' | 'when-drawn';
+  /** изменение CP этим действием */
+  cp: number;
 }
 
 export interface ScoredCard {
@@ -186,6 +210,8 @@ export interface ScoredCard {
   round: Round;
   /** чей ход шёл, когда карта засчитана (вторичные считаются в конце хода любого игрока) */
   turn: Seat;
+  /** номер карты в порядке выхода из колоды (тактические) */
+  n?: number;
   /** очки по карте до лимитов (лимиты раунда, битвы и фиксированной карты — в итогах, G1.6) */
   vp: number;
   picks: RowPick[];
@@ -199,7 +225,11 @@ export interface PlayerState extends PlayerSetup {
   /** сколько раз колоду перемешивали (часть seed для следующего перемешивания) */
   shuffles: number;
   active: ActiveCard[];
+  /** сколько карт вышло из колоды за битву (последний номер n) */
+  drawn: number;
   discarded: string[];
+  /** сброшенные карты по порядку: когда, почему, CP */
+  discardLog: DiscardEntry[];
   scored: ScoredCard[];
   /** замена карты за 1 CP — один раз за битву */
   swapUsed: boolean;
@@ -266,6 +296,8 @@ export interface GameState {
   discardCpTaken: boolean;
   /** почему битва закончилась (stage = finished) */
   endReason: 'rounds' | 'concede' | 'manual' | null;
+  /** кто сдался: решение владельца (G3.6) — победа достаётся сопернику независимо от ПО */
+  concededBy: Seat | null;
   /** номер последнего применённого события */
   lastSeq: number;
   /** id отменённых событий */

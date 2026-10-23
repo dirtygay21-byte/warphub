@@ -5,7 +5,7 @@
  * Строки внутри блока: обычная — самостоятельная награда; «или» (or) — вместо строки выше, из цепочки
  * «строка + её или» засчитывается одна; «+» (plus) — сверх строки выше, не чаще её.
  */
-import { ROUNDS, type CatalogBlock, type CatalogCard, type GameCatalog, type GameState, type PlayerTotals, type Round, type RowPick, type SecondaryMode, type Seat } from './types';
+import { ROUNDS, type BlockTurn, type PrimaryAt, type TurnStep, type CatalogBlock, type CatalogCard, type GameCatalog, type GameState, type PlayerTotals, type Round, type RowPick, type SecondaryMode, type Seat } from './types';
 
 /** Подходит ли блок карты к раунду. 'end' — только конец битвы. */
 export function blockInRound(rounds: string, round: Round, endOfBattle = false): boolean {
@@ -17,6 +17,36 @@ export function blockInRound(rounds: string, round: Round, endOfBattle = false):
   if (range) return round >= Number(range[1]) && round <= Number(range[2]);
   if (/^\d$/.test(rounds)) return round === Number(rounds);
   return false;
+}
+
+/**
+ * Можно ли засчитать блок вторичной миссии в конце этого хода (G2.11a, правила колоды миссий: в конце каждого хода
+ * засчитывают оба игрока, но карта указывает, чей ход). ownTurn — заканчивается ход владельца карты;
+ * lastTurnOfBattle — последний ход 5-го раунда: для «хода противника или конца 5-го раунда» игрок, ходящий вторым,
+ * засчитывает карту в конце своего хода (ход противника в 5-м раунде уже прошёл). Без turn — любой ход.
+ */
+export function blockTurnOk(turn: BlockTurn | undefined, ownTurn: boolean, lastTurnOfBattle: boolean): boolean {
+  if (turn === 'own') return ownTurn;
+  if (turn === 'opponent') return !ownTurn;
+  if (turn === 'opponent-or-r5') return !ownTurn || lastTurnOfBattle;
+  return true;
+}
+
+/**
+ * Можно ли засчитать блок основной миссии сейчас (G3.1). end — битва окончена (только «Конец битвы»);
+ * step — шаг хода (command — идёт фаза командования, main — после неё, до конца хода); ownTurn — ход владельца.
+ * «Конец фазы командования» засчитывается, пока идёт ваша фаза командования; own-command-r5-turn в 5-м раунде —
+ * в конце вашего хода. Без at — как раньше (по раундам блока).
+ */
+export function primaryAtOk(at: PrimaryAt | undefined, ctx: { end: boolean; step: TurnStep; ownTurn: boolean; round: Round }): boolean {
+  if (!at) return true;
+  if (ctx.end) return at === 'battle-end';
+  if (at === 'battle-end') return false;
+  if (at === 'any-turn') return ctx.step === 'main';
+  if (!ctx.ownTurn) return false;
+  if (at === 'own-turn') return ctx.step === 'main';
+  if (at === 'own-command') return ctx.step === 'command';
+  return ctx.round === ROUNDS ? ctx.step === 'main' : ctx.step === 'command';
 }
 
 /** Группа «или»: индекс первой строки цепочки, к которой относится строка. */
@@ -58,7 +88,14 @@ export function cardVp({ card, picks, round, mode, endOfBattle = false }: CardVp
     if (seen.has(key)) return { error: 'Строка отмечена дважды' };
     seen.add(key);
     if (block.mode && mode && block.mode !== mode) return { error: `Этот блок — для ${block.mode === 'fixed' ? 'фиксированного' : 'тактического'} режима` };
-    if (!blockInRound(block.rounds, round, endOfBattle)) return { error: endOfBattle ? 'В конце битвы засчитываются только блоки «Конец битвы»' : 'Этот блок не действует в этом раунде' };
+    if (!blockInRound(block.rounds, round, endOfBattle))
+      return {
+        error: endOfBattle
+          ? 'В конце битвы засчитываются только блоки «Конец битвы»'
+          : block.rounds === 'end'
+            ? 'Этот блок засчитывается в конце битвы'
+            : 'Этот блок не действует в этом раунде',
+      };
     const g = `${p.block}:${orGroup(block, p.row)}`;
     if (groups.has(g)) return { error: 'Из строк, связанных «или», засчитывается одна' };
     groups.set(g, p.row);
@@ -73,6 +110,17 @@ export function cardVp({ card, picks, round, mode, endOfBattle = false }: CardVp
     if (p.count > base) return { error: '«Сверх того» — не чаще строки выше' };
   }
   return { vp };
+}
+
+/**
+ * Итог битвы (G3.6): победитель по ПО (равенство — ничья). Если игрок сдался — победа сопернику независимо от ПО
+ * (решение владельца, 23.10.2026: в источниках правила о сдаче нет, принято турнирное соглашение). null — битва идёт.
+ */
+export function battleResult(state: GameState, catalog: GameCatalog): { winner: Seat | null; by: 'vp' | 'concede'; totals: Record<Seat, number> } | null {
+  if (state.stage !== 'finished') return null;
+  const t = { p1: totals(state, 'p1', catalog).total, p2: totals(state, 'p2', catalog).total };
+  if (state.concededBy) return { winner: state.concededBy === 'p1' ? 'p2' : 'p1', by: 'concede', totals: t };
+  return { winner: t.p1 === t.p2 ? null : t.p1 > t.p2 ? 'p1' : 'p2', by: 'vp', totals: t };
 }
 
 /** ПО за полностью покрашенную армию (Battle Ready) — правила колоды миссий и трекер wh-rules.ru. */

@@ -14,14 +14,15 @@ import {
   type GameEvent,
   type GameState,
   type PlayerState,
+  type PrimaryAt,
   type Round,
   type RollKey,
   type RollRef,
   type RollResult,
   type Seat,
 } from './types';
-import { drawCards, initDecks, noteCard, redrawWhenDrawn, swapCard } from './decks';
-import { cardVp } from './scoring';
+import { commandPhasePending, drawCards, initDecks, noteCard, redrawWhenDrawn, swapCard } from './decks';
+import { blockTurnOk, cardVp, primaryAtOk } from './scoring';
 import { setupMissing } from './setup';
 import { layoutPick, rollOff } from './rng';
 
@@ -41,7 +42,9 @@ function newPlayer(seat: Seat, name: string): PlayerState {
     deck: [],
     shuffles: 0,
     active: [],
+    drawn: 0,
     discarded: [],
+    discardLog: [],
     scored: [],
     swapUsed: false,
     primaryScored: [],
@@ -100,6 +103,7 @@ export function createGame(ev: GameEvent): ApplyResult {
       drawsThisPhase: 0,
       discardCpTaken: false,
       endReason: null,
+      concededBy: null,
       lastSeq: 1,
       reverted: [],
     },
@@ -254,6 +258,8 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
     case 'command-phase-ended': {
       const e = turnCheck(s, ev.seat, 'command');
       if (e) return fail(e);
+      const pending = commandPhasePending(s, s.activeSeat!, catalog);
+      if (pending) return fail(pending);
       s.step = 'main';
       break;
     }
@@ -278,6 +284,9 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       if (s.stage !== 'battle') return fail('Битва не идёт');
       if (ev.reason === 'rounds') return fail('Битва по раундам заканчивается сама после пятого раунда');
       if (ev.reason !== 'concede' && ev.reason !== 'manual') return fail('Неизвестная причина окончания');
+      if (ev.reason === 'concede' && (!ev.by || !SEATS.includes(ev.by))) return fail('Укажите, кто сдался');
+      if (ev.reason === 'manual' && ev.by) return fail('Окончание по договорённости — без сдавшегося');
+      s.concededBy = ev.reason === 'concede' ? ev.by! : null;
       s.stage = 'finished';
       s.endReason = ev.reason;
       s.activeSeat = null;
@@ -314,7 +323,16 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       if (!card) return fail(`Нет карты ${ev.card}`);
       const r = cardVp({ card, picks: ev.picks, round: s.round, mode: p.secondaryMode });
       if ('error' in r) return fail(r.error);
-      p.scored.push({ id: ev.card, round: s.round, turn: s.activeSeat!, vp: r.vp, picks: ev.picks.map((x) => ({ ...x })) });
+      // чей ход: карта указывает, в конце чьего хода засчитывается блок
+      const ownTurn = s.activeSeat === ev.target;
+      const lastTurn = s.round === ROUNDS && s.activeSeat !== s.firstTurn;
+      for (const pk of ev.picks) {
+        const t = card.blocks[pk.block]!.turn;
+        if (!blockTurnOk(t, ownTurn, lastTurn))
+          return fail(t === 'own' ? 'Этот блок засчитывается в конце вашего хода' : 'Этот блок засчитывается в конце хода противника (или в конце 5-го раунда)');
+      }
+      const n = p.active.find((a) => a.id === ev.card)!.n;
+      p.scored.push({ id: ev.card, round: s.round, turn: s.activeSeat!, ...(n != null ? { n } : {}), vp: r.vp, picks: ev.picks.map((x) => ({ ...x })) });
       // тактическая карта выполнена и уходит из игры; фиксированная остаётся активной всю битву
       if (p.secondaryMode === 'tactical') p.active = p.active.filter((a) => a.id !== ev.card);
       break;
@@ -325,7 +343,8 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       const p = s.players[ev.target];
       if (p.secondaryMode !== 'tactical') return fail('Фиксированные вторичные миссии не сбрасываются');
       if (s.stage !== 'battle' || s.activeSeat !== ev.target || s.step !== 'main') return fail('Сбросить карты можно в конце своего хода');
-      if (!p.active.some((a) => a.id === ev.card)) return fail('Этой карты нет среди активных');
+      const gone = p.active.find((a) => a.id === ev.card);
+      if (!gone) return fail('Этой карты нет среди активных');
       if (ev.forCp) {
         if (s.discardCpTaken) return fail('1 CP за сброс в этот ход уже получен');
         p.cp += 1;
@@ -333,6 +352,7 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       }
       p.active = p.active.filter((a) => a.id !== ev.card);
       p.discarded.push(ev.card);
+      p.discardLog.push({ id: ev.card, round: s.round, ...(gone.n != null ? { n: gone.n } : {}), why: 'discard', cp: ev.forCp ? 1 : 0 });
       break;
     }
     case 'cp-changed': {
@@ -365,6 +385,12 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       const round: Round = end ? (ROUNDS as Round) : s.round;
       const r = cardVp({ card, picks: ev.picks, round, endOfBattle: end });
       if ('error' in r) return fail(r.error);
+      // когда: конец вашего хода, вашей фазы командования (в 5-м раунде — конец хода), любого хода, конец битвы
+      const ctx = { end, step: s.step, ownTurn: s.activeSeat === ev.target, round };
+      for (const pk of ev.picks) {
+        const at = card.blocks[pk.block]!.at;
+        if (!primaryAtOk(at, ctx)) return fail(`Этот блок засчитывается: ${AT_RU[at!]}`);
+      }
       const turn = end ? null : s.activeSeat;
       const p = s.players[ev.target];
       const same = p.primaryScored.filter((x) => x.round === round && x.turn === turn && x.end === end);
@@ -406,6 +432,14 @@ function applyRoll(s: GameState, key: RollKey, roll: RollRef | undefined): RollR
   s.rollCount[key] += 1;
   return result;
 }
+
+const AT_RU: Record<PrimaryAt, string> = {
+  'own-turn': 'в конце вашего хода',
+  'own-command': 'в конце вашей фазы командования',
+  'own-command-r5-turn': 'в конце вашей фазы командования (в 5-м раунде — в конце вашего хода)',
+  'any-turn': 'в конце любого хода',
+  'battle-end': 'в конце битвы',
+};
 
 /** Ход идёт, шаг подходящий, событие от активного игрока (или общее). */
 function turnCheck(s: GameState, seat: Seat | null, step: GameState['step']): string | null {

@@ -1,6 +1,8 @@
 // Общие помощники тестов игры (G1.3+): каталог из настоящих данных, журнал по порядку, стандартная подготовка.
 import fs from 'node:fs';
 import path from 'node:path';
+import { commandPhasePending, nextDraw } from '../../../client/src/features/roster/game/decks';
+import { replay } from '../../../client/src/features/roster/game/reducer';
 import type { GameCatalog, GameEvent, Seat } from '../../../client/src/features/roster/game/types';
 
 const DATA = path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data');
@@ -9,9 +11,37 @@ const bf = JSON.parse(fs.readFileSync(path.join(DATA, 'battlefield.json'), 'utf8
 export const catalog: GameCatalog = { cards: missions.cards, caps: missions.caps, matchups: bf.matchups, layouts: bf.layouts };
 
 export type Body = Omit<GameEvent, 'id' | 'seq' | 'at' | 'seat'> & { seat?: Seat | null };
-/** Журнал с номерами и id по порядку. */
-export function log(...bodies: Body[]): GameEvent[] {
+/** Журнал с номерами и id по порядку, как есть (без автоматического взятия карт). */
+export function rawLog(...bodies: Body[]): GameEvent[] {
   return bodies.map((b, i) => ({ seat: null, ...b, id: `e${i + 1}`, seq: i + 1, at: `2026-10-23T12:00:${String(i).padStart(2, '0')}Z` }) as GameEvent);
+}
+/**
+ * Журнал с номерами и id. Перед каждым «Завершить фазу командования», где тактический игрок ещё не взял карты
+ * (с G3.3 это обязательно), добавляет взятие с верха колоды и обязательную замену «при взятии» — так тесты,
+ * которые просто проходят ходы, не перечисляют карты. Тесты самого взятия используют rawLog.
+ */
+export function log(...bodies: Body[]): GameEvent[] {
+  const out: Body[] = [];
+  for (const b of bodies) {
+    if (b.type === 'command-phase-ended') {
+      for (let guard = 0; guard < 6; guard++) {
+        const r = replay(rawLog(...out), catalog);
+        if (!r.ok) break;
+        const s = r.state;
+        const seat = s.activeSeat;
+        if (!seat || s.step !== 'command' || !commandPhasePending(s, seat, catalog)) break;
+        const top = nextDraw(s, seat);
+        if (top.length) out.push({ type: 'cards-drawn', target: seat, cards: top, source: 'random' } as Body);
+        else {
+          const req = s.players[seat].active.find((a) => catalog.cards.find((c) => c.id === a.id)?.onDraw?.required && a.round === s.round);
+          if (!req) break;
+          out.push({ type: 'card-redrawn', target: seat, card: req.id, replacement: s.players[seat].deck[0], reason: 'when-drawn', shuffleBack: true, source: 'random' } as Body);
+        }
+      }
+    }
+    out.push(b);
+  }
+  return rawLog(...out);
 }
 export const created: Body = { type: 'game-created', schema: 1, seed: 'seed-1', names: { p1: 'Аня', p2: 'Борис' } } as Body;
 
