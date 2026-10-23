@@ -127,6 +127,9 @@ export const apiModels = {
       clubSpectatorCapacity: t.Optional(
         t.Number({ description: 'Макс. зрителей в клубе (25)' }),
       ),
+      minDuration: t.Optional(
+        t.Number({ description: 'Минимум для укороченной записи, минут: если до следующей занятости меньше полной длительности, запись короче (не меньше этого)' }),
+      ),
     }),
     slots: t.Array(
       t.Object({

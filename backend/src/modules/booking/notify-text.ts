@@ -23,7 +23,16 @@ export type BookingNotice = {
   details: ReservationDetails | null;
   /** для игр за столом: сколько мест занято и сколько всего */
   table?: { occupied: number; seats: number } | null;
+  /** полная длительность услуги, минут: если запись короче — в сообщении «ограниченное время» (B1) */
+  fullMinutes?: number | null;
 };
+
+/** «3 ч», «2 ч 30 мин» */
+export function hoursLabel(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return [h ? `${h} ч` : '', m ? `${m} мин` : ''].filter(Boolean).join(' ') || '0 мин';
+}
 
 const seatsWord = (n: number) => (n % 10 === 1 && n % 100 !== 11 ? 'место' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'места' : 'мест');
 
@@ -48,6 +57,7 @@ export function bookingNoticeText(n: BookingNotice): string {
   const lines = [
     head,
     `Когда: ${formatClubDateTime(n.startsAt, n.endsAt)}`,
+    limitedLine(n),
     n.tableName ? `Стол: ${escapeHtml(n.tableName)}` : '',
     `Кто: ${escapeHtml(formatUserName(n.user))} · Telegram ID: ${n.user.telegramId}`,
     n.partySize && n.partySize > 1 ? `Мест: ${n.partySize}` : '',
@@ -70,4 +80,11 @@ export function bookingNoticeText(n: BookingNotice): string {
   if (buyArmy) lines.push(`Покупка армии: ${buyArmy}`);
   lines.push(`Оформлено: ${formatClubDateTime(n.createdAt)}`);
   return lines.filter(Boolean).join('\n');
+}
+
+/** «⚠️ Ограниченное время: 3 ч вместо 4 ч» — если запись короче полной длительности (B1). */
+function limitedLine(n: BookingNotice): string {
+  if (!n.fullMinutes || !n.startsAt || !n.endsAt) return '';
+  const minutes = Math.round((n.endsAt.getTime() - n.startsAt.getTime()) / 60_000);
+  return minutes < n.fullMinutes ? `⚠️ <b>Ограниченное время: ${hoursLabel(minutes)} вместо ${hoursLabel(n.fullMinutes)}</b> — дальше стол или места заняты` : '';
 }

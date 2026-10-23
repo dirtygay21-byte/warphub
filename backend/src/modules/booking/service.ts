@@ -59,6 +59,8 @@ import {
   type DateParts,
   type ReservationDetails,
   type TableBooking,
+  poolFitEnd,
+  tableFitEnd,
 } from './rules';
 
 export { parseDateParam } from './rules';
@@ -134,6 +136,8 @@ export type ServiceAvailability = {
     seatsPerTable: number | null;
     poolCapacity: number | null;
     hasTrainer: boolean;
+    /** B1: минимальная длительность укороченной записи, минут (если до следующей занятости меньше полной) */
+    minDuration: number;
     /** Макс. вместимость зрителей в клубе (только для club_visit) */
     clubSpectatorCapacity?: number;
   };
@@ -513,6 +517,7 @@ export async function getServiceAvailability(
       seatsPerTable: mode.mode === 'table' ? mode.seatsPerTable : null,
       poolCapacity: mode.mode === 'pool' ? mode.capacity : null,
       hasTrainer: service.hasTrainer,
+      minDuration: Math.min(durationMinutes, bookingConfig.minShortenedMinutes),
       ...(service.slug === CLUB_VISIT_SLUG && mode.mode === 'pool'
         ? { clubSpectatorCapacity: mode.capacity }
         : {}),
@@ -771,13 +776,14 @@ export async function createReservation(
 
   const startsAt = input.startsAt;
   const durationMinutes = serviceDuration(service);
-  const endsAt = new Date(startsAt.getTime() + durationMinutes * 60 * 1000);
+  // полный конец по длительности; ниже он может стать раньше, если до следующей занятости меньше (B1)
+  const fullEndsAt = new Date(startsAt.getTime() + durationMinutes * 60 * 1000);
 
   if (startsAt.getTime() <= Date.now()) {
     throw new BookingError('INVALID_TIME', 'Selected time is in the past');
   }
 
-  if (!isOnSlotGrid(startsAt, endsAt, durationMinutes)) {
+  if (!isOnSlotGrid(startsAt, fullEndsAt, durationMinutes)) {
     throw new BookingError(
       'INVALID_TIME',
       'Selected time slot is not available',
@@ -845,13 +851,25 @@ export async function createReservation(
     const reservation = await db.transaction(async (tx) => {
       await lockKey(tx, LOCK_POOL, service.id);
       const bookings = await getPoolReservations(tx, service.id, openAt, closeAt);
-      const free = poolFreeSeats({ startsAt, endsAt }, bookings, mode.capacity);
+      const free = poolFreeSeats({ startsAt, endsAt: new Date(startsAt.getTime() + 1) }, bookings, mode.capacity);
 
       if (free < partySize) {
         throw new BookingError(
           'SLOT_UNAVAILABLE',
           free === 0 ? 'No places left' : `Only ${free} places left`,
         );
+      }
+      // B1: если мест не хватит на всю длительность — запись короче, но не меньше минимума
+      const endsAt = poolFitEnd({
+        startsAt,
+        fullEnd: fullEndsAt,
+        bookings,
+        capacity: mode.capacity,
+        partySize,
+        minMinutes: bookingConfig.minShortenedMinutes,
+      });
+      if (!endsAt) {
+        throw new BookingError('SLOT_UNAVAILABLE', `Less than ${bookingConfig.minShortenedMinutes / 60} hours are free from this time`);
       }
 
       const [created] = await tx
@@ -897,6 +915,16 @@ export async function createReservation(
 
     const bookings = await getTableReservations(tx, [tableId], openAt, closeAt);
     const eventBlocks = await getEventTableBlocks([tableId], openAt, closeAt);
+    // B1: присоединение — время уже идущей сессии; новая игра — полная длительность или до следующей занятости стола
+    const session = bookings.find(
+      (b) => b.tableId === tableId && b.serviceId === service.id && b.startsAt.getTime() === startsAt.getTime(),
+    );
+    const endsAt =
+      session?.endsAt ??
+      tableFitEnd({ tableId, startsAt, fullEnd: fullEndsAt, bookings, blocks: eventBlocks, minMinutes: bookingConfig.minShortenedMinutes });
+    if (!endsAt) {
+      throw new BookingError('SLOT_UNAVAILABLE', `Less than ${bookingConfig.minShortenedMinutes / 60} hours are free at this table from this time`);
+    }
     const check = checkTableSession({
       tableId,
       serviceId: service.id,
@@ -1078,6 +1106,7 @@ async function notifyAfterCreate(
       buyArmyOptions: reservation.buyArmyOptions,
       details,
       table: atTable ? { occupied: others.length + 1, seats: seats! } : null,
+      fullMinutes: serviceDuration(service),
     });
     const playersAtTable = others.map((other) => describePlayer(other.user, other.details));
     notifyAdmins(playersAtTable.length ? `${text}\n— за столом также:\n${playersAtTable.join('\n')}` : text);
