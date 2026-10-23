@@ -198,6 +198,12 @@ cd tools/roster-data
 npm run battlefield      # → backend/roster-data/battlefield.json
 ```
 
+Сверка с game-datamissions.com и официальными картами деплоя (Mission Deck 2026-27) — `battlefield-review.json`.
+Конфликт источников: в 40kdc-data 1.4.5 у Dawn of War и Sweeping Engagement перепутаны атакующий и защитник
+(форма зон та же). Берутся официальные карты: импорт меняет подписи сторон (`SWAP_SIDES` в `import-battlefield.ts`),
+проверка — `tests/battlefield.test.ts`. У 7 раскладок пара размеров до центральных руин на 1,7–2″ больше, чем на GDM
+(другая точка отсчёта) — оставлено как есть, записано в отчёте.
+
 Резолвер геометрии взят из 40kdc-data (`vendor/40kdc-resolve.ts`, MIT). В приложении обязательна подпись
 «Powered by 40kdc-data» со ссылкой на https://40kdc.alpacasoft.dev — она стоит внизу экрана «Поле боя».
 
