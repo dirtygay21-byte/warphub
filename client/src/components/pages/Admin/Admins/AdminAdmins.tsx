@@ -29,7 +29,7 @@ export default function AdminAdmins() {
     },
   });
   const remove = useMutation({ mutationFn: removeAdmin, onSuccess: refresh });
-  const idOk = /^\d{5,15}$/.test(telegramId.trim());
+  const idOk = /^\d{1,15}$/.test(telegramId.trim()) && Number(telegramId) > 0;
   const canManage = list.data?.canManage ?? false;
 
   const ask = async (a: AdminEntry) => {

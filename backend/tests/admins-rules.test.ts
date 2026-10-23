@@ -6,11 +6,12 @@ import { cleanNote, parseTelegramId } from '../src/modules/admins/rules';
 afterEach(() => setAddedAdminIds([]));
 
 describe('parseTelegramId', () => {
-  test('число или строка из 5–15 цифр; иначе null', () => {
+  test('положительное число или строка до 15 цифр; иначе null', () => {
     expect(parseTelegramId('394165661')).toBe(394165661);
     expect(parseTelegramId(' 7012345678 ')).toBe(7012345678);
     expect(parseTelegramId(12345)).toBe(12345);
-    for (const bad of ['', '1234', '12ab567', '-394165661', '3.5', '1234567890123456', null, undefined, {}, 0]) expect(parseTelegramId(bad)).toBeNull();
+    expect(parseTelegramId('3101')).toBe(3101);
+    for (const bad of ['', '0', '12ab567', '-394165661', '3.5', '1234567890123456', null, undefined, {}, 0]) expect(parseTelegramId(bad)).toBeNull();
   });
   test('пометка: пробелы обрезаются, до 100 символов, пустая — null', () => {
     expect(cleanNote('  Вася  ')).toBe('Вася');

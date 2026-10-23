@@ -81,7 +81,7 @@ function requireBuiltin(by: User) {
 export async function addAdmin(by: User, rawId: unknown, rawNote: unknown) {
   requireBuiltin(by);
   const telegramId = parseTelegramId(rawId);
-  if (telegramId === null) throw new AdminsError('BAD_ID', 'Telegram ID — число из 5–15 цифр');
+  if (telegramId === null) throw new AdminsError('BAD_ID', 'Telegram ID — положительное число до 15 цифр');
   if (getBuiltinAdminIds().includes(String(telegramId))) throw new AdminsError('BUILTIN', 'Это основной администратор — он уже имеет доступ');
   const inserted = await db
     .insert(adminUsersTable)
@@ -97,7 +97,7 @@ export async function addAdmin(by: User, rawId: unknown, rawNote: unknown) {
 export async function removeAdmin(by: User, rawId: unknown) {
   requireBuiltin(by);
   const telegramId = parseTelegramId(rawId);
-  if (telegramId === null) throw new AdminsError('BAD_ID', 'Telegram ID — число из 5–15 цифр');
+  if (telegramId === null) throw new AdminsError('BAD_ID', 'Telegram ID — положительное число до 15 цифр');
   if (getBuiltinAdminIds().includes(String(telegramId))) throw new AdminsError('BUILTIN', 'Основного администратора нельзя удалить из админки');
   const removed = await db.delete(adminUsersTable).where(eq(adminUsersTable.telegramId, telegramId)).returning();
   if (!removed.length) throw new AdminsError('NOT_FOUND', 'Такого администратора нет');
