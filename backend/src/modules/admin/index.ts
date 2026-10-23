@@ -23,6 +23,7 @@ import {
   toReservationResponse,
 } from '../booking/service';
 import { getAdminUserProfile, searchUsersByUsername } from '../users/service';
+import { testNotification } from '../notifications/service';
 import {
   createEvent,
   deleteEvent,
@@ -928,4 +929,12 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
         description: 'Счёт не может уйти в минус. Игрок получает сообщение от бота.',
       },
     },
-  );
+  )
+  .post('/notifications/test', ({ user }) => testNotification(user), {
+    detail: {
+      tags: ['Admin'],
+      summary: 'Проверить уведомления: тестовое сообщение от бота себе',
+      description: 'Возвращает, доставлено ли сообщение, а если нет — причину (не нажат «Старт», неверный токен, уведомления выключены, нет связи).',
+    },
+  });
+

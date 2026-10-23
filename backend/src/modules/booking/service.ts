@@ -18,7 +18,6 @@ import {
 import {
   bookingConfig,
   experienceLabel,
-  paintSourceLabel,
   type TableCapacityProfile,
 } from '../../config/booking';
 import { db } from '../../db';
@@ -63,6 +62,7 @@ import {
 } from './rules';
 
 export { parseDateParam } from './rules';
+import { bookingNoticeText } from './notify-text';
 
 const ACTIVE_RESERVATION_STATUSES = ['pending', 'confirmed'] as const;
 const CLUB_VISIT_SLUG = 'club_visit';
@@ -1040,6 +1040,7 @@ async function notifyAfterCreate(
   service: ServiceRow,
   reservation: Reservation,
   context: { joined: boolean; others: string[]; seatsPerTable?: number },
+  reason: 'created' | 'help-requested' = 'created',
 ): Promise<void> {
   try {
     const [booker] = await loadUsersForReservations([reservation.id]);
@@ -1047,48 +1048,11 @@ async function notifyAfterCreate(
 
     const when = formatClubDateTime(reservation.startsAt, reservation.endsAt);
     const details = (reservation.details as ReservationDetails | null) ?? null;
-
-    if (details?.kind === 'painting') {
-      if (details.needsHelp) {
-        notifyAdmins(
-          [
-            '🎨 <b>Покраска: нужна помощь</b>',
-            `Дата: ${when}`,
-            `Участник: ${escapeHtml(formatUserName(booker.user))}`,
-            `Фракция: ${escapeHtml(details.faction)}`,
-            `Модель: ${escapeHtml(details.model)}`,
-            `Краски: ${escapeHtml(paintSourceLabel(details.paintSource))}`,
-            details.comment ? `Комментарий: ${escapeHtml(details.comment)}` : '',
-          ]
-            .filter(Boolean)
-            .join('\n'),
-        );
-      }
-      return;
-    }
-
     const seats = context.seatsPerTable;
-    if (!seats || seats < 2 || reservation.tableId === null) return;
+    const atTable = !!seats && seats >= 2 && reservation.tableId !== null;
+    const others = atTable && context.joined ? await loadUsersForReservations(context.others) : [];
 
-    const tableName = escapeHtml(await getTableName(reservation.tableId));
-
-    if (!context.joined) {
-      // Новая игра: на столе 1 из 2 — администратор может подобрать соперника
-      notifyAdmins(
-        [
-          `♟ <b>${serviceTitle(service)}: стол ждёт соперника (1/${seats})</b>`,
-          `Дата: ${when}`,
-          `Стол: ${tableName}`,
-          describePlayer(booker.user, details),
-          `Занято: 1 · Свободно: ${seats - 1}`,
-        ].join('\n'),
-      );
-      return;
-    }
-
-    const others = await loadUsersForReservations(context.others);
-    const occupied = others.length + 1;
-
+    // соперникам за столом — что к их игре присоединились
     for (const other of others) {
       notifyUser(
         other.user.telegramId,
@@ -1100,15 +1064,23 @@ async function notifyAfterCreate(
       );
     }
 
-    notifyAdmins(
-      [
-        `✅ <b>${serviceTitle(service)}: стол собран (${occupied}/${seats})</b>`,
-        `Дата: ${when}`,
-        `Стол: ${tableName}`,
-        ...others.map((other) => describePlayer(other.user, other.details)),
-        describePlayer(booker.user, details),
-      ].join('\n'),
-    );
+    // администраторам — одно полное сообщение о каждой записи (N1)
+    const text = bookingNoticeText({
+      reason,
+      serviceTitle: service.title ?? service.slug,
+      startsAt: reservation.startsAt,
+      endsAt: reservation.endsAt,
+      createdAt: reservation.createdAt,
+      tableName: reservation.tableId !== null ? await getTableName(reservation.tableId) : null,
+      user: booker.user,
+      partySize: reservation.partySize,
+      seatClubArmyOptions: reservation.seatClubArmyOptions,
+      buyArmyOptions: reservation.buyArmyOptions,
+      details,
+      table: atTable ? { occupied: others.length + 1, seats: seats! } : null,
+    });
+    const playersAtTable = others.map((other) => describePlayer(other.user, other.details));
+    notifyAdmins(playersAtTable.length ? `${text}\n— за столом также:\n${playersAtTable.join('\n')}` : text);
   } catch (error) {
     console.warn('[notify] booking notification failed', error);
   }
@@ -1518,7 +1490,7 @@ export async function updateReservationDetails(
   ) {
     const service = await loadService(db, reservation.serviceId);
     if (service) {
-      void notifyAfterCreate(service, updated!, { joined: false, others: [] });
+      void notifyAfterCreate(service, updated!, { joined: false, others: [] }, 'help-requested');
     }
   }
 

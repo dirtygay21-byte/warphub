@@ -456,3 +456,30 @@ export const uploadAdminFile = async (
   return JSON.parse(text) as AdminUploadResponse;
 };
 
+
+/** Результат проверки уведомлений: доставлено ли тестовое сообщение и почему нет. */
+export type NotificationTestResult = { ok: boolean; message: string; detail?: string; recipients: number };
+
+/** Отправить себе тестовое сообщение от бота (проверка уведомлений о записях). */
+export const testAdminNotification = () =>
+  apiRequest<NotificationTestResult>("/admin/notifications/test", { method: "POST" });
+
+/** Администратор: основной (из кода и .env сервера) или добавленный в админке по Telegram ID. */
+export type AdminEntry = {
+  telegramId: number;
+  builtin: boolean;
+  note: string | null;
+  name: string | null;
+  username: string | null;
+  addedAt: string | null;
+  addedByTelegramId: number | null;
+};
+export type AdminsList = { admins: AdminEntry[]; canManage: boolean };
+
+export const getAdmins = () => apiRequest<AdminsList>("/admin/admins");
+
+export const addAdmin = (telegramId: string, note: string) =>
+  apiRequest<{ admins: AdminEntry[] }>("/admin/admins", { method: "POST", body: JSON.stringify({ telegramId, note }) });
+
+export const removeAdmin = (telegramId: number) =>
+  apiRequest<{ admins: AdminEntry[] }>(`/admin/admins/${telegramId}`, { method: "DELETE" });
