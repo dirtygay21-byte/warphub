@@ -251,6 +251,9 @@ export interface GameState {
   /** последние броски «кто выше» и сколько бросков каждого вида уже было (следующий — с этим номером) */
   rolls: Partial<Record<RollKey, RollResult>>;
   rollCount: Record<RollKey, number>;
+  /** как определены роли и первый ход: бросок (random) или договорились (manual); null — ещё не определены */
+  rolesSource: Source | null;
+  firstTurnSource: Source | null;
   /** сколько раз раскладку уже тянули случайно (следующая случайная — с этим номером) */
   layoutDraws: number;
   firstTurn: Seat | null;

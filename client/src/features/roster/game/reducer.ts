@@ -91,6 +91,8 @@ export function createGame(ev: GameEvent): ApplyResult {
       rolls: {},
       rollCount: { roles: 0, 'first-turn': 0 },
       layoutDraws: 0,
+      rolesSource: null,
+      firstTurnSource: null,
       firstTurn: null,
       round: 1,
       activeSeat: null,
@@ -203,6 +205,7 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       } else if (ev.roll) return fail('Бросок указан, а выбор отмечен как ручной');
       s.players[ev.attacker].role = 'attacker';
       s.players[other(ev.attacker)].role = 'defender';
+      s.rolesSource = ev.source;
       break;
     }
     case 'secondaries-revealed': {
@@ -224,6 +227,7 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
         if (ev.first !== r.winner) return fail('Первым ходит победитель броска');
       } else if (ev.roll) return fail('Бросок указан, а выбор отмечен как ручной');
       s.firstTurn = ev.first;
+      s.firstTurnSource = ev.source;
       break;
     }
     case 'battle-started': {

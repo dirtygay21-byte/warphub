@@ -46,6 +46,8 @@ test('бросок за атакующего: кубики по seed, побед
   const s = ok(upTo(5, B({ type: 'roles-set', attacker: 'p2', source: 'random', roll: R(0) })));
   assert.deepEqual(s.rolls.roles, { attempt: 0, rolls: ROLES.rolls, winner: ROLES.winner });
   assert.equal(s.rollCount.roles, 1);
+  assert.equal(s.rolesSource, 'random');
+  assert.equal(ok(upTo(6)).rolesSource, 'manual');
   assert.equal(s.players.p2.role, 'attacker', 'победитель вправе выбрать любую роль для любого');
   err(upTo(5, B({ type: 'roles-set', attacker: 'p1', source: 'random', roll: R(1) })), /Ожидался бросок №1/);
   err(upTo(5, B({ type: 'roles-set', attacker: 'p1', source: 'random' })), /нужен бросок/);
@@ -68,6 +70,7 @@ test('отмена броска возвращает счётчик: повто�
 test('бросок за первый ход: победитель ходит первым', () => {
   const s = ok(upTo(9, B({ type: 'first-turn-set', first: FIRST.winner, source: 'random', roll: R(0) })));
   assert.equal(s.firstTurn, FIRST.winner);
+  assert.equal(s.firstTurnSource, 'random');
   assert.deepEqual(s.rolls['first-turn']?.rolls, FIRST.rolls);
   err(upTo(9, B({ type: 'first-turn-set', first: FIRST.winner === 'p1' ? 'p2' : 'p1', source: 'random', roll: R(0) })), /победитель броска/);
   // вручную (договорились) — любой
