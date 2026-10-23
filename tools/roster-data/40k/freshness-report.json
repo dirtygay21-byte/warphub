@@ -1,0 +1,5778 @@
+{
+ "schema": "whrules-freshness/1",
+ "snapshot": {
+  "file": "whrules-995.json",
+  "schema": "whrules-points-snapshot/2",
+  "dataVersion": 995,
+  "mfm": "1.6",
+  "date": "2026-10-16",
+  "fingerprint": "ec8b68f3b2e21d6417ed26433fd02d5a40dafaeeb72b850717c94ae3f8190fde"
+ },
+ "ours": {
+  "lastUpdate": "2026-09-28 02:38:04",
+  "updates": [
+   {
+    "id": "whrules-981-space-marines",
+    "scope": [
+     "SM",
+     "AoI"
+    ],
+    "dataVersion": 981
+   }
+  ]
+ },
+ "notInApp": [
+  "chaos-titan-legions"
+ ],
+ "armies": {
+  "AS": {
+   "name": "Adepta Sororitas",
+   "siteFactions": [
+    "adepta-sororitas"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 17
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 38,
+     "site": 38,
+     "matched": 38,
+     "same": 32,
+     "points": 5,
+     "sizes": 0,
+     "tiers": 1,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 8,
+     "site": 8,
+     "matched": 8,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 25,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000000898",
+      "name": "Saint Celestine",
+      "siteName": "Saint Celestine",
+      "ours": "1-+: 3=150",
+      "site": "1-+: 3=135"
+     },
+     {
+      "id": "000002479",
+      "name": "Morvenn Vahl",
+      "siteName": "Morvenn Vahl",
+      "ours": "1-+: 1=200",
+      "site": "1-+: 1=215"
+     },
+     {
+      "id": "000002483",
+      "name": "Paragon Warsuits",
+      "siteName": "Paragon Warsuits",
+      "ours": "1-2: 3=180 | 3-+: 3=190",
+      "site": "1-2: 3=165 | 3-+: 3=175"
+     },
+     {
+      "id": "000002484",
+      "name": "Castigator",
+      "siteName": "Castigator",
+      "ours": "1-2: 1=165 | 3-+: 1=175",
+      "site": "1-2: 1=165 | 3-+: 1=185"
+     },
+     {
+      "id": "000004189",
+      "name": "Celestian Insidiants",
+      "siteName": "Celestian Insidiants",
+      "ours": "1-+: 10=120",
+      "site": "1-+: 10=115"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [
+     {
+      "id": "000000912",
+      "name": "Exorcist",
+      "siteName": "Exorcist",
+      "ours": "1-1: 1=180 | 2-+: 1=220",
+      "site": "1-2: 1=175 | 3-+: 1=215"
+     }
+    ],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 32,
+    "counts": {
+     "ours": 38,
+     "site": 38,
+     "matched": 38
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 25
+    },
+    "same": 8,
+    "counts": {
+     "ours": 8,
+     "site": 8,
+     "matched": 8
+    }
+   }
+  },
+  "AC": {
+   "name": "Adeptus Custodes",
+   "siteFactions": [
+    "adeptus-custodes"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 205
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 31,
+     "site": 36,
+     "matched": 31,
+     "same": 5,
+     "points": 11,
+     "sizes": 5,
+     "tiers": 10,
+     "legends": 6,
+     "renamed": 9,
+     "newOnSite": 5,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 9,
+     "site": 13,
+     "matched": 4,
+     "dp": 3,
+     "newOnSite": 9,
+     "missingOnSite": 5,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 1,
+     "points": 2,
+     "newOnSite": 5,
+     "missingOnSite": 10,
+     "possibleRenames": 1,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000001446",
+      "name": "Trajann Valoris",
+      "siteName": "Trajann Valoris",
+      "ours": "1-+: 1=135",
+      "site": "1-+: 1=265"
+     },
+     {
+      "id": "000001458",
+      "name": "Contemptor-achillus Dreadnought",
+      "siteName": "Contemptor‑Achillus Dreadnought",
+      "ours": "1-2: 1=155 | 3-+: 1=170",
+      "site": "1-2: 1=230 | 3-+: 1=260"
+     },
+     {
+      "id": "000001460",
+      "name": "Caladius Grav-tank",
+      "siteName": "Caladius Grav‑Tank",
+      "ours": "1-2: 1=210 | 3-+: 1=225",
+      "site": "1-2: 1=230 | 3-+: 1=260"
+     },
+     {
+      "id": "000001461",
+      "name": "Coronus Grav-carrier",
+      "siteName": "Coronus Grav‑Carrier",
+      "ours": "1-2: 1=180 | 3-+: 1=200",
+      "site": "1-2: 1=225 | 3-+: 1=245"
+     },
+     {
+      "id": "000001479",
+      "name": "Telemon Heavy Dreadnought",
+      "siteName": "Telemon Heavy Dreadnought",
+      "ours": "1-1: 1=225 | 2-+: 1=245",
+      "site": "1-1: 1=280 | 2-+: 1=310"
+     },
+     {
+      "id": "000001557",
+      "name": "Contemptor-galatus Dreadnought",
+      "siteName": "Contemptor‑Galatus Dreadnought",
+      "ours": "1-2: 1=165 | 3-+: 1=180",
+      "site": "1-2: 1=220 | 3-+: 1=250"
+     },
+     {
+      "id": "000001562",
+      "name": "Pallas Grav-attack",
+      "siteName": "Pallas Grav‑Attack",
+      "ours": "1-+: 1=100",
+      "site": "1-+: 1=135"
+     },
+     {
+      "id": "000002519",
+      "name": "Valerian",
+      "siteName": "Valerian",
+      "ours": "1-+: 1=110",
+      "site": "1-+: 1=130"
+     },
+     {
+      "id": "000002521",
+      "name": "Prosecutors",
+      "siteName": "Prosecutor Squad",
+      "ours": "1-+: 4=45,5=50,9=75,10=85",
+      "site": "1-+: 4=45,5=50,9=80,10=90"
+     },
+     {
+      "id": "000002523",
+      "name": "Witchseekers",
+      "siteName": "Witchseeker Squad",
+      "ours": "1-+: 4=50,5=55,9=90,10=100",
+      "site": "1-+: 4=55,5=60,9=100,10=110"
+     },
+     {
+      "id": "000002524",
+      "name": "Anathema Psykana Rhino",
+      "siteName": "Anathema Psykana Rhino",
+      "ours": "1-3: 1=65 | 4-+: 1=75",
+      "site": "1-3: 1=70 | 4-+: 1=80"
+     }
+    ],
+    "sizesChanged": [
+     {
+      "id": "000000882",
+      "name": "Custodian Guard",
+      "siteName": "Custodian Guard Sodality",
+      "ours": "1-3: 4=170,5=215 | 4-+: 4=180,5=225",
+      "site": "1-3: 3=240 | 4-+: 3=270"
+     },
+     {
+      "id": "000001450",
+      "name": "Custodian Wardens",
+      "siteName": "Custodian Wardens",
+      "ours": "1-1: 4=200,5=250 | 2-+: 4=220,5=270",
+      "site": "1-1: 2=200,3=295 | 2-+: 2=230,3=325"
+     },
+     {
+      "id": "000001453",
+      "name": "Allarus Custodians",
+      "siteName": "Allarus Custodians",
+      "ours": "1-2: 2=110,3=165,5=280,6=340 | 3-+: 2=140,3=195,5=310,6=370",
+      "site": "1-2: 2=180,3=270 | 3-+: 2=210,3=300"
+     },
+     {
+      "id": "000001561",
+      "name": "Venatari Custodians",
+      "siteName": "Venatari with Verutum Lances",
+      "ours": "1-2: 3=150,6=300 | 3-+: 3=160,6=310",
+      "site": "1-2: 3=270 | 3-+: 3=300"
+     },
+     {
+      "id": "000001563",
+      "name": "Sagittarum Custodians",
+      "siteName": "Sagittarum Custodians Sodality",
+      "ours": "1-+: 5=225",
+      "site": "1-+: 3=185"
+     }
+    ],
+    "tiersChanged": [
+     {
+      "id": "000000883",
+      "name": "Venerable Contemptor Dreadnought",
+      "siteName": "Venerable Contemptor Dreadnought",
+      "ours": "1-2: 1=170 | 3-+: 1=185",
+      "site": "1-+: 1=220"
+     },
+     {
+      "id": "000000884",
+      "name": "Venerable Land Raider",
+      "siteName": "Venerable Land Raider",
+      "ours": "1-1: 1=220 | 2-+: 1=240",
+      "site": "1-+: 1=230"
+     },
+     {
+      "id": "000001447",
+      "name": "Shield-captain",
+      "siteName": "Shield‑Captain",
+      "ours": "1-+: 1=110",
+      "site": "1-1: 1=180 | 2-+: 1=200"
+     },
+     {
+      "id": "000001448",
+      "name": "Shield-captain In Allarus Terminator Armour",
+      "siteName": "Shield‑Captain in Allarus Terminator Armour",
+      "ours": "1-+: 1=130",
+      "site": "1-1: 1=185 | 2-+: 1=205"
+     },
+     {
+      "id": "000001449",
+      "name": "Shield-captain On Dawneagle Jetbike",
+      "siteName": "Shield‑Captain on Dawneagle Jetbike",
+      "ours": "1-+: 1=140",
+      "site": "1-1: 1=205 | 2-+: 1=225"
+     },
+     {
+      "id": "000001454",
+      "name": "Vertus Praetors",
+      "siteName": "Vertus Praetors",
+      "ours": "1-2: 2=145,3=215 | 3-+: 2=170,3=240",
+      "site": "1-1: 2=220,3=330 | 2-+: 2=240,3=350"
+     },
+     {
+      "id": "000001558",
+      "name": "Aquilon Custodians",
+      "siteName": "Aquilon Terminators with Solarite Power Gauntlets",
+      "ours": "1-+: 3=195,6=390",
+      "site": "1-2: 3=285 | 3-+: 3=315"
+     },
+     {
+      "id": "000001559",
+      "name": "Custodian Guard With Adrasite And Pyrithite Spears",
+      "siteName": "Custodian Guard Sodality with Adrasite Spears",
+      "ours": "1-3: 5=250 | 4-+: 5=260",
+      "site": "1-+: 3=200"
+     },
+     {
+      "id": "000001560",
+      "name": "Agamatus Custodians",
+      "siteName": "Gyrfalcon Jetbike Sodality",
+      "ours": "1-+: 3=225,6=450",
+      "site": "1-1: 2=260 | 2-+: 2=280"
+     },
+     {
+      "id": "000002518",
+      "name": "Blade Champion",
+      "siteName": "Blade Champion",
+      "ours": "1-1: 1=110 | 2-+: 1=125",
+      "site": "1-2: 1=175 | 3-+: 1=195"
+     }
+    ],
+    "legendsChanged": [
+     {
+      "id": "000000883",
+      "name": "Venerable Contemptor Dreadnought",
+      "ours": false,
+      "site": true
+     },
+     {
+      "id": "000000884",
+      "name": "Venerable Land Raider",
+      "ours": false,
+      "site": true
+     },
+     {
+      "id": "000001559",
+      "name": "Custodian Guard With Adrasite And Pyrithite Spears",
+      "ours": false,
+      "site": true
+     },
+     {
+      "id": "000001563",
+      "name": "Sagittarum Custodians",
+      "ours": false,
+      "site": true
+     },
+     {
+      "id": "000002088",
+      "name": "Aleya",
+      "ours": false,
+      "site": true
+     },
+     {
+      "id": "000002519",
+      "name": "Valerian",
+      "ours": false,
+      "site": true
+     }
+    ],
+    "renamed": [
+     {
+      "id": "000000882",
+      "name": "Custodian Guard",
+      "to": "Custodian Guard Sodality",
+      "siteId": "custodian-guard-sodality"
+     },
+     {
+      "id": "000001558",
+      "name": "Aquilon Custodians",
+      "to": "Aquilon Terminators with Solarite Power Gauntlets",
+      "siteId": "aquilon-terminators-with-solarite-power-gauntlets"
+     },
+     {
+      "id": "000001559",
+      "name": "Custodian Guard With Adrasite And Pyrithite Spears",
+      "to": "Custodian Guard Sodality with Adrasite Spears",
+      "siteId": "custodian-guard-sodality-with-adrasite-spears"
+     },
+     {
+      "id": "000001560",
+      "name": "Agamatus Custodians",
+      "to": "Gyrfalcon Jetbike Sodality",
+      "siteId": "gyrfalcon-jetbike-sodality"
+     },
+     {
+      "id": "000001561",
+      "name": "Venatari Custodians",
+      "to": "Venatari with Verutum Lances",
+      "siteId": "venatari-with-verutum-lances"
+     },
+     {
+      "id": "000001563",
+      "name": "Sagittarum Custodians",
+      "to": "Sagittarum Custodians Sodality",
+      "siteId": "sagittarum-custodians-sodality"
+     },
+     {
+      "id": "000002521",
+      "name": "Prosecutors",
+      "to": "Prosecutor Squad",
+      "siteId": "prosecutor-squad"
+     },
+     {
+      "id": "000002522",
+      "name": "Vigilators",
+      "to": "Vigilator Squad",
+      "siteId": "vigilator-squad"
+     },
+     {
+      "id": "000002523",
+      "name": "Witchseekers",
+      "to": "Witchseeker Squad",
+      "siteId": "witchseeker-squad"
+     }
+    ],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [
+     {
+      "siteId": "aquilon-terminators-with-solarite-power-talons",
+      "name": "Aquilon Terminators with Solarite Power Talons",
+      "faction": "adeptus-custodes",
+      "legends": false,
+      "points": "1-2: 3=275 | 3-+: 3=305"
+     },
+     {
+      "siteId": "caladius-annihilator-grav-tank",
+      "name": "Caladius Annihilator Grav‑Tank",
+      "faction": "adeptus-custodes",
+      "legends": false,
+      "points": "1-2: 1=250 | 3-+: 1=280"
+     },
+     {
+      "siteId": "custodian-guard-sodality-with-pyrithite-spears",
+      "name": "Custodian Guard Sodality with Pyrithite Spears",
+      "faction": "adeptus-custodes",
+      "legends": true,
+      "points": "1-+: 3=215"
+     },
+     {
+      "siteId": "sentinel-guard-sodality",
+      "name": "Sentinel Guard Sodality",
+      "faction": "adeptus-custodes",
+      "legends": false,
+      "points": "1-3: 3=240 | 4-+: 3=270"
+     },
+     {
+      "siteId": "venatari-with-kinetic-destroyers",
+      "name": "Venatari with Kinetic Destroyers",
+      "faction": "adeptus-custodes",
+      "legends": false,
+      "points": "1-2: 3=255 | 3-+: 3=280"
+     }
+    ],
+    "noPointsOnSite": [],
+    "same": 5,
+    "counts": {
+     "ours": 31,
+     "site": 36,
+     "matched": 31
+    }
+   },
+   "detachments": {
+    "dpChanged": [
+     {
+      "id": "000000862",
+      "name": "Null Maiden Vigil",
+      "ours": 2,
+      "site": 1
+     },
+     {
+      "id": "000000863",
+      "name": "Auric Champions",
+      "ours": 2,
+      "site": 1
+     },
+     {
+      "id": "000001029",
+      "name": "Lions of the Emperor",
+      "ours": 3,
+      "site": 1
+     }
+    ],
+    "missingOnSite": [
+     {
+      "id": "000000765",
+      "name": "Shield Host"
+     },
+     {
+      "id": "000000861",
+      "name": "Talons Of The Emperor"
+     },
+     {
+      "id": "000000986",
+      "name": "Solar Spearhead"
+     },
+     {
+      "id": "000001165",
+      "name": "Silent Hunters"
+     },
+     {
+      "id": "000001166",
+      "name": "Tharanatoi Hammerblow"
+     }
+    ],
+    "outdated": [],
+    "newOnSite": [
+     {
+      "siteId": "dread-host",
+      "name": "Dread Host",
+      "faction": "adeptus-custodes",
+      "dp": 1,
+      "enhancements": 2
+     },
+     {
+      "siteId": "aquilan-shield",
+      "name": "Aquilan Shield",
+      "faction": "adeptus-custodes",
+      "dp": 1,
+      "enhancements": 2
+     },
+     {
+      "siteId": "emissaries-imperatus",
+      "name": "Emissaries Imperatus",
+      "faction": "adeptus-custodes",
+      "dp": 1,
+      "enhancements": 2
+     },
+     {
+      "siteId": "emperors-chosen",
+      "name": "Emperor’s Chosen",
+      "faction": "adeptus-custodes",
+      "dp": 1,
+      "enhancements": 2
+     },
+     {
+      "siteId": "solar-watch",
+      "name": "Solar Watch",
+      "faction": "adeptus-custodes",
+      "dp": 1,
+      "enhancements": 2
+     },
+     {
+      "siteId": "grav-assault-force",
+      "name": "Grav‑Assault Force",
+      "faction": "adeptus-custodes",
+      "dp": 1,
+      "enhancements": 2
+     },
+     {
+      "siteId": "honoured-companions",
+      "name": "Honoured Companions",
+      "faction": "adeptus-custodes",
+      "dp": 1,
+      "enhancements": 2
+     },
+     {
+      "siteId": "guardians-of-the-throne",
+      "name": "Guardians of the Throne",
+      "faction": "adeptus-custodes",
+      "dp": 3,
+      "enhancements": 4
+     },
+     {
+      "siteId": "shadowkeepers",
+      "name": "Shadowkeepers",
+      "faction": "adeptus-custodes",
+      "dp": 1,
+      "enhancements": 2
+     }
+    ],
+    "enhancements": {
+     "pointsChanged": [
+      {
+       "detachment": "Null Maiden Vigil",
+       "name": "Huntress’ Eye",
+       "ours": 15,
+       "site": 10
+      },
+      {
+       "detachment": "Null Maiden Vigil",
+       "name": "Oblivion Knight",
+       "ours": 25,
+       "site": 15
+      }
+     ],
+     "newOnSite": [
+      {
+       "detachment": "Auric Champions",
+       "name": "Shroud of the Hidden Blade",
+       "site": 20
+      },
+      {
+       "detachment": "Lions of the Emperor",
+       "name": "Lightning Descent",
+       "site": 20
+      },
+      {
+       "detachment": "Lions of the Emperor",
+       "name": "Leonine Ferocity",
+       "site": 20
+      },
+      {
+       "detachment": "Might of the Moritoi",
+       "name": "Memento Moritoi (one per army) (Upgrade)",
+       "site": 30
+      },
+      {
+       "detachment": "Might of the Moritoi",
+       "name": "Augury Uplink (one per army) (Upgrade)",
+       "site": 30
+      }
+     ],
+     "missingOnSite": [
+      {
+       "detachment": "Null Maiden Vigil",
+       "name": "Enhanced Voidsheen Cloak",
+       "ours": 10
+      },
+      {
+       "detachment": "Null Maiden Vigil",
+       "name": "Raptor Blade",
+       "ours": 5
+      },
+      {
+       "detachment": "Auric Champions",
+       "name": "Blade Imperator",
+       "ours": 25
+      },
+      {
+       "detachment": "Auric Champions",
+       "name": "Veiled Blade",
+       "ours": 25
+      },
+      {
+       "detachment": "Lions of the Emperor",
+       "name": "Superior Creation",
+       "ours": 25
+      },
+      {
+       "detachment": "Lions of the Emperor",
+       "name": "Praesidius",
+       "ours": 25
+      },
+      {
+       "detachment": "Lions of the Emperor",
+       "name": "Fierce Conqueror",
+       "ours": 15
+      },
+      {
+       "detachment": "Lions of the Emperor",
+       "name": "Admonimortis",
+       "ours": 30
+      },
+      {
+       "detachment": "Might of the Moritoi",
+       "name": "Interred Expertise",
+       "ours": 25
+      },
+      {
+       "detachment": "Might of the Moritoi",
+       "name": "Auramite Sarcophagus",
+       "ours": 15
+      }
+     ],
+     "outdated": [],
+     "possibleRenames": [
+      {
+       "detachment": "Auric Champions",
+       "ours": "Martial Philosopher",
+       "site": "Superior Creation",
+       "points": 30
+      }
+     ],
+     "same": 1
+    },
+    "same": 1,
+    "counts": {
+     "ours": 9,
+     "site": 13,
+     "matched": 4
+    }
+   }
+  },
+  "AdM": {
+   "name": "Adeptus Mechanicus",
+   "siteFactions": [
+    "adeptus-mechanicus"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 21
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 38,
+     "site": 38,
+     "matched": 38,
+     "same": 25,
+     "points": 12,
+     "sizes": 0,
+     "tiers": 1,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 10,
+     "site": 10,
+     "matched": 10,
+     "dp": 3,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 34,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000000841",
+      "name": "Kataphron Breachers",
+      "siteName": "Kataphron Breachers",
+      "ours": "1-+: 3=150,6=310",
+      "site": "1-+: 3=140,6=290"
+     },
+     {
+      "id": "000000843",
+      "name": "Fulgurite Electro-priests",
+      "siteName": "Fulgurite Electro-Priests",
+      "ours": "1-+: 5=70,10=140",
+      "site": "1-+: 5=65,10=130"
+     },
+     {
+      "id": "000000844",
+      "name": "Corpuscarii Electro-priests",
+      "siteName": "Corpuscarii Electro-Priests",
+      "ours": "1-+: 5=65,10=130",
+      "site": "1-+: 5=60,10=120"
+     },
+     {
+      "id": "000000846",
+      "name": "Cybernetica Datasmith",
+      "siteName": "Cybernetica Datasmith",
+      "ours": "1-+: 1=25",
+      "site": "1-+: 1=20"
+     },
+     {
+      "id": "000000854",
+      "name": "Onager Dunecrawler",
+      "siteName": "Onager Dunecrawler",
+      "ours": "1-+: 1=155",
+      "site": "1-+: 1=150"
+     },
+     {
+      "id": "000002081",
+      "name": "Serberys Sulphurhounds",
+      "siteName": "Serberys Sulphurhounds",
+      "ours": "1-+: 3=55,6=100",
+      "site": "1-+: 3=55,6=95"
+     },
+     {
+      "id": "000002082",
+      "name": "Serberys Raiders",
+      "siteName": "Serberys Raiders",
+      "ours": "1-+: 3=60,6=110",
+      "site": "1-+: 3=60,6=105"
+     },
+     {
+      "id": "000003694",
+      "name": "Sydonian Dragoons With Radium Jezzails",
+      "siteName": "Sydonian Dragoons with Radium Jezzails",
+      "ours": "1-+: 1=55,2=100,3=150",
+      "site": "1-+: 1=55,2=95,3=140"
+     },
+     {
+      "id": "000003695",
+      "name": "Sydonian Skatros",
+      "siteName": "Sydonian Skatros",
+      "ours": "1-+: 1=50",
+      "site": "1-+: 1=45"
+     },
+     {
+      "id": "000004119",
+      "name": "Servitor Battleclade",
+      "siteName": "Servitor Battleclade",
+      "ours": "1-2: 9=65 | 3-+: 9=75",
+      "site": "1-2: 9=75 | 3-+: 9=85"
+     },
+     {
+      "id": "000004211",
+      "name": "Hastarii Exterminators",
+      "siteName": "Hastarii Exterminators",
+      "ours": "1-2: 5=105 | 3-+: 5=120",
+      "site": "1-2: 5=100 | 3-+: 5=115"
+     },
+     {
+      "id": "000004212",
+      "name": "Hastarii Fusiliers",
+      "siteName": "Hastarii Fusiliers",
+      "ours": "1-2: 5=115 | 3-+: 5=130",
+      "site": "1-2: 5=105 | 3-+: 5=120"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [
+     {
+      "id": "000000845",
+      "name": "Kastelan Robots",
+      "siteName": "Kastelan Robots",
+      "ours": "1-1: 2=150,4=300 | 2-+: 2=180,4=330",
+      "site": "1-2: 2=150,4=300 | 3-+: 2=180,4=330"
+     }
+    ],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 25,
+    "counts": {
+     "ours": 38,
+     "site": 38,
+     "matched": 38
+    }
+   },
+   "detachments": {
+    "dpChanged": [
+     {
+      "id": "000000823",
+      "name": "Cohort Cybernetica",
+      "ours": 2,
+      "site": 1
+     },
+     {
+      "id": "000001143",
+      "name": "Eradication Cohort",
+      "ours": 3,
+      "site": 2
+     },
+     {
+      "id": "000001159",
+      "name": "Lords of the Forge",
+      "ours": 1,
+      "site": 2
+     }
+    ],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 34
+    },
+    "same": 7,
+    "counts": {
+     "ours": 10,
+     "site": 10,
+     "matched": 10
+    }
+   }
+  },
+  "AE": {
+   "name": "Aeldari",
+   "siteFactions": [
+    "aeldari"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 23
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 99,
+     "site": 99,
+     "matched": 99,
+     "same": 83,
+     "points": 13,
+     "sizes": 0,
+     "tiers": 3,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 15,
+     "site": 15,
+     "matched": 15,
+     "dp": 1,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 52,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000000577",
+      "name": "Autarch",
+      "siteName": "Autarch",
+      "ours": "1-+: 1=75",
+      "site": "1-+: 1=70"
+     },
+     {
+      "id": "000000582",
+      "name": "Farseer",
+      "siteName": "Farseer",
+      "ours": "1-+: 1=65",
+      "site": "1-+: 1=60"
+     },
+     {
+      "id": "000000584",
+      "name": "Warlock Conclave",
+      "siteName": "Warlock Conclave",
+      "ours": "1-+: 2=55,4=120",
+      "site": "1-+: 2=55,4=110"
+     },
+     {
+      "id": "000000596",
+      "name": "Fire Dragons",
+      "siteName": "Fire Dragons",
+      "ours": "1-2: 5=120,10=240 | 3-+: 5=130,10=250",
+      "site": "1-2: 5=110,10=240 | 3-+: 5=120,10=250"
+     },
+     {
+      "id": "000002533",
+      "name": "Shroud Runners",
+      "siteName": "Shroud Runners",
+      "ours": "1-+: 3=90,6=175",
+      "site": "1-+: 3=90,6=165"
+     },
+     {
+      "id": "000002537",
+      "name": "Death Jester",
+      "siteName": "Death Jester",
+      "ours": "1-+: 1=70",
+      "site": "1-+: 1=65"
+     },
+     {
+      "id": "000002538",
+      "name": "Solitaire",
+      "siteName": "Solitaire",
+      "ours": "1-+: 1=115",
+      "site": "1-+: 1=105"
+     },
+     {
+      "id": "000002539",
+      "name": "Skyweavers",
+      "siteName": "Skyweavers",
+      "ours": "1-+: 2=95,4=190",
+      "site": "1-+: 2=90,4=180"
+     },
+     {
+      "id": "000002542",
+      "name": "Yvraine",
+      "siteName": "Yvraine",
+      "ours": "1-+: 1=100",
+      "site": "1-+: 1=90"
+     },
+     {
+      "id": "000002544",
+      "name": "The Yncarne",
+      "siteName": "The Yncarne",
+      "ours": "1-+: 1=245",
+      "site": "1-+: 1=230"
+     },
+     {
+      "id": "000004194",
+      "name": "Kharseth",
+      "siteName": "Kharseth",
+      "ours": "1-+: 1=85",
+      "site": "1-+: 1=80"
+     },
+     {
+      "id": "000004236",
+      "name": "Leystalker",
+      "siteName": "Leystalker",
+      "ours": "1-+: 1=80",
+      "site": "1-+: 1=75"
+     },
+     {
+      "id": "000004237",
+      "name": "Stonesinger",
+      "siteName": "Stonesinger",
+      "ours": "1-+: 1=60",
+      "site": "1-+: 1=55"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [
+     {
+      "id": "000000611",
+      "name": "Night Spinner",
+      "siteName": "Night Spinner",
+      "ours": "1-1: 1=170 | 2-+: 1=190",
+      "site": "1-2: 1=165 | 3-+: 1=195"
+     },
+     {
+      "id": "000003910",
+      "name": "D-cannon Platform",
+      "siteName": "D-cannon Platform",
+      "ours": "1-1: 1=110 | 2-+: 1=125",
+      "site": "1-2: 1=110 | 3-+: 1=130"
+     },
+     {
+      "id": "000004235",
+      "name": "Dragon Knights",
+      "siteName": "Dragon Knights",
+      "ours": "1-+: 3=90,6=180",
+      "site": "1-2: 3=85,6=180 | 3-+: 3=95,6=190"
+     }
+    ],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 83,
+    "counts": {
+     "ours": 99,
+     "site": 99,
+     "matched": 99
+    }
+   },
+   "detachments": {
+    "dpChanged": [
+     {
+      "id": "000001017",
+      "name": "Warhost",
+      "ours": 3,
+      "site": 2
+     }
+    ],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 52
+    },
+    "same": 14,
+    "counts": {
+     "ours": 15,
+     "site": 15,
+     "matched": 15
+    }
+   }
+  },
+  "AM": {
+   "name": "Astra Militarum",
+   "siteFactions": [
+    "astra-militarum"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 14
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 135,
+     "site": 135,
+     "matched": 135,
+     "same": 126,
+     "points": 4,
+     "sizes": 0,
+     "tiers": 5,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 11,
+     "site": 11,
+     "matched": 11,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 37,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 1,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000000694",
+      "name": "Hellhound",
+      "siteName": "Hellhound",
+      "ours": "1-2: 1=125 | 3-+: 1=135",
+      "site": "1-2: 1=115 | 3-+: 1=125"
+     },
+     {
+      "id": "000002605",
+      "name": "Lord Solar Leontus",
+      "siteName": "Lord Solar Leontus",
+      "ours": "1-+: 1=130",
+      "site": "1-+: 1=120"
+     },
+     {
+      "id": "000003890",
+      "name": "Lord Marshal Dreir",
+      "siteName": "Lord Marshal Dreir",
+      "ours": "1-+: 1=75",
+      "site": "1-+: 1=70"
+     },
+     {
+      "id": "000004216",
+      "name": "Commissar Yarrick",
+      "siteName": "Commissar Yarrick",
+      "ours": "1-+: 1=120",
+      "site": "1-+: 1=110"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [
+     {
+      "id": "000000695",
+      "name": "Basilisk",
+      "siteName": "Basilisk",
+      "ours": "1-1: 1=115 | 2-+: 1=135",
+      "site": "1-2: 1=115 | 3-+: 1=145"
+     },
+     {
+      "id": "000000697",
+      "name": "Wyvern",
+      "siteName": "Wyvern",
+      "ours": "1-1: 1=95 | 2-+: 1=115",
+      "site": "1-2: 1=95 | 3-+: 1=125"
+     },
+     {
+      "id": "000000698",
+      "name": "Manticore",
+      "siteName": "Manticore",
+      "ours": "1-1: 1=150 | 2-+: 1=170",
+      "site": "1-2: 1=150 | 3-+: 1=180"
+     },
+     {
+      "id": "000000699",
+      "name": "Deathstrike",
+      "siteName": "Deathstrike",
+      "ours": "1-1: 1=125 | 2-+: 1=135",
+      "site": "1-2: 1=125 | 3-+: 1=145"
+     },
+     {
+      "id": "000000723",
+      "name": "Bullgryn Squad",
+      "siteName": "Bullgryn Squad",
+      "ours": "1-1: 3=90,6=200 | 2-+: 3=105,6=215",
+      "site": "1-2: 3=90,6=200 | 3-+: 3=120,6=230"
+     }
+    ],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 126,
+    "counts": {
+     "ours": 135,
+     "site": 135,
+     "matched": 135
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [
+      {
+       "detachment": "Abhuman Auxiliaries",
+       "ours": "Sharp eyes, Light fingers",
+       "site": "Sharp Eyes",
+       "points": 10
+      }
+     ],
+     "same": 37
+    },
+    "same": 11,
+    "counts": {
+     "ours": 11,
+     "site": 11,
+     "matched": 11
+    }
+   }
+  },
+  "CD": {
+   "name": "Chaos Daemons",
+   "siteFactions": [
+    "chaos-daemons"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 7
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 70,
+     "site": 63,
+     "matched": 63,
+     "same": 59,
+     "points": 4,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 7,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 9,
+     "site": 9,
+     "matched": 9,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 29,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000001105",
+      "name": "Skarbrand",
+      "siteName": "Skarbrand",
+      "ours": "1-+: 1=315",
+      "site": "1-+: 1=330"
+     },
+     {
+      "id": "000001112",
+      "name": "Flesh Hounds",
+      "siteName": "Flesh Hounds",
+      "ours": "1-+: 5=75,10=150",
+      "site": "1-+: 5=80,10=150"
+     },
+     {
+      "id": "000001115",
+      "name": "Bloodcrushers",
+      "siteName": "Bloodcrushers",
+      "ours": "1-2: 3=95,6=200 | 3-+: 3=135,6=240",
+      "site": "1-2: 3=95,6=210 | 3-+: 3=135,6=250"
+     },
+     {
+      "id": "000001143",
+      "name": "Fiends",
+      "siteName": "Fiends",
+      "ours": "1-2: 3=90,6=190 | 3-+: 3=105,6=205",
+      "site": "1-2: 3=90,6=190 | 3-+: 3=115,6=215"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [
+     {
+      "id": "000004039",
+      "name": "Chaos Lord On Disc Of Tzeentch",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000004040",
+      "name": "Chaos Lord On Juggernaut",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000004041",
+      "name": "Chaos Lord On Palanquin Of Nurgle",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000004042",
+      "name": "Chaos Lord On Steed Of Slaanesh",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000004069",
+      "name": "Sorcerer On Disc Of Tzeentch",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000004070",
+      "name": "Sorcerer On Palanquin Of Nurgle",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000004071",
+      "name": "Sorcerer On Steed Of Slaanesh",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     }
+    ],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 59,
+    "counts": {
+     "ours": 70,
+     "site": 63,
+     "matched": 63
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 29
+    },
+    "same": 9,
+    "counts": {
+     "ours": 9,
+     "site": 9,
+     "matched": 9
+    }
+   }
+  },
+  "QT": {
+   "name": "Chaos Knights",
+   "siteFactions": [
+    "chaos-knights"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 6
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 20,
+     "site": 20,
+     "matched": 20,
+     "same": 15,
+     "points": 5,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 8,
+     "site": 8,
+     "matched": 8,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 27,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 1,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000001659",
+      "name": "Knight Tyrant",
+      "siteName": "Knight Tyrant",
+      "ours": "1-1: 1=400 | 2-+: 1=420",
+      "site": "1-1: 1=390 | 2-+: 1=410"
+     },
+     {
+      "id": "000001660",
+      "name": "Knight Desecrator",
+      "siteName": "Knight Desecrator",
+      "ours": "1-2: 1=355 | 3-+: 1=370",
+      "site": "1-2: 1=350 | 3-+: 1=370"
+     },
+     {
+      "id": "000001661",
+      "name": "Knight Rampager",
+      "siteName": "Knight Rampager",
+      "ours": "1-2: 1=355 | 3-+: 1=370",
+      "site": "1-2: 1=350 | 3-+: 1=370"
+     },
+     {
+      "id": "000002567",
+      "name": "Knight Abominant",
+      "siteName": "Knight Abominant",
+      "ours": "1-2: 1=355 | 3-+: 1=370",
+      "site": "1-2: 1=350 | 3-+: 1=370"
+     },
+     {
+      "id": "000004134",
+      "name": "Knight Ruinator",
+      "siteName": "Knight Ruinator",
+      "ours": "1-2: 1=340 | 3-+: 1=355",
+      "site": "1-2: 1=325 | 3-+: 1=345"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 15,
+    "counts": {
+     "ours": 20,
+     "site": 20,
+     "matched": 20
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [
+      {
+       "detachment": "Houndpack Lance",
+       "ours": "Panoply of the Cursed Knight",
+       "site": "Panoply of the Cursed Knights",
+       "points": 15
+      }
+     ],
+     "same": 27
+    },
+    "same": 8,
+    "counts": {
+     "ours": 8,
+     "site": 8,
+     "matched": 8
+    }
+   }
+  },
+  "CSM": {
+   "name": "Chaos Space Marines",
+   "siteFactions": [
+    "chaos-space-marines"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 87
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 111,
+     "site": 85,
+     "matched": 85,
+     "same": 46,
+     "points": 38,
+     "sizes": 0,
+     "tiers": 1,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 11,
+     "legendsNotOnSite": 15,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 17,
+     "site": 17,
+     "matched": 17,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 62,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000000924",
+      "name": "Abaddon The Despoiler",
+      "siteName": "Abaddon the Despoiler",
+      "ours": "1-+: 1=295",
+      "site": "1-+: 1=300"
+     },
+     {
+      "id": "000000925",
+      "name": "Huron Blackheart",
+      "siteName": "Huron Blackheart",
+      "ours": "1-+: 1=130",
+      "site": "1-+: 1=135"
+     },
+     {
+      "id": "000000926",
+      "name": "Cypher",
+      "siteName": "Cypher",
+      "ours": "1-+: 1=90",
+      "site": "1-+: 1=95"
+     },
+     {
+      "id": "000000928",
+      "name": "Fabius Bile",
+      "siteName": "Fabius Bile",
+      "ours": "1-+: 2=100",
+      "site": "1-+: 2=110"
+     },
+     {
+      "id": "000000929",
+      "name": "Chaos Lord",
+      "siteName": "Chaos Lord",
+      "ours": "1-+: 1=90",
+      "site": "1-+: 1=95"
+     },
+     {
+      "id": "000000930",
+      "name": "Chaos Lord In Terminator Armour",
+      "siteName": "Chaos Lord in Terminator Armour",
+      "ours": "1-+: 1=85",
+      "site": "1-+: 1=90"
+     },
+     {
+      "id": "000000936",
+      "name": "Dark Apostle",
+      "siteName": "Dark Apostle",
+      "ours": "1-+: 3=65",
+      "site": "1-+: 3=70"
+     },
+     {
+      "id": "000000937",
+      "name": "Heretic Astartes Daemon Prince",
+      "siteName": "Heretic Astartes Daemon Prince",
+      "ours": "1-+: 1=165",
+      "site": "1-+: 1=155"
+     },
+     {
+      "id": "000000938",
+      "name": "Sorcerer",
+      "siteName": "Sorcerer",
+      "ours": "1-+: 1=60",
+      "site": "1-+: 1=65"
+     },
+     {
+      "id": "000000939",
+      "name": "Sorcerer In Terminator Armour",
+      "siteName": "Sorcerer in Terminator Armour",
+      "ours": "1-+: 1=80",
+      "site": "1-+: 1=85"
+     },
+     {
+      "id": "000000944",
+      "name": "Warpsmith",
+      "siteName": "Warpsmith",
+      "ours": "1-+: 1=60",
+      "site": "1-+: 1=65"
+     },
+     {
+      "id": "000000952",
+      "name": "Chosen",
+      "siteName": "Chosen",
+      "ours": "1-2: 5=135,10=270 | 3-+: 5=145,10=280",
+      "site": "1-2: 5=140,10=280 | 3-+: 5=150,10=290"
+     },
+     {
+      "id": "000000953",
+      "name": "Possessed",
+      "siteName": "Possessed",
+      "ours": "1-2: 5=120,10=250 | 3-+: 5=130,10=260",
+      "site": "1-2: 5=130,10=260 | 3-+: 5=150,10=280"
+     },
+     {
+      "id": "000000954",
+      "name": "Helbrute",
+      "siteName": "Helbrute",
+      "ours": "1-+: 1=130",
+      "site": "1-+: 1=125"
+     },
+     {
+      "id": "000000957",
+      "name": "Chaos Bikers",
+      "siteName": "Chaos Bikers",
+      "ours": "1-+: 3=70,6=130",
+      "site": "1-+: 3=80,6=150"
+     },
+     {
+      "id": "000000958",
+      "name": "Raptors",
+      "siteName": "Raptors",
+      "ours": "1-2: 5=110,10=210 | 3-+: 5=120,10=220",
+      "site": "1-2: 5=115,10=225 | 3-+: 5=125,10=235"
+     },
+     {
+      "id": "000000959",
+      "name": "Warp Talons",
+      "siteName": "Warp Talons",
+      "ours": "1-2: 5=125,10=280 | 3-+: 5=135,10=290",
+      "site": "1-2: 5=130,10=290 | 3-+: 5=140,10=300"
+     },
+     {
+      "id": "000000963",
+      "name": "Chaos Predator Destructor",
+      "siteName": "Chaos Predator Destructor",
+      "ours": "1-2: 1=150 | 3-+: 1=160",
+      "site": "1-2: 1=145 | 3-+: 1=155"
+     },
+     {
+      "id": "000000964",
+      "name": "Chaos Vindicator",
+      "siteName": "Chaos Vindicator",
+      "ours": "1-2: 1=185 | 3-+: 1=195",
+      "site": "1-2: 1=180 | 3-+: 1=190"
+     },
+     {
+      "id": "000000966",
+      "name": "Havocs",
+      "siteName": "Havocs",
+      "ours": "1-2: 5=125 | 3-+: 5=135",
+      "site": "1-2: 5=135 | 3-+: 5=145"
+     },
+     {
+      "id": "000000967",
+      "name": "Forgefiend",
+      "siteName": "Forgefiend",
+      "ours": "1-2: 1=160 | 3-+: 1=170",
+      "site": "1-2: 1=155 | 3-+: 1=165"
+     },
+     {
+      "id": "000000968",
+      "name": "Maulerfiend",
+      "siteName": "Maulerfiend",
+      "ours": "1-+: 1=130",
+      "site": "1-+: 1=125"
+     },
+     {
+      "id": "000001556",
+      "name": "Haarken Worldclaimer",
+      "siteName": "Haarken Worldclaimer",
+      "ours": "1-+: 1=90",
+      "site": "1-+: 1=95"
+     },
+     {
+      "id": "000001581",
+      "name": "Master Of Possession",
+      "siteName": "Master of Possession",
+      "ours": "1-+: 1=60",
+      "site": "1-+: 1=65"
+     },
+     {
+      "id": "000001583",
+      "name": "Lord Discordant On Helstalker",
+      "siteName": "Lord Discordant on Helstalker",
+      "ours": "1-+: 1=160",
+      "site": "1-+: 1=155"
+     },
+     {
+      "id": "000001584",
+      "name": "Master Of Executions",
+      "siteName": "Master of Executions",
+      "ours": "1-+: 1=70",
+      "site": "1-+: 1=75"
+     },
+     {
+      "id": "000002570",
+      "name": "Legionaries",
+      "siteName": "Legionaries",
+      "ours": "1-+: 5=90,10=170",
+      "site": "1-+: 5=95,10=180"
+     },
+     {
+      "id": "000002571",
+      "name": "Accursed Cultists",
+      "siteName": "Accursed Cultists",
+      "ours": "1-2: 8=90,16=195 | 3-+: 8=110,16=215",
+      "site": "1-2: 8=90,16=185 | 3-+: 8=110,16=205"
+     },
+     {
+      "id": "000002572",
+      "name": "Chaos Predator Annihilator",
+      "siteName": "Chaos Predator Annihilator",
+      "ours": "1-2: 1=145 | 3-+: 1=155",
+      "site": "1-2: 1=140 | 3-+: 1=150"
+     },
+     {
+      "id": "000002590",
+      "name": "Traitor Guardsmen Squad",
+      "siteName": "Traitor Guardsmen Squad",
+      "ours": "1-+: 10=70",
+      "site": "1-+: 10=65"
+     },
+     {
+      "id": "000002730",
+      "name": "Heretic Astartes Daemon Prince With Wings",
+      "siteName": "Heretic Astartes Daemon Prince with Wings",
+      "ours": "1-+: 1=180",
+      "site": "1-+: 1=170"
+     },
+     {
+      "id": "000003711",
+      "name": "Chaos Lord with Jump Pack",
+      "siteName": "Chaos Lord with Jump Pack",
+      "ours": "1-+: 1=80",
+      "site": "1-+: 1=85"
+     },
+     {
+      "id": "000003876",
+      "name": "Nemesis Claw",
+      "siteName": "Nemesis Claw",
+      "ours": "1-+: 5=100,10=180",
+      "site": "1-+: 5=105,10=190"
+     },
+     {
+      "id": "000004190",
+      "name": "Masters of the Maelstrom",
+      "siteName": "Masters of the Maelstrom",
+      "ours": "1-+: 5=145",
+      "site": "1-+: 5=150"
+     },
+     {
+      "id": "000004191",
+      "name": "Red Corsairs Raiders",
+      "siteName": "Red Corsairs Raiders",
+      "ours": "1-2: 5=110,10=210 | 3-+: 5=120,10=220",
+      "site": "1-2: 5=120,10=220 | 3-+: 5=130,10=230"
+     },
+     {
+      "id": "000004192",
+      "name": "Red Corsairs Reave-Captain",
+      "siteName": "Red Corsairs Reave-Captain",
+      "ours": "1-+: 1=60",
+      "site": "1-+: 1=65"
+     },
+     {
+      "id": "000004205",
+      "name": "Kravek Morne",
+      "siteName": "Kravek Morne",
+      "ours": "1-+: 1=120",
+      "site": "1-+: 1=130"
+     },
+     {
+      "id": "000004206",
+      "name": "Mutilators",
+      "siteName": "Mutilators",
+      "ours": "1-2: 3=165 | 3-+: 3=175",
+      "site": "1-2: 3=165 | 3-+: 3=185"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [
+     {
+      "id": "000000947",
+      "name": "Chaos Terminator Squad",
+      "siteName": "Chaos Terminator Squad",
+      "ours": "1-+: 5=175,10=350",
+      "site": "1-2: 5=185,10=370 | 3-+: 5=215,10=400"
+     }
+    ],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [
+     {
+      "id": "000003582",
+      "name": "Khorne Berzerkers",
+      "siteFactions": [
+       "world-eaters"
+      ],
+      "source": "World Eaters"
+     },
+     {
+      "id": "000003583",
+      "name": "Rubric Marines",
+      "siteFactions": [
+       "thousand-sons"
+      ],
+      "source": "Thousand Sons"
+     },
+     {
+      "id": "000003584",
+      "name": "Plague Marines",
+      "siteFactions": [
+       "death-guard"
+      ],
+      "source": "Death Guard"
+     },
+     {
+      "id": "000003606",
+      "name": "Terrax-pattern Termite",
+      "siteFactions": [
+       "adeptus-mechanicus",
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003630",
+      "name": "Cerberus",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003634",
+      "name": "Kratos",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003646",
+      "name": "Mastodon",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003670",
+      "name": "Rapier Carrier",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003682",
+      "name": "Typhon",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003690",
+      "name": "Falchion",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000004099",
+      "name": "Noise Marines",
+      "siteFactions": [
+       "emperors-children"
+      ],
+      "source": "Emperor’s Children"
+     }
+    ],
+    "legendsNotOnSite": [
+     {
+      "id": "000003610",
+      "name": "Land Raider Achilles",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003614",
+      "name": "Land Raider Proteus",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003618",
+      "name": "Fire Raptor Gunship",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003622",
+      "name": "Spartan",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003626",
+      "name": "Deredeo Dreadnought",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003638",
+      "name": "Sokar-pattern Stormbird",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003642",
+      "name": "Sicaran Battle Tank",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003650",
+      "name": "Leviathan Dreadnought",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003654",
+      "name": "Fellblade",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003658",
+      "name": "Relic Contemptor Dreadnought",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003662",
+      "name": "Whirlwind Scorpius",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003666",
+      "name": "Xiphon Interceptor",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003674",
+      "name": "Storm Eagle Gunship",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003678",
+      "name": "Sicaran Venator",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003686",
+      "name": "Sicaran Punisher",
+      "source": "Space Marines (Warhammer Legends)"
+     }
+    ],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 46,
+    "counts": {
+     "ours": 111,
+     "site": 85,
+     "matched": 85
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 62
+    },
+    "same": 17,
+    "counts": {
+     "ours": 17,
+     "site": 17,
+     "matched": 17
+    }
+   }
+  },
+  "DG": {
+   "name": "Death Guard",
+   "siteFactions": [
+    "death-guard"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 35
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 71,
+     "site": 41,
+     "matched": 41,
+     "same": 29,
+     "points": 10,
+     "sizes": 0,
+     "tiers": 2,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 15,
+     "legendsNotOnSite": 15,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 9,
+     "site": 9,
+     "matched": 9,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 30,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000001044",
+      "name": "Plague Marines",
+      "siteName": "Plague Marines",
+      "ours": "1-+: 5=90,7=125,10=180",
+      "site": "1-+: 5=90,7=125,10=175"
+     },
+     {
+      "id": "000001046",
+      "name": "Helbrute",
+      "siteName": "Helbrute",
+      "ours": "1-+: 1=110",
+      "site": "1-+: 1=105"
+     },
+     {
+      "id": "000001050",
+      "name": "Chaos Predator Annihilator",
+      "siteName": "Chaos Predator Annihilator",
+      "ours": "1-2: 1=135 | 3-+: 1=145",
+      "site": "1-2: 1=130 | 3-+: 1=140"
+     },
+     {
+      "id": "000001052",
+      "name": "Daemon Prince of Nurgle",
+      "siteName": "Daemon Prince of Nurgle",
+      "ours": "1-+: 1=195",
+      "site": "1-+: 1=185"
+     },
+     {
+      "id": "000001053",
+      "name": "Typhus",
+      "siteName": "Typhus",
+      "ours": "1-+: 1=100",
+      "site": "1-+: 1=90"
+     },
+     {
+      "id": "000001054",
+      "name": "Lord of Contagion",
+      "siteName": "Lord of Contagion",
+      "ours": "1-+: 1=120",
+      "site": "1-+: 1=110"
+     },
+     {
+      "id": "000001371",
+      "name": "Deathshroud Terminators",
+      "siteName": "Deathshroud Terminators",
+      "ours": "1-2: 3=160,6=305 | 3-+: 3=170,6=315",
+      "site": "1-2: 3=150,6=305 | 3-+: 3=160,6=315"
+     },
+     {
+      "id": "000002460",
+      "name": "Lord of Virulence",
+      "siteName": "Lord of Virulence",
+      "ours": "1-+: 1=100",
+      "site": "1-+: 1=90"
+     },
+     {
+      "id": "000002461",
+      "name": "Chaos Predator Destructor",
+      "siteName": "Chaos Predator Destructor",
+      "ours": "1-2: 1=145 | 3-+: 1=155",
+      "site": "1-2: 1=140 | 3-+: 1=150"
+     },
+     {
+      "id": "000002749",
+      "name": "Daemon Prince of Nurgle with Wings",
+      "siteName": "Daemon Prince of Nurgle with Wings",
+      "ours": "1-+: 1=170",
+      "site": "1-+: 1=160"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [
+     {
+      "id": "000001372",
+      "name": "Blightlord Terminators",
+      "siteName": "Blightlord Terminators",
+      "ours": "1-+: 3=115,5=180,10=360",
+      "site": "1-2: 3=115,5=185,10=370 | 3-+: 3=145,5=215,10=400"
+     },
+     {
+      "id": "000001376",
+      "name": "Plagueburst Crawler",
+      "siteName": "Plagueburst Crawler",
+      "ours": "1-1: 1=170 | 2-+: 1=200",
+      "site": "1-2: 1=170 | 3-+: 1=200"
+     }
+    ],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [
+     {
+      "id": "000003585",
+      "name": "Chaos Thunderhawk",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003586",
+      "name": "Greater Blight Drone",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003592",
+      "name": "Chaos Lord On Palanquin Of Nurgle",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003593",
+      "name": "Gellerpox Infected",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003594",
+      "name": "Hell Blade",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003595",
+      "name": "Hell Talon",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003596",
+      "name": "Mutoid Vermin",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003600",
+      "name": "Sorcerer On Palanquin Of Nurgle",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003604",
+      "name": "Terrax-pattern Termite",
+      "siteFactions": [
+       "adeptus-mechanicus",
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003628",
+      "name": "Cerberus",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003632",
+      "name": "Kratos",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003644",
+      "name": "Mastodon",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003668",
+      "name": "Rapier Carrier",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003680",
+      "name": "Typhon",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003688",
+      "name": "Falchion",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     }
+    ],
+    "legendsNotOnSite": [
+     {
+      "id": "000003608",
+      "name": "Land Raider Achilles",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003612",
+      "name": "Land Raider Proteus",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003616",
+      "name": "Fire Raptor Gunship",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003620",
+      "name": "Spartan",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003624",
+      "name": "Deredeo Dreadnought",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003636",
+      "name": "Sokar-pattern Stormbird",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003640",
+      "name": "Sicaran Battle Tank",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003648",
+      "name": "Leviathan Dreadnought",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003652",
+      "name": "Fellblade",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003656",
+      "name": "Relic Contemptor Dreadnought",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003660",
+      "name": "Whirlwind Scorpius",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003664",
+      "name": "Xiphon Interceptor",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003672",
+      "name": "Storm Eagle Gunship",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003676",
+      "name": "Sicaran Venator",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003684",
+      "name": "Sicaran Punisher",
+      "source": "Space Marines (Warhammer Legends)"
+     }
+    ],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 29,
+    "counts": {
+     "ours": 71,
+     "site": 41,
+     "matched": 41
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 30
+    },
+    "same": 9,
+    "counts": {
+     "ours": 9,
+     "site": 9,
+     "matched": 9
+    }
+   }
+  },
+  "DRU": {
+   "name": "Drukhari",
+   "siteFactions": [
+    "drukhari"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 8
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 38,
+     "site": 30,
+     "matched": 30,
+     "same": 28,
+     "points": 2,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 8,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 9,
+     "site": 9,
+     "matched": 9,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 30,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000000650",
+      "name": "Wracks",
+      "siteName": "Wracks",
+      "ours": "1-+: 5=60,8=100,10=120",
+      "site": "1-+: 5=55,8=90,10=110"
+     },
+     {
+      "id": "000000663",
+      "name": "Talos",
+      "siteName": "Talos",
+      "ours": "1-2: 1=75,2=150 | 3-+: 1=85,2=160",
+      "site": "1-2: 1=70,2=140 | 3-+: 1=80,2=150"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [
+     {
+      "id": "000004168",
+      "name": "Corsair Voidreavers",
+      "siteFactions": [
+       "aeldari"
+      ],
+      "source": "Aeldari"
+     },
+     {
+      "id": "000004169",
+      "name": "Corsair Voidscarred",
+      "siteFactions": [
+       "aeldari"
+      ],
+      "source": "Aeldari"
+     },
+     {
+      "id": "000004170",
+      "name": "Corsair Cloud Dancer Band",
+      "siteFactions": [
+       "aeldari"
+      ],
+      "source": "Aeldari (Warhammer Legends)"
+     },
+     {
+      "id": "000004171",
+      "name": "Corsair Reaver Band",
+      "siteFactions": [
+       "aeldari"
+      ],
+      "source": "Aeldari (Warhammer Legends)"
+     },
+     {
+      "id": "000004197",
+      "name": "Kharseth",
+      "siteFactions": [
+       "aeldari"
+      ],
+      "source": "Aeldari"
+     },
+     {
+      "id": "000004198",
+      "name": "Prince Yriel",
+      "siteFactions": [
+       "aeldari"
+      ],
+      "source": "Aeldari"
+     },
+     {
+      "id": "000004199",
+      "name": "Corsair Skyreavers",
+      "siteFactions": [
+       "aeldari"
+      ],
+      "source": "Aeldari"
+     },
+     {
+      "id": "000004200",
+      "name": "Starfangs",
+      "siteFactions": [
+       "aeldari"
+      ],
+      "source": "Aeldari"
+     }
+    ],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 28,
+    "counts": {
+     "ours": 38,
+     "site": 30,
+     "matched": 30
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 30
+    },
+    "same": 9,
+    "counts": {
+     "ours": 9,
+     "site": 9,
+     "matched": 9
+    }
+   }
+  },
+  "EC": {
+   "name": "Emperor’s Children",
+   "siteFactions": [
+    "emperors-children"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 35
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 23,
+     "site": 23,
+     "matched": 23,
+     "same": 14,
+     "points": 9,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 10,
+     "site": 10,
+     "matched": 10,
+     "dp": 2,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 34,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000004078",
+      "name": "Lord Exultant",
+      "siteName": "Lord Exultant",
+      "ours": "1-2: 1=90 | 3-+: 1=100",
+      "site": "1-2: 1=95 | 3-+: 1=105"
+     },
+     {
+      "id": "000004079",
+      "name": "Tormentors",
+      "siteName": "Tormentors",
+      "ours": "1-+: 5=80,10=160",
+      "site": "1-+: 5=85,10=170"
+     },
+     {
+      "id": "000004080",
+      "name": "Infractors",
+      "siteName": "Infractors",
+      "ours": "1-+: 5=85,10=160",
+      "site": "1-+: 5=95,10=175"
+     },
+     {
+      "id": "000004081",
+      "name": "Chaos Terminators",
+      "siteName": "Chaos Terminators",
+      "ours": "1-+: 5=145",
+      "site": "1-+: 5=155"
+     },
+     {
+      "id": "000004082",
+      "name": "Chaos Land Raider",
+      "siteName": "Chaos Land Raider",
+      "ours": "1-2: 1=220 | 3-+: 1=240",
+      "site": "1-2: 1=210 | 3-+: 1=230"
+     },
+     {
+      "id": "000004083",
+      "name": "Lucius the Eternal",
+      "siteName": "Lucius the Eternal",
+      "ours": "1-+: 1=120",
+      "site": "1-+: 1=130"
+     },
+     {
+      "id": "000004086",
+      "name": "Daemon Prince of Slaanesh",
+      "siteName": "Daemon Prince of Slaanesh",
+      "ours": "1-1: 1=170 | 2-+: 1=185",
+      "site": "1-1: 1=165 | 2-+: 1=180"
+     },
+     {
+      "id": "000004087",
+      "name": "Daemon Prince of Slaanesh with Wings",
+      "siteName": "Daemon Prince of Slaanesh with Wings",
+      "ours": "1-1: 1=205 | 2-+: 1=235",
+      "site": "1-1: 1=205 | 2-+: 1=225"
+     },
+     {
+      "id": "000004088",
+      "name": "Noise Marines",
+      "siteName": "Noise Marines",
+      "ours": "1-2: 6=145 | 3-+: 6=160",
+      "site": "1-2: 6=160 | 3-+: 6=175"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 14,
+    "counts": {
+     "ours": 23,
+     "site": 23,
+     "matched": 23
+    }
+   },
+   "detachments": {
+    "dpChanged": [
+     {
+      "id": "000001036",
+      "name": "Carnival of Excess",
+      "ours": 2,
+      "site": 3
+     },
+     {
+      "id": "000001038",
+      "name": "Slaanesh’s Chosen",
+      "ours": 2,
+      "site": 1
+     }
+    ],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 34
+    },
+    "same": 8,
+    "counts": {
+     "ours": 10,
+     "site": 10,
+     "matched": 10
+    }
+   }
+  },
+  "GC": {
+   "name": "Genestealer Cults",
+   "siteFactions": [
+    "genestealer-cults"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 7
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 25,
+     "site": 25,
+     "matched": 25,
+     "same": 20,
+     "points": 5,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 9,
+     "site": 9,
+     "matched": 8,
+     "dp": 0,
+     "newOnSite": 1,
+     "missingOnSite": 1,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 26,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000000509",
+      "name": "Primus",
+      "siteName": "Primus",
+      "ours": "1-+: 1=70",
+      "site": "1-+: 1=60"
+     },
+     {
+      "id": "000000511",
+      "name": "Acolyte Hybrids With Autopistols",
+      "siteName": "Acolyte Hybrids with Autopistols",
+      "ours": "1-+: 5=70,10=130",
+      "site": "1-+: 5=65,10=120"
+     },
+     {
+      "id": "000000521",
+      "name": "Goliath Rockgrinder",
+      "siteName": "Goliath Rockgrinder",
+      "ours": "1-2: 1=120 | 3-+: 1=130",
+      "site": "1-2: 1=110 | 3-+: 1=120"
+     },
+     {
+      "id": "000001569",
+      "name": "Sanctus",
+      "siteName": "Sanctus",
+      "ours": "1-+: 1=65",
+      "site": "1-+: 1=60"
+     },
+     {
+      "id": "000001571",
+      "name": "Nexos",
+      "siteName": "Nexos",
+      "ours": "1-+: 1=60",
+      "site": "1-+: 1=50"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 20,
+    "counts": {
+     "ours": 25,
+     "site": 25,
+     "matched": 25
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [
+     {
+      "id": "000000888",
+      "name": "Brood Brother Auxilia"
+     }
+    ],
+    "outdated": [],
+    "newOnSite": [
+     {
+      "siteId": "brood-brothers-auxilia",
+      "name": "Brood Brothers Auxilia",
+      "faction": "genestealer-cults",
+      "dp": 2,
+      "enhancements": 4
+     }
+    ],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 26
+    },
+    "same": 8,
+    "counts": {
+     "ours": 9,
+     "site": 9,
+     "matched": 8
+    }
+   }
+  },
+  "GK": {
+   "name": "Grey Knights",
+   "siteFactions": [
+    "grey-knights"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 61
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 31,
+     "site": 31,
+     "matched": 31,
+     "same": 15,
+     "points": 16,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 9,
+     "site": 9,
+     "matched": 9,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 30,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000000374",
+      "name": "Grand Master Voldus",
+      "siteName": "Grand Master Voldus",
+      "ours": "1-+: 1=125",
+      "site": "1-+: 1=130"
+     },
+     {
+      "id": "000000375",
+      "name": "Grand Master",
+      "siteName": "Grand Master",
+      "ours": "1-+: 1=95",
+      "site": "1-+: 1=100"
+     },
+     {
+      "id": "000000376",
+      "name": "Brother-captain",
+      "siteName": "Brother-Captain",
+      "ours": "1-+: 1=95",
+      "site": "1-+: 1=100"
+     },
+     {
+      "id": "000000379",
+      "name": "Brotherhood Champion",
+      "siteName": "Brotherhood Champion",
+      "ours": "1-+: 1=70",
+      "site": "1-+: 1=75"
+     },
+     {
+      "id": "000000380",
+      "name": "Castellan Crowe",
+      "siteName": "Castellan Crowe",
+      "ours": "1-+: 1=100",
+      "site": "1-+: 1=105"
+     },
+     {
+      "id": "000000381",
+      "name": "Strike Squad",
+      "siteName": "Strike Squad",
+      "ours": "1-+: 5=115,10=230",
+      "site": "1-+: 5=125,10=250"
+     },
+     {
+      "id": "000000382",
+      "name": "Brotherhood Terminator Squad",
+      "siteName": "Brotherhood Terminator Squad",
+      "ours": "1-+: 4=140,5=175,8=300,10=360",
+      "site": "1-+: 4=150,5=185,8=315,10=380"
+     },
+     {
+      "id": "000000383",
+      "name": "Purifier Squad",
+      "siteName": "Purifier Squad",
+      "ours": "1-2: 5=130,10=260 | 3-+: 5=140,10=270",
+      "site": "1-2: 5=145,10=290 | 3-+: 5=155,10=300"
+     },
+     {
+      "id": "000000384",
+      "name": "Paladin Squad",
+      "siteName": "Paladin Squad",
+      "ours": "1-2: 4=170,5=215,8=360,10=460 | 3-+: 4=210,5=255,8=400,10=500",
+      "site": "1-2: 4=185,5=230,8=385,10=490 | 3-+: 4=225,5=270,8=425,10=530"
+     },
+     {
+      "id": "000000387",
+      "name": "Interceptor Squad",
+      "siteName": "Interceptor Squad",
+      "ours": "1-2: 5=125,10=250 | 3-+: 5=135,10=260",
+      "site": "1-2: 5=135,10=270 | 3-+: 5=145,10=280"
+     },
+     {
+      "id": "000000388",
+      "name": "Purgation Squad",
+      "siteName": "Purgation Squad",
+      "ours": "1-2: 5=105,10=210 | 3-+: 5=115,10=220",
+      "site": "1-2: 5=115,10=230 | 3-+: 5=125,10=240"
+     },
+     {
+      "id": "000000389",
+      "name": "Nemesis Dreadknight",
+      "siteName": "Nemesis Dreadknight",
+      "ours": "1-2: 1=195 | 3-+: 1=210",
+      "site": "1-2: 1=205 | 3-+: 1=220"
+     },
+     {
+      "id": "000000399",
+      "name": "Brotherhood Techmarine",
+      "siteName": "Brotherhood Techmarine",
+      "ours": "1-+: 1=70",
+      "site": "1-+: 1=75"
+     },
+     {
+      "id": "000001360",
+      "name": "Grand Master In Nemesis Dreadknight",
+      "siteName": "Grand Master in Nemesis Dreadknight",
+      "ours": "1-2: 1=200 | 3-+: 1=215",
+      "site": "1-2: 1=210 | 3-+: 1=225"
+     },
+     {
+      "id": "000001361",
+      "name": "Brotherhood Librarian",
+      "siteName": "Brotherhood Librarian",
+      "ours": "1-1: 1=90 | 2-+: 1=100",
+      "site": "1-1: 1=95 | 2-+: 1=105"
+     },
+     {
+      "id": "000001362",
+      "name": "Brotherhood Chaplain",
+      "siteName": "Brotherhood Chaplain",
+      "ours": "1-+: 1=65",
+      "site": "1-+: 1=70"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 15,
+    "counts": {
+     "ours": 31,
+     "site": 31,
+     "matched": 31
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 30
+    },
+    "same": 9,
+    "counts": {
+     "ours": 9,
+     "site": 9,
+     "matched": 9
+    }
+   }
+  },
+  "AoI": {
+   "name": "Imperial Agents",
+   "siteFactions": [
+    "imperial-agents"
+   ],
+   "ourSource": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 981,
+    "mfm": "1.6",
+    "date": "2026-10-14"
+   },
+   "siteChangesSince": {
+    "after": "2026-10-14",
+    "updates": [
+     "995"
+    ],
+    "items": 1
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 46,
+     "site": 46,
+     "matched": 46,
+     "same": 46,
+     "points": 0,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 5,
+     "site": 5,
+     "matched": 5,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 20,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 46,
+    "counts": {
+     "ours": 46,
+     "site": 46,
+     "matched": 46
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 20
+    },
+    "same": 5,
+    "counts": {
+     "ours": 5,
+     "site": 5,
+     "matched": 5
+    }
+   }
+  },
+  "QI": {
+   "name": "Imperial Knights",
+   "siteFactions": [
+    "imperial-knights"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 4
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 25,
+     "site": 23,
+     "matched": 23,
+     "same": 18,
+     "points": 4,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 2,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 1
+    },
+    "detachments": {
+     "ours": 8,
+     "site": 8,
+     "matched": 8,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 26,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000000857",
+      "name": "Knight Warden",
+      "siteName": "Knight Warden",
+      "ours": "1-2: 1=375 | 3-+: 1=390",
+      "site": "1-2: 1=365 | 3-+: 1=380"
+     },
+     {
+      "id": "000000862",
+      "name": "Cerastus Knight Atrapos",
+      "siteName": "Cerastus Knight Atrapos",
+      "ours": "1-1: 1=405 | 2-+: 1=425",
+      "site": "1-1: 1=420 | 2-+: 1=440"
+     },
+     {
+      "id": "000001486",
+      "name": "Knight Valiant",
+      "siteName": "Knight Valiant",
+      "ours": "1-2: 1=400 | 3-+: 1=415",
+      "site": "1-2: 1=390 | 3-+: 1=405"
+     },
+     {
+      "id": "000004149",
+      "name": "Knight Defender",
+      "siteName": "Knight Defender",
+      "ours": "1-1: 1=400 | 2-+: 1=420",
+      "site": "1-1: 1=385 | 2-+: 1=405"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [
+     {
+      "id": "000003841",
+      "name": "Skitarii Marshal",
+      "siteFactions": [
+       "adeptus-mechanicus"
+      ],
+      "source": "Adeptus Mechanicus"
+     },
+     {
+      "id": "000003842",
+      "name": "Skitarii Rangers",
+      "siteFactions": [
+       "adeptus-mechanicus"
+      ],
+      "source": "Adeptus Mechanicus"
+     }
+    ],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [
+     {
+      "id": "000002770",
+      "name": "Sir Hekhtur"
+     }
+    ],
+    "same": 18,
+    "counts": {
+     "ours": 25,
+     "site": 23,
+     "matched": 23
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 26
+    },
+    "same": 8,
+    "counts": {
+     "ours": 8,
+     "site": 8,
+     "matched": 8
+    }
+   }
+  },
+  "LoV": {
+   "name": "Leagues of Votann",
+   "siteFactions": [
+    "leagues-of-votann"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 9
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 22,
+     "site": 22,
+     "matched": 22,
+     "same": 17,
+     "points": 5,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 10,
+     "site": 10,
+     "matched": 10,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 33,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 1,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000002593",
+      "name": "Ûthar the Destined",
+      "siteName": "Ûthar the Destined",
+      "ours": "1-+: 1=90",
+      "site": "1-+: 1=100"
+     },
+     {
+      "id": "000002600",
+      "name": "Cthonian Beserks",
+      "siteName": "Cthonian Beserks",
+      "ours": "1-+: 5=95,10=190",
+      "site": "1-+: 5=90,10=180"
+     },
+     {
+      "id": "000002601",
+      "name": "Hernkyn Pioneers",
+      "siteName": "Hernkyn Pioneers",
+      "ours": "1-2: 3=80,6=160 | 3-+: 3=90,6=170",
+      "site": "1-2: 3=85,6=170 | 3-+: 3=95,6=180"
+     },
+     {
+      "id": "000002604",
+      "name": "Hekaton Land Fortress",
+      "siteName": "Hekaton Land Fortress",
+      "ours": "1-1: 1=250 | 2-+: 1=265",
+      "site": "1-1: 1=250 | 2-+: 1=270"
+     },
+     {
+      "id": "000004146",
+      "name": "Kapricus Defenders",
+      "siteName": "Kapricus Defenders",
+      "ours": "1-2: 1=70,2=140 | 3-+: 1=80,2=150",
+      "site": "1-2: 1=75,2=150 | 3-+: 1=95,2=170"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 17,
+    "counts": {
+     "ours": 22,
+     "site": 22,
+     "matched": 22
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [
+      {
+       "detachment": "Dêlve Assault Shift",
+       "ours": "Dêlvwerke Navigator",
+       "site": "Dêlvewerke Navigator",
+       "points": 25
+      }
+     ],
+     "same": 33
+    },
+    "same": 10,
+    "counts": {
+     "ours": 10,
+     "site": 10,
+     "matched": 10
+    }
+   }
+  },
+  "NEC": {
+   "name": "Necrons",
+   "siteFactions": [
+    "necrons"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 12
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 64,
+     "site": 64,
+     "matched": 64,
+     "same": 54,
+     "points": 10,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 12,
+     "site": 12,
+     "matched": 12,
+     "dp": 1,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 41,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 1,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000000532",
+      "name": "Trazyn The Infinite",
+      "siteName": "Trazyn the Infinite",
+      "ours": "1-+: 1=65",
+      "site": "1-+: 1=60"
+     },
+     {
+      "id": "000000535",
+      "name": "Immortals",
+      "siteName": "Immortals",
+      "ours": "1-+: 5=70,10=140",
+      "site": "1-+: 5=65,10=130"
+     },
+     {
+      "id": "000000553",
+      "name": "Annihilation Barge",
+      "siteName": "Annihilation Barge",
+      "ours": "1-+: 1=95",
+      "site": "1-+: 1=100"
+     },
+     {
+      "id": "000000554",
+      "name": "Doomsday Ark",
+      "siteName": "Doomsday Ark",
+      "ours": "1-2: 1=210 | 3-+: 1=230",
+      "site": "1-2: 1=200 | 3-+: 1=230"
+     },
+     {
+      "id": "000000556",
+      "name": "Tesseract Vault",
+      "siteName": "Tesseract Vault",
+      "ours": "1-1: 1=465 | 2-+: 1=485",
+      "site": "1-1: 1=465 | 2-+: 1=505"
+     },
+     {
+      "id": "000002115",
+      "name": "Canoptek Doomstalker",
+      "siteName": "Canoptek Doomstalker",
+      "ours": "1-+: 1=140",
+      "site": "1-+: 1=130"
+     },
+     {
+      "id": "000002353",
+      "name": "Psychomancer",
+      "siteName": "Psychomancer",
+      "ours": "1-+: 1=55",
+      "site": "1-+: 1=65"
+     },
+     {
+      "id": "000002359",
+      "name": "Lokhust Destroyers",
+      "siteName": "Lokhust Destroyers",
+      "ours": "1-2: 1=40,2=55,3=80,6=175 | 3-+: 1=70,2=85,3=110,6=205",
+      "site": "1-2: 1=40,2=55,3=80,6=190 | 3-+: 1=70,2=85,3=110,6=220"
+     },
+     {
+      "id": "000004177",
+      "name": "Canoptek Tomb Crawlers",
+      "siteName": "Canoptek Tomb Crawlers",
+      "ours": "1-+: 2=50",
+      "site": "1-+: 2=60"
+     },
+     {
+      "id": "000004186",
+      "name": "Nekrosor Ammentar",
+      "siteName": "Nekrosor Ammentar",
+      "ours": "1-+: 1=185",
+      "site": "1-+: 1=195"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 54,
+    "counts": {
+     "ours": 64,
+     "site": 64,
+     "matched": 64
+    }
+   },
+   "detachments": {
+    "dpChanged": [
+     {
+      "id": "000000816",
+      "name": "Canoptek Court",
+      "ours": 3,
+      "site": 2
+     }
+    ],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [
+      {
+       "detachment": "The Phaeron's Armoury",
+       "ours": "Relocational Optimiser",
+       "site": "Prelocational Optimiser",
+       "points": 25
+      }
+     ],
+     "same": 41
+    },
+    "same": 11,
+    "counts": {
+     "ours": 12,
+     "site": 12,
+     "matched": 12
+    }
+   }
+  },
+  "ORK": {
+   "name": "Orks",
+   "siteFactions": [
+    "orks"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 41
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 67,
+     "site": 67,
+     "matched": 67,
+     "same": 44,
+     "points": 23,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 15,
+     "site": 15,
+     "matched": 15,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 35,
+     "points": 3,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000000002",
+      "name": "Warboss In Mega Armour",
+      "siteName": "Warboss in Mega Armour",
+      "ours": "1-2: 1=125 | 3-+: 1=140",
+      "site": "1-2: 1=115 | 3-+: 1=130"
+     },
+     {
+      "id": "000000004",
+      "name": "Weirdboy",
+      "siteName": "Weirdboy",
+      "ours": "1-+: 1=65",
+      "site": "1-+: 1=60"
+     },
+     {
+      "id": "000000008",
+      "name": "Ghazghkull Thraka",
+      "siteName": "Ghazghkull Thraka",
+      "ours": "1-+: 1=300",
+      "site": "1-+: 1=290"
+     },
+     {
+      "id": "000000012",
+      "name": "Mek",
+      "siteName": "Mek",
+      "ours": "1-+: 1=45",
+      "site": "1-+: 1=55"
+     },
+     {
+      "id": "000000016",
+      "name": "Boyz",
+      "siteName": "Boyz",
+      "ours": "1-3: 10=90,20=180 | 4-+: 10=100,20=190",
+      "site": "1-3: 10=85,20=170 | 4-+: 10=95,20=180"
+     },
+     {
+      "id": "000000020",
+      "name": "Tankbustas",
+      "siteName": "Tankbustas",
+      "ours": "1-2: 6=145 | 3-+: 6=155",
+      "site": "1-2: 6=160 | 3-+: 6=170"
+     },
+     {
+      "id": "000000021",
+      "name": "Nobz",
+      "siteName": "Nobz",
+      "ours": "1-2: 5=125,10=250 | 3-+: 5=155,10=280",
+      "site": "1-2: 5=115,10=230 | 3-+: 5=145,10=260"
+     },
+     {
+      "id": "000000024",
+      "name": "Meganobz",
+      "siteName": "Meganobz",
+      "ours": "1-2: 2=75,3=110,5=185,6=225 | 3-+: 2=115,3=150,5=225,6=265",
+      "site": "1-2: 2=70,3=105,5=175,6=210 | 3-+: 2=110,3=145,5=215,6=250"
+     },
+     {
+      "id": "000000028",
+      "name": "Deffkoptas",
+      "siteName": "Deffkoptas",
+      "ours": "1-2: 3=80,6=160 | 3-+: 3=90,6=170",
+      "site": "1-2: 3=85,6=170 | 3-+: 3=95,6=180"
+     },
+     {
+      "id": "000000039",
+      "name": "Battlewagon",
+      "siteName": "Battlewagon",
+      "ours": "1-2: 1=150 | 3-+: 1=160",
+      "site": "1-2: 1=160 | 3-+: 1=180"
+     },
+     {
+      "id": "000000041",
+      "name": "Killa Kans",
+      "siteName": "Killa Kans",
+      "ours": "1-2: 3=130,6=260 | 3-+: 3=150,6=280",
+      "site": "1-2: 3=130,6=275 | 3-+: 3=170,6=315"
+     },
+     {
+      "id": "000000045",
+      "name": "Flash Gitz",
+      "siteName": "Flash Gitz",
+      "ours": "1-2: 5=105,10=210 | 3-+: 5=135,10=240",
+      "site": "1-2: 5=110,10=220 | 3-+: 5=150,10=260"
+     },
+     {
+      "id": "000000059",
+      "name": "Gargantuan Squiggoth",
+      "siteName": "Gargantuan Squiggoth",
+      "ours": "1-1: 1=500 | 2-+: 1=550",
+      "site": "1-1: 1=500 | 2-+: 1=600"
+     },
+     {
+      "id": "000001536",
+      "name": "Big Mek With Shokk Attack Gun",
+      "siteName": "Big Mek with Shokk Attack Gun",
+      "ours": "1-1: 1=95 | 2-+: 1=105",
+      "site": "1-1: 1=110 | 2-+: 1=125"
+     },
+     {
+      "id": "000002494",
+      "name": "Beast Snagga Boyz",
+      "siteName": "Beast Snagga Boyz",
+      "ours": "1-3: 10=85,20=170 | 4-+: 10=95,20=180",
+      "site": "1-3: 10=80,20=160 | 4-+: 10=90,20=170"
+     },
+     {
+      "id": "000002496",
+      "name": "Squighog Boyz",
+      "siteName": "Squighog Boyz",
+      "ours": "1-2: 4=140,8=280 | 3-+: 4=160,8=300",
+      "site": "1-2: 4=130,8=260 | 3-+: 4=160,8=290"
+     },
+     {
+      "id": "000002497",
+      "name": "Kill Rig",
+      "siteName": "Kill Rig",
+      "ours": "1-2: 1=175 | 3-+: 1=185",
+      "site": "1-2: 1=175 | 3-+: 1=195"
+     },
+     {
+      "id": "000002498",
+      "name": "Hunta Rig",
+      "siteName": "Hunta Rig",
+      "ours": "1-2: 1=165 | 3-+: 1=175",
+      "site": "1-2: 1=165 | 3-+: 1=185"
+     },
+     {
+      "id": "000003707",
+      "name": "Big Mek",
+      "siteName": "Big Mek",
+      "ours": "1-2: 1=85 | 3-+: 1=95",
+      "site": "1-2: 1=100 | 3-+: 1=115"
+     },
+     {
+      "id": "000003861",
+      "name": "Breaka Boyz",
+      "siteName": "Breaka Boyz",
+      "ours": "1-2: 6=135 | 3-+: 6=145",
+      "site": "1-2: 6=120 | 3-+: 6=130"
+     },
+     {
+      "id": "000004227",
+      "name": "Bannernob",
+      "siteName": "Bannernob",
+      "ours": "1-+: 1=35",
+      "site": "1-+: 1=30"
+     },
+     {
+      "id": "000004229",
+      "name": "Big Mek Dakkarig",
+      "siteName": "Big Mek Dakkarig",
+      "ours": "1-2: 1=135 | 3-+: 1=145",
+      "site": "1-2: 1=160 | 3-+: 1=180"
+     },
+     {
+      "id": "000004242",
+      "name": "Nazdreg",
+      "siteName": "Nazdreg",
+      "ours": "1-+: 1=175",
+      "site": "1-+: 1=165"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 44,
+    "counts": {
+     "ours": 67,
+     "site": 67,
+     "matched": 67
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [
+      {
+       "detachment": "Dread Mob",
+       "name": "Dreadherder",
+       "ours": 20,
+       "site": 30
+      },
+      {
+       "detachment": "Blitz Brigade",
+       "name": "Targetin' Gizmos",
+       "ours": 10,
+       "site": 25
+      },
+      {
+       "detachment": "Wreckas",
+       "name": "Supa-snazz Dakka",
+       "ours": 20,
+       "site": 25
+      }
+     ],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 35
+    },
+    "same": 15,
+    "counts": {
+     "ours": 15,
+     "site": 15,
+     "matched": 15
+    }
+   }
+  },
+  "SM": {
+   "name": "Space Marines",
+   "siteFactions": [
+    "space-marines",
+    "black-templars",
+    "blood-angels",
+    "dark-angels",
+    "deathwatch",
+    "space-wolves"
+   ],
+   "ourSource": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 981,
+    "mfm": "1.6",
+    "date": "2026-10-14"
+   },
+   "siteChangesSince": {
+    "after": "2026-10-14",
+    "updates": [
+     "995"
+    ],
+    "items": 12
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 285,
+     "site": 215,
+     "matched": 215,
+     "same": 218,
+     "points": 3,
+     "sizes": 0,
+     "tiers": 1,
+     "legends": 1,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 63,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 69,
+     "site": 35,
+     "matched": 35,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 34
+    },
+    "enhancements": {
+     "same": 93,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 16
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000002787",
+      "name": "Gladiator Lancer",
+      "siteName": "Gladiator Lancer",
+      "ours": "1-2: 1=165 | 3-+: 1=185",
+      "site": "1-2: 1=160 | 3-+: 1=180"
+     },
+     {
+      "id": "000002788",
+      "name": "Gladiator Valiant",
+      "siteName": "Gladiator Valiant",
+      "ours": "1-2: 1=145 | 3-+: 1=165",
+      "site": "1-2: 1=165 | 3-+: 1=185"
+     },
+     {
+      "id": "000002790",
+      "name": "Repulsor Executioner",
+      "siteName": "Repulsor Executioner",
+      "ours": "1-2: 1=265 | 3-+: 1=285",
+      "site": "1-2: 1=260 | 3-+: 1=280"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [
+     {
+      "id": "000002801",
+      "name": "Venerable Dreadnought",
+      "siteName": "Venerable Dreadnought",
+      "ours": "1-2: 1=130 | 3-+: 1=140",
+      "site": "1-+: 1=165"
+     }
+    ],
+    "legendsChanged": [
+     {
+      "id": "000002801",
+      "name": "Venerable Dreadnought",
+      "ours": false,
+      "site": true
+     }
+    ],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [
+     {
+      "id": "000000061",
+      "name": "Assault Squad"
+     },
+     {
+      "id": "000000063",
+      "name": "Apothecary on Bike"
+     },
+     {
+      "id": "000000064",
+      "name": "Assault Squad with Jump Packs"
+     },
+     {
+      "id": "000000068",
+      "name": "Suppressor Squad"
+     },
+     {
+      "id": "000000070",
+      "name": "Tactical Squad"
+     },
+     {
+      "id": "000000072",
+      "name": "Caestus Assault Ram"
+     },
+     {
+      "id": "000000096",
+      "name": "Carab Culln The Risen"
+     },
+     {
+      "id": "000000104",
+      "name": "Relic Terminator Squad"
+     },
+     {
+      "id": "000000107",
+      "name": "Javelin Attack Speeder"
+     },
+     {
+      "id": "000000111",
+      "name": "Mortis Dreadnought"
+     },
+     {
+      "id": "000000113",
+      "name": "Storm Eagle Gunship"
+     },
+     {
+      "id": "000000116",
+      "name": "Bike Squad"
+     },
+     {
+      "id": "000000121",
+      "name": "Uriel Ventris"
+     },
+     {
+      "id": "000000122",
+      "name": "Dreadnought Drop Pod"
+     },
+     {
+      "id": "000000131",
+      "name": "Leviathan Dreadnought"
+     },
+     {
+      "id": "000000132",
+      "name": "Land Speeder Storm"
+     },
+     {
+      "id": "000000134",
+      "name": "Astartes Servitors"
+     },
+     {
+      "id": "000000146",
+      "name": "Hunter"
+     },
+     {
+      "id": "000000148",
+      "name": "Imperial Space Marine"
+     },
+     {
+      "id": "000001162",
+      "name": "Sergeant Telion"
+     },
+     {
+      "id": "000001164",
+      "name": "Thunderfire Cannon"
+     },
+     {
+      "id": "000001166",
+      "name": "Company Veterans On Bikes"
+     },
+     {
+      "id": "000001168",
+      "name": "Land Speeder Tempest"
+     },
+     {
+      "id": "000001169",
+      "name": "Land Speeder Tornado"
+     },
+     {
+      "id": "000001178",
+      "name": "Vindicator Laser Destroyer"
+     },
+     {
+      "id": "000001179",
+      "name": "Sokar-pattern Stormbird"
+     },
+     {
+      "id": "000001182",
+      "name": "Ancient on Bike"
+     },
+     {
+      "id": "000001184",
+      "name": "Terminus Ultra"
+     },
+     {
+      "id": "000001192",
+      "name": "Chaplain Venerable Dreadnought"
+     },
+     {
+      "id": "000001344",
+      "name": "Librarian with Jump Pack"
+     },
+     {
+      "id": "000001345",
+      "name": "Lieutenant In Reiver Armour"
+     },
+     {
+      "id": "000001347",
+      "name": "Land Raider Prometheus"
+     },
+     {
+      "id": "000001348",
+      "name": "Librarian on Bike"
+     },
+     {
+      "id": "000001523",
+      "name": "Scout Sniper Squad"
+     },
+     {
+      "id": "000001524",
+      "name": "Sergeant Chronus"
+     },
+     {
+      "id": "000001527",
+      "name": "Techmarine on Bike"
+     },
+     {
+      "id": "000001607",
+      "name": "Land Raider Achilles"
+     },
+     {
+      "id": "000001608",
+      "name": "Land Raider Proteus"
+     },
+     {
+      "id": "000001609",
+      "name": "Fire Raptor Gunship"
+     },
+     {
+      "id": "000002076",
+      "name": "Attack Bike Squad"
+     },
+     {
+      "id": "000002102",
+      "name": "Land Speeder Typhoon"
+     },
+     {
+      "id": "000002103",
+      "name": "Command Squad"
+     },
+     {
+      "id": "000002202",
+      "name": "Devastator Squad"
+     },
+     {
+      "id": "000002234",
+      "name": "Primaris Company Champion"
+     },
+     {
+      "id": "000002252",
+      "name": "Spartan"
+     },
+     {
+      "id": "000002258",
+      "name": "Stalker"
+     },
+     {
+      "id": "000002267",
+      "name": "Deathstorm Drop Pod"
+     },
+     {
+      "id": "000002268",
+      "name": "Deimos Predator"
+     },
+     {
+      "id": "000002269",
+      "name": "Deredeo Dreadnought"
+     },
+     {
+      "id": "000002285",
+      "name": "Death Company Marines with Bolt Rifles"
+     },
+     {
+      "id": "000002678",
+      "name": "Chaplain Cassius"
+     },
+     {
+      "id": "000002704",
+      "name": "Fellblade"
+     },
+     {
+      "id": "000002706",
+      "name": "Ironclad Dreadnought"
+     },
+     {
+      "id": "000002710",
+      "name": "Land Raider Helios"
+     },
+     {
+      "id": "000002713",
+      "name": "Pedro Kantor"
+     },
+     {
+      "id": "000002719",
+      "name": "Relic Contemptor Dreadnought"
+     },
+     {
+      "id": "000002724",
+      "name": "Thunderhawk Transporter"
+     },
+     {
+      "id": "000002725",
+      "name": "Tyrannic War Veterans"
+     },
+     {
+      "id": "000002728",
+      "name": "Whirlwind Scorpius"
+     },
+     {
+      "id": "000002729",
+      "name": "Xiphon Interceptor"
+     },
+     {
+      "id": "000003875",
+      "name": "Kill Team Cassius"
+     },
+     {
+      "id": "000004204",
+      "name": "Ferren Areios"
+     },
+     {
+      "id": "000004234",
+      "name": "Company Champion on Bike"
+     }
+    ],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 218,
+    "counts": {
+     "ours": 285,
+     "site": 215,
+     "matched": 215
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [
+     {
+      "id": "000000758",
+      "name": "Liberator Assault Group"
+     },
+     {
+      "id": "000000793",
+      "name": "Anvil Siege Force"
+     },
+     {
+      "id": "000000795",
+      "name": "Firestorm Assault Force"
+     },
+     {
+      "id": "000000797",
+      "name": "Vanguard Spearhead"
+     },
+     {
+      "id": "000000798",
+      "name": "1st Company Task Force"
+     },
+     {
+      "id": "000000834",
+      "name": "Unforgiven Task Force"
+     },
+     {
+      "id": "000000836",
+      "name": "Company of Hunters"
+     },
+     {
+      "id": "000000900",
+      "name": "The Lost Brethren"
+     },
+     {
+      "id": "000000901",
+      "name": "The Angelic Host"
+     },
+     {
+      "id": "000000981",
+      "name": "Lion’s Blade Task Force"
+     },
+     {
+      "id": "000000994",
+      "name": "Librarius Conclave"
+     },
+     {
+      "id": "000001006",
+      "name": "Wrathful Procession"
+     },
+     {
+      "id": "000001068",
+      "name": "Saga of the Hunter"
+     },
+     {
+      "id": "000001069",
+      "name": "Saga of the Bold"
+     },
+     {
+      "id": "000001091",
+      "name": "Companions of Vehemence"
+     },
+     {
+      "id": "000001092",
+      "name": "Vindication Task Force"
+     },
+     {
+      "id": "000001093",
+      "name": "Godhammer Assault Force"
+     },
+     {
+      "id": "000001103",
+      "name": "Emperor’s Shield"
+     },
+     {
+      "id": "000001118",
+      "name": "Hammer of Avernii"
+     },
+     {
+      "id": "000001123",
+      "name": "Rage-cursed Onslaught"
+     },
+     {
+      "id": "000001130",
+      "name": "Bastion Task Force"
+     },
+     {
+      "id": "000001131",
+      "name": "Orbital Assault Force"
+     },
+     {
+      "id": "000001132",
+      "name": "Reclamation Force"
+     },
+     {
+      "id": "000001147",
+      "name": "Armoured Speartip"
+     },
+     {
+      "id": "000001148",
+      "name": "Headhunter Task Force"
+     },
+     {
+      "id": "000001210",
+      "name": "The Living Miracle"
+     },
+     {
+      "id": "000001213",
+      "name": "Legacy of Grace"
+     },
+     {
+      "id": "000001204",
+      "name": "Dark Age Arsenal"
+     },
+     {
+      "id": "000001206",
+      "name": "Interrogation Conclave"
+     },
+     {
+      "id": "000001207",
+      "name": "Legends of Saga and Song"
+     },
+     {
+      "id": "000001208",
+      "name": "Veterans of the Fang"
+     },
+     {
+      "id": "000001221",
+      "name": "Vengeful Hosts"
+     },
+     {
+      "id": "000001211",
+      "name": "Fulguris Task Force"
+     },
+     {
+      "id": "000001212",
+      "name": "Subversion Assets"
+     }
+    ],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [
+      {
+       "detachment": "Ironstorm Spearhead",
+       "name": "Target Augury Web",
+       "ours": 30
+      },
+      {
+       "detachment": "Ironstorm Spearhead",
+       "name": "The Flesh is Weak",
+       "ours": 20
+      },
+      {
+       "detachment": "Ironstorm Spearhead",
+       "name": "Adept of the Omnissiah",
+       "ours": 35
+      },
+      {
+       "detachment": "Ironstorm Spearhead",
+       "name": "Master of Machine War",
+       "ours": 20
+      },
+      {
+       "detachment": "Stormlance Task Force",
+       "name": "Fury of the Storm",
+       "ours": 25
+      },
+      {
+       "detachment": "Stormlance Task Force",
+       "name": "Portents of Wisdom",
+       "ours": 15
+      },
+      {
+       "detachment": "Stormlance Task Force",
+       "name": "Feinting Withdrawal",
+       "ours": 10
+      },
+      {
+       "detachment": "Stormlance Task Force",
+       "name": "Hunter’s Instincts",
+       "ours": 25
+      },
+      {
+       "detachment": "Gladius Task Force",
+       "name": "The Honour Vehement",
+       "ours": 15
+      },
+      {
+       "detachment": "Gladius Task Force",
+       "name": "Fire Discipline",
+       "ours": 25
+      },
+      {
+       "detachment": "Angelic Inheritors",
+       "name": "Troubling Visions",
+       "ours": 15
+      },
+      {
+       "detachment": "Inner Circle Task Force",
+       "name": "Eye of the Unseen",
+       "ours": 10
+      },
+      {
+       "detachment": "Inner Circle Task Force",
+       "name": "Deathwing Assault",
+       "ours": 30
+      },
+      {
+       "detachment": "Black Spear Task Force",
+       "name": "Thief of Secrets",
+       "ours": 25
+      },
+      {
+       "detachment": "Saga of the Beastslayer",
+       "name": "Elder’s Guidance",
+       "ours": 20
+      },
+      {
+       "detachment": "Saga of the Beastslayer",
+       "name": "Helm of the Beastslayer",
+       "ours": 15
+      }
+     ],
+     "possibleRenames": [],
+     "same": 93
+    },
+    "same": 35,
+    "counts": {
+     "ours": 69,
+     "site": 35,
+     "matched": 35
+    }
+   }
+  },
+  "TAU": {
+   "name": "T’au Empire",
+   "siteFactions": [
+    "tau-empire"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 2
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 62,
+     "site": 63,
+     "matched": 62,
+     "same": 60,
+     "points": 2,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 1,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 7,
+     "site": 7,
+     "matched": 7,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 23,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000000412",
+      "name": "Breacher Team",
+      "siteName": "Breacher Team",
+      "ours": "1-+: 10=90",
+      "site": "1-+: 10=80"
+     },
+     {
+      "id": "000004203",
+      "name": "The Twin Lance",
+      "siteName": "The Twin Lance",
+      "ours": "1-+: 2=230",
+      "site": "1-+: 2=240"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [
+     {
+      "siteId": "tactical-drones",
+      "name": "Tactical Drones",
+      "faction": "tau-empire",
+      "legends": true,
+      "points": ""
+     }
+    ],
+    "noPointsOnSite": [],
+    "same": 60,
+    "counts": {
+     "ours": 62,
+     "site": 63,
+     "matched": 62
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 23
+    },
+    "same": 7,
+    "counts": {
+     "ours": 7,
+     "site": 7,
+     "matched": 7
+    }
+   }
+  },
+  "TS": {
+   "name": "Thousand Sons",
+   "siteFactions": [
+    "thousand-sons"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 28
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 60,
+     "site": 34,
+     "matched": 34,
+     "same": 26,
+     "points": 8,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 11,
+     "legendsNotOnSite": 15,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 9,
+     "site": 9,
+     "matched": 9,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 30,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000001016",
+      "name": "Sorcerer",
+      "siteName": "Sorcerer",
+      "ours": "1-2: 1=95 | 3-+: 1=105",
+      "site": "1-2: 1=100 | 3-+: 1=110"
+     },
+     {
+      "id": "000001017",
+      "name": "Sorcerer In Terminator Armour",
+      "siteName": "Sorcerer in Terminator Armour",
+      "ours": "1-2: 1=100 | 3-+: 1=110",
+      "site": "1-2: 1=110 | 3-+: 1=120"
+     },
+     {
+      "id": "000001020",
+      "name": "Rubric Marines",
+      "siteName": "Rubric Marines",
+      "ours": "1-3: 5=100,10=190 | 4-+: 5=110,10=200",
+      "site": "1-3: 5=115,10=210 | 4-+: 5=125,10=220"
+     },
+     {
+      "id": "000001032",
+      "name": "Ahriman",
+      "siteName": "Ahriman",
+      "ours": "1-+: 1=100",
+      "site": "1-+: 1=105"
+     },
+     {
+      "id": "000001033",
+      "name": "Exalted Sorcerer",
+      "siteName": "Exalted Sorcerer",
+      "ours": "1-+: 1=95",
+      "site": "1-+: 1=100"
+     },
+     {
+      "id": "000001035",
+      "name": "Scarab Occult Terminators",
+      "siteName": "Scarab Occult Terminators",
+      "ours": "1-2: 5=180,10=385 | 3-+: 5=195,10=400",
+      "site": "1-2: 5=200,10=425 | 3-+: 5=240,10=465"
+     },
+     {
+      "id": "000002500",
+      "name": "Infernal Master",
+      "siteName": "Infernal Master",
+      "ours": "1-+: 1=100",
+      "site": "1-+: 1=105"
+     },
+     {
+      "id": "000002755",
+      "name": "Exalted Sorcerer on Disc of Tzeentch",
+      "siteName": "Exalted Sorcerer on Disc of Tzeentch",
+      "ours": "1-+: 1=90",
+      "site": "1-+: 1=95"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [
+     {
+      "id": "000003591",
+      "name": "Chaos Thunderhawk",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003597",
+      "name": "Chaos Lord On Disc Of Tzeentch",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003598",
+      "name": "Hell Blade",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003599",
+      "name": "Hell Talon",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003603",
+      "name": "Terrax-pattern Termite",
+      "siteFactions": [
+       "adeptus-mechanicus",
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003627",
+      "name": "Cerberus",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003631",
+      "name": "Kratos",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003643",
+      "name": "Mastodon",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003667",
+      "name": "Rapier Carrier",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003679",
+      "name": "Typhon",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003687",
+      "name": "Falchion",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     }
+    ],
+    "legendsNotOnSite": [
+     {
+      "id": "000003607",
+      "name": "Land Raider Achilles",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003611",
+      "name": "Land Raider Proteus",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003615",
+      "name": "Fire Raptor Gunship",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003619",
+      "name": "Spartan",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003623",
+      "name": "Deredeo Dreadnought",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003635",
+      "name": "Sokar-pattern Stormbird",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003639",
+      "name": "Sicaran Battle Tank",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003647",
+      "name": "Leviathan Dreadnought",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003651",
+      "name": "Fellblade",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003655",
+      "name": "Relic Contemptor Dreadnought",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003659",
+      "name": "Whirlwind Scorpius",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003663",
+      "name": "Xiphon Interceptor",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003671",
+      "name": "Storm Eagle Gunship",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003675",
+      "name": "Sicaran Venator",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003683",
+      "name": "Sicaran Punisher",
+      "source": "Space Marines (Warhammer Legends)"
+     }
+    ],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 26,
+    "counts": {
+     "ours": 60,
+     "site": 34,
+     "matched": 34
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 30
+    },
+    "same": 9,
+    "counts": {
+     "ours": 9,
+     "site": 9,
+     "matched": 9
+    }
+   }
+  },
+  "TYR": {
+   "name": "Tyranids",
+   "siteFactions": [
+    "tyranids"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 16
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 57,
+     "site": 57,
+     "matched": 57,
+     "same": 47,
+     "points": 10,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 10,
+     "site": 10,
+     "matched": 10,
+     "dp": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 34,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000000462",
+      "name": "Old One Eye",
+      "siteName": "Old One Eye",
+      "ours": "1-+: 1=140",
+      "site": "1-+: 1=130"
+     },
+     {
+      "id": "000000465",
+      "name": "Tervigon",
+      "siteName": "Tervigon",
+      "ours": "1-+: 1=160",
+      "site": "1-+: 1=150"
+     },
+     {
+      "id": "000000468",
+      "name": "Termagants",
+      "siteName": "Termagants",
+      "ours": "1-+: 10=60,20=110",
+      "site": "1-+: 10=55,20=110"
+     },
+     {
+      "id": "000000484",
+      "name": "Gargoyles",
+      "siteName": "Gargoyles",
+      "ours": "1-+: 10=80,20=155",
+      "site": "1-+: 10=75,20=150"
+     },
+     {
+      "id": "000000493",
+      "name": "Trygon",
+      "siteName": "Trygon",
+      "ours": "1-+: 1=140",
+      "site": "1-+: 1=135"
+     },
+     {
+      "id": "000000494",
+      "name": "Mawloc",
+      "siteName": "Mawloc",
+      "ours": "1-+: 1=135",
+      "site": "1-+: 1=130"
+     },
+     {
+      "id": "000002529",
+      "name": "Parasite Of Mortrex",
+      "siteName": "Parasite of Mortrex",
+      "ours": "1-+: 1=70",
+      "site": "1-+: 1=65"
+     },
+     {
+      "id": "000002686",
+      "name": "Barbgaunts",
+      "siteName": "Barbgaunts",
+      "ours": "1-+: 5=55,10=110",
+      "site": "1-+: 5=50,10=100"
+     },
+     {
+      "id": "000002688",
+      "name": "Neurotyrant",
+      "siteName": "Neurotyrant",
+      "ours": "1-+: 1=130",
+      "site": "1-+: 1=120"
+     },
+     {
+      "id": "000004225",
+      "name": "The Red Terror",
+      "siteName": "The Red Terror",
+      "ours": "1-+: 1=130",
+      "site": "1-+: 1=120"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 47,
+    "counts": {
+     "ours": 57,
+     "site": 57,
+     "matched": 57
+    }
+   },
+   "detachments": {
+    "dpChanged": [],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 34
+    },
+    "same": 10,
+    "counts": {
+     "ours": 10,
+     "site": 10,
+     "matched": 10
+    }
+   }
+  },
+  "WE": {
+   "name": "World Eaters",
+   "siteFactions": [
+    "world-eaters"
+   ],
+   "ourSource": {
+    "site": "wahapedia",
+    "date": "2026-09-28"
+   },
+   "siteChangesSince": {
+    "after": "2026-09-28",
+    "updates": [
+     "963",
+     "972",
+     "981",
+     "995"
+    ],
+    "items": 35
+   },
+   "summary": {
+    "datasheets": {
+     "ours": 58,
+     "site": 30,
+     "matched": 30,
+     "same": 22,
+     "points": 8,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 13,
+     "legendsNotOnSite": 15,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": {
+     "ours": 8,
+     "site": 8,
+     "matched": 8,
+     "dp": 1,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 0
+    },
+    "enhancements": {
+     "same": 26,
+     "points": 0,
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "possibleRenames": 0,
+     "outdated": 0
+    }
+   },
+   "datasheets": {
+    "pointsChanged": [
+     {
+      "id": "000002627",
+      "name": "Khorne Berzerkers",
+      "siteName": "Khorne Berzerkers",
+      "ours": "1-+: 10=160,20=320",
+      "site": "1-+: 10=170,20=330"
+     },
+     {
+      "id": "000002628",
+      "name": "Jakhals",
+      "siteName": "Jakhals",
+      "ours": "1-+: 10=65,20=130",
+      "site": "1-+: 10=65,20=120"
+     },
+     {
+      "id": "000002629",
+      "name": "Chaos Terminators",
+      "siteName": "Chaos Terminators",
+      "ours": "1-2: 5=165,10=330 | 3-+: 5=175,10=340",
+      "site": "1-2: 5=175,10=350 | 3-+: 5=185,10=360"
+     },
+     {
+      "id": "000002630",
+      "name": "Eightbound",
+      "siteName": "Eightbound",
+      "ours": "1-2: 3=125,6=255 | 3-+: 3=140,6=270",
+      "site": "1-2: 3=125,6=250 | 3-+: 3=140,6=265"
+     },
+     {
+      "id": "000002631",
+      "name": "Exalted Eightbound",
+      "siteName": "Exalted Eightbound",
+      "ours": "1-2: 3=130,6=265 | 3-+: 3=145,6=280",
+      "site": "1-2: 3=130,6=260 | 3-+: 3=145,6=275"
+     },
+     {
+      "id": "000002634",
+      "name": "Chaos Land Raider",
+      "siteName": "Chaos Land Raider",
+      "ours": "1-2: 1=220 | 3-+: 1=240",
+      "site": "1-2: 1=200 | 3-+: 1=220"
+     },
+     {
+      "id": "000004076",
+      "name": "Goremongers",
+      "siteName": "Goremongers",
+      "ours": "1-+: 8=75",
+      "site": "1-+: 8=70"
+     },
+     {
+      "id": "000004103",
+      "name": "Slaughterbound",
+      "siteName": "Slaughterbound",
+      "ours": "1-+: 1=100",
+      "site": "1-+: 1=90"
+     }
+    ],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [
+     {
+      "id": "000003587",
+      "name": "Blood Slaughterer",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003588",
+      "name": "Chaos Thunderhawk",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003589",
+      "name": "Greater Brass Scorpion",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003590",
+      "name": "Kytan Ravager",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003601",
+      "name": "Hell Blade",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003602",
+      "name": "Hell Talon",
+      "siteFactions": [
+       "chaos-space-marines"
+      ],
+      "source": "Chaos Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003605",
+      "name": "Terrax-pattern Termite",
+      "siteFactions": [
+       "adeptus-mechanicus",
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003629",
+      "name": "Cerberus",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003633",
+      "name": "Kratos",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003645",
+      "name": "Mastodon",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003669",
+      "name": "Rapier Carrier",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003681",
+      "name": "Typhon",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003689",
+      "name": "Falchion",
+      "siteFactions": [
+       "space-marines"
+      ],
+      "source": "Space Marines (Warhammer Legends)"
+     }
+    ],
+    "legendsNotOnSite": [
+     {
+      "id": "000003609",
+      "name": "Land Raider Achilles",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003613",
+      "name": "Land Raider Proteus",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003617",
+      "name": "Fire Raptor Gunship",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003621",
+      "name": "Spartan",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003625",
+      "name": "Deredeo Dreadnought",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003637",
+      "name": "Sokar-pattern Stormbird",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003641",
+      "name": "Sicaran Battle Tank",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003649",
+      "name": "Leviathan Dreadnought",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003653",
+      "name": "Fellblade",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003657",
+      "name": "Relic Contemptor Dreadnought",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003661",
+      "name": "Whirlwind Scorpius",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003665",
+      "name": "Xiphon Interceptor",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003673",
+      "name": "Storm Eagle Gunship",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003677",
+      "name": "Sicaran Venator",
+      "source": "Space Marines (Warhammer Legends)"
+     },
+     {
+      "id": "000003685",
+      "name": "Sicaran Punisher",
+      "source": "Space Marines (Warhammer Legends)"
+     }
+    ],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 22,
+    "counts": {
+     "ours": 58,
+     "site": 30,
+     "matched": 30
+    }
+   },
+   "detachments": {
+    "dpChanged": [
+     {
+      "id": "000000777",
+      "name": "Berzerker Warband",
+      "ours": 3,
+      "site": 2
+     }
+    ],
+    "missingOnSite": [],
+    "outdated": [],
+    "newOnSite": [],
+    "enhancements": {
+     "pointsChanged": [],
+     "newOnSite": [],
+     "missingOnSite": [],
+     "outdated": [],
+     "possibleRenames": [],
+     "same": 26
+    },
+    "same": 7,
+    "counts": {
+     "ours": 8,
+     "site": 8,
+     "matched": 8
+    }
+   }
+  }
+ },
+ "allies": {
+  "titan-legions": {
+   "ourFaction": "TL",
+   "group": "ally:titanicus",
+   "summary": {
+    "datasheets": {
+     "ours": 4,
+     "site": 4,
+     "matched": 4,
+     "same": 4,
+     "points": 0,
+     "sizes": 0,
+     "tiers": 0,
+     "legends": 0,
+     "renamed": 0,
+     "newOnSite": 0,
+     "removedOnSite": 0,
+     "outdated": 0,
+     "otherFactionOnSite": 0,
+     "legendsNotOnSite": 0,
+     "unmatched": 0,
+     "noPointsOnSite": 0
+    },
+    "detachments": null,
+    "enhancements": null
+   },
+   "datasheets": {
+    "pointsChanged": [],
+    "sizesChanged": [],
+    "tiersChanged": [],
+    "legendsChanged": [],
+    "renamed": [],
+    "removedOnSite": [],
+    "outdated": [],
+    "otherFactionOnSite": [],
+    "legendsNotOnSite": [],
+    "unmatched": [],
+    "newOnSite": [],
+    "noPointsOnSite": [],
+    "same": 4,
+    "counts": {
+     "ours": 4,
+     "site": 4,
+     "matched": 4
+    }
+   }
+  }
+ }
+}

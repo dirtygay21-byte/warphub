@@ -23,6 +23,8 @@ import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const SNAPSHOT_DIR = path.join(HERE, '..', '40k');
 export const WHRULES_SCHEMA = 'whrules-points-snapshot/1';
+/** /2 — все фракции сайта, у каждой ещё name, detachments (улучшения с очками) и renames; поля /1 те же. */
+export const WHRULES_SCHEMA_V2 = 'whrules-points-snapshot/2';
 const sha256 = (s) => crypto.createHash('sha256').update(s, 'utf8').digest('hex');
 
 /** Обработчики обновлений по kind: (files, snapshot, update) => { changed: число изменённых значений, lines: [] }. */
@@ -30,12 +32,17 @@ export const APPLIERS = {};
 
 /** Проверка снимка wh-rules: схема, обязательные поля, fingerprint. Ошибка — исключение. */
 export function checkWhrulesSnapshot(snap) {
-  if (snap?.schema !== WHRULES_SCHEMA) throw new Error(`снимок: схема ${snap?.schema}, ожидается ${WHRULES_SCHEMA}`);
+  if (snap?.schema !== WHRULES_SCHEMA && snap?.schema !== WHRULES_SCHEMA_V2) throw new Error(`снимок: схема ${snap?.schema}, ожидается ${WHRULES_SCHEMA} или ${WHRULES_SCHEMA_V2}`);
   const s = snap.source ?? {};
   for (const k of ['site', 'dataVersion', 'mfm', 'date', 'extractedAt']) if (s[k] == null || s[k] === '') throw new Error(`снимок: нет source.${k}`);
   if (!snap.assets || !Object.values(snap.assets).every((h) => /^[0-9a-f]{64}$/.test(h))) throw new Error('снимок: нет SHA-256 модулей источника');
   if (!snap.factions || !Object.values(snap.factions).every((f) => Array.isArray(f.datasheets))) throw new Error('снимок: нет инфолистов');
   if (!Array.isArray(snap.patches)) throw new Error('снимок: нет истории обновлений');
+  if (snap.schema === WHRULES_SCHEMA_V2)
+    for (const [slug, f] of Object.entries(snap.factions)) {
+      if (!f.name || !Array.isArray(f.detachments) || !f.renames || typeof f.renames !== 'object') throw new Error(`снимок: у ${slug} нет name, detachments или renames`);
+      if (f.detachments.some((d) => !d.id || !d.name || !Array.isArray(d.enhancements))) throw new Error(`снимок: детачмент ${slug} без id, имени или улучшений`);
+    }
   const { fingerprint, ...content } = snap;
   if (sha256(JSON.stringify(content)) !== fingerprint) throw new Error('снимок: fingerprint не совпадает — файл изменён после снятия');
   return snap;
