@@ -4,7 +4,7 @@ import { Icon, Segmented, Tag } from './kit';
 import { cx } from './util';
 
 /** Раунды блока → подпись бейджа. */
-export const ROUNDS_RU: Record<string, string> = {
+const ROUNDS_RU: Record<string, string> = {
   any: 'Любой раунд',
   '1': '1-й раунд',
   '1–2': 'Раунды 1–2',
