@@ -82,7 +82,10 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Database schema (from src/db/schema)
         working-directory: backend
-        run: bunx drizzle-kit push --force
+        # drizzle-kit push создавал схему не полностью — генерируем полный SQL из схемы и применяем psql (ошибки видны)
+        run: |
+          bunx drizzle-kit generate --dialect postgresql --schema ./src/db/schema --out ./e2e-schema --name init
+          for f in e2e-schema/*.sql; do psql "$POSTGRES_URI" -v ON_ERROR_STOP=1 -q -f "$f"; done
       - name: Migration 0014 applies on top (idempotent)
         run: psql "$POSTGRES_URI" -v ON_ERROR_STOP=1 -f backend/drizzle/0014_admin_users.sql
       - name: Tables in the test database
