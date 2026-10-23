@@ -25,11 +25,12 @@ const BEFORE = data40kAt(BEFORE_POINTS.rev);
 const TB = BEFORE ? test : test.skip;
 
 type Band = { from: number; to: number | null; options: { label: string; models?: number; cost: number }[]; addons: { label: string; cost: number }[]; wargear: { label: string; cost: number; unverified?: boolean }[] };
+const json = (x: unknown) => JSON.stringify(x);
 const ds = (f: string, name: string, group = 'own') => NOW[f].datasheets.find((d) => d.name === name && d.group === group)!;
 
 // ---------- функции обновления ----------
 
-test('rebuildCosts: наши подписи размеров и добавки, цены и ступени сайта; снаряжение — только в последней ступени', () => {
+test('rebuildCosts: наши подписи размеров и добавки, цены и ступени сайта; снаряжение — во всех ступенях', () => {
   const ours: Band[] = [{ from: 1, to: null, options: [{ label: '5 models', models: 5, cost: 90 }, { label: '1 Sword Brother, 4 Neophytes', cost: 100 }], addons: [{ label: '1 Platform', cost: 20 }], wargear: [] }];
   const site = [
     { models: 5, points: 85, note: '1st-2nd' },
@@ -40,12 +41,12 @@ test('rebuildCosts: наши подписи размеров и добавки, 
   ];
   const r = rebuildCosts(ours, site, [{ label: 'Storm Shield', cost: 5 }]);
   assert.deepEqual(r, [
-    { from: 1, to: 2, options: [{ label: '5 models', models: 5, cost: 85 }, { label: '1 Sword Brother, 4 Neophytes', cost: 95 }], addons: [{ label: '1 Platform', cost: 20 }], wargear: [] },
+    { from: 1, to: 2, options: [{ label: '5 models', models: 5, cost: 85 }, { label: '1 Sword Brother, 4 Neophytes', cost: 95 }], addons: [{ label: '1 Platform', cost: 20 }], wargear: [{ label: 'Storm Shield', cost: 5 }] },
     { from: 3, to: null, options: [{ label: '5 models', models: 5, cost: 95 }, { label: '1 Sword Brother, 4 Neophytes', cost: 105 }], addons: [{ label: '1 Platform', cost: 20 }], wargear: [{ label: 'Storm Shield', cost: 5 }] },
   ]);
   // другой размер отряда — не цена, а смена состава: обновление отказывается
   assert.throws(() => rebuildCosts(ours, [{ models: 3, points: 60 }], []), /смена состава/);
-  assert.deepEqual(placeWargear([{ wargear: [] }], [{ label: 'X', cost: 5 }]), [{ wargear: [{ label: 'X', cost: 5 }] }]);
+  assert.deepEqual(placeWargear([{ wargear: [] }, { wargear: [] }], [{ label: 'X', cost: 5 }]), [{ wargear: [{ label: 'X', cost: 5 }] }, { wargear: [{ label: 'X', cost: 5 }] }]);
 });
 
 test('siteWargear: название предмета наше, если он тот же (ручной счётчик в ростере хранится по названию)', () => {
@@ -64,7 +65,9 @@ test('обновление применено целиком: план по те
   assert.equal(U.only, undefined);
   const applied = readJson(path.join(import.meta.dirname, '..', '40k', 'whrules-points-applied.json'));
   assert.equal(applied.snapshot.fingerprint, SNAP.fingerprint);
-  assert.deepEqual(applied.summary, { units: 239, values: 250, detachments: 8, enhancements: 3, copies: 217, skipped: 29, ambiguous: 0 });
+  assert.deepEqual(applied.summary, { units: 271, values: 291, detachments: 8, enhancements: 3, copies: 239, skipped: 29, ambiguous: 0 });
+  // запись применения P1-T3 пересчитана на данных до обновления (--base) с размещением снаряжения P1-T5 (все ступени)
+  assert.equal(applied.base, BEFORE_POINTS.rev);
 });
 
 test('проверочные значения: цены, ступени, улучшения, снаряжение и копии в других армиях', () => {
@@ -74,12 +77,12 @@ test('проверочные значения: цены, ступени, улу�
   assert.equal(opts('TYR.json', 'Termagants'), '1-+: 55,110');
   assert.equal(opts('AM.json', 'Basilisk'), '1-2: 115 | 3-+: 145');
   assert.equal(NOW['ORK.json'].enhancements.find((e) => e.name === 'Dreadherder')!.cost, 30);
-  // Custodes после полной конвертации: новый состав (Wardens 2/3 модели), Praesidium Shield +25 с 2-й копии
+  // Custodes после полной конвертации: новый состав (Wardens 2/3 модели), Praesidium Shield +25 на каждой копии
   assert.deepEqual((ds('AC.json', 'Custodian Wardens').costs as Band[])[0].options.map((o) => o.models), [2, 3]);
-  assert.deepEqual((ds('AC.json', 'Shield-Captain').costs as Band[]).map((b) => b.wargear), [[], [{ label: 'Praesidium Shield', cost: 25 }]]);
-  // снаряжение: Storm Shield вместо Thunder Hammer, только с 3-й копии; Black Templars — своя цена
+  assert.deepEqual((ds('AC.json', 'Shield-Captain').costs as Band[]).map((b) => b.wargear), [[{ label: 'Praesidium Shield', cost: 25 }], [{ label: 'Praesidium Shield', cost: 25 }]]);
+  // снаряжение: Storm Shield вместо Thunder Hammer — на каждой копии; Black Templars — своя цена
   const tas = ds('SM.json', 'Terminator Assault Squad').costs as Band[];
-  assert.deepEqual(tas.map((b) => b.wargear), [[], [{ label: 'Storm Shield', cost: 5 }]]);
+  assert.deepEqual(tas.map((b) => b.wargear), [[{ label: 'Storm Shield', cost: 5 }], [{ label: 'Storm Shield', cost: 5 }]]);
   const bt = NOW['SM.json'].datasheets.find((d) => d.name === 'Gladiator Lancer' && d.source === 'Black Templars')!.costs as Band[];
   assert.deepEqual(bt.at(-1)!.wargear, [{ label: 'Multi-melta', cost: 10 }]);
   // копии: демоны у CSM и Chaos Lord в детачменте демонов — те же цены, что у исходных юнитов
@@ -87,13 +90,13 @@ test('проверочные значения: цены, ступени, улу�
   assert.deepEqual(NOW['CD.json'].datasheets.find((d) => d.name === 'Chaos Lord' && d.group.startsWith('det:'))!.costs, ds('CSM.json', 'Chaos Lord').costs);
 });
 
-test('платное снаряжение у своих юнитов — только в последней ступени цены (решение 2026-10-23)', () => {
+test('платное снаряжение у своих юнитов — во всех ступенях цены, как в конструкторе сайта (решение 2026-10-23, P1-T5)', () => {
   const bad: string[] = [];
   for (const F of Object.values(NOW))
     for (const d of F.datasheets) {
       if (d.group !== 'own' || d.faction !== F.id) continue;
       const bands = d.costs as Band[];
-      bands.slice(0, -1).forEach((b) => b.wargear.length && bad.push(`${F.id}/${d.name}`));
+      bands.forEach((b) => json(b.wargear) !== json(bands[0]!.wargear) && bad.push(`${F.id}/${d.name}`));
       if (bands.some((b) => b.wargear.some((w) => w.unverified))) bad.push(`${F.id}/${d.name}: unverified`);
     }
   assert.deepEqual(bad, []);
@@ -133,5 +136,5 @@ TB('итог ростера меняется ровно на изменение 
   const ub = computeRoster(b.r, b.L).units[0];
   assert.equal(a.r.units[0].size, b.r.units[0].size);
   assert.deepEqual([ua.total, ub.total], [90, 85]);
-  // доплата Killsaw с 3-й копии Meganobz по выбранным заменам — tests/wargear.test.ts
+  // доплата за снаряжение (на каждой копии) — tests/wargear.test.ts, tests/paid-wargear.test.ts
 });

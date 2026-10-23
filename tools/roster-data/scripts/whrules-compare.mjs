@@ -13,7 +13,7 @@
  *    points (те же размеры, другая цена), sizes (другие размеры), tiers (другие ступени цены за копии);
  *  - платные добавки: запись очков сайта без числа моделей и без пометки (платформа Tidewall Shieldline) ↔ наши addons — по цене;
  *  - платное снаряжение (схема /3, wargearPoints сайта ↔ наши costs[].wargear): та же цена, другая цена, только у нас,
- *    только на сайте; для предметов сайта — считает ли движок их сам по выбранным заменам (paidFromPicks) или только счётчиком;
+ *    только на сайте; для предметов сайта — считает ли движок их сам по итоговому снаряжению (paidIsAuto) или только счётчиком;
  *    у Space Marines — отдельно цены снаряжения орденов, если у одноимённого инфолиста ордена они другие;
  *  - Legends;
  *  - детачменты (по slug названия): новые, пропавшие, DP; улучшения в сопоставленных детачментах: очки, новые, пропавшие.
@@ -26,7 +26,7 @@ import { fileURLToPath } from 'node:url';
 import { loadSnapshot } from './updates-40k.mjs';
 import { costsOf } from './whrules-convert.mjs';
 import { slugify } from './whrules-map.mjs';
-import { paidFromPicks } from '../../../client/src/features/roster/engine/compute.ts';
+import { paidIsAuto } from '../../../client/src/features/roster/engine/compute.ts';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DATA = path.join(HERE, '..', '..', '..', 'backend', 'roster-data');
@@ -97,8 +97,7 @@ export function compareWargear(ourDs, siteW = []) {
   const ours = new Map();
   for (const b of ourDs.costs ?? []) for (const w of b.wargear ?? []) if (!ours.has(wargearKey(w.label))) ours.set(wargearKey(w.label), w);
   const site = new Map(siteW.map((w) => [wargearKey(w.name), w]));
-  const unit = { picks: {} };
-  const auto = (name) => paidFromPicks(ourDs, unit, name) !== null;
+  const auto = (name) => paidIsAuto(ourDs, name);
   const r = { same: [], priceChanged: [], onlyOurs: [], onlySite: [] };
   for (const [k, w] of ours) {
     const x = site.get(k);
@@ -361,7 +360,7 @@ export function reportMarkdown(rep) {
     '«Legends/FW нет» — наши Legends и Forge World, которых на сайте нет. «Не сопост.» — без пары, требуют проверки вручную.',
     'Детачменты и улучшения: «нет» — наших нет на сайте (уже помеченные устаревшими не считаются); «переим.?» — в том же детачменте',
     'пропало одно наше и появилось одно на сайте с той же ценой (например, «The Ephemeral Tome» → «Ephemeral Tome»): отмечено для проверки, не объединено.',
-    'Снаряжение: «не по выбору» — предмет сайта не совпал с названием в вариантах замены инфолиста: движок посчитает его только ручным счётчиком.',
+    'Снаряжение: «не по выбору» — предмета сайта нет ни в вариантах снаряжения, ни в стандартном снаряжении обязательной модели инфолиста: движок посчитает его только ручным счётчиком.',
   );
   // подробности по снаряжению: всё, что расходится
   const wl = [];

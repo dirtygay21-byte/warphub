@@ -228,7 +228,7 @@
     "TYR",
     "WE"
    ],
-   "note": "Очки отряда, ступени цены за копии, Legends, DP детачментов, очки улучшений и платное снаряжение по wh-rules.ru 995 (MFM 1.6) у сопоставленных записей; id и правила не меняются. Платное снаряжение — только в последней ступени цены за копии (решение владельца 2026-10-23: так во всех 70 предметах выгрузки Wahapedia, сайт ступень не указывает). Не обновлены: юниты, которых нет на сайте или которые там в другой фракции, Legends/Forge World вне сайта (см. 40k/freshness-report.md).",
+   "note": "Очки отряда, ступени цены за копии, Legends, DP детачментов, очки улучшений и платное снаряжение по wh-rules.ru 995 (MFM 1.6) у сопоставленных записей; id и правила не меняются. Платное снаряжение — во всех ступенях цены за копии, как в конструкторе ростеров сайта (решение владельца 2026-10-23, P1-T5; прежнее «только последняя ступень» отменено). Не обновлены: юниты, которых нет на сайте или которые там в другой фракции, Legends/Forge World вне сайта (см. 40k/freshness-report.md).",
    "source": {
     "site": "https://wh-rules.ru",
     "dataVersion": 995,
@@ -236,6 +236,30 @@
     "date": "2026-10-16",
     "snapshot": "whrules-995.json",
     "fingerprint": "79a26d70ca87852ab8aabc06fb9f93d28a907a6c1b2a724e25af59b794c02aa4"
+   }
+  },
+  {
+   "id": "whrules-995-wargear",
+   "kind": "whrules-wargear",
+   "scope": [
+    "AC",
+    "AE",
+    "AM",
+    "AdM",
+    "DRU",
+    "GC",
+    "LoV",
+    "SM",
+    "TAU"
+   ],
+   "note": "Платное стандартное снаряжение по конструктору ростеров wh-rules.ru 995: paidDefaults у 15 инфолистов (лазпушка Leman Russ ×8, dark lance Ravager, heavy mining laser Achilles Ridgerunners, Praesidium Shield Shield-Captain, Heavy Laser Destroyer Repulsor Executioner, Banner of Macragge Victrix Honour Guard, missile pod / T'au flamer Crisis Fireknife / Starscythe). Одобрено владельцем 2026-10-23 (P1-T5). Отдельные варианты из конструктора (rosterOptions, P1-T5c): Watcher in the Dark у Deathwing Terminator Squad; опечатки Kâhl, Ynnari Incubi, Kroot War Shaper; Secutarii Peltasts — galvanic caster вместо arc lance.",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-roster.json",
+    "fingerprint": "e736162b51a3ab6fa2cd9ed5274925f9b94f527944770d5a867a4568327aadbf"
    }
   }
  ]

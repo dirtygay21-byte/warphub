@@ -54,6 +54,21 @@
      "WE"
     ],
     "dataVersion": 995
+   },
+   {
+    "id": "whrules-995-wargear",
+    "scope": [
+     "AC",
+     "AE",
+     "AM",
+     "AdM",
+     "DRU",
+     "GC",
+     "LoV",
+     "SM",
+     "TAU"
+    ],
+    "dataVersion": 995
    }
   ]
  },
@@ -411,7 +426,7 @@
      "priceChanged": 0,
      "onlyOurs": 0,
      "onlySite": 0,
-     "notAuto": 1,
+     "notAuto": 0,
      "chapterVariants": 0
     },
     "addons": {
@@ -642,13 +657,7 @@
      "priceChanged": [],
      "onlyOurs": [],
      "onlySite": [],
-     "notAuto": [
-      {
-       "id": "000001447",
-       "unit": "Shield-Captain",
-       "name": "Praesidium Shield"
-      }
-     ],
+     "notAuto": [],
      "chapterVariants": []
     },
     "addons": {
@@ -1719,7 +1728,7 @@
      "priceChanged": 0,
      "onlyOurs": 0,
      "onlySite": 0,
-     "notAuto": 8,
+     "notAuto": 0,
      "chapterVariants": 0
     },
     "addons": {
@@ -2445,48 +2454,7 @@
      "priceChanged": [],
      "onlyOurs": [],
      "onlySite": [],
-     "notAuto": [
-      {
-       "id": "000000680",
-       "unit": "Leman Russ Commander",
-       "name": "Lascannon"
-      },
-      {
-       "id": "000000700",
-       "unit": "Leman Russ Battle Tank",
-       "name": "Lascannon"
-      },
-      {
-       "id": "000000701",
-       "unit": "Leman Russ Demolisher",
-       "name": "Lascannon"
-      },
-      {
-       "id": "000002741",
-       "unit": "Leman Russ Eradicator",
-       "name": "Lascannon"
-      },
-      {
-       "id": "000002742",
-       "unit": "Leman Russ Executioner",
-       "name": "Lascannon"
-      },
-      {
-       "id": "000002743",
-       "unit": "Leman Russ Exterminator",
-       "name": "Lascannon"
-      },
-      {
-       "id": "000002744",
-       "unit": "Leman Russ Punisher",
-       "name": "Lascannon"
-      },
-      {
-       "id": "000002745",
-       "unit": "Leman Russ Vanquisher",
-       "name": "Lascannon"
-      }
-     ],
+     "notAuto": [],
      "chapterVariants": []
     },
     "addons": {
@@ -4515,7 +4483,7 @@
      "priceChanged": 0,
      "onlyOurs": 0,
      "onlySite": 0,
-     "notAuto": 1,
+     "notAuto": 0,
      "chapterVariants": 0
     },
     "addons": {
@@ -4781,13 +4749,7 @@
      "priceChanged": [],
      "onlyOurs": [],
      "onlySite": [],
-     "notAuto": [
-      {
-       "id": "000000665",
-       "unit": "Ravager",
-       "name": "Dark Lance"
-      }
-     ],
+     "notAuto": [],
      "chapterVariants": []
     },
     "addons": {
@@ -5091,7 +5053,7 @@
      "priceChanged": 0,
      "onlyOurs": 0,
      "onlySite": 0,
-     "notAuto": 1,
+     "notAuto": 0,
      "chapterVariants": 0
     },
     "addons": {
@@ -5267,13 +5229,7 @@
      "priceChanged": [],
      "onlyOurs": [],
      "onlySite": [],
-     "notAuto": [
-      {
-       "id": "000001573",
-       "unit": "Achilles Ridgerunners",
-       "name": "Heavy mining laser"
-      }
-     ],
+     "notAuto": [],
      "chapterVariants": []
     },
     "addons": {
@@ -5355,7 +5311,7 @@
      "priceChanged": 0,
      "onlyOurs": 0,
      "onlySite": 0,
-     "notAuto": 3,
+     "notAuto": 0,
      "chapterVariants": 0
     },
     "addons": {
@@ -5561,23 +5517,7 @@
      "priceChanged": [],
      "onlyOurs": [],
      "onlySite": [],
-     "notAuto": [
-      {
-       "id": "000000389",
-       "unit": "Nemesis Dreadknight",
-       "name": "Heavy psycannon"
-      },
-      {
-       "id": "000001360",
-       "unit": "Grand Master In Nemesis Dreadknight",
-       "name": "Sublimator"
-      },
-      {
-       "id": "000001360",
-       "unit": "Grand Master In Nemesis Dreadknight",
-       "name": "Heavy psycannon"
-      }
-     ],
+     "notAuto": [],
      "chapterVariants": []
     },
     "addons": {
@@ -5996,7 +5936,7 @@
      "priceChanged": 0,
      "onlyOurs": 0,
      "onlySite": 0,
-     "notAuto": 1,
+     "notAuto": 0,
      "chapterVariants": 0
     },
     "addons": {
@@ -6184,13 +6124,7 @@
      "priceChanged": [],
      "onlyOurs": [],
      "onlySite": [],
-     "notAuto": [
-      {
-       "id": "000000859",
-       "unit": "Knight Crusader",
-       "name": "Rapid-fire battle cannon"
-      }
-     ],
+     "notAuto": [],
      "chapterVariants": []
     },
     "addons": {
@@ -7403,7 +7337,7 @@
      "priceChanged": 0,
      "onlyOurs": 0,
      "onlySite": 0,
-     "notAuto": 5,
+     "notAuto": 1,
      "chapterVariants": 0
     },
     "addons": {
@@ -8819,29 +8753,9 @@
      "onlySite": [],
      "notAuto": [
       {
-       "id": "000002568",
-       "unit": "Impulsor",
-       "name": "Orbital Comms Array"
-      },
-      {
-       "id": "000002722",
-       "unit": "Repulsor Executioner",
-       "name": "Heavy Laser Destroyer"
-      },
-      {
        "id": "000004185",
        "unit": "Victrix Honour Guard",
        "name": "Banner of Macragge"
-      },
-      {
-       "id": "000000230",
-       "unit": "Deathwing Terminator Squad (Dark Angels)",
-       "name": "Cyclone Missile Launcher"
-      },
-      {
-       "id": "000003873",
-       "unit": "Deathwatch Terminator Squad (Deathwatch)",
-       "name": "Cyclone Missile Launcher"
       }
      ],
      "chapterVariants": []

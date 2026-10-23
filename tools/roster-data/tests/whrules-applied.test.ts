@@ -34,10 +34,10 @@ TB('изменённые файлы совпадают с одобренным �
   for (const f of names) assert.equal(JSON.stringify(disk(`f/${f}`)), JSON.stringify(EXPECT![f]), f);
 });
 
-TB('index.json: добавлены только записи updates — 981 из одобренного отчёта, 995-custodes и 995-points', () => {
+TB('index.json: добавлены только записи updates — 981 из одобренного отчёта, 995-custodes, 995-points и 995-wargear', () => {
   const { updates, ...rest } = disk('index.json');
   assert.deepEqual(rest, BASE.index);
-  assert.deepEqual(updates.map((u: { id: string }) => u.id), ['whrules-981-space-marines', 'whrules-995-custodes', 'whrules-995-points']);
+  assert.deepEqual(updates.map((u: { id: string }) => u.id), ['whrules-981-space-marines', 'whrules-995-custodes', 'whrules-995-points', 'whrules-995-wargear']);
   assert.deepEqual(updates[0], R.scope.indexUpdate);
   assert.deepEqual(updates, EXPECT_INDEX!.updates);
   const snap = loadSnapshot(POINTS.snapshot);

@@ -64,6 +64,8 @@ export interface UnitAbility {
 export interface WargearOption {
   star: boolean;
   text: string;
+  /** откуда текст, если не из инфолиста: whrules-roster — формулировка конструктора ростеров wh-rules.ru (в тексте инфолиста вариантов нет) */
+  source?: string;
 }
 
 /** own — своя фракция; det:<id> — разрешён детачментом; ally:<key> — союзники. */
@@ -104,6 +106,8 @@ export interface Datasheet {
   abilities: UnitAbility[];
   weapons: Weapon[];
   defaultLoadout: LoadoutRule[];
+  /** стандартные платные предметы (costs[].wargear) тоже платные — как у конструктора ростеров wh-rules.ru (dw); иначе платят только сверх стандартного */
+  paidDefaults?: boolean;
   options: WargearOption[];
   /** id стратагем, доступных юниту (core + детачментов) */
   stratagems: string[];

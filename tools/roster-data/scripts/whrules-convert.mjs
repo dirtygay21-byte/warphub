@@ -393,7 +393,9 @@ export function makeConverter({ full, olds, ourIdOf, armyFactions, factionOf, so
       stats, loadout, transport: mdToText(site.transport),
       damaged, invulnNote: '',
       abilities, weapons,
-      defaultLoadout: parseLoadout(loadout, weapons),
+      // снаряжение без профиля оружия (Banner of Macragge, Praesidium Shield, Storm Shield) — тоже в стандартном снаряжении:
+      // его снимают замены («Pyrithite Spear and Praesidium Shield can be replaced …») и по нему считается платное снаряжение
+      defaultLoadout: parseLoadout(loadout, [...weapons, ...(site.wargearAbilities ?? []).filter((a) => !weapons.some((w) => w.name === a.name)).map((a) => ({ name: a.name }))]),
       options: optionsOfSite(site.options ?? []),
       stratagems: [], detachmentAbilities: [], enhancements: [],
       group,

@@ -6,7 +6,7 @@
   },
   "sources": [],
   "updates": {
-    "about": "Проверенные обновления поверх выгрузки Wahapedia (scripts/updates-40k.mjs: применяются в конце импорта и в scripts/repair-40k-data.mjs). Элемент: { id, kind, snapshot (файл в 40k/, проверяется fingerprint), enabled, scope (что обновлено), note }. Применённые записываются в index.json → updates. Снимки: 40k/whrules-<версия>.json (scripts/whrules-extract.js + scripts/whrules-save.mjs), полный — 40k/whrules-<версия>-full.json (scripts/whrules-extract-full.js + whrules-map.mjs --save-full). whrules-faction — scripts/whrules-convert.mjs (сухой прогон: bun scripts/whrules-convert.mjs --out <файл>); одобрено владельцем 2026-10-16 по отчёту сухого прогона v4. whrules-points — scripts/whrules-points.mjs (значения: очки, ступени цены, Legends, DP, очки улучшений, платное снаряжение; план — bun scripts/whrules-points.mjs → 40k/whrules-points-applied.json; only — ограничение по армии); одобрено владельцем 2026-10-23 (задача P1-T3). whrules-faction-convert — полная конвертация одной фракции (scripts/whrules-convert.mjs → applyWhrulesFactionConvert; сухой прогон: bun scripts/whrules-convert.mjs --faction <фракция сайта> --army <id> --full <снимок> --out <файл>); поля faction, army, points (снимок /3 для сопоставления).",
+    "about": "Проверенные обновления поверх выгрузки Wahapedia (scripts/updates-40k.mjs: применяются в конце импорта и в scripts/repair-40k-data.mjs). Элемент: { id, kind, snapshot (файл в 40k/, проверяется fingerprint), enabled, scope (что обновлено), note }. Применённые записываются в index.json → updates. Снимки: 40k/whrules-<версия>.json (scripts/whrules-extract.js + scripts/whrules-save.mjs), полный — 40k/whrules-<версия>-full.json (scripts/whrules-extract-full.js + whrules-map.mjs --save-full). whrules-faction — scripts/whrules-convert.mjs (сухой прогон: bun scripts/whrules-convert.mjs --out <файл>); одобрено владельцем 2026-10-16 по отчёту сухого прогона v4. whrules-points — scripts/whrules-points.mjs (значения: очки, ступени цены, Legends, DP, очки улучшений, платное снаряжение; план — bun scripts/whrules-points.mjs → 40k/whrules-points-applied.json; only — ограничение по армии); одобрено владельцем 2026-10-23 (задача P1-T3). whrules-faction-convert — полная конвертация одной фракции (scripts/whrules-convert.mjs → applyWhrulesFactionConvert; сухой прогон: bun scripts/whrules-convert.mjs --faction <фракция сайта> --army <id> --full <снимок> --out <файл>); поля faction, army, points (снимок /3 для сопоставления). whrules-wargear — scripts/whrules-wargear.mjs: какие стандартные предметы платные (paidDefaults) по снимку конструктора ростеров сайта 40k/whrules-<версия>-roster.json (scripts/whrules-extract-roster.js + whrules-save.mjs); points — снимок очков для сопоставления; одобрено владельцем 2026-10-23 (задача P1-T5).",
     "items": [
       {
         "id": "whrules-981-space-marines",
@@ -62,7 +62,63 @@
           "TYR",
           "WE"
         ],
-        "note": "Очки отряда, ступени цены за копии, Legends, DP детачментов, очки улучшений и платное снаряжение по wh-rules.ru 995 (MFM 1.6) у сопоставленных записей; id и правила не меняются. Платное снаряжение — только в последней ступени цены за копии (решение владельца 2026-10-23: так во всех 70 предметах выгрузки Wahapedia, сайт ступень не указывает). Не обновлены: юниты, которых нет на сайте или которые там в другой фракции, Legends/Forge World вне сайта (см. 40k/freshness-report.md)."
+        "note": "Очки отряда, ступени цены за копии, Legends, DP детачментов, очки улучшений и платное снаряжение по wh-rules.ru 995 (MFM 1.6) у сопоставленных записей; id и правила не меняются. Платное снаряжение — во всех ступенях цены за копии, как в конструкторе ростеров сайта (решение владельца 2026-10-23, P1-T5; прежнее «только последняя ступень» отменено). Не обновлены: юниты, которых нет на сайте или которые там в другой фракции, Legends/Forge World вне сайта (см. 40k/freshness-report.md)."
+      },
+      {
+        "id": "whrules-995-wargear",
+        "kind": "whrules-wargear",
+        "snapshot": "whrules-995-roster.json",
+        "points": "whrules-995.json",
+        "enabled": true,
+        "scope": [
+          "AC",
+          "AE",
+          "AM",
+          "AdM",
+          "DRU",
+          "GC",
+          "LoV",
+          "SM",
+          "TAU"
+        ],
+        "note": "Платное стандартное снаряжение по конструктору ростеров wh-rules.ru 995: paidDefaults у 15 инфолистов (лазпушка Leman Russ ×8, dark lance Ravager, heavy mining laser Achilles Ridgerunners, Praesidium Shield Shield-Captain, Heavy Laser Destroyer Repulsor Executioner, Banner of Macragge Victrix Honour Guard, missile pod / T'au flamer Crisis Fireknife / Starscythe). Одобрено владельцем 2026-10-23 (P1-T5). Отдельные варианты из конструктора (rosterOptions, P1-T5c): Watcher in the Dark у Deathwing Terminator Squad; опечатки Kâhl, Ynnari Incubi, Kroot War Shaper; Secutarii Peltasts — galvanic caster вместо arc lance.",
+        "rosterOptions": [
+          {
+            "army": "SM",
+            "id": "000000230",
+            "add": true,
+            "site": "Watcher in the Dark",
+            "why": "Deathwing Terminator Squad: в тексте инфолиста сайта варианта нет, в конструкторе ростеров есть (0 очков); способность Watcher in the Dark у отряда есть"
+          },
+          {
+            "army": "LoV",
+            "id": "000002594",
+            "replace": "Autoch-pattem",
+            "site": "Autoch-pattern combi-bolter can be replaced",
+            "why": "опечатка «Autoch-pattem»: вариант не снимал стандартный combi-bolter"
+          },
+          {
+            "army": "AE",
+            "id": "000003918",
+            "replace": "demilklaives",
+            "site": "demiklaives",
+            "why": "опечатка «demilklaives»: выбор давал оружие без профиля"
+          },
+          {
+            "army": "TAU",
+            "id": "000003703",
+            "replace": "tri-bade",
+            "site": "tri-blade can be replaced",
+            "why": "опечатка «tri-bade»: вариант не снимал стандартный dart-bow and tri-blade"
+          },
+          {
+            "army": "AdM",
+            "id": "000001526",
+            "replace": "arc lance",
+            "site": "galvanic caster can be replaced",
+            "why": "наш вариант меняет arc lance, которого у Peltast Alpha нет (стандартное — galvanic caster); у сайта — galvanic caster"
+          }
+        ]
       }
     ]
   }

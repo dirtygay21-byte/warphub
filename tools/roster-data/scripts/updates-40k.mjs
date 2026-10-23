@@ -52,6 +52,20 @@ export function checkWhrulesSnapshot(snap) {
   return snap;
 }
 
+/** Снимок данных конструктора ростеров wh-rules.ru (scripts/whrules-extract-roster.js; обновление whrules-wargear). */
+export const ROSTER_SCHEMA = 'whrules-roster/1';
+/** Проверка снимка ростера: схема, источник, SHA-256 модулей, юниты, словарь предметов, fingerprint. */
+export function checkRosterSnapshot(snap) {
+  if (snap?.schema !== ROSTER_SCHEMA) throw new Error(`снимок ростера: схема ${snap?.schema}, ожидается ${ROSTER_SCHEMA}`);
+  const s = snap.source ?? {};
+  for (const k of ['site', 'dataVersion', 'mfm', 'date', 'extractedAt']) if (s[k] == null || s[k] === '') throw new Error(`снимок ростера: нет source.${k}`);
+  if (!snap.assets || !Object.values(snap.assets).every((h) => /^[0-9a-f]{64}$/.test(h))) throw new Error('снимок ростера: нет SHA-256 модулей источника');
+  if (!snap.factions || !Object.values(snap.factions).every((f) => Array.isArray(f.units))) throw new Error('снимок ростера: нет юнитов');
+  if (!snap.items || typeof snap.items !== 'object') throw new Error('снимок ростера: нет словаря предметов');
+  const { fingerprint, ...content } = snap;
+  if (sha256(JSON.stringify(content)) !== fingerprint) throw new Error('снимок ростера: fingerprint не совпадает — файл изменён после снятия');
+  return snap;
+}
 export function loadSnapshot(file, dir = SNAPSHOT_DIR) {
   return checkWhrulesSnapshot(JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8')));
 }

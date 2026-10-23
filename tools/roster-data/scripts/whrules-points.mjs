@@ -11,17 +11,20 @@
  *    ростеры хранят размер по подписи (unit.size) и ручной счётчик снаряжения по названию (unit.wargear);
  *  - Legends; DP детачментов; очки улучшений (точное совпадение названия; «возможные переименования» не трогаются);
  *  - платное снаряжение: список = wargearPoints сайта (цена сайта, пометка unverified снимается); нашего предмета
- *    на сайте нет — он убирается; добавки (addons) остаются как есть. Сайт не говорит, с какой копии платится снаряжение
- *    («+5, за штуку»); в данных Wahapedia все 70 платных предметов были только в последней ступени цены за копии
- *    (Killsaw — с 3-й Meganobz). Решение владельца 2026-10-23: снаряжение — только в последней ступени (у юнита без
- *    ступеней — в единственной); так же исправляются предметы, которые обновление 981 разнесло по всем ступеням.
+ *    на сайте нет — он убирается; добавки (addons) остаются как есть. Снаряжение — во ВСЕХ ступенях цены за копии:
+ *    конструктор ростеров сайта (rosterEngine → unitPoints) добавляет очки снаряжения к каждой копии, ступень копии
+ *    меняет только базовую цену. Решение владельца 2026-10-23 (P1-T5, после проверки конструктора сайта) отменяет
+ *    прежнее «только последняя ступень» (так было в выгрузке Wahapedia: Killsaw — с 3-й Meganobz). Какие стандартные
+ *    предметы платные — обновление whrules-wargear (scripts/whrules-wargear.mjs).
  * Копии юнита в других файлах (союзники — тот же id; инфолисты детачментов — то же название и те же прежние цены)
  * получают те же значения; цены союзника Agents of the Imperium (ally:agents) не трогаются никогда.
  * Ограничение по армии: u.only = { "<армия>": ["points", "tiers", "legends", "wargear", "dp", "enhancements"] } —
  * у этой армии меняется только перечисленное (Adeptus Custodes: только points — остальное в полной конвертации).
  *
  *   bun scripts/whrules-points.mjs [--snapshot whrules-995.json] [--out 40k/whrules-points-applied.json]
- *     — план обновления на текущих данных (что изменится и что пропущено), данные не меняет.
+ *     [--base <коммит>] [--only '<json>']
+ *     — план обновления на текущих данных (что изменится и что пропущено), данные не меняет; --base — на данных из истории
+ *     git (запись применения P1-T3: --base f8387fa --only '{"AC":["points"]}' — как применялось до конвертации Custodes).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -29,6 +32,8 @@ import { fileURLToPath } from 'node:url';
 import { loadSnapshot } from './updates-40k.mjs';
 import { WHRULES_APPLIERS as CONVERT_APPLIERS } from './whrules-convert.mjs';
 import { ARMIES, compareArmy, compareDetachments, siteCosts, wargearKey } from './whrules-compare.mjs';
+import { applyWhrulesWargear } from './whrules-wargear.mjs';
+import { data40kAt } from './baseline-40k.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DATA = path.join(HERE, '..', '..', '..', 'backend', 'roster-data');
@@ -38,8 +43,8 @@ const AGENTS = 'ally:agents';
 const sizeKey = (o) => (o.models != null ? `m:${o.models}` : `l:${String(o.label ?? '').toLowerCase().replace(/\s+/g, ' ').trim()}`);
 const json = (x) => JSON.stringify(x);
 
-/** Снаряжение — только в последней ступени цены (см. решение в шапке). */
-export const placeWargear = (bands, wargear) => bands.map((b, i) => ({ ...b, wargear: i === bands.length - 1 ? wargear.map((w) => ({ ...w })) : [] }));
+/** Снаряжение — во всех ступенях цены за копии (см. решение в шапке). */
+export const placeWargear = (bands, wargear) => bands.map((b) => ({ ...b, wargear: wargear.map((w) => ({ ...w })) }));
 
 /** Новые полосы цен из очков сайта с нашими подписями размеров, добавками и (новым) снаряжением. */
 export function rebuildCosts(ourCosts, sitePoints, wargear) {
@@ -118,7 +123,7 @@ export function planPoints(files, snap, u = {}) {
       const now = wargearOf(d.costs);
       const next = siteWargear(d.costs, site.wargearPoints);
       const key = (list) => list.map((w) => `${w.label}=${w.cost}${w.unverified ? '?' : ''}`).sort().join(',');
-      // и состав, и размещение по ступеням (только последняя) должны совпадать
+      // и состав, и размещение по ступеням (во всех) должны совпадать
       const placed = (costs) => json((costs ?? []).map((b) => (b.wargear ?? []).map((w) => `${w.label}=${w.cost}${w.unverified ? '?' : ''}`).sort()));
       if (key(now) === key(next) && placed(d.costs) === placed(placeWargear(d.costs, next))) continue;
       if (!allowed(army, 'wargear')) {
@@ -211,8 +216,8 @@ export function applyWhrulesPoints(files, snap, u) {
   return { changed: res.changed + res.copies.length, lines };
 }
 
-/** Все обработчики обновлений 40K: полная конвертация (whrules-faction) и значения (whrules-points). */
-export const WHRULES_APPLIERS = { ...CONVERT_APPLIERS, 'whrules-points': applyWhrulesPoints };
+/** Все обработчики обновлений 40K: полная конвертация (whrules-faction), значения (whrules-points), платное стандартное снаряжение (whrules-wargear). */
+export const WHRULES_APPLIERS = { ...CONVERT_APPLIERS, 'whrules-points': applyWhrulesPoints, 'whrules-wargear': applyWhrulesWargear };
 
 function main() {
   const arg = (k, d) => {
@@ -222,9 +227,14 @@ function main() {
   const snapFile = arg('--snapshot', 'whrules-995.json');
   const out = path.resolve(arg('--out', path.join(HERE, '..', '40k', 'whrules-points-applied.json')));
   const curated = JSON.parse(fs.readFileSync(path.join(HERE, '..', '40k', 'curated.json'), 'utf8'));
-  const u = (curated.updates?.items ?? []).find((x) => x.kind === 'whrules-points' && x.snapshot === snapFile) ?? {};
+  const found = (curated.updates?.items ?? []).find((x) => x.kind === 'whrules-points' && x.snapshot === snapFile) ?? {};
+  const only = arg('--only');
+  const u = only ? { ...found, only: JSON.parse(only) } : found;
   const snap = loadSnapshot(snapFile);
-  const files = Object.fromEntries(fs.readdirSync(path.join(DATA, 'f')).filter((f) => f.endsWith('.json')).map((f) => [f, JSON.parse(fs.readFileSync(path.join(DATA, 'f', f), 'utf8'))]));
+  const base = arg('--base');
+  const files = base
+    ? (data40kAt(base)?.files ?? (() => { throw new Error(`whrules-points: нет данных в истории git для ${base}`); })())
+    : Object.fromEntries(fs.readdirSync(path.join(DATA, 'f')).filter((f) => f.endsWith('.json')).map((f) => [f, JSON.parse(fs.readFileSync(path.join(DATA, 'f', f), 'utf8'))]));
   const plan = planPoints(files, snap, u);
   const res = applyPlan(structuredClone(files), plan);
   const strip = ({ sitePoints: _p, wargear: _w, ...c }) => c;
@@ -233,6 +243,7 @@ function main() {
     snapshot: { file: snapFile, dataVersion: snap.source.dataVersion, mfm: snap.source.mfm, date: snap.source.date, fingerprint: snap.fingerprint },
     update: u.id ?? null,
     only: u.only ?? null,
+    base: base ?? null,
     summary: { units: plan.units.length, values: res.changed, detachments: plan.detachments.length, enhancements: plan.enhancements.length, copies: res.copies.length, skipped: plan.skipped.length, ambiguous: res.ambiguous.length },
     units: plan.units.map(strip),
     detachments: plan.detachments,
