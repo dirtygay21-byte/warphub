@@ -5,6 +5,7 @@ import { haptic } from '../../telegram';
 import { Button, Icon } from '../kit';
 import { cx } from '../util';
 import { AdjustSheet } from './Adjust';
+import { CardLink } from './CardSheet';
 import { CommandPhase } from './CommandPhase';
 import { EndOfTurn } from './EndOfTurn';
 import { EndEarly, Result } from './Result';
@@ -68,6 +69,20 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
       )}
 
       <RoundTable game={game} />
+
+      <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Основные миссии</p>
+        {(['p1', 'p2'] as Seat[]).map((s) => {
+          const id = state.primary[s];
+          const c = id ? game.data!.missions.cards.find((x) => x.id === id) : undefined;
+          return (
+            <p key={s} className="mt-1 flex items-baseline gap-1.5 text-sm">
+              <span className={cx('shrink-0 font-semibold', roleText(state.players[s].role))}>{state.players[s].name}:</span>
+              {c ? <CardLink id={c.id} seat={s} name={c.name} className="text-white/85" /> : '—'}
+            </p>
+          );
+        })}
+      </div>
 
       <p className="pt-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">Вторичные миссии</p>
       {(['p1', 'p2'] as const).map((s) => (

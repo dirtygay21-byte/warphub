@@ -3,6 +3,7 @@ import type { DataIndex } from '../../engine/types';
 import { rollOff, setupMissing, type Seat } from '../../game';
 import { haptic } from '../../telegram';
 import { Button } from '../kit';
+import { CardLink } from './CardSheet';
 import { Dice } from './Dice';
 import type { GameHook } from './useGame';
 
@@ -100,10 +101,25 @@ export function Summary({ game, index }: { game: GameHook; index: DataIndex }) {
               {p.roster.source !== 'none' && p.roster.name ? `${p.roster.name}${faction ? ` · ${faction}` : ''}` : (faction ?? 'без ростера')}
             </Row>
             <Row label="Тип армии">
-              {dName(p.disposition)} → <span className="text-accent">{cName(state.primary[s])}</span>
+              {dName(p.disposition)} →{' '}
+              {state.primary[s] ? <CardLink id={state.primary[s]!} seat={s} name={cName(state.primary[s])} className="text-accent" /> : '—'}
             </Row>
             <Row label="Вторичные">
-              {p.secondaryMode === 'fixed' ? `фиксированные: ${(p.fixed ?? []).map(cName).join(', ')}` : p.secondaryMode === 'tactical' ? 'тактические' : '—'}
+              {p.secondaryMode === 'fixed' ? (
+                <>
+                  фиксированные:{' '}
+                  {(p.fixed ?? []).map((id, i) => (
+                    <span key={id}>
+                      {i > 0 && ', '}
+                      <CardLink id={id} seat={s} name={cName(id)} className="text-accent" />
+                    </span>
+                  ))}
+                </>
+              ) : p.secondaryMode === 'tactical' ? (
+                'тактические'
+              ) : (
+                '—'
+              )}
             </Row>
           </div>
         );

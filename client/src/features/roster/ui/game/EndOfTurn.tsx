@@ -3,6 +3,7 @@ import { blockInRound, blockTurnOk, primaryAtOk, ROUNDS, type GameState, type Se
 import { haptic } from '../../telegram';
 import { Button } from '../kit';
 import { cx } from '../util';
+import { CardLink } from './CardSheet';
 import { ScoreRows } from './ScoreRows';
 import type { GameHook } from './useGame';
 
@@ -67,7 +68,9 @@ function PlayerScoring({ game, seat, first }: { game: GameHook; seat: Seat; firs
           ))}
           {scoredNow.map((x) => (
             <li key={x.id} className="text-xs text-accent">
-              ✓ {card(x.id)?.name ?? x.id}: {x.vp} ПО
+              <CardLink id={x.id} seat={seat} name={card(x.id)?.name ?? x.id}>
+                ✓ {card(x.id)?.name ?? x.id}: {x.vp} ПО
+              </CardLink>
             </li>
           ))}
         </ul>
@@ -75,7 +78,11 @@ function PlayerScoring({ game, seat, first }: { game: GameHook; seat: Seat; firs
 
       {primary && pBlocks.length > 0 && (
         <div className="mt-2">
-          <p className="mb-1 text-[12px] font-semibold text-white/70">Основная: {primary.name}</p>
+          <p className="mb-1 text-[12px] font-semibold text-white/70">
+            <CardLink id={primary.id} seat={seat} name={primary.name}>
+              Основная: {primary.name}
+            </CardLink>
+          </p>
           <ScoreRows
             card={primary}
             blocks={pBlocks}
@@ -94,8 +101,9 @@ function PlayerScoring({ game, seat, first }: { game: GameHook; seat: Seat; firs
         <details key={a.id} className="mt-2 rounded-lg border border-white/10 bg-black/20 px-2.5 py-2">
           <summary className="cursor-pointer text-[13px] font-semibold">
             {a.n != null && <span className="mr-1 text-[11px] text-white/45">№{a.n}</span>}
-            {c.name}
+            <CardLink id={a.id} seat={seat} name={c.name} />
             {a.note && <span className="font-normal text-white/50"> · {a.note}</span>}
+            <span className="ml-1.5 text-[11px] font-normal text-accent/80">— засчитать</span>
           </summary>
           <div className="mt-2">
             <ScoreRows
@@ -155,7 +163,7 @@ function Discard({ game, seat }: { game: GameHook; seat: Seat }) {
           .sort((a, b) => (a.n ?? 0) - (b.n ?? 0))
           .map((a) => (
             <div key={a.id} className="flex items-center gap-2">
-              <span className="min-w-0 flex-1 truncate text-sm">{name(a.id)}</span>
+              <CardLink id={a.id} seat={seat} name={name(a.id)} className="flex-1 text-sm" />
               <Button
                 className="shrink-0"
                 onClick={() => {
