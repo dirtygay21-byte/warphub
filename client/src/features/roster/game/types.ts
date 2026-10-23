@@ -52,8 +52,12 @@ export interface CatalogBlock {
   /** 'any' | '1' | '1–2' | '2+' | '2–3' | '2–4' | '4+' | '5' | 'end' */
   rounds: string;
   mode?: SecondaryMode;
+  /** вторичные: чей ход должен заканчиваться — см. blockTurnOk */
+  turn?: BlockTurn;
   rows: CatalogRow[];
 }
+/** own — ваш ход, opponent — ход противника, any — любой, opponent-or-r5 — ход противника или конец 5-го раунда (что раньше) */
+export type BlockTurn = 'own' | 'opponent' | 'any' | 'opponent-or-r5';
 export interface CatalogCard {
   id: string;
   name: string;
@@ -63,6 +67,8 @@ export interface CatalogCard {
   modes?: SecondaryMode[];
   /** правило «при взятии» есть на карте (подсказка и варианты на экране) */
   drawn?: string;
+  /** правило «при взятии» обязательное */
+  drawnRequired?: boolean;
   blocks: CatalogBlock[];
 }
 export interface GameCatalog {

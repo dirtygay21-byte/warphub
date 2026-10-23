@@ -21,7 +21,7 @@ import {
   type Seat,
 } from './types';
 import { drawCards, initDecks, noteCard, redrawWhenDrawn, swapCard } from './decks';
-import { cardVp } from './scoring';
+import { blockTurnOk, cardVp } from './scoring';
 import { setupMissing } from './setup';
 import { layoutPick, rollOff } from './rng';
 
@@ -314,6 +314,14 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       if (!card) return fail(`Нет карты ${ev.card}`);
       const r = cardVp({ card, picks: ev.picks, round: s.round, mode: p.secondaryMode });
       if ('error' in r) return fail(r.error);
+      // чей ход: карта указывает, в конце чьего хода засчитывается блок
+      const ownTurn = s.activeSeat === ev.target;
+      const lastTurn = s.round === ROUNDS && s.activeSeat !== s.firstTurn;
+      for (const pk of ev.picks) {
+        const t = card.blocks[pk.block]!.turn;
+        if (!blockTurnOk(t, ownTurn, lastTurn))
+          return fail(t === 'own' ? 'Этот блок засчитывается в конце вашего хода' : 'Этот блок засчитывается в конце хода противника (или в конце 5-го раунда)');
+      }
       p.scored.push({ id: ev.card, round: s.round, turn: s.activeSeat!, vp: r.vp, picks: ev.picks.map((x) => ({ ...x })) });
       // тактическая карта выполнена и уходит из игры; фиксированная остаётся активной всю битву
       if (p.secondaryMode === 'tactical') p.active = p.active.filter((a) => a.id !== ev.card);

@@ -5,7 +5,7 @@
  * Строки внутри блока: обычная — самостоятельная награда; «или» (or) — вместо строки выше, из цепочки
  * «строка + её или» засчитывается одна; «+» (plus) — сверх строки выше, не чаще её.
  */
-import { ROUNDS, type CatalogBlock, type CatalogCard, type GameCatalog, type GameState, type PlayerTotals, type Round, type RowPick, type SecondaryMode, type Seat } from './types';
+import { ROUNDS, type BlockTurn, type CatalogBlock, type CatalogCard, type GameCatalog, type GameState, type PlayerTotals, type Round, type RowPick, type SecondaryMode, type Seat } from './types';
 
 /** Подходит ли блок карты к раунду. 'end' — только конец битвы. */
 export function blockInRound(rounds: string, round: Round, endOfBattle = false): boolean {
@@ -17,6 +17,19 @@ export function blockInRound(rounds: string, round: Round, endOfBattle = false):
   if (range) return round >= Number(range[1]) && round <= Number(range[2]);
   if (/^\d$/.test(rounds)) return round === Number(rounds);
   return false;
+}
+
+/**
+ * Можно ли засчитать блок вторичной миссии в конце этого хода (G2.11a, правила колоды миссий: в конце каждого хода
+ * засчитывают оба игрока, но карта указывает, чей ход). ownTurn — заканчивается ход владельца карты;
+ * lastTurnOfBattle — последний ход 5-го раунда: для «хода противника или конца 5-го раунда» игрок, ходящий вторым,
+ * засчитывает карту в конце своего хода (ход противника в 5-м раунде уже прошёл). Без turn — любой ход.
+ */
+export function blockTurnOk(turn: BlockTurn | undefined, ownTurn: boolean, lastTurnOfBattle: boolean): boolean {
+  if (turn === 'own') return ownTurn;
+  if (turn === 'opponent') return !ownTurn;
+  if (turn === 'opponent-or-r5') return !ownTurn || lastTurnOfBattle;
+  return true;
 }
 
 /** Группа «или»: индекс первой строки цепочки, к которой относится строка. */

@@ -834,5 +834,15 @@
    "beacon timing; attacker and defender secondaries identical (all 18)"
   ],
   "setupRules": "all setup / when drawn / designer note entries on wh-rules.ru are present in our texts"
+ },
+ "secondaryTiming": {
+  "task": "G2.11a, 2026-10-23",
+  "source": "wahapedia.ru/wh40k11ed/the-rules/mission-deck-2026-27: at the end of each player's turn both players score (active player first); each card's WHEN says whose turn: 'End of your turn', 'End of a turn', 'End of your opponent's turn or the end of the fifth battle round (whichever comes first)'",
+  "field": "blocks[].turn on every secondary block: own | opponent | any | opponent-or-r5; derived from the card's WHEN text and checked by build-missions.mjs (SECONDARY_TURN)",
+  "fixedWhileActive": "Assassination (Fixed) 'while active' scores per enemy CHARACTER destroyed this turn — any turn",
+  "round5": "opponent-or-r5 (Beacon, Burden of Trust, Defend Stronghold): the player going second scores at the end of their own round-5 turn — the opponent's round-5 turn has already passed",
+  "drawnRequired": "Defend Stronghold: in round 1 the redraw is mandatory ('draw one new Secondary Mission card'); Forward Position, Behind Enemy Lines, Plunder, Cleanse, A Grievous Blow, Bring It Down — optional ('can')",
+  "duration": "Tactical cards stay active across turns and rounds until achieved (scored, then out of play), discarded at the end of your turn (1CP per turn), or swapped once per battle (1CP); no hand limit",
+  "gap": "Deck exhaustion is not covered by the rules; the engine draws the cards that remain (as the wh-rules.ru tracker)"
  }
 }

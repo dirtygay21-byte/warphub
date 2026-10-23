@@ -56,12 +56,14 @@ test('лимиты ПО: 15 за раунд и 45 за битву, 20 за фи�
   assert.deepEqual(missions.caps, { primaryRound: 15, primaryGame: 45, secondaryRound: 15, secondaryGame: 45, fixedSecondaryCard: 20, endOfBattleOutsideRoundCap: true });
 });
 
-test('сборщик: пропущенная карта и расхождение очков останавливают сборку; записанный конфликт пропускается', () => {
+test('сборщик: пропущенная карта, расхождение очков и неверное время вторичной останавливают сборку; записанный конфликт пропускается', () => {
   const kdc = [{ id: 'a', name: 'A', card_type: 'secondary', awards: [{ vp: 3 }] }];
-  const ru = (vp: number) => ({ terms: {}, cards: { a: { type: 'secondary', modes: ['tactical'], blocks: [{ rounds: 'any', mode: 'tactical', when: 'Конец', rows: [{ text: 'т', vp }] }] } } });
+  const ru = (vp: number, turn = 'own', when = 'Конец вашего хода') => ({ terms: {}, cards: { a: { type: 'secondary', modes: ['tactical'], blocks: [{ rounds: 'any', mode: 'tactical', when, turn, rows: [{ text: 'т', vp }] }] } } });
   const base = { cards: kdc, missions: [{ vp_per_round_cap: 15, vp_per_game_cap: 45, secondary_vp_per_round_cap: 15, secondary_vp_per_game_cap: 45 }], matchups: [], version: 't' };
   assert.equal(buildMissions({ ...base, ru: ru(3), review: {} }).cards.length, 1);
   assert.throws(() => buildMissions({ ...base, ru: ru(4), review: {} }), /очки расходятся/);
+  assert.throws(() => buildMissions({ ...base, ru: ru(3, 'any'), review: {} }), /turn any, по тексту «Конец вашего хода» нужно own/);
+  assert.throws(() => buildMissions({ ...base, ru: ru(3, 'own', 'Конец'), review: {} }), /неизвестное время «Конец»/);
   assert.throws(() => buildMissions({ ...base, cards: [...kdc, { id: 'b', name: 'B', card_type: 'primary', awards: [] }], ru: ru(3), review: {} }), /нет текста карты b/);
   const review = { conflicts: [{ card: 'a', vpDiff: vpDiff(ru(4).cards.a, kdc[0]) }] };
   assert.equal(buildMissions({ ...base, ru: ru(4), review }).cards.length, 1);

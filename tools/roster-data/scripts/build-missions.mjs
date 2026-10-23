@@ -38,6 +38,19 @@ export function vpDiff(card, kdc) {
   return diff.sort((a, b) => a.vp - b.vp);
 }
 
+/**
+ * Чей ход должен заканчиваться, чтобы блок вторичной миссии засчитывался (G2.11a): own — ваш, opponent — противника,
+ * any — любой, opponent-or-r5 — противника или конец 5-го раунда (что раньше). Должно совпадать с текстом «when».
+ */
+export const SECONDARY_TURN = {
+  'Конец вашего хода': 'own',
+  'Конец любого хода': 'any',
+  'Конец хода любого игрока': 'any',
+  'Конец хода противника': 'opponent',
+  'Конец хода противника или конец 5-го раунда — что наступит раньше': 'opponent-or-r5',
+  'Пока карта активна': 'any',
+};
+
 export function buildMissions({ cards, missions, matchups, ru, review, version }) {
   const kdcById = new Map(cards.map((c) => [c.id, c]));
   const errors = [];
@@ -54,6 +67,14 @@ export function buildMissions({ cards, missions, matchups, ru, review, version }
       const p = pair.get(id);
       if (!p || p[0] !== t.you || p[1] !== t.foe) errors.push(`${id}: пара ${t.you}/${t.foe}, в 40kdc ${p?.join('/')}`);
     }
+    if (t.type === 'secondary') {
+      for (const [i, b] of t.blocks.entries()) {
+        const want = SECONDARY_TURN[b.when];
+        if (!want) errors.push(`${id}: блок ${i} — неизвестное время «${b.when}»`);
+        else if (b.turn !== want) errors.push(`${id}: блок ${i} — turn ${b.turn}, по тексту «${b.when}» нужно ${want}`);
+      }
+    }
+    if (t.drawnRequired && !t.drawn) errors.push(`${id}: drawnRequired без правила «при взятии»`);
     const d = vpDiff(t, k);
     if (d.length && allowed.get(id) !== JSON.stringify(d)) errors.push(`${id}: очки расходятся с 40kdc ${JSON.stringify(d)}`);
     out.push({ id, name: k.name, ...t });

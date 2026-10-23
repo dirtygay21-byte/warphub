@@ -102,6 +102,8 @@ export interface MissionBlock {
   rounds: MissionRounds;
   mode?: 'fixed' | 'tactical';
   when: string;
+  /** вторичные: чей ход должен заканчиваться (own | opponent | any | opponent-or-r5 — противника или конец 5-го раунда) */
+  turn?: 'own' | 'opponent' | 'any' | 'opponent-or-r5';
   rows: MissionRow[];
 }
 export interface MissionAction {
@@ -123,6 +125,8 @@ export interface MissionCard {
   modes?: ('fixed' | 'tactical')[];
   setup?: string;
   drawn?: string;
+  /** правило «при взятии» обязательное (Defend Stronghold в 1-м раунде), иначе — по желанию */
+  drawnRequired?: boolean;
   note?: string;
   blocks: MissionBlock[];
   actions?: MissionAction[];
