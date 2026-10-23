@@ -237,9 +237,14 @@ npm run battlefield      # → backend/roster-data/battlefield.json
   rosterOptions` (P1-T5c): `add` — недостающий вариант (Watcher in the Dark у Deathwing Terminator Squad: в тексте инфолиста
   сайта его нет, в конструкторе — есть), `replace` — наш вариант с опечаткой или чужим оружием (Kâhl, Ynnari Incubi, Kroot War
   Shaper, Secutarii Peltasts) заменяется формулировкой конструктора. Остальные расхождения формулировок с конструктором
-  разобраны в `40k/whrules-995-roster-options-review.json` (wording — то же другими словами; conflict — содержание
-  расходится, без решения владельца не меняется: Chaos Acastus Knight Porphyrion, Kill Tank, Gargantuan Squiggoth, Wolf
-  Scouts). Название оружия с «and» внутри («dart-bow and tri-blade») — одно оружие. Тесты — `tests/paid-wargear.test.ts`.
+  разобраны в `40k/whrules-995-roster-options-review.json` (wording — то же другими словами; конфликты содержания решены в
+  P1-T5e — `resolved`: Chaos Acastus Knight Porphyrion — обе пушки вместе, Wolf Scouts — bolt pistol, Thunderclap и runic
+  stave вместе по конструктору (решение владельца), Kill Tank и Gargantuan Squiggoth — `whrules-995-wargear → datasheets`:
+  оружие, снаряжение и варианты из полного снимка `40k/whrules-995-full-orks.json`). Сохранённые выборы у инфолистов с
+  изменёнными вариантами переводятся записью `migrations` «wh-rules 995 wargear» (`buildOptionRemap`; что не переводится —
+  откладывается с предупреждением). Название оружия с «and» внутри («dart-bow and tri-blade») — одно оружие; «X and three
+  of the following» — наборы из трёх с повторами (Kill Tank); предмет стандартного снаряжения с именем профиля
+  («Kannon - Shell», «Combi-weapon - Damnatus») — оружие без профиля. Тесты — `tests/paid-wargear.test.ts`.
 - Правила детачментов, которые меняют игру, а не состав армии (ауры, стратагемы, перебросы), только показываются
   текстом — на ростер они не влияют.
 - Если у инфолиста Space Marines несколько таблиц цен (варианты орденов), берётся первая.

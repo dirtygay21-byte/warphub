@@ -220,6 +220,28 @@ function parseChoices(head: string, rest: string[], known: Map<string, string>):
     const c = prefix && list(prefix);
     return c ? withLocks({ choices: c, perModel: 1, noDup: false }, raws, known) : null;
   }
+  // «1 Deff Rolla and three of the following: • 1 Kannon • 1 Lobba • 1 Zzap Gun» (Kill Tank): варианты — все наборы из N
+  // пунктов с повторами (как прежние «3 Zzap Guns», каждый из которых можно было заменить)
+  m = t.match(/^(.+?)\s+and\s+(two|three|four|\d+) of the following\s*[:;]?\s*$/i);
+  if (m) {
+    const prefix = parseItems(m[1]!, known);
+    const n = toNum(m[2]!);
+    const items = bullets(rest).map((l) => parseItems(l, known));
+    if (!prefix || !n || !items.length || items.some((x) => !x || x.length !== 1)) return null;
+    const one = items.map((x) => x![0]!);
+    const out: Item[][] = [];
+    const walk = (from: number, acc: Item[]) => {
+      if (acc.length === n) {
+        const counts = new Map<string, Item>();
+        for (const it of acc) counts.set(it.weapon, { weapon: it.weapon, qty: (counts.get(it.weapon)?.qty ?? 0) + it.qty });
+        out.push([...prefix, ...counts.values()]);
+        return;
+      }
+      for (let i = from; i < one.length; i++) walk(i, [...acc, one[i]!]);
+    };
+    walk(0, []);
+    return { choices: out, perModel: 1, noDup: false };
+  }
   // «one of the following (duplicates are not allowed)*:» / «on of the following;» / просто «:» и список
   // «one of the following options (you cannot select the same option more than once):»
   m = t.match(/^(?:(?:one|on|1) of the following(?:\s+options)?)?((?:\s*\([^)]*\)|\s*\*+)*)\s*[:;]*\s*(.*)$/i);

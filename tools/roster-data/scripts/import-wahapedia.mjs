@@ -506,6 +506,11 @@ export function parseLoadout(text, weapons) {
       names.find((x) => x.n === n.replace(/s$/, '')) ||
       names.find((x) => x.n.replace(/s$/, '') === n.replace(/s$/, ''));
     if (exact) return exact.w;
+    // предмет назван профилем оружия: «1 Kannon - Shell» (wh-rules, Gargantuan Squiggoth) — оружие «Kannon»
+    if (/\s-\s/.test(item)) {
+      const base = find(item.split(/\s+-\s+/)[0]);
+      if (base) return base;
+    }
     // сокращённое название в тексте: «Perdition» ↔ оружие «Perdition Pistol» — только если такое оружие одно
     const pre = names.filter((x) => x.n.startsWith(n + ' '));
     return pre.length === 1 ? pre[0].w : undefined;

@@ -29,6 +29,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ROSTER_SCHEMA, SNAPSHOT_DIR, checkRosterSnapshot, loadSnapshot } from './updates-40k.mjs';
 import { ARMIES, compareArmy, wargearKey } from './whrules-compare.mjs';
+import { mdToText, optionsOfSite, plainHyphens, weaponsOf } from './whrules-convert.mjs';
+import { loadFull } from './whrules-map.mjs';
+import { parseLoadout } from './import-wahapedia.mjs';
+import { buildOptionRemap } from '../../../client/src/features/roster/engine/options-remap.ts';
+
+/** Источник записи DataMigrations этого обновления (перевод выборов снаряжения у инфолистов с изменёнными вариантами). */
+export const WARGEAR_MIGRATION = (ver) => `wh-rules ${ver} wargear`;
+export const WARGEAR_OPTIONS_NOTE = 'Варианты снаряжения инфолиста изменились в обновлении данных (wh-rules.ru: конструктор ростеров и инфолист сайта).';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DATA = path.join(HERE, '..', '..', '..', 'backend', 'roster-data');
@@ -60,7 +68,10 @@ const siteDefaults = (roster, unit) => (unit.defaults ?? []).map(([m, list]) => 
  * points — снимок очков (для сопоставления). Ничего не меняет. Возвращает { set, unset, gaps, unmatched }.
  */
 export function planWargear(files, roster, points, u = {}) {
-  const plan = { set: [], unset: [], gaps: [], unmatched: [], options: [], fixes: [], fixErrors: [] };
+  const plan = { set: [], unset: [], gaps: [], unmatched: [], options: [], fixes: [], fixErrors: [], sheets: [] };
+  // инфолисты целиком по снаряжению из полного снимка сайта (u.datasheets: { army, id, full, faction, options: 'datasheet' |
+  // 'roster' }): оружие, снаряжение, стандартное снаряжение, варианты — наша версия устарела (Kill Tank, Gargantuan Squiggoth)
+  const sheetsById = new Map((u.datasheets ?? []).map((x) => [x.id, x]));
   // отдельные варианты из конструктора (u.rosterOptions): { army, id, add | replace, site } — добавить недостающий вариант
   // или заменить наш (опечатка, ссылка на оружие, которого у юнита нет) формулировкой сайта, где есть текст site
   const fixesById = new Map();
@@ -84,7 +95,9 @@ export function planWargear(files, roster, points, u = {}) {
       if (!real.length && texts.length) plan.options.push({ army, id: p.id, name: d.name, source: d.source, texts });
       for (const f of fixesById.get(p.id) ?? []) {
         fixesById.set(p.id, fixesById.get(p.id).filter((x) => x !== f));
-        const text = texts.find((t) => t.toLowerCase().includes(f.site.toLowerCase()));
+        const found = texts.find((t) => t.toLowerCase().includes(f.site.toLowerCase()));
+        // f.names — название предмета у конструктора → как в инфолисте («combat blade» → «Combat Knife» у Wolf Scouts)
+        const text = found && Object.entries(f.names ?? {}).reduce((t, [a, b]) => t.replace(new RegExp(a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), b), found);
         if (!text) {
           plan.fixErrors.push(`${army}/${d.name}: у конструктора сайта нет варианта «${f.site}»`);
           continue;
@@ -95,6 +108,25 @@ export function planWargear(files, roster, points, u = {}) {
           continue;
         }
         plan.fixes.push({ army, id: p.id, name: d.name, ...(f.replace ? { replace: f.replace } : { add: true }), text, why: f.why });
+      }
+      const sh = sheetsById.get(p.id);
+      if (sh) {
+        sheetsById.delete(p.id);
+        const full = loadFull(sh.full, undefined, [sh.faction]);
+        const site = full.factions[sh.faction]?.datasheets.find((x) => x.id === p.siteId);
+        if (!site) plan.fixErrors.push(`${army}/${d.name}: нет в полном снимке ${sh.full}`);
+        else {
+          const weapons = plainHyphens(weaponsOf(site));
+          const loadout = mdToText(site.loadout);
+          const wa = (site.wargearAbilities ?? []).filter((a) => !weapons.some((w) => w.name === a.name)).map((a) => ({ name: a.name }));
+          const next = {
+            weapons,
+            loadout,
+            defaultLoadout: parseLoadout(loadout, [...weapons, ...wa]),
+            options: sh.options === 'roster' ? texts.map((text) => ({ star: false, text, source: 'whrules-roster' })) : optionsOfSite(site.options ?? []),
+          };
+          if (Object.entries(next).some(([k, v]) => JSON.stringify(d[k]) !== JSON.stringify(v))) plan.sheets.push({ army, id: p.id, name: d.name, from: sh.full, options: sh.options, next, why: sh.why });
+        }
       }
       const paid = (unit.dw ?? []).some(([, pts]) => pts > 0);
       want.set(p.id, paid);
@@ -110,16 +142,23 @@ export function planWargear(files, roster, points, u = {}) {
     }
   }
   for (const [id, rest] of fixesById) for (const f of rest) plan.fixErrors.push(`${f.army}/${id}: инфолист не сопоставлен с сайтом`);
+  for (const [id, x] of sheetsById) plan.fixErrors.push(`${x.army}/${id}: инфолист не сопоставлен с сайтом`);
   plan.want = want;
   return plan;
 }
 
 /** Применить план: свой инфолист и его копии в других файлах (тот же id). Возвращает число изменённых инфолистов. */
-export function applyWargearPlan(files, plan) {
+export function applyWargearPlan(files, plan, migrationSource = null) {
   let changed = 0;
   const opts = new Map(plan.options.map((x) => [x.id, x.texts]));
-  for (const F of Object.values(files))
+  const sheets = new Map(plan.sheets.map((x) => [x.id, x.next]));
+  for (const F of Object.values(files)) {
+    const before = new Map(F.datasheets.map((d) => [d, JSON.parse(JSON.stringify(d))]));
     for (const d of F.datasheets) {
+      if (sheets.has(d.id)) {
+        Object.assign(d, JSON.parse(JSON.stringify(sheets.get(d.id))));
+        changed++;
+      }
       for (const f of plan.fixes.filter((x) => x.id === d.id)) {
         if (d.options.some((o) => o.text === f.text)) continue;
         const opt = { star: false, text: f.text, source: 'whrules-roster' };
@@ -139,6 +178,21 @@ export function applyWargearPlan(files, plan) {
       else delete d.paidDefaults;
       changed++;
     }
+    // сохранённые выборы снаряжения у инфолистов с изменёнными вариантами — таблица перевода (один раз на ростер)
+    if (!migrationSource) continue;
+    const remaps = {};
+    for (const [d, old] of before) {
+      if (d.group !== 'own' && !d.group.startsWith('ally:') && !d.group.startsWith('det:')) continue;
+      if (JSON.stringify(old.options) === JSON.stringify(d.options)) continue;
+      const r = buildOptionRemap(old, JSON.parse(JSON.stringify(d)), WARGEAR_OPTIONS_NOTE);
+      if (r) remaps[d.id] = r;
+    }
+    if (!Object.keys(remaps).length) continue;
+    const list = !F.migrations ? [] : Array.isArray(F.migrations) ? F.migrations : [F.migrations];
+    const mine = list.find((m) => m.source === migrationSource);
+    if (mine) mine.options = { ...(mine.options ?? {}), ...remaps };
+    else F.migrations = [...list, { source: migrationSource, datasheets: {}, detachments: {}, enhancements: {}, options: remaps }];
+  }
   return changed;
 }
 
@@ -147,11 +201,11 @@ export function applyWhrulesWargear(files, roster, u) {
   const plan = planWargear(files, roster, loadSnapshot(u.points), u);
   if (plan.fixErrors.length) throw new Error(`whrules-wargear: rosterOptions — ${plan.fixErrors.join('; ')}`);
   if (plan.gaps.length) throw new Error(`whrules-wargear: платного стандартного предмета нет в стандартном снаряжении — ${plan.gaps.map((g) => `${g.army}/${g.name}: ${g.item}`).join(', ')}`);
-  const changed = applyWargearPlan(files, plan);
+  const changed = applyWargearPlan(files, plan, WARGEAR_MIGRATION(roster.source.dataVersion));
   return {
     changed,
     lines: [
-      `стандартное снаряжение платное (paidDefaults): ${[...plan.want.values()].filter(Boolean).length} инфолистов; варианты из конструктора сайта: ${plan.options.map((x) => x.name).join(', ') || 'нет'}; отдельные варианты (rosterOptions): ${(u.rosterOptions ?? []).length}; изменено записей: ${changed}`,
+      `стандартное снаряжение платное (paidDefaults): ${[...plan.want.values()].filter(Boolean).length} инфолистов; варианты из конструктора сайта: ${plan.options.map((x) => x.name).join(', ') || 'нет'}; отдельные варианты (rosterOptions): ${(u.rosterOptions ?? []).length}; инфолисты по снаряжению из полного снимка: ${(u.datasheets ?? []).length}; изменено записей: ${changed}`,
     ],
   };
 }

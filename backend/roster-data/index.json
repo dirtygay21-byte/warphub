@@ -249,10 +249,12 @@
     "DRU",
     "GC",
     "LoV",
+    "ORK",
+    "QT",
     "SM",
     "TAU"
    ],
-   "note": "Платное стандартное снаряжение по конструктору ростеров wh-rules.ru 995: paidDefaults у 15 инфолистов (лазпушка Leman Russ ×8, dark lance Ravager, heavy mining laser Achilles Ridgerunners, Praesidium Shield Shield-Captain, Heavy Laser Destroyer Repulsor Executioner, Banner of Macragge Victrix Honour Guard, missile pod / T'au flamer Crisis Fireknife / Starscythe). Одобрено владельцем 2026-10-23 (P1-T5). Отдельные варианты из конструктора (rosterOptions, P1-T5c): Watcher in the Dark у Deathwing Terminator Squad; опечатки Kâhl, Ynnari Incubi, Kroot War Shaper; Secutarii Peltasts — galvanic caster вместо arc lance.",
+   "note": "Платное стандартное снаряжение по конструктору ростеров wh-rules.ru 995: paidDefaults у 15 инфолистов (лазпушка Leman Russ ×8, dark lance Ravager, heavy mining laser Achilles Ridgerunners, Praesidium Shield Shield-Captain, Heavy Laser Destroyer Repulsor Executioner, Banner of Macragge Victrix Honour Guard, missile pod / T'au flamer Crisis Fireknife / Starscythe). Одобрено владельцем 2026-10-23 (P1-T5). Отдельные варианты из конструктора (rosterOptions, P1-T5c): Watcher in the Dark у Deathwing Terminator Squad; опечатки Kâhl, Ynnari Incubi, Kroot War Shaper; Secutarii Peltasts — galvanic caster вместо arc lance. Конфликты P1-T5e: Chaos Acastus Knight Porphyrion — обе пушки вместе; Wolf Scouts — bolt pistol, Thunderclap и runic stave вместе (решение владельца, конструктор сайта); Kill Tank и Gargantuan Squiggoth — оружие, снаряжение и варианты из полного снимка Orks (whrules-995-full-orks.json).",
    "source": {
     "site": "https://wh-rules.ru",
     "dataVersion": 995,

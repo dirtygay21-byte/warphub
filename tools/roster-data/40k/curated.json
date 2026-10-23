@@ -78,10 +78,12 @@
           "DRU",
           "GC",
           "LoV",
+          "ORK",
+          "QT",
           "SM",
           "TAU"
         ],
-        "note": "Платное стандартное снаряжение по конструктору ростеров wh-rules.ru 995: paidDefaults у 15 инфолистов (лазпушка Leman Russ ×8, dark lance Ravager, heavy mining laser Achilles Ridgerunners, Praesidium Shield Shield-Captain, Heavy Laser Destroyer Repulsor Executioner, Banner of Macragge Victrix Honour Guard, missile pod / T'au flamer Crisis Fireknife / Starscythe). Одобрено владельцем 2026-10-23 (P1-T5). Отдельные варианты из конструктора (rosterOptions, P1-T5c): Watcher in the Dark у Deathwing Terminator Squad; опечатки Kâhl, Ynnari Incubi, Kroot War Shaper; Secutarii Peltasts — galvanic caster вместо arc lance.",
+        "note": "Платное стандартное снаряжение по конструктору ростеров wh-rules.ru 995: paidDefaults у 15 инфолистов (лазпушка Leman Russ ×8, dark lance Ravager, heavy mining laser Achilles Ridgerunners, Praesidium Shield Shield-Captain, Heavy Laser Destroyer Repulsor Executioner, Banner of Macragge Victrix Honour Guard, missile pod / T'au flamer Crisis Fireknife / Starscythe). Одобрено владельцем 2026-10-23 (P1-T5). Отдельные варианты из конструктора (rosterOptions, P1-T5c): Watcher in the Dark у Deathwing Terminator Squad; опечатки Kâhl, Ynnari Incubi, Kroot War Shaper; Secutarii Peltasts — galvanic caster вместо arc lance. Конфликты P1-T5e: Chaos Acastus Knight Porphyrion — обе пушки вместе; Wolf Scouts — bolt pistol, Thunderclap и runic stave вместе (решение владельца, конструктор сайта); Kill Tank и Gargantuan Squiggoth — оружие, снаряжение и варианты из полного снимка Orks (whrules-995-full-orks.json).",
         "rosterOptions": [
           {
             "army": "SM",
@@ -117,6 +119,41 @@
             "replace": "arc lance",
             "site": "galvanic caster can be replaced",
             "why": "наш вариант меняет arc lance, которого у Peltast Alpha нет (стандартное — galvanic caster); у сайта — galvanic caster"
+          },
+          {
+            "army": "QT",
+            "id": "000001099",
+            "replace": "can each be replaced",
+            "site": "2 Acastus autocannons can be replaced",
+            "why": "у нас «can each be replaced» (каждая — на 2 lascannons); инфолист и конструктор сайта — обе пушки вместе (P1-T5e)"
+          },
+          {
+            "army": "SM",
+            "id": "000004182",
+            "replace": "Plasma Pistol and Combat Knife replaced with one of the following",
+            "site": "plasma pistol and combat blade can be replaced",
+            "names": {
+              "combat blade": "Combat Knife"
+            },
+            "why": "решение владельца 2026-10-23 (P1-T5e): как в конструкторе ростеров сайта — bolt pistol, Thunderclap и runic stave вместе (инфолист сайта: «одно из»); «combat blade» конструктора — Combat Knife инфолиста"
+          }
+        ],
+        "datasheets": [
+          {
+            "army": "ORK",
+            "id": "000000056",
+            "full": "whrules-995-full-orks.json",
+            "faction": "orks",
+            "options": "datasheet",
+            "why": "наша версия (Wahapedia, Legends) устарела: у сайта Dual Big Shoota и Skorcha в стандартном снаряжении, Deff Rolla и три из Kannon / Lobba / Zzap Gun, до 5 Big Shootas (P1-T5e)"
+          },
+          {
+            "army": "ORK",
+            "id": "000000059",
+            "full": "whrules-995-full-orks.json",
+            "faction": "orks",
+            "options": "roster",
+            "why": "наша версия (Forge World) устарела: у сайта Kannon в стандартном снаряжении; варианты — как в конструкторе ростеров (Kannon → Supa-kannon), без второй строки инфолиста «one of kannon / supa-kannon» (P1-T5e)"
           }
         ]
       }

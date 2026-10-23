@@ -321,3 +321,56 @@ test('каждый вариант конструктора сайта есть �
   assert.deepEqual([...accepted].filter((k) => !used.has(k)), [], 'в разборе нет устаревших записей');
   assert.ok(review.items.every((x) => ['wording', 'not-option', 'conflict'].includes(x.verdict)));
 });
+
+// ---------- P1-T5e: конфликты инфолиста и конструктора сайта ----------
+
+test('Chaos Acastus Knight Porphyrion: обе пушки вместе — на 2 lascannons или на 1 autocannon и 1 lascannon (во всех армиях с копиями)', () => {
+  for (const f of ['QT', 'CSM', 'CD', 'DG', 'EC', 'TS', 'WE']) {
+    const ds = fac(f).datasheets.find((d) => d.name === 'Chaos Acastus Knight Porphyrion')!;
+    const o = opt(ds, 'Lascannon');
+    assert.deepEqual(o.from, [{ weapon: 'Acastus Autocannon', qty: 2 }], f);
+    const c = build(f, ds, { picks: pick(o, 'Lascannon', 1) }).last;
+    assert.deepEqual([c.loadout['Lascannon'], c.loadout['Acastus Autocannon'] ?? 0, c.loadoutInfo.problems], [2, 0, []], f);
+  }
+});
+
+test('Wolf Scouts (решение владельца): plasma pistol и combat knife одной модели — на bolt pistol, Thunderclap и runic stave вместе', () => {
+  const ds = sheet('SM', 'Wolf Scouts', 'Space Wolves');
+  const o = opt(ds, 'Bolt Pistol+Thunderclap+Runic Stave');
+  assert.equal(o.choices.length, 1);
+  const c = build('SM', ds, { picks: pick(o, 'Bolt Pistol+Thunderclap+Runic Stave', 1) }).last;
+  assert.deepEqual(c.loadoutInfo.problems, []);
+  assert.deepEqual([c.loadout['Bolt Pistol'], c.loadout['Thunderclap'], c.loadout['Runic Stave']], [1, 1, 1]);
+});
+
+test('Kill Tank по инфолисту сайта: Dual Big Shoota и Skorcha в стандартном снаряжении; Deff Rolla и три из Kannon / Lobba / Zzap Gun; с Deff Rolla — до 5 Big Shootas', () => {
+  const ds = sheet('ORK', 'Kill Tank');
+  assert.ok(ds.weapons.some((w) => w.name === 'Dual Big Shoota'));
+  const base = build('ORK', ds).last;
+  assert.deepEqual([base.loadout['Dual Big Shoota'], base.loadout['Skorcha'], base.loadout['Tank Kannon']], [1, 1, 1]);
+  const rolla = optionsOf(ds).parsed.find((x) => x.choices.some((c) => c.some((i) => i.weapon === 'Deff Rolla')))!;
+  assert.equal(rolla.choices.length, 10, 'наборы из трёх с повторами');
+  const zzap = rolla.choices.findIndex((c) => c.some((i) => i.weapon === 'Zzap Gun' && i.qty === 3));
+  const shootas = opt(ds, 'Big Shoota');
+  assert.equal(shootas.perModel, 5);
+  const with5 = build('ORK', ds, { picks: { [rolla.key]: rolla.choices.map((_, i) => (i === zzap ? 1 : 0)), ...pick(shootas, 'Big Shoota', 5) } }).last;
+  assert.deepEqual(with5.loadoutInfo.problems, []);
+  assert.deepEqual([with5.loadout['Deff Rolla'], with5.loadout['Zzap Gun'], with5.loadout['Big Shoota'], with5.loadout['Tank Kannon'] ?? 0], [1, 3, 5, 0]);
+  assert.ok(build('ORK', ds, { picks: pick(shootas, 'Big Shoota', 1) }).last.loadoutInfo.problems.length, 'Big Shoota — только с Deff Rolla');
+});
+
+test('Gargantuan Squiggoth: Kannon в стандартном снаряжении, замена на Supa-kannon (как конструктор сайта)', () => {
+  const ds = sheet('ORK', 'Gargantuan Squiggoth');
+  assert.equal(build('ORK', ds).last.loadout['Kannon'], 1);
+  assert.equal(optionsOf(ds).parsed.length, 1);
+  const c = build('ORK', ds, { picks: pick(opt(ds, 'Supa-kannon'), 'Supa-kannon', 1) }).last;
+  assert.deepEqual([c.loadout['Kannon'] ?? 0, c.loadout['Supa-kannon'], c.loadoutInfo.problems], [0, 1, []]);
+});
+
+test('сохранённые выборы у инфолистов с изменёнными вариантами: таблица перевода wh-rules 995 wargear (Kill Tank — прежние замены откладываются)', () => {
+  const F = fac('ORK');
+  const mig = (Array.isArray(F.migrations) ? F.migrations : [F.migrations]).find((m) => m?.source === 'wh-rules 995 wargear')!;
+  const kt = sheet('ORK', 'Kill Tank');
+  assert.ok(mig.options?.[kt.id], 'есть перевод для Kill Tank');
+  assert.equal(mig.options![kt.id]!.keys['0'], null, 'прежняя «+ Big Shoota» без Deff Rolla — не переводится');
+});

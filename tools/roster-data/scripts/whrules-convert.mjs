@@ -964,7 +964,9 @@ export function applyWhrulesFaction(files, full, u) {
   const SM = files['SM.json'];
   const AoI = files['AoI.json'];
   if (!SM || !AoI) throw new Error('whrules-faction: нет SM.json или AoI.json');
-  const done = (F) => String(F.source?.dataVersion) === String(full.source.dataVersion) && String(F.migrations?.source ?? '').startsWith(`wh-rules ${full.source.dataVersion} `);
+  // migrations — запись или список (следующие обновления дописывают свои записи, например whrules-wargear)
+  const migs = (F) => (!F.migrations ? [] : Array.isArray(F.migrations) ? F.migrations : [F.migrations]);
+  const done = (F) => String(F.source?.dataVersion) === String(full.source.dataVersion) && migs(F).some((m) => String(m.source ?? '').startsWith(`wh-rules ${full.source.dataVersion} `));
   if (done(SM) && done(AoI)) return { changed: 0, lines: [`Space Marines и Imperial Agents уже на wh-rules ${full.source.dataVersion}`] };
   if (done(SM) || done(AoI)) throw new Error('whrules-faction: обновлена только часть файлов (SM/AoI) — восстановите данные импорта');
   const others = Object.keys(files).filter((f) => f !== 'SM.json' && f !== 'AoI.json').sort().map((f) => files[f]);
