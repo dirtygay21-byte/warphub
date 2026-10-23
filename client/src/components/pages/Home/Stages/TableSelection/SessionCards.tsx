@@ -1,9 +1,12 @@
 import type { AvailabilitySegment, TableSession } from "@/apiUtils/booking";
-import { formatClubTimeRange } from "@/utils/clubTime";
+import { formatClubTime, formatClubTimeRange } from "@/utils/clubTime";
+import { getWindowLimit, hoursLabel } from "@/utils/slots";
 import { formatDurationLabel } from "@/utils/duration";
 import clsx from "clsx";
 import { GraduationCap, Swords, UserRound, UsersRound } from "lucide-react";
 import type { ReactNode } from "react";
+
+type WindowLimit = ReturnType<typeof getWindowLimit>;
 
 function OccupancyBadge({
   occupied,
@@ -111,6 +114,7 @@ export function FreeSlotCard({
   label,
   segment,
   durationMinutes,
+  limit,
   capacity,
   hasTrainer,
   onSelect,
@@ -118,12 +122,13 @@ export function FreeSlotCard({
   label: string;
   segment: AvailabilitySegment;
   durationMinutes: number;
+  limit: WindowLimit;
   capacity: number;
   hasTrainer: boolean;
   onSelect: () => void;
 }) {
   return (
-    <article className="rounded-xl border border-white/15 bg-app-elevated p-4">
+    <article className={clsx("rounded-xl border bg-app-elevated p-4", limit.state === "none" ? "border-white/10 opacity-60" : limit.state === "limited" ? "border-red-400/50" : "border-white/15")}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-base font-semibold">{label}</p>
@@ -135,6 +140,7 @@ export function FreeSlotCard({
               {formatDurationLabel(durationMinutes)}
             </p>
           )}
+          <LimitNote limit={limit} durationMinutes={durationMinutes} />
         </div>
         <OccupancyBadge occupied={0} capacity={capacity} />
       </div>
@@ -145,14 +151,31 @@ export function FreeSlotCard({
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={onSelect}
-        className="mt-4 w-full rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground transition-transform active:scale-95"
-      >
-        Выбрать
-      </button>
+      {limit.state !== "none" && (
+        <button
+          type="button"
+          onClick={onSelect}
+          className="mt-4 w-full rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground transition-transform active:scale-95"
+        >
+          Выбрать
+        </button>
+      )}
     </article>
+  );
+}
+
+/**
+ * Предупреждение красным (B1): окно короче полной длительности — запись возможна, но только на N часов;
+ * короче минимума — записаться нельзя.
+ */
+export function LimitNote({ limit, durationMinutes }: { limit: WindowLimit; durationMinutes: number }) {
+  if (limit.state === "full") return null;
+  if (limit.state === "none")
+    return <p className="mt-1.5 text-xs font-semibold text-red-300">Свободного времени не хватает даже на укороченную запись</p>;
+  return (
+    <p className="mt-1.5 rounded-lg border border-red-400/40 bg-red-400/10 px-2 py-1 text-xs font-semibold text-red-300">
+      Только {hoursLabel(limit.maxMinutes)} вместо {hoursLabel(durationMinutes)} — до {formatClubTime(limit.until)}
+    </p>
   );
 }
 
@@ -173,15 +196,17 @@ export function PoolSlotCard({
   segment,
   capacity,
   durationMinutes,
+  limit,
   onSelect,
 }: {
   segment: AvailabilitySegment;
   capacity: number;
   durationMinutes: number;
+  limit: WindowLimit;
   onSelect: () => void;
 }) {
   const occupied = capacity - segment.freeSeats;
-  const full = segment.freeSeats <= 0;
+  const full = segment.freeSeats <= 0 || limit.state === "none";
 
   return (
     <article
@@ -205,6 +230,7 @@ export function PoolSlotCard({
               {formatDurationLabel(durationMinutes)}
             </p>
           )}
+          {segment.freeSeats > 0 && <LimitNote limit={limit} durationMinutes={durationMinutes} />}
         </div>
         <OccupancyBadge occupied={occupied} capacity={capacity} />
       </div>

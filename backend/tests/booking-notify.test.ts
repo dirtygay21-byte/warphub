@@ -93,3 +93,12 @@ describe('describeSendResult', () => {
     expect(describeSendResult({ ok: false, reason: 'telegram', status: 400 }).message).toContain('отклонил');
   });
 });
+
+describe('ограниченное время (B1)', () => {
+  test('запись короче полной длительности — строка «Ограниченное время»', () => {
+    const t = bookingNoticeText({ ...base, endsAt: new Date('2026-10-25T16:00:00Z'), fullMinutes: 240 });
+    expect(t).toContain('Ограниченное время: 3 ч вместо 4 ч');
+    expect(t).toMatch(/18:00–21:00/);
+    expect(bookingNoticeText({ ...base, startsAt: new Date('2026-10-25T13:00:00Z'), endsAt: new Date('2026-10-25T17:00:00Z'), fullMinutes: 240 })).not.toContain('Ограниченное');
+  });
+});

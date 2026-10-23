@@ -11,7 +11,8 @@ import {
   UsersRound,
   XCircle,
 } from "lucide-react";
-import { formatClubTimeRange } from "@/utils/clubTime";
+import { formatClubTime, formatClubTimeRange } from "@/utils/clubTime";
+import { hoursLabel } from "@/utils/slots";
 import type { ReactNode } from "react";
 import { getServiceDetailsMeta } from "./ServiceDetails/utils";
 import { formatSelectedDate } from "@/utils/date";
@@ -63,6 +64,13 @@ export default function ConfirmationStage({
   const time = lastBooking?.startsAt
     ? formatClubTimeRange(lastBooking.startsAt, lastBooking.endsAt)
     : "—";
+  // B1: запись короче полной длительности услуги — красное предупреждение
+  const fullMinutes = apiService?.duration ?? null;
+  const bookedMinutes =
+    lastBooking?.startsAt && lastBooking.endsAt
+      ? Math.round((new Date(lastBooking.endsAt).getTime() - new Date(lastBooking.startsAt).getTime()) / 60_000)
+      : null;
+  const limited = fullMinutes && bookedMinutes && bookedMinutes < fullMinutes ? bookedMinutes : null;
   const placesLabel = lastBooking?.joined
     ? "Стол собран — вы играете вдвоём"
     : `Мест: ${lastBooking?.partySize ?? 1}`;
@@ -146,6 +154,17 @@ export default function ConfirmationStage({
             <InfoRow icon={<UsersRound className="size-5" />} value={placesLabel} />
           </div>
         </div>
+
+        {isSuccess && limited && fullMinutes && lastBooking?.endsAt && (
+          <div className="mt-3 w-full rounded-xl border border-red-400/60 bg-red-400/15 px-4 py-3 text-left text-sm text-red-100">
+            <p className="font-semibold text-red-200">
+              ⚠️ Время ограничено: {hoursLabel(limited)} вместо {hoursLabel(fullMinutes)} — до {formatClubTime(lastBooking.endsAt)}
+            </p>
+            <p className="mt-1 text-red-100/85">
+              Если не успеете, попросим освободить место к следующей записи; если будет свободно — постараемся продлить.
+            </p>
+          </div>
+        )}
 
         {isSuccess ? (
           <>

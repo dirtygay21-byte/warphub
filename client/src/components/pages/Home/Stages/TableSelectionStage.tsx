@@ -18,7 +18,7 @@ import {
 } from "./TableSelection/SessionCards";
 import TableStateMessage from "./TableSelection/TableStateMessage";
 import { getDateKey, getToday, isDateInSchedule } from "./TableSelection/utils";
-import { minFreeSeats } from "@/utils/slots";
+import { getWindowLimit, minFreeSeats } from "@/utils/slots";
 
 const CLUB_VISIT_SLUG = "club_visit";
 
@@ -124,6 +124,7 @@ export default function TableSelectionStage() {
       segments: poolSlot.segments,
       capacity: service.poolCapacity ?? poolSlot.table.seatCapacity,
       freeSeats: segment.freeSeats,
+      minMinutes: service.minDuration,
     });
     nextStage();
   };
@@ -139,6 +140,7 @@ export default function TableSelectionStage() {
       segments: poolSlot.segments,
       capacity: service.poolCapacity ?? poolSlot.table.seatCapacity,
       freeSeats: minFreeSeats(poolSlot.segments),
+      minMinutes: service.minDuration,
     });
     nextStage();
   };
@@ -220,6 +222,7 @@ export default function TableSelectionStage() {
                   segment={segment}
                   capacity={service.poolCapacity ?? poolSlot!.table.seatCapacity}
                   durationMinutes={durationMinutes}
+                  limit={getWindowLimit({ segments, within: segment, durationMinutes, partySize: 1, minMinutes: service.minDuration })}
                   onSelect={() => handlePoolSelect(index)}
                 />
               ))
@@ -302,6 +305,7 @@ export default function TableSelectionStage() {
                   label={slot.label}
                   segment={slot.segment}
                   durationMinutes={durationMinutes}
+                  limit={getWindowLimit({ segments: slot.segments, within: slot.segment, durationMinutes, partySize: 1, minMinutes: service.minDuration })}
                   capacity={capacity}
                   hasTrainer={service.hasTrainer}
                   onSelect={() => {
@@ -316,6 +320,7 @@ export default function TableSelectionStage() {
                       },
                       segments: slot.segments,
                       capacity,
+                      minMinutes: service.minDuration,
                     });
                     nextStage();
                   }}

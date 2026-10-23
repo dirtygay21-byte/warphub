@@ -1,5 +1,6 @@
 import { useNow } from "@/hooks/useNow";
 import { DetailRow } from "./DetailRow";
+import { hoursLabel } from "@/utils/slots";
 import { formatReservationDate } from "@/utils/date";
 import { getSeatsLabel } from "@/utils/plural";
 import { isInactiveReservation } from "@/utils/reservation";
@@ -29,6 +30,8 @@ type ReservationCardProps = {
   reservation: Reservation;
   isPast: boolean;
   serviceTitle?: string;
+  /** полная длительность услуги, минут — если запись короче, красная пометка «время ограничено» (B1) */
+  serviceDuration?: number | null;
   isServiceLoading: boolean;
   disciplineTitle?: string;
   isCancelling: boolean;
@@ -40,12 +43,20 @@ export function ReservationCard({
   reservation,
   isPast,
   serviceTitle,
+  serviceDuration,
   isServiceLoading,
   disciplineTitle,
   isCancelling,
   onCancel,
   onEdit,
 }: ReservationCardProps) {
+  // B1: запись короче полной длительности услуги
+  const bookedMinutes =
+    reservation.startsAt && reservation.endsAt
+      ? Math.round((new Date(reservation.endsAt).getTime() - new Date(reservation.startsAt).getTime()) / 60_000)
+      : null;
+  const limitedMinutes = serviceDuration && bookedMinutes != null && bookedMinutes < serviceDuration ? bookedMinutes : null;
+
   const cancelled = isCancelledReservation(reservation);
   const clubArmyCount = reservation.seatClubArmyOptions.filter(Boolean).length;
   const isInactive = isInactiveReservation(reservation);
@@ -117,6 +128,11 @@ export function ReservationCard({
             value={String(reservation.partySize)}
             isLoading={isServiceLoading}
           />
+          {limitedMinutes != null && serviceDuration && (
+            <p className="rounded-lg border border-red-400/50 bg-red-400/10 px-3 py-2 text-xs font-semibold text-red-200">
+              ⚠️ Время ограничено: {hoursLabel(limitedMinutes)} вместо {hoursLabel(serviceDuration)}. Если не успеете — попросим освободить место к следующей записи; если будет свободно — постараемся продлить.
+            </p>
+          )}
           <BookingDetailsRows details={reservation.details} />
           {clubArmyCount > 0 && (
             <DetailRow
