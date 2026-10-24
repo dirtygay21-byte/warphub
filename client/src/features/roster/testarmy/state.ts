@@ -140,3 +140,41 @@ export function removeUnit(u: TAUnit): TAUnit {
 
 /** Удержать точку на столе (центр базы не уходит за край). */
 export const clampToBoard = ([x, y]: Pt): Pt => [Math.min(60, Math.max(0, x)), Math.min(44, Math.max(0, y))];
+
+/** Повернуть выставленный отряд вокруг его центра (сохраняя ручные сдвиги моделей). */
+export function rotateUnit(u: TAUnit, delta: number): TAUnit {
+  const c = unitCenter(u);
+  if (!c) return { ...u, angle: u.angle + delta };
+  const cos = Math.cos(delta);
+  const sin = Math.sin(delta);
+  return {
+    ...u,
+    angle: u.angle + delta,
+    models: u.models.map((m) => {
+      if (!m.at) return m;
+      const dx = m.at[0] - c[0];
+      const dy = m.at[1] - c[1];
+      return { ...m, at: [c[0] + dx * cos - dy * sin, c[1] + dx * sin + dy * cos] };
+    }),
+  };
+}
+
+/** База для всех моделей профиля: вариант из данных (pick) или свой размер (customMm, для баз без размера). */
+export function setProfileBase(u: TAUnit, profile: string, change: { pick?: number; customMm?: number | null }): TAUnit {
+  const models = u.models.map((m) => (m.profile === profile ? { ...m, ...change } : m));
+  const next = { ...u, models };
+  // размеры изменились — отряд перестраивается на том же месте, чтобы базы не налезали
+  const c = unitCenter(u);
+  return c ? placeUnit(next, c) : next;
+}
+
+/** Профили отряда для настройки баз: название, число моделей, варианты из данных, текущий выбор. */
+export function unitProfiles(u: TAUnit): { profile: string; count: number; options: BaseShape[]; pick: number; customMm: number | null; source: string }[] {
+  const out = new Map<string, { profile: string; count: number; options: BaseShape[]; pick: number; customMm: number | null; source: string }>();
+  for (const m of u.models) {
+    const e = out.get(m.profile);
+    if (e) e.count++;
+    else out.set(m.profile, { profile: m.profile, count: 1, options: m.options, pick: m.pick, customMm: m.customMm, source: m.source });
+  }
+  return [...out.values()];
+}

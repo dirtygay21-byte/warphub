@@ -52,3 +52,21 @@ test('база без размера: 60 мм как стартовое знач
   assert.deepEqual(modelBase(m), { shape: { kind: 'circle', d: 60 }, known: false });
   assert.deepEqual(modelBase({ ...m, customMm: 100 }), { shape: { kind: 'circle', d: 100 }, known: true });
 });
+
+test('rotateUnit: поворот вокруг центра, ручные сдвиги сохраняются; setProfileBase: свой размер и перестройка', async () => {
+  const { rotateUnit, setProfileBase, moveModel, unitProfiles } = await import('../../../client/src/features/roster/testarmy');
+  const u0 = placeUnit(buildUnits(computeRoster(roster(), L))[0]!, [30, 22], 'line');
+  const c0 = unitCenter(u0)!;
+  const r = rotateUnit(u0, Math.PI / 2);
+  const c1 = unitCenter(r)!;
+  assert.ok(Math.hypot(c0[0] - c1[0], c0[1] - c1[1]) < 1e-9);
+  // модель на расстоянии d от центра остаётся на том же расстоянии
+  const d = (u: typeof u0, i: number) => Math.hypot(u.models[i]!.at![0] - c0[0], u.models[i]!.at![1] - c0[1]);
+  assert.ok(Math.abs(d(u0, 0) - d(r, 0)) < 1e-9);
+  const nudged = moveModel(u0, u0.models[0]!.id, [10, 10]);
+  assert.deepEqual(rotateUnit(nudged, 0).models[0]!.at, [10, 10]);
+  const p = unitProfiles(u0)[0]!;
+  const big = setProfileBase(u0, p.profile, { customMm: 100 });
+  assert.equal(big.models.filter((m) => m.profile === p.profile).every((m) => m.customMm === 100), true);
+  assert.ok(big.placed);
+});
