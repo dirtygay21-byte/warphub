@@ -26,6 +26,9 @@ export type DndSchedule = {
 
 export class ScheduleError extends Error {}
 
+/** Обычный массив: драйвер БД отдаёт integer[] как Int32Array (map в строки там даёт 0, JSON — объект) */
+const list = <T>(a: ArrayLike<T> | null | undefined): T[] => Array.from(a ?? []);
+
 const TIME_ORDER = bookingOptions.dndTimePreferences.map((o) => o.value as string);
 
 function parseDate(value: unknown, field: string): Date {
@@ -53,8 +56,8 @@ export function parseSchedule(
     return { startsAt, endsAt, daysOfWeek: [], timesOfDay: [] };
   }
 
-  const days = input.daysOfWeek === undefined ? (prev?.daysOfWeek ?? []) : input.daysOfWeek;
-  const times = input.timesOfDay === undefined ? (prev?.timesOfDay ?? []) : input.timesOfDay;
+  const days = input.daysOfWeek === undefined ? list(prev?.daysOfWeek) : input.daysOfWeek;
+  const times = input.timesOfDay === undefined ? list(prev?.timesOfDay) : input.timesOfDay;
   if (!Array.isArray(days) || !days.every((d) => Number.isInteger(d) && d >= 1 && d <= 7)) {
     throw new ScheduleError('daysOfWeek must be numbers from 1 (Mon) to 7 (Sun)');
   }
@@ -71,9 +74,9 @@ export function parseSchedule(
 /** «пятница или суббота, вечер» / точная дата и время */
 export function scheduleLabel(s: Pick<DndSchedule, 'startsAt' | 'endsAt' | 'daysOfWeek' | 'timesOfDay'>): string {
   if (s.startsAt) return formatClubDateTime(s.startsAt, s.endsAt);
-  const days = s.daysOfWeek.map((d) => DND_WEEKDAYS.find((w) => w.value === d)?.label ?? String(d));
+  const days = list(s.daysOfWeek).map((d) => DND_WEEKDAYS.find((w) => w.value === d)?.label ?? String(d));
   const dayText = days.length > 1 ? `${days.slice(0, -1).join(', ')} или ${days.at(-1)}` : (days[0] ?? '—');
-  const times = s.timesOfDay.map((t) => dndTimePreferenceLabel(t).toLowerCase()).join(' или ');
+  const times = list(s.timesOfDay).map((t) => dndTimePreferenceLabel(t).toLowerCase()).join(' или ');
   return times ? `${dayText}, ${times}` : dayText;
 }
 
@@ -87,7 +90,7 @@ export function scheduleChanged(a: DndSchedule, b: DndSchedule): boolean {
   return (
     (a.startsAt?.getTime() ?? null) !== (b.startsAt?.getTime() ?? null) ||
     (a.endsAt?.getTime() ?? null) !== (b.endsAt?.getTime() ?? null) ||
-    a.daysOfWeek.join() !== b.daysOfWeek.join() ||
-    a.timesOfDay.join() !== b.timesOfDay.join()
+    list(a.daysOfWeek).join() !== list(b.daysOfWeek).join() ||
+    list(a.timesOfDay).join() !== list(b.timesOfDay).join()
   );
 }

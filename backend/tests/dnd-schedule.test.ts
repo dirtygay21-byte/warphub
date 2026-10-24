@@ -37,6 +37,12 @@ test('scheduleLabel: дни и время суток словами; точно�
   expect(scheduleLabel(exact)).toContain('18:00');
 });
 
+test('integer[] из БД приходит как Int32Array — подпись и правка без дней работают', () => {
+  const row = { startsAt: null, endsAt: null, daysOfWeek: Int32Array.from([5, 6]) as unknown as number[], timesOfDay: ['evening'] };
+  expect(scheduleLabel(row)).toBe('пятница или суббота, вечер');
+  expect(parseSchedule({}, row).daysOfWeek).toEqual([5, 6]);
+});
+
 test('gameStarted и scheduleChanged', () => {
   expect(gameStarted({ startsAt: null })).toBe(false);
   expect(gameStarted({ startsAt: new Date(Date.now() - 1000) })).toBe(true);
