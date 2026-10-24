@@ -11,6 +11,7 @@ import {
   type DndTrialRequest,
   type DndTrialStatus,
   type DndUser,
+  flexibleLabel,
 } from "@/apiUtils/dnd";
 import { formatClub, formatClubTimeRange } from "@/utils/clubTime";
 import { userLabel } from "@/utils/user";
@@ -74,7 +75,12 @@ export default function AdminDnd() {
 }
 
 const gameDateLabel = (game: AdminDndGame) =>
-  `${formatClub(game.startsAt, { weekday: "short", day: "numeric", month: "long" })} · ${formatClubTimeRange(game.startsAt, game.endsAt)}`;
+  game.startsAt
+    ? `${formatClub(game.startsAt, { weekday: "short", day: "numeric", month: "long" })} · ${formatClubTimeRange(game.startsAt, game.endsAt)}`
+    : `${flexibleLabel(game)} · время уточнит Мастер`;
+
+/** Игра без точного времени не уходит в прошлое сама — её закрывает или отменяет администратор */
+const notPast = (game: AdminDndGame, now: number) => !game.startsAt || new Date(game.startsAt).getTime() >= now;
 
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-white/10 text-white/70",
@@ -93,10 +99,11 @@ function GamesTab() {
 
   const games = gamesQuery.data ?? [];
   const now = useNow();
+  // сначала игры без точного времени, затем по началу
   const upcoming = games
-    .filter((game) => new Date(game.startsAt).getTime() >= now)
-    .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
-  const past = games.filter((game) => new Date(game.startsAt).getTime() < now);
+    .filter((game) => notPast(game, now))
+    .sort((a, b) => (a.startsAt ?? "").localeCompare(b.startsAt ?? ""));
+  const past = games.filter((game) => !notPast(game, now));
 
   return (
     <div>
@@ -338,7 +345,7 @@ function TrialsTab() {
     () =>
       (gamesQuery.data ?? []).filter(
         (game) =>
-          new Date(game.startsAt).getTime() > now &&
+          notPast(game, now) &&
           game.status !== "cancelled",
       ),
     [gamesQuery.data, now],

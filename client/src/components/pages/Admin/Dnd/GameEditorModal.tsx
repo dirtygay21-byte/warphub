@@ -2,6 +2,7 @@ import { uploadAdminFile } from "@/apiUtils/admin";
 import {
   createAdminDndGame,
   DND_GAME_STATUS_LABELS,
+  DND_WEEKDAY_OPTIONS,
   updateAdminDndGame,
   type AdminDndGame,
   type DndGamePayload,
@@ -11,7 +12,9 @@ import {
   ChoiceChips,
   Field,
   inputClassName,
+  MultiChoiceChips,
 } from "@/components/booking/FormControls";
+import { useBookingOptions } from "@/hooks/useBookingOptions";
 import { fromClubDatetimeLocal } from "@/utils/clubTime";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
@@ -27,8 +30,11 @@ import {
 const validateDraft = (draft: GameDraft): string | null => {
   if (!draft.title.trim()) return "Введите название";
   if (!draft.gameType.trim()) return "Укажите тип игры";
-  if (!draft.startsAt) return "Укажите дату и время начала";
-  if (draft.endsAt && draft.endsAt <= draft.startsAt) {
+  if (draft.timeMode === "flexible") {
+    if (!draft.daysOfWeek.length) return "Выберите хотя бы один день недели";
+    if (!draft.timesOfDay.length) return "Выберите время суток";
+  } else if (!draft.startsAt) return "Укажите дату и время начала";
+  else if (draft.endsAt && draft.endsAt <= draft.startsAt) {
     return "Окончание должно быть позже начала";
   }
   const capacity = Number(draft.capacity);
@@ -42,8 +48,19 @@ const draftToPayload = (draft: GameDraft): DndGamePayload => ({
   title: draft.title.trim(),
   description: draft.description.trim() || null,
   gameType: draft.gameType.trim(),
-  startsAt: fromClubDatetimeLocal(draft.startsAt),
-  endsAt: draft.endsAt ? fromClubDatetimeLocal(draft.endsAt) : null,
+  ...(draft.timeMode === "exact"
+    ? {
+        startsAt: fromClubDatetimeLocal(draft.startsAt),
+        endsAt: draft.endsAt ? fromClubDatetimeLocal(draft.endsAt) : null,
+        daysOfWeek: [],
+        timesOfDay: [],
+      }
+    : {
+        startsAt: null,
+        endsAt: null,
+        daysOfWeek: draft.daysOfWeek.map(Number).sort((a, b) => a - b),
+        timesOfDay: draft.timesOfDay,
+      }),
   capacity: Number(draft.capacity),
   imageUrl: draft.imageUrl || null,
   status: draft.status,
@@ -67,6 +84,7 @@ export function GameEditorModal({
   onSaved?: (game: AdminDndGame) => void;
 }) {
   const queryClient = useQueryClient();
+  const options = useBookingOptions();
   const [draft, setDraft] = useState<GameDraft>(
     () => initialDraft ?? (game ? gameToDraft(game) : emptyGameDraft()),
   );
@@ -183,6 +201,43 @@ export function GameEditorModal({
             />
           </Field>
 
+          <Field
+            label="Когда"
+            hint={
+              draft.timeMode === "flexible"
+                ? "Дни и примерное время — точное время Мастер согласует с игроками"
+                : undefined
+            }
+          >
+            <ChoiceChips
+              columns={2}
+              options={[
+                { value: "flexible", label: "Примерно" },
+                { value: "exact", label: "Точное время" },
+              ]}
+              value={draft.timeMode}
+              onChange={(timeMode) => set({ timeMode })}
+            />
+          </Field>
+
+          {draft.timeMode === "flexible" ? (
+            <>
+              <Field label="Дни недели" hint="Можно выбрать несколько">
+                <MultiChoiceChips
+                  options={DND_WEEKDAY_OPTIONS}
+                  values={draft.daysOfWeek}
+                  onChange={(daysOfWeek) => set({ daysOfWeek })}
+                />
+              </Field>
+              <Field label="Время суток" hint="Можно выбрать несколько">
+                <MultiChoiceChips
+                  options={options.dndTimePreferences}
+                  values={draft.timesOfDay}
+                  onChange={(timesOfDay) => set({ timesOfDay })}
+                />
+              </Field>
+            </>
+          ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Начало (время клуба)">
               <input
@@ -201,6 +256,7 @@ export function GameEditorModal({
               />
             </Field>
           </div>
+          )}
 
           <Field
             label="Мест всего"

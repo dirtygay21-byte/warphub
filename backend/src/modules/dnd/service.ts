@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, inArray, sql, sum } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, inArray, isNull, or, sql, sum } from 'drizzle-orm';
 import {
   bookingOptions,
   dndTimePreferenceLabel,
@@ -18,9 +18,9 @@ import {
   type DndTrialStatus,
 } from '../../db/schema';
 import { canBookDndSeats, dndAvailableSeats, formatLocalIso } from '../booking/rules';
+import { gameStarted, parseSchedule, scheduleChanged, scheduleLabel, ScheduleError, type DndSchedule } from './schedule';
 import {
   escapeHtml,
-  formatClubDateTime,
   formatUserName,
   notifyAdmins,
   notifyUser,
@@ -56,8 +56,13 @@ export type DndGameView = {
   title: string;
   description: string | null;
   gameType: string;
-  startsAt: string;
+  /** null — время примерное: дни недели и время суток (daysOfWeek, timesOfDay) */
+  startsAt: string | null;
   endsAt: string | null;
+  daysOfWeek: number[];
+  timesOfDay: string[];
+  /** «пятница или суббота, вечер» или точная дата и время */
+  scheduleLabel: string;
   capacity: number;
   occupied: number;
   available: number;
@@ -134,8 +139,11 @@ function toGameView(game: GameRow, occupied: number): DndGameView {
     title: game.title,
     description: game.description,
     gameType: game.gameType,
-    startsAt: formatLocalIso(game.startsAt),
+    startsAt: game.startsAt ? formatLocalIso(game.startsAt) : null,
     endsAt: game.endsAt ? formatLocalIso(game.endsAt) : null,
+    daysOfWeek: game.daysOfWeek,
+    timesOfDay: game.timesOfDay,
+    scheduleLabel: scheduleLabel(game),
     capacity: game.capacity,
     occupied,
     available,
@@ -143,7 +151,7 @@ function toGameView(game: GameRow, occupied: number): DndGameView {
     status: game.status as DndGameStatus,
     isBookable:
       game.status === 'open' &&
-      game.startsAt.getTime() > Date.now() &&
+      !gameStarted(game) &&
       available > 0,
   };
 }
@@ -223,13 +231,18 @@ function parseExperience(value: unknown, required: boolean): string | null {
   return value;
 }
 
-function parseDate(value: unknown, field: string): Date {
-  const date = typeof value === 'string' ? new Date(value) : null;
-  if (!date || Number.isNaN(date.getTime())) {
-    throw new DndError('INVALID_INPUT', `${field} must be a valid date`);
+function schedule(input: GameInput, prev?: DndSchedule): DndSchedule {
+  try {
+    return parseSchedule(input, prev);
+  } catch (e) {
+    if (e instanceof ScheduleError) throw new DndError('INVALID_INPUT', e.message);
+    throw e;
   }
-  return date;
 }
+
+/** Порядок игр: сначала с примерным временем (идут, пока открыты), затем по точному началу */
+const byStart = sql`${dndGamesTable.startsAt} asc nulls first`;
+const byStartDesc = sql`${dndGamesTable.startsAt} desc nulls first`;
 
 async function getGameRow(gameId: number): Promise<GameRow | undefined> {
   const [game] = await db
@@ -255,11 +268,8 @@ async function getUser(userId: string): Promise<UserInfo | undefined> {
   return user;
 }
 
-function gameLine(game: Pick<GameRow, 'title' | 'gameType' | 'startsAt' | 'endsAt'>) {
-  return `«${escapeHtml(game.title)}» (${escapeHtml(game.gameType)}) — ${formatClubDateTime(
-    game.startsAt,
-    game.endsAt,
-  )}`;
+function gameLine(game: Pick<GameRow, 'title' | 'gameType' | 'startsAt' | 'endsAt' | 'daysOfWeek' | 'timesOfDay'>) {
+  return `«${escapeHtml(game.title)}» (${escapeHtml(game.gameType)}) — ${scheduleLabel(game)}`;
 }
 
 // ----------------------------------------------------------------------------
@@ -273,10 +283,10 @@ export async function listPublicGames(): Promise<DndGameView[]> {
     .where(
       and(
         inArray(dndGamesTable.status, ['open', 'closed']),
-        gt(dndGamesTable.startsAt, new Date()),
+        or(isNull(dndGamesTable.startsAt), gt(dndGamesTable.startsAt, new Date())),
       ),
     )
-    .orderBy(asc(dndGamesTable.startsAt));
+    .orderBy(byStart);
 
   const occupancy = await getOccupancy(games.map((game) => game.id));
   return games.map((game) => toGameView(game, occupancy.get(game.id) ?? 0));
@@ -333,7 +343,7 @@ export async function bookDndGame(
     if (game.status !== 'open') {
       throw new DndError('GAME_NOT_OPEN', 'Booking for this game is closed');
     }
-    if (game.startsAt.getTime() <= Date.now()) {
+    if (gameStarted(game)) {
       throw new DndError('GAME_STARTED', 'This game has already started');
     }
 
@@ -392,7 +402,7 @@ export async function bookDndGame(
         gameLine(game),
         `Игрок: ${escapeHtml(user ? formatUserName(user) : '—')}`,
         `Мест: ${booking.quantity}`,
-        `Время удобно: ${booking.timeIsConvenient ? 'да' : 'нет'}`,
+        game.startsAt ? `Время удобно: ${booking.timeIsConvenient ? 'да' : 'нет'}` : 'Время примерное — свяжитесь с игроком и согласуйте детали',
         `Опыт: ${escapeHtml(experienceLabel(booking.experienceLevel))}`,
         `Занято: ${occupied}/${game.capacity}`,
       ].join('\n'),
@@ -421,7 +431,7 @@ export async function cancelDndBooking(
   if (!row || row.booking.status !== 'active') {
     throw new DndError('BOOKING_NOT_FOUND', 'Booking not found');
   }
-  if (row.game.startsAt.getTime() <= Date.now()) {
+  if (gameStarted(row.game)) {
     throw new DndError('GAME_STARTED', 'This game has already started');
   }
 
@@ -571,7 +581,7 @@ export async function getMyDnd(userId: string): Promise<MyDndView> {
     .from(dndGameBookingsTable)
     .innerJoin(dndGamesTable, eq(dndGameBookingsTable.gameId, dndGamesTable.id))
     .where(eq(dndGameBookingsTable.userId, userId))
-    .orderBy(desc(dndGamesTable.startsAt))
+    .orderBy(byStartDesc)
     .limit(50);
 
   const occupancy = await getOccupancy([
@@ -609,7 +619,7 @@ export async function listAllGames(): Promise<AdminDndGameView[]> {
   const games = await db
     .select()
     .from(dndGamesTable)
-    .orderBy(desc(dndGamesTable.startsAt));
+    .orderBy(byStartDesc);
 
   const ids = games.map((game) => game.id);
   const occupancy = await getOccupancy(ids);
@@ -661,6 +671,8 @@ export type GameInput = {
   gameType?: unknown;
   startsAt?: unknown;
   endsAt?: unknown;
+  daysOfWeek?: unknown;
+  timesOfDay?: unknown;
   capacity?: unknown;
   imageUrl?: unknown;
   status?: unknown;
@@ -682,14 +694,7 @@ function parseStatus(value: unknown): DndGameStatus {
 }
 
 export async function createGame(input: GameInput): Promise<AdminDndGameView> {
-  const startsAt = parseDate(input.startsAt, 'startsAt');
-  const endsAt =
-    input.endsAt === undefined || input.endsAt === null || input.endsAt === ''
-      ? null
-      : parseDate(input.endsAt, 'endsAt');
-  if (endsAt && endsAt <= startsAt) {
-    throw new DndError('INVALID_INPUT', 'endsAt must be after startsAt');
-  }
+  const when = schedule(input);
 
   const [game] = await db
     .insert(dndGamesTable)
@@ -697,8 +702,7 @@ export async function createGame(input: GameInput): Promise<AdminDndGameView> {
       title: requiredText(input.title, 'title', 120),
       description: optionalText(input.description, 'description', 4000),
       gameType: requiredText(input.gameType, 'gameType', 60),
-      startsAt,
-      endsAt,
+      ...when,
       capacity: parseCapacity(input.capacity),
       imageUrl: optionalText(input.imageUrl, 'imageUrl', 1000),
       status: input.status === undefined ? 'open' : parseStatus(input.status),
@@ -721,19 +725,7 @@ export async function updateGame(
   const existing = await getGameRow(gameId);
   if (!existing) throw new DndError('GAME_NOT_FOUND', 'Game not found');
 
-  const startsAt =
-    input.startsAt === undefined
-      ? existing.startsAt
-      : parseDate(input.startsAt, 'startsAt');
-  const endsAt =
-    input.endsAt === undefined
-      ? existing.endsAt
-      : input.endsAt === null || input.endsAt === ''
-        ? null
-        : parseDate(input.endsAt, 'endsAt');
-  if (endsAt && endsAt <= startsAt) {
-    throw new DndError('INVALID_INPUT', 'endsAt must be after startsAt');
-  }
+  const when = schedule(input, existing);
 
   const capacity =
     input.capacity === undefined ? existing.capacity : parseCapacity(input.capacity);
@@ -765,8 +757,7 @@ export async function updateGame(
         input.gameType === undefined
           ? existing.gameType
           : requiredText(input.gameType, 'gameType', 60),
-      startsAt,
-      endsAt,
+      ...when,
       capacity,
       imageUrl:
         input.imageUrl === undefined
@@ -777,23 +768,23 @@ export async function updateGame(
     .where(eq(dndGamesTable.id, gameId))
     .returning();
 
-  const timeChanged =
-    existing.startsAt.getTime() !== game!.startsAt.getTime() ||
-    (existing.endsAt?.getTime() ?? null) !== (game!.endsAt?.getTime() ?? null);
+  const timeChanged = scheduleChanged(existing, game!);
   const cancelled = existing.status !== 'cancelled' && game!.status === 'cancelled';
+  // не беспокоим игроков из-за правок давно прошедшей игры (примерная — не прошла, пока не закрыта)
+  const recent = !game!.startsAt || game!.startsAt.getTime() > Date.now() - 86_400_000;
 
-  if ((timeChanged || cancelled) && game!.startsAt.getTime() > Date.now() - 86_400_000) {
+  if ((timeChanged || cancelled) && recent) {
     void notifyGamePlayers(gameId, cancelled
       ? [
           '❌ <b>Игра D&D отменена</b>',
-          `«${escapeHtml(game!.title)}» — ${formatClubDateTime(existing.startsAt, existing.endsAt)}`,
+          `«${escapeHtml(game!.title)}» — ${scheduleLabel(existing)}`,
           'Приносим извинения. Следите за новыми играми в приложении.',
         ].join('\n')
       : [
           '🕒 <b>Игра D&D перенесена</b>',
           `«${escapeHtml(game!.title)}»`,
-          `Было: ${formatClubDateTime(existing.startsAt, existing.endsAt)}`,
-          `Стало: ${formatClubDateTime(game!.startsAt, game!.endsAt)}`,
+          `Было: ${scheduleLabel(existing)}`,
+          `Стало: ${scheduleLabel(game!)}`,
           'Если новое время не подходит — отмените запись в разделе «Мои записи».',
         ].join('\n'));
   }

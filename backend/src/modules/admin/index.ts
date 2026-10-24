@@ -65,8 +65,10 @@ const dndGameBody = t.Object({
   gameType: t.Optional(
     t.String({ description: 'Тип игры: «Пробная игра», «One-shot» …' }),
   ),
-  startsAt: t.Optional(t.String({ description: 'Начало (ISO 8601)' })),
+  startsAt: t.Optional(t.Nullable(t.String({ description: 'Точное начало (ISO 8601); null — время примерное' }))),
   endsAt: t.Optional(t.Nullable(t.String({ description: 'Окончание (ISO 8601)' }))),
+  daysOfWeek: t.Optional(t.Array(t.Integer({ minimum: 1, maximum: 7 }), { description: 'Примерное время: дни недели, 1 — пн … 7 — вс' })),
+  timesOfDay: t.Optional(t.Array(t.String(), { description: 'Примерное время: morning / afternoon / evening' })),
   capacity: t.Optional(t.Number({ minimum: 1, description: 'Мест всего' })),
   imageUrl: t.Optional(t.Nullable(t.String())),
   status: t.Optional(
