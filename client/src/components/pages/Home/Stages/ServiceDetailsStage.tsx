@@ -1,6 +1,7 @@
 import { createBooking, detailsKindForSlug } from "@/apiUtils/booking";
 import { getDisciplines, getServiceById } from "@/apiUtils/disciplines";
 import { FieldLabel, NumberChips } from "@/components/booking/FormControls";
+import { TimeWheel } from "@/components/booking/TimeWheel";
 import { PaintingForm, PlayerInfoForm } from "@/components/booking/PlayerForms";
 import {
   emptyPaintingForm,
@@ -19,7 +20,6 @@ import { formatSelectedDate } from "@/utils/date";
 import { s3Url } from "@/utils/s3utils";
 import { getSlotEnd, getStartTimeOptions, getWindowLimit, hoursLabel, minFreeSeats } from "@/utils/slots";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import clsx from "clsx";
 import { CalendarDays, Clock3, Dice6, Swords, UsersRound } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
@@ -85,15 +85,13 @@ export default function ServiceDetailsStage() {
 
   const [chosenStart, setChosenStart] = useState<string | null>(null);
 
-  // Присоединение — время игры фиксировано; посещение клуба — первое доступное
+  // Присоединение — время игры фиксировано; иначе — время с барабана (B2), по умолчанию первое доступное
   const startsAt =
     selectedSlot?.kind === "join"
       ? selectedSlot.startsAt
-      : isClubVisit
-        ? (timeOptions[0] ?? null)
-        : chosenStart && timeOptions.includes(chosenStart)
-          ? chosenStart
-          : null;
+      : chosenStart && timeOptions.includes(chosenStart)
+        ? chosenStart
+        : (timeOptions[0] ?? null);
   // B1: конец — полная длительность или раньше, если дальше стол/места заняты; присоединение — время сессии
   const endOf = (start: string) =>
     selectedSlot?.kind === "join"
@@ -249,40 +247,29 @@ export default function ServiceDetailsStage() {
             </div>
           )}
 
-          {!isJoin && !isClubVisit && (
+          {!isJoin && (
             <div>
-              <FieldLabel>Время начала</FieldLabel>
+              <FieldLabel>{isClubVisit ? "Время прихода" : "Время начала"}</FieldLabel>
               {timeOptions.length === 0 ? (
                 <p className="text-sm text-white/55">
                   В этом окне не помещается запись. Вернитесь и выберите другое время.
                 </p>
               ) : (
-                <div className="flex flex-wrap gap-2">
-                  {timeOptions.map((option) => {
-                    const short = minutesOf(option, endOf(option)) < durationMinutes;
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        aria-pressed={startsAt === option}
-                        onClick={() => setChosenStart(option)}
-                        className={clsx(
-                          "rounded-lg border px-3 py-2 text-sm font-semibold transition-colors",
-                          startsAt === option
-                            ? short
-                              ? "border-red-400 bg-red-400 text-black"
-                              : "border-accent bg-accent text-accent-foreground"
-                            : short
-                              ? "border-red-400/60 bg-red-400/10 text-red-200 active:bg-red-400/20"
-                              : "border-white/10 bg-white/5 text-white active:bg-white/10",
-                        )}
-                      >
-                        {formatClubTime(option)}
-                        {short && <span className="block text-[11px] font-medium">до {formatClubTime(endOf(option))}</span>}
-                      </button>
-                    );
-                  })}
-                </div>
+                <>
+                  <TimeWheel
+                    options={timeOptions}
+                    value={startsAt}
+                    onChange={setChosenStart}
+                    format={formatClubTime}
+                    short={(option) => minutesOf(option, endOf(option)) < durationMinutes}
+                    hint={(option) => {
+                      const end = endOf(option);
+                      const minutes = minutesOf(option, end);
+                      return minutes < durationMinutes ? `до ${formatClubTime(end)} · только ${hoursLabel(minutes)}` : `до ${formatClubTime(end)}`;
+                    }}
+                  />
+                  <p className="mt-1.5 text-xs text-white/50">Прокрутите вверх или вниз, чтобы выбрать время.</p>
+                </>
               )}
               {showErrors && timeError && (
                 <p className="mt-2 text-sm text-red-300">{timeError}</p>
