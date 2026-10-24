@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState, type MouseEvent, type PointerEvent } from 'react';
 import type { BfDeployment, BfLayout } from '../../data';
+import type { ComputedRoster, DataLookup } from '../../engine/compute';
 import type { Roster } from '../../engine/types';
 import { haptic } from '../../telegram';
 import {
@@ -37,6 +38,7 @@ import {
 import { BattleMap } from '../Battlefield';
 import { Button, IconButton, Segmented } from '../kit';
 import { cx } from '../util';
+import { UnitInfo } from './UnitInfo';
 
 const ZOOMS = [1, 1.5, 2, 3];
 const SIDE_COLOR: Record<Side, string> = { attacker: '#f87171', defender: '#60a5fa' };
@@ -68,6 +70,8 @@ const undisp = ([dx, dy]: Pt): Pt => [dy, 44 - dx];
  */
 export function Board({
   roster,
+  cr,
+  L,
   layout,
   dep,
   side,
@@ -76,6 +80,8 @@ export function Board({
   onBack,
 }: {
   roster: Roster;
+  cr: ComputedRoster;
+  L: DataLookup;
   layout: BfLayout;
   dep: BfDeployment;
   side: Side;
@@ -93,6 +99,8 @@ export function Board({
   const [ranges, setRanges] = useState(false);
   const [ruler, setRuler] = useState<{ a: RulerEnd | null; b: RulerEnd | null }>({ a: null, b: null });
   const [pair, setPair] = useState<string[]>([]);
+  const [infoFor, setInfoFor] = useState<string | null>(null);
+  const infoUnit = units.find((u) => u.uid === infoFor) ?? null;
   const endDrag = useRef<{ which: 'a' | 'b'; pointerId: number } | null>(null);
   const sel = units.find((u) => u.uid === selected) ?? null;
   const placedCount = units.filter((u) => u.placed).length;
@@ -254,6 +262,7 @@ export function Board({
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-app">
+      {infoUnit && <UnitInfo unit={infoUnit} cr={cr} roster={roster} L={L} onClose={() => setInfoFor(null)} />}
       <header className="flex items-center gap-2 px-3 pb-2 pt-3">
         <IconButton icon="back" label="Назад" onClick={onBack} className="size-9" />
         <div className="min-w-0 flex-1">
@@ -376,6 +385,11 @@ export function Board({
             onDone={() => setSelected(null)}
             info={info}
             side={side}
+            stats={(() => {
+              const st = cr.byUid.get(sel.uid)?.ds?.stats[0];
+              return st ? `M ${st.M} · T ${st.T} · Sv ${st.Sv}${st.inv ? ` (${st.inv.replace(/\+/g, '')}++)` : ''} · W ${st.W} · Ld ${st.Ld} · OC ${st.OC}` : null;
+            })()}
+            onInfo={() => setInfoFor(sel.uid)}
           />
         ) : (
           <UnitTray units={units} onSelect={(uid) => (haptic.select(), setSelected(uid))} />
@@ -480,6 +494,8 @@ function UnitPanel({
   onDone,
   info,
   side,
+  stats,
+  onInfo,
 }: {
   unit: TAUnit;
   n: number;
@@ -495,6 +511,9 @@ function UnitPanel({
     enemy: { d: number } | null;
   } | null;
   side: Side;
+  /** «M 6″ · T 4 · …» первого профиля */
+  stats: string | null;
+  onInfo: () => void;
 }) {
   const [bases, setBases] = useState(false);
   const profiles = useMemo(() => unitProfiles(unit), [unit]);
@@ -520,6 +539,10 @@ function UnitPanel({
         </div>
         <IconButton icon="close" label="Готово" onClick={onDone} className="size-8" />
       </div>
+      <button type="button" onClick={onInfo} className="flex w-full items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-left text-xs active:bg-white/10">
+        <span className="min-w-0 flex-1 truncate tabular-nums text-white/80">{stats ?? 'Характеристики'}</span>
+        <span className="shrink-0 font-semibold text-accent">Характеристики ›</span>
+      </button>
       {info && (
         <div className="grid grid-cols-3 gap-1.5 text-center text-[11px]">
           <div className={cx('rounded-lg border px-1.5 py-1', info.objective?.inRange ? 'border-[#4ade80]/50 text-[#4ade80]' : 'border-white/10')}>

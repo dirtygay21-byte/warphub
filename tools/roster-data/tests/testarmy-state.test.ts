@@ -70,3 +70,16 @@ test('rotateUnit: поворот вокруг центра, ручные сдв�
   assert.equal(big.models.filter((m) => m.profile === p.profile).every((m) => m.customMm === 100), true);
   assert.ok(big.placed);
 });
+
+test('restoreUnits: позиции и настройки возвращаются по uid и id модели; новые отряды — не выставлены', async () => {
+  const { restoreUnits, parseSave } = await import('../../../client/src/features/roster/testarmy');
+  const fresh = buildUnits(computeRoster(roster(), L));
+  const placed = [{ ...placeUnit(fresh[0]!, [20, 20], 'arc'), gap: 1 }];
+  const back = restoreUnits(fresh, placed);
+  assert.deepEqual(back[0]!.models.map((m) => m.at), placed[0]!.models.map((m) => m.at));
+  assert.equal(back[0]!.formation, 'arc');
+  assert.equal(back[0]!.placed, true);
+  assert.equal(restoreUnits(fresh, [])[0]!.placed, false);
+  assert.equal(parseSave('{битое'), null);
+  assert.equal(parseSave(JSON.stringify({ v: 1, rosterId: 'r', layoutId: 'l', side: 'attacker', savedAt: '', units: [] }))!.layoutId, 'l');
+});

@@ -178,3 +178,36 @@ export function unitProfiles(u: TAUnit): { profile: string; count: number; optio
   }
   return [...out.values()];
 }
+
+/** Сохранённая расстановка (на телефоне, по ростеру). */
+export type TASave = { v: 1; rosterId: string; layoutId: string; side: Side; savedAt: string; units: TAUnit[] };
+
+/**
+ * Вернуть сохранённую расстановку на отряды из текущего ростера: позиции, построение, поворот, зазор и базы — там, где
+ * отряд (uid) и модель (id и профиль) совпадают. Изменённый с тех пор ростер: новые отряды — не выставлены, удалённые — пропадают.
+ */
+export function restoreUnits(fresh: TAUnit[], saved: readonly TAUnit[]): TAUnit[] {
+  const byUid = new Map(saved.map((u) => [u.uid, u]));
+  return fresh.map((u) => {
+    const s = byUid.get(u.uid);
+    if (!s) return u;
+    const byId = new Map(s.models.map((m) => [m.id, m]));
+    const models = u.models.map((m) => {
+      const o = byId.get(m.id);
+      if (!o || o.profile !== m.profile) return m;
+      return { ...m, at: o.at, pick: o.pick < m.options.length ? o.pick : 0, customMm: o.customMm };
+    });
+    const placed = models.some((m) => m.at);
+    return { ...u, models, formation: s.formation, angle: s.angle, gap: s.gap, placed };
+  });
+}
+
+/** Прочитать сохранение (повреждённое — null). */
+export function parseSave(text: string | null): TASave | null {
+  try {
+    const v = JSON.parse(text ?? 'null') as TASave | null;
+    return v && v.v === 1 && Array.isArray(v.units) && typeof v.layoutId === 'string' ? v : null;
+  } catch {
+    return null;
+  }
+}

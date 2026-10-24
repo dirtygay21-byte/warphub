@@ -1,15 +1,39 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { loadBattlefield, loadFaction, type BattlefieldData } from '../../data';
-import { computeRoster, makeLookup } from '../../engine/compute';
+import { computeRoster, makeLookup, type ComputedRoster, type DataLookup } from '../../engine/compute';
 import type { DataIndex, Roster } from '../../engine/types';
-import { pushOverlay } from '../../telegram';
-import { buildUnits, type Side, type TAUnit } from '../../testarmy';
+import { pushOverlay, tg } from '../../telegram';
+import { buildUnits, parseSave, restoreUnits, type Side, type TASave, type TAUnit } from '../../testarmy';
 import { BattleMap } from '../Battlefield';
 import { Button, IconButton, Segmented } from '../kit';
 import { cx, fmtPts } from '../util';
 import { Board } from './Board';
 
 const LETTERS = ['A', 'B', 'C'];
+
+// расстановка сохраняется на телефоне: своя у аккаунта Telegram и ростера (этап 6)
+const saveKey = (rosterId: string) => `warphub.testarmy.v1${tg?.initDataUnsafe.user?.id ? `.${tg.initDataUnsafe.user.id}` : ''}.${rosterId}`;
+const readSave = (rosterId: string): TASave | null => {
+  try {
+    return parseSave(localStorage.getItem(saveKey(rosterId)));
+  } catch {
+    return null;
+  }
+};
+const writeSave = (s: TASave) => {
+  try {
+    localStorage.setItem(saveKey(s.rosterId), JSON.stringify(s));
+  } catch {
+    /* хранилище недоступно — расстановка живёт до закрытия экрана */
+  }
+};
+const dropSave = (rosterId: string) => {
+  try {
+    localStorage.removeItem(saveKey(rosterId));
+  } catch {
+    /* хранилище недоступно */
+  }
+};
 
 /**
  * Test Army (24.10.2026): ростер → поле боя (пара типов армий и раскладка A/B/C) и сторона → стол, где модели ростера —
@@ -22,6 +46,7 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
   const [layoutId, setLayoutId] = useState<string | null>(null);
   const [side, setSide] = useState<Side>('attacker');
   const [units, setUnits] = useState<TAUnit[] | null>(null);
+  const [ctx, setCtx] = useState<{ cr: ComputedRoster; L: DataLookup } | null>(null);
   const [step, setStep] = useState<'roster' | 'field' | 'board'>(initialRosterId ? 'field' : 'roster');
 
   useEffect(() => {
@@ -37,16 +62,30 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
     return undefined;
   }, [step, initialRosterId]);
 
-  const deploy = (id: string) => {
+  // saved — продолжить сохранённую расстановку; иначе новая (сохранение этого ростера заменяется)
+  const deploy = (id: string, s: Side, saved?: TASave) => {
     if (!roster) return;
     setLayoutId(id);
+    setSide(s);
     setUnits(null);
     setStep('board');
+    if (!saved) dropSave(roster.id);
     loadFaction(roster.factionId).then(
-      (f) => setUnits(buildUnits(computeRoster(roster, makeLookup(f)))),
+      (f) => {
+        const L = makeLookup(f);
+        const cr = computeRoster(roster, L);
+        const fresh = buildUnits(cr);
+        setCtx({ cr, L });
+        setUnits(saved ? restoreUnits(fresh, saved.units) : fresh);
+      },
       (e) => setError(String(e?.message ?? e)),
     );
   };
+
+  // автосохранение после каждого изменения расстановки
+  useEffect(() => {
+    if (step === 'board' && roster && layoutId && units) writeSave({ v: 1, rosterId: roster.id, layoutId, side, savedAt: new Date().toISOString(), units });
+  }, [step, roster, layoutId, side, units]);
 
   if (error)
     return (
@@ -64,13 +103,14 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
   const layout = bf.layouts.find((l) => l.id === layoutId) ?? null;
   if (step === 'board' && roster && layout) {
     const dep = bf.deployments.find((d) => d.id === layout.deployment)!;
-    if (!units) return <Spinner full />;
-    return <Board roster={roster} layout={layout} dep={dep} side={side} units={units} onUnits={setUnits} onBack={() => setStep('field')} />;
+    if (!units || !ctx) return <Spinner full />;
+    return <Board roster={roster} cr={ctx.cr} L={ctx.L} layout={layout} dep={dep} side={side} units={units} onUnits={setUnits} onBack={() => setStep('field')} />;
   }
 
   if (step === 'field' && roster)
     return (
       <Shell onBack={initialRosterId ? onBack : () => setStep('roster')}>
+        <SavedCard bf={bf} rosterId={roster.id} onContinue={(s) => deploy(s.layoutId, s.side, s)} />
         <FieldPicker
           bf={bf}
           roster={roster}
@@ -78,7 +118,7 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
           onLayout={setLayoutId}
           side={side}
           onSide={setSide}
-          onDeploy={deploy}
+          onDeploy={(id) => deploy(id, side)}
         />
       </Shell>
     );
@@ -105,6 +145,29 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
         ))}
       </ul>
     </Shell>
+  );
+}
+
+/** Сохранённая расстановка ростера: раскладка, сторона, сколько отрядов на столе, когда — «Продолжить». */
+function SavedCard({ bf, rosterId, onContinue }: { bf: BattlefieldData; rosterId: string; onContinue: (s: TASave) => void }) {
+  const [saved] = useState(() => readSave(rosterId));
+  if (!saved) return null;
+  const layout = bf.layouts.find((l) => l.id === saved.layoutId);
+  if (!layout) return null;
+  const dep = bf.deployments.find((d) => d.id === layout.deployment);
+  const placed = saved.units.filter((u) => u.placed).length;
+  const when = new Date(saved.savedAt).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  return (
+    <div className="mb-4 rounded-2xl border border-accent/40 bg-accent/10 p-3">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">Сохранённая расстановка · {when}</p>
+      <p className="mt-1 text-sm">
+        {dep?.nameRu ?? '—'} · раскладка {LETTERS[layout.variant - 1] ?? layout.variant} · {saved.side === 'attacker' ? 'атакующий' : 'защитник'} · на столе {placed} из {saved.units.length}
+      </p>
+      <Button variant="primary" className="mt-2 w-full" onClick={() => onContinue(saved)}>
+        Продолжить расстановку
+      </Button>
+      <p className="mt-1.5 text-[11px] text-white/45">Новая расстановка ниже заменит сохранённую.</p>
+    </div>
   );
 }
 
