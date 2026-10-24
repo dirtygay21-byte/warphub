@@ -17,6 +17,18 @@ import {
   setProfileBase,
   unitCenter,
   unitProfiles,
+  fmtInches,
+  nearestObjective,
+  objectiveRadius,
+  OBJECTIVE_RANGE,
+  OBJECTIVE_RULE_SOURCE,
+  resolveRuler,
+  snapEnd,
+  unitToUnit,
+  unitToZone,
+  closestPoints,
+  type Placed,
+  type RulerEnd,
   type Formation,
   type Pt,
   type Side,
@@ -35,6 +47,13 @@ const GAPS = [0, 0.5, 1, 2];
 const LONG_PRESS_MS = 450;
 /** сдвиг пальца (дюймы поля), после которого это перетаскивание, а не нажатие */
 const DRAG_START = 0.15;
+
+type Tool = 'move' | 'ruler' | 'units';
+const TOOLS: { id: Tool; label: string }[] = [
+  { id: 'move', label: 'Двигать' },
+  { id: 'ruler', label: 'Линейка' },
+  { id: 'units', label: 'Отряд ↔ отряд' },
+];
 
 type Drag = { uid: string; modelId: string | null; start: Pt; orig: TAUnit; moved: boolean; timer: number | undefined; pointerId: number };
 
@@ -70,6 +89,11 @@ export function Board({
   const drag = useRef<Drag | null>(null);
   const justDragged = useRef(false);
   const [single, setSingle] = useState<string | null>(null);
+  const [tool, setTool] = useState<Tool>('move');
+  const [ranges, setRanges] = useState(false);
+  const [ruler, setRuler] = useState<{ a: RulerEnd | null; b: RulerEnd | null }>({ a: null, b: null });
+  const [pair, setPair] = useState<string[]>([]);
+  const endDrag = useRef<{ which: 'a' | 'b'; pointerId: number } | null>(null);
   const sel = units.find((u) => u.uid === selected) ?? null;
   const placedCount = units.filter((u) => u.placed).length;
 
@@ -95,12 +119,56 @@ export function Board({
     return set;
   }, [units, zone]);
 
-  // нажатие на поле: выбранный отряд встаёт центром в эту точку (не после перетаскивания)
+  // все базы на столе (для линейки и расстояний)
+  const allBases = useMemo(() => {
+    const out: { modelId: string; uid: string; base: Placed }[] = [];
+    for (const u of units) placedBases(u).forEach((b, i) => b && out.push({ modelId: u.models[i]!.id, uid: u.uid, base: b }));
+    return out;
+  }, [units]);
+  const baseOf = (id: string) => allBases.find((x) => x.modelId === id)?.base ?? null;
+  // привязка линейки: центры целей и углы участков террейна
+  const snapPoints = useMemo<Pt[]>(
+    () => [...layout.objectives.map((o) => [o.x, o.y] as Pt), ...layout.pieces.filter((pc) => pc.kind === 'area').flatMap((pc) => pc.poly as Pt[])],
+    [layout],
+  );
+  const rulerLine = ruler.a && ruler.b ? resolveRuler(ruler.a, ruler.b, baseOf) : null;
+  const rulerA = ruler.a ? (ruler.a.kind === 'pt' ? ruler.a.at : (() => { const b = baseOf(ruler.a.modelId); return b ? ([b.x, b.y] as Pt) : null; })()) : null;
+  const unitsOf = (uid: string) => allBases.filter((x) => x.uid === uid).map((x) => x.base);
+  const pairLine = (() => {
+    if (pair.length < 2) return null;
+    const a = unitsOf(pair[0]!);
+    const b = unitsOf(pair[1]!);
+    if (!a.length || !b.length) return null;
+    const r = unitToUnit(a, b);
+    const [from, to] = closestPoints(a[r.i]!, b[r.j]!);
+    return { from, to, d: r.d };
+  })();
+  // выбранный отряд: до ближайшей цели и до зон деплоя
+  const selBases = sel ? unitsOf(sel.uid) : [];
+  const enemyZone = dep.zones.find((z) => z.player !== side)?.poly ?? null;
+  const info = selBases.length
+    ? {
+        objective: nearestObjective(selBases, layout.objectives),
+        own: zone ? unitToZone(selBases, zone) : null,
+        enemy: enemyZone ? unitToZone(selBases, enemyZone) : null,
+      }
+    : null;
+
+  // нажатие на поле: линейка — конец; иначе выбранный отряд встаёт центром в эту точку (не после перетаскивания)
   const onTap = (e: MouseEvent<SVGSVGElement>) => {
     if (justDragged.current) {
       justDragged.current = false;
       return;
     }
+    if (tool === 'ruler') {
+      const p = toBoard(e.clientX, e.clientY);
+      if (!p) return;
+      const end = snapEnd(clampToBoard(p), allBases, snapPoints);
+      setRuler((r) => (!r.a || r.b ? { a: end, b: null } : { a: r.a, b: end }));
+      haptic.select();
+      return;
+    }
+    if (tool === 'units') return;
     const p = sel && toBoard(e.clientX, e.clientY);
     if (!sel || !p) return;
     update(placeUnit(sel, clampToBoard(p)));
@@ -109,6 +177,14 @@ export function Board({
 
   // перетаскивание: палец на базе — весь отряд; удержание без движения — одна модель
   const onDown = (e: PointerEvent, unit: TAUnit, modelId: string) => {
+    // линейка: нажатие на базу обрабатывает onTap (привязка к базе)
+    if (tool === 'ruler') return;
+    if (tool === 'units') {
+      e.stopPropagation();
+      setPair((p) => (p.length >= 2 || p[0] === unit.uid ? [unit.uid] : [...p, unit.uid]));
+      haptic.select();
+      return;
+    }
     const p = toBoard(e.clientX, e.clientY);
     if (!p) return;
     e.stopPropagation();
@@ -124,7 +200,20 @@ export function Board({
     drag.current = d;
     svg.current?.setPointerCapture(e.pointerId);
   };
+  const onEndDown = (e: PointerEvent, which: 'a' | 'b') => {
+    e.stopPropagation();
+    // нажатие на конец линейки не ставит новую точку
+    justDragged.current = true;
+    endDrag.current = { which, pointerId: e.pointerId };
+    svg.current?.setPointerCapture(e.pointerId);
+  };
   const onMove = (e: PointerEvent) => {
+    const ed = endDrag.current;
+    if (ed && e.pointerId === ed.pointerId) {
+      const p = toBoard(e.clientX, e.clientY);
+      if (p) setRuler((r) => ({ ...r, [ed.which]: snapEnd(clampToBoard(p), allBases, snapPoints) }));
+      return;
+    }
     const d = drag.current;
     if (!d || e.pointerId !== d.pointerId) return;
     const p = toBoard(e.clientX, e.clientY);
@@ -140,10 +229,19 @@ export function Board({
     } else update(moveUnit(d.orig, dx, dy));
   };
   const onUp = (e: PointerEvent) => {
+    if (endDrag.current?.pointerId === e.pointerId) {
+      endDrag.current = null;
+      // флаг гасит только «клик» сразу после отпускания
+      window.setTimeout(() => (justDragged.current = false), 0);
+      return;
+    }
     const d = drag.current;
     if (!d || e.pointerId !== d.pointerId) return;
     window.clearTimeout(d.timer);
-    if (d.moved) justDragged.current = true;
+    if (d.moved) {
+      justDragged.current = true;
+      window.setTimeout(() => (justDragged.current = false), 0);
+    }
     drag.current = null;
     setSingle(null);
   };
@@ -181,15 +279,89 @@ export function Board({
             onPointerUp={onUp}
             onPointerCancel={onUp}
           >
+            {ranges &&
+              layout.objectives.map((o, i) => {
+                const [x, y] = disp([o.x, o.y]);
+                return <circle key={i} cx={x} cy={y} r={objectiveRadius + OBJECTIVE_RANGE} fill="#eaff44" fillOpacity={0.06} stroke="#eaff44" strokeOpacity={0.7} strokeWidth={0.1} strokeDasharray="0.5 0.35" pointerEvents="none" />;
+              })}
             {units.map((u, i) => (
-              <UnitShapes key={u.uid} unit={u} n={i + 1} color={SIDE_COLOR[side]} active={u.uid === selected} single={single} outside={outside} onDown={onDown} />
+              <UnitShapes
+                key={u.uid}
+                unit={u}
+                n={i + 1}
+                color={SIDE_COLOR[side]}
+                active={tool === 'units' ? pair.includes(u.uid) : u.uid === selected}
+                single={single}
+                outside={outside}
+                passThrough={tool === 'ruler'}
+                onDown={onDown}
+              />
             ))}
+            {tool === 'move' && info?.objective && <Measure from={info.objective.from} to={info.objective.to} d={info.objective.d} color={info.objective.inRange ? '#4ade80' : ACCENT} dashed />}
+            {tool === 'move' && info?.enemy && info.enemy.d > 0 && <Measure from={info.enemy.from} to={info.enemy.to} d={info.enemy.d} color={side === 'attacker' ? SIDE_COLOR.defender : SIDE_COLOR.attacker} dashed />}
+            {tool === 'units' && pairLine && <Measure from={pairLine.from} to={pairLine.to} d={pairLine.d} color="#fff" />}
+            {tool === 'ruler' && rulerLine && <Measure from={rulerLine.from} to={rulerLine.to} d={rulerLine.d} color="#fff" handles onHandle={onEndDown} />}
+            {tool === 'ruler' && !rulerLine && rulerA && <circle cx={disp(rulerA)[0]} cy={disp(rulerA)[1]} r={0.35} fill="#fff" pointerEvents="none" />}
           </svg>
         </div>
       </div>
 
       <div className="border-t border-white/10 bg-app-elevated px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5">
-        {sel ? (
+        <div className="mb-2 flex flex-wrap items-center gap-1.5">
+          {TOOLS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => (haptic.select(), setTool(t.id), setRuler({ a: null, b: null }), setPair([]))}
+              className={cx('rounded-lg border px-2.5 py-1.5 text-xs font-semibold', tool === t.id ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 bg-white/[0.04] active:bg-white/10')}
+            >
+              {t.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => setRanges((v) => !v)}
+            aria-pressed={ranges}
+            className={cx('rounded-lg border px-2.5 py-1.5 text-xs font-semibold', ranges ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 bg-white/[0.04] active:bg-white/10')}
+          >
+            Дальность целей
+          </button>
+        </div>
+        {ranges && <p className="mb-1.5 text-[10.5px] text-white/40">Круги: {OBJECTIVE_RULE_SOURCE}. Для целей в участке террейна правило другое; высота на карте не учитывается.</p>}
+        {tool === 'ruler' ? (
+          <div className="flex items-center gap-2 text-sm">
+            <p className="min-w-0 flex-1 text-white/70">
+              {rulerLine ? (
+                <>
+                  Расстояние: <b className="text-white">{fmtInches(rulerLine.d)}</b>
+                  <span className="block text-[11px] text-white/45">Концы можно тянуть. У базы линейка меряет от её края. Новое нажатие — новая линейка.</span>
+                </>
+              ) : ruler.a ? (
+                'Нажмите вторую точку.'
+              ) : (
+                'Нажмите первую точку: на поле, на базу (от края), рядом с целью или углом террейна — привяжется.'
+              )}
+            </p>
+            {ruler.a && (
+              <Button className="text-xs" onClick={() => setRuler({ a: null, b: null })}>
+                Сброс
+              </Button>
+            )}
+          </div>
+        ) : tool === 'units' ? (
+          <p className="text-sm text-white/70">
+            {pairLine ? (
+              <>
+                Между отрядами {units.findIndex((u) => u.uid === pair[0]) + 1} и {units.findIndex((u) => u.uid === pair[1]) + 1}: <b className="text-white">{fmtInches(pairLine.d)}</b>
+                <span className="block text-[11px] text-white/45">Между ближайшими базами, от края до края. Нажмите другой отряд — новая пара.</span>
+              </>
+            ) : pair.length === 1 ? (
+              'Нажмите второй отряд.'
+            ) : (
+              'Нажмите на базу первого отряда, затем второго.'
+            )}
+          </p>
+        ) : sel ? (
           <UnitPanel
             unit={sel}
             n={units.indexOf(sel) + 1}
@@ -202,6 +374,8 @@ export function Board({
             onBase={(profile, change) => update(setProfileBase(sel, profile, change))}
             onRemove={() => update(removeUnit(sel))}
             onDone={() => setSelected(null)}
+            info={info}
+            side={side}
           />
         ) : (
           <UnitTray units={units} onSelect={(uid) => (haptic.select(), setSelected(uid))} />
@@ -219,6 +393,7 @@ function UnitShapes({
   active,
   single,
   outside,
+  passThrough,
   onDown,
 }: {
   unit: TAUnit;
@@ -227,6 +402,8 @@ function UnitShapes({
   active: boolean;
   single: string | null;
   outside: Set<string>;
+  /** линейка: нажатие проходит к полю (привязка к базе там) */
+  passThrough: boolean;
   onDown: (e: PointerEvent, unit: TAUnit, modelId: string) => void;
 }) {
   const bases = placedBases(unit);
@@ -234,7 +411,7 @@ function UnitShapes({
   if (!c) return null;
   const [cx0, cy0] = disp(c);
   return (
-    <g style={{ cursor: 'grab', touchAction: 'none' }} onClick={(e) => e.stopPropagation()}>
+    <g style={passThrough ? undefined : { cursor: 'grab', touchAction: 'none' }} onClick={passThrough ? undefined : (e) => e.stopPropagation()}>
       {bases.map((b, i) => {
         if (!b) return null;
         const m = unit.models[i]!;
@@ -301,6 +478,8 @@ function UnitPanel({
   onBase,
   onRemove,
   onDone,
+  info,
+  side,
 }: {
   unit: TAUnit;
   n: number;
@@ -310,6 +489,12 @@ function UnitPanel({
   onBase: (profile: string, change: { pick?: number; customMm?: number | null }) => void;
   onRemove: () => void;
   onDone: () => void;
+  info: {
+    objective: { d: number; inRange: boolean } | null;
+    own: { d: number } | null;
+    enemy: { d: number } | null;
+  } | null;
+  side: Side;
 }) {
   const [bases, setBases] = useState(false);
   const profiles = useMemo(() => unitProfiles(unit), [unit]);
@@ -335,6 +520,23 @@ function UnitPanel({
         </div>
         <IconButton icon="close" label="Готово" onClick={onDone} className="size-8" />
       </div>
+      {info && (
+        <div className="grid grid-cols-3 gap-1.5 text-center text-[11px]">
+          <div className={cx('rounded-lg border px-1.5 py-1', info.objective?.inRange ? 'border-[#4ade80]/50 text-[#4ade80]' : 'border-white/10')}>
+            <span className="block text-white/45">до цели</span>
+            <b className="text-sm">{info.objective ? fmtInches(info.objective.d) : '—'}</b>
+            {info.objective?.inRange && <span className="block">в дальности</span>}
+          </div>
+          <div className="rounded-lg border border-white/10 px-1.5 py-1">
+            <span className="block text-white/45">до своей зоны</span>
+            <b className="text-sm">{info.own ? (info.own.d ? fmtInches(info.own.d) : 'в зоне') : '—'}</b>
+          </div>
+          <div className="rounded-lg border border-white/10 px-1.5 py-1">
+            <span className="block text-white/45">до зоны {side === 'attacker' ? 'защитника' : 'атакующего'}</span>
+            <b className="text-sm">{info.enemy ? (info.enemy.d ? fmtInches(info.enemy.d) : 'в зоне') : '—'}</b>
+          </div>
+        </div>
+      )}
       <Segmented<Formation> value={unit.formation} onChange={onFormation} options={FORMATIONS.map((f) => ({ value: f.id, label: f.label }))} />
       {unit.placed && (
         <div className="flex flex-wrap items-center gap-1.5 text-xs">
@@ -416,5 +618,53 @@ function UnitPanel({
         </Button>
       )}
     </div>
+  );
+}
+
+/** Линия измерения с подписью (поле → экран); handles — концы можно тянуть. */
+function Measure({
+  from,
+  to,
+  d,
+  color,
+  dashed,
+  handles,
+  onHandle,
+}: {
+  from: Pt;
+  to: Pt;
+  d: number;
+  color: string;
+  dashed?: boolean;
+  handles?: boolean;
+  onHandle?: (e: PointerEvent, which: 'a' | 'b') => void;
+}) {
+  const [x1, y1] = disp(from);
+  const [x2, y2] = disp(to);
+  return (
+    <g>
+      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth={0.14} strokeDasharray={dashed ? '0.45 0.3' : undefined} strokeLinecap="round" pointerEvents="none" />
+      <text
+        x={(x1 + x2) / 2}
+        y={(y1 + y2) / 2 - 0.45}
+        textAnchor="middle"
+        fontSize={1.1}
+        fontWeight={700}
+        fill={color}
+        stroke="rgba(0,0,0,0.85)"
+        strokeWidth={0.22}
+        style={{ paintOrder: 'stroke' }}
+        pointerEvents="none"
+      >
+        {fmtInches(d)}
+      </text>
+      {handles &&
+        ([
+          ['a', x1, y1],
+          ['b', x2, y2],
+        ] as const).map(([w, x, y]) => (
+          <circle key={w} cx={x} cy={y} r={0.55} fill={color} fillOpacity={0.35} stroke={color} strokeWidth={0.1} style={{ touchAction: 'none', cursor: 'grab' }} onPointerDown={(e) => onHandle?.(e, w)} />
+        ))}
+    </g>
   );
 }

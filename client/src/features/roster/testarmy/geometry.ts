@@ -143,3 +143,29 @@ export function nearestOnBase(p: Pt, b: Placed): Pt {
   }
   return outline(b).reduce((a, q) => (dist(p, q) < dist(p, a) ? q : a));
 }
+
+/** Ближайшие точки двух баз (для линии между ними). */
+export function closestPoints(a: Placed, b: Placed): [Pt, Pt] {
+  if (isCircle(a) && isCircle(b)) return [nearestOnBase([b.x, b.y], a), nearestOnBase([a.x, a.y], b)];
+  const pa = isCircle(a) ? null : outline(a);
+  const pb = isCircle(b) ? null : outline(b);
+  if (!pa) {
+    const q = pb!.reduce((m, p) => (dist(p, [a.x, a.y]) < dist(m, [a.x, a.y]) ? p : m));
+    return [nearestOnBase(q, a), q];
+  }
+  if (!pb) {
+    const q = pa.reduce((m, p) => (dist(p, [b.x, b.y]) < dist(m, [b.x, b.y]) ? p : m));
+    return [q, nearestOnBase(q, b)];
+  }
+  let best: [Pt, Pt] = [pa[0]!, pb[0]!];
+  let bd = Infinity;
+  for (const p of pa)
+    for (const q of pb) {
+      const d = dist(p, q);
+      if (d < bd) {
+        bd = d;
+        best = [p, q];
+      }
+    }
+  return best;
+}
