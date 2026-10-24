@@ -32,6 +32,7 @@ export function RosterEditor({
   onBack,
   onRules,
   onStartGame,
+  onTestArmy,
   onChange,
   onDuplicate,
   onDelete,
@@ -42,6 +43,7 @@ export function RosterEditor({
   onBack: () => void;
   onRules: () => void;
   onStartGame: () => void;
+  onTestArmy?: () => void;
   onChange: (r: Roster) => void;
   onDuplicate: (r: Roster) => void;
   onDelete: () => void;
@@ -94,7 +96,7 @@ export function RosterEditor({
       </div>
     );
   }
-  return <Editor roster={roster} L={L} cr={cr} index={index} onBack={onBack} onRules={onRules} onStartGame={onStartGame} onChange={onChange} onDuplicate={onDuplicate} onDelete={onDelete} viewOnly={viewOnly} />;
+  return <Editor roster={roster} L={L} cr={cr} index={index} onBack={onBack} onRules={onRules} onStartGame={onStartGame} onTestArmy={onTestArmy} onChange={onChange} onDuplicate={onDuplicate} onDelete={onDelete} viewOnly={viewOnly} />;
 }
 
 function Editor({
@@ -105,6 +107,7 @@ function Editor({
   onBack,
   onRules,
   onStartGame,
+  onTestArmy,
   onChange,
   onDuplicate,
   onDelete,
@@ -117,6 +120,7 @@ function Editor({
   onBack: () => void;
   onRules: () => void;
   onStartGame: () => void;
+  onTestArmy?: () => void;
   onChange: (r: Roster) => void;
   onDuplicate: (r: Roster) => void;
   onDelete: () => void;
@@ -502,6 +506,11 @@ function Editor({
           <Button className="w-full justify-start" onClick={() => (setMenu(false), onStartGame())}>
             <Icon name="map" /> Начать игру с этим ростером
           </Button>
+          {onTestArmy && (
+            <Button className="w-full justify-start" onClick={() => (setMenu(false), onTestArmy())}>
+              <Icon name="shield" /> Test Army с этим ростером
+            </Button>
+          )}
           <Button className="w-full justify-start" onClick={() => (setMenu(false), onDuplicate(duplicateRoster(roster)))}>
             <Icon name="copy" /> Дублировать ростер
           </Button>
