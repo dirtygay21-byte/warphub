@@ -20,7 +20,6 @@ import { formatSelectedDate } from "@/utils/date";
 import { s3Url } from "@/utils/s3utils";
 import { getSlotEnd, getStartTimeOptions, getWindowLimit, hoursLabel, minFreeSeats } from "@/utils/slots";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import clsx from "clsx";
 import { CalendarDays, Clock3, Dice6, Swords, UsersRound } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
