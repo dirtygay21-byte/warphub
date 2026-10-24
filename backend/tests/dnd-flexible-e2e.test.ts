@@ -55,6 +55,7 @@ describe('D&D: примерное время', () => {
     expect(r.status).toBe(200);
     expect(r.json.startsAt).toBeNull();
     expect(r.json.daysOfWeek).toEqual([5, 6]);
+    if (r.json.scheduleLabel !== 'пятница или суббота, вечер') console.error(`::error::label ${JSON.stringify(r.json.scheduleLabel)} days ${JSON.stringify(r.json.daysOfWeek)} times ${JSON.stringify(r.json.timesOfDay)}`);
     expect(r.json.scheduleLabel).toBe('пятница или суббота, вечер');
     expect(r.json.isBookable).toBe(true);
     gameId = r.json.id;
