@@ -141,8 +141,9 @@ function toGameView(game: GameRow, occupied: number): DndGameView {
     gameType: game.gameType,
     startsAt: game.startsAt ? formatLocalIso(game.startsAt) : null,
     endsAt: game.endsAt ? formatLocalIso(game.endsAt) : null,
-    daysOfWeek: game.daysOfWeek,
-    timesOfDay: game.timesOfDay,
+    // обычные массивы: массивы из драйвера БД в ответе сериализуются как объекты {"0": …}
+    daysOfWeek: Array.from(game.daysOfWeek, Number),
+    timesOfDay: Array.from(game.timesOfDay, String),
     scheduleLabel: scheduleLabel(game),
     capacity: game.capacity,
     occupied,
