@@ -2,6 +2,7 @@ import { cors } from '@elysiajs/cors';
 import { Elysia } from 'elysia';
 import { apiModels } from './lib/api-schemas';
 import { apiModule } from './modules/api';
+import { onlineGamesModule } from './modules/online-games';
 import { adminModule } from './modules/admin';
 import { authModule } from './modules/auth';
 import { internalModule } from './modules/internal';
@@ -39,5 +40,6 @@ export function createApp() {
     .use(adminModule)
     .use(rosterAdminModule)
     .use(rosterModule)
+    .use(onlineGamesModule)
     .use(apiModule);
 }
