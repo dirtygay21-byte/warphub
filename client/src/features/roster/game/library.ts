@@ -63,7 +63,7 @@ const sorted = (list: SavedEntry[]) => [...list].sort((a, b) => b.updatedAt.loca
 
 /** Записать список; сверх лимита — убрать самые старые (сначала законченные), их журналы тоже. */
 function writeIndex(store: KeyValueStore, suffix: string, list: SavedEntry[]): string | null {
-  let out = sorted(list);
+  const out = sorted(list);
   while (out.length > LIBRARY_LIMIT) {
     const finished = out.findLastIndex((e) => e.summary?.stage === 'finished');
     const drop = out.splice(finished >= 0 ? finished : out.length - 1, 1)[0]!;
