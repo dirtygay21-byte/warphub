@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import type { DataIndex, Roster } from '../../engine/types';
-import { currentSetupStep, ROUNDS, setupSteps, totals, type Seat, type SetupStepId } from '../../game';
+import { currentSetupStep, ROUNDS, setupSteps, totals, type EventBody, type Seat, type SetupStepId } from '../../game';
 import { pushOverlay } from '../../telegram';
 import { Battlefield } from '../Battlefield';
 import { Button, Icon, IconButton } from '../kit';
 import { cx } from '../util';
 import { CardSheet } from './CardSheet';
-import { CardViewerContext, RosterViewerContext } from './cardViewer';
+import { CardViewerContext, MySeatContext, RosterViewerContext } from './cardViewer';
+import { OnlineBar, OnlineStart } from './Online';
 import { rosterRefFor } from './players';
 import { RosterViewer } from './RosterViewer';
 import { StepDispositions } from './StepDispositions';
@@ -28,12 +29,22 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
   const { data, loadError, state } = game;
   // ростер из меню «Начать игру с этим ростером» — первым событием подготовки (если в нём есть детачмент)
   const [starting, setStarting] = useState(false);
-  const start = async () => {
+  const initialEvents = async (): Promise<EventBody[]> => {
     const r = initialRosterId ? rosters.find((x) => x.id === initialRosterId) : undefined;
-    setStarting(true);
     const ref = r && data ? await rosterRefFor(r, 'own', data.battlefield) : null;
+    return ref && typeof ref !== 'string' ? [{ type: 'player-set', target: 'p1', patch: { roster: ref } }] : [];
+  };
+  const start = async () => {
+    setStarting(true);
+    const initial = await initialEvents();
     setStarting(false);
-    game.newGame({}, ref && typeof ref !== 'string' ? [{ type: 'player-set', target: 'p1', patch: { roster: ref } }] : []);
+    game.newGame({}, initial);
+  };
+  // два телефона (T3): создатель — игрок 1, его ростер из меню — так же первым событием
+  const startOnline = async () => {
+    setStarting(true);
+    await game.startOnline(await initialEvents());
+    setStarting(false);
   };
   // режим мастера (G2.12): ростеры игроков можно открыть для просмотра; запоминается на этом телефоне
   const [master, setMaster] = useState(readMaster);
@@ -73,9 +84,13 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
   return (
     <CardViewerContext.Provider value={openCard}>
       <RosterViewerContext.Provider value={master ? openRoster : null}>
+       <MySeatContext.Provider value={game.online?.seat ?? null}>
         <Shell onBack={onBack} undo={state && game.canUndo ? game.undo : undefined} master={master} onMaster={toggleMaster}>
-          {!state ? (
-            <StartCard game={game} onStart={start} starting={starting} />
+          <OnlineBar game={game} />
+          {game.online && !state ? (
+            <div className="mx-auto mt-16 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
+          ) : !state ? (
+            <StartCard game={game} onStart={start} onStartOnline={startOnline} starting={starting} />
           ) : (
             state.stage === 'setup' ? <Setup game={game} rosters={rosters} index={index} /> : <Tracker game={game} index={index} />
           )}
@@ -104,6 +119,7 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
           </button>
           {card && <CardSheet game={game} id={card.id} seat={card.seat} onClose={closeCard} />}
         </Shell>
+       </MySeatContext.Provider>
       </RosterViewerContext.Provider>
     </CardViewerContext.Provider>
   );
@@ -129,13 +145,13 @@ const writeMaster = (on: boolean) => {
  * Начало (G4b): сохранённая на устройстве игра — «Продолжить» (раунд, игроки, счёт) или «Новая игра» с подтверждением;
  * нечитаемое сохранение — причина и новая игра с откладыванием старого сохранения; иначе — новая игра.
  */
-function StartCard({ game, onStart, starting }: { game: GameHook; onStart: () => void; starting: boolean }) {
+function StartCard({ game, onStart, onStartOnline, starting }: { game: GameHook; onStart: () => void; onStartOnline: () => Promise<void>; starting: boolean }) {
   const [confirm, setConfirm] = useState(false);
   const saved = game.saved;
   const intro = (
     <p className="mt-1 text-sm leading-snug text-white/60">
       Подготовка по шагам правил Chapter Approved 2026–27: игроки и ростеры, типы армий, раскладка, атакующий и защитник, вторичные миссии, первый ход.
-      Затем — трекер партии. Игра сохраняется на этом телефоне после каждого действия.
+      Затем — трекер партии. Игра на одном телефоне сохраняется на нём после каждого действия.
     </p>
   );
   if (saved?.kind === 'ok') {
@@ -177,6 +193,7 @@ function StartCard({ game, onStart, starting }: { game: GameHook; onStart: () =>
             </div>
           )}
         </div>
+        <OnlineStart game={game} onCreate={onStartOnline} busy={starting} />
       </section>
     );
   }
@@ -196,6 +213,7 @@ function StartCard({ game, onStart, starting }: { game: GameHook; onStart: () =>
           Начать подготовку
         </Button>
       </div>
+      <OnlineStart game={game} onCreate={onStartOnline} busy={starting} />
     </section>
   );
 }
