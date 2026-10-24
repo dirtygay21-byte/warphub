@@ -17,6 +17,8 @@ export type SelectedSlot =
       window: { startsAt: string; endsAt: string };
       segments: AvailabilitySegment[];
       capacity: number;
+      /** B1: минимум для укороченной записи, минут */
+      minMinutes?: number;
     }
   | {
       kind: "join";
@@ -33,6 +35,8 @@ export type SelectedSlot =
       segments: AvailabilitySegment[];
       capacity: number;
       freeSeats: number;
+      /** B1: минимум для укороченной записи, минут */
+      minMinutes?: number;
     };
 
 export type LastBooking = {

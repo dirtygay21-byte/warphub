@@ -151,6 +151,8 @@ export type ServiceAvailability = {
     seatsPerTable: number | null;
     poolCapacity: number | null;
     hasTrainer: boolean;
+    /** B1: минимум для укороченной записи, минут (если до следующей занятости меньше полной длительности) */
+    minDuration: number;
   };
   slots: Array<{
     table: { id: number; name: string; seatCapacity: number };
@@ -180,6 +182,7 @@ export const getAvailability = async (
       seatsPerTable: data.service?.seatsPerTable ?? null,
       poolCapacity: data.service?.poolCapacity ?? null,
       hasTrainer: data.service?.hasTrainer ?? false,
+      minDuration: data.service?.minDuration ?? Math.min(data.service?.duration ?? 60, 120),
     },
     slots: data.slots ?? [],
     sessions: data.sessions ?? [],

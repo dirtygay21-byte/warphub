@@ -275,6 +275,57 @@ export function checkTableSession(input: {
   };
 }
 
+/**
+ * Конец новой игры за столом (B1): полная длительность или раньше — до начала следующей занятости стола
+ * (запись или мероприятие). null — свободно меньше minMinutes (тогда записаться нельзя).
+ * Занятость, которая уже идёт в момент начала, здесь не учитывается — её отклоняет checkTableSession.
+ */
+export function tableFitEnd(input: {
+  tableId: number;
+  startsAt: Date;
+  fullEnd: Date;
+  bookings: TableBooking[];
+  blocks?: TableBlock[];
+  minMinutes: number;
+}): Date | null {
+  const start = input.startsAt.getTime();
+  let end = input.fullEnd.getTime();
+  for (const b of [...input.bookings, ...(input.blocks ?? [])]) {
+    if (b.tableId !== input.tableId) continue;
+    const s = b.startsAt.getTime();
+    if (s > start && s < end) end = s;
+  }
+  if (end < input.fullEnd.getTime() && end - start < input.minMinutes * 60_000) return null;
+  return new Date(end);
+}
+
+/**
+ * Конец записи без стола (покраска, посещение клуба — общий запас мест, B1): полная длительность или раньше —
+ * до момента, когда свободных мест станет меньше partySize. null — так свободно меньше minMinutes.
+ */
+export function poolFitEnd(input: {
+  startsAt: Date;
+  fullEnd: Date;
+  bookings: Array<{ partySize: number; startsAt: Date; endsAt: Date }>;
+  capacity: number;
+  partySize: number;
+  minMinutes: number;
+}): Date | null {
+  const free = (end: number) => poolFreeSeats({ startsAt: input.startsAt, endsAt: new Date(end) }, input.bookings, input.capacity);
+  const start = input.startsAt.getTime();
+  const full = input.fullEnd.getTime();
+  if (free(full) >= input.partySize) return new Date(full);
+  // свободных мест становится меньше только в начале чужой записи — проверяем эти моменты по порядку
+  const points = [...new Set(input.bookings.map((b) => b.startsAt.getTime()).filter((t) => t > start && t < full))].sort((a, b) => a - b);
+  let end = start;
+  for (const p of points) {
+    if (free(p) >= input.partySize) end = p;
+    else break;
+  }
+  if (end - start < input.minMinutes * 60_000) return null;
+  return new Date(end);
+}
+
 export type TableSession = {
   tableId: number;
   startsAt: Date;

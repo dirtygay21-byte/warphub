@@ -370,6 +370,7 @@ export default function Reservation() {
               reservation={reservation}
               isPast={isPastReservation(reservation)}
               onEdit={() => setReservationToEdit(reservation.id)}
+              serviceDuration={servicesById.get(reservation.serviceId)?.duration ?? null}
               serviceTitle={
                 servicesById.get(reservation.serviceId)?.title ??
                 reservation.serviceTitle ??

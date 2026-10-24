@@ -23,6 +23,9 @@ import {
   toReservationResponse,
 } from '../booking/service';
 import { getAdminUserProfile, searchUsersByUsername } from '../users/service';
+import { testNotification } from '../notifications/service';
+import { addAdmin, AdminsError, listAdmins, removeAdmin } from '../admins/service';
+import { isBuiltinAdmin } from '../../config/admin';
 import {
   createEvent,
   deleteEvent,
@@ -928,4 +931,32 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
         description: 'Счёт не может уйти в минус. Игрок получает сообщение от бота.',
       },
     },
-  );
+  )
+  .post('/notifications/test', ({ user }) => testNotification(user), {
+    detail: {
+      tags: ['Admin'],
+      summary: 'Проверить уведомления: тестовое сообщение от бота себе',
+      description: 'Возвращает, доставлено ли сообщение, а если нет — причину (не нажат «Старт», неверный токен, уведомления выключены, нет связи).',
+    },
+  })
+  .get('/admins', async ({ user }) => ({ ...(await listAdmins()), canManage: isBuiltinAdmin(user) }), {
+    detail: { tags: ['Admin'], summary: 'Администраторы: основные и добавленные по Telegram ID' },
+  })
+  .post('/admins', ({ user, body }) => adminsGuard(() => addAdmin(user, body.telegramId, body.note)), {
+    body: t.Object({ telegramId: t.Union([t.String({ maxLength: 20 }), t.Number()]), note: t.Optional(t.String({ maxLength: 200 })) }),
+    detail: { tags: ['Admin'], summary: 'Добавить администратора по Telegram ID (только основные администраторы)' },
+  })
+  .delete('/admins/:telegramId', ({ user, params }) => adminsGuard(() => removeAdmin(user, params.telegramId)), {
+    detail: { tags: ['Admin'], summary: 'Удалить добавленного администратора (только основные администраторы)' },
+  });
+
+async function adminsGuard<T>(fn: () => Promise<T>) {
+  try {
+    return await fn();
+  } catch (error) {
+    if (!(error instanceof AdminsError)) throw error;
+    const code = { FORBIDDEN: 403, BAD_ID: 400, BUILTIN: 400, EXISTS: 409, NOT_FOUND: 404 }[error.code] as 400 | 403 | 404 | 409;
+    return status(code, { error: error.message });
+  }
+}
+

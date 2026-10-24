@@ -18,7 +18,6 @@ import {
 import {
   bookingConfig,
   experienceLabel,
-  paintSourceLabel,
   type TableCapacityProfile,
 } from '../../config/booking';
 import { db } from '../../db';
@@ -60,9 +59,12 @@ import {
   type DateParts,
   type ReservationDetails,
   type TableBooking,
+  poolFitEnd,
+  tableFitEnd,
 } from './rules';
 
 export { parseDateParam } from './rules';
+import { bookingNoticeText } from './notify-text';
 
 const ACTIVE_RESERVATION_STATUSES = ['pending', 'confirmed'] as const;
 const CLUB_VISIT_SLUG = 'club_visit';
@@ -134,6 +136,8 @@ export type ServiceAvailability = {
     seatsPerTable: number | null;
     poolCapacity: number | null;
     hasTrainer: boolean;
+    /** B1: минимальная длительность укороченной записи, минут (если до следующей занятости меньше полной) */
+    minDuration: number;
     /** Макс. вместимость зрителей в клубе (только для club_visit) */
     clubSpectatorCapacity?: number;
   };
@@ -513,6 +517,7 @@ export async function getServiceAvailability(
       seatsPerTable: mode.mode === 'table' ? mode.seatsPerTable : null,
       poolCapacity: mode.mode === 'pool' ? mode.capacity : null,
       hasTrainer: service.hasTrainer,
+      minDuration: Math.min(durationMinutes, bookingConfig.minShortenedMinutes),
       ...(service.slug === CLUB_VISIT_SLUG && mode.mode === 'pool'
         ? { clubSpectatorCapacity: mode.capacity }
         : {}),
@@ -771,13 +776,14 @@ export async function createReservation(
 
   const startsAt = input.startsAt;
   const durationMinutes = serviceDuration(service);
-  const endsAt = new Date(startsAt.getTime() + durationMinutes * 60 * 1000);
+  // полный конец по длительности; ниже он может стать раньше, если до следующей занятости меньше (B1)
+  const fullEndsAt = new Date(startsAt.getTime() + durationMinutes * 60 * 1000);
 
   if (startsAt.getTime() <= Date.now()) {
     throw new BookingError('INVALID_TIME', 'Selected time is in the past');
   }
 
-  if (!isOnSlotGrid(startsAt, endsAt, durationMinutes)) {
+  if (!isOnSlotGrid(startsAt, fullEndsAt, durationMinutes)) {
     throw new BookingError(
       'INVALID_TIME',
       'Selected time slot is not available',
@@ -845,13 +851,25 @@ export async function createReservation(
     const reservation = await db.transaction(async (tx) => {
       await lockKey(tx, LOCK_POOL, service.id);
       const bookings = await getPoolReservations(tx, service.id, openAt, closeAt);
-      const free = poolFreeSeats({ startsAt, endsAt }, bookings, mode.capacity);
+      const free = poolFreeSeats({ startsAt, endsAt: new Date(startsAt.getTime() + 1) }, bookings, mode.capacity);
 
       if (free < partySize) {
         throw new BookingError(
           'SLOT_UNAVAILABLE',
           free === 0 ? 'No places left' : `Only ${free} places left`,
         );
+      }
+      // B1: если мест не хватит на всю длительность — запись короче, но не меньше минимума
+      const endsAt = poolFitEnd({
+        startsAt,
+        fullEnd: fullEndsAt,
+        bookings,
+        capacity: mode.capacity,
+        partySize,
+        minMinutes: bookingConfig.minShortenedMinutes,
+      });
+      if (!endsAt) {
+        throw new BookingError('SLOT_UNAVAILABLE', `Less than ${bookingConfig.minShortenedMinutes / 60} hours are free from this time`);
       }
 
       const [created] = await tx
@@ -897,6 +915,16 @@ export async function createReservation(
 
     const bookings = await getTableReservations(tx, [tableId], openAt, closeAt);
     const eventBlocks = await getEventTableBlocks([tableId], openAt, closeAt);
+    // B1: присоединение — время уже идущей сессии; новая игра — полная длительность или до следующей занятости стола
+    const session = bookings.find(
+      (b) => b.tableId === tableId && b.serviceId === service.id && b.startsAt.getTime() === startsAt.getTime(),
+    );
+    const endsAt =
+      session?.endsAt ??
+      tableFitEnd({ tableId, startsAt, fullEnd: fullEndsAt, bookings, blocks: eventBlocks, minMinutes: bookingConfig.minShortenedMinutes });
+    if (!endsAt) {
+      throw new BookingError('SLOT_UNAVAILABLE', `Less than ${bookingConfig.minShortenedMinutes / 60} hours are free at this table from this time`);
+    }
     const check = checkTableSession({
       tableId,
       serviceId: service.id,
@@ -1040,6 +1068,7 @@ async function notifyAfterCreate(
   service: ServiceRow,
   reservation: Reservation,
   context: { joined: boolean; others: string[]; seatsPerTable?: number },
+  reason: 'created' | 'help-requested' = 'created',
 ): Promise<void> {
   try {
     const [booker] = await loadUsersForReservations([reservation.id]);
@@ -1047,48 +1076,11 @@ async function notifyAfterCreate(
 
     const when = formatClubDateTime(reservation.startsAt, reservation.endsAt);
     const details = (reservation.details as ReservationDetails | null) ?? null;
-
-    if (details?.kind === 'painting') {
-      if (details.needsHelp) {
-        notifyAdmins(
-          [
-            '🎨 <b>Покраска: нужна помощь</b>',
-            `Дата: ${when}`,
-            `Участник: ${escapeHtml(formatUserName(booker.user))}`,
-            `Фракция: ${escapeHtml(details.faction)}`,
-            `Модель: ${escapeHtml(details.model)}`,
-            `Краски: ${escapeHtml(paintSourceLabel(details.paintSource))}`,
-            details.comment ? `Комментарий: ${escapeHtml(details.comment)}` : '',
-          ]
-            .filter(Boolean)
-            .join('\n'),
-        );
-      }
-      return;
-    }
-
     const seats = context.seatsPerTable;
-    if (!seats || seats < 2 || reservation.tableId === null) return;
+    const atTable = !!seats && seats >= 2 && reservation.tableId !== null;
+    const others = atTable && context.joined ? await loadUsersForReservations(context.others) : [];
 
-    const tableName = escapeHtml(await getTableName(reservation.tableId));
-
-    if (!context.joined) {
-      // Новая игра: на столе 1 из 2 — администратор может подобрать соперника
-      notifyAdmins(
-        [
-          `♟ <b>${serviceTitle(service)}: стол ждёт соперника (1/${seats})</b>`,
-          `Дата: ${when}`,
-          `Стол: ${tableName}`,
-          describePlayer(booker.user, details),
-          `Занято: 1 · Свободно: ${seats - 1}`,
-        ].join('\n'),
-      );
-      return;
-    }
-
-    const others = await loadUsersForReservations(context.others);
-    const occupied = others.length + 1;
-
+    // соперникам за столом — что к их игре присоединились
     for (const other of others) {
       notifyUser(
         other.user.telegramId,
@@ -1100,15 +1092,24 @@ async function notifyAfterCreate(
       );
     }
 
-    notifyAdmins(
-      [
-        `✅ <b>${serviceTitle(service)}: стол собран (${occupied}/${seats})</b>`,
-        `Дата: ${when}`,
-        `Стол: ${tableName}`,
-        ...others.map((other) => describePlayer(other.user, other.details)),
-        describePlayer(booker.user, details),
-      ].join('\n'),
-    );
+    // администраторам — одно полное сообщение о каждой записи (N1)
+    const text = bookingNoticeText({
+      reason,
+      serviceTitle: service.title ?? service.slug,
+      startsAt: reservation.startsAt,
+      endsAt: reservation.endsAt,
+      createdAt: reservation.createdAt,
+      tableName: reservation.tableId !== null ? await getTableName(reservation.tableId) : null,
+      user: booker.user,
+      partySize: reservation.partySize,
+      seatClubArmyOptions: reservation.seatClubArmyOptions,
+      buyArmyOptions: reservation.buyArmyOptions,
+      details,
+      table: atTable ? { occupied: others.length + 1, seats: seats! } : null,
+      fullMinutes: serviceDuration(service),
+    });
+    const playersAtTable = others.map((other) => describePlayer(other.user, other.details));
+    notifyAdmins(playersAtTable.length ? `${text}\n— за столом также:\n${playersAtTable.join('\n')}` : text);
   } catch (error) {
     console.warn('[notify] booking notification failed', error);
   }
@@ -1518,7 +1519,7 @@ export async function updateReservationDetails(
   ) {
     const service = await loadService(db, reservation.serviceId);
     if (service) {
-      void notifyAfterCreate(service, updated!, { joined: false, others: [] });
+      void notifyAfterCreate(service, updated!, { joined: false, others: [] }, 'help-requested');
     }
   }
 

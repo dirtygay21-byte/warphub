@@ -5,9 +5,11 @@
  * Отключить все уведомления (например, на тестовом сервере):
  *   TELEGRAM_NOTIFICATIONS=off
  */
-import { bookingConfig } from '../../config/booking';
 import { getAdminTelegramIds } from '../../config/admin';
 import { env } from '../../config/env';
+import { describeSendResult, escapeHtml, formatClubDateTime, formatUserName, type SendResult } from '../../lib/telegram/format';
+
+export { escapeHtml, formatClubDateTime, formatUserName };
 
 const TELEGRAM_API = 'https://api.telegram.org';
 
@@ -15,49 +17,45 @@ function notificationsEnabled(): boolean {
   return (process.env.TELEGRAM_NOTIFICATIONS ?? 'on').toLowerCase() !== 'off';
 }
 
-export function escapeHtml(value: string | number | null | undefined): string {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-export async function sendTelegramMessage(
-  chatId: number | string,
-  text: string,
-): Promise<boolean> {
-  if (!notificationsEnabled()) return false;
+/** Отправить сообщение и вернуть подробный результат (для проверки уведомлений из админки). */
+export async function sendTelegramMessageDetailed(chatId: number | string, text: string): Promise<SendResult> {
+  if (!notificationsEnabled()) return { ok: false, reason: 'disabled' };
 
   try {
-    const response = await fetch(
-      `${TELEGRAM_API}/bot${env.telegramBotToken}/sendMessage`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text,
-          parse_mode: 'HTML',
-          disable_web_page_preview: true,
-        }),
-        signal: AbortSignal.timeout(10_000),
-      },
-    );
+    const response = await fetch(`${TELEGRAM_API}/bot${env.telegramBotToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+      }),
+      signal: AbortSignal.timeout(10_000),
+    });
 
     if (!response.ok) {
-      // 403 — пользователь не нажимал «Старт» у бота или заблокировал его
+      // 403 — пользователь не нажимал «Старт» у бота или заблокировал его; 401 — неверный токен
       const body = await response.text().catch(() => '');
-      console.warn(
-        `[notify] Telegram ${response.status} for chat ${chatId}: ${body.slice(0, 200)}`,
-      );
-      return false;
+      let description: string | undefined;
+      try {
+        description = (JSON.parse(body) as { description?: string }).description;
+      } catch {
+        description = body.slice(0, 200) || undefined;
+      }
+      console.warn(`[notify] Telegram ${response.status} for chat ${chatId}: ${body.slice(0, 200)}`);
+      return { ok: false, reason: 'telegram', status: response.status, description };
     }
 
-    return true;
+    return { ok: true };
   } catch (error) {
     console.warn(`[notify] failed for chat ${chatId}:`, (error as Error).message);
-    return false;
+    return { ok: false, reason: 'network', description: (error as Error).message };
   }
+}
+
+export async function sendTelegramMessage(chatId: number | string, text: string): Promise<boolean> {
+  return (await sendTelegramMessageDetailed(chatId, text)).ok;
 }
 
 /** Отправить сообщение всем администраторам (не ждёт результата) */
@@ -73,37 +71,14 @@ export function notifyUser(telegramId: number | null | undefined, text: string) 
   void sendTelegramMessage(telegramId, text);
 }
 
-const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
-  timeZone: bookingConfig.timeZone,
-  weekday: 'short',
-  day: 'numeric',
-  month: 'long',
-});
-
-const timeFormatter = new Intl.DateTimeFormat('ru-RU', {
-  timeZone: bookingConfig.timeZone,
-  hour: '2-digit',
-  minute: '2-digit',
-});
-
-/** «сб, 10 октября, 18:00–21:00» во времени клуба */
-export function formatClubDateTime(
-  startsAt: Date | null | undefined,
-  endsAt?: Date | null,
-): string {
-  if (!startsAt) return '—';
-  const date = dateFormatter.format(startsAt);
-  const start = timeFormatter.format(startsAt);
-  return endsAt
-    ? `${date}, ${start}–${timeFormatter.format(endsAt)}`
-    : `${date}, ${start}`;
-}
-
-export function formatUserName(user: {
-  firstName: string;
-  lastName?: string | null;
-  username?: string | null;
-}): string {
-  const name = [user.firstName, user.lastName].filter(Boolean).join(' ');
-  return user.username ? `${name} (@${user.username})` : name;
+/**
+ * Проверка уведомлений из админки: тестовое сообщение администратору, который нажал кнопку,
+ * и понятный ответ, что произошло (доставлено / нужно нажать «Старт» / неверный токен / выключено / нет связи).
+ */
+export async function testNotification(admin: { telegramId: number; firstName: string }) {
+  const result = await sendTelegramMessageDetailed(
+    admin.telegramId,
+    `🔔 <b>Проверка уведомлений WarpHub</b>\nЕсли вы видите это сообщение, бот может писать вам. Уведомления о записях приходят всем администраторам.`,
+  );
+  return { ...describeSendResult(result), recipients: getAdminTelegramIds().length };
 }

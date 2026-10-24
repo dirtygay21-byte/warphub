@@ -27,6 +27,7 @@ import clsx from "clsx";
 import { Filter, LoaderCircle, RefreshCw, Shield } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ExtendReservationDialog } from "./components/ExtendReservationDialog";
+import { NotificationCheck } from "./components/NotificationCheck";
 import { ReservationsFilters } from "./components/ReservationsFilters";
 import { ReservationsPagination } from "./components/ReservationsPagination";
 import { ReservationsTable } from "./components/ReservationsTable";
@@ -293,6 +294,7 @@ export default function AdminReservations() {
 
   return (
     <div className="px-4 py-3 pb-28 text-white sm:px-6">
+      <NotificationCheck />
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Все записи</h1>

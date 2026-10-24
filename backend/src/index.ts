@@ -1,7 +1,12 @@
 import { createApp } from './app';
 import { env } from './config/env';
+import { refreshAddedAdmins } from './modules/admins/service';
 
 const app = createApp();
+
+// администраторы, добавленные в админке (N2): загрузить при старте и перечитывать раз в 5 минут
+void refreshAddedAdmins();
+setInterval(() => void refreshAddedAdmins(), 5 * 60_000);
 
 app.listen(env.port);
 
