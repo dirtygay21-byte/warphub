@@ -6,7 +6,8 @@ import { Button, Icon } from '../kit';
 import { cx } from '../util';
 import { AdjustSheet } from './Adjust';
 import { CardLink } from './CardSheet';
-import { useOpenRoster } from './cardViewer';
+import { ActAs } from './ActAs';
+import { useMySeat, useOpenRoster } from './cardViewer';
 import { RosterButton } from './RosterViewer';
 import { CommandPhase } from './CommandPhase';
 import { EndOfTurn } from './EndOfTurn';
@@ -29,6 +30,9 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
   const [summary, setSummary] = useState(false);
   const pending = state.step === 'command' && active ? commandPhasePending(state, active, game.data!.catalog) : null;
   const lastTurn = state.round === ROUNDS && active != null && active !== state.firstTurn;
+  // два телефона: шаги хода отмечает только тот, чей ход
+  const mine = useMySeat();
+  const myTurn = !mine || mine === active;
 
   const next = () => {
     const body =
@@ -61,10 +65,14 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
 
       {!finished && (
         <>
-          {state.step === 'command' && <CommandPhase game={game} />}
+          {state.step === 'command' && active && (
+            <ActAs game={game} seat={active}>
+              <CommandPhase game={game} />
+            </ActAs>
+          )}
           {state.step === 'main' && <EndOfTurn game={game} />}
-          <Button variant="primary" className="h-12 w-full" disabled={!!pending} onClick={next}>
-            {nextLabel}
+          <Button variant="primary" className="h-12 w-full" disabled={!!pending || !myTurn} onClick={next}>
+            {myTurn ? nextLabel : `Ход соперника: ${active ? state.players[active].name : ''}`}
           </Button>
           {state.step === 'start' && <p className="text-center text-[11px] text-white/45">В начале фазы командования оба игрока получают 1 CP.</p>}
           <EndEarly game={game} />
@@ -122,6 +130,8 @@ function Scoreboard({ game }: { game: GameHook }) {
   const state = game.state!;
   const catalog = game.data!.catalog;
   const [open, setOpen] = useState<Seat | null>(null);
+  // два телефона: CP и ПО поправляет только сам игрок
+  const mine = useMySeat();
   return (
     <div className="grid grid-cols-2 gap-2">
       {open && <AdjustSheet game={game} seat={open} onClose={() => setOpen(null)} />}
@@ -133,8 +143,9 @@ function Scoreboard({ game }: { game: GameHook }) {
           <button
             key={s}
             type="button"
+            disabled={!!mine && mine !== s}
             onClick={() => setOpen(s)}
-            className={cx('rounded-xl border bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10', state.activeSeat === s ? 'border-accent/50' : 'border-white/10')}
+            className={cx('rounded-xl border bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10 disabled:active:bg-white/[0.03]', state.activeSeat === s ? 'border-accent/50' : 'border-white/10')}
           >
             <span className={cx('block truncate text-[12px] font-semibold', roleText(p.role))}>{p.name}</span>
             <span className="block font-display mt-0.5 text-3xl font-semibold leading-none">
@@ -148,7 +159,7 @@ function Scoreboard({ game }: { game: GameHook }) {
             {cut > 0 && <span className="block text-[11px] text-warn">сверх лимитов: {cut}</span>}
             <span className="mt-1.5 flex items-center justify-between gap-1">
               <span className="rounded-full border border-white/15 px-2 py-0.5 text-[12px] font-semibold">CP: {p.cp}</span>
-              <span className="text-[11px] font-semibold text-accent/90">Изменить</span>
+              {(!mine || mine === s) && <span className="text-[11px] font-semibold text-accent/90">Изменить</span>}
             </span>
           </button>
         );

@@ -6,6 +6,7 @@ import { haptic } from '../../telegram';
 import { Button, Segmented } from '../kit';
 import { cx, fmtPts } from '../util';
 import { rosterRefFor } from './players';
+import { useCanAct } from './cardViewer';
 import { RosterButton } from './RosterViewer';
 import type { GameHook } from './useGame';
 
@@ -33,7 +34,9 @@ export function StepPlayers({ game, rosters, index, onNext }: { game: GameHook; 
 
 function PlayerCard({ seat, game, rosters, index }: { seat: Seat; game: GameHook; rosters: Roster[]; index: DataIndex }) {
   const p = game.state!.players[seat];
-  const locked = game.state!.dispositionsRevealed;
+  // два телефона: чужую карточку только видно — ростер и имя выбирает сам игрок у себя
+  const canAct = useCanAct(seat);
+  const locked = game.state!.dispositionsRevealed || !canAct;
   const [name, setName] = useState(p.name);
   const [source, setSource] = useState<Source>(p.roster.source === 'code' || !rosters.length ? 'code' : 'own');
   const [code, setCode] = useState('');
@@ -87,6 +90,7 @@ function PlayerCard({ seat, game, rosters, index }: { seat: Seat; game: GameHook
         <span className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'}</span>
         <input
           value={name}
+          disabled={!canAct}
           maxLength={24}
           onChange={(e) => setName(e.target.value)}
           onBlur={commitName}
@@ -98,7 +102,9 @@ function PlayerCard({ seat, game, rosters, index }: { seat: Seat; game: GameHook
       <RosterSummary roster={p.roster} seat={seat} factionName={factionName} dName={dName} />
 
       {locked ? (
-        <p className="mt-2 text-[11px] text-white/45">Типы армий раскрыты — ростер больше не меняется.</p>
+        <p className="mt-2 text-[11px] text-white/45">
+          {canAct ? 'Типы армий раскрыты — ростер больше не меняется.' : `Ростер выбирает ${p.name} на своём телефоне.`}
+        </p>
       ) : (
         <>
           <Segmented<Source>

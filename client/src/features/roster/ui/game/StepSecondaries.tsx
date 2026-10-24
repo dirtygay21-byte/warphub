@@ -3,7 +3,8 @@ import type { SecondaryMode, Seat } from '../../game';
 import { haptic } from '../../telegram';
 import { Button, Icon, Segmented } from '../kit';
 import { cx } from '../util';
-import { useOpenCard } from './cardViewer';
+import { useMySeat, useOpenCard } from './cardViewer';
+import { OnlineSecret } from './OnlineSecret';
 import { DeckList, SecondaryCard } from './SecondaryCard';
 import type { GameHook } from './useGame';
 
@@ -15,7 +16,26 @@ import type { GameHook } from './useGame';
 export function StepSecondaries({ game, onNext }: { game: GameHook; onNext: () => void }) {
   const state = game.state!;
   const [phase, setPhase] = useState<'p1' | 'pass' | 'p2' | 'ready'>('p1');
+  const mine = useMySeat();
   if (state.secondariesRevealed) return <Revealed game={game} onNext={onNext} />;
+  if (mine)
+    return (
+      <OnlineSecret
+        game={game}
+        seat={mine}
+        chosen={(s) => !!state.players[s].secondaryMode}
+        what="вторичные миссии"
+        reveal={{ type: 'secondaries-revealed' }}
+        revealLabel="Раскрыть вторичные миссии"
+        extra={
+          <>
+            <SecondaryCard game={game} seat="p1" hidden />
+            <SecondaryCard game={game} seat="p2" hidden />
+          </>
+        }
+        choose={(onDone) => <Choose seat={mine} game={game} onDone={onDone} />}
+      />
+    );
 
   if (phase === 'pass' || phase === 'ready') {
     const who = state.players.p2.name;

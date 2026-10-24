@@ -33,3 +33,13 @@ test('движок: телефон игрока 1 не может менять �
   const own = { ...bad, target: 'p1', patch: { name: 'Свой' } } as GameEvent;
   assert.equal(applyEvent(r.state, own, catalog).ok, true);
 });
+
+test('движок: сдаться на своём телефоне можно только за себя', async () => {
+  const { setupBodies } = await import('./game-helpers');
+  const r = replay(log(...setupBodies()), catalog);
+  assert.ok(r.ok, r.ok ? '' : r.error);
+  const base = { id: 'c', seq: r.state.lastSeq + 1, at: '', type: 'battle-ended', reason: 'concede' } as const;
+  assert.equal(applyEvent(r.state, { ...base, seat: 'p1', by: 'p2' } as GameEvent, catalog).ok, false);
+  assert.equal(applyEvent(r.state, { ...base, seat: 'p2', by: 'p2' } as GameEvent, catalog).ok, true);
+  assert.equal(applyEvent(r.state, { ...base, seat: null, by: 'p1' } as GameEvent, catalog).ok, true);
+});

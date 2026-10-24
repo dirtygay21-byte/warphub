@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { rollOff, type Seat } from '../../game';
 import { haptic } from '../../telegram';
 import { Button } from '../kit';
+import { useMySeat } from './cardViewer';
 import { Dice } from './Dice';
 import type { GameHook } from './useGame';
 
@@ -16,6 +17,7 @@ export function StepRoles({ game, onNext }: { game: GameHook; onNext: () => void
   const attacker: Seat | null = state.players.p1.role === 'attacker' ? 'p1' : state.players.p2.role === 'attacker' ? 'p2' : null;
   const locked = state.secondariesRevealed;
   const [mode, setMode] = useState<'idle' | 'roll' | 'manual'>('idle');
+  const mine = useMySeat();
   const attempt = state.rollCount.roles;
   const roll = rollOff(state.seed, 'roles', attempt);
 
@@ -34,6 +36,11 @@ export function StepRoles({ game, onNext }: { game: GameHook; onNext: () => void
         <>
           <Dice rolls={roll.rolls} winner={roll.winner} names={names} />
           <p className="text-sm text-white/70">{names[roll.winner]} решает:</p>
+          {mine && mine !== roll.winner ? (
+            <p className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-xs text-white/60">
+              Атакующего и защитника выбирает {names[roll.winner]} на своём телефоне — экран обновится сам.
+            </p>
+          ) : (
           <div className="grid grid-cols-2 gap-2">
             <Button variant="primary" onClick={() => set(roll.winner, true)}>
               Я атакующий
@@ -42,6 +49,7 @@ export function StepRoles({ game, onNext }: { game: GameHook; onNext: () => void
               Я защитник
             </Button>
           </div>
+          )}
         </>
       )}
 

@@ -4,6 +4,7 @@ import { haptic } from '../../telegram';
 import { Button } from '../kit';
 import { cx } from '../util';
 import { CardLink } from './CardSheet';
+import { ActAs } from './ActAs';
 import { ScoreRows } from './ScoreRows';
 import type { GameHook } from './useGame';
 
@@ -22,9 +23,13 @@ export function EndOfTurn({ game }: { game: GameHook }) {
       <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Конец хода · {state.players[active].name}</p>
       <p className="text-xs text-white/55">Засчитывают оба игрока — сначала тот, чей ход. Невыполненные карты остаются активными.</p>
       {order.map((s, i) => (
-        <PlayerScoring key={s} game={game} seat={s} first={i === 0} />
+        <ActAs key={s} game={game} seat={s}>
+          <PlayerScoring game={game} seat={s} first={i === 0} />
+        </ActAs>
       ))}
-      <Discard game={game} seat={active} />
+      <ActAs game={game} seat={active}>
+        <Discard game={game} seat={active} />
+      </ActAs>
     </div>
   );
 }
