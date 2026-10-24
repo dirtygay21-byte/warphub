@@ -5,18 +5,19 @@ import {
   GAME_SCHEMA,
   appendRemote,
   applyEvent,
-  gameSaveKey,
+  loadLocalGame,
   newSeed,
-  readSavedGame,
+  readLibrary,
+  rememberOnlineGame,
+  removeSavedGame,
   replay,
-  setAsideSavedGame,
+  saveLocalGame,
   undoTarget,
-  writeSavedGame,
   type EventBody,
   type GameCatalog,
   type GameEvent,
   type GameState,
-  type SavedRead,
+  type SavedEntry,
   type Seat,
   seatForEvent,
 } from '../../game';
@@ -25,8 +26,7 @@ import { haptic, tg } from '../../telegram';
 
 // сохранение — своё у каждого аккаунта Telegram (как ростеры в storage.ts)
 const USER_SUFFIX = tg?.initDataUnsafe.user?.id ? `.${tg.initDataUnsafe.user.id}` : '';
-const SAVE_KEY = gameSaveKey(USER_SUFFIX);
-/** игра на двух телефонах (T2): какая игра и какое место у этого телефона — журнал хранит сервер */
+/** ссылка на игру на двух телефонах до списка игр (T2) — переносится в список */
 const ONLINE_KEY = `warphub.game.online.v1${USER_SUFFIX}`;
 /** как часто телефон спрашивает сервер о новых событиях соперника */
 const POLL_MS = 2500;
@@ -39,10 +39,9 @@ const readOnlineRef = (): OnlineRef | null => {
     return null;
   }
 };
-const writeOnlineRef = (v: OnlineRef | null) => {
+const dropOnlineRef = () => {
   try {
-    if (v) store()?.setItem(ONLINE_KEY, JSON.stringify(v));
-    else store()?.removeItem(ONLINE_KEY);
+    store()?.removeItem(ONLINE_KEY);
   } catch {
     /* хранилище недоступно */
   }
@@ -76,24 +75,22 @@ export interface GameHook {
   /** что снимет «Отменить» (null — нечего) */
   canUndo: boolean;
   undo: () => void;
-  /** сохранённая на устройстве игра (G4b): null — данные ещё грузятся; none / ok / bad */
-  saved: SavedRead | null;
-  /** продолжить сохранённую игру */
-  resume: () => void;
+  /** сохранённые игры на этом телефоне, новые сверху (null — ещё грузятся) */
+  library: SavedEntry[] | null;
+  /** открыть игру из списка (одиночную — с телефона, на двух телефонах — с сервера) */
+  openSaved: (entry: SavedEntry) => Promise<boolean>;
+  /** убрать игру из списка (на двух телефонах — только ссылку) */
+  removeSaved: (key: string) => void;
+  /** закрыть игру и вернуться к началу (игра остаётся в списке) */
+  closeGame: () => void;
   /** игра на двух телефонах (T2): null — игра на одном телефоне */
   online: (OnlineGame & { seat: Seat }) | null;
-  /** незаконченная игра на двух телефонах на этом телефоне (можно вернуться) */
-  savedOnline: OnlineRef | null;
   /** соединение с сервером: идёт отправка / последняя ошибка связи */
   sync: { sending: boolean; offline: boolean };
   /** создать игру на двух телефонах: этот телефон — игрок 1; initial — первые события (ростер из меню) */
   startOnline: (initial?: EventBody[]) => Promise<boolean>;
   /** войти по коду вторым игроком */
   joinOnline: (code: string) => Promise<boolean>;
-  /** вернуться к игре на двух телефонах */
-  resumeOnline: () => Promise<boolean>;
-  /** выйти из игры на этом телефоне (на сервере игра остаётся) */
-  leaveOnline: () => void;
 }
 
 /**
@@ -109,9 +106,8 @@ export function useGame(): GameHook {
   const [events, setEvents] = useState<GameEvent[]>([]);
   const [state, setState] = useState<GameState | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState<SavedRead | null>(null);
+  const [library, setLibrary] = useState<SavedEntry[] | null>(null);
   const [online, setOnline] = useState<GameHook['online']>(null);
-  const [savedOnline, setSavedOnline] = useState<OnlineRef | null>(null);
   const [sync, setSync] = useState({ sending: false, offline: false });
 
   // текущие журнал и состояние для асинхронной отправки и опроса (без устаревших замыканий)
@@ -134,8 +130,13 @@ export function useGame(): GameHook {
         const catalog = toCatalog(battlefield, missions);
         setData({ battlefield, missions, catalog });
         const s = store();
-        setSaved(s ? readSavedGame(s, SAVE_KEY, catalog) : { kind: 'none' });
-        setSavedOnline(readOnlineRef());
+        if (!s) return setLibrary([]);
+        // ссылка на игру на двух телефонах из прежней версии — в список
+        const old = readOnlineRef();
+        if (old && !rememberOnlineGame(s, USER_SUFFIX, { gameId: old.id, seat: old.seat, code: old.code }, null, catalog)) dropOnlineRef();
+        const lib = readLibrary(s, USER_SUFFIX, catalog);
+        setLibrary(lib.entries);
+        if (lib.warnings.length) setError(lib.warnings.join(' '));
       },
       (e) => setLoadError(String(e?.message ?? e)),
     );
@@ -144,21 +145,24 @@ export function useGame(): GameHook {
   // автосохранение (одиночная игра): после каждого принятого действия и отмены журнал целиком пишется на устройство.
   // Ошибка записи возвращается строкой — её показывает тот, кто менял журнал. Игру на двух телефонах хранит сервер.
   const persist = useCallback(
-    (list: GameEvent[]): string | null => {
-      if (onlineRef.current) return null;
+    (list: GameEvent[], st: GameState | null): string | null => {
+      if (onlineRef.current || !st) return null;
       const s = store();
-      return data && s ? writeSavedGame(s, SAVE_KEY, list, data.catalog) : null;
+      return data && s ? saveLocalGame(s, USER_SUFFIX, list, st, data.catalog) : null;
     },
     [data],
   );
 
-  const resume = useCallback(() => {
-    if (saved?.kind !== 'ok') return;
-    onlineRef.current = null;
-    setOnline(null);
-    commit(saved.events, saved.state);
-    setError(saved.warnings.length ? saved.warnings.join(' ') : null);
-  }, [saved, commit]);
+  // игра на двух телефонах: сводка для списка игр обновляется после каждого изменения
+  useEffect(() => {
+    const s = store();
+    if (online && state && data && s) rememberOnlineGame(s, USER_SUFFIX, { gameId: online.id, seat: online.seat, code: online.code }, state, data.catalog);
+  }, [online, state, data]);
+
+  const refreshLibrary = useCallback(() => {
+    const s = store();
+    if (s && data) setLibrary(readLibrary(s, USER_SUFFIX, data.catalog).entries);
+  }, [data]);
 
   const stamp = useCallback((body: EventBody, seq: number): GameEvent => {
     const o = onlineRef.current;
@@ -252,13 +256,15 @@ export function useGame(): GameHook {
     return () => window.clearInterval(t);
   }, [online, data, resync, commit]);
 
-  const enterOnline = useCallback((g: OnlineGame, seat: Seat) => {
-    const ref = { id: g.id, seat, code: g.code };
-    onlineRef.current = ref;
-    writeOnlineRef(ref);
-    setSavedOnline(ref);
-    setOnline({ ...g, seat });
-  }, []);
+  const enterOnline = useCallback(
+    (g: OnlineGame, seat: Seat) => {
+      onlineRef.current = { id: g.id, seat, code: g.code };
+      const s = store();
+      if (s && data) rememberOnlineGame(s, USER_SUFFIX, { gameId: g.id, seat, code: g.code }, null, data.catalog);
+      setOnline({ ...g, seat });
+    },
+    [data],
+  );
 
   const startOnline = useCallback(
     async (initial: EventBody[] = []): Promise<boolean> => {
@@ -308,25 +314,50 @@ export function useGame(): GameHook {
     [data, reject, enterOnline, resync, stamp, commit, send],
   );
 
-  const resumeOnline = useCallback(async (): Promise<boolean> => {
-    const ref = readOnlineRef();
-    if (!ref) return false;
-    onlineRef.current = ref;
-    setOnline({ id: ref.id, code: ref.code, seat: ref.seat, lastSeq: 0, players: { p1: null, p2: null }, createdAt: '', updatedAt: '' });
-    if (await resync()) return true;
-    // не открылась — обратно на начальный экран (ссылка на игру остаётся, можно повторить)
+  const closeGame = useCallback(() => {
     onlineRef.current = null;
-    setOnline(null);
-    return false;
-  }, [resync]);
-
-  const leaveOnline = useCallback(() => {
-    onlineRef.current = null;
-    writeOnlineRef(null);
-    setSavedOnline(null);
     setOnline(null);
     commit([], null);
-  }, [commit]);
+    setError(null);
+    refreshLibrary();
+  }, [commit, refreshLibrary]);
+
+  const openSaved = useCallback(
+    async (entry: SavedEntry): Promise<boolean> => {
+      const s = store();
+      if (!data || !s) return false;
+      if (entry.kind === 'local') {
+        const r = loadLocalGame(s, USER_SUFFIX, entry.key, data.catalog);
+        if (r.kind !== 'ok') return (reject(r.kind === 'bad' ? `Игру не удалось открыть: ${r.error}` : 'Игра не найдена на телефоне'), false);
+        onlineRef.current = null;
+        setOnline(null);
+        commit(r.events, r.state);
+        setError(r.warnings.length ? r.warnings.join(' ') : null);
+        return true;
+      }
+      const link = entry.online;
+      if (!link) return false;
+      onlineRef.current = { id: link.gameId, seat: link.seat, code: link.code };
+      setOnline({ id: link.gameId, code: link.code, seat: link.seat, lastSeq: 0, players: { p1: null, p2: null }, createdAt: '', updatedAt: '' });
+      if (await resync()) return true;
+      // не открылась — обратно к началу (ссылка остаётся в списке, можно повторить)
+      onlineRef.current = null;
+      setOnline(null);
+      return false;
+    },
+    [data, reject, commit, resync],
+  );
+
+  const removeSaved = useCallback(
+    (key: string) => {
+      const s = store();
+      if (!s) return;
+      const err = removeSavedGame(s, USER_SUFFIX, key);
+      if (err) reject(err);
+      refreshLibrary();
+    },
+    [reject, refreshLibrary],
+  );
 
   // ---------- общие действия ----------
 
@@ -335,17 +366,14 @@ export function useGame(): GameHook {
       if (!data) return;
       onlineRef.current = null;
       setOnline(null);
-      // нечитаемое сохранение не затирается молча — откладывается под ключ .broken
-      const s = store();
-      if (s && saved?.kind === 'bad') setAsideSavedGame(s, SAVE_KEY);
       const ev = stamp({ type: 'game-created', schema: GAME_SCHEMA, seed: newSeed(), names: { p1: names.p1 ?? 'Игрок 1', p2: names.p2 ?? 'Игрок 2' } }, 1);
       const list = [ev, ...initial.map((b, i) => stamp(b, i + 2))];
       const r = replay(list, data.catalog);
       if (!r.ok) return reject(r.error);
       commit(list, r.state);
-      setError(persist(list));
+      setError(persist(list, r.state));
     },
-    [data, saved, stamp, reject, persist, commit],
+    [data, stamp, reject, persist, commit],
   );
 
   const dispatch = useCallback(
@@ -363,7 +391,7 @@ export function useGame(): GameHook {
       if (onlineRef.current) {
         setError(null);
         send([ev]);
-      } else setError(persist(list));
+      } else setError(persist(list, r.state));
       return true;
     },
     [data, stamp, reject, commit, persist, send],
@@ -385,7 +413,7 @@ export function useGame(): GameHook {
     haptic.tap();
     commit(next, r.state);
     if (onlineRef.current) send([ev]);
-    else setError(persist(next));
+    else setError(persist(next, r.state));
   }, [data, stamp, reject, commit, persist, send]);
 
   return {
@@ -399,14 +427,13 @@ export function useGame(): GameHook {
     dispatch,
     canUndo,
     undo,
-    saved,
-    resume,
+    library,
+    openSaved,
+    removeSaved,
+    closeGame,
     online,
-    savedOnline,
     sync,
     startOnline,
     joinOnline,
-    resumeOnline,
-    leaveOnline,
   };
 }
