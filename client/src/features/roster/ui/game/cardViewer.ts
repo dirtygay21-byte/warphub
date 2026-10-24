@@ -20,3 +20,16 @@ export const RosterViewerContext = createContext<OpenRoster | null>(null);
 export function useOpenRoster(): OpenRoster | null {
   return useContext(RosterViewerContext);
 }
+
+/** Место этого телефона в игре на двух телефонах (T3); null — игра на одном телефоне: действует за обоих. */
+export const MySeatContext = createContext<Seat | null>(null);
+
+export function useMySeat(): Seat | null {
+  return useContext(MySeatContext);
+}
+
+/** Может ли этот телефон действовать за игрока seat (на одном телефоне — за любого). */
+export function useCanAct(seat: Seat): boolean {
+  const mine = useContext(MySeatContext);
+  return mine === null || mine === seat;
+}

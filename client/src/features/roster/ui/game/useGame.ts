@@ -286,7 +286,11 @@ export function useGame(): GameHook {
       const seat = r.data.seat;
       if (!seat) return (reject('Не удалось занять место в игре'), false);
       enterOnline(r.data, seat);
-      if (!(await resync())) return false;
+      if (!(await resync())) {
+        onlineRef.current = null;
+        setOnline(null);
+        return false;
+      }
       // второй игрок: своё имя из Telegram вместо «Игрок 2»
       const st = stateRef.current;
       const myName = r.data.players[seat]?.name;
@@ -309,7 +313,11 @@ export function useGame(): GameHook {
     if (!ref) return false;
     onlineRef.current = ref;
     setOnline({ id: ref.id, code: ref.code, seat: ref.seat, lastSeq: 0, players: { p1: null, p2: null }, createdAt: '', updatedAt: '' });
-    return resync();
+    if (await resync()) return true;
+    // не открылась — обратно на начальный экран (ссылка на игру остаётся, можно повторить)
+    onlineRef.current = null;
+    setOnline(null);
+    return false;
   }, [resync]);
 
   const leaveOnline = useCallback(() => {
