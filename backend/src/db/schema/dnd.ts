@@ -36,8 +36,19 @@ export const dndGamesTable = pgTable(
     description: text('description'),
     /** Тип игры: «Пробная игра», «One-shot», «Кампания» … */
     gameType: varchar('game_type').notNull(),
-    startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+    /** Точное начало; null — время примерное (дни недели и время суток), детали согласует Мастер */
+    startsAt: timestamp('starts_at', { withTimezone: true }),
     endsAt: timestamp('ends_at', { withTimezone: true }),
+    /** Примерное расписание: дни недели (1 — пн … 7 — вс) */
+    daysOfWeek: integer('days_of_week')
+      .array()
+      .notNull()
+      .default(sql`'{}'::integer[]`),
+    /** Примерное расписание: время суток (morning / afternoon / evening) */
+    timesOfDay: varchar('times_of_day')
+      .array()
+      .notNull()
+      .default(sql`'{}'::varchar[]`),
     capacity: integer('capacity').notNull(),
     imageUrl: text('image_url'),
     status: varchar('status', { enum: DND_GAME_STATUSES })
@@ -60,6 +71,10 @@ export const dndGamesTable = pgTable(
     check(
       'dnd_games_ends_at_check',
       sql`${table.endsAt} is null or ${table.endsAt} > ${table.startsAt}`,
+    ),
+    check(
+      'dnd_games_schedule_check',
+      sql`${table.startsAt} is not null or (cardinality(${table.daysOfWeek}) > 0 and cardinality(${table.timesOfDay}) > 0)`,
     ),
     index('dnd_games_starts_at_index').on(table.startsAt),
   ],

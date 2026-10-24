@@ -1,6 +1,8 @@
 import {
   bookDndGame,
   createTrialRequest,
+  DND_MASTER_CONTACT,
+  flexibleLabel,
   getDndGames,
   type DndGame,
 } from "@/apiUtils/dnd";
@@ -88,7 +90,13 @@ const gameImage = (game: DndGame) =>
   game.imageUrl || s3Url("services/dnd_game.webp");
 
 const formatGameDate = (game: DndGame) =>
-  formatClub(game.startsAt, { weekday: "short", day: "numeric", month: "long" });
+  game.startsAt
+    ? formatClub(game.startsAt, { weekday: "short", day: "numeric", month: "long" })
+    : flexibleLabel(game);
+
+/** Время: точное — «18:00–22:00»; у игры без точного времени — его уточнит Мастер */
+const formatGameTime = (game: DndGame) =>
+  game.startsAt ? formatClubTimeRange(game.startsAt, game.endsAt) : "Точное время уточнит Мастер";
 
 function availabilityLabel(game: DndGame) {
   if (game.status === "closed") return "Запись закрыта";
@@ -198,7 +206,7 @@ export function DndGameCard({
           </p>
           <p className="flex items-center gap-2">
             <Clock3 className="size-4 text-accent" />
-            {formatClubTimeRange(game.startsAt, game.endsAt)}
+            {formatGameTime(game)}
           </p>
           <p className="flex items-center gap-2">
             <UsersRound className="size-4 text-accent" />
@@ -360,8 +368,10 @@ function JoinForm({
   const [experienceLevel, setExperienceLevel] = useState("");
   const [showErrors, setShowErrors] = useState(false);
 
+  // у игры без точного времени вопроса «удобно ли время» нет — время согласует Мастер
+  const exact = !!game.startsAt;
   const validationError =
-    timeIsConvenient === null
+    exact && timeIsConvenient === null
       ? "Ответьте, удобно ли время"
       : !experienceLevel
         ? "Выберите уровень опыта"
@@ -371,7 +381,7 @@ function JoinForm({
     mutationFn: () =>
       bookDndGame(game.id, {
         quantity,
-        timeIsConvenient: timeIsConvenient === true,
+        timeIsConvenient: exact ? timeIsConvenient === true : true,
         experienceLevel,
       }),
     onSuccess: () => {
@@ -391,9 +401,11 @@ function JoinForm({
           <NumberChips max={maxQuantity} value={quantity} onChange={setQuantity} />
         </Field>
 
-        <Field label="Это время вам удобно?">
-          <YesNoChips value={timeIsConvenient} onChange={setTimeIsConvenient} />
-        </Field>
+        {exact && (
+          <Field label="Это время вам удобно?">
+            <YesNoChips value={timeIsConvenient} onChange={setTimeIsConvenient} />
+          </Field>
+        )}
 
         <Field label="Опыт">
           <ChoiceChips
@@ -446,9 +458,14 @@ function DndDone({ kind, game }: { kind: "trial" | "join"; game?: DndGame }) {
         {kind === "trial"
           ? "Мы подберём группу и напишем вам в Telegram."
           : game
-            ? `«${game.title}», ${formatGameDate(game)}, ${formatClubTimeRange(game.startsAt, game.endsAt)}`
+            ? `«${game.title}», ${formatGameDate(game)}${game.startsAt ? `, ${formatGameTime(game)}` : ""}`
             : "Ждём тебя на игре."}
       </p>
+      {kind === "join" && (
+        <p className="mt-3 rounded-xl border border-accent/40 bg-accent/10 px-4 py-3 text-sm font-semibold text-white">
+          {DND_MASTER_CONTACT}
+        </p>
+      )}
 
       <button
         type="button"

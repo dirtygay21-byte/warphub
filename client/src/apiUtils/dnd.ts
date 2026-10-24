@@ -7,8 +7,13 @@ export type DndGame = {
   title: string;
   description: string | null;
   gameType: string;
-  startsAt: string;
+  /** null — время примерное: дни недели и время суток, детали уточнит Мастер */
+  startsAt: string | null;
   endsAt: string | null;
+  daysOfWeek: number[];
+  timesOfDay: string[];
+  /** «пятница или суббота, вечер» или точная дата и время */
+  scheduleLabel: string;
   capacity: number;
   occupied: number;
   available: number;
@@ -110,12 +115,27 @@ export type DndGamePayload = {
   title: string;
   description: string | null;
   gameType: string;
-  startsAt: string;
+  startsAt: string | null;
   endsAt: string | null;
+  daysOfWeek: number[];
+  timesOfDay: string[];
   capacity: number;
   imageUrl: string | null;
   status: DndGameStatus;
 };
+
+/** Дни недели для примерного времени игры (1 — пн … 7 — вс) */
+export const DND_WEEKDAY_OPTIONS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((label, i) => ({
+  value: String(i + 1),
+  label,
+}));
+
+/** «Пятница или суббота, вечер» — расписание игры без точного времени с заглавной буквы */
+export const flexibleLabel = (game: Pick<DndGame, "scheduleLabel">) =>
+  game.scheduleLabel.charAt(0).toUpperCase() + game.scheduleLabel.slice(1);
+
+/** Сообщение после записи на игру D&D */
+export const DND_MASTER_CONTACT = "Мастер свяжется с вами, чтобы уточнить детали.";
 
 export const getAdminDndGames = () =>
   apiRequest<AdminDndGame[]>("/admin/dnd/games");
@@ -173,4 +193,4 @@ export const DND_TRIAL_STATUS_LABELS: Record<DndTrialStatus, string> = {
 export const isDndBookingInactive = (booking: DndBooking & { game: DndGame }) =>
   booking.status === "cancelled" ||
   booking.game.status === "cancelled" ||
-  new Date(booking.game.startsAt).getTime() < Date.now();
+  (!!booking.game.startsAt && new Date(booking.game.startsAt).getTime() < Date.now());

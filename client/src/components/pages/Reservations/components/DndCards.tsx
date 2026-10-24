@@ -1,5 +1,7 @@
 import {
   DND_TRIAL_STATUS_LABELS,
+  DND_MASTER_CONTACT,
+  flexibleLabel,
   isDndBookingInactive,
   type DndBooking,
   type DndGame,
@@ -94,34 +96,47 @@ export function DndBookingCard({
       </div>
 
       <div className="space-y-3 px-4 py-4 text-sm">
-        <DetailRow
-          icon={<CalendarDays className="size-4" />}
-          label="Дата"
-          value={formatClub(booking.game.startsAt, {
-            day: "numeric",
-            month: "long",
-            weekday: "short",
-          })}
-          isLoading={false}
-        />
-        <DetailRow
-          icon={<Clock3 className="size-4" />}
-          label="Время"
-          value={formatClubTimeRange(booking.game.startsAt, booking.game.endsAt)}
-          isLoading={false}
-        />
+        {booking.game.startsAt ? (
+          <>
+            <DetailRow
+              icon={<CalendarDays className="size-4" />}
+              label="Дата"
+              value={formatClub(booking.game.startsAt, {
+                day: "numeric",
+                month: "long",
+                weekday: "short",
+              })}
+              isLoading={false}
+            />
+            <DetailRow
+              icon={<Clock3 className="size-4" />}
+              label="Время"
+              value={formatClubTimeRange(booking.game.startsAt, booking.game.endsAt)}
+              isLoading={false}
+            />
+          </>
+        ) : (
+          <DetailRow
+            icon={<CalendarDays className="size-4" />}
+            label="Когда"
+            value={`${flexibleLabel(booking.game)}. ${DND_MASTER_CONTACT}`}
+            isLoading={false}
+          />
+        )}
         <DetailRow
           icon={<UsersRound className="size-4" />}
           label="Мест"
           value={String(booking.quantity)}
           isLoading={false}
         />
-        <DetailRow
-          icon={<ThumbsUp className="size-4" />}
-          label="Время удобно"
-          value={booking.timeIsConvenient ? "Да" : "Нет"}
-          isLoading={false}
-        />
+        {booking.game.startsAt && (
+          <DetailRow
+            icon={<ThumbsUp className="size-4" />}
+            label="Время удобно"
+            value={booking.timeIsConvenient ? "Да" : "Нет"}
+            isLoading={false}
+          />
+        )}
         {booking.experienceLabel && (
           <DetailRow
             icon={<Medal className="size-4" />}

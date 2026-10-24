@@ -170,8 +170,9 @@ export default function Reservation() {
       [...(dndQuery.data?.bookings ?? [])].sort(
         (a, b) =>
           Number(isDndBookingInactive(a)) - Number(isDndBookingInactive(b)) ||
-          new Date(a.game.startsAt).getTime() -
-            new Date(b.game.startsAt).getTime()
+          // игры без точного времени — первыми среди активных
+          (a.game.startsAt ? new Date(a.game.startsAt).getTime() : 0) -
+            (b.game.startsAt ? new Date(b.game.startsAt).getTime() : 0)
       ),
     [dndQuery.data]
   );
