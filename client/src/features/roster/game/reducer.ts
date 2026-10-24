@@ -303,6 +303,8 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       if (ev.reason === 'rounds') return fail('Битва по раундам заканчивается сама после пятого раунда');
       if (ev.reason !== 'concede' && ev.reason !== 'manual') return fail('Неизвестная причина окончания');
       if (ev.reason === 'concede' && (!ev.by || !SEATS.includes(ev.by))) return fail('Укажите, кто сдался');
+      // два телефона: сдаться можно только за себя (общий телефон — за любого)
+      if (ev.reason === 'concede' && ev.seat !== null && ev.seat !== ev.by) return fail('Сдаться можно только за себя');
       if (ev.reason === 'manual' && ev.by) return fail('Окончание по договорённости — без сдавшегося');
       s.concededBy = ev.reason === 'concede' ? ev.by! : null;
       s.stage = 'finished';

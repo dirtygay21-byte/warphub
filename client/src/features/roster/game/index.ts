@@ -7,3 +7,4 @@ export * from './scoring';
 export * from './serialize';
 export * from './setup';
 export * from './autosave';
+export * from './online';

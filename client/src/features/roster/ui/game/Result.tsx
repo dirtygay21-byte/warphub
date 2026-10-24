@@ -3,6 +3,8 @@ import { battleResult, BATTLE_READY_VP, totals, type Seat } from '../../game';
 import { haptic } from '../../telegram';
 import { Button, Icon } from '../kit';
 import { cx } from '../util';
+import { ActAs } from './ActAs';
+import { useMySeat } from './cardViewer';
 import { RosterButton } from './RosterViewer';
 import { ScoreRows } from './ScoreRows';
 import type { GameHook } from './useGame';
@@ -35,7 +37,9 @@ export function Result({ game }: { game: GameHook }) {
       </div>
 
       {SEATS.map((s) => (
-        <EndScoring key={s} game={game} seat={s} />
+        <ActAs key={s} game={game} seat={s}>
+          <EndScoring game={game} seat={s} />
+        </ActAs>
       ))}
 
       <div className="grid grid-cols-2 gap-2">
@@ -130,6 +134,8 @@ function EndScoring({ game, seat }: { game: GameHook; seat: Seat }) {
 export function EndEarly({ game }: { game: GameHook }) {
   const state = game.state!;
   const [open, setOpen] = useState(false);
+  // два телефона: сдаться можно только за себя
+  const mine = useMySeat();
   const end = (by: Seat | null) => {
     const ok = game.dispatch(by ? { type: 'battle-ended', reason: 'concede', by } : { type: 'battle-ended', reason: 'manual' });
     if (ok) {
@@ -148,9 +154,9 @@ export function EndEarly({ game }: { game: GameHook }) {
       <p className="text-sm font-semibold">Завершить битву досрочно?</p>
       <p className="text-[11px] text-white/55">Если игрок сдаётся — победа сопернику независимо от ПО. «Отменить» вернёт битву.</p>
       <div className="grid grid-cols-2 gap-1.5">
-        {SEATS.map((s) => (
+        {SEATS.filter((s) => !mine || s === mine).map((s) => (
           <Button key={s} variant="danger" onClick={() => end(s)}>
-            Сдаётся {state.players[s].name}
+            {mine ? 'Я сдаюсь' : `Сдаётся ${state.players[s].name}`}
           </Button>
         ))}
       </div>

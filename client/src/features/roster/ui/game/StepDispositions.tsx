@@ -4,6 +4,8 @@ import { haptic } from '../../telegram';
 import { Button } from '../kit';
 import { MissionCardView } from '../MissionCard';
 import { cx } from '../util';
+import { useMySeat } from './cardViewer';
+import { OnlineSecret } from './OnlineSecret';
 import type { GameHook } from './useGame';
 
 /**
@@ -14,7 +16,20 @@ import type { GameHook } from './useGame';
 export function StepDispositions({ game, onNext }: { game: GameHook; onNext: () => void }) {
   const state = game.state!;
   const [phase, setPhase] = useState<'p1' | 'pass' | 'p2' | 'ready'>('p1');
+  const mine = useMySeat();
   if (state.dispositionsRevealed) return <Revealed game={game} onNext={onNext} />;
+  if (mine)
+    return (
+      <OnlineSecret
+        game={game}
+        seat={mine}
+        chosen={(s) => !!state.players[s].disposition}
+        what="тип армии"
+        reveal={{ type: 'dispositions-revealed' }}
+        revealLabel="Раскрыть типы армий"
+        choose={(onDone) => <Choose seat={mine} game={game} onDone={onDone} />}
+      />
+    );
 
   if (phase === 'pass' || phase === 'ready') {
     const who = state.players.p2.name;

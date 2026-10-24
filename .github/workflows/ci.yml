@@ -49,7 +49,7 @@ jobs:
   backend-e2e:
     name: "Backend e2e: admins"
     # (имя job сохранено; внутри — и тесты записи короче полной длительности, B1)
-    # Настоящий сервер + временный PostgreSQL на раннере GitHub; новые сквозные тесты (admins-e2e, booking-short-e2e).
+    # Настоящий сервер + временный PostgreSQL на раннере GitHub; новые сквозные тесты (admins-e2e, booking-short-e2e, online-games-e2e).
     # Все секреты — тестовые заглушки; уведомления выключены, наружу ничего не уходит.
     runs-on: ubuntu-24.04
     services:
@@ -91,8 +91,8 @@ jobs:
           for f in e2e-schema/*.sql; do
             psql "$POSTGRES_URI" -v ON_ERROR_STOP=1 -q -f "$f" 2> psql.err || { sed 's/^/::error::schema: /' psql.err | head -5; exit 1; }
           done
-      - name: Migration 0014 applies on top (idempotent)
-        run: psql "$POSTGRES_URI" -v ON_ERROR_STOP=1 -f backend/drizzle/0014_admin_users.sql
+      - name: Migrations 0014–0015 apply on top (idempotent)
+        run: for f in backend/drizzle/0014_admin_users.sql backend/drizzle/0015_online_games.sql; do psql "$POSTGRES_URI" -v ON_ERROR_STOP=1 -f "$f"; done
       - name: Tables in the test database
         run: |
           T=$(psql "$POSTGRES_URI" -Atc "select string_agg(table_name, ' ' order by table_name) from information_schema.tables where table_schema='public'")
@@ -105,7 +105,7 @@ jobs:
           cat api.log; exit 1
       - name: E2E tests
         working-directory: backend
-        run: WARPHUB_E2E=1 bun test tests/admins-e2e.test.ts tests/booking-short-e2e.test.ts
+        run: WARPHUB_E2E=1 bun test tests/admins-e2e.test.ts tests/booking-short-e2e.test.ts tests/online-games-e2e.test.ts
       - name: API log on failure
         if: failure()
         working-directory: backend

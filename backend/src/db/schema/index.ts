@@ -9,3 +9,4 @@ export * from './dnd';
 export * from './roster';
 export * from './minigames';
 export * from './admins';
+export * from './online-games';
