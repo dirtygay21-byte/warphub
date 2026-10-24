@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import type { DataIndex, Roster } from '../../engine/types';
-import { currentSetupStep, ROUNDS, setupSteps, totals, type EventBody, type Seat, type SetupStepId } from '../../game';
+import { currentSetupStep, setupSteps, type EventBody, type Seat, type SetupStepId } from '../../game';
 import { pushOverlay } from '../../telegram';
 import { Battlefield } from '../Battlefield';
 import { Button, Icon, IconButton } from '../kit';
@@ -8,6 +8,7 @@ import { cx } from '../util';
 import { CardSheet } from './CardSheet';
 import { CardViewerContext, MySeatContext, RosterViewerContext } from './cardViewer';
 import { OnlineBar, OnlineStart } from './Online';
+import { SavedGames } from './SavedGames';
 import { rosterRefFor } from './players';
 import { RosterViewer } from './RosterViewer';
 import { StepDispositions } from './StepDispositions';
@@ -85,7 +86,7 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
     <CardViewerContext.Provider value={openCard}>
       <RosterViewerContext.Provider value={master ? openRoster : null}>
        <MySeatContext.Provider value={game.online?.seat ?? null}>
-        <Shell onBack={onBack} undo={state && game.canUndo ? game.undo : undefined} master={master} onMaster={toggleMaster}>
+        <Shell onBack={state || game.online ? game.closeGame : onBack} undo={state && game.canUndo ? game.undo : undefined} master={master} onMaster={toggleMaster}>
           <OnlineBar game={game} />
           {game.online && !state ? (
             <div className="mx-auto mt-16 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
@@ -142,73 +143,35 @@ const writeMaster = (on: boolean) => {
 };
 
 /**
- * Начало (G4b): сохранённая на устройстве игра — «Продолжить» (раунд, игроки, счёт) или «Новая игра» с подтверждением;
- * нечитаемое сохранение — причина и новая игра с откладыванием старого сохранения; иначе — новая игра.
+ * Начало: новая игра на одном телефоне, игра на двух телефонах и кнопка «Сохранённые игры» — список с датой,
+ * игроками и миссиями (новая игра старые не затирает).
  */
 function StartCard({ game, onStart, onStartOnline, starting }: { game: GameHook; onStart: () => void; onStartOnline: () => Promise<void>; starting: boolean }) {
-  const [confirm, setConfirm] = useState(false);
-  const saved = game.saved;
-  const intro = (
-    <p className="mt-1 text-sm leading-snug text-white/60">
-      Подготовка по шагам правил Chapter Approved 2026–27: игроки и ростеры, типы армий, раскладка, атакующий и защитник, вторичные миссии, первый ход.
-      Затем — трекер партии. Игра на одном телефоне сохраняется на нём после каждого действия.
-    </p>
-  );
-  if (saved?.kind === 'ok') {
-    const s = saved.state;
-    const t = { p1: totals(s, 'p1', game.data!.catalog).total, p2: totals(s, 'p2', game.data!.catalog).total };
-    const where = s.stage === 'setup' ? 'подготовка к битве' : s.stage === 'finished' ? 'битва окончена' : `раунд ${s.round} из ${ROUNDS}`;
-    return (
-      <section className="space-y-3">
-        <div className="rounded-2xl border border-accent/40 bg-accent/10 p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">Сохранённая игра · {where}</p>
-          <p className="font-display mt-1 text-xl font-semibold uppercase leading-tight">
-            {s.players.p1.name} — {s.players.p2.name}
-          </p>
-          {s.stage !== 'setup' && (
-            <p className="font-display mt-1 text-2xl font-semibold tabular-nums">
-              {t.p1} : {t.p2}
-            </p>
-          )}
-          <Button variant="primary" className="mt-3 w-full" onClick={game.resume}>
-            {s.stage === 'finished' ? 'Открыть итог' : 'Продолжить игру'}
-          </Button>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-          <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
-          {intro}
-          {!confirm ? (
-            <Button className="mt-3 w-full" onClick={() => setConfirm(true)}>
-              Начать новую игру
-            </Button>
-          ) : (
-            <div className="mt-3 space-y-2">
-              <p className="text-xs text-warn">Сохранённая игра будет заменена новой. Начать?</p>
-              <div className="grid grid-cols-2 gap-2">
-                <Button variant="danger" disabled={starting} onClick={onStart}>
-                  Да, новая игра
-                </Button>
-                <Button onClick={() => setConfirm(false)}>Нет</Button>
-              </div>
-            </div>
-          )}
-        </div>
-        <OnlineStart game={game} onCreate={onStartOnline} busy={starting} />
-      </section>
-    );
-  }
+  const [list, setList] = useState(false);
+  const closeList = useCallback(() => setList(false), []);
+  if (list) return <SavedGames game={game} onClose={closeList} />;
+  const count = game.library?.length ?? 0;
+  const unfinished = game.library?.filter((e) => e.summary?.stage !== 'finished').length ?? 0;
   return (
     <section className="space-y-3">
-      {saved?.kind === 'bad' && (
-        <div className="rounded-2xl border border-warn/40 bg-warn/10 p-4 text-sm">
-          <p className="font-semibold text-warn">Сохранённую игру не удалось открыть</p>
-          <p className="mt-1 text-white/70">{saved.error}</p>
-          <p className="mt-1 text-[11px] text-white/50">Сохранение не удалено: при новой игре оно будет отложено отдельно.</p>
-        </div>
-      )}
+      <button
+        type="button"
+        onClick={() => setList(true)}
+        className="flex w-full items-center gap-3 rounded-2xl border border-accent/40 bg-accent/10 px-4 py-3 text-left active:bg-accent/15"
+      >
+        <Icon name="book" className="size-5 text-accent" />
+        <span className="min-w-0 flex-1">
+          <span className="block font-display text-lg font-semibold uppercase leading-tight">Сохранённые игры{count ? ` (${count})` : ''}</span>
+          <span className="block text-[11px] text-white/55">{count ? (unfinished ? `Незаконченных: ${unfinished}` : 'Все законченные') : 'Пока нет — начните новую игру'}</span>
+        </span>
+        <Icon name="chevron" className="size-4 text-white/40" />
+      </button>
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
-        {intro}
+        <p className="mt-1 text-sm leading-snug text-white/60">
+          Подготовка по шагам правил Chapter Approved 2026–27: игроки и ростеры, типы армий, раскладка, атакующий и защитник, вторичные миссии, первый ход.
+          Затем — трекер партии. Игра сохраняется на этом телефоне после каждого действия и появляется в «Сохранённых играх».
+        </p>
         <Button variant="primary" className="mt-3 w-full" disabled={starting} onClick={onStart}>
           Начать подготовку
         </Button>

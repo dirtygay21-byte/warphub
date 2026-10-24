@@ -16,19 +16,14 @@ export function OnlineStart({ game, onCreate, busy }: { game: GameHook; onCreate
     await f();
     setWorking(false);
   };
-  const saved = game.savedOnline;
   const disabled = busy || working;
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
       <p className="font-display text-xl font-semibold uppercase">На двух телефонах</p>
       <p className="mt-1 text-sm leading-snug text-white/60">
         Каждый игрок ведёт игру на своём телефоне: свой ростер, тайный выбор, свои карты и CP. Счёт и ход видны обоим.
+        Начатые игры — в «Сохранённых играх».
       </p>
-      {saved && (
-        <Button variant="primary" className="mt-3 w-full" disabled={disabled} onClick={() => void run(game.resumeOnline)}>
-          Вернуться к игре · код {saved.code}
-        </Button>
-      )}
       <Button className="mt-3 w-full" disabled={disabled} onClick={() => void run(onCreate)}>
         Создать игру и позвать соперника
       </Button>
@@ -49,10 +44,9 @@ export function OnlineStart({ game, onCreate, busy }: { game: GameHook; onCreate
   );
 }
 
-/** Полоса игры на двух телефонах: код, кто я, есть ли соперник, связь; «Позвать» и «Выйти». */
+/** Полоса игры на двух телефонах: код, кто я, есть ли соперник, связь; «Позвать» и «К списку» (игра остаётся в сохранённых). */
 export function OnlineBar({ game }: { game: GameHook }) {
   const o = game.online;
-  const [leaving, setLeaving] = useState(false);
   if (!o) return null;
   const opp = o.seat === 'p1' ? 'p2' : 'p1';
   const me = game.state?.players[o.seat].name ?? (o.seat === 'p1' ? 'Игрок 1' : 'Игрок 2');
@@ -81,22 +75,10 @@ export function OnlineBar({ game }: { game: GameHook }) {
             Позвать
           </button>
         )}
-        {!leaving ? (
-          <button type="button" onClick={() => setLeaving(true)} className="rounded-full border border-white/15 px-2.5 py-1 font-semibold text-white/60 active:bg-white/10">
-            Выйти
-          </button>
-        ) : (
-          <span className="flex items-center gap-1">
-            <button type="button" onClick={game.leaveOnline} className="rounded-full border border-danger/50 px-2.5 py-1 font-semibold text-danger">
-              Выйти
-            </button>
-            <button type="button" onClick={() => setLeaving(false)} className="rounded-full border border-white/15 px-2.5 py-1 font-semibold text-white/60">
-              Нет
-            </button>
-          </span>
-        )}
+        <button type="button" onClick={game.closeGame} className="rounded-full border border-white/15 px-2.5 py-1 font-semibold text-white/60 active:bg-white/10">
+          К списку
+        </button>
       </div>
-      {leaving && <p className="mt-1 text-[11px] text-white/45">Игра останется на сервере: вернуться можно по коду {o.code}.</p>}
     </div>
   );
 }
