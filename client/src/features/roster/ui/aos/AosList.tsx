@@ -17,6 +17,7 @@ export function AosList({
   rosters,
   onOpen,
   onStartGame,
+  onTestArmy,
   onCreate,
   onDuplicate,
   onDelete,
@@ -27,6 +28,7 @@ export function AosList({
   rosters: AosRoster[];
   onOpen: (id: string) => void;
   onStartGame: () => void;
+  onTestArmy: () => void;
   onCreate: (r: AosRoster) => void;
   onDuplicate: (r: AosRoster) => void;
   onDelete: (id: string) => void;
@@ -49,9 +51,8 @@ export function AosList({
       {switcher}
 
       <div className="mb-5 grid grid-cols-2 gap-2">
-        <div className="col-span-2 grid">
-          <Tile icon="spark" title="Начать игру" sub="Батлплан, priority, CP, тактики и счёт" onClick={onStartGame} />
-        </div>
+        <Tile icon="spark" title="Начать игру" sub="Батлплан, priority, CP, тактики" onClick={onStartGame} />
+        <Tile icon="map" title="Test Army" sub="Расстановка на карте батлплана" onClick={onTestArmy} />
         <Tile icon="book" title="Правила" sub="Core Rules · Wahapedia" onClick={() => openExternal('https://wahapedia.ru/aos4/the-rules/the-core-rules/')} />
         <Tile icon="shield" title="Сезон" sub="General’s Handbook 2026-27" onClick={() => openExternal('https://wahapedia.ru/aos4/the-rules/general-s-handbook-2026-27/')} />
       </div>

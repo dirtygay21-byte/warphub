@@ -4,11 +4,12 @@ import { computeRoster, makeLookup, type ComputedRoster, type DataLookup } from 
 import { decodeRoster } from '../../engine/roster';
 import type { DataIndex, Roster } from '../../engine/types';
 import { pushOverlay, tg } from '../../telegram';
-import { buildUnits, FOE_PREFIX, otherSide, parseSave, restoreUnits, type ArmyKey, type Side, type TAArmy, type TASave, type TAUnit } from '../../testarmy';
+import { buildUnits, FOE_PREFIX, OBJECTIVE_RULE_SOURCE, otherSide, parseSave, restoreUnits, type ArmyKey, type Pt, type Side, type TAArmy, type TASave, type TAUnit } from '../../testarmy';
 import { BattleMap } from '../Battlefield';
 import { Button, IconButton, Segmented } from '../kit';
 import { cx, fmtPts } from '../util';
-import { Board } from './Board';
+import { Board, type BoardArmy as BoardArmyView, type BoardField } from './Board';
+import { UnitInfo } from './UnitInfo';
 
 const LETTERS = ['A', 'B', 'C'];
 
@@ -33,6 +34,17 @@ type FoeSpec = { kind: 'none' } | { kind: 'own'; rosterId: string } | { kind: 'c
 
 /** Армия на столе со всем, что нужно экрану: ростер, данные фракции, расчёт ростера. */
 export type BoardArmy = TAArmy & { roster: Roster; cr: ComputedRoster; L: DataLookup };
+
+/** Армия 40K для стола: имя, строка характеристик (первый профиль инфолиста) и карточка отряда. */
+const view40k = (a: BoardArmy): BoardArmyView => ({
+  ...a,
+  name: a.roster.name,
+  stats: (u) => {
+    const st = a.cr.byUid.get(u.uid.startsWith(FOE_PREFIX) ? u.uid.slice(FOE_PREFIX.length) : u.uid)?.ds?.stats[0];
+    return st ? `M ${st.M} · T ${st.T} · Sv ${st.Sv}${st.inv ? ` (${st.inv.replace(/\+/g, '')}++)` : ''} · W ${st.W} · Ld ${st.Ld} · OC ${st.OC}` : null;
+  },
+  info: (u, onClose) => <UnitInfo unit={u} cr={a.cr} roster={a.roster} L={a.L} onClose={onClose} />,
+});
 
 const dropSave = (rosterId: string) => {
   try {
@@ -151,7 +163,15 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
   if (step === 'board' && roster && layout) {
     const dep = bf.deployments.find((d) => d.id === layout.deployment)!;
     if (!armies) return <Spinner full />;
-    return <Board armies={armies} layout={layout} dep={dep} onArmy={setArmyUnits} onBack={() => setStep('field')} />;
+    const field: BoardField = {
+      title: dep.nameRu,
+      background: <BattleMap layout={layout} dep={dep} guides="none" className="block h-full w-full" />,
+      objectives: layout.objectives,
+      snapPoints: [...layout.objectives.map((o) => [o.x, o.y] as Pt), ...layout.pieces.filter((pc) => pc.kind === 'area').flatMap((pc) => pc.poly as Pt[])],
+      zones: Object.fromEntries(dep.zones.map((z) => [z.player, [z.poly as Pt[]]])),
+      objectiveNote: `${OBJECTIVE_RULE_SOURCE}. Для целей в участке террейна правило другое; высота на карте не учитывается.`,
+    };
+    return <Board armies={armies.map(view40k)} field={field} onArmy={setArmyUnits} onBack={() => setStep('field')} />;
   }
 
   if (step === 'field' && roster)

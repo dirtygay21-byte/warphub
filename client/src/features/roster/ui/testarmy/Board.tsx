@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode } from 'react';
-import type { BfDeployment, BfLayout } from '../../data';
 import { haptic, pushOverlay, tg } from '../../telegram';
 import {
   APPROX_DEFAULT_MM,
@@ -11,7 +10,6 @@ import {
   baseToZone,
   clampToBoard,
   closestPoints,
-  FOE_PREFIX,
   FORMATIONS,
   fmtInches,
   modelBase,
@@ -20,7 +18,6 @@ import {
   nearestEnemy,
   nearestObjective,
   OBJECTIVE_RANGE,
-  OBJECTIVE_RULE_SOURCE,
   objectiveRadius,
   pickBase,
   placeUnit,
@@ -34,7 +31,7 @@ import {
   unitCenter,
   unitProfiles,
   unitToUnit,
-  unitToZone,
+  unitToZones,
   type ApproxShape,
   type BaseShape,
   type Formation,
@@ -43,13 +40,11 @@ import {
   type RulerEnd,
   type ArmyKey,
   type Side,
+  type TAArmy,
   type TAUnit,
 } from '../../testarmy';
-import { BattleMap } from '../Battlefield';
 import { Button, IconButton, Segmented } from '../kit';
 import { cx } from '../util';
-import type { BoardArmy } from './TestArmyScreen';
-import { UnitInfo } from './UnitInfo';
 
 const SIDE_COLOR: Record<Side, string> = { attacker: '#f87171', defender: '#60a5fa' };
 const ACCENT = '#eaff44';
@@ -67,6 +62,25 @@ const MIN_SCALE = 1;
 const MAX_SCALE = 6;
 /** viewBox карты (BattleMap): 47 × 63 */
 const MAP_ASPECT = 47 / 63;
+
+/**
+ * Армия на столе для Board — без привязки к игровой системе (40K / AoS, 30.10.2026): имя ростера, строка характеристик
+ * отряда и карточка отряда даёт экран своей системы.
+ */
+export type BoardArmy = TAArmy & { name: string; stats: (u: TAUnit) => string | null; info: (u: TAUnit, onClose: () => void) => ReactNode };
+/**
+ * Поле: картинка (svg с тем же viewBox «-1.5 -1.5 47 63», поле повёрнуто как в BattleMap), цели, точки привязки линейки,
+ * зоны деплоя / территории сторон (многоугольники в дюймах поля 60×44) и подпись правила целей.
+ */
+export type BoardField = {
+  title: string;
+  background: ReactNode;
+  objectives: { x: number; y: number; role: string | null }[];
+  snapPoints: Pt[];
+  /** части зоны стороны (у 40K — одна, у территорий AoS бывает несколько) */
+  zones: Partial<Record<Side, Pt[][]>>;
+  objectiveNote: string;
+};
 
 type Tool = 'move' | 'ruler' | 'units';
 const TOOLS: { id: Tool; icon: string; label: string }[] = [
@@ -99,15 +113,13 @@ const undisp = ([dx, dy]: Pt): Pt => [dy, 44 - dx];
  */
 export function Board({
   armies,
-  layout,
-  dep,
+  field,
   onArmy,
   onBack,
 }: {
   /** своя армия (me) и, если выбрана, армия соперника (foe) — за другую сторону */
   armies: BoardArmy[];
-  layout: BfLayout;
-  dep: BfDeployment;
+  field: BoardField;
   onArmy: (key: ArmyKey, units: TAUnit[]) => void;
   onBack: () => void;
 }) {
@@ -213,15 +225,15 @@ export function Board({
   const outside = useMemo(() => {
     const set = new Set<string>();
     for (const a of armies) {
-      const z = dep.zones.find((x) => x.player === a.side)?.poly;
+      const z = field.zones[a.side];
       if (!z) continue;
       for (const u of a.units)
         placedBases(u).forEach((b, i) => {
-          if (b && !baseToZone(b, z).whollyInside) set.add(u.models[i]!.id);
+          if (b && !z.some((p) => baseToZone(b, p).whollyInside)) set.add(u.models[i]!.id);
         });
     }
     return set;
-  }, [armies, dep]);
+  }, [armies, field]);
 
   // все базы на столе (для линейки и расстояний)
   const allBases = useMemo(() => {
@@ -232,8 +244,8 @@ export function Board({
   const baseOf = (id: string) => allBases.find((x) => x.modelId === id)?.base ?? null;
   // привязка линейки: центры целей и углы участков террейна
   const snapPoints = useMemo<Pt[]>(
-    () => [...layout.objectives.map((o) => [o.x, o.y] as Pt), ...layout.pieces.filter((pc) => pc.kind === 'area').flatMap((pc) => pc.poly as Pt[])],
-    [layout],
+    () => field.snapPoints,
+    [field],
   );
   const rulerLine = ruler.a && ruler.b ? resolveRuler(ruler.a, ruler.b, baseOf) : null;
   const rulerA = ruler.a ? (ruler.a.kind === 'pt' ? ruler.a.at : (() => { const b = baseOf(ruler.a.modelId); return b ? ([b.x, b.y] as Pt) : null; })()) : null;
@@ -250,14 +262,14 @@ export function Board({
   // выбранный отряд: до ближайшей цели, до зон деплоя (своей армии и другой) и до ближайшего врага
   const selBases = sel ? unitsOf(sel.uid) : [];
   const selArmy = sel ? armyOf(sel.uid) : me;
-  const ownZone = dep.zones.find((z) => z.player === selArmy.side)?.poly ?? null;
-  const enemyZone = dep.zones.find((z) => z.player !== selArmy.side)?.poly ?? null;
+  const ownZone = field.zones[selArmy.side] ?? null;
+  const enemyZone = field.zones[selArmy.side === 'attacker' ? 'defender' : 'attacker'] ?? null;
   const enemyArmy = armies.find((a) => a.key !== selArmy.key);
   const info = selBases.length
     ? {
-        objective: nearestObjective(selBases, layout.objectives),
-        own: ownZone ? unitToZone(selBases, ownZone) : null,
-        enemy: enemyZone ? unitToZone(selBases, enemyZone) : null,
+        objective: nearestObjective(selBases, field.objectives),
+        own: ownZone ? unitToZones(selBases, ownZone) : null,
+        enemy: enemyZone ? unitToZones(selBases, enemyZone) : null,
         foe: enemyArmy ? nearestEnemy(selBases, allBases.filter((x) => enemyArmy.units.some((u) => u.uid === x.uid))) : null,
       }
     : null;
@@ -467,7 +479,7 @@ export function Board({
 
   return (
     <div className="fixed inset-0 z-40 flex bg-app">
-      {infoUnit && <UnitInfo unit={infoUnit} cr={armyOf(infoUnit.uid).cr} roster={armyOf(infoUnit.uid).roster} L={armyOf(infoUnit.uid).L} onClose={() => setInfoFor(null)} />}
+      {infoUnit && armyOf(infoUnit.uid).info(infoUnit, () => setInfoFor(null))}
 
       {/* поле: жесты — свои (touch-action: none), браузер ничего не прокручивает */}
       <div
@@ -479,10 +491,10 @@ export function Board({
         onPointerCancel={onUp}
       >
         <div ref={content} className="absolute left-0 top-0 origin-top-left" style={{ width: base.w, height: base.h }}>
-          <BattleMap layout={layout} dep={dep} guides="none" className="block h-full w-full" />
+          {field.background}
           <svg ref={svg} viewBox="-1.5 -1.5 47 63" className="absolute inset-0 h-full w-full">
             {ranges &&
-              layout.objectives.map((o, i) => {
+              field.objectives.map((o, i) => {
                 const [x, y] = disp([o.x, o.y]);
                 return <circle key={i} cx={x} cy={y} r={objectiveRadius + OBJECTIVE_RANGE} fill="#eaff44" fillOpacity={0.06} stroke="#eaff44" strokeOpacity={0.7} strokeWidth={0.1} strokeDasharray="0.5 0.35" pointerEvents="none" />;
               })}
@@ -533,8 +545,8 @@ export function Board({
             <div className="min-w-0 flex-1">
               <p className="font-display truncate text-base font-semibold uppercase leading-none">Test Army</p>
               <p className="truncate text-[11px] text-white/45">
-                {me.roster.name} · {dep.nameRu} · {side === 'attacker' ? 'атакующий' : 'защитник'}
-                {foe && ` · соперник: ${foe.roster.name}`}
+                {me.name} · {field.title} · {side === 'attacker' ? 'атакующий' : 'защитник'}
+                {foe && ` · соперник: ${foe.name}`}
               </p>
             </div>
             <IconButton icon="close" label="Закрыть" onClick={() => setPanel(false)} className="size-8" />
@@ -555,10 +567,7 @@ export function Board({
                 onDone={() => setSelected(null)}
                 info={info}
                 side={selArmy.side}
-                stats={(() => {
-                  const st = selArmy.cr.byUid.get(sel.uid.startsWith(FOE_PREFIX) ? sel.uid.slice(FOE_PREFIX.length) : sel.uid)?.ds?.stats[0];
-                  return st ? `M ${st.M} · T ${st.T} · Sv ${st.Sv}${st.inv ? ` (${st.inv.replace(/\+/g, '')}++)` : ''} · W ${st.W} · Ld ${st.Ld} · OC ${st.OC}` : null;
-                })()}
+                stats={selArmy.stats(sel)}
                 onInfo={() => setInfoFor(sel.uid)}
                 onPlace={() => (setTool('move'), setPanel(false))}
               />
@@ -583,7 +592,7 @@ export function Board({
                 />
               </>
             )}
-            {ranges && <p className="mt-3 text-[10.5px] text-white/40">Круги целей: {OBJECTIVE_RULE_SOURCE}. Для целей в участке террейна правило другое; высота на карте не учитывается.</p>}
+            {ranges && <p className="mt-3 text-[10.5px] text-white/40">Круги целей: {field.objectiveNote}</p>}
           </div>
         </aside>
       )}
@@ -779,6 +788,7 @@ function UnitPanel({
             {n}. {unit.name}
           </p>
           {unit.leaders.length > 0 && <p className="text-[11px] text-white/55">с персонажами: {unit.leaders.join(', ')}</p>}
+          {unit.tags?.length ? <p className="text-[11px] text-white/55">{unit.tags.join(' · ')}</p> : null}
           <p className={cx('text-[11px]', unknown ? 'text-warn' : 'text-white/45')}>{summary.map(([k, c]) => `${c} × ${k}`).join(' · ')}</p>
         </div>
         <IconButton icon="close" label="К списку отрядов" onClick={onDone} className="size-8" />

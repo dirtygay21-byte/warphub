@@ -13,6 +13,7 @@ import { Battlefield } from './Battlefield';
 import { GameScreen } from './game/GameScreen';
 import { TestArmyScreen } from './testarmy/TestArmyScreen';
 import { AosGameScreen } from './aosgame/AosGameScreen';
+import { AosTestArmyScreen } from './testarmy/AosTestArmyScreen';
 import { Rules } from './Rules';
 
 type Route =
@@ -23,7 +24,8 @@ type Route =
   | { screen: 'battlefield'; back: Route; disposition?: string | null }
   | { screen: 'game'; back: Route; rosterId?: string }
   | { screen: 'test-army'; back: Route; rosterId?: string }
-  | { screen: 'aos-game'; back: Route; rosterId?: string };
+  | { screen: 'aos-game'; back: Route; rosterId?: string }
+  | { screen: 'aos-test-army'; back: Route; rosterId?: string };
 
 type GameSystem = '40k' | 'aos';
 const SYSTEM_KEY = 'warphub.roster.system';
@@ -185,6 +187,9 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
     />
   );
 
+  if (route.screen === 'aos-test-army' && aosIndex) {
+    return <AosTestArmyScreen onBack={goBack} rosters={aosRosters!} index={aosIndex} initialRosterId={route.rosterId} />;
+  }
   if (route.screen === 'aos-game' && aosIndex) {
     return <AosGameScreen onBack={goBack} rosters={aosRosters!} index={aosIndex} initialRosterId={route.rosterId} />;
   }
@@ -199,6 +204,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
           index={aosIndex}
           onBack={goList}
           onStartGame={() => setRoute({ screen: 'aos-game', back: route, rosterId: roster.id })}
+          onTestArmy={() => setRoute({ screen: 'aos-test-army', back: route, rosterId: roster.id })}
           onChange={onAosChange}
           onDuplicate={(r) => {
             updateAos((list) => [r, ...list]);
@@ -223,6 +229,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
         rosters={aosRosters!}
         onOpen={(id) => setRoute({ screen: 'aos-editor', id })}
         onStartGame={() => setRoute({ screen: 'aos-game', back: route })}
+        onTestArmy={() => setRoute({ screen: 'aos-test-army', back: route })}
         onCreate={(r) => {
           updateAos((list) => [r, ...list]);
           setRoute({ screen: 'aos-editor', id: r.id });
