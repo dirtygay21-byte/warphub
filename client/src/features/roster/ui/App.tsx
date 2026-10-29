@@ -12,6 +12,7 @@ import { RosterEditor } from './RosterEditor';
 import { Battlefield } from './Battlefield';
 import { GameScreen } from './game/GameScreen';
 import { TestArmyScreen } from './testarmy/TestArmyScreen';
+import { AosGameScreen } from './aosgame/AosGameScreen';
 import { Rules } from './Rules';
 
 type Route =
@@ -21,7 +22,8 @@ type Route =
   | { screen: 'rules'; back: Route; factionId?: string; detachmentIds?: string[] }
   | { screen: 'battlefield'; back: Route; disposition?: string | null }
   | { screen: 'game'; back: Route; rosterId?: string }
-  | { screen: 'test-army'; back: Route; rosterId?: string };
+  | { screen: 'test-army'; back: Route; rosterId?: string }
+  | { screen: 'aos-game'; back: Route; rosterId?: string };
 
 type GameSystem = '40k' | 'aos';
 const SYSTEM_KEY = 'warphub.roster.system';
@@ -183,6 +185,10 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
     />
   );
 
+  if (route.screen === 'aos-game' && aosIndex) {
+    return <AosGameScreen onBack={goBack} rosters={aosRosters!} index={aosIndex} initialRosterId={route.rosterId} />;
+  }
+
   if (route.screen === 'aos-editor' && aosIndex) {
     const roster = aosRosters!.find((r) => r.id === route.id);
     if (roster) {
@@ -192,6 +198,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
           roster={roster}
           index={aosIndex}
           onBack={goList}
+          onStartGame={() => setRoute({ screen: 'aos-game', back: route, rosterId: roster.id })}
           onChange={onAosChange}
           onDuplicate={(r) => {
             updateAos((list) => [r, ...list]);
@@ -215,6 +222,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
         index={aosIndex}
         rosters={aosRosters!}
         onOpen={(id) => setRoute({ screen: 'aos-editor', id })}
+        onStartGame={() => setRoute({ screen: 'aos-game', back: route })}
         onCreate={(r) => {
           updateAos((list) => [r, ...list]);
           setRoute({ screen: 'aos-editor', id: r.id });
