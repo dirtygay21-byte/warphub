@@ -65,6 +65,29 @@ npm test             # движок и правила формирования �
 
 ## Обновление данных
 
+### Чеклист обновления данных 40K (P1-T7, 30.10.2026)
+
+С 23.10.2026 выгрузка Wahapedia для 40K приостановлена (`CLAUDE.md`): основной датированный источник — wh-rules.ru.
+Подробности по каждому шагу — в разделах ниже.
+
+1. **Снимки** в браузере на wh-rules.ru: очки — `scripts/whrules-extract.js`, конструктор ростеров —
+   `scripts/whrules-extract-roster.js`; полный снимок (`scripts/whrules-extract-full.js`) — только для армий, у которых
+   меняются инфолисты. Сохранить с проверкой схемы и fingerprint: `node scripts/whrules-save.mjs <файл>`,
+   `node scripts/whrules-map.mjs --save-full <файл>`.
+2. **Измерить**: `bun scripts/whrules-compare.mjs --snapshot whrules-<версия>.json` → `40k/freshness-report.md` — что
+   отличается, по армиям. Данные приложения не меняются.
+3. **Применить** через `40k/curated.json → updates`: очки (`whrules-points`), платное снаряжение (`whrules-wargear`),
+   полные конвертации (`whrules-faction-convert`). Конвертации — сначала сухой прогон
+   (`bun scripts/whrules-convert.mjs … --out <файл>`).
+4. **Пересобрать и проверить**: `bun scripts/repair-40k-data.mjs`, затем `bun test tests/` — все тесты, сверка с
+   конструктором ростеров сайта должна показать 0 отличий.
+5. **Просмотреть**: конфликты источников (`import-report.json`, отчёт свежести), переводы сохранённых ростеров
+   (`migrations`), подписи версии данных в приложении. Конфликты не решать молча — записать и выбрать с объяснением.
+6. **Выпуск**: ветка `data/<тема>` → PR в `roster-builder` → PR в `main` → deploy `data` (dry-run, затем apply) →
+   проверка в Telegram. Бэкенд перезапускать не нужно: данные читаются с проверкой даты изменения файла.
+
+Age of Sigmar: у wh-rules.ru данных нет — обновление AoS ждёт выбора источника.
+
 ```bash
 # из скачанных CSV (положить в tools/roster-data/wahapedia-csv/)
 npm run data
