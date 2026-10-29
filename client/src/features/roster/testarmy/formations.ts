@@ -14,7 +14,7 @@ export const FORMATIONS: { id: Formation; label: string }[] = [
 ];
 
 /** Радиус базы для построения: овалы — по длинной полуоси (их длинная ось ставится поперёк линии). */
-export type FormationBase = { rx: number; ry: number };
+export type FormationBase = { rx: number; ry: number; rect?: boolean };
 
 const rot = ([x, y]: Pt, a: number): Pt => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)];
 
@@ -70,7 +70,8 @@ function arc(bases: readonly FormationBase[], gap: number): Pt[] {
  * место, где она касается двух уже поставленных (или одной) и ни с кем не пересекается.
  */
 function tight(bases: readonly FormationBase[], gap: number): Pt[] {
-  const order = bases.map((b, i) => ({ r: Math.max(b.rx, b.ry) + gap / 2, i })).sort((a, b) => b.r - a.r || a.i - b.i);
+  // квадрат в любом повороте помещается в описанный круг
+  const order = bases.map((b, i) => ({ r: (b.rect ? Math.hypot(b.rx, b.ry) : Math.max(b.rx, b.ry)) + gap / 2, i })).sort((a, b) => b.r - a.r || a.i - b.i);
   const placed: { x: number; y: number; r: number; i: number }[] = [];
   const free = (x: number, y: number, r: number) => placed.every((p) => Math.hypot(p.x - x, p.y - y) >= p.r + r - 1e-6);
   for (const { r, i } of order) {

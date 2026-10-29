@@ -125,3 +125,23 @@ test('snap: ближайшая цель в пределах допуска', () 
   assert.deepEqual(snap([1, 1], [[1.3, 1], [5, 5]]).at, [1.3, 1]);
   assert.equal(snap([1, 1], [[2, 2]]).snapped, false);
 });
+
+test('квадратная база (техника без размера): внутри, до края, база–база, плотное построение без пересечений', async () => {
+  const { approxBase, approxOf, insideBase } = await import('../../../client/src/features/roster/testarmy');
+  assert.deepEqual(approxBase('oval', 120), { kind: 'oval', w: 120, h: 92 });
+  assert.deepEqual(approxOf(approxBase('square', 80)), { shape: 'square', mm: 80 });
+  const sq: Placed = { x: 0, y: 0, rx: 2, ry: 2, angle: 0, rect: true };
+  assert.equal(insideBase([1.9, 1.9], sq), true);
+  near(pointToBase([5, 0], sq), 3);
+  near(pointToBase([5, 5], sq), Math.hypot(3, 3), 0.05);
+  near(baseToBase(sq, circle(6, 0, 50.8)), 3, 0.02);
+  near(baseToBase({ ...sq, angle: Math.PI / 4 }, circle(6, 0, 50.8)), 6 - 1 - 2 * Math.SQRT2, 0.05);
+  const r = { rx: 2, ry: 2, rect: true };
+  const pts = formation('tight', [r, r, r, r], 0);
+  for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) {
+    const a = { x: pts[i]![0], y: pts[i]![1], rx: 2, ry: 2, angle: 0, rect: true };
+    const b = { x: pts[j]![0], y: pts[j]![1], rx: 2, ry: 2, angle: 0, rect: true };
+    assert.ok(baseToBase(a, b) >= 0, 'без пересечений');
+    assert.ok(!insideBase([b.x, b.y], a));
+  }
+});

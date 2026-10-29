@@ -5,20 +5,41 @@
  */
 export type Pt = [number, number];
 
-/** База на столе: центр, полуоси (дюймы), поворот длинной оси (радианы). */
-export type Placed = { x: number; y: number; rx: number; ry: number; angle: number };
+/** База на столе: центр, полуоси (дюймы), поворот длинной оси (радианы); rect — прямоугольная (rx, ry — половины сторон). */
+export type Placed = { x: number; y: number; rx: number; ry: number; angle: number; rect?: boolean };
 
 const STEPS = 72;
 
 export const dist = (a: Pt, b: Pt) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 
-const isCircle = (b: Placed) => Math.abs(b.rx - b.ry) < 1e-6;
+const isCircle = (b: Placed) => !b.rect && Math.abs(b.rx - b.ry) < 1e-6;
 
 /** Точки контура базы. */
 export function outline(b: Placed, steps = STEPS): Pt[] {
   const c = Math.cos(b.angle);
   const s = Math.sin(b.angle);
   const out: Pt[] = [];
+  if (b.rect) {
+    // по периметру прямоугольника, равномерно
+    const per = steps / 4;
+    const corners: Pt[] = [
+      [-b.rx, -b.ry],
+      [b.rx, -b.ry],
+      [b.rx, b.ry],
+      [-b.rx, b.ry],
+    ];
+    for (let k = 0; k < 4; k++) {
+      const [ax, ay] = corners[k]!;
+      const [bx, by] = corners[(k + 1) % 4]!;
+      for (let i = 0; i < per; i++) {
+        const t = i / per;
+        const ex = ax + (bx - ax) * t;
+        const ey = ay + (by - ay) * t;
+        out.push([b.x + ex * c - ey * s, b.y + ex * s + ey * c]);
+      }
+    }
+    return out;
+  }
   for (let i = 0; i < steps; i++) {
     const t = (i / steps) * Math.PI * 2;
     const ex = b.rx * Math.cos(t);
@@ -36,6 +57,7 @@ export function insideBase(p: Pt, b: Placed): boolean {
   const s = Math.sin(-b.angle);
   const u = dx * c - dy * s;
   const v = dx * s + dy * c;
+  if (b.rect) return Math.abs(u) <= b.rx + 1e-9 && Math.abs(v) <= b.ry + 1e-9;
   return (u * u) / (b.rx * b.rx) + (v * v) / (b.ry * b.ry) <= 1 + 1e-9;
 }
 
