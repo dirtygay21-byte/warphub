@@ -38,4 +38,8 @@ Kurnoth Hunters…), Legends и Armies of Renown.
 
 ## Открыто
 
+- **GW опубликовали новые документы 28.10.2026** (Battle Profiles и Rules Updates, warhammer-community.com → Downloads →
+  Age of Sigmar) — новее выгрузки Wahapedia 2026-10-22 и сентябрьских правок. Решение владельца 30.10.2026: пока не
+  скачиваем и не применяем; 3 расхождения очков ниже остаются по Wahapedia.
+
 - 3 расхождения очков выше; BoC «Bestial Manifestations» без очков; KB «Hobgrot Slittaboss» вариант «Monster»; A449 Khazalite Holds.
