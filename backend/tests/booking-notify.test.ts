@@ -29,6 +29,7 @@ describe('bookingNoticeText', () => {
     expect(t).toContain('Кто: Иван Петров (@ivan) · Telegram ID: 123456789');
     expect(t).toContain('Армия: Orks');
     expect(t).toContain('Очки: 2000');
+    expect(t).toContain('Игра: Warhammer 40,000');
     expect(t).toContain('Опыт: Игрок');
     expect(t).toMatch(/Оформлено: .*24 октября, 03:47/);
     expect(t).not.toContain('Мест:');
@@ -101,4 +102,20 @@ describe('ограниченное время (B1)', () => {
     expect(t).toMatch(/18:00–21:00/);
     expect(bookingNoticeText({ ...base, startsAt: new Date('2026-10-25T13:00:00Z'), endsAt: new Date('2026-10-25T17:00:00Z'), fullMinutes: 240 })).not.toContain('Ограниченное');
   });
+});
+
+test('Kill Team: «Игра: Kill Team», «Команда», без строки очков', () => {
+  const t = bookingNoticeText({
+    reason: 'created',
+    serviceTitle: 'Игра',
+    startsAt: new Date('2026-11-06T13:00:00Z'),
+    endsAt: new Date('2026-11-06T17:00:00Z'),
+    createdAt: new Date('2026-11-01T10:00:00Z'),
+    user: { telegramId: 1, firstName: 'Аня' },
+    partySize: 1,
+    details: { kind: 'wh_player', game: 'kt', army: 'Pathfinders', points: null, experienceLevel: 'player' },
+  });
+  expect(t).toContain('Игра: Kill Team');
+  expect(t).toContain("Команда: Pathfinders (T'au Empire)");
+  expect(t).not.toContain('Очки');
 });

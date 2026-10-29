@@ -44,3 +44,24 @@ export function readRosterData(name: string, system: '40k' | 'aos' = '40k'): { b
   gzCache.set(file, { mtime: stat.mtimeMs, body });
   return { body, gzip: true };
 }
+
+const aosFactionsCache: { mtime: number; names: string[] } = { mtime: -1, names: [] };
+
+/**
+ * Фракции Age of Sigmar для формы записи — из данных Roster Builder (aos/index.json), без «только Legends».
+ * Нет файла — пустой список (в форме остаётся «Другая…»).
+ */
+export function aosFactionNames(): string[] {
+  const file = path.join(rosterDataDir(), 'aos', 'index.json');
+  try {
+    const mtime = fs.statSync(file).mtimeMs;
+    if (mtime !== aosFactionsCache.mtime) {
+      const data = JSON.parse(fs.readFileSync(file, 'utf8')) as { factions?: { name: string; legendsOnly?: boolean }[] };
+      aosFactionsCache.names = (data.factions ?? []).filter((f) => !f.legendsOnly).map((f) => f.name).sort((a, b) => a.localeCompare(b));
+      aosFactionsCache.mtime = mtime;
+    }
+    return aosFactionsCache.names;
+  } catch {
+    return [];
+  }
+}

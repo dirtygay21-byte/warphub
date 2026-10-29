@@ -85,7 +85,7 @@ export function EditDetailsDialog({
         </h2>
 
         {kind === "wh_player" && (
-          <PlayerInfoForm value={player} onChange={setPlayer} options={options} />
+          <PlayerInfoForm value={player} onChange={setPlayer} options={options} lockedGame={player.game} />
         )}
         {kind === "painting" && (
           <PaintingForm value={painting} onChange={setPainting} options={options} />
