@@ -198,10 +198,14 @@ test('Auto-Endrin: ставится Zontari Endrin Dock, очков нет и н
   assert.doesNotMatch(missingPointsNote('KO', w, curated) ?? '', /нельзя добавить/);
 });
 
-test('устаревшие правила OM и SoB: предупреждение в данных = curated, даты исправлены', () => {
+test('правила OM и SoB актуальны (выгрузка 2026-10-22 с новыми батлтомами): предупреждения нет, построения и лоры есть', () => {
   for (const f of ALL) assert.equal(f.rulesNotice ?? null, rulesNoticeOf(curated, f.id), f.id);
-  assert.match(load('OM').rulesNotice!, /Ogor Mawtribes \(июль 2026\)/);
-  assert.match(load('SoB').rulesNotice!, /Sons of Behemat \(сентябрь 2026\)/);
+  for (const id of ['OM', 'SoB']) {
+    const f = load(id);
+    assert.equal(f.rulesNotice ?? null, null, id);
+    assert.ok(f.formations.length >= 4, `${id}: построения`);
+    assert.ok(f.lores.some((l: { kind: string }) => l.kind === 'spell') && f.lores.some((l: { kind: string }) => l.kind === 'prayer'), `${id}: лоры`);
+  }
 });
 
 test('источники правок и пометок «правила устарели» — только Wahapedia, с датой проверки', () => {

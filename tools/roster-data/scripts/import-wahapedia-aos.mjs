@@ -88,6 +88,12 @@ export function parseNotes(html, dataDate, seasonInfo = {}) {
   });
   take(/This HERO regiment as can join an eligible ([^.]+?)\./gi, (_, t) => out.joinAs.push(norm(t)));
   take(/This (?:HERO|Hero) can join (?:an )?eligible regiment as (?:an? )?(.+?)(?:\.|(?=This |You |$))/g, (_, t) => out.joinAs.push(norm(t)));
+  // «can join the regiment of <b>A, the B</b>, <b>C</b>, or <b>D</b>.» (выгрузка с 10.2026): в именах есть запятые — берём имена из <b>
+  const joinOf = String(html ?? '').match(/can join the regiment of ((?:\s*<b>[^<]+<\/b>\s*,?\s*(?:or\s+)?)+)/i);
+  if (joinOf) {
+    for (const m of joinOf[1].matchAll(/<b>([^<]+)<\/b>/g)) out.joinLeaders.push(norm(text(m[1])));
+    take(/This (?:HERO|Hero) can join the regiment of [^.]+\./g, () => {});
+  }
   take(/This (?:HERO|Hero) can join (?:an? )?(.+?) regiment\.?/g, (_, t) => {
     for (const n of t.split(/,\s*|\s+or\s+/)) out.joinLeaders.push(norm(n.replace(/['’]s?$/, '')));
   });

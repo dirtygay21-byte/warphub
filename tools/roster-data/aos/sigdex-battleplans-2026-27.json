@@ -1,0 +1,1392 @@
+{
+ "about": "Battleplan maps of General's Handbook 2026-27 from sigdex.io (bundle assets/index-CWII1kz1.js, studioVersion 1.0.0, battlePack «General's Handbook 2026-27»), snapshot 2026-10-30, SHA-256 of the compact JSON 5270cd0f3573bcb5. Coordinates in inches on a 60×44 battlefield (x to the right, y down); mirror: x | y | both — a copy mirrored through the centre line; zones — attacker/defender territories as rectangles. scoring: [vp, rounds|null, condition] — cross-check only (matches battlepack.json for all 12 plans). Owner decision 30.10.2026: Sigdex/BSData are the second source; neither states a licence. For S3 (maps), not used by the app yet.",
+ "source": "https://sigdex.io/rules → GHB 2026-27 BATTLEPLANS",
+ "checked": "2026-10-30",
+ "battleplans": {
+  "Into the Fire": {
+   "map": {
+    "objectives": [
+     {
+      "type": "golden_lions",
+      "x": 15,
+      "y": 22,
+      "mirror": "x"
+     },
+     {
+      "type": "sun_seekers",
+      "x": 30,
+      "y": 5.5
+     },
+     {
+      "type": "sigmarite",
+      "x": 30,
+      "y": 22
+     },
+     {
+      "type": "heldenhain",
+      "x": 30,
+      "y": 38.5
+     }
+    ],
+    "terrain": [
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 15,
+      "y": 5.5,
+      "mirror": "both"
+     },
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 37.5,
+      "y": 11,
+      "mirror": "both"
+     },
+     {
+      "type": "obscuring",
+      "size": "small",
+      "x": 22.5,
+      "y": 16.5,
+      "mirror": "both"
+     },
+     {
+      "type": "place_of_power",
+      "size": "medium",
+      "x": 52.5,
+      "y": 14.5,
+      "mirror": "both"
+     }
+    ],
+    "zones": [
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 0,
+      "x2": 15,
+      "y2": 33
+     },
+     {
+      "type": "defender",
+      "x1": 45,
+      "y1": 11,
+      "x2": 60,
+      "y2": 44
+     },
+     {
+      "type": "attacker",
+      "x1": 15,
+      "y1": 11,
+      "x2": 30,
+      "y2": 33,
+      "hideLabel": true
+     },
+     {
+      "type": "defender",
+      "x1": 30,
+      "y1": 11,
+      "x2": 45,
+      "y2": 33,
+      "hideLabel": true
+     }
+    ]
+   },
+   "scoring": [
+    [
+     3,
+     null,
+     "Control at least 1 objective."
+    ],
+    [
+     3,
+     null,
+     "Control 2 or more objectives."
+    ],
+    [
+     4,
+     null,
+     "Control more objectives than your opponent."
+    ]
+   ],
+   "abil": [
+    "Secure The Gateway",
+    "Determined Defenders"
+   ]
+  },
+  "Bloodstained Coasts": {
+   "map": {
+    "objectives": [
+     {
+      "type": "golden_lions",
+      "x": 45,
+      "y": 11,
+      "mirror": "y"
+     },
+     {
+      "type": "heldenhain",
+      "x": 45,
+      "y": 22
+     },
+     {
+      "type": "sun_seekers",
+      "x": 30,
+      "y": 16.5,
+      "mirror": "y"
+     },
+     {
+      "type": "sigmarite",
+      "x": 15,
+      "y": 22
+     }
+    ],
+    "terrain": [
+     {
+      "type": "place_of_power",
+      "size": "medium",
+      "x": 7.5,
+      "y": 22
+     },
+     {
+      "type": "obscuring",
+      "size": "medium",
+      "x": 15,
+      "y": 11,
+      "mirror": "y"
+     },
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 30,
+      "y": 5.5,
+      "mirror": "y"
+     },
+     {
+      "type": "place_of_power",
+      "size": "small",
+      "x": 22.5,
+      "y": 22
+     },
+     {
+      "type": "obscuring",
+      "size": "medium",
+      "x": 37.5,
+      "y": 22
+     },
+     {
+      "type": "obscuring",
+      "size": "small",
+      "x": 52.5,
+      "y": 22
+     }
+    ],
+    "zones": [
+     {
+      "type": "attacker",
+      "x1": 15,
+      "y1": 0,
+      "x2": 60,
+      "y2": 22,
+      "labelDx": 15,
+      "labelDy": -5.5
+     },
+     {
+      "type": "defender",
+      "x1": 15,
+      "y1": 22,
+      "x2": 60,
+      "y2": 44,
+      "labelDx": 15.5,
+      "labelDy": 5.5
+     }
+    ]
+   },
+   "scoring": [
+    [
+     3,
+     null,
+     "Control at least 1 objective."
+    ],
+    [
+     3,
+     null,
+     "Control 2 or more objectives."
+    ],
+    [
+     4,
+     [
+      1
+     ],
+     "Control more objectives than your opponent."
+    ],
+    [
+     4,
+     [
+      2,
+      3,
+      4,
+      5
+     ],
+     "Control an objective that was controlled by your opponent at the start of the turn."
+    ]
+   ],
+   "abil": [
+    "Emberstone-Augmented Weapons",
+    "Emberstone Cache"
+   ]
+  },
+  "Avalanche of Ash": {
+   "map": {
+    "objectives": [
+     {
+      "type": "golden_lions",
+      "x": 15,
+      "y": 11,
+      "mirror": "both"
+     },
+     {
+      "type": "heldenhain",
+      "x": 30,
+      "y": 11
+     },
+     {
+      "type": "sigmarite",
+      "x": 30,
+      "y": 33
+     },
+     {
+      "type": "sun_seekers",
+      "x": 45,
+      "y": 11,
+      "mirror": "both"
+     }
+    ],
+    "terrain": [
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 22.5,
+      "y": 5.5,
+      "mirror": "both"
+     },
+     {
+      "type": "place_of_power",
+      "size": "small",
+      "x": 37.5,
+      "y": 5.5,
+      "mirror": "both"
+     },
+     {
+      "type": "obscuring",
+      "size": "medium",
+      "x": 22.5,
+      "y": 22,
+      "mirror": "x"
+     },
+     {
+      "type": "obscuring",
+      "size": "small",
+      "x": 7.5,
+      "y": 22,
+      "mirror": "both"
+     }
+    ],
+    "zones": [
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 0,
+      "x2": 30,
+      "y2": 33,
+      "labelDx": -7.5,
+      "labelDy": -11
+     },
+     {
+      "type": "defender",
+      "x1": 30,
+      "y1": 11,
+      "x2": 60,
+      "y2": 44,
+      "labelDx": 7.5,
+      "labelDy": 11
+     }
+    ]
+   },
+   "scoring": [
+    [
+     3,
+     null,
+     "Control at least 1 objective."
+    ],
+    [
+     3,
+     null,
+     "Control at least 2 or more objectives."
+    ],
+    [
+     4,
+     null,
+     "Control more objectives than your opponent."
+    ],
+    [
+     3,
+     null,
+     "If there is no more than 1 objective on the battlefield and you control a non-**^^FACTION TERRAIN^^** terrain feature within enemy territory."
+    ],
+    [
+     7,
+     null,
+     "If there are no objectives on the battlefield and you control more non-**^^FACTION TERRAIN^^** terrain features than your opponent."
+    ]
+   ],
+   "abil": [
+    "Collapsing Pass"
+   ]
+  },
+  "Caverns of Slaughter": {
+   "map": {
+    "objectives": [
+     {
+      "type": "sigmarite",
+      "x": 30,
+      "y": 22
+     },
+     {
+      "type": "golden_lions",
+      "x": 15,
+      "y": 11
+     },
+     {
+      "type": "golden_lions",
+      "x": 30,
+      "y": 33
+     },
+     {
+      "type": "sun_seekers",
+      "x": 30,
+      "y": 11
+     },
+     {
+      "type": "sun_seekers",
+      "x": 45,
+      "y": 33
+     }
+    ],
+    "terrain": [
+     {
+      "type": "obscuring",
+      "size": "medium",
+      "x": 20.5,
+      "y": 22,
+      "mirror": "x"
+     },
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 7.5,
+      "y": 33,
+      "mirror": "both"
+     },
+     {
+      "type": "obscuring",
+      "size": "small",
+      "x": 7.5,
+      "y": 5.5,
+      "mirror": "both"
+     },
+     {
+      "type": "place_of_power",
+      "size": "small",
+      "x": 37.5,
+      "y": 5.5,
+      "mirror": "both"
+     }
+    ],
+    "zones": [
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 11,
+      "x2": 30,
+      "y2": 33,
+      "labelDx": -7.5,
+      "labelDy": -5.5
+     },
+     {
+      "type": "defender",
+      "x1": 30,
+      "y1": 11,
+      "x2": 60,
+      "y2": 33,
+      "labelDx": 7.5,
+      "labelDy": 5.5
+     }
+    ]
+   },
+   "scoring": [
+    [
+     3,
+     null,
+     "Control at least 1 objective."
+    ],
+    [
+     3,
+     null,
+     "Control 2 or more objectives."
+    ],
+    [
+     4,
+     null,
+     "Control any pair of objectives."
+    ]
+   ],
+   "abil": [
+    "Shifting Passages",
+    "Navigate The Tunnels"
+   ]
+  },
+  "What's Yours is Ours": {
+   "map": {
+    "objectives": [
+     {
+      "type": "golden_lions",
+      "x": 15,
+      "y": 22,
+      "mirror": "x"
+     },
+     {
+      "type": "sigmarite",
+      "x": 30,
+      "y": 22
+     },
+     {
+      "type": "sun_seekers",
+      "x": 45,
+      "y": 11,
+      "mirror": "y"
+     }
+    ],
+    "terrain": [
+     {
+      "type": "obscuring",
+      "size": "medium",
+      "x": 15,
+      "y": 11,
+      "mirror": "y"
+     },
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 37.5,
+      "y": 5.5,
+      "mirror": "y"
+     },
+     {
+      "type": "place_of_power",
+      "size": "medium",
+      "x": 53.5,
+      "y": 22
+     },
+     {
+      "type": "obscuring",
+      "size": "medium",
+      "x": 6.5,
+      "y": 22
+     },
+     {
+      "type": "place_of_power",
+      "size": "small",
+      "x": 22.5,
+      "y": 22
+     },
+     {
+      "type": "obscuring",
+      "size": "small",
+      "x": 37.5,
+      "y": 22
+     }
+    ],
+    "zones": [
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 0,
+      "x2": 30,
+      "y2": 22,
+      "labelDx": -7,
+      "labelDy": -5.5
+     },
+     {
+      "type": "attacker",
+      "x1": 45,
+      "y1": 0,
+      "x2": 60,
+      "y2": 11,
+      "hideLabel": true
+     },
+     {
+      "type": "defender",
+      "x1": 0,
+      "y1": 22,
+      "x2": 30,
+      "y2": 44,
+      "labelDx": -7,
+      "labelDy": 5.5
+     },
+     {
+      "type": "defender",
+      "x1": 45,
+      "y1": 33,
+      "x2": 60,
+      "y2": 44,
+      "hideLabel": true
+     }
+    ]
+   },
+   "scoring": [
+    [
+     3,
+     null,
+     "Control at least 1 objective."
+    ],
+    [
+     3,
+     null,
+     "Control the **coveted** pair of objectives."
+    ],
+    [
+     4,
+     null,
+     "Control more objectives than your opponent."
+    ]
+   ],
+   "abil": [
+    "All The Rage"
+   ]
+  },
+  "Hidden Under Ash-Clouds": {
+   "map": {
+    "objectives": [
+     {
+      "type": "sigmarite",
+      "x": 30,
+      "y": 22
+     },
+     {
+      "type": "sun_seekers",
+      "x": 15,
+      "y": 22,
+      "mirror": "x"
+     },
+     {
+      "type": "golden_lions",
+      "x": 37.5,
+      "y": 11,
+      "mirror": "both"
+     }
+    ],
+    "terrain": [
+     {
+      "type": "place_of_power",
+      "size": "medium",
+      "x": 52.5,
+      "y": 33,
+      "mirror": "both"
+     },
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 46.5,
+      "y": 11,
+      "mirror": "both"
+     },
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 22.5,
+      "y": 13.5,
+      "mirror": "both"
+     },
+     {
+      "type": "obscuring",
+      "size": "small",
+      "x": 37.5,
+      "y": 17.5,
+      "mirror": "both"
+     }
+    ],
+    "zones": [
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 0,
+      "x2": 60,
+      "y2": 11,
+      "labelDx": -22.5,
+      "labelDy": 0,
+      "hideLabel": false
+     },
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 11,
+      "x2": 15,
+      "y2": 22,
+      "hideLabel": true
+     },
+     {
+      "type": "attacker",
+      "x1": 45,
+      "y1": 11,
+      "x2": 60,
+      "y2": 22,
+      "hideLabel": true
+     },
+     {
+      "type": "defender",
+      "x1": 0,
+      "y1": 33,
+      "x2": 60,
+      "y2": 44,
+      "labelDx": 22.5,
+      "labelDy": 0
+     },
+     {
+      "type": "defender",
+      "x1": 0,
+      "y1": 22,
+      "x2": 15,
+      "y2": 33,
+      "hideLabel": true
+     },
+     {
+      "type": "defender",
+      "x1": 45,
+      "y1": 22,
+      "x2": 60,
+      "y2": 33,
+      "hideLabel": true
+     }
+    ]
+   },
+   "scoring": [
+    [
+     3,
+     null,
+     "Control at least 1 objective."
+    ],
+    [
+     3,
+     null,
+     "Control 2 or more objectives."
+    ],
+    [
+     4,
+     null,
+     "Control more objectives than your opponent."
+    ]
+   ],
+   "abil": [
+    "Rolling Ash-Clouds"
+   ]
+  },
+  "Warped Ruins": {
+   "map": {
+    "objectives": [
+     {
+      "type": "sun_seekers",
+      "x": 22.5,
+      "y": 11,
+      "mirror": "both"
+     },
+     {
+      "type": "golden_lions",
+      "x": 37.5,
+      "y": 11,
+      "mirror": "both"
+     },
+     {
+      "type": "sigmarite",
+      "x": 45,
+      "y": 22,
+      "mirror": "y"
+     },
+     {
+      "type": "heldenhain",
+      "x": 15,
+      "y": 22,
+      "mirror": "y"
+     }
+    ],
+    "terrain": [
+     {
+      "type": "obscuring",
+      "size": "medium",
+      "x": 48.5,
+      "y": 11,
+      "mirror": "y"
+     },
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 11.5,
+      "y": 10.5,
+      "mirror": "y"
+     },
+     {
+      "type": "obscuring",
+      "size": "medium",
+      "x": 22.5,
+      "y": 22,
+      "mirror": "y"
+     },
+     {
+      "type": "obscuring",
+      "size": "small",
+      "x": 7.5,
+      "y": 22,
+      "mirror": "y"
+     },
+     {
+      "type": "place_of_power",
+      "size": "small",
+      "x": 37.5,
+      "y": 22,
+      "mirror": "y"
+     },
+     {
+      "type": "place_of_power",
+      "size": "medium",
+      "x": 52.5,
+      "y": 22
+     }
+    ],
+    "zones": [
+     {
+      "type": "defender",
+      "x1": 0,
+      "y1": 22,
+      "x2": 60,
+      "y2": 44,
+      "labelDx": 22.5,
+      "labelDy": 5.5
+     },
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 0,
+      "x2": 60,
+      "y2": 22,
+      "labelDx": -22.5,
+      "labelDy": -5.5
+     }
+    ]
+   },
+   "scoring": [
+    [
+     3,
+     null,
+     "Control at least 1 objective."
+    ],
+    [
+     3,
+     null,
+     "Control any pair of objectives."
+    ],
+    [
+     4,
+     null,
+     "Control more objectives than your opponent."
+    ]
+   ],
+   "abil": [
+    "Spreading Warpfire"
+   ]
+  },
+  "Curse of the Gnaw": {
+   "map": {
+    "objectives": [
+     {
+      "type": "golden_lions",
+      "x": 15,
+      "y": 11
+     },
+     {
+      "type": "sun_seekers",
+      "x": 45,
+      "y": 33
+     },
+     {
+      "type": "heldenhain",
+      "x": 22.5,
+      "y": 22
+     },
+     {
+      "type": "sigmarite",
+      "x": 37.5,
+      "y": 22
+     }
+    ],
+    "terrain": [
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 31.5,
+      "y": 11,
+      "mirror": "both"
+     },
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 46.5,
+      "y": 11,
+      "mirror": "both"
+     },
+     {
+      "type": "obscuring",
+      "size": "small",
+      "x": 22.5,
+      "y": 15,
+      "mirror": "both"
+     },
+     {
+      "type": "place_of_power",
+      "size": "medium",
+      "x": 7.5,
+      "y": 15.5,
+      "mirror": "both"
+     }
+    ],
+    "zones": [
+     {
+      "type": "defender",
+      "x1": 30,
+      "y1": 0,
+      "x2": 60,
+      "y2": 22,
+      "labelDx": 7.5,
+      "labelDy": -5.5
+     },
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 22,
+      "x2": 30,
+      "y2": 44,
+      "labelDx": -7,
+      "labelDy": 5.5
+     },
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 11,
+      "x2": 15,
+      "y2": 22,
+      "hideLabel": true
+     },
+     {
+      "type": "attacker",
+      "x1": 30,
+      "y1": 33,
+      "x2": 45,
+      "y2": 44,
+      "hideLabel": true
+     },
+     {
+      "type": "defender",
+      "x1": 45,
+      "y1": 22,
+      "x2": 60,
+      "y2": 33,
+      "hideLabel": true
+     },
+     {
+      "type": "defender",
+      "x1": 15,
+      "y1": 0,
+      "x2": 30,
+      "y2": 11,
+      "hideLabel": true
+     }
+    ]
+   },
+   "scoring": [
+    [
+     3,
+     null,
+     "Control the **Golden Lion** objective."
+    ],
+    [
+     3,
+     null,
+     "Control the **Sun Seekers** objective."
+    ],
+    [
+     4,
+     null,
+     "Control more objectives than your opponent."
+    ]
+   ],
+   "abil": [
+    "Echoes Of Blight City"
+   ]
+  },
+  "Seize the Embers": {
+   "map": {
+    "objectives": [
+     {
+      "type": "sun_seekers",
+      "x": 15,
+      "y": 11,
+      "mirror": "both"
+     },
+     {
+      "type": "golden_lions",
+      "x": 45,
+      "y": 11,
+      "mirror": "both"
+     },
+     {
+      "type": "heldenhain",
+      "x": 30,
+      "y": 22
+     }
+    ],
+    "terrain": [
+     {
+      "type": "obscuring",
+      "size": "small",
+      "x": 7.5,
+      "y": 5.5,
+      "mirror": "both"
+     },
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 22.5,
+      "y": 16.5,
+      "mirror": "both"
+     },
+     {
+      "type": "obscuring",
+      "size": "medium",
+      "x": 36.5,
+      "y": 11,
+      "mirror": "both"
+     },
+     {
+      "type": "place_of_power",
+      "size": "small",
+      "x": 11.5,
+      "y": 22,
+      "mirror": "both"
+     }
+    ],
+    "zones": [
+     {
+      "type": "defender",
+      "x1": 15,
+      "y1": 0,
+      "x2": 60,
+      "y2": 22,
+      "labelDx": 15,
+      "labelDy": -5.5
+     },
+     {
+      "type": "defender",
+      "x1": 45,
+      "y1": 22,
+      "x2": 60,
+      "y2": 44,
+      "hideLabel": true
+     },
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 22,
+      "x2": 45,
+      "y2": 44,
+      "labelDx": -15,
+      "labelDy": 5.5
+     },
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 0,
+      "x2": 15,
+      "y2": 22,
+      "hideLabel": true
+     }
+    ]
+   },
+   "scoring": [
+    [
+     3,
+     null,
+     "Control at least 1 objective."
+    ],
+    [
+     3,
+     [
+      1
+     ],
+     "Control 2 or more objectives."
+    ],
+    [
+     3,
+     [
+      2,
+      3,
+      4,
+      5
+     ],
+     "Used the 'Back to Base Camp' ability this turn."
+    ],
+    [
+     4,
+     null,
+     "Control more objectives than your opponent."
+    ]
+   ],
+   "abil": [
+    "Search The Ruin",
+    "Back To Base Camp"
+   ]
+  },
+  "Treacherous Ground": {
+   "map": {
+    "objectives": [
+     {
+      "type": "sun_seekers",
+      "x": 15,
+      "y": 11,
+      "mirror": "x"
+     },
+     {
+      "type": "golden_lions",
+      "x": 15,
+      "y": 33,
+      "mirror": "x"
+     },
+     {
+      "type": "sigmarite",
+      "x": 7.5,
+      "y": 22
+     },
+     {
+      "type": "heldenhain",
+      "x": 52.5,
+      "y": 22
+     }
+    ],
+    "terrain": [
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 6.5,
+      "y": 11,
+      "mirror": "both"
+     },
+     {
+      "type": "obscuring",
+      "size": "medium",
+      "x": 34,
+      "y": 33,
+      "mirror": "both"
+     },
+     {
+      "type": "place_of_power",
+      "size": "small",
+      "x": 22.5,
+      "y": 22,
+      "mirror": "both"
+     },
+     {
+      "type": "obscuring",
+      "size": "small",
+      "x": 7.5,
+      "y": 38.5,
+      "mirror": "both"
+     }
+    ],
+    "zones": [
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 0,
+      "x2": 60,
+      "y2": 11,
+      "labelDx": -22.5,
+      "labelDy": -2.5
+     },
+     {
+      "type": "attacker",
+      "x1": 15,
+      "y1": 11,
+      "x2": 45,
+      "y2": 22,
+      "hideLabel": true
+     },
+     {
+      "type": "defender",
+      "x1": 0,
+      "y1": 33,
+      "x2": 60,
+      "y2": 44,
+      "labelDx": 22.5,
+      "labelDy": 2.5
+     },
+     {
+      "type": "defender",
+      "x1": 15,
+      "y1": 22,
+      "x2": 45,
+      "y2": 33,
+      "hideLabel": true
+     }
+    ]
+   },
+   "scoring": [
+    [
+     3,
+     null,
+     "Control at least 1 **stable** objective."
+    ],
+    [
+     3,
+     null,
+     "Control 2 or more **stable** objectives."
+    ],
+    [
+     4,
+     null,
+     "Control more **stable** objectives than your opponent."
+    ]
+   ],
+   "abil": [
+    "Tread Carefully",
+    "Violent Tremor"
+   ]
+  },
+  "Escape From the Coast": {
+   "map": {
+    "objectives": [
+     {
+      "type": "golden_lions",
+      "x": 7.5,
+      "y": 11,
+      "mirror": "y"
+     },
+     {
+      "type": "sun_seekers",
+      "x": 45,
+      "y": 11,
+      "mirror": "y"
+     },
+     {
+      "type": "sigmarite",
+      "x": 22.5,
+      "y": 22
+     },
+     {
+      "type": "heldenhain",
+      "x": 45,
+      "y": 22
+     }
+    ],
+    "terrain": [
+     {
+      "type": "obscuring",
+      "size": "medium",
+      "x": 22.5,
+      "y": 11,
+      "mirror": "y"
+     },
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 37.5,
+      "y": 5.5,
+      "mirror": "y"
+     },
+     {
+      "type": "place_of_power",
+      "size": "medium",
+      "x": 55,
+      "y": 22
+     },
+     {
+      "type": "obscuring",
+      "size": "medium",
+      "x": 36.5,
+      "y": 22
+     },
+     {
+      "type": "obscuring",
+      "size": "small",
+      "x": 15,
+      "y": 22
+     },
+     {
+      "type": "place_of_power",
+      "size": "small",
+      "x": 5,
+      "y": 22
+     }
+    ],
+    "zones": [
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 0,
+      "x2": 30,
+      "y2": 22,
+      "labelDx": -7.5,
+      "labelDy": -5.5
+     },
+     {
+      "type": "attacker",
+      "x1": 30,
+      "y1": 0,
+      "x2": 60,
+      "y2": 11,
+      "hideLabel": true
+     },
+     {
+      "type": "defender",
+      "x1": 0,
+      "y1": 22,
+      "x2": 30,
+      "y2": 44,
+      "labelDx": -7.5,
+      "labelDy": 5.5
+     },
+     {
+      "type": "defender",
+      "x1": 30,
+      "y1": 33,
+      "x2": 60,
+      "y2": 44,
+      "hideLabel": true
+     }
+    ]
+   },
+   "scoring": [
+    [
+     3,
+     null,
+     "Control at least 1 objective."
+    ],
+    [
+     3,
+     null,
+     "Control 2 or more objectives."
+    ],
+    [
+     4,
+     null,
+     "Control more objectives than your opponent."
+    ]
+   ],
+   "abil": [
+    "To The Ships!"
+   ]
+  },
+  "Power of the Realms": {
+   "map": {
+    "objectives": [
+     {
+      "type": "golden_lions",
+      "x": 30,
+      "y": 11,
+      "mirror": "y"
+     },
+     {
+      "type": "sigmarite",
+      "x": 15,
+      "y": 22
+     },
+     {
+      "type": "sun_seekers",
+      "x": 30,
+      "y": 22
+     },
+     {
+      "type": "heldenhain",
+      "x": 45,
+      "y": 22
+     }
+    ],
+    "terrain": [
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 15,
+      "y": 11,
+      "mirror": "both"
+     },
+     {
+      "type": "ruin",
+      "size": "medium",
+      "x": 45,
+      "y": 11,
+      "mirror": "both"
+     },
+     {
+      "type": "place_of_power",
+      "size": "medium",
+      "x": 4.5,
+      "y": 22,
+      "mirror": "both"
+     },
+     {
+      "type": "obscuring",
+      "size": "small",
+      "x": 37.5,
+      "y": 38.5,
+      "mirror": "both"
+     }
+    ],
+    "zones": [
+     {
+      "type": "attacker",
+      "x1": 0,
+      "y1": 0,
+      "x2": 60,
+      "y2": 22,
+      "labelDx": -22.5,
+      "labelDy": -5.5
+     },
+     {
+      "type": "defender",
+      "x1": 0,
+      "y1": 22,
+      "x2": 60,
+      "y2": 44,
+      "labelDx": 22.5,
+      "labelDy": 5.5
+     }
+    ]
+   },
+   "scoring": [
+    [
+     3,
+     null,
+     "Control the **primary** objective."
+    ],
+    [
+     3,
+     null,
+     "Control 2 or more **secondary** objectives."
+    ],
+    [
+     4,
+     null,
+     "Control more objectives than your opponent."
+    ]
+   ],
+   "abil": [
+    "Arcane Charge"
+   ]
+  }
+ }
+}
