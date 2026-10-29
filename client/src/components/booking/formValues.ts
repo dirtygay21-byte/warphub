@@ -1,12 +1,14 @@
-import type { PaintingDetails, WhPlayerDetails } from "@/apiUtils/booking";
+import type { PaintingDetails, WhGame, WhPlayerDetails } from "@/apiUtils/booking";
 
 export type PlayerFormValue = {
+  game: WhGame;
   army: string;
   points: string;
   experienceLevel: string;
 };
 
-export const emptyPlayerForm = (): PlayerFormValue => ({
+export const emptyPlayerForm = (game: WhGame = "40k"): PlayerFormValue => ({
+  game,
   army: "",
   points: "",
   experienceLevel: "",
@@ -17,8 +19,9 @@ export const playerFormFromDetails = (
 ): PlayerFormValue =>
   details
     ? {
+        game: details.game ?? "40k",
         army: details.army,
-        points: String(details.points),
+        points: details.points != null ? String(details.points) : "",
         experienceLevel: details.experienceLevel,
       }
     : emptyPlayerForm();
@@ -27,19 +30,23 @@ export const validatePlayerForm = (
   value: PlayerFormValue,
   maxPoints: number,
 ): string | null => {
-  if (!value.army.trim()) return "Укажите армию";
-  const points = Number(value.points);
-  if (!value.points || !Number.isInteger(points) || points < 1) {
-    return "Укажите количество очков";
+  if (!value.army.trim()) return value.game === "kt" ? "Укажите команду" : "Укажите армию";
+  // у Kill Team лимита очков нет
+  if (value.game !== "kt") {
+    const points = Number(value.points);
+    if (!value.points || !Number.isInteger(points) || points < 1) {
+      return "Укажите количество очков";
+    }
+    if (points > maxPoints) return `Не больше ${maxPoints} очков`;
   }
-  if (points > maxPoints) return `Не больше ${maxPoints} очков`;
   if (!value.experienceLevel) return "Выберите уровень опыта";
   return null;
 };
 
 export const playerFormToDetails = (value: PlayerFormValue): WhPlayerDetails => ({
+  game: value.game,
   army: value.army.trim(),
-  points: Number(value.points),
+  points: value.game === "kt" ? null : Number(value.points),
   experienceLevel: value.experienceLevel,
 });
 

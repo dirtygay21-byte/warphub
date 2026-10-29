@@ -11,14 +11,17 @@ import {
 
 const OTHER_FACTION = "__other__";
 
-/** Фракция: список из справочника + «Другая» со своим вариантом */
+/** Фракция: список из справочника (или по группам) + «Другая» со своим вариантом */
 export function FactionInput({
   factions,
+  groups,
   value,
   onChange,
   placeholder = "Выберите фракцию",
 }: {
   factions: string[];
+  /** список по группам (Kill Team: «Imperium · Space Marines»); тогда factions — тот же список плоско */
+  groups?: { label: string; items: string[] }[];
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -44,11 +47,21 @@ export function FactionInput({
         <option value="" disabled>
           {placeholder}
         </option>
-        {factions.map((faction) => (
-          <option key={faction} value={faction}>
-            {faction}
-          </option>
-        ))}
+        {groups
+          ? groups.map((g) => (
+              <optgroup key={g.label} label={g.label}>
+                {g.items.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </optgroup>
+            ))
+          : factions.map((faction) => (
+              <option key={faction} value={faction}>
+                {faction}
+              </option>
+            ))}
         <option value={OTHER_FACTION}>Другая…</option>
       </select>
 
@@ -67,20 +80,33 @@ export function FactionInput({
   );
 }
 
-/** Армия, очки, опыт — одна форма для игры и тренировок Warhammer */
+/**
+ * Игра (40K / AoS / Kill Team), армия или команда, очки (кроме Kill Team), опыт — одна форма для игры и тренировок
+ * Warhammer. lockedGame — игра задана (присоединение к столу: как у первого игрока; правка записи — прежняя).
+ */
 export function PlayerInfoForm({
   value,
   onChange,
   options,
   playerName,
+  lockedGame,
 }: {
   value: PlayerFormValue;
   onChange: (value: PlayerFormValue) => void;
   options: BookingOptions;
   playerName?: string;
+  lockedGame?: string | null;
 }) {
   const set = (patch: Partial<PlayerFormValue>) =>
     onChange({ ...value, ...patch });
+  const kt = value.game === "kt";
+  const list = value.game === "aos" ? options.aosFactions : kt ? options.killTeams : options.factions;
+  // Kill Team: команды по фракциям — «Imperium · Space Marines»
+  const groups = kt
+    ? options.killTeamGroups.flatMap((g) =>
+        g.factions.map((f) => ({ label: f.faction === g.group ? g.group : `${g.group} · ${f.faction}`, items: f.teams })),
+      )
+    : undefined;
 
   return (
     <div className="space-y-5">
@@ -92,15 +118,36 @@ export function PlayerInfoForm({
         </Field>
       )}
 
-      <Field label="Армия">
+      <Field label="Игра" hint={lockedGame ? "Как у соперника за этим столом" : undefined}>
+        {lockedGame ? (
+          <div className="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2.5 text-sm font-semibold text-white">
+            {options.games.find((g) => g.value === lockedGame)?.label ?? lockedGame}
+          </div>
+        ) : (
+          <ChoiceChips
+            columns={3}
+            options={options.games}
+            value={value.game}
+            onChange={(game) =>
+              // другая игра — другой список армий; очки у Kill Team не нужны
+              set({ game: game as PlayerFormValue["game"], army: "", points: game === "kt" ? "" : value.points })
+            }
+          />
+        )}
+      </Field>
+
+      <Field label={kt ? "Команда (kill team)" : "Армия"}>
         <FactionInput
-          factions={options.factions}
+          key={value.game}
+          factions={list}
+          groups={groups}
           value={value.army}
           onChange={(army) => set({ army })}
-          placeholder="Выберите армию"
+          placeholder={kt ? "Выберите команду" : "Выберите армию"}
         />
       </Field>
 
+      {!kt && (
       <Field label="Очки">
         <div className="space-y-2">
           <div className="flex flex-wrap gap-2">
@@ -135,6 +182,7 @@ export function PlayerInfoForm({
           />
         </div>
       </Field>
+      )}
 
       <Field label="Уровень опыта">
         <ChoiceChips

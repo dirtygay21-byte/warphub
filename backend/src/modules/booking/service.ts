@@ -18,6 +18,8 @@ import {
 import {
   bookingConfig,
   experienceLabel,
+  armyLine,
+  gameLabel,
   type TableCapacityProfile,
 } from '../../config/booking';
 import { db } from '../../db';
@@ -104,6 +106,9 @@ export type BookingMode = 'table' | 'pool' | 'none';
 
 export type SessionPlayerView = {
   firstName: string;
+  /** игра (40k / aos / kt); null — не игрок Warhammer */
+  game: string | null;
+  gameLabel: string | null;
   army: string | null;
   points: number | null;
   experienceLevel: string | null;
@@ -445,6 +450,8 @@ function toPlayerView(
   if (details?.kind === 'wh_player') {
     return {
       firstName,
+      game: details.game ?? '40k',
+      gameLabel: gameLabel(details.game),
       army: details.army,
       points: details.points,
       experienceLevel: details.experienceLevel,
@@ -454,6 +461,8 @@ function toPlayerView(
 
   return {
     firstName,
+    game: null,
+    gameLabel: null,
     army: null,
     points: null,
     experienceLevel: null,
@@ -949,6 +958,15 @@ export async function createReservation(
       );
     }
 
+    // присоединение к игре: игра (40K / AoS / Kill Team) — как у первого игрока за столом
+    if (check.isJoin && session && details?.kind === 'wh_player') {
+      const [host] = await tx.select({ details: reservationsTable.details }).from(reservationsTable).where(eq(reservationsTable.id, session.id)).limit(1);
+      const hostGame = host?.details?.kind === 'wh_player' ? (host.details.game ?? '40k') : null;
+      if (hostGame && hostGame !== (details.game ?? '40k')) {
+        throw new BookingError('INVALID_DETAILS', `This table plays ${gameLabel(hostGame)}`);
+      }
+    }
+
     if (
       check.isJoin &&
       bookings.some(
@@ -1052,8 +1070,9 @@ function describePlayer(user: UserBrief, details: ReservationDetails | null) {
   const lines = [`Игрок: ${escapeHtml(formatUserName(user))}`];
   if (details?.kind === 'wh_player') {
     lines.push(
-      `Армия: ${escapeHtml(details.army)}`,
-      `Очки: ${details.points}`,
+      `Игра: ${escapeHtml(gameLabel(details.game))}`,
+      escapeHtml(armyLine(details.game, details.army)),
+      ...(details.points != null ? [`Очки: ${details.points}`] : []),
       `Опыт: ${escapeHtml(experienceLabel(details.experienceLevel))}`,
     );
   }

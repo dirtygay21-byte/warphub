@@ -6,6 +6,7 @@ import { PaintingForm, PlayerInfoForm } from "@/components/booking/PlayerForms";
 import {
   emptyPaintingForm,
   emptyPlayerForm,
+  type PlayerFormValue,
   paintingFormToDetails,
   playerFormToDetails,
   validatePaintingForm,
@@ -115,7 +116,11 @@ export default function ServiceDetailsStage() {
         ? { minutes: windowLimit.maxMinutes, until: windowLimit.until }
         : null;
 
-  const [player, setPlayer] = useState(emptyPlayerForm);
+  const [playerDraft, setPlayer] = useState(() => emptyPlayerForm());
+  // присоединение к столу: игра — как у первого игрока (сервер проверяет то же)
+  const lockedGame =
+    selectedSlot?.kind === "join" ? ((selectedSlot.players.find((p) => p.game)?.game as PlayerFormValue["game"] | undefined) ?? "40k") : null;
+  const player = lockedGame && playerDraft.game !== lockedGame ? { ...playerDraft, game: lockedGame } : playerDraft;
   const [clubArmy, setClubArmy] = useState(false);
   const [painting, setPainting] = useState(emptyPaintingForm);
   const [showErrors, setShowErrors] = useState(false);
@@ -227,7 +232,7 @@ export default function ServiceDetailsStage() {
               {selectedSlot.players.map((p, index) => (
                 <p key={index} className="mt-1.5 text-sm text-white/85">
                   {p.firstName}
-                  {p.army ? ` · ${p.army} · ${p.points} очков · ${p.experienceLabel}` : ""}
+                  {p.army ? ` · ${p.gameLabel ?? "Warhammer 40,000"} · ${p.army}${p.points != null ? ` · ${p.points} очков` : ""} · ${p.experienceLabel}` : ""}
                 </p>
               ))}
             </div>
@@ -282,6 +287,7 @@ export default function ServiceDetailsStage() {
               <PlayerInfoForm
                 value={player}
                 onChange={setPlayer}
+                lockedGame={lockedGame}
                 options={options}
                 playerName={
                   user ? [user.firstName, user.lastName].filter(Boolean).join(" ") : undefined

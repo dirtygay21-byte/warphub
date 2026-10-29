@@ -85,6 +85,68 @@ export const bookingOptions = {
     'Tyranids',
     'World Eaters',
   ],
+  /** Игра в записи на Warhammer (24.10.2026) */
+  games: [
+    { value: '40k', label: 'Warhammer 40,000' },
+    { value: 'aos', label: 'Age of Sigmar' },
+    { value: 'kt', label: 'Kill Team' },
+  ],
+  /**
+   * Команды Kill Team (3-я редакция) для поля «Команда» — по фракциям, как в меню Wahapedia (решение владельца, 29.10.2026).
+   * Источник: wahapedia.ru/kill-team3 — меню команд (страница NPO); пять команд, которых нет в меню, но есть свои страницы
+   * (Celestian Insidiants, Spectre Squad, Wolf Scouts, Murderwing, XV26 Stealth Battlesuits), — по ключевым словам фракции
+   * на их страницах. Названия — как на Wahapedia. Exodite Dragon Masters (август 2026) на Wahapedia ещё нет — «Другая…».
+   * Новые команды добавлять сюда.
+   */
+  killTeamGroups: [
+    {
+      group: 'Imperium',
+      factions: [
+        { faction: 'Adepta Sororitas', teams: ['Celestian Insidiants', 'Novitiates'] },
+        { faction: 'Adeptus Mechanicus', teams: ['Battleclade', 'Hunter Clade'] },
+        { faction: 'Agents of the Imperium', teams: ['Elucidian Starstrider', 'Exaction Squad', 'Imperial Navy Breacher', 'Inquisitorial Agent', 'Sanctifiers'] },
+        { faction: 'Astra Militarum', teams: ['Death Korps', 'Kasrkin', 'Ratlings', 'Spectre Squad', 'Tempestus Aquilons'] },
+        { faction: 'Space Marines', teams: ['Angel of Death', 'Deathwatch', 'Phobos Strike Team', 'Scout Squad', 'Wolf Scouts'] },
+      ],
+    },
+    {
+      group: 'Chaos',
+      factions: [
+        { faction: 'Chaos Daemons', teams: ['Gellerpox Infected'] },
+        { faction: 'Chaos Space Marines', teams: ['Legionary', 'Murderwing', 'Nemesis Claw'] },
+        { faction: 'Cultists', teams: ['Blooded', 'Chaos Cult', 'Fellgor Ravager'] },
+        { faction: 'Death Guard', teams: ['Plague Marines'] },
+        { faction: 'Thousand Sons', teams: ['Warpcoven'] },
+        { faction: 'World Eaters', teams: ['Goremonger'] },
+      ],
+    },
+    {
+      group: 'Aeldari',
+      factions: [
+        { faction: 'Corsairs', teams: ['Corsair Voidscarred'] },
+        { faction: 'Craftworlds', teams: ['Blades of Khaine'] },
+        { faction: 'Drukhari', teams: ['Hand of the Archon', 'Mandrakes'] },
+        { faction: 'Harlequins', teams: ['Void-dancer Troupe'] },
+      ],
+    },
+    {
+      group: 'Xenos',
+      factions: [
+        { faction: 'Genestealer Cults', teams: ['Brood Brother', 'Wyrmblade'] },
+        { faction: 'Kroot', teams: ['Farstalker Kinband'] },
+        { faction: 'Leagues of Votann', teams: ['Hearthkyn Salvager', 'Hernkyn Yaegir'] },
+        { faction: 'Necrons', teams: ['Canoptek Circle', 'Hierotek Circle'] },
+        { faction: 'Orks', teams: ['Kommandos', 'Wrecka Krew'] },
+        { faction: "T'au Empire", teams: ['Pathfinders', 'Vespid Stingwings', 'XV26 Stealth Battlesuits'] },
+      ],
+    },
+    {
+      group: 'Tyranids',
+      factions: [
+        { faction: 'Tyranids', teams: ['Raveners'] },
+      ],
+    },
+  ],
   paintSources: [
     { value: 'own', label: 'Свои краски' },
     { value: 'club', label: 'Краски клуба' },
@@ -104,6 +166,32 @@ export const bookingOptions = {
 export type ExperienceLevel =
   (typeof bookingOptions.experienceLevels)[number]['value'];
 export type PaintSource = (typeof bookingOptions.paintSources)[number]['value'];
+export type WhGame = (typeof bookingOptions.games)[number]['value'];
+
+/** Все команды Kill Team списком (для справочника клиента и проверок). */
+export const killTeams: string[] = bookingOptions.killTeamGroups.flatMap((g) => g.factions.flatMap((f) => [...f.teams]));
+
+/** «Армия: Orks» / «Команда: Pathfinders (T'au Empire)» — строка уведомления (без HTML-экранирования). */
+export function armyLine(game: string | null | undefined, army: string): string {
+  if (game !== 'kt') return `Армия: ${army}`;
+  const f = killTeamFaction(army);
+  return `Команда: ${army}${f ? ` (${f})` : ''}`;
+}
+
+/** Фракция команды Kill Team («T'au Empire») или null — команды нет в списке («Другая…»). */
+export function killTeamFaction(team: string): string | null {
+  for (const g of bookingOptions.killTeamGroups) for (const f of g.factions) if ((f.teams as readonly string[]).includes(team)) return f.faction;
+  return null;
+}
+
+export function isWhGame(value: unknown): value is WhGame {
+  return bookingOptions.games.some((g) => g.value === value);
+}
+
+/** «Warhammer 40,000» / «Age of Sigmar» / «Kill Team»; старые записи без игры — 40K */
+export function gameLabel(value: string | null | undefined): string {
+  return bookingOptions.games.find((g) => g.value === (value ?? '40k'))?.label ?? bookingOptions.games[0].label;
+}
 export type DndTimePreference =
   (typeof bookingOptions.dndTimePreferences)[number]['value'];
 

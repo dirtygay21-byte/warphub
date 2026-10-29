@@ -10,7 +10,8 @@ import {
   toReservationResponse,
   updateReservationDetails,
 } from '../booking/service';
-import { bookingConfig, bookingOptions } from '../../config/booking';
+import { bookingConfig, bookingOptions, killTeams } from '../../config/booking';
+import { aosFactionNames } from '../roster/data';
 import { mapDndError } from '../dnd/http';
 import {
   bookDndGame,
@@ -145,6 +146,8 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
     '/booking-options',
     () => ({
       ...bookingOptions,
+      aosFactions: aosFactionNames(),
+      killTeams,
       allowedWeekdays: bookingConfig.allowedWeekdays,
       timeZone: bookingConfig.timeZone,
       timezoneOffsetMinutes: bookingConfig.timezoneOffsetMinutes,
@@ -154,7 +157,7 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
         tags: ['Booking'],
         summary: 'Справочники для форм записи',
         description:
-          'Уровни опыта, фракции, варианты красок, время для D&D, разрешённые дни недели (ISO) и часовой пояс клуба. Публичный эндпоинт.',
+          'Уровни опыта, игры (40K, AoS, Kill Team), фракции 40K и AoS (из данных Roster Builder), команды Kill Team, варианты красок, время для D&D, разрешённые дни недели (ISO) и часовой пояс клуба. Публичный эндпоинт.',
       },
     },
   )

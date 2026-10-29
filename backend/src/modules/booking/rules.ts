@@ -7,8 +7,10 @@ import {
   bookingOptions,
   isExperienceLevel,
   isPaintSource,
+  isWhGame,
   type ExperienceLevel,
   type PaintSource,
+  type WhGame,
 } from '../../config/booking';
 
 // ----------------------------------------------------------------------------
@@ -404,8 +406,12 @@ export function poolFreeSeats(
 
 export type WhPlayerDetails = {
   kind: 'wh_player';
+  /** игра (24.10.2026); в записях до этого поля нет — значит 40K */
+  game?: WhGame;
+  /** армия (40K, AoS) или команда (Kill Team) */
   army: string;
-  points: number;
+  /** лимит очков; у Kill Team очков нет — null */
+  points: number | null;
   experienceLevel: ExperienceLevel;
 };
 
@@ -481,15 +487,21 @@ export function validateDetails(
   const data = raw as Record<string, unknown>;
 
   if (kind === 'wh_player') {
-    const points = Number(data.points);
-    if (
-      !Number.isInteger(points) ||
-      points < 1 ||
-      points > bookingOptions.maxPoints
-    ) {
-      throw new DetailsValidationError(
-        `points must be a whole number from 1 to ${bookingOptions.maxPoints}`,
-      );
+    const game = data.game === undefined || data.game === null ? '40k' : data.game;
+    if (!isWhGame(game)) throw new DetailsValidationError('game must be 40k, aos or kt');
+    // у Kill Team нет лимита очков — поле не нужно и не сохраняется
+    let points: number | null = null;
+    if (game !== 'kt') {
+      points = Number(data.points);
+      if (
+        !Number.isInteger(points) ||
+        points < 1 ||
+        points > bookingOptions.maxPoints
+      ) {
+        throw new DetailsValidationError(
+          `points must be a whole number from 1 to ${bookingOptions.maxPoints}`,
+        );
+      }
     }
     if (!isExperienceLevel(data.experienceLevel)) {
       throw new DetailsValidationError('experienceLevel is invalid');
@@ -497,6 +509,7 @@ export function validateDetails(
 
     return {
       kind,
+      game,
       army: cleanText(data.army, 'army', 80),
       points,
       experienceLevel: data.experienceLevel,
