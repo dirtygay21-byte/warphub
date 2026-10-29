@@ -32,7 +32,10 @@ async function api(method: string, path: string, token?: string, body?: unknown)
 }
 function sql(query: string): string {
   const r = Bun.spawnSync(['psql', process.env.POSTGRES_URI!, '-tAq', '-v', 'ON_ERROR_STOP=1', '-c', query]);
-  if (r.exitCode !== 0) throw new Error(r.stderr.toString());
+  if (r.exitCode !== 0) {
+    console.error(`::error::psql: ${r.stderr.toString().replace(/\s+/g, ' ').slice(0, 400)}`);
+    throw new Error(r.stderr.toString());
+  }
   return r.stdout.toString().trim();
 }
 
