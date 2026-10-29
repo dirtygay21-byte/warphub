@@ -10,7 +10,7 @@ import {
   toReservationResponse,
   updateReservationDetails,
 } from '../booking/service';
-import { bookingConfig, bookingOptions } from '../../config/booking';
+import { bookingConfig, bookingOptions, killTeams } from '../../config/booking';
 import { aosFactionNames } from '../roster/data';
 import { mapDndError } from '../dnd/http';
 import {
@@ -147,6 +147,7 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
     () => ({
       ...bookingOptions,
       aosFactions: aosFactionNames(),
+      killTeams,
       allowedWeekdays: bookingConfig.allowedWeekdays,
       timeZone: bookingConfig.timeZone,
       timezoneOffsetMinutes: bookingConfig.timezoneOffsetMinutes,

@@ -18,6 +18,7 @@ import {
 import {
   bookingConfig,
   experienceLabel,
+  armyLine,
   gameLabel,
   type TableCapacityProfile,
 } from '../../config/booking';
@@ -1070,7 +1071,7 @@ function describePlayer(user: UserBrief, details: ReservationDetails | null) {
   if (details?.kind === 'wh_player') {
     lines.push(
       `Игра: ${escapeHtml(gameLabel(details.game))}`,
-      `${details.game === 'kt' ? 'Команда' : 'Армия'}: ${escapeHtml(details.army)}`,
+      escapeHtml(armyLine(details.game, details.army)),
       ...(details.points != null ? [`Очки: ${details.points}`] : []),
       `Опыт: ${escapeHtml(experienceLabel(details.experienceLevel))}`,
     );

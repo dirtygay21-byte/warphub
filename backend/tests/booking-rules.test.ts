@@ -347,3 +347,17 @@ describe('details validation', () => {
     );
   });
 });
+
+describe('Kill Team: список команд по фракциям (Wahapedia)', () => {
+  test('47 команд, без повторов, у каждой фракции есть команды', async () => {
+    const { bookingOptions, killTeams, killTeamFaction, armyLine } = await import('../src/config/booking');
+    expect(killTeams.length).toBe(47);
+    expect(new Set(killTeams).size).toBe(killTeams.length);
+    for (const g of bookingOptions.killTeamGroups) for (const f of g.factions) expect(f.teams.length).toBeGreaterThan(0);
+    expect(bookingOptions.killTeamGroups.map((g) => g.group)).toEqual(['Imperium', 'Chaos', 'Aeldari', 'Xenos', 'Tyranids']);
+    expect(killTeamFaction('Wolf Scouts')).toBe('Space Marines');
+    expect(killTeamFaction('Своя команда')).toBeNull();
+    expect(armyLine('kt', 'Своя команда')).toBe('Команда: Своя команда');
+    expect(armyLine('40k', 'Orks')).toBe('Армия: Orks');
+  });
+});

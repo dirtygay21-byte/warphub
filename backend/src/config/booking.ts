@@ -92,60 +92,60 @@ export const bookingOptions = {
     { value: 'kt', label: 'Kill Team' },
   ],
   /**
-   * Команды Kill Team для поля «Команда» (плюс «Другая…»). Источники (решение владельца 1B, 24.10.2026):
-   * Warhammer Community «Kill Team: managing the range of kill teams in the new edition» (06.09.2024) — 33 команды;
-   * команды, вышедшие позже, — по списку «Kill Team Tier List Q3 2026» (canyourollacrit.com, 08.10.2026), написание —
-   * как у Warhammer Community («Legionaries», «Tempestus Aquilons»). Новые команды добавлять сюда.
+   * Команды Kill Team (3-я редакция) для поля «Команда» — по фракциям, как в меню Wahapedia (решение владельца, 29.10.2026).
+   * Источник: wahapedia.ru/kill-team3 — меню команд (страница NPO); пять команд, которых нет в меню, но есть свои страницы
+   * (Celestian Insidiants, Spectre Squad, Wolf Scouts, Murderwing, XV26 Stealth Battlesuits), — по ключевым словам фракции
+   * на их страницах. Названия — как на Wahapedia. Exodite Dragon Masters (август 2026) на Wahapedia ещё нет — «Другая…».
+   * Новые команды добавлять сюда.
    */
-  killTeams: [
-    'Angels of Death',
-    'Battleclade',
-    'Blades of Khaine',
-    'Blooded',
-    'Brood Brothers',
-    'Canoptek Circle',
-    'Celestian Insidiants',
-    'Chaos Cult',
-    'Corsair Voidscarred',
-    'Death Korps',
-    'Deathwatch',
-    'Elucidian Starstriders',
-    'Exaction Squad',
-    'Exodite Dragon Masters',
-    'Farstalker Kinband',
-    'Fellgor Ravagers',
-    'Gellerpox Infected',
-    'Goremongers',
-    'Hand of the Archon',
-    'Hearthkyn Salvagers',
-    'Hernkyn Yaegirs',
-    'Hierotek Circle',
-    'Hunter Clade',
-    'Imperial Navy Breachers',
-    'Inquisitorial Agents',
-    'Kasrkin',
-    'Kommandos',
-    'Legionaries',
-    'Mandrakes',
-    'Murderwing',
-    'Nemesis Claw',
-    'Novitiates',
-    'Pathfinders',
-    'Phobos Strike Team',
-    'Plague Marines',
-    'Ratlings',
-    'Raveners',
-    'Sanctifiers',
-    'Scout Squad',
-    'Spectre Squad',
-    'Tempestus Aquilons',
-    'Vespid Stingwings',
-    'Void-dancer Troupe',
-    'Warpcoven',
-    'Wolf Scouts',
-    'Wrecka Krew',
-    'Wyrmblade',
-    'XV26 Stealth Battlesuits',
+  killTeamGroups: [
+    {
+      group: 'Imperium',
+      factions: [
+        { faction: 'Adepta Sororitas', teams: ['Celestian Insidiants', 'Novitiates'] },
+        { faction: 'Adeptus Mechanicus', teams: ['Battleclade', 'Hunter Clade'] },
+        { faction: 'Agents of the Imperium', teams: ['Elucidian Starstrider', 'Exaction Squad', 'Imperial Navy Breacher', 'Inquisitorial Agent', 'Sanctifiers'] },
+        { faction: 'Astra Militarum', teams: ['Death Korps', 'Kasrkin', 'Ratlings', 'Spectre Squad', 'Tempestus Aquilons'] },
+        { faction: 'Space Marines', teams: ['Angel of Death', 'Deathwatch', 'Phobos Strike Team', 'Scout Squad', 'Wolf Scouts'] },
+      ],
+    },
+    {
+      group: 'Chaos',
+      factions: [
+        { faction: 'Chaos Daemons', teams: ['Gellerpox Infected'] },
+        { faction: 'Chaos Space Marines', teams: ['Legionary', 'Murderwing', 'Nemesis Claw'] },
+        { faction: 'Cultists', teams: ['Blooded', 'Chaos Cult', 'Fellgor Ravager'] },
+        { faction: 'Death Guard', teams: ['Plague Marines'] },
+        { faction: 'Thousand Sons', teams: ['Warpcoven'] },
+        { faction: 'World Eaters', teams: ['Goremonger'] },
+      ],
+    },
+    {
+      group: 'Aeldari',
+      factions: [
+        { faction: 'Corsairs', teams: ['Corsair Voidscarred'] },
+        { faction: 'Craftworlds', teams: ['Blades of Khaine'] },
+        { faction: 'Drukhari', teams: ['Hand of the Archon', 'Mandrakes'] },
+        { faction: 'Harlequins', teams: ['Void-dancer Troupe'] },
+      ],
+    },
+    {
+      group: 'Xenos',
+      factions: [
+        { faction: 'Genestealer Cults', teams: ['Brood Brother', 'Wyrmblade'] },
+        { faction: 'Kroot', teams: ['Farstalker Kinband'] },
+        { faction: 'Leagues of Votann', teams: ['Hearthkyn Salvager', 'Hernkyn Yaegir'] },
+        { faction: 'Necrons', teams: ['Canoptek Circle', 'Hierotek Circle'] },
+        { faction: 'Orks', teams: ['Kommandos', 'Wrecka Krew'] },
+        { faction: "T'au Empire", teams: ['Pathfinders', 'Vespid Stingwings', 'XV26 Stealth Battlesuits'] },
+      ],
+    },
+    {
+      group: 'Tyranids',
+      factions: [
+        { faction: 'Tyranids', teams: ['Raveners'] },
+      ],
+    },
   ],
   paintSources: [
     { value: 'own', label: 'Свои краски' },
@@ -167,6 +167,22 @@ export type ExperienceLevel =
   (typeof bookingOptions.experienceLevels)[number]['value'];
 export type PaintSource = (typeof bookingOptions.paintSources)[number]['value'];
 export type WhGame = (typeof bookingOptions.games)[number]['value'];
+
+/** Все команды Kill Team списком (для справочника клиента и проверок). */
+export const killTeams: string[] = bookingOptions.killTeamGroups.flatMap((g) => g.factions.flatMap((f) => [...f.teams]));
+
+/** «Армия: Orks» / «Команда: Pathfinders (T'au Empire)» — строка уведомления (без HTML-экранирования). */
+export function armyLine(game: string | null | undefined, army: string): string {
+  if (game !== 'kt') return `Армия: ${army}`;
+  const f = killTeamFaction(army);
+  return `Команда: ${army}${f ? ` (${f})` : ''}`;
+}
+
+/** Фракция команды Kill Team («T'au Empire») или null — команды нет в списке («Другая…»). */
+export function killTeamFaction(team: string): string | null {
+  for (const g of bookingOptions.killTeamGroups) for (const f of g.factions) if ((f.teams as readonly string[]).includes(team)) return f.faction;
+  return null;
+}
 
 export function isWhGame(value: unknown): value is WhGame {
   return bookingOptions.games.some((g) => g.value === value);

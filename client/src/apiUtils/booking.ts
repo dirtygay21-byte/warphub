@@ -12,8 +12,10 @@ export type BookingOptions = {
   factions: string[];
   /** фракции Age of Sigmar (из данных Roster Builder) */
   aosFactions: string[];
-  /** команды Kill Team */
+  /** команды Kill Team списком */
   killTeams: string[];
+  /** команды Kill Team по фракциям (как на Wahapedia): Imperium → Space Marines → [Deathwatch, …] */
+  killTeamGroups: { group: string; factions: { faction: string; teams: string[] }[] }[];
   paintSources: OptionItem[];
   dndTimePreferences: OptionItem[];
   dndMaxPlayersPerRequest: number;
@@ -39,6 +41,7 @@ export const DEFAULT_BOOKING_OPTIONS: BookingOptions = {
   factions: [],
   aosFactions: [],
   killTeams: [],
+  killTeamGroups: [],
   paintSources: [
     { value: "own", label: "Свои краски" },
     { value: "club", label: "Краски клуба" },
@@ -80,6 +83,12 @@ export type WhPlayerDetails = {
   experienceLevel: string;
 };
 
+/** «Pathfinders (T'au Empire)»; команды нет в списке — как есть */
+export const killTeamWithFaction = (options: BookingOptions, team: string) => {
+  const f = options.killTeamGroups.flatMap((g) => g.factions).find((x) => x.teams.includes(team));
+  return f ? `${team} (${f.faction})` : team;
+};
+
 export const gameLabelOf = (options: BookingOptions, game: string | null | undefined) =>
   options.games.find((g) => g.value === (game ?? "40k"))?.label ?? "Warhammer 40,000";
 
@@ -88,7 +97,7 @@ export const playerLine = (
   d: { game?: string | null; army: string | null; points: number | null; experienceLevel?: string | null },
   options: BookingOptions,
 ) =>
-  [gameLabelOf(options, d.game), d.army, d.points != null ? `${d.points} оч.` : null, d.experienceLevel ? experienceLabelOf(options, d.experienceLevel) : null]
+  [gameLabelOf(options, d.game), d.game === "kt" && d.army ? killTeamWithFaction(options, d.army) : d.army, d.points != null ? `${d.points} оч.` : null, d.experienceLevel ? experienceLabelOf(options, d.experienceLevel) : null]
     .filter(Boolean)
     .join(" · ");
 

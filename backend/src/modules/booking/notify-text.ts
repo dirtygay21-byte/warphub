@@ -3,7 +3,7 @@
  * что забронировано, когда, кто (имя, @username, Telegram ID) и все выбранные варианты.
  * Чистая функция без БД и окружения — покрыта tests/booking-notify.test.ts.
  */
-import { experienceLabel, gameLabel, paintSourceLabel } from '../../config/booking';
+import { armyLine, experienceLabel, gameLabel, paintSourceLabel } from '../../config/booking';
 import { escapeHtml, formatClubDateTime, formatUserName } from '../../lib/telegram/format';
 import type { ReservationDetails } from './rules';
 
@@ -66,7 +66,7 @@ export function bookingNoticeText(n: BookingNotice): string {
   if (d?.kind === 'wh_player') {
     lines.push(
       `Игра: ${escapeHtml(gameLabel(d.game))}`,
-      `${d.game === 'kt' ? 'Команда' : 'Армия'}: ${escapeHtml(d.army)}`,
+      escapeHtml(armyLine(d.game, d.army)),
       d.points != null ? `Очки: ${d.points}` : '',
       `Опыт: ${escapeHtml(experienceLabel(d.experienceLevel))}`,
     );

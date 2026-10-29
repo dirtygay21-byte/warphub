@@ -116,6 +116,6 @@ test('Kill Team: «Игра: Kill Team», «Команда», без строк�
     details: { kind: 'wh_player', game: 'kt', army: 'Pathfinders', points: null, experienceLevel: 'player' },
   });
   expect(t).toContain('Игра: Kill Team');
-  expect(t).toContain('Команда: Pathfinders');
+  expect(t).toContain("Команда: Pathfinders (T'au Empire)");
   expect(t).not.toContain('Очки');
 });
