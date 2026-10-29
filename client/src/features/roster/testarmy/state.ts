@@ -36,6 +36,8 @@ export type TAUnit = {
   name: string;
   /** персонажи, присоединённые к отряду (их модели — в начале списка models) */
   leaders: string[];
+  /** пометки отряда для экрана (AoS: «усилен», «полк славы») */
+  tags?: string[];
   datasheetIds: string[];
   points: number;
   models: TAModel[];

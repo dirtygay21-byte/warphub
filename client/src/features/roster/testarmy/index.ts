@@ -5,3 +5,4 @@ export * from './formations';
 export * from './geometry';
 export * from './state';
 export * from './measure';
+export * from './aos';

@@ -72,6 +72,16 @@ export function unitToZone(bases: readonly Placed[], poly: readonly Pt[]): { d: 
   return best;
 }
 
+/** До зоны из нескольких частей (территории AoS): ближайшая часть. */
+export function unitToZones(bases: readonly Placed[], polys: readonly (readonly Pt[])[]): { d: number; from: Pt; to: Pt } | null {
+  let best: { d: number; from: Pt; to: Pt } | null = null;
+  for (const p of polys) {
+    const r = unitToZone(bases, p);
+    if (r && (!best || r.d < best.d)) best = r;
+  }
+  return best;
+}
+
 /** «12,4″» */
 export const fmtInches = (d: number) => `${(Math.round(d * 10) / 10).toFixed(1).replace('.', ',')}″`;
 
