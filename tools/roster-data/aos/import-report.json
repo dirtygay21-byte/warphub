@@ -2,20 +2,17 @@
  "errors": [],
  "warnings": [
   "BoC: лор «Bestial Manifestations» — нет очков",
-  "KB: «Hobgrot Slittaboss» — вариант полка «Monster» не подходит ни одному юниту фракции",
-  "OM: террейн «Great Mawpot» — 0 в CSV, 20 в Battle Profiles (берём Battle Profiles)"
+  "KB: «Hobgrot Slittaboss» — вариант полка «Monster» не подходит ни одному юниту фракции"
  ],
  "info": [
   "BoC: все юниты в Legends — фракция доступна только с «Показать Legends»",
   "KO: «Auto-Endrin» — очков нет по правилам: ставится способностью «Release The Auto-Endrins» (Zontari Endrin Dock)",
   "OB: «The Grand Necromystic» — вариант полка «PETRIFEX ELITE» не подходит ни одному юниту фракции",
   "SE: «Hamilcar Bear-Eater» — вариант полка «ASTRAL TEMPLARS» не подходит ни одному юниту фракции",
-  "OM: нет боевых построений",
-  "SoB: нет боевых построений",
   "IJ: «Dakkbad Grotkicker» — вариант полка «IRONSUNZ» не подходит ни одному юниту фракции",
-  "полные тексты правил (aos/curated.json → fullTexts, сайт Wahapedia 2026-10-16): подставлено 194",
-  "полный текст затем заменён официальной правкой GW (officialUpdates): SY|lore:Lore of the Spirit-Song «SONG OF THE LOST»; KB|trait «DIRTY TRICKS»",
-  "официальные правки GW (aos/curated.json → officialUpdates, Battle Profiles, September 2026 2026-09-23; Rules Updates, September 2026 2026-09-23; Battle Profiles: Khazalite Holds, October 2026 2026-10-14): применено 378 из 378",
+  "полные тексты правил (aos/curated.json → fullTexts, сайт Wahapedia 2026-10-30): подставлено 239",
+  "полный текст затем заменён официальной правкой GW (officialUpdates): KB|trait «DIRTY TRICKS»; SY|lore:Lore of the Spirit-Song «SONG OF THE LOST»",
+  "официальные правки GW (aos/curated.json → officialUpdates, Battle Profiles, September 2026 2026-09-23; Rules Updates, September 2026 2026-09-23; Battle Profiles: Khazalite Holds, October 2026 2026-10-14): применено 377 из 377",
   "проверено по официальным документам: A262 «Pyrofane Fusiliers, Pyrofane Great Cannon, Pyrofane Fusil-Major on Ogor Warhulk, Pyrofane Steelhelms (DoT)» — marked Warhammer Legends (curated.warscrollOverrides, set.legends); points unchanged",
   "проверено по официальным документам: A391 «Iron March: Immolator Cogfort, Linebreaker Cogfort (CoS)» — no change",
   "проверено по официальным документам: A417 «Oracular Visions — Chaos Sorcerer Lord on Manticore (StD)» — no text change",
@@ -24,12 +21,13 @@
   "проверено по официальным документам: F04 «Grombrindal, The White Dwarf (CoS, FY, KO)» — no change",
   "проверено по официальным документам: F05 «SONG OF THE LOST — Lore of the Spirit-Song (SY)» — source metadata fixed",
   "проверено по официальным документам: F06 «Warscrolls from the GW \"Legends Warscrolls\" publication (export Source.csv 000000138)» — marked Warhammer Legends in normaliseAosFaction (import and repair)",
-  "не решено: A216 «Krong the Club (Regiment of Renown, 140)» — Battle Profiles, September 2026, p. 59 replaces Stumblefoot Gargant with Krong the Club; the Wahapedia export of 2026-08-25 has no record for it — needs a newer export (Stage B).",
+  "проверено по официальным документам: A415 «FERAL RUIN — Despoilers (StD)» — update removed: the ability no longer exists",
+  "проверено по официальным документам: A216 «Krong the Club (Regiment of Renown, 140)» — resolved by the Wahapedia export 2026-10-22: record present, 140 points",
   "не решено: A449 «Gotrek Gurnisson as a Khazalite Holds hero (220)» — Khazalite Holds has no data in the app (no Wahapedia export yet); Khazalite Holds stays separate from Fyreslayers.",
-  "полные тексты восстановлены: обрезанных — 177 из 177, без таблицы — 21 из 21"
+  "полные тексты восстановлены: обрезанных — 221 из 221, без таблицы — 21 из 21"
  ],
  "exportIncomplete": {
-  "truncated": 177,
+  "truncated": 221,
   "table": 21
  },
  "refreshed": "строки о полных текстах, неполных текстах и юнитах без очков пересчитаны по данным (scripts/repair-aos-data.mjs); остальное — из импорта CSV"

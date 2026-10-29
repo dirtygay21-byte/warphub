@@ -26,6 +26,7 @@
     "SE|Scars of War": { "hero": false, "not": ["BEAST"], "text": "non-HERO non-BEAST Stormcast Eternals units" },
     "SG|Origins of terrifying Folk Tales": { "hero": false, "all": ["INFANTRY"], "text": "non-Hero Soulblight Gravelords Infantry units" },
     "SN|Beasts of the Dark Jungle": { "all": ["MONSTER"], "text": "Seraphon Monsters" },
+    "SoB|Realm-Shaking Rampages": { "all": ["BIG"], "not": ["UNIQUE"], "text": "non-UNIQUE BIG units (одна Realm-shaking Rampage на юнит)" },
     "SoB|Cracked Heels": { "names": ["Mancrusher Gargants"], "text": "Mancrusher Gargants" },
     "ST|Moulder Mutations": { "hero": false, "not": ["WAR MACHINE"], "text": "non-Hero non-War Machine Skaven units" },
     "StD|Brands of the Dark Gods": { "hero": false, "all": ["INFANTRY"], "text": "non-Hero Slaves to Darkness Infantry units" },

@@ -86,7 +86,14 @@ npm test             # движок и правила формирования �
 6. **Выпуск**: ветка `data/<тема>` → PR в `roster-builder` → PR в `main` → deploy `data` (dry-run, затем apply) →
    проверка в Telegram. Бэкенд перезапускать не нужно: данные читаются с проверкой даты изменения файла.
 
-Age of Sigmar: у wh-rules.ru данных нет — обновление AoS ждёт выбора источника.
+Age of Sigmar (решение владельца 30.10.2026): основной источник — выгрузка Wahapedia (импорт ниже), второй — sigdex.io,
+который показывает данные BSData `age-of-sigmar-4th`. Отчёт свежести — `aos/freshness-report.md`.
+
+1. Скачать CSV Wahapedia (`https://wahapedia.ru/aos4/<таблица>.csv`, 13 таблиц) в `tools/roster-data/wahapedia-aos-csv/`.
+2. `node scripts/import-wahapedia-aos.mjs`, затем `node scripts/repair-aos-data.mjs`; разобрать `aos/import-report.json`
+   (новые таблицы правил — `curated.json → seasons`; официальные правки, не применённые к новой выгрузке, — пересмотреть).
+3. Сверка с BSData: `git clone --depth 1 https://github.com/BSData/age-of-sigmar-4th` и
+   `python3 scripts/bsdata-aos-compare.py <путь>` → `aos/bsdata-compare.json`; расхождения — в отчёт свежести.
 
 ```bash
 # из скачанных CSV (положить в tools/roster-data/wahapedia-csv/)
