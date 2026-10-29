@@ -85,6 +85,68 @@ export const bookingOptions = {
     'Tyranids',
     'World Eaters',
   ],
+  /** Игра в записи на Warhammer (24.10.2026) */
+  games: [
+    { value: '40k', label: 'Warhammer 40,000' },
+    { value: 'aos', label: 'Age of Sigmar' },
+    { value: 'kt', label: 'Kill Team' },
+  ],
+  /**
+   * Команды Kill Team для поля «Команда» (плюс «Другая…»). Источники (решение владельца 1B, 24.10.2026):
+   * Warhammer Community «Kill Team: managing the range of kill teams in the new edition» (06.09.2024) — 33 команды;
+   * команды, вышедшие позже, — по списку «Kill Team Tier List Q3 2026» (canyourollacrit.com, 08.10.2026), написание —
+   * как у Warhammer Community («Legionaries», «Tempestus Aquilons»). Новые команды добавлять сюда.
+   */
+  killTeams: [
+    'Angels of Death',
+    'Battleclade',
+    'Blades of Khaine',
+    'Blooded',
+    'Brood Brothers',
+    'Canoptek Circle',
+    'Celestian Insidiants',
+    'Chaos Cult',
+    'Corsair Voidscarred',
+    'Death Korps',
+    'Deathwatch',
+    'Elucidian Starstriders',
+    'Exaction Squad',
+    'Exodite Dragon Masters',
+    'Farstalker Kinband',
+    'Fellgor Ravagers',
+    'Gellerpox Infected',
+    'Goremongers',
+    'Hand of the Archon',
+    'Hearthkyn Salvagers',
+    'Hernkyn Yaegirs',
+    'Hierotek Circle',
+    'Hunter Clade',
+    'Imperial Navy Breachers',
+    'Inquisitorial Agents',
+    'Kasrkin',
+    'Kommandos',
+    'Legionaries',
+    'Mandrakes',
+    'Murderwing',
+    'Nemesis Claw',
+    'Novitiates',
+    'Pathfinders',
+    'Phobos Strike Team',
+    'Plague Marines',
+    'Ratlings',
+    'Raveners',
+    'Sanctifiers',
+    'Scout Squad',
+    'Spectre Squad',
+    'Tempestus Aquilons',
+    'Vespid Stingwings',
+    'Void-dancer Troupe',
+    'Warpcoven',
+    'Wolf Scouts',
+    'Wrecka Krew',
+    'Wyrmblade',
+    'XV26 Stealth Battlesuits',
+  ],
   paintSources: [
     { value: 'own', label: 'Свои краски' },
     { value: 'club', label: 'Краски клуба' },
@@ -104,6 +166,16 @@ export const bookingOptions = {
 export type ExperienceLevel =
   (typeof bookingOptions.experienceLevels)[number]['value'];
 export type PaintSource = (typeof bookingOptions.paintSources)[number]['value'];
+export type WhGame = (typeof bookingOptions.games)[number]['value'];
+
+export function isWhGame(value: unknown): value is WhGame {
+  return bookingOptions.games.some((g) => g.value === value);
+}
+
+/** «Warhammer 40,000» / «Age of Sigmar» / «Kill Team»; старые записи без игры — 40K */
+export function gameLabel(value: string | null | undefined): string {
+  return bookingOptions.games.find((g) => g.value === (value ?? '40k'))?.label ?? bookingOptions.games[0].label;
+}
 export type DndTimePreference =
   (typeof bookingOptions.dndTimePreferences)[number]['value'];
 

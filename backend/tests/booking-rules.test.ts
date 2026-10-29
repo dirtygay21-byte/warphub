@@ -259,10 +259,32 @@ describe('details validation', () => {
       }),
     ).toEqual({
       kind: 'wh_player',
+      game: '40k',
       army: 'Astra Militarum',
       points: 1500,
       experienceLevel: 'experienced',
     });
+  });
+
+  test('warhammer player details: game — AoS with points, Kill Team without points, bad game rejected', () => {
+    expect(validateDetails('wh_player', { game: 'aos', army: 'Stormcast Eternals', points: 2000, experienceLevel: 'player' })).toEqual({
+      kind: 'wh_player',
+      game: 'aos',
+      army: 'Stormcast Eternals',
+      points: 2000,
+      experienceLevel: 'player',
+    });
+    // Kill Team: очки не нужны и не сохраняются, даже если пришли
+    expect(validateDetails('wh_player', { game: 'kt', army: 'Pathfinders', points: 999, experienceLevel: 'beginner' })).toEqual({
+      kind: 'wh_player',
+      game: 'kt',
+      army: 'Pathfinders',
+      points: null,
+      experienceLevel: 'beginner',
+    });
+    expect(validateDetails('wh_player', { game: 'kt', army: 'Kasrkin', experienceLevel: 'player' })).toMatchObject({ points: null });
+    expect(() => validateDetails('wh_player', { game: 'aos', army: 'Seraphon', experienceLevel: 'player' })).toThrow(DetailsValidationError);
+    expect(() => validateDetails('wh_player', { game: 'necromunda', army: 'X', points: 100, experienceLevel: 'player' })).toThrow(DetailsValidationError);
   });
 
   test('warhammer details reject bad values', () => {

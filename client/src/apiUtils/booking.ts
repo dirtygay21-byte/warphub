@@ -6,7 +6,14 @@ export type OptionItem = { value: string; label: string; hint?: string };
 
 export type BookingOptions = {
   experienceLevels: OptionItem[];
+  /** игры в записи на Warhammer: 40k / aos / kt */
+  games: OptionItem[];
+  /** фракции 40K */
   factions: string[];
+  /** фракции Age of Sigmar (из данных Roster Builder) */
+  aosFactions: string[];
+  /** команды Kill Team */
+  killTeams: string[];
   paintSources: OptionItem[];
   dndTimePreferences: OptionItem[];
   dndMaxPlayersPerRequest: number;
@@ -24,7 +31,14 @@ export const DEFAULT_BOOKING_OPTIONS: BookingOptions = {
     { value: "experienced", label: "Опытный", hint: "15–30 игр" },
     { value: "veteran", label: "Ветеран", hint: "30–60 игр" },
   ],
+  games: [
+    { value: "40k", label: "Warhammer 40,000" },
+    { value: "aos", label: "Age of Sigmar" },
+    { value: "kt", label: "Kill Team" },
+  ],
   factions: [],
+  aosFactions: [],
+  killTeams: [],
   paintSources: [
     { value: "own", label: "Свои краски" },
     { value: "club", label: "Краски клуба" },
@@ -53,12 +67,30 @@ export const experienceLabelOf = (
 
 // -------------------------- Данные записи --------------------------
 
+export type WhGame = "40k" | "aos" | "kt";
+
 export type WhPlayerDetails = {
   kind?: "wh_player";
+  /** игра; в старых записях нет — 40K */
+  game?: WhGame;
+  /** армия (40K, AoS) или команда (Kill Team) */
   army: string;
-  points: number;
+  /** у Kill Team очков нет — null */
+  points: number | null;
   experienceLevel: string;
 };
+
+export const gameLabelOf = (options: BookingOptions, game: string | null | undefined) =>
+  options.games.find((g) => g.value === (game ?? "40k"))?.label ?? "Warhammer 40,000";
+
+/** «Kill Team · Pathfinders · Игрок» / «Warhammer 40,000 · Orks · 1000 оч. · Игрок» */
+export const playerLine = (
+  d: { game?: string | null; army: string | null; points: number | null; experienceLevel?: string | null },
+  options: BookingOptions,
+) =>
+  [gameLabelOf(options, d.game), d.army, d.points != null ? `${d.points} оч.` : null, d.experienceLevel ? experienceLabelOf(options, d.experienceLevel) : null]
+    .filter(Boolean)
+    .join(" · ");
 
 export type PaintingDetails = {
   kind?: "painting";
@@ -100,7 +132,7 @@ export const summarizeDetails = (
   options: BookingOptions,
 ): string => {
   if (isWhPlayerDetails(details)) {
-    return `${details.army} · ${details.points} оч. · ${experienceLabelOf(options, details.experienceLevel)}`;
+    return playerLine(details, options);
   }
   if (isPaintingDetails(details)) {
     const paints =
@@ -121,6 +153,8 @@ export type AvailabilitySegment = {
 
 export type SessionPlayer = {
   firstName: string;
+  game?: string | null;
+  gameLabel?: string | null;
   army: string | null;
   points: number | null;
   experienceLevel: string | null;
