@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 import type { BfDeployment, BfLayout } from '../../data';
-import type { ComputedRoster, DataLookup } from '../../engine/compute';
-import type { Roster } from '../../engine/types';
 import { haptic, pushOverlay, tg } from '../../telegram';
 import {
   APPROX_DEFAULT_MM,
@@ -13,11 +11,13 @@ import {
   baseToZone,
   clampToBoard,
   closestPoints,
+  FOE_PREFIX,
   FORMATIONS,
   fmtInches,
   modelBase,
   moveModel,
   moveUnit,
+  nearestEnemy,
   nearestObjective,
   OBJECTIVE_RANGE,
   OBJECTIVE_RULE_SOURCE,
@@ -39,12 +39,14 @@ import {
   type Placed,
   type Pt,
   type RulerEnd,
+  type ArmyKey,
   type Side,
   type TAUnit,
 } from '../../testarmy';
 import { BattleMap } from '../Battlefield';
 import { Button, IconButton, Segmented } from '../kit';
 import { cx } from '../util';
+import type { BoardArmy } from './TestArmyScreen';
 import { UnitInfo } from './UnitInfo';
 
 const SIDE_COLOR: Record<Side, string> = { attacker: '#f87171', defender: '#60a5fa' };
@@ -92,26 +94,31 @@ const undisp = ([dx, dy]: Pt): Pt => [dy, 44 - dx];
  * панель справа (закрывается, когда нужно нажать на поле).
  */
 export function Board({
-  roster,
-  cr,
-  L,
+  armies,
   layout,
   dep,
-  side,
-  units,
-  onUnits,
+  onArmy,
   onBack,
 }: {
-  roster: Roster;
-  cr: ComputedRoster;
-  L: DataLookup;
+  /** своя армия (me) и, если выбрана, армия соперника (foe) — за другую сторону */
+  armies: BoardArmy[];
   layout: BfLayout;
   dep: BfDeployment;
-  side: Side;
-  units: TAUnit[];
-  onUnits: (u: TAUnit[]) => void;
+  onArmy: (key: ArmyKey, units: TAUnit[]) => void;
   onBack: () => void;
 }) {
+  const me = armies.find((a) => a.key === 'me')!;
+  const foe = armies.find((a) => a.key === 'foe') ?? null;
+  const side = me.side;
+  // все отряды обеих армий; армия отряда и подпись: свои 1, 2…, соперника С1, С2…
+  const units = useMemo(() => armies.flatMap((a) => a.units), [armies]);
+  const armyOf = (uid: string): BoardArmy => armies.find((a) => a.units.some((u) => u.uid === uid)) ?? me;
+  const label = (u: TAUnit) => {
+    const a = armyOf(u.uid);
+    const i = a.units.findIndex((x) => x.uid === u.uid) + 1;
+    return a.key === 'foe' ? `С${i}` : String(i);
+  };
+  const [tab, setTab] = useState<ArmyKey>('me');
   const [selected, setSelected] = useState<string | null>(null);
   const [panel, setPanel] = useState(false);
   const svg = useRef<SVGSVGElement>(null);
@@ -127,7 +134,8 @@ export function Board({
   const infoUnit = units.find((u) => u.uid === infoFor) ?? null;
   const endDrag = useRef<{ which: 'a' | 'b'; pointerId: number } | null>(null);
   const sel = units.find((u) => u.uid === selected) ?? null;
-  const placedCount = units.filter((u) => u.placed).length;
+  const placedCount = me.units.filter((u) => u.placed).length;
+  const foePlaced = foe ? foe.units.filter((u) => u.placed).length : 0;
 
   // ---------- масштаб и прокрутка (свои, без прокрутки браузера) ----------
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -184,7 +192,10 @@ export function Board({
     return { x: e.clientX - r.left, y: e.clientY - r.top };
   };
 
-  const update = (u: TAUnit) => onUnits(units.map((x) => (x.uid === u.uid ? u : x)));
+  const update = (u: TAUnit) => {
+    const a = armyOf(u.uid);
+    onArmy(a.key, a.units.map((x) => (x.uid === u.uid ? u : x)));
+  };
 
   // экранная точка → точка поля (getScreenCTM учитывает масштаб и сдвиг)
   const toBoard = (clientX: number, clientY: number): Pt | null => {
@@ -194,16 +205,19 @@ export function Board({
     return undisp([p.x, p.y]);
   };
   // модели вне своей зоны деплоя (база не целиком в зоне) — подсветка
-  const zone = dep.zones.find((z) => z.player === side)?.poly ?? null;
+  // у каждой армии — своя зона
   const outside = useMemo(() => {
     const set = new Set<string>();
-    if (!zone) return set;
-    for (const u of units)
-      placedBases(u).forEach((b, i) => {
-        if (b && !baseToZone(b, zone).whollyInside) set.add(u.models[i]!.id);
-      });
+    for (const a of armies) {
+      const z = dep.zones.find((x) => x.player === a.side)?.poly;
+      if (!z) continue;
+      for (const u of a.units)
+        placedBases(u).forEach((b, i) => {
+          if (b && !baseToZone(b, z).whollyInside) set.add(u.models[i]!.id);
+        });
+    }
     return set;
-  }, [units, zone]);
+  }, [armies, dep]);
 
   // все базы на столе (для линейки и расстояний)
   const allBases = useMemo(() => {
@@ -229,14 +243,18 @@ export function Board({
     const [from, to] = closestPoints(a[r.i]!, b[r.j]!);
     return { from, to, d: r.d };
   })();
-  // выбранный отряд: до ближайшей цели и до зон деплоя
+  // выбранный отряд: до ближайшей цели, до зон деплоя (своей армии и другой) и до ближайшего врага
   const selBases = sel ? unitsOf(sel.uid) : [];
-  const enemyZone = dep.zones.find((z) => z.player !== side)?.poly ?? null;
+  const selArmy = sel ? armyOf(sel.uid) : me;
+  const ownZone = dep.zones.find((z) => z.player === selArmy.side)?.poly ?? null;
+  const enemyZone = dep.zones.find((z) => z.player !== selArmy.side)?.poly ?? null;
+  const enemyArmy = armies.find((a) => a.key !== selArmy.key);
   const info = selBases.length
     ? {
         objective: nearestObjective(selBases, layout.objectives),
-        own: zone ? unitToZone(selBases, zone) : null,
+        own: ownZone ? unitToZone(selBases, ownZone) : null,
         enemy: enemyZone ? unitToZone(selBases, enemyZone) : null,
+        foe: enemyArmy ? nearestEnemy(selBases, allBases.filter((x) => enemyArmy.units.some((u) => u.uid === x.uid))) : null,
       }
     : null;
 
@@ -406,7 +424,7 @@ export function Board({
     ) : tool === 'units' ? (
       pairLine ? (
         <>
-          Отряды {units.findIndex((u) => u.uid === pair[0]) + 1} ↔ {units.findIndex((u) => u.uid === pair[1]) + 1}: <b className="text-white">{fmtInches(pairLine.d)}</b> · от края до края
+          Отряды {label(units.find((u) => u.uid === pair[0])!)} ↔ {label(units.find((u) => u.uid === pair[1])!)}: <b className="text-white">{fmtInches(pairLine.d)}</b> · от края до края
         </>
       ) : pair.length === 1 ? (
         'Нажмите второй отряд'
@@ -416,21 +434,23 @@ export function Board({
     ) : sel ? (
       <>
         <b className="text-white">
-          {units.indexOf(sel) + 1}. {sel.name}
+          {label(sel)}. {sel.name}
         </b>
         {info?.objective ? <> · до цели {fmtInches(info.objective.d)}{info.objective.inRange ? ' ✓' : ''}</> : null}
+        {info?.foe ? <> · до врага {fmtInches(info.foe.d)}</> : null}
         {sel.placed ? ' · тяните базу' : ' · нажмите на поле, чтобы поставить'}
       </>
     ) : (
       <>
-        На столе {placedCount} из {units.length}
+        На столе {placedCount} из {me.units.length}
+        {foe && ` · соперник ${foePlaced} из ${foe.units.length}`}
         {outside.size > 0 && <span className="text-[#ff6b6b]"> · вне зоны: {outside.size}</span>} · «Отряды» справа
       </>
     );
 
   return (
     <div className="fixed inset-0 z-40 flex bg-app">
-      {infoUnit && <UnitInfo unit={infoUnit} cr={cr} roster={roster} L={L} onClose={() => setInfoFor(null)} />}
+      {infoUnit && <UnitInfo unit={infoUnit} cr={armyOf(infoUnit.uid).cr} roster={armyOf(infoUnit.uid).roster} L={armyOf(infoUnit.uid).L} onClose={() => setInfoFor(null)} />}
 
       {/* поле: жесты — свои (touch-action: none), браузер ничего не прокручивает */}
       <div
@@ -449,12 +469,12 @@ export function Board({
                 const [x, y] = disp([o.x, o.y]);
                 return <circle key={i} cx={x} cy={y} r={objectiveRadius + OBJECTIVE_RANGE} fill="#eaff44" fillOpacity={0.06} stroke="#eaff44" strokeOpacity={0.7} strokeWidth={0.1} strokeDasharray="0.5 0.35" pointerEvents="none" />;
               })}
-            {units.map((u, i) => (
+            {units.map((u) => (
               <UnitShapes
                 key={u.uid}
                 unit={u}
-                n={i + 1}
-                color={SIDE_COLOR[side]}
+                n={label(u)}
+                color={SIDE_COLOR[armyOf(u.uid).side]}
                 active={tool === 'units' ? pair.includes(u.uid) : u.uid === selected}
                 single={single}
                 outside={outside}
@@ -462,7 +482,8 @@ export function Board({
               />
             ))}
             {tool === 'move' && info?.objective && <Measure from={info.objective.from} to={info.objective.to} d={info.objective.d} color={info.objective.inRange ? '#4ade80' : ACCENT} dashed />}
-            {tool === 'move' && info?.enemy && info.enemy.d > 0 && <Measure from={info.enemy.from} to={info.enemy.to} d={info.enemy.d} color={side === 'attacker' ? SIDE_COLOR.defender : SIDE_COLOR.attacker} dashed />}
+            {tool === 'move' && info?.enemy && info.enemy.d > 0 && !info.foe && <Measure from={info.enemy.from} to={info.enemy.to} d={info.enemy.d} color={selArmy.side === 'attacker' ? SIDE_COLOR.defender : SIDE_COLOR.attacker} dashed />}
+            {tool === 'move' && info?.foe && <Measure from={info.foe.from} to={info.foe.to} d={info.foe.d} color="#ffffff" dashed />}
             {tool === 'units' && pairLine && <Measure from={pairLine.from} to={pairLine.to} d={pairLine.d} color="#fff" />}
             {tool === 'ruler' && rulerLine && <Measure from={rulerLine.from} to={rulerLine.to} d={rulerLine.d} color="#fff" handles onHandle={onEndDown} />}
             {tool === 'ruler' && !rulerLine && rulerA && <circle cx={disp(rulerA)[0]} cy={disp(rulerA)[1]} r={0.35} fill="#fff" pointerEvents="none" />}
@@ -496,7 +517,8 @@ export function Board({
             <div className="min-w-0 flex-1">
               <p className="font-display truncate text-base font-semibold uppercase leading-none">Test Army</p>
               <p className="truncate text-[11px] text-white/45">
-                {roster.name} · {dep.nameRu} · {side === 'attacker' ? 'атакующий' : 'защитник'}
+                {me.roster.name} · {dep.nameRu} · {side === 'attacker' ? 'атакующий' : 'защитник'}
+                {foe && ` · соперник: ${foe.roster.name}`}
               </p>
             </div>
             <IconButton icon="close" label="Закрыть" onClick={() => setPanel(false)} className="size-8" />
@@ -505,7 +527,7 @@ export function Board({
             {sel ? (
               <UnitPanel
                 unit={sel}
-                n={units.indexOf(sel) + 1}
+                n={label(sel)}
                 onFormation={setFormation}
                 onRotate={(deg) => update(rotateUnit(sel, (deg * Math.PI) / 180))}
                 onGap={(gap) => {
@@ -516,16 +538,34 @@ export function Board({
                 onRemove={() => update(removeUnit(sel))}
                 onDone={() => setSelected(null)}
                 info={info}
-                side={side}
+                side={selArmy.side}
                 stats={(() => {
-                  const st = cr.byUid.get(sel.uid)?.ds?.stats[0];
+                  const st = selArmy.cr.byUid.get(sel.uid.startsWith(FOE_PREFIX) ? sel.uid.slice(FOE_PREFIX.length) : sel.uid)?.ds?.stats[0];
                   return st ? `M ${st.M} · T ${st.T} · Sv ${st.Sv}${st.inv ? ` (${st.inv.replace(/\+/g, '')}++)` : ''} · W ${st.W} · Ld ${st.Ld} · OC ${st.OC}` : null;
                 })()}
                 onInfo={() => setInfoFor(sel.uid)}
                 onPlace={() => (setTool('move'), setPanel(false))}
               />
             ) : (
-              <UnitList units={units} onSelect={(uid) => (haptic.select(), setSelected(uid), setTool('move'))} />
+              <>
+                {foe && (
+                  <Segmented<ArmyKey>
+                    className="mb-2"
+                    value={tab}
+                    onChange={setTab}
+                    options={[
+                      { value: 'me', label: `Моя армия · ${placedCount}/${me.units.length}` },
+                      { value: 'foe', label: `Соперник · ${foePlaced}/${foe.units.length}` },
+                    ]}
+                  />
+                )}
+                <UnitList
+                  units={(tab === 'foe' && foe ? foe : me).units}
+                  label={label}
+                  color={SIDE_COLOR[(tab === 'foe' && foe ? foe : me).side]}
+                  onSelect={(uid) => (haptic.select(), setSelected(uid), setTool('move'))}
+                />
+              </>
             )}
             {ranges && <p className="mt-3 text-[10.5px] text-white/40">Круги целей: {OBJECTIVE_RULE_SOURCE}. Для целей в участке террейна правило другое; высота на карте не учитывается.</p>}
           </div>
@@ -564,7 +604,7 @@ function UnitShapes({
   onDown,
 }: {
   unit: TAUnit;
-  n: number;
+  n: string;
   color: string;
   active: boolean;
   single: string | null;
@@ -607,12 +647,12 @@ function UnitShapes({
 }
 
 /** Список отрядов: номер, название, моделей, на столе ли. */
-function UnitList({ units, onSelect }: { units: TAUnit[]; onSelect: (uid: string) => void }) {
+function UnitList({ units, label, color, onSelect }: { units: TAUnit[]; label: (u: TAUnit) => string; color: string; onSelect: (uid: string) => void }) {
   return (
     <div>
       <p className="mb-2 text-[11px] text-white/50">Выберите отряд — построение, базы, характеристики; затем «Поставить на поле».</p>
       <ul className="space-y-1.5">
-        {units.map((u, i) => (
+        {units.map((u) => (
           <li key={u.uid}>
             <button
               type="button"
@@ -620,7 +660,7 @@ function UnitList({ units, onSelect }: { units: TAUnit[]; onSelect: (uid: string
               className={cx('w-full rounded-xl border px-2.5 py-2 text-left', u.placed ? 'border-accent/40 bg-accent/[0.07]' : 'border-white/10 bg-white/[0.03] active:bg-white/10')}
             >
               <span className="flex items-center gap-1.5 text-[11px] text-white/45">
-                <b className="text-white">{i + 1}</b>
+                <b style={{ color }}>{label(u)}</b>
                 {u.placed ? 'на столе' : 'не выставлен'} · моделей: {u.models.length}
               </span>
               <span className="mt-0.5 line-clamp-2 block text-[13px] font-semibold leading-tight">{u.name}</span>
@@ -686,7 +726,7 @@ function UnitPanel({
   onPlace,
 }: {
   unit: TAUnit;
-  n: number;
+  n: string;
   onFormation: (f: Formation) => void;
   onRotate: (deg: number) => void;
   onGap: (gap: number) => void;
@@ -697,6 +737,7 @@ function UnitPanel({
     objective: { d: number; inRange: boolean } | null;
     own: { d: number } | null;
     enemy: { d: number } | null;
+    foe: { d: number } | null;
   } | null;
   side: Side;
   /** «M 6″ · T 4 · …» первого профиля */
@@ -748,6 +789,12 @@ function UnitPanel({
             <span className="block text-white/45">до зоны {side === 'attacker' ? 'защитника' : 'атакующего'}</span>
             <b className="text-sm">{info.enemy ? (info.enemy.d ? fmtInches(info.enemy.d) : 'в зоне') : '—'}</b>
           </div>
+          {info.foe && (
+            <div className="col-span-3 rounded-lg border border-white/10 px-1.5 py-1">
+              <span className="text-white/45">до ближайшего врага (от края до края): </span>
+              <b className="text-sm">{fmtInches(info.foe.d)}</b>
+            </div>
+          )}
         </div>
       )}
       <Segmented<Formation> value={unit.formation} onChange={onFormation} options={FORMATIONS.map((f) => ({ value: f.id, label: f.label }))} />
