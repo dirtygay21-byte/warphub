@@ -5,7 +5,8 @@ import { aosSetupMissing, battleplanRoll, otherSeat, rolesRoll, SEATS, type AosR
 import { Dice } from '../game/Dice';
 import { Button, Icon, Segmented } from '../kit';
 import { cx, fmtPts } from '../util';
-import { rosterRefOf, TIER_LABEL } from './refs';
+import { BattleplanMap } from './BattleplanMap';
+import { isMapTerritory, rosterRefOf, territoryLabel, TIER_LABEL } from './refs';
 import type { AosGameHook } from './useAosGame';
 
 /** Подготовка: шаги по порядку General's Handbook; каждый шаг — отдельная карточка, готовые отмечены. */
@@ -154,7 +155,7 @@ function PlayerRow({ game, seat, rosters, index }: { game: AosGameHook; seat: Se
   );
 }
 
-export function BattleplanInfo({ bp, n, round }: { bp: AosBattlepack; n: number; round?: number }) {
+export function BattleplanInfo({ bp, n, round, territory, showMap }: { bp: AosBattlepack; n: number; round?: number; territory?: string | null; showMap?: boolean }) {
   const plan = bp.battleplans.find((b) => b.n === n);
   if (!plan) return <p className="text-sm text-white/50">Нет данных о батлплане №{n}.</p>;
   const label = { all: 'каждый раунд', '1': 'раунд 1', '2+': 'раунды 2+' } as const;
@@ -177,6 +178,11 @@ export function BattleplanInfo({ bp, n, round }: { bp: AosBattlepack; n: number;
           );
         })}
       </ul>
+      {showMap && plan.map && (
+        <div className="mt-2">
+          <BattleplanMap bp={bp} map={plan.map} attacker={isMapTerritory(territory) ? territory : null} />
+        </div>
+      )}
     </div>
   );
 }
@@ -192,7 +198,7 @@ function StepBattleplan({ game }: { game: AosGameHook }) {
   };
   return (
     <>
-      {s.battleplan && <BattleplanInfo bp={bp} n={s.battleplan} />}
+      {s.battleplan && <BattleplanInfo bp={bp} n={s.battleplan} showMap />}
       {last && (
         <p className="text-[11.5px] text-white/50">
           Бросок: D6 таблицы — {last.tableDie} (таблица {last.table}), D6 батлплана — {last.planDie}.
@@ -282,25 +288,43 @@ function StepRoles({ game }: { game: AosGameHook }) {
 
 function StepTerritory({ game, attacker }: { game: AosGameHook; attacker: Seat }) {
   const s = game.state!;
-  const [t, setT] = useState(s.territory ?? '');
+  const bp = game.bp!;
+  const map = bp.battleplans.find((b) => b.n === s.battleplan)?.map;
+  const [t, setT] = useState(s.territory && !isMapTerritory(s.territory) ? s.territory : '');
+  const pick = (v: string) => v !== s.territory && game.dispatch({ type: 'territory-set', territory: v });
   return (
     <>
       <p className="text-[12.5px] leading-snug text-white/65">
-        {s.players[attacker].name} (атакующий) выбирает территорию по карте батлплана; вторая достаётся защитнику. Карт батлпланов в приложении пока нет — запишите выбор словами.
+        Защитник ставит цели и террейн по карте, затем {s.players[attacker].name} (атакующий) выбирает свою территорию; вторая достаётся защитнику.
+        {map ? ' Нажмите на территорию на карте.' : ' Карты этого батлплана нет — запишите выбор словами.'}
       </p>
-      <div className="flex gap-2">
-        <input
-          value={t}
-          maxLength={40}
-          onChange={(e) => setT(e.target.value)}
-          placeholder="Например: северная половина"
-          className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm outline-none focus:border-accent"
-        />
-        <Button variant={s.territory ? 'ghost' : 'primary'} disabled={!t.trim() || t.trim() === s.territory} onClick={() => game.dispatch({ type: 'territory-set', territory: t })}>
-          ОК
-        </Button>
-      </div>
-      {s.territory && <p className="text-[12px] text-white/55">Территория атакующего: {s.territory}</p>}
+      {map && (
+        <>
+          <BattleplanMap bp={bp} map={map} attacker={isMapTerritory(s.territory) ? s.territory : null} onPick={pick} />
+          <div className="grid grid-cols-2 gap-2">
+            {(['A', 'B'] as const).map((x) => (
+              <Button key={x} variant={s.territory === x ? 'primary' : 'outline'} onClick={() => pick(x)}>
+                Атакую из {x}
+              </Button>
+            ))}
+          </div>
+        </>
+      )}
+      {(!map || (s.territory && !isMapTerritory(s.territory))) && (
+        <div className="flex gap-2">
+          <input
+            value={t}
+            maxLength={40}
+            onChange={(e) => setT(e.target.value)}
+            placeholder="Например: северная половина"
+            className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm outline-none focus:border-accent"
+          />
+          <Button variant={s.territory ? 'ghost' : 'primary'} disabled={!t.trim() || t.trim() === s.territory} onClick={() => pick(t.trim())}>
+            ОК
+          </Button>
+        </div>
+      )}
+      {s.territory && <p className="text-[12px] text-white/55">Территория атакующего: {territoryLabel(s.territory)}</p>}
     </>
   );
 }

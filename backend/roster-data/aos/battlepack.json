@@ -9,7 +9,8 @@
     "cp": "Warhammer Community — React to Your Opponent With Powerful New Commands in #NewAoS",
     "cpUrl": "https://www.warhammer-community.com/en-gb/articles/EEICxhva/react-to-your-opponent-with-powerful-new-commands-in-newaos/",
     "coreUrl": "https://wahapedia.ru/aos4/the-rules/the-core-rules/",
-    "note": "Описания карт и правил — краткий пересказ своими словами, без текста карт GW. Названия — английские, как в источнике. Положения целей и террейна на картах — отдельный этап (S3): в источнике только картинки."
+    "note": "Описания карт и правил — краткий пересказ своими словами, без текста карт GW. Названия — английские, как в источнике. Карты батлпланов — по Sigdex (source.maps).",
+    "maps": "sigdex.io (данные BSData), снимок 2026-10-30: tools/roster-data/aos/sigdex-battleplans-2026-27.json; территории A и B — атакующий выбирает свою; размер террейна условный"
   },
   "rounds": 5,
   "victory": { "majorMargin": 5, "tie": "Равные ПО: малая победа у того, кто выполнил больше боевых тактик; поровну — ничья." },
@@ -89,54 +90,66 @@
     { "n": 1, "table": 1, "name": "Into the Fire", "rules": "Обе армии получают способность «Secure the Gateway».", "scoring": [
       { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
       { "rounds": "all", "text": "Контролируете 2 и больше целей", "vp": 3 },
-      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ],
+      "map": {"objectives":[{"type":"golden-lions","x":15,"y":22},{"type":"golden-lions","x":45,"y":22},{"type":"sun-seekers","x":30,"y":5.5},{"type":"scions","x":30,"y":22},{"type":"heldenhain","x":30,"y":38.5}],"terrain":[{"type":"ruin","r":3.5,"x":15,"y":5.5},{"type":"ruin","r":3.5,"x":45,"y":38.5},{"type":"ruin","r":3.5,"x":37.5,"y":11},{"type":"ruin","r":3.5,"x":22.5,"y":33},{"type":"obscuring","r":2.5,"x":22.5,"y":16.5},{"type":"obscuring","r":2.5,"x":37.5,"y":27.5},{"type":"place-of-power","r":3.5,"x":52.5,"y":14.5},{"type":"place-of-power","r":3.5,"x":7.5,"y":29.5}],"territories":{"A":[[0,0,15,33],[15,11,15,22]],"B":[[45,11,15,33],[30,11,15,22]]}} },
     { "n": 2, "table": 1, "name": "Bloodstained Coasts", "rules": "Со второго раунда обоим доступны способности батлплана (убирают «emberstone slivers» — это не цели).", "scoring": [
       { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
       { "rounds": "all", "text": "Контролируете 2 и больше целей", "vp": 3 },
       { "rounds": "1", "text": "Первый раунд: контролируете больше целей, чем соперник", "vp": 4 },
-      { "rounds": "2+", "text": "Со второго раунда: контролируете цель, которую соперник контролировал в начале хода", "vp": 4 } ] },
+      { "rounds": "2+", "text": "Со второго раунда: контролируете цель, которую соперник контролировал в начале хода", "vp": 4 } ],
+      "map": {"objectives":[{"type":"golden-lions","x":45,"y":11},{"type":"golden-lions","x":45,"y":33},{"type":"heldenhain","x":45,"y":22},{"type":"sun-seekers","x":30,"y":16.5},{"type":"sun-seekers","x":30,"y":27.5},{"type":"scions","x":15,"y":22}],"terrain":[{"type":"place-of-power","r":3.5,"x":7.5,"y":22},{"type":"obscuring","r":3.5,"x":15,"y":11},{"type":"obscuring","r":3.5,"x":15,"y":33},{"type":"ruin","r":3.5,"x":30,"y":5.5},{"type":"ruin","r":3.5,"x":30,"y":38.5},{"type":"place-of-power","r":2.5,"x":22.5,"y":22},{"type":"obscuring","r":3.5,"x":37.5,"y":22},{"type":"obscuring","r":2.5,"x":52.5,"y":22}],"territories":{"A":[[15,0,45,22]],"B":[[15,22,45,22]]}} },
     { "n": 3, "table": 1, "name": "Avalanche of Ash", "rules": "Underdog обязан использовать «Collapsing Pass»: на 8+ цель убирается с поля.", "scoring": [
       { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
       { "rounds": "all", "text": "Контролируете 2 и больше целей", "vp": 3 },
       { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 },
       { "rounds": "all", "text": "Осталось не больше 1 цели, и вы контролируете элемент террейна без FACTION TERRAIN во вражеской территории", "vp": 3 },
-      { "rounds": "all", "text": "Целей не осталось, и вы контролируете больше элементов террейна без FACTION TERRAIN", "vp": 7 } ] },
+      { "rounds": "all", "text": "Целей не осталось, и вы контролируете больше элементов террейна без FACTION TERRAIN", "vp": 7 } ],
+      "map": {"objectives":[{"type":"golden-lions","x":15,"y":11},{"type":"golden-lions","x":45,"y":33},{"type":"heldenhain","x":30,"y":11},{"type":"scions","x":30,"y":33},{"type":"sun-seekers","x":45,"y":11},{"type":"sun-seekers","x":15,"y":33}],"terrain":[{"type":"ruin","r":3.5,"x":22.5,"y":5.5},{"type":"ruin","r":3.5,"x":37.5,"y":38.5},{"type":"place-of-power","r":2.5,"x":37.5,"y":5.5},{"type":"place-of-power","r":2.5,"x":22.5,"y":38.5},{"type":"obscuring","r":3.5,"x":22.5,"y":22},{"type":"obscuring","r":3.5,"x":37.5,"y":22},{"type":"obscuring","r":2.5,"x":7.5,"y":22},{"type":"obscuring","r":2.5,"x":52.5,"y":22}],"territories":{"A":[[0,0,30,33]],"B":[[30,11,30,33]]}} },
     { "n": 4, "table": 1, "name": "Caverns of Slaughter", "rules": "Underdog может использовать «Shifting Passages» (жетоны скрытых проходов).", "scoring": [
       { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
       { "rounds": "all", "text": "Контролируете 2 и больше целей", "vp": 3 },
-      { "rounds": "all", "text": "Контролируете любую пару одинаковых целей", "vp": 4 } ] },
+      { "rounds": "all", "text": "Контролируете любую пару одинаковых целей", "vp": 4 } ],
+      "map": {"objectives":[{"type":"scions","x":30,"y":22},{"type":"golden-lions","x":15,"y":11},{"type":"golden-lions","x":30,"y":33},{"type":"sun-seekers","x":30,"y":11},{"type":"sun-seekers","x":45,"y":33}],"terrain":[{"type":"obscuring","r":3.5,"x":20.5,"y":22},{"type":"obscuring","r":3.5,"x":39.5,"y":22},{"type":"ruin","r":3.5,"x":7.5,"y":33},{"type":"ruin","r":3.5,"x":52.5,"y":11},{"type":"obscuring","r":2.5,"x":7.5,"y":5.5},{"type":"obscuring","r":2.5,"x":52.5,"y":38.5},{"type":"place-of-power","r":2.5,"x":37.5,"y":5.5},{"type":"place-of-power","r":2.5,"x":22.5,"y":38.5}],"territories":{"A":[[0,11,30,22]],"B":[[30,11,30,22]]}} },
     { "n": 5, "table": 1, "name": "What's Yours Is Ours", "rules": "В нечётные раунды «желанная пара» — Golden Lions, в чётные — Sun Seekers.", "scoring": [
       { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
       { "rounds": "all", "text": "Контролируете желанную пару целей", "vp": 3 },
-      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ],
+      "map": {"objectives":[{"type":"golden-lions","x":15,"y":22},{"type":"golden-lions","x":45,"y":22},{"type":"scions","x":30,"y":22},{"type":"sun-seekers","x":45,"y":11},{"type":"sun-seekers","x":45,"y":33}],"terrain":[{"type":"obscuring","r":3.5,"x":15,"y":11},{"type":"obscuring","r":3.5,"x":15,"y":33},{"type":"ruin","r":3.5,"x":37.5,"y":5.5},{"type":"ruin","r":3.5,"x":37.5,"y":38.5},{"type":"place-of-power","r":3.5,"x":53.5,"y":22},{"type":"obscuring","r":3.5,"x":6.5,"y":22},{"type":"place-of-power","r":2.5,"x":22.5,"y":22},{"type":"obscuring","r":2.5,"x":37.5,"y":22}],"territories":{"A":[[0,0,30,22],[45,0,15,11]],"B":[[0,22,30,22],[45,33,15,11]]}} },
     { "n": 6, "table": 1, "name": "Hidden Under Ash-Clouds", "rules": "В начале каждого раунда underdog решает, низкие ли пепельные облака.", "scoring": [
       { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
       { "rounds": "all", "text": "Контролируете 2 и больше целей", "vp": 3 },
-      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ],
+      "map": {"objectives":[{"type":"scions","x":30,"y":22},{"type":"sun-seekers","x":15,"y":22},{"type":"sun-seekers","x":45,"y":22},{"type":"golden-lions","x":37.5,"y":11},{"type":"golden-lions","x":22.5,"y":33}],"terrain":[{"type":"place-of-power","r":3.5,"x":52.5,"y":33},{"type":"place-of-power","r":3.5,"x":7.5,"y":11},{"type":"ruin","r":3.5,"x":46.5,"y":11},{"type":"ruin","r":3.5,"x":13.5,"y":33},{"type":"ruin","r":3.5,"x":22.5,"y":13.5},{"type":"ruin","r":3.5,"x":37.5,"y":30.5},{"type":"obscuring","r":2.5,"x":37.5,"y":17.5},{"type":"obscuring","r":2.5,"x":22.5,"y":26.5}],"territories":{"A":[[0,0,60,11],[0,11,15,11],[45,11,15,11]],"B":[[0,33,60,11],[0,22,15,11],[45,22,15,11]]}} },
     { "n": 7, "table": 2, "name": "Warped Ruins", "rules": "«Spreading Warpfire»: цель горит до конца битвы; урон D3 смертельных по всем отрядам (своим и чужим) в 6″.", "scoring": [
       { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
       { "rounds": "all", "text": "Контролируете любую пару одинаковых целей", "vp": 3 },
-      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ],
+      "map": {"objectives":[{"type":"sun-seekers","x":22.5,"y":11},{"type":"sun-seekers","x":37.5,"y":33},{"type":"golden-lions","x":37.5,"y":11},{"type":"golden-lions","x":22.5,"y":33},{"type":"scions","x":45,"y":22},{"type":"heldenhain","x":15,"y":22}],"terrain":[{"type":"obscuring","r":3.5,"x":48.5,"y":11},{"type":"obscuring","r":3.5,"x":48.5,"y":33},{"type":"ruin","r":3.5,"x":11.5,"y":10.5},{"type":"ruin","r":3.5,"x":11.5,"y":33.5},{"type":"obscuring","r":3.5,"x":22.5,"y":22},{"type":"obscuring","r":2.5,"x":7.5,"y":22},{"type":"place-of-power","r":2.5,"x":37.5,"y":22},{"type":"place-of-power","r":3.5,"x":52.5,"y":22}],"territories":{"A":[[0,0,60,22]],"B":[[0,22,60,22]]}} },
     { "n": 8, "table": 2, "name": "Curse of the Gnaw", "rules": "«Echoes of Blight City»: смертельный урон по отрядам, оспаривающим цель, затем уровень нестабильности сбрасывается на 1.", "scoring": [
       { "rounds": "all", "text": "Контролируете цель Golden Lions", "vp": 3 },
       { "rounds": "all", "text": "Контролируете цель Sun Seekers", "vp": 3 },
-      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ],
+      "map": {"objectives":[{"type":"golden-lions","x":15,"y":11},{"type":"sun-seekers","x":45,"y":33},{"type":"heldenhain","x":22.5,"y":22},{"type":"scions","x":37.5,"y":22}],"terrain":[{"type":"ruin","r":3.5,"x":31.5,"y":11},{"type":"ruin","r":3.5,"x":28.5,"y":33},{"type":"ruin","r":3.5,"x":46.5,"y":11},{"type":"ruin","r":3.5,"x":13.5,"y":33},{"type":"obscuring","r":2.5,"x":22.5,"y":15},{"type":"obscuring","r":2.5,"x":37.5,"y":29},{"type":"place-of-power","r":3.5,"x":7.5,"y":15.5},{"type":"place-of-power","r":3.5,"x":52.5,"y":28.5}],"territories":{"A":[[0,22,30,22],[0,11,15,11],[30,33,15,11]],"B":[[30,0,30,22],[45,22,15,11],[15,0,15,11]]}} },
     { "n": 9, "table": 2, "name": "Seize the Embers", "rules": "«Back to Base Camp»: убрать самородок эмберстоуна с отряда.", "scoring": [
       { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
       { "rounds": "1", "text": "Первый раунд: контролируете 2 и больше целей", "vp": 3 },
       { "rounds": "2+", "text": "Со второго раунда: в этот ход использовали «Back to Base Camp»", "vp": 3 },
-      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ],
+      "map": {"objectives":[{"type":"sun-seekers","x":15,"y":11},{"type":"sun-seekers","x":45,"y":33},{"type":"golden-lions","x":45,"y":11},{"type":"golden-lions","x":15,"y":33},{"type":"heldenhain","x":30,"y":22}],"terrain":[{"type":"obscuring","r":2.5,"x":7.5,"y":5.5},{"type":"obscuring","r":2.5,"x":52.5,"y":38.5},{"type":"ruin","r":3.5,"x":22.5,"y":16.5},{"type":"ruin","r":3.5,"x":37.5,"y":27.5},{"type":"obscuring","r":3.5,"x":36.5,"y":11},{"type":"obscuring","r":3.5,"x":23.5,"y":33},{"type":"place-of-power","r":2.5,"x":11.5,"y":22},{"type":"place-of-power","r":2.5,"x":48.5,"y":22}],"territories":{"A":[[0,22,45,22],[0,0,15,22]],"B":[[15,0,45,22],[45,22,15,22]]}} },
     { "n": 10, "table": 2, "name": "Treacherous Ground", "rules": "«Tread Carefully» делает цель нестабильной; «Violent Tremor» переносит стабильность на другую цель.", "scoring": [
       { "rounds": "all", "text": "Контролируете хотя бы 1 стабильную цель", "vp": 3 },
       { "rounds": "all", "text": "Контролируете 2 и больше стабильных целей", "vp": 3 },
-      { "rounds": "all", "text": "Контролируете больше стабильных целей, чем соперник", "vp": 4 } ] },
+      { "rounds": "all", "text": "Контролируете больше стабильных целей, чем соперник", "vp": 4 } ],
+      "map": {"objectives":[{"type":"sun-seekers","x":15,"y":11},{"type":"sun-seekers","x":45,"y":11},{"type":"golden-lions","x":15,"y":33},{"type":"golden-lions","x":45,"y":33},{"type":"scions","x":7.5,"y":22},{"type":"heldenhain","x":52.5,"y":22}],"terrain":[{"type":"ruin","r":3.5,"x":6.5,"y":11},{"type":"ruin","r":3.5,"x":53.5,"y":33},{"type":"obscuring","r":3.5,"x":34,"y":33},{"type":"obscuring","r":3.5,"x":26,"y":11},{"type":"place-of-power","r":2.5,"x":22.5,"y":22},{"type":"place-of-power","r":2.5,"x":37.5,"y":22},{"type":"obscuring","r":2.5,"x":7.5,"y":38.5},{"type":"obscuring","r":2.5,"x":52.5,"y":5.5}],"territories":{"A":[[0,0,60,11],[15,11,30,11]],"B":[[0,33,60,11],[15,22,30,11]]}} },
     { "n": 11, "table": 2, "name": "Escape From the Coast", "rules": "«To the Ships!»: цель убирается с поля.", "scoring": [
       { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
       { "rounds": "all", "text": "Контролируете 2 и больше целей", "vp": 3 },
-      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ],
+      "map": {"objectives":[{"type":"golden-lions","x":7.5,"y":11},{"type":"golden-lions","x":7.5,"y":33},{"type":"sun-seekers","x":45,"y":11},{"type":"sun-seekers","x":45,"y":33},{"type":"scions","x":22.5,"y":22},{"type":"heldenhain","x":45,"y":22}],"terrain":[{"type":"obscuring","r":3.5,"x":22.5,"y":11},{"type":"obscuring","r":3.5,"x":22.5,"y":33},{"type":"ruin","r":3.5,"x":37.5,"y":5.5},{"type":"ruin","r":3.5,"x":37.5,"y":38.5},{"type":"place-of-power","r":3.5,"x":55,"y":22},{"type":"obscuring","r":3.5,"x":36.5,"y":22},{"type":"obscuring","r":2.5,"x":15,"y":22},{"type":"place-of-power","r":2.5,"x":5,"y":22}],"territories":{"A":[[0,0,30,22],[30,0,30,11]],"B":[[0,22,30,22],[30,33,30,11]]}} },
     { "n": 12, "table": 2, "name": "Power of the Realms", "rules": "«Arcane Charge»: прямая от центра главной цели; первая пересечённая второстепенная цель становится главной.", "scoring": [
       { "rounds": "all", "text": "Контролируете главную цель", "vp": 3 },
       { "rounds": "all", "text": "Контролируете 2 и больше второстепенных целей", "vp": 3 },
-      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] }
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ],
+      "map": {"objectives":[{"type":"golden-lions","x":30,"y":11},{"type":"golden-lions","x":30,"y":33},{"type":"scions","x":15,"y":22},{"type":"sun-seekers","x":30,"y":22},{"type":"heldenhain","x":45,"y":22}],"terrain":[{"type":"ruin","r":3.5,"x":15,"y":11},{"type":"ruin","r":3.5,"x":45,"y":33},{"type":"ruin","r":3.5,"x":45,"y":11},{"type":"ruin","r":3.5,"x":15,"y":33},{"type":"place-of-power","r":3.5,"x":4.5,"y":22},{"type":"place-of-power","r":3.5,"x":55.5,"y":22},{"type":"obscuring","r":2.5,"x":37.5,"y":38.5},{"type":"obscuring","r":2.5,"x":22.5,"y":5.5}],"territories":{"A":[[0,0,60,22]],"B":[[0,22,60,22]]}} }
   ]
 }
