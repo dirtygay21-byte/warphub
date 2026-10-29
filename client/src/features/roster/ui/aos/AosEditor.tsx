@@ -28,7 +28,7 @@ import { AosUnitCard, Warscroll } from './AosUnitCard';
 import { AosRuleCard, EnhancementsPanel, ManifestationsPanel, SpellsPanel } from './AosPanels';
 import { aosPointSystems } from '../../points';
 import { AosTerrainGuide } from './AosTerrainGuide';
-import { AosScoreTracker, PointsSheet } from '../PointsSheet';
+import { PointsSheet } from '../PointsSheet';
 import { useSpellsOpen } from './useSpellsOpen';
 import { EnhancementSheet, FormationSheet, LoreSheet, MoveSheet, RorSheet, TerrainSheet } from './AosSheets';
 
@@ -37,6 +37,7 @@ export function AosEditor(props: {
   roster: AosRoster;
   index: AosIndex;
   onBack: () => void;
+  onStartGame: () => void;
   onChange: (r: AosRoster) => void;
   onDuplicate: (r: AosRoster) => void;
   onDelete: () => void;
@@ -82,6 +83,7 @@ function Editor({
   L,
   cr,
   onBack,
+  onStartGame,
   onChange,
   onDuplicate,
   onDelete,
@@ -91,6 +93,7 @@ function Editor({
   L: AosLookup;
   cr: AosComputed;
   onBack: () => void;
+  onStartGame: () => void;
   onChange: (r: AosRoster) => void;
   onDuplicate: (r: AosRoster) => void;
   onDelete: () => void;
@@ -398,7 +401,13 @@ function Editor({
       <LoreSheet key={'lore-' + (lore ?? 'closed')} kind={lore} onClose={() => setLoreSheet(null)} roster={roster} L={L} onPick={(id) => (lore && onChange(setLore(roster, lore, id)), setLoreSheet(null))} />
       <EnhancementSheet target={enh} onClose={() => setEnh(null)} roster={roster} L={L} onPick={(id) => (enh && onChange(setEnhancement(roster, enh.uid, enh.typeKey, id)), setEnh(null))} />
       <MoveSheet uid={moving} onClose={() => setMoving(null)} roster={roster} L={L} onMove={(t) => (moving && apply(moveAosUnit(roster, moving, t, L), 'Перенесено'), setMoving(null))} />
-      <PointsSheet open={sheet === 'points'} onClose={() => setSheet(null)} systems={aosPointSystems(roster, L, cr)} extra={{ game: <AosScoreTracker /> }} />
+      <PointsSheet open={sheet === 'points'} onClose={() => setSheet(null)} systems={aosPointSystems(roster, L, cr)} extra={{
+          game: (
+            <Button variant="primary" className="w-full" onClick={() => (setSheet(null), onStartGame())}>
+              <Icon name="spark" /> Начать игру: батлплан, priority, тактики и счёт
+            </Button>
+          ),
+        }} />
       <AosExportSheet open={sheet === 'export'} onClose={() => setSheet(null)} roster={roster} L={L} cr={cr} />
 
       <Sheet open={sheet === 'traits'} onClose={() => setSheet(null)} title="Боевые черты" tall>
@@ -450,6 +459,9 @@ function Editor({
             Показывать Warhammer Legends
             <input type="checkbox" checked={roster.showLegends} onChange={() => set({ showLegends: !roster.showLegends })} className="size-5 accent-accent" />
           </label>
+          <Button className="w-full justify-start" onClick={() => (setSheet(null), onStartGame())}>
+            <Icon name="spark" /> Начать игру с этим ростером
+          </Button>
           <Button className="w-full justify-start" onClick={() => (setSheet(null), onDuplicate(duplicateAosRoster(roster)))}>
             <Icon name="copy" /> Дублировать ростер
           </Button>
