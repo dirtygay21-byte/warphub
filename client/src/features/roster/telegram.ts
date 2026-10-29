@@ -23,6 +23,8 @@ interface TgWebApp {
   HapticFeedback?: { impactOccurred(s: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft'): void; notificationOccurred(t: 'error' | 'success' | 'warning'): void; selectionChanged(): void };
   CloudStorage?: CloudStorage;
   disableVerticalSwipes?(): void;
+  enableVerticalSwipes?(): void;
+  isVerticalSwipesEnabled?: boolean;
 }
 
 // Типы Telegram WebApp в клиенте уже объявлены (@types/telegram-web-app) — берём объект через узкий интерфейс выше.

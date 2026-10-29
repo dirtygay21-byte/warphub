@@ -47,9 +47,11 @@ test('placeUnit / moveUnit / removeUnit: центр в точке, базы не
   assert.equal(unitCenter(gone), null);
 });
 
-test('база без размера: 60 мм как стартовое значение, свой размер — из customMm', () => {
+test('база без размера: круг 120 мм как стартовое значение; свой размер из старых сохранений (customMm); примерная форма', async () => {
   const m = { id: 'x', profile: 'X', options: [], source: 'Use model', pick: 0, customMm: null, at: null };
-  assert.deepEqual(modelBase(m), { shape: { kind: 'circle', d: 60 }, known: false });
+  assert.deepEqual(modelBase(m), { shape: { kind: 'circle', d: 120 }, known: false });
+  const { approxBase } = await import('../../../client/src/features/roster/testarmy');
+  assert.deepEqual(modelBase({ ...m, custom: approxBase('square', 100) }), { shape: { kind: 'rect', w: 100, h: 100 }, known: true });
   assert.deepEqual(modelBase({ ...m, customMm: 100 }), { shape: { kind: 'circle', d: 100 }, known: true });
 });
 
