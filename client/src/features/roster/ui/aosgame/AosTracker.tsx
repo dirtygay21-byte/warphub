@@ -78,7 +78,7 @@ function Priority({ game }: { game: AosGameHook }) {
     if (game.dispatch(source === 'random' ? { type: 'round-started', first, source, roll: { attempt: s.rollCount.priority } } : { type: 'round-started', first, source })) setRolled(false);
   };
   const firstBtn = (seat: Seat, source: 'random' | 'manual', label: string) => {
-    const blocked = seizeBlocked && seat === second && (source === 'manual' || r.decider === second);
+    const blocked = (seizeBlocked && seat === second && (source === 'manual' || r.decider === second)) || (source === 'random' && !game.mine(r.decider));
     return (
       <Button key={seat + source} variant={source === 'random' ? 'primary' : 'outline'} className="text-xs" disabled={blocked} onClick={() => pick(seat, source)}>
         {label}
@@ -103,7 +103,7 @@ function Priority({ game }: { game: AosGameHook }) {
               {names.p1} {r.p1} : {r.p2} {names.p2} — ничья, решает {names[r.decider]} (ходил первым в прошлом раунде).
             </p>
           )}
-          <p className="text-[12.5px] text-white/70">{names[r.decider]}, кто ходит первым?</p>
+          <p className="text-[12.5px] text-white/70">{game.mine(r.decider) ? `${names[r.decider]}, кто ходит первым?` : `Кто ходит первым, решает ${names[r.decider]} на своём телефоне.`}</p>
           <div className="grid grid-cols-2 gap-2">
             {firstBtn(r.decider, 'random', 'Я хожу первым')}
             {firstBtn(otherSeat(r.decider), 'random', 'Соперник первым')}
@@ -136,6 +136,13 @@ function Turn({ game }: { game: AosGameHook }) {
   const [picked, setPicked] = useState<number[]>([]);
   const seizedTurn = s.seized === seat && s.turnIndex === 0;
   const score = () => game.dispatch({ type: 'plan-scored', target: seat, rows: picked }) && setPicked([]);
+  if (!game.mine(seat))
+    return (
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-center">
+        <p className="font-display text-lg font-semibold uppercase">Ход соперника</p>
+        <p className="mt-1 text-[12.5px] text-white/55">{p.name} ходит и в конце хода отмечает батлплан и тактики на своём телефоне; счёт обновится здесь.</p>
+      </div>
+    );
   return (
     <div className="rounded-2xl border border-accent/30 bg-white/[0.03] p-4">
       <p className="font-display text-lg font-semibold uppercase">Конец хода · {p.name}</p>
@@ -264,9 +271,9 @@ function Resources({ game }: { game: AosGameHook }) {
               {p.name}
               {s.underdog === seat ? ' · underdog' : ''}
             </p>
-            <Counter label="CP" value={p.cp} onMinus={() => game.dispatch({ type: 'cp-changed', target: seat, delta: -1, reason: 'spent' })} onPlus={() => game.dispatch({ type: 'cp-changed', target: seat, delta: 1, reason: 'gained' })} />
-            <Counter label="Кубы ярости" value={p.rage} onMinus={() => game.dispatch({ type: 'rage-changed', target: seat, dice: -1 })} onPlus={() => game.dispatch({ type: 'rage-changed', target: seat, dice: 1 })} />
-            <Counter label="Уровень ярости" value={p.fury} onMinus={() => game.dispatch({ type: 'rage-changed', target: seat, fury: -1 })} onPlus={() => game.dispatch({ type: 'rage-changed', target: seat, fury: 1 })} />
+            <Counter readOnly={!game.mine(seat)} label="CP" value={p.cp} onMinus={() => game.dispatch({ type: 'cp-changed', target: seat, delta: -1, reason: 'spent' })} onPlus={() => game.dispatch({ type: 'cp-changed', target: seat, delta: 1, reason: 'gained' })} />
+            <Counter readOnly={!game.mine(seat)} label="Кубы ярости" value={p.rage} onMinus={() => game.dispatch({ type: 'rage-changed', target: seat, dice: -1 })} onPlus={() => game.dispatch({ type: 'rage-changed', target: seat, dice: 1 })} />
+            <Counter readOnly={!game.mine(seat)} label="Уровень ярости" value={p.fury} onMinus={() => game.dispatch({ type: 'rage-changed', target: seat, fury: -1 })} onPlus={() => game.dispatch({ type: 'rage-changed', target: seat, fury: 1 })} />
           </div>
         );
       })}
@@ -277,13 +284,13 @@ function Resources({ game }: { game: AosGameHook }) {
   );
 }
 
-function Counter({ label, value, onMinus, onPlus }: { label: string; value: number; onMinus: () => void; onPlus: () => void }) {
+function Counter({ label, value, onMinus, onPlus, readOnly }: { label: string; value: number; onMinus: () => void; onPlus: () => void; readOnly?: boolean }) {
   return (
     <div className="mt-1.5 flex items-center gap-1.5">
       <span className="min-w-0 flex-1 text-[11px] text-white/50">{label}</span>
-      <IconButton icon="minus" label={`${label}: меньше`} onClick={onMinus} className="size-7" />
+      {!readOnly && <IconButton icon="minus" label={`${label}: меньше`} onClick={onMinus} className="size-7" />}
       <span className="font-display w-6 text-center font-semibold tabular-nums">{value}</span>
-      <IconButton icon="plus" label={`${label}: больше`} onClick={onPlus} className="size-7" />
+      {!readOnly && <IconButton icon="plus" label={`${label}: больше`} onClick={onPlus} className="size-7" />}
     </div>
   );
 }
@@ -349,7 +356,7 @@ function EndEarly({ game }: { game: AosGameHook }) {
     <div className="space-y-2 rounded-2xl border border-danger/30 bg-danger/5 p-3">
       <p className="text-[12.5px] text-white/70">Сдавшийся проигрывает независимо от ПО. По договорённости — итог по текущим ПО.</p>
       <div className="grid grid-cols-2 gap-2">
-        {SEATS.map((x) => (
+        {SEATS.filter((x) => game.mine(x)).map((x) => (
           <Button key={x} variant="danger" className="text-xs" onClick={() => game.dispatch({ type: 'battle-ended', reason: 'concede', by: x })}>
             Сдаётся {s.players[x].name}
           </Button>
