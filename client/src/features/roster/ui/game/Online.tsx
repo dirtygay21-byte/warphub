@@ -2,13 +2,23 @@ import { useState } from 'react';
 import { haptic, shareText } from '../../telegram';
 import { Button } from '../kit';
 import { cx } from '../util';
-import type { GameHook } from './useGame';
+import type { Seat } from '../../game';
+import type { OnlineGame } from '../../online';
+
+/** Что нужно экрану игры на двух телефонах — общее для 40K (useGame) и AoS (useAosGame, 30.10.2026). */
+export type OnlineLike = {
+  online: (OnlineGame & { seat: Seat }) | null;
+  state: { players: Record<Seat, { name: string }> } | null;
+  sync: { sending: boolean; offline: boolean };
+  joinOnline: (code: string) => Promise<boolean>;
+  closeGame: () => void;
+};
 
 /**
  * Игра на двух телефонах (T3): создать игру (этот телефон — игрок 1, сопернику — код) или войти по коду (игрок 2);
  * вернуться к незаконченной. Журнал хранит сервер; каждый телефон действует только за своего игрока.
  */
-export function OnlineStart({ game, onCreate, busy }: { game: GameHook; onCreate: () => Promise<void>; busy: boolean }) {
+export function OnlineStart({ game, onCreate, busy }: { game: OnlineLike; onCreate: () => Promise<void>; busy: boolean }) {
   const [code, setCode] = useState('');
   const [working, setWorking] = useState(false);
   const run = async (f: () => Promise<unknown>) => {
@@ -45,14 +55,14 @@ export function OnlineStart({ game, onCreate, busy }: { game: GameHook; onCreate
 }
 
 /** Полоса игры на двух телефонах: код, кто я, есть ли соперник, связь; «Позвать» и «К списку» (игра остаётся в сохранённых). */
-export function OnlineBar({ game }: { game: GameHook }) {
+export function OnlineBar({ game, system = '40k' }: { game: OnlineLike; system?: '40k' | 'aos' }) {
   const o = game.online;
   if (!o) return null;
   const opp = o.seat === 'p1' ? 'p2' : 'p1';
   const me = game.state?.players[o.seat].name ?? (o.seat === 'p1' ? 'Игрок 1' : 'Игрок 2');
   const joined = !!o.players[opp];
   const invite = () => {
-    shareText(`Игра Warhammer 40,000 в WarpHub: откройте Roster Builder → «Начать игру» → «На двух телефонах» и введите код ${o.code}`);
+    shareText(`Игра ${system === 'aos' ? 'Age of Sigmar' : 'Warhammer 40,000'} в WarpHub: откройте Roster Builder${system === 'aos' ? ' → Age of Sigmar' : ''} → «Начать игру» → «На двух телефонах» и введите код ${o.code}`);
     haptic.tap();
   };
   const status = game.sync.offline ? 'нет связи' : game.sync.sending ? 'отправка…' : 'на связи';

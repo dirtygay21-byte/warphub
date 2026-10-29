@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import type { AosIndex, AosRoster } from '../../aos/types';
 import type { AosEventBody, AosSavedEntry } from '../../aosgame';
 import { haptic, pushOverlay } from '../../telegram';
+import { OnlineBar, OnlineStart } from '../game/Online';
 import { Button, Icon, IconButton } from '../kit';
 import { cx } from '../util';
 import { AosSetup } from './AosSetup';
@@ -17,10 +18,13 @@ import { useAosGame, type AosGameHook } from './useAosGame';
 export function AosGameScreen({ onBack, rosters, index, initialRosterId }: { onBack: () => void; rosters: AosRoster[]; index: AosIndex; initialRosterId?: string }) {
   const game = useAosGame();
   const { bp, loadError, state } = game;
-  const start = () => {
+  const initial = (): AosEventBody[] => {
     const r = initialRosterId ? rosters.find((x) => x.id === initialRosterId) : undefined;
-    const initial: AosEventBody[] = r ? [{ type: 'player-set', target: 'p1', patch: { roster: rosterRefOf(r, 'own', index) } }] : [];
-    game.newGame(initial);
+    return r ? [{ type: 'player-set', target: 'p1', patch: { roster: rosterRefOf(r, 'own', index) } }] : [];
+  };
+  const start = () => game.newGame(initial());
+  const startOnline = async () => {
+    await game.startOnline(initial());
   };
   if (loadError) return <Shell onBack={onBack}><p className="mt-10 text-center text-sm text-white/50">Нет данных батлпака: {loadError}</p></Shell>;
   if (!bp) {
@@ -31,8 +35,11 @@ export function AosGameScreen({ onBack, rosters, index, initialRosterId }: { onB
     );
   }
   return (
-    <Shell onBack={state ? game.closeGame : onBack} undo={state && game.canUndo ? game.undo : undefined}>
-      {!state ? <StartCard game={game} onStart={start} /> : state.stage === 'setup' ? <AosSetup game={game} rosters={rosters} index={index} /> : <AosTracker game={game} />}
+    <Shell onBack={state || game.online ? game.closeGame : onBack} undo={state && game.canUndo ? game.undo : undefined}>
+      <OnlineBar game={game} system="aos" />
+      {game.online && !state ? (
+        <div className="mx-auto mt-16 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
+      ) : !state ? <StartCard game={game} onStart={start} onStartOnline={startOnline} /> : state.stage === 'setup' ? <AosSetup game={game} rosters={rosters} index={index} /> : <AosTracker game={game} />}
       {game.error && (
         <div className="sheet-enter fixed inset-x-0 bottom-0 z-40 border-t border-danger/40 bg-app-elevated px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
           <div className="mx-auto flex max-w-lg items-start gap-2">
@@ -69,7 +76,7 @@ function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => vo
   );
 }
 
-function StartCard({ game, onStart }: { game: AosGameHook; onStart: () => void }) {
+function StartCard({ game, onStart, onStartOnline }: { game: AosGameHook; onStart: () => void; onStartOnline: () => Promise<void> }) {
   const [list, setList] = useState(false);
   const closeList = useCallback(() => setList(false), []);
   if (list) return <SavedList game={game} onClose={closeList} />;
@@ -94,8 +101,8 @@ function StartCard({ game, onStart }: { game: AosGameHook; onStart: () => void }
         <Button variant="primary" className="mt-3 w-full" onClick={onStart}>
           Начать подготовку
         </Button>
-        <p className="mt-2 text-[11px] text-white/40">Игра на двух телефонах для AoS — позже; сейчас — один телефон на двоих.</p>
       </div>
+      <OnlineStart game={game} onCreate={onStartOnline} busy={false} />
     </section>
   );
 }
@@ -118,7 +125,7 @@ function SavedList({ game, onClose }: { game: AosGameHook; onClose: () => void }
       {!list.length && <p className="py-6 text-center text-sm text-white/50">Сохранённых игр пока нет.</p>}
       <ul className="space-y-2">
         {list.map((e) => (
-          <SavedRow key={e.key} entry={e} rounds={game.bp!.rounds} onOpen={() => game.openSaved(e.key) && haptic.ok()} onRemove={() => game.removeSaved(e.key)} />
+          <SavedRow key={e.key} entry={e} rounds={game.bp!.rounds} onOpen={() => void game.openSaved(e.key).then((ok) => ok && haptic.ok())} onRemove={() => game.removeSaved(e.key)} />
         ))}
       </ul>
       <p className="pt-1 text-[11px] text-white/40">Игры хранятся на этом телефоне (до 20).</p>
@@ -134,7 +141,7 @@ function SavedRow({ entry, rounds, onOpen, onRemove }: { entry: AosSavedEntry; r
     <li className={cx('rounded-2xl border bg-white/[0.03]', s.stage === 'finished' ? 'border-white/10' : 'border-accent/30')}>
       <button type="button" onClick={onOpen} className="w-full px-3 pb-2 pt-2.5 text-left active:bg-white/5">
         <span className="block text-[11px] text-white/45">
-          {fmtDate(entry.updatedAt)} · {stage}
+          {fmtDate(entry.updatedAt)} · {stage} · {entry.online ? `2 телефона · ${entry.online.code}` : '1 телефон'}
         </span>
         <span className="mt-1 flex items-baseline gap-2">
           <span className="min-w-0 flex-1 truncate text-sm font-semibold">
@@ -156,7 +163,7 @@ function SavedRow({ entry, rounds, onOpen, onRemove }: { entry: AosSavedEntry; r
           </button>
         ) : (
           <>
-            <span className="min-w-0 flex-1 text-[11px] text-warn">Игра будет удалена с телефона.</span>
+            <span className="min-w-0 flex-1 text-[11px] text-warn">{entry.online ? 'Игра останется на сервере, уберётся только ссылка.' : 'Игра будет удалена с телефона.'}</span>
             <Button variant="danger" className="text-xs" onClick={onRemove}>
               Удалить
             </Button>
