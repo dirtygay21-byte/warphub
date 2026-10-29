@@ -25,13 +25,15 @@ const gzCache = new Map<string, { mtime: number; body: Uint8Array }>();
 /**
  * Файл данных (сжатый gzip, с кешем в памяти).
  * Warhammer 40K: name — 'index', 'battlefield', 'missions' или код фракции (папка roster-data).
- * Age of Sigmar: name — 'index' или код фракции (папка roster-data/aos).
+ * Age of Sigmar: name — 'index', 'battlepack' или код фракции (папка roster-data/aos).
  */
 export function readRosterData(name: string, system: '40k' | 'aos' = '40k'): { body: Uint8Array; gzip: boolean } | null {
   if (system === '40k' && !/^(index|battlefield|missions|[A-Za-z]{1,6})$/.test(name)) return null;
-  if (system === 'aos' && !/^(index|[A-Za-z]{1,6})$/.test(name)) return null;
+  if (system === 'aos' && !/^(index|battlepack|[A-Za-z]{1,6})$/.test(name)) return null;
   const dir = system === 'aos' ? path.join(rosterDataDir(), 'aos') : rosterDataDir();
-  const file = name === 'index' || (system === '40k' && (name === 'battlefield' || name === 'missions')) ? path.join(dir, `${name}.json`) : path.join(dir, 'f', `${name}.json`);
+  // AoS: battlepack — данные General's Handbook (батлпланы, тактики) рядом с index.json
+  const top = name === 'index' || (system === '40k' && (name === 'battlefield' || name === 'missions')) || (system === 'aos' && name === 'battlepack');
+  const file = top ? path.join(dir, `${name}.json`) : path.join(dir, 'f', `${name}.json`);
   let stat: fs.Stats;
   try {
     stat = fs.statSync(file);

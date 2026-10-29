@@ -1,0 +1,142 @@
+{
+  "system": "aos",
+  "id": "gh-2026-27",
+  "title": "General's Handbook 2026-27 · Pitched Battles",
+  "source": {
+    "name": "Wahapedia — General's Handbook 2026-27 (Age of Sigmar 4th edition)",
+    "url": "https://wahapedia.ru/aos4/the-rules/general-s-handbook-2026-27/",
+    "checked": "2026-10-30",
+    "cp": "Warhammer Community — React to Your Opponent With Powerful New Commands in #NewAoS",
+    "cpUrl": "https://www.warhammer-community.com/en-gb/articles/EEICxhva/react-to-your-opponent-with-powerful-new-commands-in-newaos/",
+    "coreUrl": "https://wahapedia.ru/aos4/the-rules/the-core-rules/",
+    "note": "Описания карт и правил — краткий пересказ своими словами, без текста карт GW. Названия — английские, как в источнике. Положения целей и террейна на картах — отдельный этап (S3): в источнике только картинки."
+  },
+  "rounds": 5,
+  "victory": { "majorMargin": 5, "tie": "Равные ПО: малая победа у того, кто выполнил больше боевых тактик; поровну — ничья." },
+  "battlefield": { "width": 60, "height": 44, "objectiveMarkerMm": 40, "objectiveRange": 3, "terrain": "Рекомендуется 8 элементов: 4 малых и 4 средних; не ближе 3″ к краю и целям, не ближе 6″ к другому террейну." },
+  "cp": {
+    "perRound": 4,
+    "underdog": 1,
+    "fewerAuxiliaries": 1,
+    "lostAtRoundEnd": true,
+    "note": "В начале каждого раунда — 4 очка команд; отстающий (underdog) — +1; у кого меньше вспомогательных отрядов, чем у соперника, — +1. Неистраченные сгорают в конце раунда."
+  },
+  "priority": {
+    "roll": "В начале каждого раунда — бросок «кто выше» (priority roll); победитель решает, кто ходит первым. Ничья — решает тот, кто ходил первым в прошлом раунде.",
+    "underdog": "Underdog раунда — игрок с меньшим числом ПО; поровну — underdog нет.",
+    "seize": "Игрок, ходивший вторым в прошлом раунде, может после выигранного броска ходить первым (seize the initiative) — нельзя, если соперник впереди на 11 ПО и больше; в такой ход он не выполняет боевые тактики.",
+    "seizeBlockedLead": 11
+  },
+  "setup": [
+    "Армии",
+    "Выбор карт боевых тактик — раскрываются в начале битвы",
+    "Батлплан: D6 — таблица (1–3 — первая, 4–6 — вторая), D6 — батлплан (или выбрать)",
+    "Атакующий и защитник: бросок, победитель решает",
+    "Защитник ставит цели по карте",
+    "Защитник ставит террейн",
+    "Атакующий выбирает территорию",
+    "Деплой — начинает атакующий",
+    "Укрытие (hideout) и беглец (fugitive) для тактик — после способностей фазы деплоя, до выбора первого хода"
+  ],
+  "objectiveTypes": [
+    { "id": "sun-seekers", "name": "Sun Seekers", "count": 2 },
+    { "id": "golden-lions", "name": "Golden Lions", "count": 2 },
+    { "id": "heldenhain", "name": "Heldenhain", "count": 1 },
+    { "id": "scions", "name": "Scions of the Comet", "count": 1 }
+  ],
+  "season": {
+    "name": "Season Rules 2026-27 (Aqshy)",
+    "rules": [
+      { "name": "Raising the Heat", "when": "Деплой, раз за битву", "text": "Уровень ярости (fury): атакующий — 1, защитник — 2." },
+      { "name": "Simmering Rage", "when": "Начало раунда, обязательно", "text": "Получить кубы ярости (rage dice) по уровню ярости; неистраченные сгорают в конце раунда." },
+      { "name": "Eruption of Fury", "when": "Конец любого хода, раз за ход", "text": "Потратить до 3 кубов ярости — столько же атак ближнего боя по врагу в бою с выбранным отрядом." },
+      { "name": "Fight Through the Pain", "when": "Пассивно", "text": "Потратить кубы ярости, понизив уровень ярости, и на 3+ снять очко урона." }
+    ]
+  },
+  "tactics": {
+    "pick": 2,
+    "vp": 5,
+    "order": ["affray", "strike", "domination"],
+    "rule": "До 2 карт на армию. В конце своего хода — не больше одной тактики с каждой карты, по порядку Affray → Strike → Domination; выполненная по условиям тактика засчитывается обязательно. 5 ПО за каждую.",
+    "cards": [
+      { "id": "blazing-onslaught", "name": "Blazing Onslaught", "setup": "Соперник выбирает укрытие (hideout) — элемент террейна без FACTION TERRAIN в своей территории; его нельзя убрать.", "tactics": [
+        { "tier": "affray", "name": "Master of Arms", "text": "Один и тот же вражеский отряд получил урон в 3 разных фазах этого хода." },
+        { "tier": "strike", "name": "Break Their Defences", "text": "Вы контролируете вражеское укрытие." },
+        { "tier": "domination", "name": "No Survivors", "text": "За ход уничтожено 2+ вражеских отряда, и вы контролируете вражеское укрытие." } ] },
+      { "id": "siege-of-ashes", "name": "Siege of Ashes", "tactics": [
+        { "tier": "affray", "name": "Form a Wall", "text": "2+ своих отряда целиком вне своей территории, целиком в 6″ от неё и в 3″ друг от друга." },
+        { "tier": "strike", "name": "Outpost Resupply", "text": "Вы контролируете цель во вражеской территории, её оспаривают свой отряд, не двигавшийся (MOVE) в этот ход, и другой свой отряд, атаковавший (charge) в этот ход." },
+        { "tier": "domination", "name": "Repel the Attackers", "text": "3+ своих отряда в 3″ от центра поля и не в бою." } ] },
+      { "id": "flanking-firestorm", "name": "Flanking Firestorm", "tactics": [
+        { "tier": "affray", "name": "Ambuscade", "text": "2+ контролируемых вами цели или элемента террейна без FACTION TERRAIN (в любом сочетании), каждый оспаривает другой свой отряд — дальше 6″ от своей территории и выставленный не в этот ход (с исправлением)." },
+        { "tier": "strike", "name": "Surround the Enemy", "text": "2+ своих отряда, выставленных не в этот ход, каждый в 9″ от другого угла поля и целиком вне своей территории." },
+        { "tier": "domination", "name": "Claim What's Yours", "text": "Во вражеской территории своих отрядов больше, чем вражеских, и хотя бы один свой HERO целиком в ней." } ] },
+      { "id": "smokescreen", "name": "Smokescreen", "tactics": [
+        { "tier": "affray", "name": "Keep the Enemy Close", "text": "Вы контролируете цель, которую оспаривает хотя бы один вражеский отряд." },
+        { "tier": "strike", "name": "Feign Weakness", "text": "За ход уничтожено больше своих отрядов, чем вражеских." },
+        { "tier": "domination", "name": "Execute the Plan", "text": "Вы контролируете все цели во вражеской территории." } ] },
+      { "id": "burning-for-vengeance", "name": "Burning for Vengeance", "setup": "Выбрать вражеского HERO (на поле или в резерве) — беглец (fugitive) до конца битвы.", "tactics": [
+        { "tier": "affray", "name": "Search Every Inch", "text": "В каждой большой четверти поля целиком стоит свой отряд (разные), все дальше 9″ от центра, и не больше одного выставлен в этот ход." },
+        { "tier": "strike", "name": "Quick Pursuit", "text": "3+ своих отряда не в бою в 12″ от вражеского беглеца — или беглеца на поле нет." },
+        { "tier": "domination", "name": "Bring Them In", "text": "3+ своих отряда в бою с вражеским беглецом — или беглеца на поле нет и 3+ своих отряда оспаривают одну цель целиком вне своей территории." } ] },
+      { "id": "legend-of-the-parch", "name": "Legend of The Parch", "tactics": [
+        { "tier": "affray", "name": "Daring Rescue", "text": "Вражеский отряд, бывший в бою в начале хода, уничтожен атакой ближнего боя своего отряда, атаковавшего (charge) в этот ход." },
+        { "tier": "strike", "name": "Command from the Front", "text": "На поле 2+ своих HERO, все в 9″ от видимого вражеского отряда, и ни один свой HERO не убит в этот ход." },
+        { "tier": "domination", "name": "Hero of Legend", "text": "Вы контролируете цель целиком вне своей территории, которую не контролировали в начале хода, и её оспаривает свой HERO." } ] }
+    ]
+  },
+  "battleplans": [
+    { "n": 1, "table": 1, "name": "Into the Fire", "rules": "Обе армии получают способность «Secure the Gateway».", "scoring": [
+      { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете 2 и больше целей", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+    { "n": 2, "table": 1, "name": "Bloodstained Coasts", "rules": "Со второго раунда обоим доступны способности батлплана (убирают «emberstone slivers» — это не цели).", "scoring": [
+      { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете 2 и больше целей", "vp": 3 },
+      { "rounds": "1", "text": "Первый раунд: контролируете больше целей, чем соперник", "vp": 4 },
+      { "rounds": "2+", "text": "Со второго раунда: контролируете цель, которую соперник контролировал в начале хода", "vp": 4 } ] },
+    { "n": 3, "table": 1, "name": "Avalanche of Ash", "rules": "Underdog обязан использовать «Collapsing Pass»: на 8+ цель убирается с поля.", "scoring": [
+      { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете 2 и больше целей", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 },
+      { "rounds": "all", "text": "Осталось не больше 1 цели, и вы контролируете элемент террейна без FACTION TERRAIN во вражеской территории", "vp": 3 },
+      { "rounds": "all", "text": "Целей не осталось, и вы контролируете больше элементов террейна без FACTION TERRAIN", "vp": 7 } ] },
+    { "n": 4, "table": 1, "name": "Caverns of Slaughter", "rules": "Underdog может использовать «Shifting Passages» (жетоны скрытых проходов).", "scoring": [
+      { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете 2 и больше целей", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете любую пару одинаковых целей", "vp": 4 } ] },
+    { "n": 5, "table": 1, "name": "What's Yours Is Ours", "rules": "В нечётные раунды «желанная пара» — Golden Lions, в чётные — Sun Seekers.", "scoring": [
+      { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете желанную пару целей", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+    { "n": 6, "table": 1, "name": "Hidden Under Ash-Clouds", "rules": "В начале каждого раунда underdog решает, низкие ли пепельные облака.", "scoring": [
+      { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете 2 и больше целей", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+    { "n": 7, "table": 2, "name": "Warped Ruins", "rules": "«Spreading Warpfire»: цель горит до конца битвы; урон D3 смертельных по всем отрядам (своим и чужим) в 6″.", "scoring": [
+      { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете любую пару одинаковых целей", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+    { "n": 8, "table": 2, "name": "Curse of the Gnaw", "rules": "«Echoes of Blight City»: смертельный урон по отрядам, оспаривающим цель, затем уровень нестабильности сбрасывается на 1.", "scoring": [
+      { "rounds": "all", "text": "Контролируете цель Golden Lions", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете цель Sun Seekers", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+    { "n": 9, "table": 2, "name": "Seize the Embers", "rules": "«Back to Base Camp»: убрать самородок эмберстоуна с отряда.", "scoring": [
+      { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
+      { "rounds": "1", "text": "Первый раунд: контролируете 2 и больше целей", "vp": 3 },
+      { "rounds": "2+", "text": "Со второго раунда: в этот ход использовали «Back to Base Camp»", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+    { "n": 10, "table": 2, "name": "Treacherous Ground", "rules": "«Tread Carefully» делает цель нестабильной; «Violent Tremor» переносит стабильность на другую цель.", "scoring": [
+      { "rounds": "all", "text": "Контролируете хотя бы 1 стабильную цель", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете 2 и больше стабильных целей", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете больше стабильных целей, чем соперник", "vp": 4 } ] },
+    { "n": 11, "table": 2, "name": "Escape From the Coast", "rules": "«To the Ships!»: цель убирается с поля.", "scoring": [
+      { "rounds": "all", "text": "Контролируете хотя бы 1 цель", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете 2 и больше целей", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] },
+    { "n": 12, "table": 2, "name": "Power of the Realms", "rules": "«Arcane Charge»: прямая от центра главной цели; первая пересечённая второстепенная цель становится главной.", "scoring": [
+      { "rounds": "all", "text": "Контролируете главную цель", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете 2 и больше второстепенных целей", "vp": 3 },
+      { "rounds": "all", "text": "Контролируете больше целей, чем соперник", "vp": 4 } ] }
+  ]
+}
