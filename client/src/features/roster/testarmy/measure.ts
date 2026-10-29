@@ -74,3 +74,17 @@ export function unitToZone(bases: readonly Placed[], poly: readonly Pt[]): { d: 
 
 /** «12,4″» */
 export const fmtInches = (d: number) => `${(Math.round(d * 10) / 10).toFixed(1).replace('.', ',')}″`;
+
+/** До ближайшего отряда другой армии: от края базы до края базы; точки для линии; null — врагов на столе нет. */
+export function nearestEnemy(bases: readonly Placed[], enemies: readonly { uid: string; base: Placed }[]): { d: number; from: Pt; to: Pt; uid: string } | null {
+  let best: { d: number; from: Pt; to: Pt; uid: string } | null = null;
+  for (const b of bases)
+    for (const e of enemies) {
+      const d = baseToBase(b, e.base);
+      if (!best || d < best.d) {
+        const [from, to] = closestPoints(b, e.base);
+        best = { d, from, to, uid: e.uid };
+      }
+    }
+  return best;
+}

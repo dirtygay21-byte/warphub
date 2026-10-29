@@ -53,3 +53,11 @@ test('до зоны: 0 внутри, иначе до ближайшей точк
   near(p[0], 2, 0.02);
   near(q[0], 5.5, 0.02);
 });
+
+test('до ближайшего врага: от края до края, какой отряд', async () => {
+  const { nearestEnemy } = await import('../../../client/src/features/roster/testarmy');
+  const r = nearestEnemy([c(0, 0), c(2, 0)], [{ uid: 'e1', base: c(10, 0) }, { uid: 'e2', base: c(6, 0) }])!;
+  assert.equal(r.uid, 'e2');
+  near(r.d, 3);
+  assert.equal(nearestEnemy([c(0, 0)], []), null);
+});

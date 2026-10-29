@@ -85,3 +85,19 @@ test('restoreUnits: позиции и настройки возвращаютс�
   assert.equal(parseSave('{битое'), null);
   assert.equal(parseSave(JSON.stringify({ v: 1, rosterId: 'r', layoutId: 'l', side: 'attacker', savedAt: '', units: [] }))!.layoutId, 'l');
 });
+
+test('армия соперника: тот же ростер — свои id (префикс), сохранение v1 читается как своя армия, v2 — обе', async () => {
+  const { parseSave, FOE_PREFIX, otherSide } = await import('../../../client/src/features/roster/testarmy');
+  const cr = computeRoster(roster(), L);
+  const mine = buildUnits(cr);
+  const foe = buildUnits(cr, FOE_PREFIX);
+  const ids = new Set([...mine, ...foe].flatMap((u) => [u.uid, ...u.models.map((m) => m.id)]));
+  assert.equal(ids.size, mine.length * 2 + mine.reduce((s, u) => s + u.models.length, 0) * 2);
+  assert.equal(otherSide('attacker'), 'defender');
+  const v1 = parseSave(JSON.stringify({ v: 1, rosterId: 'r', layoutId: 'l', side: 'defender', savedAt: 'x', units: mine }))!;
+  assert.equal(v1.v, 2);
+  assert.deepEqual(v1.armies.map((a) => [a.key, a.side, a.rosterId]), [['me', 'defender', 'r']]);
+  const v2 = parseSave(JSON.stringify({ v: 2, rosterId: 'r', layoutId: 'l', side: 'attacker', savedAt: 'x', armies: [{ key: 'me', side: 'attacker', rosterId: 'r', units: mine }, { key: 'foe', side: 'defender', code: 'WH1.x', units: foe }] }))!;
+  assert.equal(v2.armies[1]!.code, 'WH1.x');
+  assert.equal(parseSave(JSON.stringify({ v: 2, rosterId: 'r', layoutId: 'l', side: 'attacker', armies: [{ key: 'x', units: [] }] })), null);
+});

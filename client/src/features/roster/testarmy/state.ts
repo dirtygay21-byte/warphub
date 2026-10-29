@@ -47,7 +47,13 @@ export type TAUnit = {
 
 export type Side = 'attacker' | 'defender';
 
-export type TAArmy = { side: Side; rosterId: string; units: TAUnit[] };
+/** Армия на столе: своя (me) или соперника (foe, 30.10.2026); ростер — свой по id или по коду (WH1.…). */
+export type ArmyKey = 'me' | 'foe';
+export type TAArmy = { key: ArmyKey; side: Side; rosterId?: string; code?: string; units: TAUnit[] };
+
+/** Префикс id отрядов соперника: один и тот же ростер может стоять за обе стороны. */
+export const FOE_PREFIX = 'foe:';
+export const otherSide = (s: Side): Side => (s === 'attacker' ? 'defender' : 'attacker');
 
 /** База модели для геометрии: из данных, свой размер или стартовые 60 мм. */
 export function modelBase(m: TAModel): { shape: BaseShape; known: boolean } {
@@ -57,8 +63,8 @@ export function modelBase(m: TAModel): { shape: BaseShape; known: boolean } {
   return { shape: { kind: 'circle', d: m.customMm ?? UNKNOWN_BASE_MM }, known: m.customMm != null };
 }
 
-/** Отряды из ростера: присоединённые персонажи — вместе со своим отрядом. */
-export function buildUnits(cr: ComputedRoster): TAUnit[] {
+/** Отряды из ростера: присоединённые персонажи — вместе со своим отрядом. prefix — к id отрядов (армия соперника). */
+export function buildUnits(cr: ComputedRoster, prefix = ''): TAUnit[] {
   const out: TAUnit[] = [];
   const attachedUids = new Set(cr.units.filter((c) => c.unit.attachedTo && cr.byUid.has(c.unit.attachedTo)).map((c) => c.unit.uid));
   for (const c of cr.units) {
@@ -68,7 +74,7 @@ export function buildUnits(cr: ComputedRoster): TAUnit[] {
     let n = 0;
     const models: TAModel[] = parts.flatMap((p) =>
       unitModels(p.ds!, p.models).map((m) => ({
-        id: `${c.unit.uid}.${n++}`,
+        id: `${prefix}${c.unit.uid}.${n++}`,
         profile: m.profile,
         options: m.base.options,
         source: m.base.source,
@@ -78,7 +84,7 @@ export function buildUnits(cr: ComputedRoster): TAUnit[] {
       })),
     );
     out.push({
-      uid: c.unit.uid,
+      uid: prefix + c.unit.uid,
       name: c.ds.name,
       leaders: leaders.map((l) => l.ds!.name),
       datasheetIds: parts.map((p) => p.ds!.id),
@@ -183,8 +189,11 @@ export function unitProfiles(u: TAUnit): { profile: string; count: number; optio
   return [...out.values()];
 }
 
-/** Сохранённая расстановка (на телефоне, по ростеру). */
-export type TASave = { v: 1; rosterId: string; layoutId: string; side: Side; savedAt: string; units: TAUnit[] };
+/**
+ * Сохранённая расстановка (на телефоне, по своему ростеру). v2 — армии (своя и соперника); v1 (до 30.10.2026) — только свои
+ * отряды в units: читается как армия «me».
+ */
+export type TASave = { v: 2; rosterId: string; layoutId: string; side: Side; savedAt: string; armies: TAArmy[] };
 
 /**
  * Вернуть сохранённую расстановку на отряды из текущего ростера: позиции, построение, поворот, зазор и базы — там, где
@@ -206,11 +215,16 @@ export function restoreUnits(fresh: TAUnit[], saved: readonly TAUnit[]): TAUnit[
   });
 }
 
-/** Прочитать сохранение (повреждённое — null). */
+/** Прочитать сохранение (повреждённое — null); старое v1 — как v2 со своей армией. */
 export function parseSave(text: string | null): TASave | null {
   try {
-    const v = JSON.parse(text ?? 'null') as TASave | null;
-    return v && v.v === 1 && Array.isArray(v.units) && typeof v.layoutId === 'string' ? v : null;
+    const v = JSON.parse(text ?? 'null') as (Omit<Partial<TASave>, 'v'> & { v?: number; units?: TAUnit[] }) | null;
+    if (!v || typeof v.layoutId !== 'string' || typeof v.rosterId !== 'string' || (v.side !== 'attacker' && v.side !== 'defender')) return null;
+    if (v.v === 1 && Array.isArray(v.units))
+      return { v: 2, rosterId: v.rosterId, layoutId: v.layoutId, side: v.side, savedAt: v.savedAt ?? '', armies: [{ key: 'me', side: v.side, rosterId: v.rosterId, units: v.units }] };
+    if (v.v === 2 && Array.isArray(v.armies) && v.armies.every((a) => a && (a.key === 'me' || a.key === 'foe') && Array.isArray(a.units)))
+      return { v: 2, rosterId: v.rosterId, layoutId: v.layoutId, side: v.side, savedAt: v.savedAt ?? '', armies: v.armies };
+    return null;
   } catch {
     return null;
   }

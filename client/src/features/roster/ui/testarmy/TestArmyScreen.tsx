@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { loadBattlefield, loadFaction, type BattlefieldData } from '../../data';
 import { computeRoster, makeLookup, type ComputedRoster, type DataLookup } from '../../engine/compute';
+import { decodeRoster } from '../../engine/roster';
 import type { DataIndex, Roster } from '../../engine/types';
 import { pushOverlay, tg } from '../../telegram';
-import { buildUnits, parseSave, restoreUnits, type Side, type TASave, type TAUnit } from '../../testarmy';
+import { buildUnits, FOE_PREFIX, otherSide, parseSave, restoreUnits, type ArmyKey, type Side, type TAArmy, type TASave, type TAUnit } from '../../testarmy';
 import { BattleMap } from '../Battlefield';
 import { Button, IconButton, Segmented } from '../kit';
 import { cx, fmtPts } from '../util';
@@ -27,6 +28,12 @@ const writeSave = (s: TASave) => {
     /* хранилище недоступно — расстановка живёт до закрытия экрана */
   }
 };
+/** Армия соперника в настройке: нет, свой ростер или ростер по коду (WH1.…). */
+type FoeSpec = { kind: 'none' } | { kind: 'own'; rosterId: string } | { kind: 'code'; code: string };
+
+/** Армия на столе со всем, что нужно экрану: ростер, данные фракции, расчёт ростера. */
+export type BoardArmy = TAArmy & { roster: Roster; cr: ComputedRoster; L: DataLookup };
+
 const dropSave = (rosterId: string) => {
   try {
     localStorage.removeItem(saveKey(rosterId));
@@ -37,7 +44,7 @@ const dropSave = (rosterId: string) => {
 
 /**
  * Test Army (24.10.2026): ростер → поле боя (пара типов армий и раскладка A/B/C) и сторона → стол, где модели ростера —
- * базы в настоящем размере. Только 40K. Армия соперника — позже (состояние уже хранит сторону армии).
+ * базы в настоящем размере. Только 40K. Армия соперника (30.10.2026) — свой ростер или код, за другую сторону.
  */
 export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { onBack: () => void; rosters: Roster[]; index: DataIndex; initialRosterId?: string }) {
   const [bf, setBf] = useState<BattlefieldData | null>(null);
@@ -45,8 +52,7 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
   const [rosterId, setRosterId] = useState<string | null>(initialRosterId ?? null);
   const [layoutId, setLayoutId] = useState<string | null>(null);
   const [side, setSide] = useState<Side>('attacker');
-  const [units, setUnits] = useState<TAUnit[] | null>(null);
-  const [ctx, setCtx] = useState<{ cr: ComputedRoster; L: DataLookup } | null>(null);
+  const [armies, setArmies] = useState<BoardArmy[] | null>(null);
   const [step, setStep] = useState<'roster' | 'field' | 'board'>(initialRosterId ? 'field' : 'roster');
 
   useEffect(() => {
@@ -62,30 +68,71 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
     return undefined;
   }, [step, initialRosterId]);
 
+  // ростер соперника: свой — текущая версия из Roster Builder, по коду — из кода; null — не открыть
+  const foeRoster = (f: FoeSpec): Roster | null => {
+    if (f.kind === 'own') return rosters.find((r) => r.id === f.rosterId) ?? null;
+    if (f.kind === 'code') {
+      try {
+        return decodeRoster(f.code, index.factions.map((x) => x.id));
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
   // saved — продолжить сохранённую расстановку; иначе новая (сохранение этого ростера заменяется)
-  const deploy = (id: string, s: Side, saved?: TASave) => {
+  const deploy = (id: string, s: Side, foe: FoeSpec, saved?: TASave) => {
     if (!roster) return;
     setLayoutId(id);
     setSide(s);
-    setUnits(null);
+    setArmies(null);
     setStep('board');
     if (!saved) dropSave(roster.id);
-    loadFaction(roster.factionId).then(
-      (f) => {
-        const L = makeLookup(f);
-        const cr = computeRoster(roster, L);
-        const fresh = buildUnits(cr);
-        setCtx({ cr, L });
-        setUnits(saved ? restoreUnits(fresh, saved.units) : fresh);
+    const parts: { key: ArmyKey; roster: Roster; side: Side; spec?: FoeSpec }[] = [{ key: 'me', roster, side: s }];
+    const fr = foeRoster(foe);
+    if (fr) parts.push({ key: 'foe', roster: fr, side: otherSide(s), spec: foe });
+    Promise.all(parts.map((p) => loadFaction(p.roster.factionId))).then(
+      (factions) => {
+        setArmies(
+          parts.map((p, i) => {
+            const L = makeLookup(factions[i]!);
+            const cr = computeRoster(p.roster, L);
+            const fresh = buildUnits(cr, p.key === 'foe' ? FOE_PREFIX : '');
+            const old = saved?.armies.find((a) => a.key === p.key)?.units;
+            return {
+              key: p.key,
+              side: p.side,
+              ...(p.spec?.kind === 'own' ? { rosterId: p.spec.rosterId } : p.spec?.kind === 'code' ? { code: p.spec.code } : { rosterId: p.roster.id }),
+              units: old ? restoreUnits(fresh, old) : fresh,
+              roster: p.roster,
+              cr,
+              L,
+            };
+          }),
+        );
       },
       (e) => setError(String(e?.message ?? e)),
     );
   };
+  const continueSaved = (sv: TASave) => {
+    const f = sv.armies.find((a) => a.key === 'foe');
+    deploy(sv.layoutId, sv.side, f?.code ? { kind: 'code', code: f.code } : f?.rosterId ? { kind: 'own', rosterId: f.rosterId } : { kind: 'none' }, sv);
+  };
 
-  // автосохранение после каждого изменения расстановки
+  // автосохранение после каждого изменения расстановки (обе армии)
   useEffect(() => {
-    if (step === 'board' && roster && layoutId && units) writeSave({ v: 1, rosterId: roster.id, layoutId, side, savedAt: new Date().toISOString(), units });
-  }, [step, roster, layoutId, side, units]);
+    if (step === 'board' && roster && layoutId && armies)
+      writeSave({
+        v: 2,
+        rosterId: roster.id,
+        layoutId,
+        side,
+        savedAt: new Date().toISOString(),
+        armies: armies.map(({ key, side: sd, rosterId: rid, code, units }) => ({ key, side: sd, ...(rid ? { rosterId: rid } : {}), ...(code ? { code } : {}), units })),
+      });
+  }, [step, roster, layoutId, side, armies]);
+  const setArmyUnits = (key: ArmyKey, units: TAUnit[]) => setArmies((list) => list && list.map((a) => (a.key === key ? { ...a, units } : a)));
 
   if (error)
     return (
@@ -103,22 +150,24 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
   const layout = bf.layouts.find((l) => l.id === layoutId) ?? null;
   if (step === 'board' && roster && layout) {
     const dep = bf.deployments.find((d) => d.id === layout.deployment)!;
-    if (!units || !ctx) return <Spinner full />;
-    return <Board roster={roster} cr={ctx.cr} L={ctx.L} layout={layout} dep={dep} side={side} units={units} onUnits={setUnits} onBack={() => setStep('field')} />;
+    if (!armies) return <Spinner full />;
+    return <Board armies={armies} layout={layout} dep={dep} onArmy={setArmyUnits} onBack={() => setStep('field')} />;
   }
 
   if (step === 'field' && roster)
     return (
       <Shell onBack={initialRosterId ? onBack : () => setStep('roster')}>
-        <SavedCard bf={bf} rosterId={roster.id} onContinue={(s) => deploy(s.layoutId, s.side, s)} />
+        <SavedCard bf={bf} rosterId={roster.id} rosters={rosters} onContinue={continueSaved} />
         <FieldPicker
           bf={bf}
           roster={roster}
+          rosters={rosters}
+          factionIds={index.factions.map((f) => f.id)}
           layoutId={layoutId}
           onLayout={setLayoutId}
           side={side}
           onSide={setSide}
-          onDeploy={(id) => deploy(id, side)}
+          onDeploy={(id, foe) => deploy(id, side, foe)}
         />
       </Shell>
     );
@@ -149,19 +198,23 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
 }
 
 /** Сохранённая расстановка ростера: раскладка, сторона, сколько отрядов на столе, когда — «Продолжить». */
-function SavedCard({ bf, rosterId, onContinue }: { bf: BattlefieldData; rosterId: string; onContinue: (s: TASave) => void }) {
+function SavedCard({ bf, rosterId, rosters, onContinue }: { bf: BattlefieldData; rosterId: string; rosters: Roster[]; onContinue: (s: TASave) => void }) {
   const [saved] = useState(() => readSave(rosterId));
   if (!saved) return null;
   const layout = bf.layouts.find((l) => l.id === saved.layoutId);
   if (!layout) return null;
   const dep = bf.deployments.find((d) => d.id === layout.deployment);
-  const placed = saved.units.filter((u) => u.placed).length;
+  const mineUnits = saved.armies.find((a) => a.key === 'me')?.units ?? [];
+  const placed = mineUnits.filter((u) => u.placed).length;
+  const foe = saved.armies.find((a) => a.key === 'foe');
+  const foeName = foe ? (foe.rosterId ? (rosters.find((r) => r.id === foe.rosterId)?.name ?? 'ростер удалён') : 'ростер по коду') : null;
   const when = new Date(saved.savedAt).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   return (
     <div className="mb-4 rounded-2xl border border-accent/40 bg-accent/10 p-3">
       <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">Сохранённая расстановка · {when}</p>
       <p className="mt-1 text-sm">
-        {dep?.nameRu ?? '—'} · раскладка {LETTERS[layout.variant - 1] ?? layout.variant} · {saved.side === 'attacker' ? 'атакующий' : 'защитник'} · на столе {placed} из {saved.units.length}
+        {dep?.nameRu ?? '—'} · раскладка {LETTERS[layout.variant - 1] ?? layout.variant} · {saved.side === 'attacker' ? 'атакующий' : 'защитник'} · на столе {placed} из {mineUnits.length}
+        {foeName && ` · соперник: ${foeName}`}
       </p>
       <Button variant="primary" className="mt-2 w-full" onClick={() => onContinue(saved)}>
         Продолжить расстановку
@@ -175,6 +228,8 @@ function SavedCard({ bf, rosterId, onContinue }: { bf: BattlefieldData; rosterId
 function FieldPicker({
   bf,
   roster,
+  rosters,
+  factionIds,
   layoutId,
   onLayout,
   side,
@@ -183,12 +238,31 @@ function FieldPicker({
 }: {
   bf: BattlefieldData;
   roster: Roster;
+  rosters: Roster[];
+  factionIds: string[];
   layoutId: string | null;
   onLayout: (id: string) => void;
   side: Side;
   onSide: (s: Side) => void;
-  onDeploy: (layoutId: string) => void;
+  onDeploy: (layoutId: string, foe: FoeSpec) => void;
 }) {
+  const [foeKind, setFoeKind] = useState<FoeSpec['kind']>('none');
+  const [foeId, setFoeId] = useState<string | null>(null);
+  const [code, setCode] = useState('');
+  // код ростера соперника: только 40K (WH1.…), фракция должна быть в данных
+  const codeError = useMemo(() => {
+    const c = code.trim();
+    if (!c) return null;
+    if (c.startsWith('AOS1.')) return 'Это ростер Age of Sigmar — в Test Army только Warhammer 40,000.';
+    try {
+      decodeRoster(c, factionIds);
+      return null;
+    } catch (e) {
+      return e instanceof Error && e.message.startsWith('Ростер для') ? e.message : 'Не получилось прочитать код. Скопируйте его целиком (начинается с WH1.).';
+    }
+  }, [code, factionIds]);
+  const foeSpec: FoeSpec | null =
+    foeKind === 'none' ? { kind: 'none' } : foeKind === 'own' ? (foeId ? { kind: 'own', rosterId: foeId } : null) : code.trim() && !codeError ? { kind: 'code', code: code.trim() } : null;
   const mine = bf.dispositions.find((d) => d.name === roster.forceDisposition || d.id === roster.forceDisposition)?.id ?? bf.dispositions[0]!.id;
   const [you, setYou] = useState(mine);
   const [foe, setFoe] = useState(mine);
@@ -253,9 +327,51 @@ function FieldPicker({
           ]}
         />
       </div>
+      <div>
+        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">Армия соперника</p>
+        <Segmented<FoeSpec['kind']>
+          value={foeKind}
+          onChange={setFoeKind}
+          options={[
+            { value: 'none', label: 'Без соперника' },
+            { value: 'own', label: 'Мой ростер' },
+            { value: 'code', label: 'Код ростера' },
+          ]}
+        />
+        {foeKind === 'own' && (
+          <ul className="mt-2 max-h-56 space-y-1.5 overflow-y-auto">
+            {rosters.map((r) => (
+              <li key={r.id}>
+                <button
+                  type="button"
+                  onClick={() => setFoeId(r.id)}
+                  className={cx('w-full rounded-lg border px-3 py-2 text-left', foeId === r.id ? 'border-accent bg-accent/10' : 'border-white/10 bg-white/[0.03] active:bg-white/10')}
+                >
+                  <span className="block truncate text-sm font-semibold">{r.name}</span>
+                  <span className="block text-[11px] text-white/45">{r.summary ? `${fmtPts(r.summary.points)} очк.` : ''}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        {foeKind === 'code' && (
+          <div className="mt-2">
+            <textarea
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              rows={3}
+              placeholder="WH1.eyJ2Ijox…"
+              className="w-full rounded-lg border border-white/10 bg-white/[0.04] p-2.5 font-mono text-xs text-white outline-none focus:border-accent"
+            />
+            <p className="mt-1 text-[11px] text-white/45">Код ростера: Roster Builder → ростер → «Экспорт» → код.</p>
+            {codeError && <p className="mt-1 text-xs text-danger">{codeError}</p>}
+          </div>
+        )}
+        {foeKind !== 'none' && <p className="mt-1 text-[11px] text-white/45">Соперник встаёт за другую сторону — {side === 'attacker' ? 'защитник' : 'атакующий'}.</p>}
+      </div>
       {layout && dep && <BattleMap layout={layout} dep={dep} guides="none" className="mx-auto block w-full max-w-[360px] rounded-xl" />}
-      <Button variant="primary" className="h-12 w-full" disabled={!layout} onClick={() => layout && onDeploy(layout.id)}>
-        Расставить армию
+      <Button variant="primary" className="h-12 w-full" disabled={!layout || !foeSpec} onClick={() => layout && foeSpec && onDeploy(layout.id, foeSpec)}>
+        {foeKind === 'none' ? 'Расставить армию' : 'Расставить армии'}
       </Button>
     </section>
   );
