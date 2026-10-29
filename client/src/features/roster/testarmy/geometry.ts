@@ -191,3 +191,21 @@ export function closestPoints(a: Placed, b: Placed): [Pt, Pt] {
     }
   return best;
 }
+
+/**
+ * Какую базу задел палец (29.10.2026): база в пределах tol (дюймы поля — пересчёт из пикселей экрана) от точки нажатия.
+ * Сначала — базы отряда prefer (выбранного), затем ближайшая; null — нажатие на пустое поле.
+ */
+export function pickBase<T extends { uid: string; base: Placed }>(p: Pt, bases: readonly T[], tol: number, prefer?: string | null): T | null {
+  let best: { e: T; d: number; pref: boolean } | null = null;
+  for (const e of bases) {
+    const d = pointToBase(p, e.base);
+    if (d > tol) continue;
+    const pref = !!prefer && e.uid === prefer;
+    if (!best || (pref && !best.pref) || (pref === best.pref && d < best.d)) best = { e, d, pref };
+  }
+  return best?.e ?? null;
+}
+
+/** Допуск нажатия в дюймах поля: px пикселей экрана при ширине карты widthPx (карта — 47 единиц viewBox по ширине). */
+export const touchTolerance = (px: number, widthPx: number) => (widthPx > 0 ? (px * 47) / widthPx : 0.5);

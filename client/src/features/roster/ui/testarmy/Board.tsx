@@ -22,6 +22,7 @@ import {
   OBJECTIVE_RANGE,
   OBJECTIVE_RULE_SOURCE,
   objectiveRadius,
+  pickBase,
   placeUnit,
   placedBases,
   removeUnit,
@@ -29,6 +30,7 @@ import {
   rotateUnit,
   setProfileBase,
   snapEnd,
+  touchTolerance,
   unitCenter,
   unitProfiles,
   unitToUnit,
@@ -57,6 +59,8 @@ const GAPS = [0, 0.5, 1, 2];
 const LONG_PRESS_MS = 450;
 /** сдвиг пальца (дюймы поля), после которого это перетаскивание, а не нажатие */
 const DRAG_START = 0.15;
+/** палец в пределах стольких пикселей экрана от базы — это касание базы (мелкие базы меньше пальца) */
+const TOUCH_PX = 14;
 /** сдвиг пальца (px), после которого нажатие на поле — это прокрутка, а не «поставить сюда» */
 const TAP_SLOP = 8;
 const MIN_SCALE = 1;
@@ -263,7 +267,7 @@ export function Board({
     const p = toBoard(clientX, clientY);
     if (!p) return;
     if (tool === 'ruler') {
-      const end = snapEnd(clampToBoard(p), allBases, snapPoints);
+      const end = snapEnd(clampToBoard(p), allBases, snapPoints, Math.max(0.4, tolerance()));
       setRuler((r) => (!r.a || r.b ? { a: end, b: null } : { a: r.a, b: end }));
       haptic.select();
       return;
@@ -273,11 +277,11 @@ export function Board({
     haptic.select();
   };
 
-  // палец на базе: весь отряд; удержание без движения — одна модель. Поле в это время не двигается.
-  const onModelDown = (e: PointerEvent, unit: TAUnit, modelId: string) => {
-    // линейка: нажатие на базу — точка линейки у края базы (обрабатывается как нажатие на поле)
-    if (tool === 'ruler') return;
-    e.stopPropagation();
+  // допуск касания базы в дюймах поля — постоянный в пикселях экрана при любом масштабе
+  const tolerance = () => touchTolerance(TOUCH_PX, base.w * view.current.s);
+
+  // палец на базе (или рядом, до TOUCH_PX): весь отряд; удержание без движения — одна модель. Поле в это время не двигается.
+  const startModel = (e: PointerEvent, unit: TAUnit, modelId: string) => {
     if (tool === 'units') {
       setPair((p) => (p.length >= 2 || p[0] === unit.uid ? [unit.uid] : [...p, unit.uid]));
       haptic.select();
@@ -303,9 +307,22 @@ export function Board({
     viewport.current?.setPointerCapture(e.pointerId);
   };
 
-  // пустое поле: один палец — прокрутка (или нажатие, если не сдвинулся), два — масштаб
+  // нажатие: рядом с базой — модель/отряд (выбранный отряд первым); иначе поле: один палец — прокрутка (или нажатие,
+  // если не сдвинулся), два — масштаб. Пока тянется модель, другие пальцы не учитываются.
   const onDown = (e: PointerEvent) => {
+    if (drag.current) return;
     const g = gesture.current;
+    if (g.pts.size === 0 && tool !== 'ruler') {
+      const bp = toBoard(e.clientX, e.clientY);
+      // выбран отряд, который ещё не на столе: нажатие рядом с чужими базами ставит его, а не хватает их (только точно по базе)
+      const tol = sel && !sel.placed && tool === 'move' ? 0 : tolerance();
+      const hit = bp ? pickBase(bp, allBases, tol, selected) : null;
+      const unit = hit ? units.find((u) => u.uid === hit.uid) : undefined;
+      if (hit && unit) {
+        startModel(e, unit, hit.modelId);
+        return;
+      }
+    }
     const p = local(e);
     g.pts.set(e.pointerId, p);
     viewport.current?.setPointerCapture(e.pointerId);
@@ -478,7 +495,6 @@ export function Board({
                 active={tool === 'units' ? pair.includes(u.uid) : u.uid === selected}
                 single={single}
                 outside={outside}
-                onDown={onModelDown}
               />
             ))}
             {tool === 'move' && info?.objective && <Measure from={info.objective.from} to={info.objective.to} d={info.objective.d} color={info.objective.inRange ? '#4ade80' : ACCENT} dashed />}
@@ -601,7 +617,6 @@ function UnitShapes({
   active,
   single,
   outside,
-  onDown,
 }: {
   unit: TAUnit;
   n: string;
@@ -609,7 +624,6 @@ function UnitShapes({
   active: boolean;
   single: string | null;
   outside: Set<string>;
-  onDown: (e: PointerEvent, unit: TAUnit, modelId: string) => void;
 }) {
   const bases = placedBases(unit);
   const c = unitCenter(unit);
@@ -630,7 +644,6 @@ function UnitShapes({
           stroke: out ? OUTSIDE : active ? ACCENT : color,
           strokeWidth: out || active ? 0.14 : 0.08,
           strokeDasharray: known ? undefined : '0.25 0.18',
-          onPointerDown: (e: PointerEvent) => onDown(e, unit, m.id),
         };
         // квадрат — примерный «след» техники без базы
         return b.rect ? (

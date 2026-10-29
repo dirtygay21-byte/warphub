@@ -145,3 +145,17 @@ test('квадратная база (техника без размера): вн
     assert.ok(!insideBase([b.x, b.y], a));
   }
 });
+
+test('касание базы: в пределах допуска, выбранный отряд первым, ближайшая; допуск от масштаба', async () => {
+  const { pickBase, touchTolerance } = await import('../../../client/src/features/roster/testarmy');
+  const bases = [
+    { uid: 'a', modelId: 'a.0', base: circle(0, 0, 25.4) },
+    { uid: 'b', modelId: 'b.0', base: circle(1.6, 0, 25.4) },
+  ];
+  assert.equal(pickBase([0.6, 0], bases, 0.3)!.uid, 'a');
+  assert.equal(pickBase([1.0, 0], bases, 0.6)!.uid, 'b', 'ближайшая');
+  assert.equal(pickBase([0.8, 0], bases, 0.6, 'a')!.uid, 'a', 'выбранный отряд первым');
+  assert.equal(pickBase([5, 5], bases, 0.6), null);
+  near(touchTolerance(14, 470), 1.4, 1e-9);
+  assert.ok(touchTolerance(14, 940) < touchTolerance(14, 470), 'при увеличении допуск в дюймах меньше');
+});
