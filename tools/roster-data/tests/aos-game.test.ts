@@ -167,3 +167,13 @@ test('сохранённые игры AoS: сводка, открытие жур
   assert.equal(readAosLibrary(store, '.42').length, 0);
   assert.equal(loadAosGame(store, '.42', 'e1', cat), 'Игра не найдена на телефоне');
 });
+
+test('смена батлплана сбрасывает территорию (A/B — по карте батлплана), тот же батлплан — нет', () => {
+  const base = setup().filter((b) => b.type !== 'tactics-revealed' && b.type !== 'battle-started');
+  const st = ok(replayAos(log(...base, { type: 'battleplan-set', n: 1, source: 'manual' }), cat));
+  assert.equal(st.territory, 'Север');
+  const st2 = ok(replayAos(log(...base, { type: 'battleplan-set', n: 2, source: 'manual' }), cat));
+  assert.equal(st2.territory, null);
+  const st3 = ok(replayAos(log(...base, { type: 'battleplan-set', n: 2, source: 'manual' }, { type: 'territory-set', territory: 'B' }), cat));
+  assert.equal(st3.territory, 'B');
+});

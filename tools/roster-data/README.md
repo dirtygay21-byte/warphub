@@ -94,6 +94,10 @@ Age of Sigmar (решение владельца 30.10.2026): основной �
    (новые таблицы правил — `curated.json → seasons`; официальные правки, не применённые к новой выгрузке, — пересмотреть).
 3. Сверка с BSData: `git clone --depth 1 https://github.com/BSData/age-of-sigmar-4th` и
    `python3 scripts/bsdata-aos-compare.py <путь>` → `aos/bsdata-compare.json`; расхождения — в отчёт свежести.
+4. Карты батлпланов (S3): снимок Sigdex `aos/sigdex-battleplans-2026-27.json` → `node scripts/aos-battleplan-maps.mjs`
+   (`battlepack.json → battleplans[].map`; `--check` — проверка, её же делает тест). Зеркала раскрываются как в Sigdex,
+   точки на оси симметрии не дублируются; «sigmarite» = Scions of the Comet; территории A и B — атакующий выбирает свою
+   (GH 2026-27), размер террейна на карте условный.
 
 ```bash
 # из скачанных CSV (положить в tools/roster-data/wahapedia-csv/)
