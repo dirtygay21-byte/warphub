@@ -4,13 +4,13 @@
  * Координаты — поле боя 60×44″ (x вдоль 60″), как в battlefield.json.
  */
 import type { ComputedRoster } from '../engine/compute';
-import { baseRadii, type BaseShape } from './bases';
+import { APPROX_DEFAULT_MM, baseRadii, type BaseShape } from './bases';
 import { formation, type Formation } from './formations';
 import type { Placed, Pt } from './geometry';
 import { unitModels } from './models';
 
-/** База без размера в данных — размер задаёт игрок; до этого — 60 мм (стартовое значение, не правило). */
-export const UNKNOWN_BASE_MM = 60;
+/** База без размера в данных — форму и примерный размер задаёт игрок; до этого — круг 120 мм (стартовое значение, не правило). */
+export const UNKNOWN_BASE_MM = APPROX_DEFAULT_MM;
 export const DEFAULT_GAP = 0.5;
 /** По умолчанию строй идёт поперёк поля (на экране — горизонтально). */
 export const DEFAULT_ANGLE = Math.PI / 2;
@@ -23,6 +23,9 @@ export type TAModel = {
   source: string;
   /** выбранный вариант (индекс в options) или свой размер, мм (для баз без размера) */
   pick: number;
+  /** примерная база, выбранная игроком (форма и размер), — для моделей без размера в данных */
+  custom?: BaseShape | null;
+  /** устаревшее (до 29.10.2026): свой размер круглой базы, мм — читается из старых сохранений */
   customMm: number | null;
   /** центр на столе; null — не выставлена */
   at: Pt | null;
@@ -50,6 +53,7 @@ export type TAArmy = { side: Side; rosterId: string; units: TAUnit[] };
 export function modelBase(m: TAModel): { shape: BaseShape; known: boolean } {
   const fromData = m.options[m.pick] ?? m.options[0];
   if (fromData) return { shape: fromData, known: true };
+  if (m.custom) return { shape: m.custom, known: true };
   return { shape: { kind: 'circle', d: m.customMm ?? UNKNOWN_BASE_MM }, known: m.customMm != null };
 }
 
@@ -93,8 +97,8 @@ export function buildUnits(cr: ComputedRoster): TAUnit[] {
 export function placedBases(u: TAUnit): (Placed | null)[] {
   return u.models.map((m) => {
     if (!m.at) return null;
-    const { rx, ry } = baseRadii(modelBase(m).shape);
-    return { x: m.at[0], y: m.at[1], rx, ry, angle: u.angle };
+    const { rx, ry, rect } = baseRadii(modelBase(m).shape);
+    return { x: m.at[0], y: m.at[1], rx, ry, angle: u.angle, ...(rect ? { rect } : {}) };
   });
 }
 
@@ -160,7 +164,7 @@ export function rotateUnit(u: TAUnit, delta: number): TAUnit {
 }
 
 /** База для всех моделей профиля: вариант из данных (pick) или свой размер (customMm, для баз без размера). */
-export function setProfileBase(u: TAUnit, profile: string, change: { pick?: number; customMm?: number | null }): TAUnit {
+export function setProfileBase(u: TAUnit, profile: string, change: { pick?: number; custom?: BaseShape | null; customMm?: number | null }): TAUnit {
   const models = u.models.map((m) => (m.profile === profile ? { ...m, ...change } : m));
   const next = { ...u, models };
   // размеры изменились — отряд перестраивается на том же месте, чтобы базы не налезали
@@ -169,12 +173,12 @@ export function setProfileBase(u: TAUnit, profile: string, change: { pick?: numb
 }
 
 /** Профили отряда для настройки баз: название, число моделей, варианты из данных, текущий выбор. */
-export function unitProfiles(u: TAUnit): { profile: string; count: number; options: BaseShape[]; pick: number; customMm: number | null; source: string }[] {
-  const out = new Map<string, { profile: string; count: number; options: BaseShape[]; pick: number; customMm: number | null; source: string }>();
+export function unitProfiles(u: TAUnit): { profile: string; count: number; options: BaseShape[]; pick: number; custom: BaseShape | null; customMm: number | null; source: string }[] {
+  const out = new Map<string, { profile: string; count: number; options: BaseShape[]; pick: number; custom: BaseShape | null; customMm: number | null; source: string }>();
   for (const m of u.models) {
     const e = out.get(m.profile);
     if (e) e.count++;
-    else out.set(m.profile, { profile: m.profile, count: 1, options: m.options, pick: m.pick, customMm: m.customMm, source: m.source });
+    else out.set(m.profile, { profile: m.profile, count: 1, options: m.options, pick: m.pick, custom: m.custom ?? null, customMm: m.customMm, source: m.source });
   }
   return [...out.values()];
 }
@@ -195,7 +199,7 @@ export function restoreUnits(fresh: TAUnit[], saved: readonly TAUnit[]): TAUnit[
     const models = u.models.map((m) => {
       const o = byId.get(m.id);
       if (!o || o.profile !== m.profile) return m;
-      return { ...m, at: o.at, pick: o.pick < m.options.length ? o.pick : 0, customMm: o.customMm };
+      return { ...m, at: o.at, pick: o.pick < m.options.length ? o.pick : 0, custom: o.custom ?? null, customMm: o.customMm ?? null };
     });
     const placed = models.some((m) => m.at);
     return { ...u, models, formation: s.formation, angle: s.angle, gap: s.gap, placed };
