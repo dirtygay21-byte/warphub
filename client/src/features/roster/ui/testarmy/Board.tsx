@@ -292,7 +292,7 @@ export function Board({
     g.pts.set(e.pointerId, p);
     viewport.current?.setPointerCapture(e.pointerId);
     if (g.pts.size === 1) {
-      g.start = { x: p.x, y: p.y, t: Date.now() };
+      g.start = { x: p.x, y: p.y, t: e.timeStamp };
       g.moved = false;
       g.pan = { x: p.x, y: p.y, v0: { ...view.current } };
       g.pinch = null;
@@ -364,7 +364,7 @@ export function Board({
     const g = gesture.current;
     if (!g.pts.has(e.pointerId)) return;
     g.pts.delete(e.pointerId);
-    const tap = e.type === 'pointerup' && !g.moved && g.start && Date.now() - g.start.t < 600 && g.pts.size === 0;
+    const tap = e.type === 'pointerup' && !g.moved && g.start && e.timeStamp - g.start.t < 600 && g.pts.size === 0;
     if (g.pts.size === 0) {
       g.pinch = null;
       g.pan = null;
