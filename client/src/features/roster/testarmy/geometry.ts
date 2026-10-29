@@ -209,3 +209,54 @@ export function pickBase<T extends { uid: string; base: Placed }>(p: Pt, bases: 
 
 /** Допуск нажатия в дюймах поля: px пикселей экрана при ширине карты widthPx (карта — 47 единиц viewBox по ширине). */
 export const touchTolerance = (px: number, widthPx: number) => (widthPx > 0 ? (px * 47) / widthPx : 0.5);
+
+/**
+ * Контуры объединения прямоугольников [x, y, w, h] (территории AoS — несколько прямоугольников, иногда раздельных, 30.10.2026).
+ * Сетка по всем границам → занятые клетки → граничные рёбра по часовой стрелке → обход. Каждый связный кусок — свой контур
+ * (у «What's Yours Is Ours» территория из двух несвязанных частей). Фигуры без дыр (так у всех карт GH 2026-27).
+ */
+export function rectsUnionPolys(rects: readonly (readonly [number, number, number, number])[]): Pt[][] {
+  if (!rects.length) return [];
+  const xs = [...new Set(rects.flatMap(([x, , w]) => [x, x + w]))].sort((a, b) => a - b);
+  const ys = [...new Set(rects.flatMap(([, y, , h]) => [y, y + h]))].sort((a, b) => a - b);
+  const cell = (i: number, j: number) => {
+    if (i < 0 || j < 0 || i >= xs.length - 1 || j >= ys.length - 1) return false;
+    const cx = (xs[i]! + xs[i + 1]!) / 2;
+    const cy = (ys[j]! + ys[j + 1]!) / 2;
+    return rects.some(([x, y, w, h]) => cx > x && cx < x + w && cy > y && cy < y + h);
+  };
+  // направленные граничные рёбра (занятая клетка справа по ходу при y вниз): начало → конец
+  const next = new Map<string, Pt>();
+  const key = (p: Pt) => `${p[0]},${p[1]}`;
+  for (let i = 0; i < xs.length - 1; i++)
+    for (let j = 0; j < ys.length - 1; j++) {
+      if (!cell(i, j)) continue;
+      const [x0, x1, y0, y1] = [xs[i]!, xs[i + 1]!, ys[j]!, ys[j + 1]!];
+      if (!cell(i, j - 1)) next.set(key([x0, y0]), [x1, y0]);
+      if (!cell(i + 1, j)) next.set(key([x1, y0]), [x1, y1]);
+      if (!cell(i, j + 1)) next.set(key([x1, y1]), [x0, y1]);
+      if (!cell(i - 1, j)) next.set(key([x0, y1]), [x0, y0]);
+    }
+  const out: Pt[][] = [];
+  while (next.size) {
+    const start = [...next.keys()][0]!.split(',').map(Number) as Pt;
+    const loop: Pt[] = [];
+    let cur = start;
+    for (let guard = 0; guard < 10000; guard++) {
+      loop.push(cur);
+      const n = next.get(key(cur));
+      next.delete(key(cur));
+      if (!n || key(n) === key(start)) break;
+      cur = n;
+    }
+    // убрать точки на прямых участках
+    out.push(
+      loop.filter((p, i) => {
+        const a = loop[(i - 1 + loop.length) % loop.length]!;
+        const b = loop[(i + 1) % loop.length]!;
+        return (p[0] - a[0]) * (b[1] - p[1]) !== (p[1] - a[1]) * (b[0] - p[0]);
+      }),
+    );
+  }
+  return out;
+}

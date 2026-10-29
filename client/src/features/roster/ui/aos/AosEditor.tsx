@@ -38,6 +38,7 @@ export function AosEditor(props: {
   index: AosIndex;
   onBack: () => void;
   onStartGame: () => void;
+  onTestArmy: () => void;
   onChange: (r: AosRoster) => void;
   onDuplicate: (r: AosRoster) => void;
   onDelete: () => void;
@@ -84,6 +85,7 @@ function Editor({
   cr,
   onBack,
   onStartGame,
+  onTestArmy,
   onChange,
   onDuplicate,
   onDelete,
@@ -94,6 +96,7 @@ function Editor({
   cr: AosComputed;
   onBack: () => void;
   onStartGame: () => void;
+  onTestArmy: () => void;
   onChange: (r: AosRoster) => void;
   onDuplicate: (r: AosRoster) => void;
   onDelete: () => void;
@@ -461,6 +464,9 @@ function Editor({
           </label>
           <Button className="w-full justify-start" onClick={() => (setSheet(null), onStartGame())}>
             <Icon name="spark" /> Начать игру с этим ростером
+          </Button>
+          <Button className="w-full justify-start" onClick={() => (setSheet(null), onTestArmy())}>
+            <Icon name="map" /> Test Army: расставить на карте
           </Button>
           <Button className="w-full justify-start" onClick={() => (setSheet(null), onDuplicate(duplicateAosRoster(roster)))}>
             <Icon name="copy" /> Дублировать ростер
