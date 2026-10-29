@@ -4,7 +4,8 @@ import type { AosEventBody, AosSavedEntry } from '../../aosgame';
 import { haptic, pushOverlay } from '../../telegram';
 import { Button, Icon, IconButton } from '../kit';
 import { cx } from '../util';
-import { AosSetup, rosterRefOf } from './AosSetup';
+import { AosSetup } from './AosSetup';
+import { rosterRefOf } from './refs';
 import { AosTracker } from './AosTracker';
 import { useAosGame, type AosGameHook } from './useAosGame';
 

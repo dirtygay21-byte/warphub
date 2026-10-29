@@ -3,7 +3,8 @@ import { aosResult, aosTotals, nextTier, otherSeat, planRowsFor, priorityRoll, S
 import { Dice } from '../game/Dice';
 import { Button, IconButton } from '../kit';
 import { cx } from '../util';
-import { BattleplanInfo, TacticCards, TIER_LABEL } from './AosSetup';
+import { BattleplanInfo, TacticCards } from './AosSetup';
+import { TIER_LABEL } from './refs';
 import type { AosGameHook } from './useAosGame';
 
 /** Трекер битвы AoS: счёт, priority в начале раунда, ресурсы игроков, конец хода (батлплан и тактики), итог. */
