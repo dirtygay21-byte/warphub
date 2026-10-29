@@ -1,0 +1,323 @@
+{
+ "bsdata": {
+  "repo": "https://github.com/BSData/age-of-sigmar-4th",
+  "revision": "105",
+  "commit": "6909c14 2026-10-23"
+ },
+ "ours": "2026-10-22 18:12:05",
+ "factions": [
+  {
+   "id": "CoS",
+   "name": "Cities of Sigmar",
+   "same": 67,
+   "diff": [],
+   "onlyOurs": [
+    "Allies of the Free Cities Auric Hearthguard",
+    "Allies of the Free Cities Vanari Auralan Sentinels",
+    "Allies of the Free Cities Vanari Auralan Wardens",
+    "Allies of the Free Cities Vulkyn Flameseekers",
+    "Grombrindal, The White Dwarf",
+    "Immolator Cogfort",
+    "Linebreaker Cogfort",
+    "Scourge of Ghyran Pontifex Zenestra"
+   ],
+   "onlyBs": [
+    "Pontifex Zenestra, Matriarch of the Great Wheel (Scourge of Ghyran)"
+   ]
+  },
+  {
+   "id": "DoK",
+   "name": "Daughters of Khaine",
+   "same": 28,
+   "diff": [
+    {
+     "unit": "Khainite Shadowstalkers",
+     "ours": [
+      130
+     ],
+     "bsdata": 100
+    }
+   ],
+   "onlyOurs": [],
+   "onlyBs": []
+  },
+  {
+   "id": "FY",
+   "name": "Fyreslayers",
+   "same": 21,
+   "diff": [],
+   "onlyOurs": [
+    "Grombrindal, The White Dwarf",
+    "Hearthguard Berzerker with Berzerker Broadaxes"
+   ],
+   "onlyBs": [
+    "Hearthguard Berzerkers with Berzerker Broadaxes"
+   ]
+  },
+  {
+   "id": "ID",
+   "name": "Idoneth Deepkin",
+   "same": 24,
+   "diff": [],
+   "onlyOurs": [],
+   "onlyBs": []
+  },
+  {
+   "id": "KO",
+   "name": "Kharadron Overlords",
+   "same": 24,
+   "diff": [],
+   "onlyOurs": [
+    "Grombrindal, The White Dwarf"
+   ],
+   "onlyBs": []
+  },
+  {
+   "id": "LRL",
+   "name": "Lumineth Realm-lords",
+   "same": 31,
+   "diff": [],
+   "onlyOurs": [],
+   "onlyBs": []
+  },
+  {
+   "id": "SN",
+   "name": "Seraphon",
+   "same": 37,
+   "diff": [],
+   "onlyOurs": [],
+   "onlyBs": []
+  },
+  {
+   "id": "SE",
+   "name": "Stormcast Eternals",
+   "same": 88,
+   "diff": [],
+   "onlyOurs": [
+    "Hamilcar Bear-Eater"
+   ],
+   "onlyBs": []
+  },
+  {
+   "id": "SY",
+   "name": "Sylvaneth",
+   "same": 24,
+   "diff": [],
+   "onlyOurs": [
+    "Kurnoth Hunters with Greatbows",
+    "Kurnoth Hunters with Greatscythes",
+    "Kurnoth Hunters with Greatswords",
+    "Scourge of Aqshy Kurnoth Hunters with Greatswords"
+   ],
+   "onlyBs": [
+    "Kurnoth Hunters with Kurnoth Greatbows",
+    "Kurnoth Hunters with Kurnoth Greatswords",
+    "Kurnoth Hunters with Kurnoth Greatswords (Scourge of Aqshy)",
+    "Kurnoth Hunters with Kurnoth Scythes"
+   ]
+  },
+  {
+   "id": "BoC",
+   "name": "Beasts of Chaos",
+   "same": 22,
+   "diff": [],
+   "onlyOurs": [],
+   "onlyBs": []
+  },
+  {
+   "id": "BoK",
+   "name": "Blades of Khorne",
+   "same": 40,
+   "diff": [],
+   "onlyOurs": [
+    "Korghos Khul"
+   ],
+   "onlyBs": [
+    "Khorgos Khul"
+   ]
+  },
+  {
+   "id": "DoT",
+   "name": "Disciples of Tzeentch",
+   "same": 35,
+   "diff": [],
+   "onlyOurs": [
+    "Pyrofane Fusil-Major on Ogor Warhulk",
+    "Pyrofane Fusiliers",
+    "Pyrofane Great Cannon",
+    "Pyrofane Steelhelms"
+   ],
+   "onlyBs": []
+  },
+  {
+   "id": "HS",
+   "name": "Hedonites of Slaanesh",
+   "same": 38,
+   "diff": [],
+   "onlyOurs": [],
+   "onlyBs": []
+  },
+  {
+   "id": "HoH",
+   "name": "Helsmiths of Hashut",
+   "same": 20,
+   "diff": [],
+   "onlyOurs": [
+    "Hobgrotz Vandalz"
+   ],
+   "onlyBs": [
+    "Hobgrot Vandalz"
+   ]
+  },
+  {
+   "id": "MoN",
+   "name": "Maggotkin of Nurgle",
+   "same": 39,
+   "diff": [],
+   "onlyOurs": [],
+   "onlyBs": []
+  },
+  {
+   "id": "ST",
+   "name": "Skaven",
+   "same": 50,
+   "diff": [],
+   "onlyOurs": [
+    "Plague Censer Bearer"
+   ],
+   "onlyBs": [
+    "Plague Censer Bearers"
+   ]
+  },
+  {
+   "id": "StD",
+   "name": "Slaves to Darkness",
+   "same": 58,
+   "diff": [],
+   "onlyOurs": [
+    "Beasts of Nurgle",
+    "Bloodcrushers",
+    "Bloodletters",
+    "Fiends",
+    "Flamers of Tzeentch",
+    "Hellflayer",
+    "Plaguebearers",
+    "Screamers of Tzeentch"
+   ],
+   "onlyBs": []
+  },
+  {
+   "id": "FE",
+   "name": "Flesh-eater Courts",
+   "same": 31,
+   "diff": [],
+   "onlyOurs": [],
+   "onlyBs": []
+  },
+  {
+   "id": "NT",
+   "name": "Nighthaunt",
+   "same": 34,
+   "diff": [],
+   "onlyOurs": [],
+   "onlyBs": []
+  },
+  {
+   "id": "OB",
+   "name": "Ossiarch Bonereapers",
+   "same": 31,
+   "diff": [],
+   "onlyOurs": [
+    "The Grand Necromystic"
+   ],
+   "onlyBs": []
+  },
+  {
+   "id": "SG",
+   "name": "Soulblight Gravelords",
+   "same": 51,
+   "diff": [],
+   "onlyOurs": [
+    "Wight King on Skeleton Steed"
+   ],
+   "onlyBs": [
+    "Wight King on Skeletal Steed"
+   ]
+  },
+  {
+   "id": "BS",
+   "name": "Bonesplitterz",
+   "same": 12,
+   "diff": [],
+   "onlyOurs": [],
+   "onlyBs": []
+  },
+  {
+   "id": "GG",
+   "name": "Gloomspite Gitz",
+   "same": 51,
+   "diff": [],
+   "onlyOurs": [],
+   "onlyBs": []
+  },
+  {
+   "id": "IJ",
+   "name": "Ironjawz",
+   "same": 22,
+   "diff": [],
+   "onlyOurs": [
+    "Dakkbad Grotkicker"
+   ],
+   "onlyBs": []
+  },
+  {
+   "id": "KB",
+   "name": "Kruleboyz",
+   "same": 22,
+   "diff": [],
+   "onlyOurs": [
+    "Monsta-killaz"
+   ],
+   "onlyBs": [
+    "Kruleboyz Monsta-killaz"
+   ]
+  },
+  {
+   "id": "OM",
+   "name": "Ogor Mawtribes",
+   "same": 41,
+   "diff": [],
+   "onlyOurs": [],
+   "onlyBs": []
+  },
+  {
+   "id": "SoB",
+   "name": "Sons of Behemat",
+   "same": 12,
+   "diff": [
+    {
+     "unit": "Scourge of Aqshy Gatebreaker Mega-Gargant",
+     "ours": [
+      490
+     ],
+     "bsdata": 400
+    },
+    {
+     "unit": "Scourge of Aqshy Mancrusher Gargant",
+     "ours": [
+      120
+     ],
+     "bsdata": 150
+    }
+   ],
+   "onlyOurs": [],
+   "onlyBs": []
+  }
+ ],
+ "total": {
+  "same": 953,
+  "diff": 3,
+  "onlyOurs": 35,
+  "onlyBs": 11
+ }
+}

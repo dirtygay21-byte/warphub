@@ -253,13 +253,13 @@ test('неполные тексты: обрыв лимитом выгрузки 
   const rule = (fid: string, fname: string, rname: string) => load(fid).formations.find((x) => x.name === fname)!.rules.find((x) => x.name === rname)!;
   assert.equal(rule('ST', 'Fleshmeld Menagerie', 'Prized Creations').incomplete, undefined);
   assert.equal(rule('ST', 'Fleshmeld Menagerie', 'Prized Creations').textSource, 'wahapedia-site');
-  // FERAL RUIN (Despoilers): Rules Updates 23.09.2026 — официальный текст GW (curated.officialUpdates, A415) вместо обрезанной выгрузки
-  const feral = rule('StD', 'Despoilers', 'FERAL RUIN');
-  const feralOU = curated.officialUpdates.items.find((i: { ref: string; field: string }) => i.ref === 'A415' && i.field === 'text');
-  assert.equal(feral.incomplete, undefined);
-  assert.equal(feral.textSource, 'gw-rules-updates');
-  assert.equal(feral.text, feralOU.value);
-  assert.match(feral.text, /that does not have an Ensorcelled Banner/);
+  // FERAL RUIN (Despoilers) с выгрузки 2026-10-22 нет: у построения новая способность «YOU WILL SERVE!» (Wahapedia и BSData;
+  // правка A415 перенесена в curated → officialUpdates.reviewed)
+  const desp = load('StD').formations.find((x) => x.name === 'Despoilers')!;
+  assert.ok(!desp.rules.some((x) => x.name === 'FERAL RUIN'));
+  assert.ok(desp.rules.some((x) => x.name === 'YOU WILL SERVE!'));
+  assert.ok(curated.officialUpdates.reviewed.some((x: { ref: string }) => x.ref === 'A415'));
+  assert.ok(!curated.officialUpdates.items.some((x: { ref: string }) => x.ref === 'A415'));
   for (const f of ALL)
     for (const fm of f.formations)
       for (const r of fm.rules) if (r.incomplete) assert.ok(['truncated', 'table'].includes(r.incomplete), `${f.id} «${r.name}»`);

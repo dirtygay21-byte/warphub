@@ -112,18 +112,20 @@ const find = (ref: string, name: string) => {
 test('fullTexts в curated: обход проверки редакции (revised) не используется, у каждого текста есть источник', () => {
   for (const it of ft.items) {
     assert.equal(it.revised, undefined, `${it.name}: revised без отдельного одобрения запрещён`);
-    assert.match(it.source, /^https:\/\/wahapedia\.ru\/aos4\//, it.name);
+    // источник — страница Wahapedia; если её нет (404), BSData (решение владельца 30.10.2026: BSData/Sigdex — второй источник)
+    assert.match(it.source, /^https:\/\/(wahapedia\.ru\/aos4\/|github\.com\/BSData\/age-of-sigmar-4th )/, it.name);
     assert.ok(it.in.length > 0, it.name);
   }
-  // 117 текстов, обрезанных лимитом 1024 символа (173 записи, с OUTPUT TO MAXIMUM! с 17.10.2026), + 16 текстов с восстановленными таблицами (21 запись)
-  assert.equal(ft.items.length, 133);
-  assert.equal(ft.items.reduce((n: number, it: { in: string[] }) => n + it.in.length, 0), 194);
+  // выгрузка 2026-10-22: 155 текстов (239 записей) — обрезанные лимитом 1024 символа и с восстановленными таблицами;
+  // 24 текста добавлены 30.10.2026 (новые батлтомы OM и SoB, изменённые правила), 2 текста полков славы — из BSData
+  assert.equal(ft.items.length, 155);
+  assert.equal(ft.items.reduce((n: number, it: { in: string[] }) => n + it.in.length, 0), 239);
 });
 
 const officialText = (ref: string, name: string) =>
   curated.officialUpdates?.items.find((i: { kind: string; field: string; ruleName?: string; owners?: string[] }) => i.kind === 'rule' && i.field === 'text' && i.ruleName === name && i.owners!.includes(ref));
 
-test('данные AoS: все 194 записи из fullTexts получили полный текст из curated', () => {
+test('данные AoS: все 239 записей из fullTexts получили полный текст из curated', () => {
   let n = 0;
   for (const it of ft.items)
     for (const ref of it.in) {
@@ -139,7 +141,7 @@ test('данные AoS: все 194 записи из fullTexts получили 
       assert.equal(r.textSource, ou ? 'gw-rules-updates' : 'wahapedia-site', `${ref} «${it.name}»`);
       n++;
     }
-  assert.equal(n, 194);
+  assert.equal(n, 239);
 });
 
 // OUTPUT TO MAXIMUM! (удерживался 16.10.2026): восстановлен 17.10.2026 — текст сайта Wahapedia дословно, без знака дюйма,
@@ -147,16 +149,16 @@ test('данные AoS: все 194 записи из fullTexts получили 
 const HELD_RESTORED: [string, string, string][] = [
   ['CoS|ws:Linebreaker Cogfort', 'OUTPUT TO MAXIMUM!', 'c5b17d806b92f0a4'],
 ];
-// 4 конфликта (на сайте другая редакция): Rules Updates GW 23.09.2026 подтвердили редакцию сайта — в данных официальный текст
-// (curated.officialUpdates, Stage A), пометки «неполный» нет. Хэш — обрезанный текст выгрузки, который заменён (16.10.2026).
+// Конфликты (на сайте другая редакция): Rules Updates GW 23.09.2026 подтвердили редакцию сайта — в данных официальный текст
+// (curated.officialUpdates, Stage A), пометки «неполный» нет. Хэш — текст выгрузки 2026-10-22, который заменён.
+// FERAL RUIN (A415) убран 30.10.2026: у построения Despoilers этой способности больше нет (curated → officialUpdates.reviewed).
 const OFFICIAL: [string, string, string, string][] = [
-  ['OB|ws:Katakros, Mortarch of the Necropolis', 'Supreme Lord of the Bonereaper Legions', 'bb30160560c41909', 'A412'],
-  ['NT|ws:Lord Vitriolic', 'Spectral Alchemy', '754edcf4e7e36b9f', 'A406'],
-  ['SG|ws:Scourge of Aqshy Vengorian Lord', 'Frenzied Surge', '54a95ff1bd5a0ab8', 'A422'],
-  ['StD|form:Despoilers', 'FERAL RUIN', '83307c15f8521431', 'A415'],
+  ['OB|ws:Katakros, Mortarch of the Necropolis', 'Supreme Lord of the Bonereaper Legions', '4e4fdc26140963ad', 'A412'],
+  ['NT|ws:Lord Vitriolic', 'Spectral Alchemy', 'a4d29ad110c070f1', 'A406'],
+  ['SG|ws:Scourge of Aqshy Vengorian Lord', 'Frenzied Surge', '8945ee0dfccd8e29', 'A422'],
 ];
 
-test('данные AoS: удержанных правил нет (OUTPUT TO MAXIMUM! восстановлен), 4 конфликта заменены официальным текстом GW', () => {
+test('данные AoS: удержанных правил нет (OUTPUT TO MAXIMUM! восстановлен), конфликты заменены официальным текстом GW', () => {
   assert.deepEqual(ft.missing, []);
   const restored = new Map(ft.items.flatMap((it: { in: string[]; name: string; text: string }) => it.in.map((ref) => [`${ref}|${it.name}`, it.text])));
   for (const [ref, name, hash] of HELD_RESTORED) {
@@ -189,10 +191,10 @@ test('данные AoS: удержанных правил нет (OUTPUT TO MAXI
 
 test('данные AoS: отчёт подстановки без неподошедших текстов', () => {
   const lines = fullTextReport(Object.fromEntries(Object.entries(data).map(([id, d]) => [`${id}.json`, d])), curated);
-  assert.ok(lines.some((l) => /подставлено 194\b/.test(l)), lines.join('\n'));
+  assert.ok(lines.some((l) => /подставлено 239\b/.test(l)), lines.join('\n'));
   assert.ok(!lines.some((l) => l.startsWith('полный текст из curated не подставлен')), lines.join('\n'));
   // восстановленный текст затем заменён официальной правкой GW — отдельной строкой, а не как «не подставлен»
-  assert.ok(lines.includes('полный текст затем заменён официальной правкой GW (officialUpdates): SY|lore:Lore of the Spirit-Song «SONG OF THE LOST»; KB|trait «DIRTY TRICKS»'), lines.join('\n'));
+  assert.ok(lines.includes('полный текст затем заменён официальной правкой GW (officialUpdates): KB|trait «DIRTY TRICKS»; SY|lore:Lore of the Spirit-Song «SONG OF THE LOST»'), lines.join('\n'));
 });
 
 // ---------- таблицы правил AoS (вместо заглушки «$000001417» в выгрузке) ----------
@@ -208,7 +210,8 @@ const TABLE_RULES: [string, string][] = [
   ['HoH|ws:Infernal Cohort with Hashutite Blades', 'Daemonic Resilience'],
   ['HoH|ws:The Blood of the Bull', 'Infernal Empowerment'],
   ['HoH|ws:Scourge of Ghyran Infernal Cohort with Hashutite Blades', 'Daemonic Resilience'],
-  ['KO|ws:Scourge of Aqshy Endrinriggers', 'Emergency Field Repairs'],
+  // выгрузка 2026-10-22: у Scourge of Aqshy Endrinriggers вместо «Emergency Field Repairs» правило «We're Working Here!» (тоже с таблицей)
+  ['KO|ws:Scourge of Aqshy Endrinriggers', "We're Working Here!"],
   ['BoK|ws:Scourge of Aqshy Blood Warriors', 'Only the Worthy'],
   ['HoH|ws:Scourge of Aqshy Daemonsmith on Infernal Taurus', 'Daemonic Resilience'],
   ['HoH|ws:Scourge of Aqshy Anointed Sentinels', 'Daemonic Resilience'],
@@ -309,9 +312,9 @@ test('отчёт импорта соответствует данным: пол�
   const report = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', 'aos', 'import-report.json'), 'utf8'));
   const files = Object.fromEntries(fs.readdirSync(path.join(AOS, 'f')).filter((f) => f.endsWith('.json')).map((f) => [f, JSON.parse(fs.readFileSync(path.join(AOS, 'f', f), 'utf8'))]));
   assert.deepEqual(refreshAosReport(report, files, curated), report, 'отчёт устарел — запустите scripts/repair-aos-data.mjs');
-  assert.deepEqual(report.exportIncomplete, { truncated: 177, table: 21 });
-  // 173 восстановлены с сайта Wahapedia (с OUTPUT TO MAXIMUM! с 17.10.2026) + 4 заменены официальным текстом GW (Stage A); обрезанных не осталось
-  assert.ok(report.info.includes('полные тексты восстановлены: обрезанных — 177 из 177, без таблицы — 21 из 21'));
+  assert.deepEqual(report.exportIncomplete, { truncated: 221, table: 21 }); // выгрузка 2026-10-22
+  // все обрезанные и без таблицы восстановлены (сайт Wahapedia, 2 полка славы — BSData) или заменены официальным текстом GW (Stage A)
+  assert.ok(report.info.includes('полные тексты восстановлены: обрезанных — 221 из 221, без таблицы — 21 из 21'));
   assert.ok(!report.warnings.some((l: string) => l.startsWith('неполные тексты в выгрузке:')), 'неполных текстов больше нет');
   assert.equal(report.info.filter((l: string) => l.startsWith('полного текста нет: ')).length, curated.fullTexts.missing.length);
   // юнит с ценой или Legends не числится «без очков»; Auto-Endrin — «очков нет по правилам»
