@@ -111,6 +111,8 @@ export function applyAosEvent(state: AosGameState, ev: AosGameEvent, cat: AosCat
         if (battleplanRoll(s.seed, ev.roll.attempt).n !== ev.n) return fail('Батлплан не совпадает с броском');
         s.battleplanDraws += 1;
       } else if (ev.roll) return fail('Бросок указан, а выбор отмечен как ручной');
+      // территории A/B — по карте батлплана: другой батлплан — территорию выбирают заново
+      if (s.battleplan !== ev.n) s.territory = null;
       s.battleplan = ev.n;
       s.battleplanSource = ev.source;
       break;

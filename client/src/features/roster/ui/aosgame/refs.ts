@@ -1,5 +1,5 @@
 import { encodeAosRoster } from '../../aos/roster';
-import type { AosIndex, AosRoster } from '../../aos/types';
+import type { AosIndex, AosRoster, AosTerritory } from '../../aos/types';
 import type { AosRosterRef } from '../../aosgame';
 
 /** Ссылка на ростер для игры: имя, фракция, очки и число вспомогательных отрядов (для +1 CP). */
@@ -17,3 +17,7 @@ export function rosterRefOf(r: AosRoster, source: 'own' | 'code', index: AosInde
 }
 
 export const TIER_LABEL = { affray: 'Affray', strike: 'Strike', domination: 'Domination' } as const;
+
+/** Территория атакующего по карте батлплана — 'A' или 'B'; любая другая строка записана словами (батлплан без карты). */
+export const isMapTerritory = (t: string | null | undefined): t is AosTerritory => t === 'A' || t === 'B';
+export const territoryLabel = (t: string) => (isMapTerritory(t) ? `территория ${t} на карте` : t);

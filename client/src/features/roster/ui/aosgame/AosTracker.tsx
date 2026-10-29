@@ -4,7 +4,7 @@ import { Dice } from '../game/Dice';
 import { Button, IconButton } from '../kit';
 import { cx } from '../util';
 import { BattleplanInfo, TacticCards } from './AosSetup';
-import { TIER_LABEL } from './refs';
+import { territoryLabel, TIER_LABEL } from './refs';
 import type { AosGameHook } from './useAosGame';
 
 /** Трекер битвы AoS: счёт, priority в начале раунда, ресурсы игроков, конец хода (батлплан и тактики), итог. */
@@ -48,8 +48,8 @@ export function AosTracker({ game }: { game: AosGameHook }) {
       <details className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
         <summary className="cursor-pointer text-sm font-semibold">Батлплан и карты тактик</summary>
         <div className="mt-2 space-y-2">
-          {s.battleplan && <BattleplanInfo bp={bp} n={s.battleplan} round={s.round} />}
-          {s.territory && <p className="text-[12px] text-white/55">Территория атакующего: {s.territory}</p>}
+          {s.battleplan && <BattleplanInfo bp={bp} n={s.battleplan} round={s.round} territory={s.territory} showMap />}
+          {s.territory && <p className="text-[12px] text-white/55">Территория атакующего: {territoryLabel(s.territory)}</p>}
           {SEATS.map((seat) => (
             <div key={seat}>
               <p className="text-[12px] font-semibold text-white/60">{names[seat]}</p>

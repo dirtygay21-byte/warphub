@@ -277,7 +277,7 @@ export interface AosBattlepack {
   system: 'aos';
   id: string;
   title: string;
-  source: { name: string; url: string; checked: string; cp: string; cpUrl: string; coreUrl: string; note: string };
+  source: { name: string; url: string; checked: string; cp: string; cpUrl: string; coreUrl: string; note: string; maps?: string };
   rounds: number;
   victory: { majorMargin: number; tie: string };
   battlefield: { width: number; height: number; objectiveMarkerMm: number; objectiveRange: number; terrain: string };
@@ -293,5 +293,15 @@ export interface AosBattlepack {
     rule: string;
     cards: { id: string; name: string; setup?: string; tactics: { tier: AosTacticTier; name: string; text: string }[] }[];
   };
-  battleplans: { n: number; table: 1 | 2; name: string; rules: string; scoring: { rounds: 'all' | '1' | '2+'; text: string; vp: number }[] }[];
+  battleplans: { n: number; table: 1 | 2; name: string; rules: string; scoring: { rounds: 'all' | '1' | '2+'; text: string; vp: number }[]; map?: AosBattleplanMap }[];
+}
+
+/** Карта батлплана в дюймах (поле 60×44, x вправо, y вниз), S3 30.10.2026 — по Sigdex, см. battlepack.source.maps. */
+export type AosTerritory = 'A' | 'B';
+export interface AosBattleplanMap {
+  objectives: { type: string; x: number; y: number }[];
+  /** r — условный радиус изображения (2,5″ малый, 3,5″ средний), не правило */
+  terrain: { type: 'ruin' | 'obscuring' | 'place-of-power'; r: number; x: number; y: number }[];
+  /** территории — прямоугольники [x, y, ширина, высота]; атакующий выбирает A или B */
+  territories: Record<AosTerritory, [number, number, number, number][]>;
 }
