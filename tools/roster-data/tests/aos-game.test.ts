@@ -10,6 +10,10 @@ import {
   aosUndoTarget,
   applyAosEvent,
   battleplanRoll,
+  loadAosGame,
+  readAosLibrary,
+  removeAosGame,
+  saveAosGame,
   priorityRoll,
   replayAos,
   rolesRoll,
@@ -140,4 +144,26 @@ test('случайные броски в журнале сверяются с se
   assert.equal(s.priority!.decider, pr.decider);
   const loser: Seat = pr.decider === 'p1' ? 'p2' : 'p1';
   assert.equal(replayAos(log(...setup(), { type: 'round-started', first: loser, source: 'random', roll: { attempt: 0 }, seat: loser }), cat).ok, false, 'решает победитель priority');
+});
+
+test('сохранённые игры AoS: сводка, открытие журнала, удаление; отдельный ключ от 40K', () => {
+  const mem = new Map<string, string>();
+  const store = { getItem: (k: string) => mem.get(k) ?? null, setItem: (k: string, v: string) => void mem.set(k, v), removeItem: (k: string) => void mem.delete(k) };
+  const events = log(...setup(), ...round('p1', [{ type: 'plan-scored', target: 'p1', rows: [0] }]));
+  const st = ok(replayAos(events, cat));
+  assert.equal(saveAosGame(store, '.42', events, st, cat), null);
+  const [entry] = readAosLibrary(store, '.42');
+  assert.ok(entry);
+  assert.equal(entry.key, 'e1');
+  assert.deepEqual(entry.summary.names, { p1: 'Аня', p2: 'Борис' });
+  assert.equal(entry.summary.battleplan, 'Into the Fire');
+  assert.deepEqual(entry.summary.score, { p1: 3, p2: 0 });
+  assert.ok([...mem.keys()].every((k) => k.startsWith('warphub.game.aos.')));
+  assert.equal(readAosLibrary(store, '.7').length, 0, 'другой пользователь Telegram не видит игру');
+  const back = loadAosGame(store, '.42', 'e1', cat);
+  assert.ok(typeof back !== 'string');
+  assert.deepEqual(back.state, st);
+  assert.equal(removeAosGame(store, '.42', 'e1'), null);
+  assert.equal(readAosLibrary(store, '.42').length, 0);
+  assert.equal(loadAosGame(store, '.42', 'e1', cat), 'Игра не найдена на телефоне');
 });

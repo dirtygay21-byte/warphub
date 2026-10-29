@@ -3,3 +3,4 @@ export * from './types';
 export * from './rolls';
 export * from './reducer';
 export * from './scoring';
+export * from './library';
