@@ -58,7 +58,7 @@ beforeAll(async () => {
   const existing = sql(`select id from services where slug = 'wh_game' limit 1`);
   if (existing) serviceId = Number(existing);
   else {
-    const disc = sql(`insert into disciplines (slug, title) values ('wh-game-e2e', 'E2E WH') returning id`);
+    const disc = sql(`select id from disciplines where slug = 'wh' limit 1`) || sql(`insert into disciplines (slug, title) values ('wh', 'E2E WH') returning id`);
     serviceId = Number(sql(`insert into services (discipline_id, slug, title, duration, seats_per_table) values (${disc}, 'wh_game', 'E2E игра', 240, 2) returning id`));
   }
   tableId = Number(sql(`insert into tables (name) values ('E2E стол игры') returning id`));
