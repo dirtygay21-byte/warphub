@@ -23,6 +23,11 @@ describe('roster data files', () => {
     expect(readRosterData('SM', 'aos')).toBeNull();
     expect(readRosterData('battlefield', 'aos')).toBeNull();
     expect(readRosterData('missions', 'aos')).toBeNull();
+    // General's Handbook (батлпланы, тактики) — рядом с index.json
+    const bp = readRosterData('battlepack', 'aos');
+    expect(bp).not.toBeNull();
+    expect(JSON.parse(new TextDecoder().decode(Bun.gunzipSync(bp!.body))).battleplans.length).toBe(12);
+    expect(readRosterData('battlepack')).toBeNull();
   });
   test('rejects paths outside the data folder', () => {
     for (const bad of ['../index', 'aos/index', '..', 'f/SM', 'index.json/..', '']) {

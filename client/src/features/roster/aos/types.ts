@@ -270,3 +270,28 @@ export interface AosRoster {
   createdAt: number;
   updatedAt: number;
 }
+
+// ---------- General's Handbook: батлпланы и боевые тактики (backend/roster-data/aos/battlepack.json, S2 30.10.2026) ----------
+export type AosTacticTier = 'affray' | 'strike' | 'domination';
+export interface AosBattlepack {
+  system: 'aos';
+  id: string;
+  title: string;
+  source: { name: string; url: string; checked: string; cp: string; cpUrl: string; coreUrl: string; note: string };
+  rounds: number;
+  victory: { majorMargin: number; tie: string };
+  battlefield: { width: number; height: number; objectiveMarkerMm: number; objectiveRange: number; terrain: string };
+  cp: { perRound: number; underdog: number; fewerAuxiliaries: number; lostAtRoundEnd: boolean; note: string };
+  priority: { roll: string; underdog: string; seize: string; seizeBlockedLead: number };
+  setup: string[];
+  objectiveTypes: { id: string; name: string; count: number }[];
+  season: { name: string; rules: { name: string; when: string; text: string }[] };
+  tactics: {
+    pick: number;
+    vp: number;
+    order: AosTacticTier[];
+    rule: string;
+    cards: { id: string; name: string; setup?: string; tactics: { tier: AosTacticTier; name: string; text: string }[] }[];
+  };
+  battleplans: { n: number; table: 1 | 2; name: string; rules: string; scoring: { rounds: 'all' | '1' | '2+'; text: string; vp: number }[] }[];
+}

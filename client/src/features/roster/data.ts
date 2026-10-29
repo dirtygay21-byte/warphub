@@ -1,6 +1,6 @@
 import { apiRequest } from '@/apiUtils/general';
 import type { DataIndex, FactionData } from './engine/types';
-import type { AosFactionData, AosIndex } from './aos/types';
+import type { AosBattlepack, AosFactionData, AosIndex } from './aos/types';
 
 // Данные Wahapedia отдаёт backend (GET /roster/data/:name) — только пользователям с доступом.
 let indexPromise: Promise<DataIndex> | null = null;
@@ -38,6 +38,14 @@ export function loadAosFaction(id: string): Promise<AosFactionData> {
     p.catch(() => aosCache.delete(id));
   }
   return aosCache.get(id)!;
+}
+
+/** General's Handbook (AoS): батлпланы, боевые тактики, CP и priority — для «Начать игру» AoS */
+let aosBattlepackPromise: Promise<AosBattlepack> | null = null;
+export function loadAosBattlepack(): Promise<AosBattlepack> {
+  aosBattlepackPromise ??= apiRequest<AosBattlepack>('/roster/data/aos/battlepack');
+  aosBattlepackPromise.catch(() => (aosBattlepackPromise = null));
+  return aosBattlepackPromise;
 }
 
 // ---------- «Поле боя»: раскладки террейна и карты деплоя (40kdc-data) ----------
