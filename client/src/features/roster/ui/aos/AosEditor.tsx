@@ -22,6 +22,7 @@ import type { AosFactionData, AosIndex, AosRegiment, AosRoster, AosUnit, AosWars
 import { confirmAsk, haptic } from '../../telegram';
 import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
 import { cx, fmtPts } from '../util';
+import { HeaderStat, NameInput } from '../common/BuilderKit';
 import { AosExportSheet } from './AosExportSheet';
 import { AosPicker, type PickTarget } from './AosPicker';
 import { AosUnitCard, Warscroll } from './AosUnitCard';
@@ -207,8 +208,8 @@ function Editor({
             <Icon name="info" className="size-3.5 shrink-0 self-center text-white/35" />
           </button>
           <div className="flex gap-1.5">
-            <Stat label="Полки" value={`${roster.regiments.length}/${AOS_RULES.maxRegiments}`} bad={cr.issues.some((i) => i.code === 'regiments' || i.code === 'no-regiment')} />
-            <Stat label="Высадки" value={String(cr.drops)} />
+            <HeaderStat label="Полки" value={`${roster.regiments.length}/${AOS_RULES.maxRegiments}`} bad={cr.issues.some((i) => i.code === 'regiments' || i.code === 'no-regiment')} />
+            <HeaderStat label="Высадки" value={String(cr.drops)} />
             <button
               type="button"
               onClick={() => (haptic.tap(), setSheet('problems'))}
@@ -555,38 +556,5 @@ function PickRow({ label, value, points, empty, warn, onClick }: { label: string
       {!!points && <Tag>+{points}</Tag>}
       {onClick && <Icon name="chevron" className="size-4 shrink-0 text-white/35" />}
     </button>
-  );
-}
-
-function Stat({ label, value, bad }: { label: string; value: string; bad?: boolean }) {
-  return (
-    <div className={cx('flex min-w-12 flex-col items-center justify-center rounded-lg px-2 py-1', bad ? 'bg-danger/15 text-danger' : 'bg-white/[0.06] text-white/80')}>
-      <span className="font-display text-[15px] font-semibold leading-tight tabular-nums">{value}</span>
-      <span className="text-[10px] font-semibold uppercase leading-tight opacity-60">{label}</span>
-    </div>
-  );
-}
-
-function NameInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const [v, setV] = useState(value);
-  const [prev, setPrev] = useState(value);
-  const ref = useRef<HTMLInputElement>(null);
-  if (value !== prev) {
-    setPrev(value);
-    setV(value);
-  }
-  return (
-    <input
-      ref={ref}
-      value={v}
-      onChange={(e) => {
-        setV(e.target.value);
-        if (e.target.value.trim()) onChange(e.target.value);
-      }}
-      onBlur={() => (v.trim() ? v !== v.trim() && onChange(v.trim()) : setV(value))}
-      onKeyDown={(e) => e.key === 'Enter' && ref.current?.blur()}
-      aria-label="Название ростера"
-      className="font-display min-w-0 flex-1 truncate rounded-lg border border-transparent bg-transparent px-1.5 py-1 text-lg font-semibold uppercase outline-none focus:border-white/10 focus:bg-white/[0.04]"
-    />
   );
 }

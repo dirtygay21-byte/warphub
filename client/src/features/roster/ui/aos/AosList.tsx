@@ -5,7 +5,8 @@ import type { AosIndex, AosPointsLimit, AosRoster } from '../../aos/types';
 import { cloudEnabled } from '../../storage';
 import { confirmAsk, haptic, openExternal } from '../../telegram';
 import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
-import { cx, fmtPts } from '../util';
+import { cx } from '../util';
+import { RosterCard, ToolTile } from '../common/BuilderKit';
 
 const ALLIANCE_RU: Record<string, string> = { ORDER: 'Порядок', CHAOS: 'Хаос', DEATH: 'Смерть', DESTRUCTION: 'Разрушение' };
 
@@ -51,10 +52,10 @@ export function AosList({
       {switcher}
 
       <div className="mb-5 grid grid-cols-2 gap-2">
-        <Tile icon="spark" title="Начать игру" sub="Батлплан, priority, CP, тактики" onClick={onStartGame} />
-        <Tile icon="map" title="Test Army" sub="Расстановка на карте батлплана" onClick={onTestArmy} />
-        <Tile icon="book" title="Правила" sub="Core Rules · Wahapedia" onClick={() => openExternal('https://wahapedia.ru/aos4/the-rules/the-core-rules/')} />
-        <Tile icon="shield" title="Сезон" sub="General’s Handbook 2026-27" onClick={() => openExternal('https://wahapedia.ru/aos4/the-rules/general-s-handbook-2026-27/')} />
+        <ToolTile icon="spark" title="Начать игру" sub="Батлплан, priority, CP, тактики" onClick={onStartGame} />
+        <ToolTile icon="map" title="Test Army" sub="Расстановка на карте батлплана" onClick={onTestArmy} />
+        <ToolTile icon="book" title="Правила" sub="Core Rules · Wahapedia" onClick={() => openExternal('https://wahapedia.ru/aos4/the-rules/the-core-rules/')} />
+        <ToolTile icon="shield" title="Сезон" sub="General’s Handbook 2026-27" onClick={() => openExternal('https://wahapedia.ru/aos4/the-rules/general-s-handbook-2026-27/')} />
       </div>
 
       {rosters.length === 0 ? (
@@ -110,37 +111,25 @@ export function AosList({
 }
 
 function Card({ roster, faction, onOpen, onMenu }: { roster: AosRoster; faction: string; onOpen: () => void; onMenu: () => void }) {
-  const date = new Date(roster.updatedAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
   const units = roster.regiments.reduce((n, g) => n + 1 + g.units.length, 0) + roster.auxiliaries.length;
   return (
-    <li className="flex items-stretch overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
-      <button type="button" onClick={() => (haptic.tap(), onOpen())} className="min-w-0 flex-1 px-4 py-3.5 text-left active:bg-white/[0.03]">
-        <p className="truncate text-base font-semibold">{roster.name}</p>
-        <p className="mt-0.5 truncate text-sm text-white/55">{faction}</p>
-        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+    <RosterCard
+      name={roster.name}
+      sub={faction}
+      tags={
+        <>
           <Tag>AoS</Tag>
           <Tag>{roster.regiments.length} полк.</Tag>
           <Tag>{units} юн.</Tag>
-          {roster.summary && (
-            <Tag tone={roster.summary.errors ? 'danger' : roster.summary.warnings ? 'warn' : 'accent'}>
-              {roster.summary.errors ? `${roster.summary.errors} ош.` : roster.summary.warnings ? `${roster.summary.warnings} пред.` : 'OK'}
-            </Tag>
-          )}
-          <span className="text-xs text-white/35">{date}</span>
-        </div>
-      </button>
-      {roster.summary && (
-        <div className="flex flex-col items-end justify-center pr-1 text-right">
-          <span className={cx('font-display text-xl font-semibold leading-none tabular-nums', roster.summary.points > roster.pointsLimit ? 'text-danger' : 'text-white')}>
-            {fmtPts(roster.summary.points)}
-          </span>
-          <span className="mt-1 text-[11px] text-white/40">из {fmtPts(roster.pointsLimit)}</span>
-        </div>
-      )}
-      <button type="button" aria-label="Действия" onClick={() => (haptic.tap(), onMenu())} className="flex w-12 items-center justify-center text-white/50 active:bg-white/5">
-        <Icon name="more" className="size-6" strokeWidth={3} />
-      </button>
-    </li>
+        </>
+      }
+      status={roster.summary}
+      points={roster.summary?.points}
+      limit={roster.pointsLimit}
+      updatedAt={roster.updatedAt}
+      onOpen={onOpen}
+      onMenu={onMenu}
+    />
   );
 }
 
@@ -265,23 +254,5 @@ function ImportSheet({ open, onClose, onImport, factions }: { open: boolean; onC
       />
       {err && <p className="mt-2 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{err}</p>}
     </Sheet>
-  );
-}
-
-function Tile({ icon, title, sub, onClick }: { icon: string; title: string; sub: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={() => (haptic.tap(), onClick())}
-      className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 text-left transition active:bg-white/10"
-    >
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent">
-        <Icon name={icon} />
-      </span>
-      <span className="min-w-0">
-        <span className="font-display block text-base font-semibold uppercase leading-none">{title}</span>
-        <span className="mt-1 block truncate text-[11px] text-white/45">{sub}</span>
-      </span>
-    </button>
   );
 }

@@ -22,15 +22,22 @@ import {
   type WarcryRoster,
   type WarcryRosterFighter,
 } from '../../warcry/roster';
-import type { WarcryAbility, WarcryFaction, WarcryFighter, WarcryIndex } from '../../warcry/types';
+import type { WarcryAbility, WarcryFaction, WarcryFighter, WarcryIndex, WarcryWeapon } from '../../warcry/types';
 import { confirmAsk, haptic, shareText } from '../../telegram';
 import { Button, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
 import { cx } from '../util';
+import { CostBadge, DataCard, EditorHeader, HeaderStat, RuleCard, SearchField, SectionTitle } from '../common/BuilderKit';
 
 type Tab = 'fighters' | 'groups' | 'rules';
+const ALLIANCE: Record<string, string> = { chaos: 'Chaos', death: 'Death', destruction: 'Destruction', order: 'Order' };
 const COST: Record<string, string> = { double: 'Double', triple: 'Triple', quad: 'Quad', reaction: 'Reaction', passive: 'Passive', battletrait: 'Battle trait' };
+const COST_TONE: Record<string, 'muted' | 'accent' | 'warn' | 'danger'> = { double: 'muted', triple: 'accent', quad: 'danger', reaction: 'warn', passive: 'muted', battletrait: 'muted' };
+const COST_ORDER = ['reaction', 'double', 'triple', 'quad', 'passive', 'battletrait'];
 
-/** Редактор варбанды Warcry (W5 30.10.2026): бойцы (свои, союзники, траллы, монстр), группы, правила и проверка построения. */
+/**
+ * Редактор варбанды Warcry (W5, вид R2 30.10.2026 — как AoS и Kill Team): шапка с очками и лимитами, блок варбанды,
+ * датакарты бойцов (характеристики, оружие, способности по стоимости), группы Dagger / Shield / Hammer, правила.
+ */
 export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { roster: WarcryRoster; index: WarcryIndex; onBack: () => void; onChange: (r: WarcryRoster) => void; onDelete: () => void }) {
   const [data, setData] = useState<Map<string, WarcryFaction>>(new Map());
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +69,8 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
   const [adding, setAdding] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [menu, setMenu] = useState(false);
+  const [armyOpen, setArmyOpen] = useState(false);
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   if (error)
     return (
@@ -73,139 +82,182 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
       </div>
     );
   if (!own || !ready) return <div className="mx-auto mt-24 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />;
+  const L = WARCRY_LIMITS;
+  const count = (role: WarcryRosterFighter['role']) => roster.fighters.filter((x) => x.role === role).length;
   const heroes = roster.fighters.filter((x) => fighterOf(data, x)?.runemarks.includes('hero')).length;
+  const n = roster.fighters.length;
   const battletraits = own.abilities.filter((a) => a.cost === 'battletrait');
 
   return (
-    <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-3xl lg:pt-8">
-      <header className="mb-3 flex items-start gap-3">
-        <IconButton icon="back" label="К списку" onClick={onBack} className="mt-0.5 size-9" />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-xs font-semibold uppercase tracking-[0.18em] text-accent">Warcry · {own.name}</p>
-          <input
-            value={roster.name}
-            onChange={(e) => onChange(touchWarcry({ ...roster, name: e.target.value.slice(0, 80) }))}
-            className="font-display mt-1 w-full bg-transparent text-2xl font-semibold uppercase leading-none outline-none"
-            aria-label="Название варбанды"
-          />
-          <p className="mt-1 text-[11px] tabular-nums text-white/45">
-            <span className={cx(points > WARCRY_LIMITS.points && 'text-danger')}>
-              {points} / {WARCRY_LIMITS.points} очк.
-            </span>{' '}
-            · бойцов {roster.fighters.length} / {WARCRY_LIMITS.maxFighters} · героев {heroes}
-          </p>
-        </div>
-        <IconButton icon="share" label="Экспорт" onClick={() => setExporting(true)} className="size-9" />
-        <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />
-      </header>
-      {issues.length > 0 && (
-        <ul className="mb-3 space-y-1 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-          {issues.map((i, k) => (
-            <li key={k} className={cx('flex gap-2 text-[12.5px]', i.level === 'error' ? 'text-danger' : 'text-warn')}>
-              <Icon name="alert" className="mt-0.5 size-4 shrink-0" />
-              {i.message}
-            </li>
-          ))}
-        </ul>
-      )}
-      <Segmented
-        className="mb-3"
-        value={tab}
-        onChange={setTab}
-        options={[
-          { value: 'fighters', label: 'Бойцы' },
-          { value: 'groups', label: 'Группы' },
-          { value: 'rules', label: 'Правила' },
-        ]}
+    <div className="mx-auto min-h-dvh max-w-lg pb-32 lg:max-w-3xl">
+      <EditorHeader
+        name={roster.name}
+        onName={(name) => onChange(touchWarcry({ ...roster, name: name.slice(0, 80) }))}
+        onBack={onBack}
+        actions={
+          <>
+            <IconButton icon="share" label="Экспорт" onClick={() => setExporting(true)} className="size-9" />
+            <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />
+          </>
+        }
+        big={points}
+        bigLimit={L.points}
+        stats={
+          <>
+            <HeaderStat label="Бойцы" value={`${n}/${L.maxFighters}`} bad={n > 0 && (n < L.minFighters || n > L.maxFighters)} />
+            <HeaderStat label="Герои" value={own.heroesAll ? String(heroes) : `${heroes}/${L.heroes}`} bad={!own.heroesAll && heroes > L.heroes} />
+          </>
+        }
+        issues={issues}
       />
-      {tab === 'fighters' && (
-        <section className="space-y-2.5">
-          {roster.fighters.map((x, n) => {
-            const f = fighterOf(data, x);
-            return f ? (
-              <FighterCard
-                key={x.uid}
-                leader={n === 0}
-                x={x}
-                f={f}
-                src={data.get(x.factionId)}
-                own={own}
-                universal={index.universal}
-                onChange={(p) => onChange(updateFighter(roster, x.uid, p))}
-                onLeader={() => (haptic.select(), onChange(makeLeader(roster, x.uid)))}
-                onRemove={() => onChange(removeFighter(roster, x.uid))}
-              />
-            ) : (
-              <div key={x.uid} className="flex items-center justify-between rounded-2xl border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-danger">
-                Нет в данных: {x.fighterId}
-                <Button variant="danger" className="text-xs" onClick={() => onChange(removeFighter(roster, x.uid))}>
-                  Убрать
-                </Button>
+
+      <div className="space-y-4 px-4 pt-4">
+        {/* ---- варбанда ---- */}
+        <section className="rounded-2xl border border-white/10 bg-app-elevated">
+          <button type="button" onClick={() => setArmyOpen((o) => !o)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wider text-white/45">Warcry · {ALLIANCE[own.grandAlliance] ?? own.grandAlliance}</p>
+              <p className="mt-0.5 truncate text-[15px] font-semibold">{own.name}</p>
+              <div className="mt-1.5 flex flex-wrap gap-1">
+                <Tag tone={count('ally') > L.allies ? 'danger' : 'muted'}>
+                  Союзники {count('ally')}/{L.allies}
+                </Tag>
+                <Tag tone={count('thrall') > L.thralls ? 'danger' : 'muted'}>
+                  Траллы {count('thrall')}/{L.thralls}
+                </Tag>
+                <Tag tone={count('monster') > L.monsters ? 'danger' : 'muted'}>
+                  Монстр {count('monster')}/{L.monsters}
+                </Tag>
               </div>
-            );
-          })}
-          <Button variant="primary" className="h-12 w-full" onClick={() => setAdding(true)}>
-            <Icon name="plus" /> Добавить бойца
-          </Button>
-          <p className="text-[11px] text-white/35">Лидер — первый боец: герой своей фракции, не союзник.</p>
-        </section>
-      )}
-      {tab === 'groups' && (
-        <section className="space-y-3">
-          <Button className="w-full" onClick={() => (haptic.select(), onChange(autoGroups(roster)))}>
-            Распределить автоматически
-          </Button>
-          {WARCRY_GROUPS.map((g) => {
-            const list = roster.fighters.filter((x) => x.group === g);
-            return (
-              <div key={g} className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">
-                  {GROUP_LABEL[g]} · {list.length}
-                </p>
-                {!list.length && <p className="text-[12px] text-white/35">Пусто</p>}
-                {list.map((x) => (
-                  <GroupRow key={x.uid} x={x} name={x.name || fighterOf(data, x)?.name || x.fighterId} onGroup={(group) => onChange(updateFighter(roster, x.uid, { group }))} />
-                ))}
-              </div>
-            );
-          })}
-          {roster.fighters.some((x) => !x.group) && (
-            <div className="rounded-2xl border border-warn/30 bg-warn/5 p-3">
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-warn">Без группы</p>
-              {roster.fighters
-                .filter((x) => !x.group)
-                .map((x) => (
-                  <GroupRow key={x.uid} x={x} name={x.name || fighterOf(data, x)?.name || x.fighterId} onGroup={(group) => onChange(updateFighter(roster, x.uid, { group }))} />
-                ))}
+            </div>
+            <Icon name="down" className={cx('size-5 shrink-0 text-white/40 transition', armyOpen && 'rotate-180')} />
+          </button>
+          {armyOpen && (
+            <div className="space-y-3 border-t border-white/[0.06] px-4 pb-4 pt-3">
+              {own.subfactions.length > 0 && (
+                <div>
+                  <SectionTitle>Подфракции</SectionTitle>
+                  <div className="flex flex-wrap gap-1">
+                    {own.subfactions.map((s) => (
+                      <Tag key={s.name}>
+                        {s.name}
+                        {s.bladeborn ? ' · Bladeborn' : ''}
+                      </Tag>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <AbilityList title="Боевые черты фракции" list={battletraits} empty="В данных нет боевых черт фракции." />
+              <p className="text-[11px] text-white/35">
+                Данные: {index.source.name}, {index.source.date} ({index.source.commit}). Тексты способностей — английский оригинал.
+              </p>
             </div>
           )}
-          <p className="text-[11px] text-white/35">Бойцы — как можно ровнее по трём группам; монстр — один в своей группе, остальные ровно по двум другим.</p>
         </section>
-      )}
-      {tab === 'rules' && (
-        <section className="space-y-3">
-          <AbilityList title="Боевые черты фракции" list={battletraits} empty="В данных нет боевых черт фракции." />
-          <AbilityList title="Универсальные способности" list={index.universal} />
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-[12.5px] leading-snug text-white/75">
-            <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">Построение варбанды</p>
-            <ul className="list-disc space-y-0.5 pl-4">
-              <li>
-                {WARCRY_LIMITS.minFighters}–{WARCRY_LIMITS.maxFighters} бойцов, не больше {WARCRY_LIMITS.points} очков.
-              </li>
-              <li>Первый боец — герой и лидер; не больше {WARCRY_LIMITS.heroes} героев (с героями-союзниками).</li>
-              <li>
-                Союзники (Hero или Ally другой фракции альянса) — до {WARCRY_LIMITS.allies}, траллы — до {WARCRY_LIMITS.thralls}, монстр — {WARCRY_LIMITS.monsters}.
-              </li>
-              <li>Бойцы Bladeborn — по одному; герой-Bladeborn союзником открывает своих спутников вне лимита союзников.</li>
-              {own.heroesAll && <li>«Heroes All»: героев своей фракции — без лимита, героев других фракций — до {WARCRY_LIMITS.heroesAllOther}.</li>}
-            </ul>
-            <p className="mt-2 text-[11px] text-white/40">Источник правил: warcrier.net (The Warbands; Allies, Thralls and Monsters; Bladeborn; страницы фракций).</p>
-          </div>
-          <p className="text-[11px] text-white/35">
-            Данные: {index.source.name}, {index.source.date} ({index.source.commit}). Тексты способностей — английский оригинал.
-          </p>
-        </section>
-      )}
+
+        <Segmented
+          value={tab}
+          onChange={setTab}
+          options={[
+            { value: 'fighters', label: 'Бойцы' },
+            { value: 'groups', label: 'Группы' },
+            { value: 'rules', label: 'Правила' },
+          ]}
+        />
+
+        {tab === 'fighters' && (
+          <section className="space-y-2.5">
+            {!n && <p className="rounded-xl border border-dashed border-white/15 px-3 py-6 text-center text-sm text-white/45">Добавьте бойцов — первый боец становится лидером (герой своей фракции).</p>}
+            {roster.fighters.map((x, i) => {
+              const f = fighterOf(data, x);
+              return f ? (
+                <FighterCard
+                  key={x.uid}
+                  leader={i === 0}
+                  x={x}
+                  f={f}
+                  src={data.get(x.factionId)}
+                  own={own}
+                  universal={index.universal}
+                  open={expanded === x.uid}
+                  onToggle={() => setExpanded((e) => (e === x.uid ? null : x.uid))}
+                  onChange={(p) => onChange(updateFighter(roster, x.uid, p))}
+                  onLeader={() => (haptic.select(), onChange(makeLeader(roster, x.uid)))}
+                  onRemove={() => onChange(removeFighter(roster, x.uid))}
+                />
+              ) : (
+                <div key={x.uid} className="flex items-center justify-between rounded-2xl border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-danger">
+                  Нет в данных: {x.fighterId}
+                  <Button variant="danger" className="text-xs" onClick={() => onChange(removeFighter(roster, x.uid))}>
+                    Убрать
+                  </Button>
+                </div>
+              );
+            })}
+            <Button variant="primary" className="h-12 w-full" onClick={() => setAdding(true)}>
+              <Icon name="plus" /> Добавить бойца
+            </Button>
+          </section>
+        )}
+
+        {tab === 'groups' && (
+          <section className="space-y-3">
+            <Button className="w-full" onClick={() => (haptic.select(), onChange(autoGroups(roster)))}>
+              Распределить автоматически
+            </Button>
+            <div className="grid gap-2.5 sm:grid-cols-3">
+              {WARCRY_GROUPS.map((g) => {
+                const list = roster.fighters.filter((x) => x.group === g);
+                return (
+                  <div key={g} className="rounded-2xl border border-white/10 bg-app-elevated p-3">
+                    <p className="font-display mb-1.5 flex items-baseline justify-between text-lg font-semibold uppercase leading-none">
+                      {GROUP_LABEL[g]}
+                      <span className="text-sm text-white/40">{list.length}</span>
+                    </p>
+                    {!list.length && <p className="text-[12px] text-white/35">Пусто</p>}
+                    {list.map((x) => (
+                      <GroupRow key={x.uid} x={x} f={fighterOf(data, x)} onGroup={(group) => onChange(updateFighter(roster, x.uid, { group }))} />
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+            {roster.fighters.some((x) => !x.group) && (
+              <div className="rounded-2xl border border-warn/30 bg-warn/5 p-3">
+                <SectionTitle>Без группы</SectionTitle>
+                {roster.fighters
+                  .filter((x) => !x.group)
+                  .map((x) => (
+                    <GroupRow key={x.uid} x={x} f={fighterOf(data, x)} onGroup={(group) => onChange(updateFighter(roster, x.uid, { group }))} />
+                  ))}
+              </div>
+            )}
+            <p className="text-[11px] text-white/35">Бойцы — как можно ровнее по трём группам; монстр — один в своей группе, остальные ровно по двум другим.</p>
+          </section>
+        )}
+
+        {tab === 'rules' && (
+          <section className="space-y-4">
+            <AbilityList title="Боевые черты фракции" list={battletraits} empty="В данных нет боевых черт фракции." />
+            <AbilityList title="Универсальные способности" list={index.universal} />
+            <div className="rounded-2xl border border-white/10 bg-app-elevated p-3.5 text-[12.5px] leading-snug text-white/75">
+              <SectionTitle>Построение варбанды</SectionTitle>
+              <ul className="list-disc space-y-1 pl-4">
+                <li>
+                  {L.minFighters}–{L.maxFighters} бойцов, не больше {L.points} очков.
+                </li>
+                <li>Первый боец — герой и лидер; не больше {L.heroes} героев (с героями-союзниками).</li>
+                <li>
+                  Союзники (Hero или Ally другой фракции альянса) — до {L.allies}, траллы — до {L.thralls}, монстр — {L.monsters}.
+                </li>
+                <li>Бойцы Bladeborn — по одному; герой-Bladeborn союзником открывает своих спутников вне лимита союзников.</li>
+                {own.heroesAll && <li>«Heroes All»: героев своей фракции — без лимита, героев других фракций — до {L.heroesAllOther}.</li>}
+              </ul>
+              <p className="mt-2 text-[11px] text-white/40">Источник: warcrier.net (The Warbands; Allies, Thralls and Monsters; Bladeborn; страницы фракций).</p>
+            </div>
+          </section>
+        )}
+      </div>
 
       <AddSheet open={adding} onClose={() => setAdding(false)} own={own} index={index} data={data} roster={roster} onLoad={load} onAdd={(r) => (haptic.tap(), onChange(r), setAdding(false))} />
       <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} data={data} points={points} />
@@ -224,20 +276,24 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
   );
 }
 
-function GroupRow({ x, name, onGroup }: { x: WarcryRosterFighter; name: string; onGroup: (g: WarcryRosterFighter['group']) => void }) {
+function GroupRow({ x, f, onGroup }: { x: WarcryRosterFighter; f?: WarcryFighter; onGroup: (g: WarcryRosterFighter['group']) => void }) {
   return (
-    <div className="flex items-center gap-2 py-1">
-      <span className="min-w-0 flex-1 truncate text-[13px]">
-        {name}
-        {x.role !== 'warband' && <span className="ml-1 text-[11px] text-white/40">· {ROLE_LABEL[x.role].toLowerCase()}</span>}
+    <div className="flex items-center gap-2 border-t border-white/[0.05] py-1.5 first-of-type:border-t-0">
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-[13px] font-semibold">{x.name || f?.name || x.fighterId}</span>
+        <span className="block text-[11px] text-white/40">
+          {f ? `${f.points} очк.` : ''}
+          {x.role !== 'warband' ? ` · ${ROLE_LABEL[x.role].toLowerCase()}` : ''}
+        </span>
       </span>
       <div className="flex gap-1">
         {WARCRY_GROUPS.map((g) => (
           <button
             key={g}
             type="button"
+            aria-label={GROUP_LABEL[g]}
             onClick={() => (haptic.select(), onGroup(g))}
-            className={cx('rounded-lg border px-2 py-1 text-[11px] font-semibold', x.group === g ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 text-white/50')}
+            className={cx('size-7 rounded-lg border text-[11px] font-bold', x.group === g ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 text-white/45')}
           >
             {GROUP_LABEL[g][0]}
           </button>
@@ -247,13 +303,14 @@ function GroupRow({ x, name, onGroup }: { x: WarcryRosterFighter; name: string; 
   );
 }
 
-const STAT = (label: string, v: string | number) => (
-  <div className="rounded-lg bg-white/[0.04] px-1 py-1 text-center">
-    <p className="text-[9.5px] font-semibold uppercase text-white/40">{label}</p>
-    <p className="font-display text-[16px] font-semibold leading-tight">{v}</p>
-  </div>
-);
+const FIGHTER_STATS = (f: WarcryFighter) => [
+  { label: 'Move', value: f.movement },
+  { label: 'Tough', value: f.toughness },
+  { label: 'Wounds', value: f.wounds },
+  { label: 'Очки', value: f.points },
+];
 
+/** Датакарта бойца: характеристики и оружие всегда; раскрытая — способности по стоимости, рунмарки, управление. */
 function FighterCard({
   leader,
   x,
@@ -261,6 +318,8 @@ function FighterCard({
   src,
   own,
   universal,
+  open,
+  onToggle,
   onChange,
   onLeader,
   onRemove,
@@ -271,66 +330,86 @@ function FighterCard({
   src: WarcryFaction | undefined;
   own: WarcryFaction;
   universal: WarcryAbility[];
+  open: boolean;
+  onToggle: () => void;
   onChange: (p: Partial<Pick<WarcryRosterFighter, 'name' | 'group'>>) => void;
   onLeader: () => void;
   onRemove: () => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const abilities = useMemo(() => (open ? abilitiesFor(src, f) : []), [open, src, f]);
-  const univ = useMemo(() => (open ? universalFor(universal, f) : []), [open, universal, f]);
+  const abilities = useMemo(() => (open ? sortByCost(abilitiesFor(src, f)) : []), [open, src, f]);
+  const univ = useMemo(() => (open ? sortByCost(universalFor(universal, f)) : []), [open, universal, f]);
+  const from = src && src.id !== own.id ? (src.generic ? `${ALLIANCE[src.grandAlliance] ?? src.grandAlliance} · общий` : src.name) : null;
   return (
-    <div className={cx('rounded-2xl border p-3', leader ? 'border-accent/40 bg-accent/[0.04]' : 'border-white/10 bg-white/[0.03]')}>
-      <div className="flex items-start gap-2">
-        <div className="min-w-0 flex-1">
-          <p className="text-[15px] font-semibold leading-tight">{x.name || f.name}</p>
-          {x.name && <p className="text-[11px] text-white/45">{f.name}</p>}
-          <p className="mt-1 flex flex-wrap gap-1">
-            {leader && <Tag tone="accent">Лидер</Tag>}
-            {x.role !== 'warband' && <Tag tone="warn">{ROLE_LABEL[x.role]}</Tag>}
-            {src && src.id !== own.id && !src.generic && <Tag>{src.name}</Tag>}
-            {f.subfaction && <Tag>{f.subfaction}</Tag>}
-            {x.group && <Tag>{GROUP_LABEL[x.group]}</Tag>}
-          </p>
-          {f.runemarks.length > 0 && <p className="mt-1 truncate text-[10.5px] text-white/40">{f.runemarks.join(', ')}</p>}
-        </div>
-        <IconButton icon={open ? 'down' : 'chevron'} label="Подробнее" onClick={() => setOpen((v) => !v)} className="size-8" />
+    <DataCard
+      title={x.name || f.name}
+      subtitle={[x.name ? f.name : null, from, f.subfaction || null].filter(Boolean).join(' · ') || undefined}
+      highlight={leader}
+      badges={
+        <>
+          {leader && <Tag tone="accent">Лидер</Tag>}
+          {x.role !== 'warband' && <Tag tone="warn">{ROLE_LABEL[x.role]}</Tag>}
+          {x.group && <Tag>{GROUP_LABEL[x.group]}</Tag>}
+          {f.runemarks.map((r) => (
+            <Tag key={r}>{r}</Tag>
+          ))}
+        </>
+      }
+      stats={FIGHTER_STATS(f)}
+      open={open}
+      onToggle={onToggle}
+      summary={<WeaponTable list={f.weapons} />}
+    >
+      <AbilityList title="Способности" list={abilities} empty="Нет способностей фракции для рунмарок этого бойца." />
+      <AbilityList title="Универсальные способности" list={univ} collapsed />
+      <input
+        value={x.name}
+        onChange={(e) => onChange({ name: e.target.value.slice(0, 40) })}
+        placeholder="Своё имя бойца"
+        className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none placeholder:text-white/30 focus:border-accent"
+      />
+      <div className="grid grid-cols-2 gap-2">
+        {!leader && (
+          <Button className="text-xs" onClick={onLeader}>
+            <Icon name="crown" /> Сделать лидером
+          </Button>
+        )}
+        <Button variant="danger" className={cx('text-xs', leader && 'col-span-2')} onClick={onRemove}>
+          <Icon name="trash" /> Убрать
+        </Button>
       </div>
-      <div className="mt-2 grid grid-cols-4 gap-1.5">
-        {STAT('Move', f.movement)}
-        {STAT('Tough', f.toughness)}
-        {STAT('Wounds', f.wounds)}
-        {STAT('Очки', f.points)}
+    </DataCard>
+  );
+}
+
+const sortByCost = (list: WarcryAbility[]) => [...list].sort((a, b) => COST_ORDER.indexOf(a.cost) - COST_ORDER.indexOf(b.cost));
+
+/** Оружие бойца таблицей: рунмарка оружия, дальность, атаки, сила, урон (обычный / крит). */
+function WeaponTable({ list }: { list: WarcryWeapon[] }) {
+  if (!list.length) return <p className="text-[12px] text-white/45">Нет оружия в данных</p>;
+  const cols = 'grid-cols-[1fr_3rem_2.25rem_2.25rem_3rem]';
+  return (
+    <div className="overflow-hidden rounded-xl border border-white/[0.07]">
+      <div className={cx('grid gap-x-1 bg-white/[0.05] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/45', cols)}>
+        <span>Оружие</span>
+        <span className="text-center">Range</span>
+        <span className="text-center">A</span>
+        <span className="text-center">S</span>
+        <span className="text-center">Dmg</span>
       </div>
-      <ul className="mt-2 space-y-0.5">
-        {f.weapons.map((w, i) => (
-          <li key={i} className="text-[11.5px] tabular-nums text-white/70">
-            <b className="text-white/85">{w.runemark || 'оружие'}</b> · Range {w.minRange ? `${w.minRange}-` : ''}
-            {w.maxRange}" · Attacks {w.attacks} · Str {w.strength} · Dmg {w.dmgHit}/{w.dmgCrit}
-          </li>
-        ))}
-      </ul>
-      {open && (
-        <div className="mt-2 space-y-2">
-          <input
-            value={x.name}
-            onChange={(e) => onChange({ name: e.target.value.slice(0, 40) })}
-            placeholder="Своё имя бойца"
-            className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm outline-none focus:border-accent"
-          />
-          <AbilityList title="Способности" list={abilities} empty="Нет способностей фракции для рунмарок этого бойца." />
-          <AbilityList title="Универсальные" list={univ} collapsed />
-          <div className="grid grid-cols-2 gap-2">
-            {!leader && (
-              <Button className="text-xs" onClick={onLeader}>
-                Сделать лидером
-              </Button>
-            )}
-            <Button variant="danger" className={cx('text-xs', leader && 'col-span-2')} onClick={onRemove}>
-              <Icon name="trash" /> Убрать
-            </Button>
-          </div>
+      {list.map((w, i) => (
+        <div key={i} className={cx('grid items-center gap-x-1 border-t border-white/[0.06] px-2.5 py-1.5 text-[12.5px] tabular-nums', cols)}>
+          <span className="truncate font-semibold capitalize">{w.runemark || 'оружие'}</span>
+          <span className="text-center">
+            {w.minRange ? `${w.minRange}-` : ''}
+            {w.maxRange}"
+          </span>
+          <span className="text-center">{w.attacks}</span>
+          <span className="text-center">{w.strength}</span>
+          <span className="text-center">
+            {w.dmgHit}/{w.dmgCrit}
+          </span>
         </div>
-      )}
+      ))}
     </div>
   );
 }
@@ -339,25 +418,25 @@ function AbilityList({ title, list, empty, collapsed }: { title: string; list: W
   if (!list.length) return empty ? <p className="text-[12px] text-white/45">{empty}</p> : null;
   return (
     <div>
-      <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">{title}</p>
+      <SectionTitle>{title}</SectionTitle>
       <div className="space-y-1.5">
         {list.map((a) => (
-          <details key={a.id} open={!collapsed} className="rounded-xl bg-black/20 px-3 py-2">
-            <summary className="cursor-pointer text-[13px] font-semibold">
-              <span className="mr-1 text-[10.5px] font-semibold uppercase text-accent">[{COST[a.cost] ?? a.cost}]</span>
-              {a.name}
-              {a.subfaction && <span className="ml-1 text-[11px] font-normal text-white/45">· {a.subfaction}</span>}
-              {a.runemarks.length > 0 && <span className="ml-1 text-[11px] font-normal text-white/45">· {a.runemarks.join(', ')}</span>}
-            </summary>
-            <p className="mt-1 whitespace-pre-line text-[12.5px] leading-snug text-white/75">{a.text}</p>
-          </details>
+          <RuleCard
+            key={a.id}
+            name={a.name}
+            sub={[a.subfaction, a.runemarks.length ? a.runemarks.join(', ') : null].filter(Boolean).join(' · ') || undefined}
+            badge={<CostBadge tone={COST_TONE[a.cost] ?? 'muted'}>{COST[a.cost] ?? a.cost}</CostBadge>}
+            open={!collapsed}
+          >
+            <p className="whitespace-pre-line text-[12.5px] leading-relaxed text-white/70">{a.text}</p>
+          </RuleCard>
         ))}
       </div>
     </div>
   );
 }
 
-/** Добавление бойца: своя фракция; союзники, траллы и монстры — общий файл альянса и другие фракции альянса. */
+/** Добавление бойца: источник (своя фракция; общий файл альянса; другие фракции альянса), поиск, роли кнопками. */
 function AddSheet({
   open,
   onClose,
@@ -377,68 +456,87 @@ function AddSheet({
   onLoad: (id: string) => Promise<void>;
   onAdd: (r: WarcryRoster) => void;
 }) {
-  const sources = useMemo(() => index.factions.filter((f) => f.grandAlliance === own.grandAlliance && f.id !== own.id), [index, own]);
+  const sources = useMemo(() => index.factions.filter((f) => f.grandAlliance === own.grandAlliance && f.id !== own.id).sort((a, b) => Number(b.generic) - Number(a.generic)), [index, own]);
   const [srcId, setSrcId] = useState(own.id);
+  const [q, setQ] = useState('');
   const src = data.get(srcId);
   useEffect(() => {
     if (open && !data.has(srcId)) void onLoad(srcId);
   }, [open, srcId, data, onLoad]);
-  const rows = useMemo(() => (src ? src.fighters.map((f) => ({ f, roles: rolesFor(own, src, f) })).filter((r) => r.roles.length) : []), [src, own]);
   const groups = useMemo(() => {
+    if (!src) return [];
+    const needle = q.trim().toLowerCase();
+    const rows = src.fighters
+      .map((f) => ({ f, roles: rolesFor(own, src, f) }))
+      .filter((r) => r.roles.length && (!needle || [r.f.name, ...r.f.runemarks, r.f.subfaction].some((s) => s.toLowerCase().includes(needle))));
     const m = new Map<string, typeof rows>();
-    for (const r of rows) m.set(r.f.subfaction, [...(m.get(r.f.subfaction) ?? []), r]);
-    return [...m];
-  }, [rows]);
+    for (const r of rows) {
+      const key = r.f.subfaction || (r.f.runemarks.includes('hero') ? 'Герои' : 'Бойцы');
+      m.set(key, [...(m.get(key) ?? []), r]);
+    }
+    const order = (k: string) => (k === 'Герои' ? 0 : k === 'Бойцы' ? 1 : 2);
+    return [...m].sort(([a], [b]) => order(a) - order(b) || a.localeCompare(b));
+  }, [src, own, q]);
   return (
     <Sheet open={open} onClose={onClose} title="Боец" tall>
-      <div className="mb-3 flex flex-wrap gap-1.5">
-        {[{ id: own.id, name: own.name, generic: false }, ...sources].map((s) => (
-          <button
-            key={s.id}
-            type="button"
-            onClick={() => (haptic.select(), setSrcId(s.id))}
-            className={cx('rounded-full border px-2.5 py-1 text-[11.5px] font-semibold', srcId === s.id ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 text-white/55')}
-          >
-            {s.id === own.id ? 'Своя фракция' : s.generic ? 'Союзники, траллы, монстры альянса' : s.name}
-          </button>
-        ))}
+      <div className="space-y-3">
+        <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+          {[{ id: own.id, name: own.name, generic: false }, ...sources].map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => (haptic.select(), setSrcId(s.id))}
+              className={cx('shrink-0 rounded-full border px-3 py-1.5 text-[12px] font-semibold', srcId === s.id ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 text-white/55')}
+            >
+              {s.id === own.id ? 'Своя фракция' : s.generic ? 'Союзники, траллы, монстры' : s.name}
+            </button>
+          ))}
+        </div>
+        <SearchField value={q} onChange={setQ} placeholder="Поиск: имя или рунмарка" />
+        {!src ? (
+          <div className="mx-auto my-8 size-6 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
+        ) : !groups.length ? (
+          <p className="text-sm text-white/50">Нет бойцов, которых можно взять в эту варбанду.</p>
+        ) : (
+          groups.map(([group, list]) => (
+            <div key={group}>
+              <SectionTitle>{group}</SectionTitle>
+              <ul className="space-y-1.5">
+                {list.map(({ f, roles }) => {
+                  const taken = roster.fighters.filter((x) => x.factionId === src.id && x.fighterId === f.id).length;
+                  return (
+                    <li key={f.id} className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="min-w-0 flex-1 text-[14px] font-semibold leading-tight">{f.name}</span>
+                        {taken > 0 && <Tag tone="accent">×{taken}</Tag>}
+                        <span className="font-display text-[17px] font-semibold tabular-nums">{f.points}</span>
+                      </div>
+                      <div className="mt-1.5 grid grid-cols-3 gap-1 text-center">
+                        {FIGHTER_STATS(f)
+                          .slice(0, 3)
+                          .map((s) => (
+                            <span key={s.label} className="rounded-md bg-black/25 py-0.5">
+                              <span className="block text-[9px] font-semibold uppercase text-white/40">{s.label}</span>
+                              <span className="font-display block text-[14px] font-semibold leading-tight">{s.value}</span>
+                            </span>
+                          ))}
+                      </div>
+                      {f.runemarks.length > 0 && <p className="mt-1 truncate text-[11px] capitalize text-white/40">{f.runemarks.join(' · ')}</p>}
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {roles.map((role) => (
+                          <Button key={role} className="h-8 px-3 text-xs" onClick={() => onAdd(addFighter(roster, src.id, f, role))}>
+                            <Icon name="plus" className="size-3.5" /> {role === 'warband' ? 'Добавить' : ROLE_LABEL[role]}
+                          </Button>
+                        ))}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))
+        )}
       </div>
-      {!src ? (
-        <div className="mx-auto my-8 size-6 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
-      ) : !rows.length ? (
-        <p className="text-sm text-white/50">Нет бойцов, которых можно взять в эту варбанду.</p>
-      ) : (
-        groups.map(([sub, list]) => (
-          <div key={sub} className="mb-3">
-            {sub && <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">{sub}</p>}
-            <ul className="space-y-1.5">
-              {list.map(({ f, roles }) => {
-                const count = roster.fighters.filter((x) => x.factionId === src.id && x.fighterId === f.id).length;
-                return (
-                  <li key={f.id} className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
-                    <div className="flex items-center gap-2">
-                      <span className="min-w-0 flex-1 text-sm font-semibold">{f.name}</span>
-                      {count > 0 && <Tag tone="accent">×{count}</Tag>}
-                      <span className="text-[12px] tabular-nums text-white/60">{f.points}</span>
-                    </div>
-                    <p className="text-[11px] text-white/45">
-                      Move {f.movement} · Tough {f.toughness} · Wounds {f.wounds}
-                      {f.runemarks.length ? ` · ${f.runemarks.join(', ')}` : ''}
-                    </p>
-                    <div className="mt-1.5 flex flex-wrap gap-1.5">
-                      {roles.map((role) => (
-                        <Button key={role} className="h-8 px-3 text-xs" onClick={() => onAdd(addFighter(roster, src.id, f, role))}>
-                          <Icon name="plus" className="size-3.5" /> {role === 'warband' ? 'Добавить' : ROLE_LABEL[role]}
-                        </Button>
-                      ))}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))
-      )}
     </Sheet>
   );
 }

@@ -96,8 +96,46 @@ for (const k of [...d.killteams].sort((a, b) => a.killteamName.localeCompare(b.k
   if (!team.equipment.length) warn.push(`${k.killteamId}: нет снаряжения команды`);
   if (!ploys.some((p) => p.type === 'strategy') || !ploys.some((p) => p.type === 'firefight')) warn.push(`${k.killteamId}: нет стратегических или боевых уловок`);
   files[k.killteamId] = team;
-  teams.push({ id: team.id, factionId: team.factionId, name: team.name, special, archetypes: team.archetypes, operatives: ops.length });
+  teams.push({ id: team.id, factionId: team.factionId, name: team.name, group: null, special, archetypes: team.archetypes, operatives: ops.length });
 }
+// Группа команды внутри фракции ktdash (R1 30.10.2026) — по ключевым словам самих оперативников, без внешних списков:
+// общие для всех оперативников команды ключевые слова, кроме слова самой команды и слова фракции ktdash
+// (Kasrkin → ASTRA MILITARUM, Legionaries → HERETIC ASTARTES). Если таких несколько — то, что встречается у большего
+// числа команд фракции (при равенстве — длиннее). Нет — group: null (в списке «Другие команды»).
+const letters = (s) => s.toLowerCase().replace(/[^a-z]/g, '').replace(/s/g, '');
+const near = (a, b) => {
+  const x = letters(a), y = letters(b);
+  if (!x || !y) return false;
+  if (x.includes(y) || y.includes(x)) return true;
+  let i = 0;
+  while (i < x.length && i < y.length && x[i] === y[i]) i++;
+  return i >= Math.min(x.length, y.length) - 2 && i >= 5;
+};
+const candidates = new Map();
+for (const t of teams) {
+  const ops = files[t.id].operatives;
+  const common = ops.length ? ops[0].keywords.filter((k) => ops.every((o) => o.keywords.includes(k))) : [];
+  const fName = d.factions.find((f) => f.factionId === t.factionId)?.factionName ?? '';
+  candidates.set(t.id, common.filter((k) => !near(k, t.name) && !near(k, fName)));
+}
+const groupKey = (k) => letters(k);
+const freq = new Map();
+for (const t of teams) for (const k of candidates.get(t.id)) freq.set(`${t.factionId}|${groupKey(k)}`, (freq.get(`${t.factionId}|${groupKey(k)}`) ?? 0) + 1);
+const title = (k) => k.toLowerCase().replace(/(^|[\s-])([a-z])/g, (m, p, c) => p + c.toUpperCase()).replace(/'([A-Z])/g, (m, c) => "'" + c.toLowerCase());
+const labelOf = new Map();
+for (const t of teams) {
+  const list = candidates.get(t.id).sort((a, b) => (freq.get(`${t.factionId}|${groupKey(b)}`) ?? 0) - (freq.get(`${t.factionId}|${groupKey(a)}`) ?? 0) || b.length - a.length);
+  const k = list[0];
+  if (!k) {
+    t.group = null;
+    continue;
+  }
+  // одна подпись на группу (GENESTEALER CULT / GENESTEALER CULTS → первая встреченная)
+  const key = `${t.factionId}|${groupKey(k)}`;
+  if (!labelOf.has(key)) labelOf.set(key, title(k));
+  t.group = labelOf.get(key);
+}
+report.info.push(`группы команд по ключевым словам: ${teams.filter((t) => !t.special).map((t) => `${t.id}→${t.group ?? '—'}`).join(', ')}`);
 const usedFactions = new Set(teams.map((t) => t.factionId));
 const index = {
   system: 'kt',

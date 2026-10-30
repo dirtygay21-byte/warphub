@@ -10,7 +10,8 @@ export interface KtIndex {
   source: KtSource;
   factions: { id: string; name: string }[];
   /** special — наборы миссий и неигровые оперативники (фракция SPEC), не команда для обычной игры */
-  teams: { id: string; factionId: string; name: string; special: boolean; archetypes: string[]; operatives: number }[];
+  /** group — группа внутри фракции ktdash по ключевым словам оперативников (Adeptus Astartes…), null — без группы */
+  teams: { id: string; factionId: string; name: string; group: string | null; special: boolean; archetypes: string[]; operatives: number }[];
   /** правила оружия: code — как в профиле (с «_» вместо числа) */
   weaponRules: { code: string; name: string; text: string }[];
 }

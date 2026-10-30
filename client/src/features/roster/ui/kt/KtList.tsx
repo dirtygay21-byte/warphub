@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react';
 import { loadKtTeam } from '../../data';
 import { uid } from '../../engine/roster';
-import { decodeKtRoster, KT_CODE_PREFIX, newKtRoster, type KtRoster } from '../../kt/roster';
+import { decodeKtRoster, KT_CODE_PREFIX, ktTeamGroup, newKtRoster, type KtRoster } from '../../kt/roster';
 import type { KtIndex } from '../../kt/types';
+import { cloudEnabled } from '../../storage';
 import { confirmAsk, haptic } from '../../telegram';
-import { Button, Empty, Icon, IconButton, Sheet, Tag } from '../kit';
-import { cx } from '../util';
+import { Button, Empty, Field, Icon, Segmented, Sheet, Tag } from '../kit';
+import { BottomAction, ListHeader, PickTile, RosterCard, SearchField } from '../common/BuilderKit';
 
-/** Список команд Kill Team (W3 30.10.2026): свои ростеры, создание по команде, импорт по коду KT1.…. */
+type Team = KtIndex['teams'][number];
+
+/** Список команд Kill Team (W3, вид R1 30.10.2026 — как в AoS): ростеры, создание по команде, импорт по коду KT1.…. */
 export function KtList({
   onExit,
   index,
@@ -28,40 +31,42 @@ export function KtList({
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
   const [menu, setMenu] = useState<KtRoster | null>(null);
-  const teamName = useMemo(() => Object.fromEntries(index.teams.map((t) => [t.id, t.name])), [index]);
+  const teamOf = useMemo(() => new Map(index.teams.map((t) => [t.id, t])), [index]);
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-4xl lg:pt-8">
-      <header className="mb-4 flex items-end justify-between gap-3">
-        <IconButton icon="back" label="К играм" onClick={onExit} className="mb-0.5 size-9" />
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpBuilder · {index.edition}</p>
-          <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Kill Team</h1>
-        </div>
-        <IconButton icon="upload" label="Импорт команды по коду" onClick={() => setImporting(true)} />
-      </header>
+      <ListHeader kicker={`WarpBuilder · ${index.edition}`} title="Kill Team" onBack={onExit} onImport={() => setImporting(true)} />
       {rosters.length === 0 ? (
-        <Empty title="Пока пусто">Выберите команду и наберите оперативников: оружие, снаряжение, уловки и правила — из данных KTDash.</Empty>
+        <Empty title="Пока пусто">Выберите команду и наберите оперативников: датакарты, оружие, снаряжение и уловки — из данных KTDash.</Empty>
       ) : (
         <ul className="space-y-2.5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-2.5 lg:space-y-0">
-          {rosters.map((r) => (
-            <li key={r.id} className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-3">
-              <button type="button" onClick={() => (haptic.tap(), onOpen(r.id))} className="min-w-0 flex-1 text-left">
-                <span className="block truncate text-[15px] font-semibold">{r.name}</span>
-                <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11px] text-white/45">
-                  {teamName[r.teamId] ?? r.teamId} · оперативников: {r.operatives.length}
-                  {r.summary?.errors ? <Tag tone="danger">ошибок: {r.summary.errors}</Tag> : r.summary?.warnings ? <Tag tone="warn">замечаний: {r.summary.warnings}</Tag> : null}
-                </span>
-              </button>
-              <IconButton icon="more" label="Меню" onClick={() => setMenu(r)} className="size-9" />
-            </li>
-          ))}
+          {rosters.map((r) => {
+            const t = teamOf.get(r.teamId);
+            return (
+              <RosterCard
+                key={r.id}
+                name={r.name}
+                sub={t ? `${t.name} · ${ktTeamGroup(index, t)}` : r.teamId}
+                tags={
+                  <>
+                    <Tag>KT</Tag>
+                    <Tag>{r.operatives.length} опер.</Tag>
+                  </>
+                }
+                status={r.summary}
+                updatedAt={r.updatedAt}
+                onOpen={() => onOpen(r.id)}
+                onMenu={() => setMenu(r)}
+              />
+            );
+          })}
         </ul>
       )}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-app/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
-        <Button variant="primary" className="mx-auto h-12 w-full max-w-lg" onClick={() => setCreating(true)}>
-          <Icon name="plus" /> Новая команда
-        </Button>
-      </div>
+      <p className="mt-8 text-center text-xs leading-relaxed text-white/35">
+        Данные: {index.source.name} · {index.source.date} ({index.source.commit})
+        <br />
+        {cloudEnabled() ? 'Команды синхронизируются через Telegram' : 'Команды хранятся в этом браузере'}
+      </p>
+      <BottomAction onClick={() => setCreating(true)}>Новая команда</BottomAction>
       <CreateSheet open={creating} index={index} onClose={() => setCreating(false)} onCreate={(r) => (setCreating(false), onCreate(r))} />
       <ImportSheet open={importing} index={index} onClose={() => setImporting(false)} onImport={(r) => (setImporting(false), onCreate(r))} />
       <Sheet open={!!menu} onClose={() => setMenu(null)} title={menu?.name ?? ''}>
@@ -89,53 +94,110 @@ export function KtList({
   );
 }
 
+/**
+ * Выбор команды: фракция ktdash → группа по ключевым словам (Imperium → Astra Militarum → Kasrkin), поиск,
+ * отдельно — наборы миссий и неигровые оперативники. Как создание ростера AoS: название, выбор, «Создать».
+ */
 function CreateSheet({ open, index, onClose, onCreate }: { open: boolean; index: KtIndex; onClose: () => void; onCreate: (r: KtRoster) => void }) {
-  const [busy, setBusy] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [special, setSpecial] = useState(false);
-  const pick = async (id: string) => {
-    setBusy(id);
+  const [kind, setKind] = useState<'play' | 'special'>('play');
+  const [q, setQ] = useState('');
+  const [picked, setPicked] = useState<string | null>(null);
+  const [name, setName] = useState('');
+  const sections = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    const match = (t: Team) => !needle || [t.name, t.group ?? '', ...t.archetypes].some((s) => s.toLowerCase().includes(needle));
+    return index.factions
+      .map((f) => {
+        const teams = index.teams.filter((t) => t.factionId === f.id && t.special === (kind === 'special') && match(t));
+        // сначала команды без группы (подпись — фракция), затем группы по алфавиту
+        const groups = new Map<string, Team[]>();
+        for (const t of teams) groups.set(t.group ?? '', [...(groups.get(t.group ?? '') ?? []), t]);
+        const list = [...groups].sort(([a], [b]) => (a === '' ? -1 : b === '' ? 1 : a.localeCompare(b)));
+        return { faction: f, count: teams.length, groups: list };
+      })
+      .filter((s) => s.count > 0);
+  }, [index, kind, q]);
+  const create = async () => {
+    if (!picked) return;
+    setBusy(true);
     setErr(null);
     try {
-      const team = await loadKtTeam(id);
-      onCreate(newKtRoster(team, index.source.commit));
+      const team = await loadKtTeam(picked);
+      const r = newKtRoster(team, index.source.commit);
+      if (name.trim()) r.name = name.trim().slice(0, 80);
+      haptic.ok();
+      onCreate(r);
+      setPicked(null);
+      setName('');
+      setQ('');
     } catch (e) {
       setErr(e instanceof Error ? e.message : String(e));
     }
-    setBusy(null);
+    setBusy(false);
   };
   return (
-    <Sheet open={open} onClose={onClose} title="Команда" tall>
-      {err && <p className="mb-2 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{err}</p>}
-      {index.factions.map((f) => {
-        const teams = index.teams.filter((t) => t.factionId === f.id && t.special === special);
-        if (!teams.length) return null;
-        return (
-          <div key={f.id} className="mb-3">
-            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">{f.name}</p>
-            <div className="grid grid-cols-1 gap-1.5 min-[420px]:grid-cols-2">
-              {teams.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  disabled={!!busy}
-                  onClick={() => void pick(t.id)}
-                  className={cx('rounded-xl border px-3 py-2 text-left active:bg-white/10 disabled:opacity-50', busy === t.id ? 'border-accent bg-accent/10' : 'border-white/10 bg-white/[0.03]')}
-                >
-                  <span className="block text-sm font-semibold">{t.name}</span>
-                  <span className="block truncate text-[11px] text-white/45">{t.archetypes.join(' · ') || `профилей: ${t.operatives}`}</span>
-                </button>
+    <Sheet
+      open={open}
+      onClose={onClose}
+      title="Новая команда · Kill Team"
+      tall
+      footer={
+        <Button variant="primary" className="h-12 w-full text-base" disabled={!picked || busy} onClick={() => void create()}>
+          {busy ? 'Загрузка…' : 'Создать'}
+        </Button>
+      }
+    >
+      <div className="space-y-4">
+        <Field label="Название">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="По умолчанию — название команды"
+            className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-white outline-none placeholder:text-white/30 focus:border-accent"
+          />
+        </Field>
+        <Segmented
+          value={kind}
+          onChange={(v) => (setKind(v), setPicked(null))}
+          options={[
+            { value: 'play', label: 'Команды' },
+            { value: 'special', label: 'Наборы миссий' },
+          ]}
+        />
+        <SearchField value={q} onChange={setQ} placeholder="Поиск: команда, группа, архетип" />
+        {err && <p className="rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{err}</p>}
+        {!sections.length && <p className="text-sm text-white/50">Ничего не найдено.</p>}
+        {sections.map(({ faction, count, groups }) => (
+          <section key={faction.id}>
+            <p className="font-display mb-2 flex items-baseline justify-between border-b border-white/10 pb-1 text-lg font-semibold uppercase leading-none">
+              {faction.name}
+              <span className="text-[11px] font-semibold text-white/35">{count}</span>
+            </p>
+            <div className="space-y-3">
+              {groups.map(([group, teams]) => (
+                <div key={group || '-'}>
+                  {group && <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-accent/80">{group}</p>}
+                  <div className="grid grid-cols-1 gap-1.5 min-[400px]:grid-cols-2">
+                    {teams.map((t) => (
+                      <PickTile
+                        key={t.id}
+                        title={t.name}
+                        sub={`${t.group ?? faction.name} · профилей: ${t.operatives}`}
+                        chips={t.archetypes}
+                        active={picked === t.id}
+                        onClick={() => setPicked(t.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
-          </div>
-        );
-      })}
-      <button type="button" onClick={() => setSpecial((v) => !v)} className="mt-1 text-[12px] font-semibold text-white/45">
-        {special ? '← Команды для игры' : 'Наборы миссий и неигровые оперативники →'}
-      </button>
-      <p className="mt-3 text-[11px] text-white/35">
-        Данные: {index.source.name}, {index.source.date} ({index.source.commit}).
-      </p>
+          </section>
+        ))}
+        <p className="text-[11px] text-white/35">Группы — по ключевым словам оперативников в данных KTDash. Архетипы — как в источнике.</p>
+      </div>
     </Sheet>
   );
 }

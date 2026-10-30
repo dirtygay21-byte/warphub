@@ -5,7 +5,7 @@
  * источника на экране; лимит снаряжения в источнике не записан — не проверяется (ничего не придумываем).
  */
 import { uid } from '../engine/roster';
-import type { KtOperative, KtTeam } from './types';
+import type { KtIndex, KtOperative, KtTeam } from './types';
 
 export interface KtRosterOp {
   uid: string;
@@ -28,6 +28,9 @@ export interface KtRoster {
   createdAt: number;
   updatedAt: number;
 }
+
+/** Подпись команды: группа внутри фракции (Astra Militarum) или фракция ktdash (Imperium). */
+export const ktTeamGroup = (index: KtIndex, t: KtIndex['teams'][number]) => t.group ?? index.factions.find((f) => f.id === t.factionId)?.name ?? t.factionId;
 
 export function newKtRoster(team: KtTeam, dataVersion: string | null): KtRoster {
   const now = Date.now();
