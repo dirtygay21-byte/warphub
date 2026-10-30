@@ -34,7 +34,7 @@ export function RosterCard({
     <li className="flex items-stretch overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
       <button type="button" onClick={() => (haptic.tap(), onOpen())} className="min-w-0 flex-1 px-4 py-3.5 text-left active:bg-white/[0.03]">
         <p className="truncate text-base font-semibold">{name}</p>
-        <p className="mt-0.5 truncate text-sm text-fg-3">{sub}</p>
+        <p className="mt-0.5 truncate text-sm text-fg-2">{sub}</p>
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
           {tags}
           {status && (
@@ -64,14 +64,14 @@ export function ToolTile({ icon, title, sub, onClick }: { icon: string; title: s
     <button
       type="button"
       onClick={() => (haptic.tap(), onClick())}
-      className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 text-left transition active:bg-white/10"
+      className="ds-press flex min-h-16 items-center gap-3 rounded-2xl border border-white/10 bg-app-elevated px-3 py-3 text-left"
     >
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent">
         <Icon name={icon} />
       </span>
       <span className="min-w-0">
         <span className="font-display block text-base font-semibold uppercase leading-none">{title}</span>
-        <span className="mt-1 block truncate text-[12px] text-fg-3">{sub}</span>
+        <span className="mt-1 block truncate text-[13px] text-fg-2">{sub}</span>
       </span>
     </button>
   );
@@ -81,10 +81,10 @@ export function ToolTile({ icon, title, sub, onClick }: { icon: string; title: s
 export function ListHeader({ kicker, title, onBack, onImport }: { kicker: string; title: string; onBack: () => void; onImport?: () => void }) {
   return (
     <header className="mb-4 flex items-end justify-between gap-3">
-      <IconButton icon="back" label="К играм" onClick={onBack} className="mb-0.5 size-9" />
+      <IconButton icon="back" label="К играм" onClick={onBack} className="mb-0.5" />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-xs font-semibold uppercase tracking-[0.18em] text-accent">{kicker}</p>
-        <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">{title}</h1>
+        <p className="truncate text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">{kicker}</p>
+        <h1 className="font-display mt-1 text-[32px] font-semibold uppercase leading-none">{title}</h1>
       </div>
       {onImport && <IconButton icon="upload" label="Импорт по коду" onClick={onImport} />}
     </header>
@@ -174,7 +174,7 @@ export function EditorHeader({
   return (
     <div className="sticky top-0 z-30 border-b border-white/[0.06] bg-app/95 px-4 pb-3 pt-3 backdrop-blur">
       <div className="flex items-center gap-2">
-        <IconButton icon="back" label="К списку" onClick={onBack} className="size-9" />
+        <IconButton icon="back" label="К списку" onClick={onBack} />
         <NameInput value={name} onChange={onName} />
         {actions}
       </div>
