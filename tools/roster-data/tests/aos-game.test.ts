@@ -9,6 +9,8 @@ import {
   aosTotals,
   aosUndoTarget,
   applyAosEvent,
+  aosSeatForEvent,
+  rememberAosOnline,
   battleplanRoll,
   loadAosGame,
   readAosLibrary,
@@ -176,4 +178,44 @@ test('смена батлплана сбрасывает территорию (A
   assert.equal(st2.territory, null);
   const st3 = ok(replayAos(log(...base, { type: 'battleplan-set', n: 2, source: 'manual' }, { type: 'territory-set', territory: 'B' }), cat));
   assert.equal(st3.territory, 'B');
+});
+
+test('два телефона AoS: общие события — без места, остальные — со своим; чужой ход и чужие CP движок не принимает', async () => {
+  const { isAosLog, appendRemote } = await import('../../../client/src/features/roster/game');
+  assert.equal(aosSeatForEvent('game-created', 'p2'), null);
+  assert.equal(aosSeatForEvent('tactics-revealed', 'p2'), null);
+  assert.equal(aosSeatForEvent('battle-started', 'p1'), null);
+  assert.equal(aosSeatForEvent('cp-changed', 'p2'), 'p2');
+  const seat = (b: Body, s: Seat): Body => ({ ...b, seat: aosSeatForEvent(b.type, s) });
+  const base = setup().map((b, i) => (i === 0 ? { ...b, system: 'aos' } : b)) as Body[];
+  const ev = log(...base, seat({ type: 'round-started', first: 'p1', source: 'manual' }, 'p1'));
+  assert.ok(isAosLog(ev));
+  assert.ok(!isAosLog(log(setup()[1]!)));
+  const st = ok(replayAos(ev, cat));
+  // p2 не может закончить ход p1 и менять CP p1
+  for (const bad of [seat({ type: 'turn-ended' }, 'p2'), { ...seat({ type: 'cp-changed', target: 'p1', delta: 1, reason: 'x' }, 'p2') }]) {
+    const r = applyAosEvent(st, { ...(bad as AosGameEvent), id: 'x', seq: st.lastSeq + 1, at: '' }, cat);
+    assert.equal(r.ok, false);
+  }
+  const good = applyAosEvent(st, { ...(seat({ type: 'turn-ended' }, 'p1') as AosGameEvent), id: 'y', seq: st.lastSeq + 1, at: '' }, cat);
+  assert.ok(good.ok);
+  // продолжение журнала с сервера — по номерам
+  assert.equal(appendRemote(ev.slice(0, 3), ev.slice(3))!.length, ev.length);
+  assert.equal(appendRemote(ev.slice(0, 3), ev.slice(5)), null);
+});
+
+test('два телефона AoS: ссылка в списке игр, сводка обновляется, удаление — только ссылка', () => {
+  const mem = new Map<string, string>();
+  const store = { getItem: (k: string) => mem.get(k) ?? null, setItem: (k: string, v: string) => void mem.set(k, v), removeItem: (k: string) => void mem.delete(k) };
+  assert.equal(rememberAosOnline(store, '', { gameId: 'g1', seat: 'p2', code: 'ABCDE' }, null, cat), null);
+  let [e] = readAosLibrary(store, '');
+  assert.equal(e!.key, 'online:g1');
+  assert.deepEqual(e!.online, { gameId: 'g1', seat: 'p2', code: 'ABCDE' });
+  const st = ok(replayAos(log(...setup()), cat));
+  rememberAosOnline(store, '', { gameId: 'g1', seat: 'p2', code: 'ABCDE' }, st, cat);
+  [e] = readAosLibrary(store, '');
+  assert.equal(e!.summary.battleplan, 'Into the Fire');
+  assert.equal(readAosLibrary(store, '').length, 1);
+  assert.equal(removeAosGame(store, '', 'online:g1'), null);
+  assert.equal(readAosLibrary(store, '').length, 0);
 });

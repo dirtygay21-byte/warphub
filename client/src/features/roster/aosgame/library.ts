@@ -16,7 +16,9 @@ export type AosSummary = {
   round: number;
   score: Record<Seat, number>;
 };
-export type AosSavedEntry = { key: string; createdAt: string; updatedAt: string; summary: AosSummary };
+export type AosOnlineLink = { gameId: string; seat: Seat; code: string };
+/** online — игра на двух телефонах: журнал на сервере, здесь только ссылка и сводка */
+export type AosSavedEntry = { key: string; createdAt: string; updatedAt: string; summary: AosSummary; online?: AosOnlineLink };
 
 const indexKey = (suffix: string) => `warphub.game.aos.library.v1${suffix}`;
 const logKey = (suffix: string, id: string) => `warphub.game.aos.v1${suffix}.${id}`;
@@ -105,4 +107,16 @@ export function removeAosGame(store: KeyValueStore, suffix: string, key: string)
     /* хранилище недоступно */
   }
   return writeIndex(store, suffix, readIndex(store, suffix).filter((e) => e.key !== key));
+}
+
+const EMPTY: AosSummary = { names: { p1: 'Игрок 1', p2: 'Игрок 2' }, battleplan: null, stage: 'setup', round: 1, score: { p1: 0, p2: 0 } };
+
+/** Запомнить игру на двух телефонах в списке (ключ — id игры на сервере); state null — сводки ещё нет. */
+export function rememberAosOnline(store: KeyValueStore, suffix: string, link: AosOnlineLink, state: AosGameState | null, cat: AosCatalog): string | null {
+  const list = readIndex(store, suffix);
+  const key = 'online:' + link.gameId;
+  const old = list.find((e) => e.key === key);
+  const now = new Date().toISOString();
+  const summary = state ? aosSummarize(state, cat) : (old?.summary ?? EMPTY);
+  return writeIndex(store, suffix, [...list.filter((e) => e.key !== key), { key, createdAt: old?.createdAt ?? now, updatedAt: state ? now : (old?.updatedAt ?? now), summary, online: link }]);
 }
