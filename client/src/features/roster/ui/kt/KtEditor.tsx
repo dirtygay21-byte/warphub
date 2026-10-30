@@ -1,15 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { loadKtTeam } from '../../data';
-import { addOperative, checkKtRoster, encodeKtRoster, removeOperative, toggleEquipment, touchKt, updateOperative, type KtRoster, type KtRosterOp } from '../../kt/roster';
+import { addOperative, checkKtRoster, compositionTotal, encodeKtRoster, ktTeamGroup, removeOperative, toggleEquipment, touchKt, updateOperative, type KtRoster, type KtRosterOp } from '../../kt/roster';
 import type { KtIndex, KtOperative, KtTeam, KtWeapon } from '../../kt/types';
-import { confirmAsk, haptic, shareText } from '../../telegram';
+import { confirmAsk, haptic, openExternal, shareText } from '../../telegram';
 import { Button, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
 import { cx } from '../util';
+import { CostBadge, DataCard, EditorHeader, HeaderStat, RuleCard, SectionTitle } from '../common/BuilderKit';
 import { Md } from './Md';
 
-type Tab = 'ops' | 'ploys' | 'equip' | 'team';
+type Tab = 'ops' | 'rules' | 'ploys' | 'equip';
 
-/** Редактор команды Kill Team (W3 30.10.2026): оперативники и оружие, снаряжение, уловки, состав и проверки. */
+/**
+ * Редактор команды Kill Team (W3, вид R1 30.10.2026 — как AoS и датакарты Wahapedia): шапка со счётом и проверкой,
+ * блок команды, датакарты оперативников, правила фракции (один раз, а не в каждой карточке), уловки, снаряжение.
+ */
 export function KtEditor({ roster, index, onBack, onChange, onDelete }: { roster: KtRoster; index: KtIndex; onBack: () => void; onChange: (r: KtRoster) => void; onDelete: () => void }) {
   const [team, setTeam] = useState<KtTeam | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +21,6 @@ export function KtEditor({ roster, index, onBack, onChange, onDelete }: { roster
     loadKtTeam(roster.teamId).then(setTeam, (e) => setError(String(e?.message ?? e)));
   }, [roster.teamId]);
   const issues = useMemo(() => (team ? checkKtRoster(roster, team) : []), [roster, team]);
-  // краткая сводка для списка
   useEffect(() => {
     if (!team) return;
     const s = { operatives: roster.operatives.length, errors: issues.filter((i) => i.level === 'error').length, warnings: issues.filter((i) => i.level === 'warning').length };
@@ -28,6 +31,16 @@ export function KtEditor({ roster, index, onBack, onChange, onDelete }: { roster
   const [adding, setAdding] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [menu, setMenu] = useState(false);
+  const [teamOpen, setTeamOpen] = useState(false);
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  // правила фракции повторяются в каждом оперативнике источника — показываются один раз во вкладке «Правила»
+  const factionRules = useMemo(() => {
+    if (!team) return [];
+    const seen = new Map<string, KtOperative['abilities'][number]>();
+    for (const o of team.operatives) for (const a of o.abilities) if (a.factionRule && !seen.has(a.name)) seen.set(a.name, a);
+    return [...seen.values()];
+  }, [team]);
 
   if (error)
     return (
@@ -40,254 +53,427 @@ export function KtEditor({ roster, index, onBack, onChange, onDelete }: { roster
     );
   if (!team) return <div className="mx-auto mt-24 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />;
   const opOf = (x: KtRosterOp) => team.operatives.find((o) => o.id === x.opTypeId);
+  const total = compositionTotal(team.composition);
+  const meta = index.teams.find((t) => t.id === team.id);
+  const leader = roster.operatives.some((x) => opOf(x)?.keywords.includes('LEADER'));
+  const ploys = team.ploys.filter((p) => p.type !== 'rule');
+  const teamRules = team.ploys.filter((p) => p.type === 'rule');
 
   return (
-    <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-3xl lg:pt-8">
-      <header className="mb-3 flex items-start gap-3">
-        <IconButton icon="back" label="К списку" onClick={onBack} className="mt-0.5 size-9" />
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Kill Team · {team.name}</p>
-          <input
-            value={roster.name}
-            onChange={(e) => onChange(touchKt({ ...roster, name: e.target.value.slice(0, 80) }))}
-            className="font-display mt-1 w-full bg-transparent text-2xl font-semibold uppercase leading-none outline-none"
-            aria-label="Название команды"
-          />
-          <p className="mt-1 text-[11px] text-white/45">
-            оперативников: {roster.operatives.length} · снаряжение: {roster.equipment.length}
-          </p>
-        </div>
-        <IconButton icon="share" label="Экспорт" onClick={() => setExporting(true)} className="size-9" />
-        <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />
-      </header>
-      {issues.length > 0 && (
-        <ul className="mb-3 space-y-1 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-          {issues.map((i, k) => (
-            <li key={k} className={cx('flex gap-2 text-[12.5px]', i.level === 'error' ? 'text-danger' : 'text-warn')}>
-              <Icon name="alert" className="mt-0.5 size-4 shrink-0" />
-              {i.message}
-            </li>
-          ))}
-        </ul>
-      )}
-      <Segmented
-        className="mb-3"
-        value={tab}
-        onChange={setTab}
-        options={[
-          { value: 'ops', label: 'Оперативники' },
-          { value: 'equip', label: 'Снаряжение' },
-          { value: 'ploys', label: 'Уловки' },
-          { value: 'team', label: 'Команда' },
-        ]}
+    <div className="mx-auto min-h-dvh max-w-lg pb-32 lg:max-w-3xl">
+      <EditorHeader
+        name={roster.name}
+        onName={(name) => onChange(touchKt({ ...roster, name: name.slice(0, 80) }))}
+        onBack={onBack}
+        actions={
+          <>
+            <IconButton icon="share" label="Экспорт" onClick={() => setExporting(true)} className="size-9" />
+            <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />
+          </>
+        }
+        big={roster.operatives.length}
+        bigLimit={total}
+        bigUnit={total == null ? 'оперативн.' : undefined}
+        stats={
+          <>
+            <HeaderStat label="Лидер" value={leader ? '✓' : '—'} bad={!leader && roster.operatives.length > 0} />
+            <HeaderStat label="Снаряж." value={String(roster.equipment.length)} />
+          </>
+        }
+        issues={issues}
       />
-      {tab === 'ops' && (
-        <section className="space-y-2.5">
-          {roster.operatives.map((x, n) => {
-            const o = opOf(x);
-            return o ? (
-              <OpCard key={x.uid} n={n + 1} x={x} o={o} onChange={(p) => onChange(updateOperative(roster, x.uid, p))} onRemove={() => onChange(removeOperative(roster, x.uid))} />
-            ) : (
-              <div key={x.uid} className="flex items-center justify-between rounded-2xl border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-danger">
-                Нет в данных: {x.opTypeId}
-                <Button variant="danger" className="text-xs" onClick={() => onChange(removeOperative(roster, x.uid))}>
-                  Убрать
-                </Button>
-              </div>
-            );
-          })}
-          <Button variant="primary" className="h-12 w-full" onClick={() => setAdding(true)}>
-            <Icon name="plus" /> Добавить оперативника
-          </Button>
-        </section>
-      )}
-      {tab === 'equip' && (
-        <section className="space-y-2">
-          {!team.equipment.length && <p className="text-sm text-white/50">В данных нет снаряжения этой команды.</p>}
-          {team.equipment.map((e) => {
-            const on = roster.equipment.includes(e.id);
-            return (
-              <label key={e.id} className={cx('block cursor-pointer rounded-2xl border p-3', on ? 'border-accent/50 bg-accent/[0.06]' : 'border-white/10 bg-white/[0.03]')}>
-                <span className="flex items-center gap-2">
-                  <input type="checkbox" checked={on} onChange={() => (haptic.select(), onChange(toggleEquipment(roster, e.id)))} className="size-5 accent-accent" />
-                  <span className="text-sm font-semibold">{e.name}</span>
-                </span>
-                <Md text={e.text} />
-              </label>
-            );
-          })}
-          <p className="text-[11px] text-white/35">Лимит снаряжения в данных источника не записан — смотрите правила редакции.</p>
-        </section>
-      )}
-      {tab === 'ploys' && (
-        <section className="space-y-3">
-          {(['strategy', 'firefight', 'rule'] as const).map((type) => {
-            const list = team.ploys.filter((p) => p.type === type);
-            if (!list.length) return null;
-            return (
-              <div key={type}>
-                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">{type === 'strategy' ? 'Стратегические уловки' : type === 'firefight' ? 'Боевые уловки' : 'Правила команды'}</p>
-                <div className="space-y-2">
-                  {list.map((p) => (
-                    <details key={p.id} className="rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2">
-                      <summary className="cursor-pointer text-sm font-semibold">{p.name}</summary>
-                      <Md text={p.text} />
-                    </details>
+
+      <div className="space-y-4 px-4 pt-4">
+        {/* ---- команда ---- */}
+        <section className="rounded-2xl border border-white/10 bg-app-elevated">
+          <button type="button" onClick={() => setTeamOpen((o) => !o)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wider text-white/45">Kill Team · {meta ? ktTeamGroup(index, meta) : team.factionId}</p>
+              <p className="mt-0.5 truncate text-[15px] font-semibold">{team.name}</p>
+              {team.archetypes.length > 0 && (
+                <div className="mt-1.5 flex flex-wrap gap-1">
+                  {team.archetypes.map((a) => (
+                    <Tag key={a}>{a}</Tag>
                   ))}
                 </div>
+              )}
+            </div>
+            <Icon name="down" className={cx('size-5 shrink-0 text-white/40 transition', teamOpen && 'rotate-180')} />
+          </button>
+          {teamOpen && (
+            <div className="space-y-3 border-t border-white/[0.06] px-4 pb-4 pt-3">
+              {team.description && <Md text={team.description} className="text-[12.5px] italic leading-snug text-white/60" />}
+              <div>
+                <SectionTitle>Состав команды</SectionTitle>
+                {team.composition ? <Md text={team.composition} className="text-[12.5px] leading-snug text-white/75" /> : <p className="text-sm text-white/50">Нет данных о составе.</p>}
               </div>
-            );
-          })}
-        </section>
-      )}
-      {tab === 'team' && (
-        <section className="space-y-3">
-          {team.archetypes.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {team.archetypes.map((a) => (
-                <Tag key={a}>{a}</Tag>
-              ))}
+              <p className="text-[11px] text-white/35">
+                Данные: {index.source.name}, {index.source.date} ({index.source.commit}).
+              </p>
             </div>
           )}
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Состав команды</p>
-            {team.composition ? <Md text={team.composition} /> : <p className="text-sm text-white/50">Нет данных о составе.</p>}
-          </div>
-          {team.description && (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-              <Md text={team.description} className="text-[12.5px] italic leading-snug text-white/60" />
-            </div>
-          )}
-          <p className="text-[11px] text-white/35">
-            Данные: {index.source.name}, {index.source.date} ({index.source.commit}).
-          </p>
         </section>
-      )}
 
-      <Sheet open={adding} onClose={() => setAdding(false)} title="Оперативник" tall>
-        <ul className="space-y-1.5">
-          {team.operatives.map((o) => {
-            const count = roster.operatives.filter((x) => x.opTypeId === o.id).length;
-            return (
-              <li key={o.id}>
-                <button type="button" onClick={() => (haptic.tap(), onChange(addOperative(roster, o)), setAdding(false))} className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left active:bg-white/10">
-                  <span className="flex items-center gap-2">
-                    <span className="min-w-0 flex-1 text-sm font-semibold">{o.name}</span>
-                    {count > 0 && <Tag tone="accent">×{count}</Tag>}
-                  </span>
-                  <span className="block text-[11px] text-white/45">
-                    APL {o.stats.apl} · Move {o.stats.move} · Save {o.stats.save} · Wounds {o.stats.wounds}
-                    {o.keywords.includes('LEADER') ? ' · LEADER' : ''}
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </Sheet>
+        <Segmented
+          value={tab}
+          onChange={setTab}
+          options={[
+            { value: 'ops', label: 'Оперативники' },
+            { value: 'rules', label: 'Правила' },
+            { value: 'ploys', label: 'Уловки' },
+            { value: 'equip', label: 'Снаряж.' },
+          ]}
+        />
+
+        {tab === 'ops' && (
+          <section className="space-y-2.5">
+            {!roster.operatives.length && <p className="rounded-xl border border-dashed border-white/15 px-3 py-6 text-center text-sm text-white/45">Добавьте оперативников — первым обычно идёт лидер.</p>}
+            {roster.operatives.map((x, n) => {
+              const o = opOf(x);
+              return o ? (
+                <OpCard
+                  key={x.uid}
+                  n={n + 1}
+                  x={x}
+                  o={o}
+                  open={expanded === x.uid}
+                  onToggle={() => setExpanded((e) => (e === x.uid ? null : x.uid))}
+                  onChange={(p) => onChange(updateOperative(roster, x.uid, p))}
+                  onRemove={() => onChange(removeOperative(roster, x.uid))}
+                />
+              ) : (
+                <div key={x.uid} className="flex items-center justify-between rounded-2xl border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-danger">
+                  Нет в данных: {x.opTypeId}
+                  <Button variant="danger" className="text-xs" onClick={() => onChange(removeOperative(roster, x.uid))}>
+                    Убрать
+                  </Button>
+                </div>
+              );
+            })}
+            <Button variant="primary" className="h-12 w-full" onClick={() => setAdding(true)}>
+              <Icon name="plus" /> Добавить оперативника
+            </Button>
+          </section>
+        )}
+
+        {tab === 'rules' && (
+          <section className="space-y-4">
+            <div>
+              <SectionTitle>Правила фракции</SectionTitle>
+              <div className="space-y-1.5">
+                {factionRules.map((a) => (
+                  <RuleCard key={a.id} name={a.name} badge={a.ap != null ? <CostBadge>{a.ap} AP</CostBadge> : undefined}>
+                    <Md text={a.text} className="text-[12.5px] leading-relaxed text-white/70" />
+                  </RuleCard>
+                ))}
+                {teamRules.map((p) => (
+                  <RuleCard key={p.id} name={p.name}>
+                    <Md text={p.text} className="text-[12.5px] leading-relaxed text-white/70" />
+                  </RuleCard>
+                ))}
+                {!factionRules.length && !teamRules.length && <p className="text-sm text-white/50">В данных нет правил фракции.</p>}
+              </div>
+            </div>
+            <WeaponRules index={index} />
+          </section>
+        )}
+
+        {tab === 'ploys' && (
+          <section className="space-y-4">
+            {(['strategy', 'firefight'] as const).map((type) => {
+              const list = ploys.filter((p) => p.type === type);
+              if (!list.length) return null;
+              return (
+                <div key={type}>
+                  <SectionTitle>{type === 'strategy' ? 'Стратегические уловки' : 'Боевые уловки'}</SectionTitle>
+                  <div className="space-y-1.5">
+                    {list.map((p) => (
+                      <RuleCard key={p.id} name={p.name} badge={<CostBadge tone={type === 'strategy' ? 'accent' : 'warn'}>{type === 'strategy' ? 'Strategy' : 'Firefight'}</CostBadge>}>
+                        <Md text={p.text} className="text-[12.5px] leading-relaxed text-white/70" />
+                      </RuleCard>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            <p className="text-[11px] text-white/35">Стоимость уловок в CP в данных источника не записана — смотрите правила редакции.</p>
+          </section>
+        )}
+
+        {tab === 'equip' && (
+          <section className="space-y-2">
+            {!team.equipment.length && <p className="text-sm text-white/50">В данных нет снаряжения этой команды.</p>}
+            {team.equipment.map((e) => {
+              const on = roster.equipment.includes(e.id);
+              return (
+                <div key={e.id} className={cx('overflow-hidden rounded-2xl border', on ? 'border-accent/50 bg-accent/[0.06]' : 'border-white/10 bg-app-elevated')}>
+                  <button type="button" onClick={() => (haptic.select(), onChange(toggleEquipment(roster, e.id)))} className="flex w-full items-center gap-3 px-3.5 py-3 text-left">
+                    <span className={cx('flex size-5 shrink-0 items-center justify-center rounded-md border', on ? 'border-accent bg-accent text-black' : 'border-white/30')}>{on && <Icon name="check" className="size-3.5" />}</span>
+                    <span className="min-w-0 flex-1 text-[14px] font-semibold">{e.name}</span>
+                    {on && <Tag tone="accent">Взято</Tag>}
+                  </button>
+                  <div className="border-t border-white/[0.06] px-3.5 py-2">
+                    <Md text={e.text} className="text-[12.5px] leading-relaxed text-white/65" />
+                  </div>
+                </div>
+              );
+            })}
+            <p className="text-[11px] text-white/35">Лимит снаряжения в данных источника не записан — смотрите правила редакции.</p>
+          </section>
+        )}
+      </div>
+
+      <AddSheet open={adding} team={team} roster={roster} onClose={() => setAdding(false)} onAdd={(o) => (haptic.tap(), onChange(addOperative(roster, o)), setAdding(false))} />
       <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} team={team} />
       <Sheet open={menu} onClose={() => setMenu(false)} title="Команда">
-        <Button
-          variant="danger"
-          className="w-full justify-start"
-          onClick={async () => {
-            if (await confirmAsk(`Удалить команду «${roster.name}»?`)) onDelete();
-          }}
-        >
-          <Icon name="trash" /> Удалить команду
-        </Button>
+        <div className="space-y-2 pb-2">
+          <Button className="w-full justify-start" onClick={() => openExternal('https://wahapedia.ru/kill-team3/')}>
+            <Icon name="book" /> Правила Kill Team на Wahapedia
+          </Button>
+          <Button
+            variant="danger"
+            className="w-full justify-start"
+            onClick={async () => {
+              if (await confirmAsk(`Удалить команду «${roster.name}»?`)) onDelete();
+            }}
+          >
+            <Icon name="trash" /> Удалить команду
+          </Button>
+        </div>
       </Sheet>
     </div>
   );
 }
 
-const STAT = (label: string, v: string | number) => (
-  <div className="rounded-lg bg-white/[0.04] px-1 py-1 text-center">
-    <p className="text-[9.5px] font-semibold uppercase text-white/40">{label}</p>
-    <p className="font-display text-[16px] font-semibold leading-tight">{v}</p>
-  </div>
-);
+const OP_STATS = (o: KtOperative) => [
+  { label: 'APL', value: o.stats.apl },
+  { label: 'Move', value: o.stats.move },
+  { label: 'Save', value: o.stats.save },
+  { label: 'Wounds', value: o.stats.wounds },
+];
 
-function OpCard({ n, x, o, onChange, onRemove }: { n: number; x: KtRosterOp; o: KtOperative; onChange: (p: Partial<KtRosterOp>) => void; onRemove: () => void }) {
-  const [open, setOpen] = useState(false);
+/** Датакарта оперативника: характеристики, выбранное оружие таблицей; раскрытая — всё оружие, способности, имя. */
+function OpCard({
+  n,
+  x,
+  o,
+  open,
+  onToggle,
+  onChange,
+  onRemove,
+}: {
+  n: number;
+  x: KtRosterOp;
+  o: KtOperative;
+  open: boolean;
+  onToggle: () => void;
+  onChange: (p: Partial<KtRosterOp>) => void;
+  onRemove: () => void;
+}) {
   const chosen = o.weapons.filter((w) => x.weapons.includes(w.id));
   const toggle = (w: KtWeapon) => (haptic.select(), onChange({ weapons: x.weapons.includes(w.id) ? x.weapons.filter((id) => id !== w.id) : [...x.weapons, w.id] }));
+  const leader = o.keywords.includes('LEADER');
+  const own = o.abilities.filter((a) => !a.factionRule);
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-      <div className="flex items-start gap-2">
-        <span className="font-display mt-0.5 w-6 text-center text-lg font-semibold text-white/40">{n}</span>
-        <div className="min-w-0 flex-1">
-          <p className="text-[15px] font-semibold leading-tight">{x.name || o.name}</p>
-          {x.name && <p className="text-[11px] text-white/45">{o.name}</p>}
-          <p className="mt-0.5 truncate text-[10.5px] text-white/40">{o.keywords.join(', ')}</p>
+    <DataCard
+      title={x.name || o.name}
+      subtitle={x.name ? o.name : o.keywords.filter((k) => k !== 'LEADER').join(' · ')}
+      highlight={leader}
+      right={<span className="font-display text-lg font-semibold leading-none text-white/30">#{n}</span>}
+      badges={
+        <>
+          {leader && <Tag tone="accent">Лидер</Tag>}
+          {own.length > 0 && <Tag>{own.length} способн.</Tag>}
+        </>
+      }
+      stats={OP_STATS(o)}
+      open={open}
+      onToggle={onToggle}
+      summary={!open && <WeaponTable list={chosen} empty="Оружие не выбрано — раскройте карточку" />}
+    >
+      <div>
+        <SectionTitle>Оружие · отметьте выбранное</SectionTitle>
+        <WeaponTable list={o.weapons} chosen={x.weapons} onToggle={toggle} />
+      </div>
+      {own.length > 0 && (
+        <div>
+          <SectionTitle>Способности</SectionTitle>
+          <div className="space-y-1.5">
+            {own.map((a) => (
+              <RuleCard key={a.id} name={a.name} badge={a.ap != null ? <CostBadge>{a.ap} AP</CostBadge> : undefined}>
+                <Md text={a.text} className="text-[12.5px] leading-relaxed text-white/70" />
+              </RuleCard>
+            ))}
+          </div>
         </div>
-        <IconButton icon={open ? 'down' : 'chevron'} label="Подробнее" onClick={() => setOpen((v) => !v)} className="size-8" />
+      )}
+      {o.options.length > 0 && (
+        <div>
+          <SectionTitle>Опции</SectionTitle>
+          <div className="space-y-1.5">
+            {o.options.map((a) => (
+              <RuleCard key={a.id} name={a.name}>
+                <Md text={a.text} className="text-[12.5px] leading-relaxed text-white/70" />
+              </RuleCard>
+            ))}
+          </div>
+        </div>
+      )}
+      <div className="flex flex-wrap gap-1">
+        {o.keywords.map((k) => (
+          <Tag key={k}>{k}</Tag>
+        ))}
       </div>
-      <div className="mt-2 grid grid-cols-4 gap-1.5">
-        {STAT('APL', o.stats.apl)}
-        {STAT('Move', o.stats.move)}
-        {STAT('Save', o.stats.save)}
-        {STAT('Wounds', o.stats.wounds)}
+      <input
+        value={x.name}
+        onChange={(e) => onChange({ name: e.target.value.slice(0, 40) })}
+        placeholder="Своё имя оперативника"
+        className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none placeholder:text-white/30 focus:border-accent"
+      />
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[11px] text-white/40">Подставка: {o.baseMm ? `${o.baseMm} мм` : 'нет данных'}</span>
+        <Button variant="danger" className="text-xs" onClick={onRemove}>
+          <Icon name="trash" /> Убрать
+        </Button>
       </div>
-      <Weapons list={open ? o.weapons : chosen} chosen={x.weapons} onToggle={open ? toggle : undefined} />
+    </DataCard>
+  );
+}
+
+/** Значок типа оружия (как на Wahapedia: стрелковое / ближний бой). */
+function WeaponIcon({ type }: { type: KtWeapon['type'] }) {
+  if (type === 'melee')
+    return (
+      <svg viewBox="0 0 20 20" className="size-4 shrink-0 text-accent" aria-label="Ближний бой">
+        <path d="M3 17 L13 7 M11 5 L15 9 M13 7 L17 3" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+      </svg>
+    );
+  return (
+    <svg viewBox="0 0 20 20" className="size-4 shrink-0 text-accent" aria-label={type === 'ranged' ? 'Стрелковое' : 'Снаряжение'}>
+      <circle cx="10" cy="10" r="6" stroke="currentColor" strokeWidth="2" fill="none" />
+      <path d="M10 1 V6 M10 14 V19 M1 10 H6 M14 10 H19" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+
+/**
+ * Оружие таблицей, как на датакарте Wahapedia: строка названия со значком, под ней ATK · HIT · DMG и правила (WR).
+ * onToggle — режим выбора (отметки слева).
+ */
+function WeaponTable({ list, chosen, onToggle, empty }: { list: KtWeapon[]; chosen?: string[]; onToggle?: (w: KtWeapon) => void; empty?: string }) {
+  if (!list.length) return <p className="text-[12px] text-white/45">{empty ?? 'Нет оружия'}</p>;
+  return (
+    <div className="overflow-hidden rounded-xl border border-white/[0.07]">
+      <div className="grid grid-cols-[1fr_2.5rem_2.5rem_2.75rem] gap-x-1 bg-white/[0.05] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/45">
+        <span>Оружие</span>
+        <span className="text-center">ATK</span>
+        <span className="text-center">HIT</span>
+        <span className="text-center">DMG</span>
+      </div>
+      {list.map((w) => {
+        const on = chosen?.includes(w.id);
+        return (
+          <button
+            key={w.id}
+            type="button"
+            disabled={!onToggle}
+            onClick={() => onToggle?.(w)}
+            className={cx('block w-full border-t border-white/[0.06] px-2.5 py-1.5 text-left', onToggle && !on && 'opacity-55', onToggle && 'active:bg-white/5')}
+          >
+            <span className="flex items-center gap-1.5">
+              {onToggle && <span className={cx('flex size-4 shrink-0 items-center justify-center rounded border', on ? 'border-accent bg-accent text-black' : 'border-white/30')}>{on && <Icon name="check" className="size-3" />}</span>}
+              <WeaponIcon type={w.type} />
+              <span className="min-w-0 flex-1 text-[13px] font-semibold leading-tight">{w.name}</span>
+            </span>
+            {w.profiles.map((p, i) => (
+              <span key={i} className="mt-0.5 grid grid-cols-[1fr_2.5rem_2.5rem_2.75rem] gap-x-1 text-[12.5px] tabular-nums">
+                <span className="min-w-0 pl-[1.375rem] text-[11px] leading-snug text-white/50">
+                  {p.name && <b className="text-white/75">{p.name}</b>}
+                  {p.name && p.rules ? ' · ' : ''}
+                  {p.rules}
+                </span>
+                <span className="text-center text-white/85">{p.atk}</span>
+                <span className="text-center text-white/85">{p.hit}</span>
+                <span className="text-center text-white/85">{p.dmg}</span>
+              </span>
+            ))}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Справочник правил оружия (WR) — свёрнут. */
+function WeaponRules({ index }: { index: KtIndex }) {
+  const [open, setOpen] = useState(false);
+  if (!index.weaponRules.length) return null;
+  return (
+    <div>
+      <SectionTitle
+        right={
+          <button type="button" onClick={() => setOpen((v) => !v)} className="text-[11px] font-semibold text-accent">
+            {open ? 'Скрыть' : 'Показать'}
+          </button>
+        }
+      >
+        Правила оружия (WR)
+      </SectionTitle>
       {open && (
-        <div className="mt-2 space-y-2">
-          <input
-            value={x.name}
-            onChange={(e) => onChange({ name: e.target.value.slice(0, 40) })}
-            placeholder="Своё имя оперативника"
-            className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm outline-none focus:border-accent"
-          />
-          {o.abilities.map((a) => (
-            <div key={a.id} className="rounded-xl bg-black/20 px-3 py-2">
-              <p className="text-[13px] font-semibold">
-                {a.name}
-                {a.ap != null && <span className="ml-1 text-[11px] font-normal text-accent">{a.ap} AP</span>}
-              </p>
-              <Md text={a.text} />
-            </div>
+        <div className="space-y-1.5">
+          {index.weaponRules.map((r) => (
+            <RuleCard key={r.code} name={r.name} sub={r.code}>
+              <Md text={r.text} className="text-[12.5px] leading-relaxed text-white/70" />
+            </RuleCard>
           ))}
-          {o.options.map((a) => (
-            <div key={a.id} className="rounded-xl bg-black/20 px-3 py-2">
-              <p className="text-[13px] font-semibold">{a.name}</p>
-              <Md text={a.text} />
-            </div>
-          ))}
-          <p className="text-[11px] text-white/40">База: {o.baseMm ? `${o.baseMm} мм` : 'нет данных'}</p>
-          <Button variant="danger" className="w-full text-xs" onClick={onRemove}>
-            <Icon name="trash" /> Убрать оперативника
-          </Button>
         </div>
       )}
     </div>
   );
 }
 
-/** Оружие: профили (ATK, HIT, DMG, правила); в развёрнутой карточке — всё оружие с отметкой выбранного. */
-function Weapons({ list, chosen, onToggle }: { list: KtWeapon[]; chosen: string[]; onToggle?: (w: KtWeapon) => void }) {
-  if (!list.length) return <p className="mt-2 text-[12px] text-white/45">Оружие не выбрано — раскройте карточку.</p>;
-  return (
-    <ul className="mt-2 space-y-1">
-      {list.map((w) => {
-        const on = chosen.includes(w.id);
-        return (
-          <li key={w.id} className={cx('rounded-lg px-2 py-1.5', on ? 'bg-white/[0.05]' : 'opacity-60')}>
-            <button type="button" disabled={!onToggle} onClick={() => onToggle?.(w)} className="flex w-full items-center gap-2 text-left">
-              {onToggle && <span className={cx('flex size-4 items-center justify-center rounded border', on ? 'border-accent bg-accent text-black' : 'border-white/30')}>{on && <Icon name="check" className="size-3" />}</span>}
-              <span className="text-[10px] font-semibold uppercase text-white/40">{w.type === 'ranged' ? 'Дальн.' : w.type === 'melee' ? 'Ближн.' : 'Снар.'}</span>
-              <span className="min-w-0 flex-1 text-[13px] font-semibold">{w.name}</span>
-            </button>
-            {w.profiles.map((p, i) => (
-              <p key={i} className="ml-6 text-[11.5px] tabular-nums text-white/70">
-                {p.name && <b className="text-white/85">{p.name}: </b>}
-                ATK {p.atk} · HIT {p.hit} · DMG {p.dmg}
-                {p.rules && <span className="text-white/50"> · {p.rules}</span>}
-              </p>
+/** Добавление оперативника: лидеры сверху, у каждого — характеристики и число уже взятых. */
+function AddSheet({ open, team, roster, onClose, onAdd }: { open: boolean; team: KtTeam; roster: KtRoster; onClose: () => void; onAdd: (o: KtOperative) => void }) {
+  const leaders = team.operatives.filter((o) => o.keywords.includes('LEADER'));
+  const others = team.operatives.filter((o) => !o.keywords.includes('LEADER'));
+  const row = (o: KtOperative) => {
+    const count = roster.operatives.filter((x) => x.opTypeId === o.id).length;
+    return (
+      <li key={o.id}>
+        <button type="button" onClick={() => onAdd(o)} className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10">
+          <span className="flex items-center gap-2">
+            <span className="min-w-0 flex-1 text-[14px] font-semibold leading-tight">{o.name}</span>
+            {count > 0 && <Tag tone="accent">×{count}</Tag>}
+            <Icon name="plus" className="size-4 text-accent" />
+          </span>
+          <span className="mt-1.5 grid grid-cols-4 gap-1 text-center">
+            {OP_STATS(o).map((s) => (
+              <span key={s.label} className="rounded-md bg-black/25 py-0.5">
+                <span className="block text-[9px] font-semibold uppercase text-white/40">{s.label}</span>
+                <span className="font-display block text-[14px] font-semibold leading-tight">{s.value}</span>
+              </span>
             ))}
-          </li>
-        );
-      })}
-    </ul>
+          </span>
+          <span className="mt-1 block truncate text-[11px] text-white/40">{o.weapons.map((w) => w.name).join(', ')}</span>
+        </button>
+      </li>
+    );
+  };
+  return (
+    <Sheet open={open} onClose={onClose} title="Оперативник" tall>
+      <div className="space-y-4">
+        {leaders.length > 0 && (
+          <div>
+            <SectionTitle>Лидер</SectionTitle>
+            <ul className="space-y-1.5">{leaders.map(row)}</ul>
+          </div>
+        )}
+        <div>
+          <SectionTitle>Оперативники</SectionTitle>
+          <ul className="space-y-1.5">{others.map(row)}</ul>
+        </div>
+      </div>
+    </Sheet>
   );
 }
 

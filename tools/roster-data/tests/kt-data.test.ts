@@ -26,6 +26,10 @@ test('индекс: источник с коммитом и датой, кома
     assert.equal(file!.special, t.factionId === 'SPEC', t.id);
   }
   assert.ok(index.teams.filter((t) => !t.special).length >= 45);
+  // группы по ключевым словам оперативников (R1): Kasrkin — Astra Militarum, Legionaries — Heretic Astartes
+  assert.equal(index.teams.find((t) => t.name === 'Kasrkin')?.group, 'Astra Militarum');
+  assert.equal(index.teams.find((t) => t.name === 'Legionaries')?.group, 'Heretic Astartes');
+  for (const t of index.teams) assert.ok(t.group === null || (typeof t.group === 'string' && t.group.length > 2), t.id);
 });
 
 test('команды: оперативники с характеристиками, оружие с профилями, id уникальны, уловки размечены', () => {
