@@ -5,7 +5,7 @@ import { useReservationStore } from "@/stores/useReservationStore";
 import { useQuery } from "@tanstack/react-query";
 import { s3Url } from "@/utils/s3utils";
 import { getRosterAccess } from "@/apiUtils/roster";
-import { ChevronRight, Swords } from "lucide-react";
+import { Calendar, ChevronRight, Swords } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function HomeStage() {
@@ -27,12 +27,21 @@ export default function HomeStage() {
 
   return (
     <>
-      <div className="relative z-[50] flex flex-col space-y-12 px-4 py-3 pb-28 lg:grid lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start lg:gap-8 lg:space-y-0 lg:pb-12 lg:pt-4">
+      <div className="relative z-[50] flex flex-col space-y-12 px-4 py-3 pb-8 lg:grid lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start lg:gap-8 lg:space-y-0 lg:pb-12 lg:pt-4">
         <section className="space-y-3">
           <h2 className="text-2xl font-semibold text-white">Ближайший ивент</h2>
           <div className="event-banner-glow aspect-[5/3] w-full overflow-hidden rounded-xl">
             <NearestEventBanner />
           </div>
+          {/* «Записаться» — в потоке страницы под ивентом, а не поверх списка услуг (A1); на компьютере — в боковой панели */}
+          <button
+            type="button"
+            onClick={() => handleRegistartionClick(null)}
+            className="register-btn-glow flex w-full items-center justify-center gap-2.5 rounded-xl bg-accent px-6 py-3.5 text-lg font-semibold text-accent-foreground transition-transform active:scale-95 lg:hidden"
+          >
+            <Calendar className="size-5" />
+            Записаться
+          </button>
         </section>
 
         <section className="flex w-full flex-col gap-3 text-white">

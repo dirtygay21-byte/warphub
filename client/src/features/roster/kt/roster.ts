@@ -61,6 +61,8 @@ export function checkKtRoster(r: KtRoster, team: KtTeam): KtIssue[] {
   const ops = r.operatives.map((x) => ({ x, o: byId.get(x.opTypeId) }));
   for (const { x, o } of ops) if (!o) out.push({ level: 'error', message: `Оперативника ${x.opTypeId} нет в данных команды — удалите его` });
   const known = ops.filter((p) => p.o);
+  // пустая команда — не «OK» (UI-аудит B1)
+  if (!r.operatives.length) out.push({ level: 'warning', message: 'В команде нет оперативников — добавьте лидера и остальных' });
   if (team.operatives.some((o) => o.keywords.includes('LEADER'))) {
     const leaders = known.filter((p) => p.o!.keywords.includes('LEADER')).length;
     if (leaders === 0 && known.length) out.push({ level: 'error', message: 'Нет лидера (оперативник с ключевым словом LEADER)' });
