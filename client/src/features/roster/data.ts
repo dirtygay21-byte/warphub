@@ -1,6 +1,7 @@
 import { apiRequest } from '@/apiUtils/general';
 import type { DataIndex, FactionData } from './engine/types';
 import type { AosBattlepack, AosFactionData, AosIndex } from './aos/types';
+import type { KtIndex, KtTeam } from './kt/types';
 
 // Данные Wahapedia отдаёт backend (GET /roster/data/:name) — только пользователям с доступом.
 let indexPromise: Promise<DataIndex> | null = null;
@@ -162,4 +163,23 @@ export function loadMissions(): Promise<MissionsData> {
   missionsPromise ??= apiRequest<MissionsData>('/roster/data/missions');
   missionsPromise.catch(() => (missionsPromise = null));
   return missionsPromise;
+}
+
+// ---------- Kill Team 2024 (backend: GET /roster/data/kt/:name, W2 30.10.2026) ----------
+let ktIndexPromise: Promise<KtIndex> | null = null;
+const ktCache = new Map<string, Promise<KtTeam>>();
+
+export function loadKtIndex(): Promise<KtIndex> {
+  ktIndexPromise ??= apiRequest<KtIndex>('/roster/data/kt/index');
+  ktIndexPromise.catch(() => (ktIndexPromise = null));
+  return ktIndexPromise;
+}
+
+export function loadKtTeam(id: string): Promise<KtTeam> {
+  if (!ktCache.has(id)) {
+    const p = apiRequest<KtTeam>(`/roster/data/kt/${encodeURIComponent(id)}`);
+    ktCache.set(id, p);
+    p.catch(() => ktCache.delete(id));
+  }
+  return ktCache.get(id)!;
 }

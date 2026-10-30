@@ -495,3 +495,21 @@ Battle Profiles / Rules Updates, которых нет в выгрузке. Пр
 npm run data:aos
 npm test
 ```
+
+
+## Kill Team (редакция 2024) — W2, 30.10.2026
+
+Источник — открытый репозиторий [ktdash-v4-public](https://github.com/vjosset/ktdash-v4-public) (KTDash.app),
+файл `prisma/seed-data.json`. Лицензии в репозитории нет — использование по решению владельца 30.10.2026.
+
+```
+tools/roster-data/scripts/import-ktdash.mjs <клон ktdash> [--check]   → backend/roster-data/kt/{index.json, t/<id команды>.json}
+tools/roster-data/kt/import-report.json                              отчёт импорта
+tools/roster-data/tests/kt-data.test.ts                              структура данных; сверка с клоном (KTDASH_DIR), если он есть
+```
+
+- id команд, оперативников, оружия, уловок и снаряжения — как в ktdash; коммит и дата источника — в `index.json → source`.
+- Тексты правил — Markdown источника (**жирный**, таблицы, списки); правила оружия — строкой профиля («Rng 6", Lethal 5+»).
+- Фракция `SPEC` — наборы миссий и неигровые оперативники (`special: true`), не команды для обычной игры.
+- Состав команды — текст источника (`composition`); универсального снаряжения в источнике нет.
+- Сервер: `GET /roster/data/kt/:name` (`index` или id команды), только с доступом к WarpBuilder.
