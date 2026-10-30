@@ -26,7 +26,7 @@ export function ReservationsPagination({
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-app-bg/95 px-4 py-3 backdrop-blur-sm sm:px-6 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
       <div className="mx-auto flex max-w-screen-xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 text-sm text-white/60">
+        <div className="flex items-center gap-2 text-sm text-fg-2">
           <span>На странице</span>
           <select
             value={pageSize}
@@ -42,7 +42,7 @@ export function ReservationsPagination({
         </div>
 
         <div className="flex items-center justify-between gap-3 sm:justify-end">
-          <span className="text-sm text-white/60">
+          <span className="text-sm text-fg-2">
             {totalPages != null
               ? `Страница ${page + 1} из ${totalPages}`
               : `Страница ${page + 1}`}
@@ -53,7 +53,7 @@ export function ReservationsPagination({
               type="button"
               onClick={() => onPageChange(page - 1)}
               disabled={page === 0}
-              className="flex size-9 items-center justify-center rounded-lg border border-white/10 bg-white/3 text-white transition-colors active:bg-white/10 disabled:opacity-40"
+              className="flex ds-hit size-9 items-center justify-center rounded-lg border border-white/10 bg-white/3 text-white transition-colors active:bg-white/10 disabled:opacity-40"
               aria-label="Предыдущая страница"
             >
               <ChevronLeft className="size-4" />
@@ -63,7 +63,7 @@ export function ReservationsPagination({
               type="button"
               onClick={() => onPageChange(page + 1)}
               disabled={!hasNextPage || itemsCount === 0}
-              className="flex size-9 items-center justify-center rounded-lg border border-white/10 bg-white/3 text-white transition-colors active:bg-white/10 disabled:opacity-40"
+              className="flex ds-hit size-9 items-center justify-center rounded-lg border border-white/10 bg-white/3 text-white transition-colors active:bg-white/10 disabled:opacity-40"
               aria-label="Следующая страница"
             >
               <ChevronRight className="size-4" />

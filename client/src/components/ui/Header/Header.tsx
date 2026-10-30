@@ -90,7 +90,7 @@ export default function Header() {
               type="button"
               onClick={() => navigate("/profile")}
               aria-label="Выйти из админ-панели"
-              className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/3 text-white/80 transition-colors active:bg-white/10"
+              className="flex ds-hit size-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/3 text-white/80 transition-colors active:bg-white/10"
             >
               <ChevronLeft className="size-5" />
             </button>

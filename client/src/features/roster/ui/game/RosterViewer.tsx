@@ -32,7 +32,7 @@ export function RosterViewer({ rosterRef: r, rosters, index, onClose }: { roster
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
         <p className="font-display text-xl uppercase">Ростер не открыть</p>
-        <p className="mt-2 text-sm text-white/50">В игре нет копии этого ростера.</p>
+        <p className="mt-2 text-sm text-fg-3">В игре нет копии этого ростера.</p>
         <Button className="mt-5" onClick={onClose}>
           К игре
         </Button>
@@ -65,7 +65,7 @@ export function RosterButton({ seat, className }: { seat: Seat; className?: stri
         e.stopPropagation();
         open(seat);
       }}
-      className={cx('inline-flex items-center gap-1 rounded-full border border-accent/40 px-2 py-0.5 text-[11px] font-semibold text-accent active:bg-accent/10', className)}
+      className={cx('inline-flex items-center gap-1 rounded-full border border-accent/40 px-2 py-0.5 text-[12px] font-semibold text-accent active:bg-accent/10', className)}
     >
       <Icon name="eye" className="size-3.5" />
       Ростер

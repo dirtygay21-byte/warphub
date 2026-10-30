@@ -38,12 +38,12 @@ export function StatusConfirmDialog({
           <h2 className="text-lg font-semibold">
             {isConfirm ? "Подтвердить запись?" : "Отклонить запись?"}
           </h2>
-          <p className="mt-2 text-sm text-white/60">{userLabel}</p>
+          <p className="mt-2 text-sm text-fg-2">{userLabel}</p>
         </div>
 
         <div className="space-y-2 px-5 py-4 text-sm">
           <p className="font-medium text-white/90">{serviceTitle}</p>
-          <p className="text-white/60">
+          <p className="text-fg-2">
             {dateLabel} · {timeLabel}
           </p>
         </div>
@@ -68,8 +68,8 @@ export function StatusConfirmDialog({
           >
             {isPending
               ? isConfirm
-                ? "Подтверждаем..."
-                : "Отклоняем..."
+                ? "Подтверждаем…"
+                : "Отклоняем…"
               : isConfirm
               ? "Да, подтвердить"
               : "Да, отклонить"}

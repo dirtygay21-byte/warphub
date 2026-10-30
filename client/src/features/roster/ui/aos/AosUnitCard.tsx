@@ -70,7 +70,7 @@ export function AosUnitCard({
             {isGeneral && <Icon name="crown" className="size-4 shrink-0 text-accent" />}
             <span className="min-w-0 break-words">{ws.name}</span>
           </p>
-          <p className="mt-0.5 text-[12px] leading-snug text-white/45">
+          <p className="mt-0.5 text-[12px] leading-snug text-fg-3">
             {[leader ? 'Лидер полка' : ws.hero ? 'Герой' : null, models > 1 ? `${models} мод.` : null, unit.reinforced ? 'усилен' : null, seasonLabel(ws.season), ws.legends ? 'Legends' : null]
               .filter(Boolean)
               .join(' · ')}
@@ -80,9 +80,9 @@ export function AosUnitCard({
         {errors.length > 0 && <Icon name="alert" className="size-4 shrink-0 text-danger" />}
         <span className="shrink-0 text-right">
           <span className="font-display block text-[19px] font-semibold leading-none tabular-nums">{unitTotal(unit, L)}</span>
-          <span className="text-[10px] uppercase text-white/35">очк.</span>
+          <span className="text-[12px] uppercase text-fg-3">очк.</span>
         </span>
-        <Icon name="down" className={cx('size-4 shrink-0 text-white/35 transition', expanded && 'rotate-180')} />
+        <Icon name="down" className={cx('size-4 shrink-0 text-fg-3 transition', expanded && 'rotate-180')} />
       </button>
       {expanded && (
         <div className="space-y-3 border-t border-white/[0.06] px-3.5 pb-3.5 pt-3">
@@ -94,7 +94,7 @@ export function AosUnitCard({
           {!readOnly && <Controls unit={unit} ws={ws} roster={roster} L={L} regiment={regiment} leader={leader} isGeneral={isGeneral} actions={actions} />}
           {enhRefs.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Улучшения юнита</p>
+              <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Улучшения юнита</p>
               {enhRefs.map((e) => (
                 <AosRuleCard key={e.item.id} rule={e.item} L={L} open={readOnly} extraSub={[e.type.name, e.item.points ? `+${e.item.points} очк.` : null, seasonLabel(e.table.season)].filter(Boolean).join(' · ')} />
               ))}
@@ -116,7 +116,7 @@ function KnownLores({ ws, roster, L }: { ws: AosWarscroll; roster: AosRoster; L:
     ws.wizard ? `WIZARD (${ws.wizard}): ${[name('spell'), name('manifestation')].filter(Boolean).join(' · ') || 'лор не выбран'}` : null,
     ws.priest ? `PRIEST (${ws.priest}): ${[name('prayer'), name('manifestation')].filter(Boolean).join(' · ') || 'лор не выбран'}` : null,
   ].filter(Boolean);
-  return <p className="rounded-lg bg-white/[0.04] px-2.5 py-2 text-[12px] leading-snug text-white/60">{parts.join(' · ')}</p>;
+  return <p className="rounded-lg bg-white/[0.04] px-2.5 py-2 text-[12px] leading-snug text-fg-2">{parts.join(' · ')}</p>;
 }
 
 function Controls({
@@ -190,7 +190,7 @@ function Controls({
           />
         );
       })}
-      {ws.unique && types.length === 0 && ws.hero && <p className="text-[12px] text-white/40">UNIQUE — улучшения недоступны.</p>}
+      {ws.unique && types.length === 0 && ws.hero && <p className="text-[12px] text-fg-3">UNIQUE — улучшения недоступны.</p>}
       <div className="flex flex-wrap gap-2 pt-1">
         {!leader && (
           <Button className="h-9 px-3 text-xs" onClick={actions.onMove}>
@@ -204,7 +204,7 @@ function Controls({
           <Icon name="trash" className="size-4" /> {leader ? 'Удалить полк' : 'Удалить'}
         </Button>
       </div>
-      <p className="text-[11px] text-white/35">
+      <p className="text-[12px] text-fg-3">
         Цена: {unitBaseCost(unit, ws)} очк.{Object.keys(unit.enhancements).length ? ' + улучшения' : ''}
       </p>
     </div>
@@ -224,12 +224,12 @@ function Row({ label, value, action, reason }: { label: string; value: string; a
     <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] px-3 py-2">
       <div className="flex items-center gap-2">
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{label}</p>
+          <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{label}</p>
           <p className="truncate text-[13px] font-semibold text-white/85">{value}</p>
         </div>
         {action}
       </div>
-      {reason && <p className="mt-1 text-[12px] leading-snug text-white/45">{reason}</p>}
+      {reason && <p className="mt-1 text-[12px] leading-snug text-fg-3">{reason}</p>}
     </div>
   );
 }
@@ -245,16 +245,16 @@ export function Warscroll({ ws, unit, L, defaultOpen = false, embedded = false }
   const melee = ws.weapons.filter((w) => w.type === 'melee');
   const stat = (label: string, v: string) => (
     <div className="rounded-lg bg-white/[0.04] px-1 py-1.5 text-center">
-      <p className="text-[10px] font-semibold uppercase text-white/40">{label}</p>
+      <p className="text-[12px] font-semibold uppercase text-fg-3">{label}</p>
       <p className="font-display text-[17px] font-semibold leading-tight">{v || '—'}</p>
     </div>
   );
   return (
     <div className={cx(!embedded && 'rounded-xl border border-white/10 bg-white/[0.02]')}>
       {!embedded && (
-        <button type="button" onClick={() => setOpen((o) => !o)} className="flex w-full items-center justify-between px-3 py-2.5 text-sm font-semibold text-white/75">
+        <button type="button" onClick={() => setOpen((o) => !o)} className="flex w-full items-center justify-between px-3 py-2.5 text-sm font-semibold text-fg-2">
           Варскролл
-          <Icon name="down" className={cx('size-4 text-white/40 transition', open && 'rotate-180')} />
+          <Icon name="down" className={cx('size-4 text-fg-3 transition', open && 'rotate-180')} />
         </button>
       )}
       {open && (
@@ -270,15 +270,15 @@ export function Warscroll({ ws, unit, L, defaultOpen = false, embedded = false }
           {melee.length > 0 && <Weapons title="Ближний бой" list={melee} />}
           {ws.abilities.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Способности</p>
+              <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Способности</p>
               {ws.abilities.map((a, i) => (
                 <AosRuleCard key={i} rule={a} L={L} link={ws.link} />
               ))}
             </div>
           )}
           {ws.composition.length > 0 && (
-            <p className="text-[12.5px] text-white/60">
-              <span className="text-white/40">Состав: </span>
+            <p className="text-[12.5px] text-fg-2">
+              <span className="text-fg-3">Состав: </span>
               {ws.composition.map((c) => `${c.size} × ${c.unit}`).join(', ')}
             </p>
           )}
@@ -292,7 +292,7 @@ export function Warscroll({ ws, unit, L, defaultOpen = false, embedded = false }
               <Tag key={k}>{k + (ws.params[k] ? ` (${ws.params[k]})` : '')}</Tag>
             ))}
           </div>
-          <div className="space-y-0.5 text-[12px] text-white/45">
+          <div className="space-y-0.5 text-[12px] text-fg-3">
             {!embedded && (
               <p>
                 Размер: {ws.unitSize} мод.{unit?.reinforced ? ` (усилен — ${ws.unitSize * 2})` : ''} · Очки: {ws.cost ?? '—'}
@@ -315,11 +315,11 @@ export function Warscroll({ ws, unit, L, defaultOpen = false, embedded = false }
 function Weapons({ title, list, ranged }: { title: string; list: AosWeapon[]; ranged?: boolean }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{title}</p>
+      <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{title}</p>
       <div className="no-scrollbar -mx-1 mt-1 overflow-x-auto px-1">
         <table className="w-full min-w-[250px] text-center text-[12px]">
           <thead>
-            <tr className="text-[10px] uppercase text-white/35">
+            <tr className="text-[12px] uppercase text-fg-3">
               <th className="pb-1 text-left font-semibold"> </th>
               {[ranged ? 'Rng' : null, 'Atk', 'Hit', 'Wnd', 'Rnd', 'Dmg'].filter(Boolean).map((h) => (
                 <th key={h} className="px-1 pb-1 font-semibold">
@@ -333,7 +333,7 @@ function Weapons({ title, list, ranged }: { title: string; list: AosWeapon[]; ra
               <tr key={i} className="border-t border-white/[0.05] align-top">
                 <td className="max-w-[9rem] py-1.5 pr-1.5 text-left">
                   <span className="block break-words text-[12px] font-semibold leading-tight">{w.name}</span>
-                  {w.abilities && w.abilities !== '-' && <span className="block text-[10px] uppercase leading-tight text-accent/70">{w.abilities}</span>}
+                  {w.abilities && w.abilities !== '-' && <span className="block text-[12px] uppercase leading-tight text-accent/70">{w.abilities}</span>}
                 </td>
                 {ranged && <td className="px-0.5 py-1.5">{w.range}</td>}
                 <td className="px-0.5 py-1.5">{w.attacks}</td>

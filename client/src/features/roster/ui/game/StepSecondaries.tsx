@@ -43,7 +43,7 @@ export function StepSecondaries({ game, onNext }: { game: GameHook; onNext: () =
       <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-4 text-center">
         {phase === 'pass' ? (
           <>
-            <p className="text-sm text-white/70">Выбор игрока «{state.players.p1.name}» сохранён и скрыт.</p>
+            <p className="text-sm text-fg-2">Выбор игрока «{state.players.p1.name}» сохранён и скрыт.</p>
             <p className="font-display mt-2 text-lg font-semibold uppercase">Передайте телефон: {who}</p>
             <Button variant="primary" className="mt-3 w-full" onClick={() => setPhase('p2')}>
               Я — {who}, выбрать вторичные
@@ -52,7 +52,7 @@ export function StepSecondaries({ game, onNext }: { game: GameHook; onNext: () =
         ) : (
           <>
             <p className="font-display text-lg font-semibold uppercase">Оба игрока выбрали</p>
-            <p className="mt-1 text-sm text-white/60">Положите телефон так, чтобы видели оба, и раскройте выбор.</p>
+            <p className="mt-1 text-sm text-fg-2">Положите телефон так, чтобы видели оба, и раскройте выбор.</p>
             <div className="mt-3 space-y-2 text-left">
               <SecondaryCard game={game} seat="p1" hidden />
               <SecondaryCard game={game} seat="p2" hidden />
@@ -106,9 +106,9 @@ function Choose({ seat, game, onDone }: { seat: Seat; game: GameHook; onDone: ()
     <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
       <p className="text-sm">
         Выбирает <span className="font-semibold text-accent">{p.name}</span>
-        <span className="text-white/50"> — втайне от соперника</span>
+        <span className="text-fg-3"> — втайне от соперника</span>
       </p>
-      <p className="mt-0.5 text-[11px] text-white/45">Колода {p.role === 'attacker' ? 'атакующего' : 'защитника'} — те же 18 карт, что у соперника.</p>
+      <p className="mt-0.5 text-[12px] text-fg-3">Колода {p.role === 'attacker' ? 'атакующего' : 'защитника'} — те же 18 карт, что у соперника.</p>
       <Segmented<SecondaryMode>
         className="mt-2"
         value={mode}
@@ -120,7 +120,7 @@ function Choose({ seat, game, onDone }: { seat: Seat; game: GameHook; onDone: ()
       />
       {mode === 'tactical' ? (
         <>
-          <p className="mt-2 text-xs leading-snug text-white/55">
+          <p className="mt-2 text-xs leading-snug text-fg-3">
             Колода перемешивается; в начале каждой своей фазы командования вы тянете две карты. Карта активна до выполнения или сброса.
             Выполненные засчитываются в конце хода, указанного на карте; ненужные можно сбросить в конце своего хода (1 CP за ход), одну
             карту за битву — заменить за 1 CP.
@@ -131,13 +131,13 @@ function Choose({ seat, game, onDone }: { seat: Seat; game: GameHook; onDone: ()
             className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] py-2 text-[13px] font-semibold active:bg-white/10"
           >
             Все карты колоды ({game.data!.missions.cards.filter((c) => c.type === 'secondary').length})
-            <Icon name="down" className={cx('size-4 text-white/50 transition', deck && 'rotate-180')} />
+            <Icon name="down" className={cx('size-4 text-fg-3 transition', deck && 'rotate-180')} />
           </button>
           {deck && <DeckList cards={game.data!.missions.cards.filter((c) => c.type === 'secondary')} />}
         </>
       ) : (
         <>
-          <p className="mt-2 text-xs leading-snug text-white/55">
+          <p className="mt-2 text-xs leading-snug text-fg-3">
             Выберите две — они активны всю битву, их нельзя сбросить{cap ? `; с одной карты — не больше ${cap} ПО` : ''}. Фиксированными можно взять только эти
             карты:
           </p>
@@ -162,7 +162,7 @@ function Choose({ seat, game, onDone }: { seat: Seat; game: GameHook; onDone: ()
               );
             })}
           </ul>
-          <p className="mt-1.5 text-[11px] text-white/45">Выбрано: {picked.length} из 2</p>
+          <p className="mt-1.5 text-[12px] text-fg-3">Выбрано: {picked.length} из 2</p>
         </>
       )}
       <Button variant="primary" className="mt-3 w-full" disabled={!ready} onClick={done}>

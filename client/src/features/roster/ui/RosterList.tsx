@@ -71,8 +71,8 @@ export function RosterList({
         </ul>
       )}
 
-      <p className="mt-8 text-center text-xs leading-relaxed text-white/35">
-        <button type="button" onClick={() => setSources(true)} className="underline decoration-white/20 underline-offset-2 active:text-white/60">
+      <p className="mt-8 text-center text-xs leading-relaxed text-fg-3">
+        <button type="button" onClick={() => setSources(true)} className="underline decoration-white/20 underline-offset-2 active:text-fg-2">
           {indexCredit(index)}
         </button>
         <br />
@@ -84,7 +84,7 @@ export function RosterList({
           {indexCreditDetails(index).map((x) => (
             <li key={x.title}>
               <p className="font-semibold">{x.title}</p>
-              <p className="text-xs leading-relaxed text-white/55">{x.text}</p>
+              <p className="text-xs leading-relaxed text-fg-3">{x.text}</p>
             </li>
           ))}
         </ul>
@@ -133,7 +133,7 @@ function RosterCard({ roster, faction, onOpen, onMenu }: { roster: Roster; facti
     <li className="flex items-stretch overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
       <button type="button" onClick={() => (haptic.tap(), onOpen())} className="min-w-0 flex-1 px-4 py-3.5 text-left active:bg-white/[0.03]">
         <p className="truncate text-base font-semibold">{roster.name}</p>
-        <p className="mt-0.5 truncate text-sm text-white/55">
+        <p className="mt-0.5 truncate text-sm text-fg-3">
           {faction}
           {roster.chapter ? ` · ${roster.chapter}` : ''}
         </p>
@@ -145,7 +145,7 @@ function RosterCard({ roster, faction, onOpen, onMenu }: { roster: Roster; facti
               {roster.summary.errors ? `${roster.summary.errors} ош.` : roster.summary.warnings ? `${roster.summary.warnings} пред.` : 'OK'}
             </Tag>
           )}
-          <span className="text-xs text-white/35">{date}</span>
+          <span className="text-xs text-fg-3">{date}</span>
         </div>
       </button>
       {roster.summary && (
@@ -153,10 +153,10 @@ function RosterCard({ roster, faction, onOpen, onMenu }: { roster: Roster; facti
           <span className={cx('font-display text-xl font-semibold leading-none tabular-nums', roster.summary.points > size.points ? 'text-danger' : 'text-white')}>
             {fmtPts(roster.summary.points)}
           </span>
-          <span className="mt-1 text-[11px] text-white/40">из {fmtPts(size.points)}</span>
+          <span className="mt-1 text-[12px] text-fg-3">из {fmtPts(size.points)}</span>
         </div>
       )}
-      <button type="button" aria-label="Действия" onClick={() => (haptic.tap(), onMenu())} className="flex w-12 items-center justify-center text-white/50 active:bg-white/5">
+      <button type="button" aria-label="Действия" onClick={() => (haptic.tap(), onMenu())} className="flex w-12 items-center justify-center text-fg-3 active:bg-white/5">
         <Icon name="more" className="size-6" strokeWidth={3} />
       </button>
     </li>
@@ -200,7 +200,7 @@ function CreateSheet({ open, index, onClose, onCreate }: { open: boolean; index:
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Например: Турнир в субботу"
-            className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-white outline-none placeholder:text-white/30 focus:border-accent"
+            className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-white outline-none placeholder:text-fg-3 focus:border-accent"
           />
         </Field>
         <Field label="Размер боя">
@@ -224,7 +224,7 @@ function CreateSheet({ open, index, onClose, onCreate }: { open: boolean; index:
                   )}
                 >
                   {f.name}
-                  <span className={cx('mt-0.5 block text-[11px] font-medium', faction === f.id ? 'text-accent/70' : 'text-white/40')}>
+                  <span className={cx('mt-0.5 block text-[12px] font-medium', faction === f.id ? 'text-accent/70' : 'text-fg-3')}>
                     {f.units} инфолистов
                   </span>
                 </button>
@@ -272,7 +272,7 @@ function ImportSheet({ open, onClose, onImport, factions }: { open: boolean; onC
         </Button>
       }
     >
-      <p className="mb-3 text-sm text-white/55">Вставьте код ростера из раздела «Экспорт → Код» на другом устройстве.</p>
+      <p className="mb-3 text-sm text-fg-3">Вставьте код ростера из раздела «Экспорт → Код» на другом устройстве.</p>
       <textarea
         value={code}
         onChange={(e) => setCode(e.target.value)}
@@ -297,7 +297,7 @@ function ToolTile({ icon, title, sub, onClick }: { icon: string; title: string; 
       </span>
       <span className="min-w-0">
         <span className="font-display block text-base font-semibold uppercase leading-none">{title}</span>
-        <span className="mt-1 block truncate text-[11px] text-white/45">{sub}</span>
+        <span className="mt-1 block truncate text-[12px] text-fg-3">{sub}</span>
       </span>
     </button>
   );

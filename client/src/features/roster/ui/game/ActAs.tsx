@@ -13,7 +13,7 @@ export function ActAs({ game, seat, children, note }: { game: GameHook; seat: Se
   return (
     <fieldset disabled className="m-0 min-w-0 border-0 p-0">
       <div className="opacity-60">{children}</div>
-      <p className="mt-1 text-[11px] text-white/45">{note ?? `Отмечает ${game.state!.players[seat].name} на своём телефоне.`}</p>
+      <p className="mt-1 text-[12px] text-fg-3">{note ?? `Отмечает ${game.state!.players[seat].name} на своём телефоне.`}</p>
     </fieldset>
   );
 }

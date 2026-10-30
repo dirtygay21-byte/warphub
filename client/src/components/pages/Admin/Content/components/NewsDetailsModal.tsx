@@ -268,7 +268,7 @@ export default function NewsDetailsModal({
             onClick={handleClose}
             disabled={saveMutation.isPending || deleteMutation.isPending}
             aria-label="Закрыть"
-            className="flex size-9 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-white/80 transition-colors active:bg-white/10 disabled:opacity-60"
+            className="flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-white/80 transition-colors active:bg-white/10 disabled:opacity-60"
           >
             <X className="size-4" />
           </button>
@@ -283,7 +283,7 @@ export default function NewsDetailsModal({
 
           {!isCreate && newsQuery.isError && (
             <div className="flex min-h-48 flex-col items-center justify-center gap-4 px-5 py-10 text-center">
-              <p className="text-sm text-white/70">
+              <p className="text-sm text-fg-2">
                 Не удалось загрузить новость. Попробуйте ещё раз.
               </p>
               <button
@@ -326,7 +326,7 @@ export default function NewsDetailsModal({
                     className="aspect-video w-full object-cover"
                   />
                 ) : (
-                  <div className="flex aspect-video w-full items-center justify-center bg-white/5 text-sm text-white/40">
+                  <div className="flex aspect-video w-full items-center justify-center bg-white/5 text-sm text-fg-3">
                     Без обложки
                   </div>
                 )}
@@ -376,14 +376,14 @@ export default function NewsDetailsModal({
                     placeholder="Текст новости"
                   />
                 ) : (
-                  <p className="whitespace-pre-wrap px-1 text-sm leading-relaxed text-white/70">
+                  <p className="whitespace-pre-wrap px-1 text-sm leading-relaxed text-fg-2">
                     {draft.text || "Без текста"}
                   </p>
                 )}
               </div>
 
               {!isCreate && newsQuery.data && (
-                <div className="space-y-3 rounded-xl border border-white/10 bg-white/3 p-4 text-sm text-white/70">
+                <div className="space-y-3 rounded-xl border border-white/10 bg-white/3 p-4 text-sm text-fg-2">
                   <p className="flex items-start gap-2">
                     <CalendarDays className="mt-0.5 size-4 shrink-0 text-accent" />
                     <span>
@@ -394,7 +394,7 @@ export default function NewsDetailsModal({
               )}
 
               {!isCreate && newsQuery.data?.createdAt && (
-                <div className="space-y-1 text-xs text-white/45">
+                <div className="space-y-1 text-xs text-fg-3">
                   <p>
                     Создана:{" "}
                     {formatReservationDateTime(newsQuery.data.createdAt)}
@@ -517,10 +517,10 @@ export default function NewsDetailsModal({
           >
             <div className="border-b border-white/10 px-5 py-5">
               <h2 className="text-lg font-semibold">Удалить новость?</h2>
-              <p className="mt-2 text-sm text-white/60">{draft.title}</p>
+              <p className="mt-2 text-sm text-fg-2">{draft.title}</p>
             </div>
 
-            <p className="px-5 py-4 text-sm text-white/70">
+            <p className="px-5 py-4 text-sm text-fg-2">
               Это действие нельзя отменить.
             </p>
 

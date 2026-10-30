@@ -44,16 +44,16 @@ export function RuleText({
       <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2">
         <span className="min-w-0 flex-1">
           <span className="block text-[13px] font-semibold text-white/85">{cleanRuleText(name)}</span>
-          {subText && <span className="block text-[11px] text-white/40">{subText}</span>}
+          {subText && <span className="block text-[12px] text-fg-3">{subText}</span>}
         </span>
         {badge}
         {right}
-        <Icon name="down" className="size-4 shrink-0 text-white/35 transition group-open:rotate-180" />
+        <Icon name="down" className="size-4 shrink-0 text-fg-3 transition group-open:rotate-180" />
       </summary>
       <div className="border-t border-white/[0.06] px-3 py-2">
-        <p className="whitespace-pre-line text-[12px] leading-relaxed text-white/65">{cleanRuleText(text)}</p>
+        <p className="whitespace-pre-line text-[12px] leading-relaxed text-fg-2">{cleanRuleText(text)}</p>
         {missing && (
-          <p className="mt-2 rounded-lg bg-warn/10 px-2.5 py-1.5 text-[11.5px] leading-snug text-amber-100">
+          <p className="mt-2 rounded-lg bg-warn/10 px-2.5 py-1.5 text-[12px] leading-snug text-amber-100">
             {INCOMPLETE_TEXT[missing]}
             {link && (
               <>
@@ -98,8 +98,8 @@ function Section({ label, count, open, children }: { label: string; count: numbe
   return (
     <details className="group/s" open={open}>
       <summary className="flex cursor-pointer list-none items-baseline justify-between gap-2 py-1">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-white/45">{label}</span>
-        <span className="flex items-center gap-1 text-xs text-white/35">
+        <span className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{label}</span>
+        <span className="flex items-center gap-1 text-xs text-fg-3">
           {count}
           <Icon name="down" className="size-3.5 transition group-open/s:rotate-180" />
         </span>
@@ -139,7 +139,7 @@ export function DetachmentPanel({
     <section id="detachment-panel" className="sheet-enter rounded-2xl border border-accent/30 bg-app-elevated">
       <div className="flex items-start gap-2 px-4 pb-2 pt-3">
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent/80">Детачмент</p>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent/80">Детачмент</p>
           <h2 className="font-display mt-0.5 text-xl font-semibold uppercase leading-tight">{ruleLabel(d)}</h2>
           {d.outdated && <p className="mt-1 text-xs text-amber-200">{OUTDATED_RULE_NOTE}</p>}
         </div>
@@ -152,7 +152,7 @@ export function DetachmentPanel({
               key={x.id}
               type="button"
               onClick={() => onSwitch(x.id)}
-              className={cx('shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold', x.id === d.id ? 'bg-accent text-accent-foreground' : 'bg-white/[0.06] text-white/70')}
+              className={cx('shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold', x.id === d.id ? 'bg-accent text-accent-foreground' : 'bg-white/[0.06] text-fg-2')}
             >
               {ruleLabel(x)}
             </button>
@@ -179,7 +179,7 @@ export function DetachmentPanel({
               key={s.id}
               name={s.name}
               sub={[s.type.replace(/ Stratagem$/, ''), TURN_RU[s.turn] ?? s.turn, s.phase].filter(Boolean).join(' · ')}
-              right={<span className="shrink-0 rounded-md bg-accent/15 px-1.5 py-0.5 text-[11px] font-semibold text-accent">{s.cp} CP</span>}
+              right={<span className="shrink-0 rounded-md bg-accent/15 px-1.5 py-0.5 text-[12px] font-semibold text-accent">{s.cp} CP</span>}
               text={s.text}
             />
           ))}
@@ -190,13 +190,13 @@ export function DetachmentPanel({
               key={e.id}
               name={e.name}
               sub={[e.upgrade ? 'Upgrade · до 3 юнитов' : '', e.restriction].filter(Boolean).join(' · ') || undefined}
-              right={<span className="shrink-0 text-xs font-semibold tabular-nums text-white/60">{e.cost} очк.</span>}
+              right={<span className="shrink-0 text-xs font-semibold tabular-nums text-fg-2">{e.cost} очк.</span>}
               text={e.text}
             />
           ))}
         </Section>
         <Section label="Особые условия" count={cond.length}>
-          <ul className="space-y-1 text-[12.5px] leading-relaxed text-white/70">
+          <ul className="space-y-1 text-[12.5px] leading-relaxed text-fg-2">
             {cond.map((c, i) => (
               <li key={i}>• {c}</li>
             ))}

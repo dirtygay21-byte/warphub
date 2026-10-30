@@ -21,7 +21,7 @@ export default function NewsCard({ news, onClick }: NewsCardProps) {
           className="aspect-[16/7] w-full object-cover"
         />
       ) : (
-        <div className="flex aspect-[16/7] w-full items-center justify-center bg-white/5 text-sm text-white/40">
+        <div className="flex aspect-[16/7] w-full items-center justify-center bg-white/5 text-sm text-fg-3">
           Без обложки
         </div>
       )}
@@ -30,11 +30,11 @@ export default function NewsCard({ news, onClick }: NewsCardProps) {
         <div>
           <h3 className="text-lg font-semibold text-white">{news.title}</h3>
           {news.text && (
-            <p className="mt-1 line-clamp-2 text-sm text-white/60">{news.text}</p>
+            <p className="mt-1 line-clamp-2 text-sm text-fg-2">{news.text}</p>
           )}
         </div>
 
-        <p className="flex items-start gap-2 text-sm text-white/70">
+        <p className="flex items-start gap-2 text-sm text-fg-2">
           <CalendarDays className="mt-0.5 size-4 shrink-0 text-accent" />
           <span>{formatNewsDate(news.publishedAt)}</span>
         </p>

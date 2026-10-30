@@ -58,7 +58,7 @@ export function AccessCodeDialog({
         <h2 id="access-code-title" className="text-lg font-semibold">
           Код доступа
         </h2>
-        <p className="mt-1 text-sm text-white/60">
+        <p className="mt-1 text-sm text-fg-2">
           Введите 4 цифры, которые вам передал администратор клуба.
         </p>
 

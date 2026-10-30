@@ -75,7 +75,7 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
   if (error)
     return (
       <div className="mx-auto max-w-lg px-4 pt-10 text-center">
-        <p className="text-sm text-white/55">{error}</p>
+        <p className="text-sm text-fg-3">{error}</p>
         <Button className="mt-4" onClick={onBack}>
           Назад
         </Button>
@@ -116,7 +116,7 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
         <section className="rounded-2xl border border-white/10 bg-app-elevated">
           <button type="button" onClick={() => setArmyOpen((o) => !o)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-white/45">Warcry · {ALLIANCE[own.grandAlliance] ?? own.grandAlliance}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-fg-3">Warcry · {ALLIANCE[own.grandAlliance] ?? own.grandAlliance}</p>
               <p className="mt-0.5 truncate text-[15px] font-semibold">{own.name}</p>
               <div className="mt-1.5 flex flex-wrap gap-1">
                 <Tag tone={count('ally') > L.allies ? 'danger' : 'muted'}>
@@ -130,7 +130,7 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
                 </Tag>
               </div>
             </div>
-            <Icon name="down" className={cx('size-5 shrink-0 text-white/40 transition', armyOpen && 'rotate-180')} />
+            <Icon name="down" className={cx('size-5 shrink-0 text-fg-3 transition', armyOpen && 'rotate-180')} />
           </button>
           {armyOpen && (
             <div className="space-y-3 border-t border-white/[0.06] px-4 pb-4 pt-3">
@@ -148,7 +148,7 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
                 </div>
               )}
               <AbilityList title="Боевые черты фракции" list={battletraits} empty="В данных нет боевых черт фракции." />
-              <p className="text-[11px] text-white/35">
+              <p className="text-[12px] text-fg-3">
                 Данные: {index.source.name}, {index.source.date} ({index.source.commit}). Тексты способностей — английский оригинал.
               </p>
             </div>
@@ -167,7 +167,7 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
 
         {tab === 'fighters' && (
           <section className="space-y-2.5">
-            {!n && <p className="rounded-xl border border-dashed border-white/15 px-3 py-6 text-center text-sm text-white/45">Добавьте бойцов — первый боец становится лидером (герой своей фракции).</p>}
+            {!n && <p className="rounded-xl border border-dashed border-white/15 px-3 py-6 text-center text-sm text-fg-3">Добавьте бойцов — первый боец становится лидером (герой своей фракции).</p>}
             {roster.fighters.map((x, i) => {
               const f = fighterOf(data, x);
               return f ? (
@@ -212,9 +212,9 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
                   <div key={g} className="rounded-2xl border border-white/10 bg-app-elevated p-3">
                     <p className="font-display mb-1.5 flex items-baseline justify-between text-lg font-semibold uppercase leading-none">
                       {GROUP_LABEL[g]}
-                      <span className="text-sm text-white/40">{list.length}</span>
+                      <span className="text-sm text-fg-3">{list.length}</span>
                     </p>
-                    {!list.length && <p className="text-[12px] text-white/35">Пусто</p>}
+                    {!list.length && <p className="text-[12px] text-fg-3">Пусто</p>}
                     {list.map((x) => (
                       <GroupRow key={x.uid} x={x} f={fighterOf(data, x)} onGroup={(group) => onChange(updateFighter(roster, x.uid, { group }))} />
                     ))}
@@ -232,7 +232,7 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
                   ))}
               </div>
             )}
-            <p className="text-[11px] text-white/35">Бойцы — как можно ровнее по трём группам; монстр — один в своей группе, остальные ровно по двум другим.</p>
+            <p className="text-[12px] text-fg-3">Бойцы — как можно ровнее по трём группам; монстр — один в своей группе, остальные ровно по двум другим.</p>
           </section>
         )}
 
@@ -240,7 +240,7 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
           <section className="space-y-4">
             <AbilityList title="Боевые черты фракции" list={battletraits} empty="В данных нет боевых черт фракции." />
             <AbilityList title="Универсальные способности" list={index.universal} />
-            <div className="rounded-2xl border border-white/10 bg-app-elevated p-3.5 text-[12.5px] leading-snug text-white/75">
+            <div className="rounded-2xl border border-white/10 bg-app-elevated p-3.5 text-[12.5px] leading-snug text-fg-2">
               <SectionTitle>Построение варбанды</SectionTitle>
               <ul className="list-disc space-y-1 pl-4">
                 <li>
@@ -253,7 +253,7 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
                 <li>Бойцы Bladeborn — по одному; герой-Bladeborn союзником открывает своих спутников вне лимита союзников.</li>
                 {own.heroesAll && <li>«Heroes All»: героев своей фракции — без лимита, героев других фракций — до {L.heroesAllOther}.</li>}
               </ul>
-              <p className="mt-2 text-[11px] text-white/40">Источник: warcrier.net (The Warbands; Allies, Thralls and Monsters; Bladeborn; страницы фракций).</p>
+              <p className="mt-2 text-[12px] text-fg-3">Источник: warcrier.net (The Warbands; Allies, Thralls and Monsters; Bladeborn; страницы фракций).</p>
             </div>
           </section>
         )}
@@ -281,7 +281,7 @@ function GroupRow({ x, f, onGroup }: { x: WarcryRosterFighter; f?: WarcryFighter
     <div className="flex items-center gap-2 border-t border-white/[0.05] py-1.5 first-of-type:border-t-0">
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[13px] font-semibold">{x.name || f?.name || x.fighterId}</span>
-        <span className="block text-[11px] text-white/40">
+        <span className="block text-[12px] text-fg-3">
           {f ? `${f.points} очк.` : ''}
           {x.role !== 'warband' ? ` · ${ROLE_LABEL[x.role].toLowerCase()}` : ''}
         </span>
@@ -293,7 +293,7 @@ function GroupRow({ x, f, onGroup }: { x: WarcryRosterFighter; f?: WarcryFighter
             type="button"
             aria-label={GROUP_LABEL[g]}
             onClick={() => (haptic.select(), onGroup(g))}
-            className={cx('size-7 rounded-lg border text-[11px] font-bold', x.group === g ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 text-white/45')}
+            className={cx('ds-hit size-7 rounded-lg border text-[12px] font-bold', x.group === g ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 text-fg-3')}
           >
             {GROUP_LABEL[g][0]}
           </button>
@@ -365,7 +365,7 @@ function FighterCard({
         value={x.name}
         onChange={(e) => onChange({ name: e.target.value.slice(0, 40) })}
         placeholder="Своё имя бойца"
-        className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none placeholder:text-white/30 focus:border-accent"
+        className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none placeholder:text-fg-3 focus:border-accent"
       />
       <div className="grid grid-cols-2 gap-2">
         {!leader && (
@@ -385,11 +385,11 @@ const sortByCost = (list: WarcryAbility[]) => [...list].sort((a, b) => COST_ORDE
 
 /** Оружие бойца таблицей: рунмарка оружия, дальность, атаки, сила, урон (обычный / крит). */
 function WeaponTable({ list }: { list: WarcryWeapon[] }) {
-  if (!list.length) return <p className="text-[12px] text-white/45">Нет оружия в данных</p>;
+  if (!list.length) return <p className="text-[12px] text-fg-3">Нет оружия в данных</p>;
   const cols = 'grid-cols-[1fr_3rem_2.25rem_2.25rem_3rem]';
   return (
     <div className="overflow-hidden rounded-xl border border-white/[0.07]">
-      <div className={cx('grid gap-x-1 bg-white/[0.05] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/45', cols)}>
+      <div className={cx('grid gap-x-1 bg-white/[0.05] px-2.5 py-1 text-[12px] font-semibold uppercase tracking-wide text-fg-3', cols)}>
         <span>Оружие</span>
         <span className="text-center">Range</span>
         <span className="text-center">A</span>
@@ -415,7 +415,7 @@ function WeaponTable({ list }: { list: WarcryWeapon[] }) {
 }
 
 function AbilityList({ title, list, empty, collapsed }: { title: string; list: WarcryAbility[]; empty?: string; collapsed?: boolean }) {
-  if (!list.length) return empty ? <p className="text-[12px] text-white/45">{empty}</p> : null;
+  if (!list.length) return empty ? <p className="text-[12px] text-fg-3">{empty}</p> : null;
   return (
     <div>
       <SectionTitle>{title}</SectionTitle>
@@ -428,7 +428,7 @@ function AbilityList({ title, list, empty, collapsed }: { title: string; list: W
             badge={<CostBadge tone={COST_TONE[a.cost] ?? 'muted'}>{COST[a.cost] ?? a.cost}</CostBadge>}
             open={!collapsed}
           >
-            <p className="whitespace-pre-line text-[12.5px] leading-relaxed text-white/70">{a.text}</p>
+            <p className="whitespace-pre-line text-[12.5px] leading-relaxed text-fg-2">{a.text}</p>
           </RuleCard>
         ))}
       </div>
@@ -486,7 +486,7 @@ function AddSheet({
               key={s.id}
               type="button"
               onClick={() => (haptic.select(), setSrcId(s.id))}
-              className={cx('shrink-0 rounded-full border px-3 py-1.5 text-[12px] font-semibold', srcId === s.id ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 text-white/55')}
+              className={cx('shrink-0 rounded-full border px-3 py-1.5 text-[12px] font-semibold', srcId === s.id ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 text-fg-3')}
             >
               {s.id === own.id ? 'Своя фракция' : s.generic ? 'Союзники, траллы, монстры' : s.name}
             </button>
@@ -496,7 +496,7 @@ function AddSheet({
         {!src ? (
           <div className="mx-auto my-8 size-6 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
         ) : !groups.length ? (
-          <p className="text-sm text-white/50">Нет бойцов, которых можно взять в эту варбанду.</p>
+          <p className="text-sm text-fg-3">Нет бойцов, которых можно взять в эту варбанду.</p>
         ) : (
           groups.map(([group, list]) => (
             <div key={group}>
@@ -516,12 +516,12 @@ function AddSheet({
                           .slice(0, 3)
                           .map((s) => (
                             <span key={s.label} className="rounded-md bg-black/25 py-0.5">
-                              <span className="block text-[9px] font-semibold uppercase text-white/40">{s.label}</span>
+                              <span className="block text-[12px] font-semibold uppercase text-fg-3">{s.label}</span>
                               <span className="font-display block text-[14px] font-semibold leading-tight">{s.value}</span>
                             </span>
                           ))}
                       </div>
-                      {f.runemarks.length > 0 && <p className="mt-1 truncate text-[11px] capitalize text-white/40">{f.runemarks.join(' · ')}</p>}
+                      {f.runemarks.length > 0 && <p className="mt-1 truncate text-[12px] capitalize text-fg-3">{f.runemarks.join(' · ')}</p>}
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {roles.map((role) => (
                           <Button key={role} className="h-8 px-3 text-xs" onClick={() => onAdd(addFighter(roster, src.id, f, role))}>
@@ -590,7 +590,7 @@ function ExportSheet({ open, onClose, roster, data, points }: { open: boolean; o
           { value: 'code', label: 'Код WC1.' },
         ]}
       />
-      <pre className="whitespace-pre-wrap break-all rounded-xl border border-white/10 bg-black/30 p-3 font-mono text-[11.5px] text-white/80">{text}</pre>
+      <pre className="whitespace-pre-wrap break-all rounded-xl border border-white/10 bg-black/30 p-3 font-mono text-[12px] text-white/80">{text}</pre>
     </Sheet>
   );
 }

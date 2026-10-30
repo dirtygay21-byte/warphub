@@ -19,17 +19,17 @@ export function UnitInfo({ unit, cr, roster, L, onClose }: { unit: TAUnit; cr: C
   return (
     <Sheet open onClose={onClose} title={unit.name} tall>
       <div className="space-y-3 pb-3">
-        <p className="text-xs text-white/55">
+        <p className="text-xs text-fg-3">
           {fmtPts(unit.points)} очк. · моделей: {unit.models.length}
           {unit.leaders.length > 0 && ` · с персонажами: ${unit.leaders.join(', ')}`}
         </p>
         {parts.map((p) =>
           p.ds ? (
             <div key={p.unit.uid} className="overflow-x-auto rounded-xl border border-white/10 bg-black/20 p-2">
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/45">{p.ds.name}</p>
+              <p className="mb-1 text-[12px] font-semibold uppercase tracking-wider text-fg-3">{p.ds.name}</p>
               <table className="w-full text-center text-[12px] tabular-nums">
                 <thead>
-                  <tr className="text-white/45">
+                  <tr className="text-fg-3">
                     <th className="text-left font-semibold">Профиль</th>
                     {STATS.map((k) => (
                       <th key={k} className="px-1 font-semibold">
@@ -48,7 +48,7 @@ export function UnitInfo({ unit, cr, roster, L, onClose }: { unit: TAUnit; cr: C
                           {st[k] ? (k === 'inv' ? `${st[k].replace(/\+/g, '')}++` : st[k]) : '—'}
                         </td>
                       ))}
-                      <td className="px-1 py-1 text-[11px] text-white/60">{st.base || 'нет данных'}</td>
+                      <td className="px-1 py-1 text-[12px] text-fg-2">{st.base || 'нет данных'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -74,7 +74,7 @@ export function UnitInfo({ unit, cr, roster, L, onClose }: { unit: TAUnit; cr: C
             readOnly
           />
         ))}
-        {!parts.length && <p className="text-sm text-white/50">Отряда нет в текущих данных ростера.</p>}
+        {!parts.length && <p className="text-sm text-fg-3">Отряда нет в текущих данных ростера.</p>}
       </div>
     </Sheet>
   );

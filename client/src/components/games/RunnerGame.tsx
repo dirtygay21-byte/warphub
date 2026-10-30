@@ -157,7 +157,7 @@ export default function RunnerGame() {
               {meters} м
             </div>
             {phase === "playing" && nextTier && (
-              <div className="pointer-events-none absolute right-3 top-3 rounded-md bg-black/50 px-2 py-0.5 text-[11px] text-white/80">
+              <div className="pointer-events-none absolute right-3 top-3 rounded-md bg-black/50 px-2 py-0.5 text-[12px] text-white/80">
                 {nextTier.label} · {nextTier.minScore} м
               </div>
             )}
@@ -177,7 +177,7 @@ export default function RunnerGame() {
           </div>
 
           {phase === "playing" && (
-            <p className="mt-3 text-center text-xs text-white/50">
+            <p className="mt-3 text-center text-xs text-fg-3">
               Нажимайте в любом месте экрана, чтобы прыгать
             </p>
           )}
@@ -190,8 +190,8 @@ export default function RunnerGame() {
 
           {(phase === "intro" || phase === "error") && game && (
             <div className="mt-5">
-              <p className="text-sm text-white/70">{game.description}</p>
-              <p className={`mb-2 mt-5 text-sm uppercase tracking-widest text-white/50 ${oswald}`}>
+              <p className="text-sm text-fg-2">{game.description}</p>
+              <p className={`mb-2 mt-5 text-sm uppercase tracking-widest text-fg-3 ${oswald}`}>
                 Награды
               </p>
               <TierList game={game} />

@@ -34,17 +34,17 @@ export function CommandPhase({ game }: { game: GameHook }) {
 
   return (
     <div className="space-y-2.5 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Фаза командования · {p.name}</p>
-      <p className="text-xs text-white/55">Оба игрока получили 1 CP.</p>
+      <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Фаза командования · {p.name}</p>
+      <p className="text-xs text-fg-3">Оба игрока получили 1 CP.</p>
 
-      {p.secondaryMode === 'fixed' && <p className="text-sm text-white/70">Фиксированные вторичные — карты не берутся.</p>}
+      {p.secondaryMode === 'fixed' && <p className="text-sm text-fg-2">Фиксированные вторичные — карты не берутся.</p>}
       {p.secondaryMode === 'tactical' &&
         (top.length ? (
           <Button variant="primary" className="h-12 w-full" onClick={draw}>
             Взять {top.length === 1 ? '1 карту' : `${top.length} карты`} вторичных миссий
           </Button>
         ) : (
-          !drawnNow.length && !p.deck.length && <p className="text-sm text-white/60">Колода пуста — брать нечего.</p>
+          !drawnNow.length && !p.deck.length && <p className="text-sm text-fg-2">Колода пуста — брать нечего.</p>
         ))}
 
       {drawnNow.map((a) => {
@@ -100,18 +100,18 @@ function DrawnCard({ game, seat, card, n }: { game: GameHook; seat: Seat; card: 
   return (
     <div className={cx('rounded-xl border px-3 py-2.5', swap?.required && !blocked ? 'border-warn/50 bg-warn/[0.06]' : 'border-white/10 bg-black/20')}>
       <p className="flex items-baseline text-sm font-bold">
-        {n != null && <span className="mr-1.5 shrink-0 text-[11px] font-semibold text-white/45">№{n}</span>}
+        {n != null && <span className="mr-1.5 shrink-0 text-[12px] font-semibold text-fg-3">№{n}</span>}
         <CardLink id={card.id} seat={seat} name={card.name} />
       </p>
-      {card.drawn && <p className="mt-1 text-[12px] leading-snug text-white/70">{card.drawn}</p>}
+      {card.drawn && <p className="mt-1 text-[12px] leading-snug text-fg-2">{card.drawn}</p>}
       {swap && (
         <>
           <Button variant={swap.required && !blocked ? 'primary' : 'ghost'} className="mt-2 w-full" disabled={!!blocked} onClick={act}>
             {swap.action === 'reshuffle' ? 'Взять новую, эту — в колоду' : swap.confirm ? 'Условие выполнено — сбросить и взять новую' : 'Сбросить и взять новую'}
             {swap.required ? ' (обязательно)' : ''}
           </Button>
-          {blocked && <p className="mt-1 text-[11px] text-white/45">Сейчас нельзя: {blocked}.</p>}
-          {swap.confirm && !blocked && <p className="mt-1 text-[11px] text-white/45">Условие проверяете вы — по желанию.</p>}
+          {blocked && <p className="mt-1 text-[12px] text-fg-3">Сейчас нельзя: {blocked}.</p>}
+          {swap.confirm && !blocked && <p className="mt-1 text-[12px] text-fg-3">Условие проверяете вы — по желанию.</p>}
         </>
       )}
     </div>
@@ -128,7 +128,7 @@ function NoteEditor({ game, seat, cardId, name, rule, value }: { game: GameHook;
           {name}: выбор
         </CardLink>
       </p>
-      <p className="mt-0.5 text-[11.5px] leading-snug text-white/55">{rule}</p>
+      <p className="mt-0.5 text-[12px] leading-snug text-fg-3">{rule}</p>
       <div className="mt-2 flex gap-2">
         <input
           value={text}
@@ -155,16 +155,16 @@ function Swap({ game, seat }: { game: GameHook; seat: Seat }) {
   const state = game.state!;
   const p = state.players[seat];
   const [pick, setPick] = useState<string | null>(null);
-  if (p.swapUsed) return <p className="text-[11px] text-white/45">Замена за 1 CP в этой битве уже использована.</p>;
+  if (p.swapUsed) return <p className="text-[12px] text-fg-3">Замена за 1 CP в этой битве уже использована.</p>;
   if (!p.active.length || !p.deck.length) return null;
   const name = (id: string) => game.data!.missions.cards.find((c) => c.id === id)?.name ?? id;
   return (
     <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-2.5">
       <p className="text-sm font-semibold">Заменить карту за 1 CP</p>
-      <p className="text-[11px] text-white/50">Один раз за битву: сбросить активную карту и взять новую сверху колоды. CP: {p.cp}</p>
+      <p className="text-[12px] text-fg-3">Один раз за битву: сбросить активную карту и взять новую сверху колоды. CP: {p.cp}</p>
       <div className="mt-2 flex flex-wrap gap-1.5">
         {p.active.map((a) => (
-          <span key={a.id} className={cx('inline-flex items-center gap-1 rounded-full border pl-2.5 pr-1', pick === a.id ? 'border-accent bg-accent/15 text-accent' : 'border-white/15 text-white/75')}>
+          <span key={a.id} className={cx('inline-flex items-center gap-1 rounded-full border pl-2.5 pr-1', pick === a.id ? 'border-accent bg-accent/15 text-accent' : 'border-white/15 text-fg-2')}>
             <button type="button" onClick={() => setPick(pick === a.id ? null : a.id)} className="py-1 text-xs font-semibold">
               {name(a.id)}
             </button>

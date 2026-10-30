@@ -39,7 +39,7 @@ export function EventCancelConfirmDialog({
             <h2 id="event-cancel-dialog-title" className="text-lg font-semibold">
               Не сможете посетить?
             </h2>
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-fg-2">
               Запись на ивент будет отменена.
             </p>
           </div>
@@ -47,7 +47,7 @@ export function EventCancelConfirmDialog({
 
         <div className="space-y-2 px-5 py-4 text-sm">
           <p className="font-medium text-white/90">{eventTitle}</p>
-          <p className="text-white/60">
+          <p className="text-fg-2">
             {dateLabel} · {timeLabel}
           </p>
         </div>
@@ -70,7 +70,7 @@ export function EventCancelConfirmDialog({
             ) : (
               <XCircle className="size-4" />
             )}
-            {isPending ? "Отменяем..." : "Да, отказаться"}
+            {isPending ? "Отменяем…" : "Да, отказаться"}
           </button>
           <button
             type="button"

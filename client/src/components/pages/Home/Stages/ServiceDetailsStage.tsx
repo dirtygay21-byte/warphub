@@ -174,7 +174,7 @@ export default function ServiceDetailsStage() {
 
   if (!selectedSlot) {
     return (
-      <div className="px-6 py-6 text-sm text-white/60">
+      <div className="px-6 py-6 text-sm text-fg-2">
         Сначала выберите время на предыдущем шаге.
       </div>
     );
@@ -256,7 +256,7 @@ export default function ServiceDetailsStage() {
             <div>
               <FieldLabel>{isClubVisit ? "Время прихода" : "Время начала"}</FieldLabel>
               {timeOptions.length === 0 ? (
-                <p className="text-sm text-white/55">
+                <p className="text-sm text-fg-3">
                   В этом окне не помещается запись. Вернитесь и выберите другое время.
                 </p>
               ) : (
@@ -273,7 +273,7 @@ export default function ServiceDetailsStage() {
                       return minutes < durationMinutes ? `до ${formatClubTime(end)} · только ${hoursLabel(minutes)}` : `до ${formatClubTime(end)}`;
                     }}
                   />
-                  <p className="mt-1.5 text-xs text-white/50">Прокрутите вверх или вниз, чтобы выбрать время.</p>
+                  <p className="mt-1.5 text-xs text-fg-3">Прокрутите вверх или вниз, чтобы выбрать время.</p>
                 </>
               )}
               {showErrors && timeError && (
@@ -331,7 +331,7 @@ export default function ServiceDetailsStage() {
           >
             {isJoin ? <Swords className="size-5" /> : <Dice6 className="size-5" />}
             {mutation.isPending
-              ? "Записываем..."
+              ? "Записываем…"
               : isJoin
                 ? "Присоединиться к игре"
                 : "Записаться"}

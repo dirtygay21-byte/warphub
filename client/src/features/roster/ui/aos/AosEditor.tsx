@@ -64,7 +64,7 @@ export function AosEditor(props: {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
         <p className="font-display text-xl uppercase">Нет данных фракции</p>
-        <p className="mt-2 text-sm text-white/50">{error}</p>
+        <p className="mt-2 text-sm text-fg-3">{error}</p>
         <Button className="mt-5" onClick={props.onBack}>
           Назад
         </Button>
@@ -204,8 +204,8 @@ function Editor({
         <div className="mt-3 flex items-end justify-between gap-3">
           <button type="button" onClick={() => (haptic.tap(), setSheet('points'))} aria-label="Очки: сборка армии и партия" className="flex min-w-0 items-baseline gap-1.5 rounded-lg text-left active:opacity-70">
             <span className={cx('font-display text-[32px] max-[359px]:text-[26px] font-semibold leading-none tabular-nums', over ? 'text-danger' : 'text-white')}>{fmtPts(cr.points.total)}</span>
-            <span className="whitespace-nowrap text-sm text-white/40">/ {fmtPts(roster.pointsLimit)}</span>
-            <Icon name="info" className="size-3.5 shrink-0 self-center text-white/35" />
+            <span className="whitespace-nowrap text-sm text-fg-3">/ {fmtPts(roster.pointsLimit)}</span>
+            <Icon name="info" className="size-3.5 shrink-0 self-center text-fg-3" />
           </button>
           <div className="flex gap-1.5">
             <HeaderStat label="Полки" value={`${roster.regiments.length}/${AOS_RULES.maxRegiments}`} bad={cr.issues.some((i) => i.code === 'regiments' || i.code === 'no-regiment')} />
@@ -219,7 +219,7 @@ function Editor({
               )}
             >
               <Icon name={cr.errors || cr.warnings ? 'alert' : 'check'} className="size-4" />
-              <span className="text-[11px] font-semibold leading-tight">{cr.errors ? cr.errors : cr.warnings ? cr.warnings : 'OK'}</span>
+              <span className="text-[12px] font-semibold leading-tight">{cr.errors ? cr.errors : cr.warnings ? cr.warnings : 'OK'}</span>
             </button>
           </div>
         </div>
@@ -233,18 +233,18 @@ function Editor({
         <section className="rounded-2xl border border-white/10 bg-app-elevated">
           <button type="button" onClick={() => setArmyOpen((o) => !o)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-white/45">
+              <p className="text-xs font-semibold uppercase tracking-wider text-fg-3">
                 Age of Sigmar · {f.name} · {POINTS_LIMIT_LABEL[roster.pointsLimit]}
               </p>
               <p className="mt-0.5 truncate text-[15px] font-semibold">{formation ? formation.name : formationsOf(L).length ? <span className="text-accent">Выберите боевое построение</span> : 'Без построения'}</p>
-              <p className="mt-0.5 truncate text-sm text-white/55">
+              <p className="mt-0.5 truncate text-sm text-fg-3">
                 {(['spell', 'prayer', 'manifestation'] as LoreKind[])
                   .map((k) => (roster.lores[k] ? L.lore.get(roster.lores[k]!)?.name : null))
                   .filter(Boolean)
                   .join(' · ') || 'Лоры не выбраны'}
               </p>
             </div>
-            <Icon name="down" className={cx('size-5 shrink-0 text-white/40 transition', armyOpen && 'rotate-180')} />
+            <Icon name="down" className={cx('size-5 shrink-0 text-fg-3 transition', armyOpen && 'rotate-180')} />
           </button>
           {armyOpen && view && <ArmyView roster={roster} L={L} onGuide={setGuide} />}
           {armyOpen && !view && (
@@ -294,13 +294,13 @@ function Editor({
           return (
             <section key={reg.uid}>
               <div className="mb-2 flex items-baseline justify-between px-1">
-                <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-white/70">
+                <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-fg-2">
                   {isGen ? 'Полк генерала' : `Полк ${regs[0]?.leader.uid === roster.generalUid ? n : n + 1}`}
-                  <span className="ml-2 font-sans text-xs font-semibold text-white/30">
+                  <span className="ml-2 font-sans text-xs font-semibold text-fg-3">
                     {used}/{cap}
                   </span>
                 </h2>
-                <span className="text-xs font-semibold tabular-nums text-white/40">{fmtPts(total)}</span>
+                <span className="text-xs font-semibold tabular-nums text-fg-3">{fmtPts(total)}</span>
               </div>
               <div className="space-y-2">
                 <AosUnitCard unit={reg.leader} roster={roster} L={L} cr={cr} regiment={reg} leader expanded={expanded === reg.leader.uid} actions={actionsFor(reg.leader, reg, true)} readOnly={view} />
@@ -315,7 +315,7 @@ function Editor({
                   <button
                     type="button"
                     onClick={() => setPicker({ kind: 'regiment', regUid: reg.uid })}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-3 py-2.5 text-[13px] font-semibold text-white/60 active:bg-white/5"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-3 py-2.5 text-[13px] font-semibold text-fg-2 active:bg-white/5"
                   >
                     <Icon name="plus" className="size-4" /> В полк {used >= cap ? '(заполнен)' : `· свободно ${cap - used}`}
                   </button>
@@ -329,9 +329,9 @@ function Editor({
         {(roster.auxiliaries.length > 0 || (!view && roster.regiments.length > 0)) && (
           <section>
             <div className="mb-2 flex items-baseline justify-between px-1">
-              <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-white/70">
+              <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-fg-2">
                 Вспомогательные
-                <span className="ml-2 font-sans text-xs font-semibold text-white/30">{roster.auxiliaries.length}</span>
+                <span className="ml-2 font-sans text-xs font-semibold text-fg-3">{roster.auxiliaries.length}</span>
               </h2>
               {cr.points.auxiliary > 0 && <span className="text-xs font-semibold text-warn">доплата +{auxiliarySurcharge(roster.auxiliaries.length)}</span>}
             </div>
@@ -343,7 +343,7 @@ function Editor({
               <button
                 type="button"
                 onClick={() => setPicker({ kind: 'aux' })}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-3 py-2.5 text-[13px] font-semibold text-white/60 active:bg-white/5"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-3 py-2.5 text-[13px] font-semibold text-fg-2 active:bg-white/5"
               >
                 <Icon name="plus" className="size-4" /> Юнит вне полка
               </button>
@@ -355,12 +355,12 @@ function Editor({
         {ror && (
           <section>
             <div className="mb-2 flex items-baseline justify-between px-1">
-              <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-white/70">Полк славы</h2>
-              <span className="text-xs font-semibold tabular-nums text-white/40">{fmtPts(cr.points.ror)}</span>
+              <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-fg-2">Полк славы</h2>
+              <span className="text-xs font-semibold tabular-nums text-fg-3">{fmtPts(cr.points.ror)}</span>
             </div>
             <button type="button" onClick={() => !view && setSheet('ror')} className="w-full rounded-2xl border border-white/10 bg-app-elevated px-3.5 py-3 text-left">
               <p className="text-[15px] font-semibold">{ror.name}</p>
-              <p className="mt-0.5 text-[12px] text-white/45">
+              <p className="mt-0.5 text-[12px] text-fg-3">
                 {ror.units
                   .filter((u) => !u.optional || roster.ror!.picked.includes(u.id))
                   .map((u) => `${u.count > 1 ? u.count + '× ' : ''}${L.ws.get(u.id)?.name}`)
@@ -370,7 +370,7 @@ function Editor({
           </section>
         )}
 
-        <p className="pt-2 text-center text-xs text-white/30">Данные: powered by Wahapedia · {index.lastUpdate?.slice(0, 10)} · General’s Handbook 2026-27</p>
+        <p className="pt-2 text-center text-xs text-fg-3">Данные: powered by Wahapedia · {index.lastUpdate?.slice(0, 10)} · General’s Handbook 2026-27</p>
       </div>
 
       {/* ---- нижняя панель ---- */}
@@ -429,7 +429,7 @@ function Editor({
               <Icon name="check" className="size-6" />
             </div>
             <p className="mt-3 font-semibold">Ростер соответствует правилам</p>
-            <p className="mt-1 text-sm text-white/50">Очки, полки, генерал, улучшения, лоры и ограничения в порядке.</p>
+            <p className="mt-1 text-sm text-fg-3">Очки, полки, генерал, улучшения, лоры и ограничения в порядке.</p>
           </div>
         ) : (
           <ul className="space-y-2 pb-2">
@@ -495,10 +495,10 @@ function ArmyView({ roster, L, onGuide }: { roster: AosRoster; L: AosLookup; onG
   const ror = roster.ror ? L.ror.get(roster.ror.id) : null;
   const line = (label: string, value: string | null | undefined, points?: number | null) => (
     <div className="flex items-baseline justify-between gap-3 border-b border-white/[0.05] py-1.5 last:border-0">
-      <span className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{label}</span>
+      <span className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{label}</span>
       <span className="text-right text-[13.5px] font-semibold text-white/85">
-        {value ?? <span className="text-white/35">—</span>}
-        {points ? <span className="ml-1.5 text-xs text-white/40">+{points}</span> : null}
+        {value ?? <span className="text-fg-3">—</span>}
+        {points ? <span className="ml-1.5 text-xs text-fg-3">+{points}</span> : null}
       </span>
     </div>
   );
@@ -522,7 +522,7 @@ function ArmyView({ roster, L, onGuide }: { roster: AosRoster; L: AosLookup; onG
       )}
       {formation && formation.rules.length > 0 && (
         <div className="space-y-1.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Построение · {formation.name}</p>
+          <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Построение · {formation.name}</p>
           {formation.rules.map((a, i) => (
             <AosRuleCard key={i} rule={a} L={L} />
           ))}
@@ -530,7 +530,7 @@ function ArmyView({ roster, L, onGuide }: { roster: AosRoster; L: AosLookup; onG
       )}
       {f.battleTraits.length > 0 && (
         <div className="space-y-1.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Боевые черты · {f.battleTraits.length}</p>
+          <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Боевые черты · {f.battleTraits.length}</p>
           {f.battleTraits.map((a, i) => (
             <AosRuleCard key={i} rule={a} L={L} />
           ))}
@@ -550,11 +550,11 @@ function PickRow({ label, value, points, empty, warn, onClick }: { label: string
       className={cx('flex w-full items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition active:bg-white/5', warn ? 'border-accent/40' : 'border-white/10', !onClick && 'opacity-50')}
     >
       <span className="min-w-0 flex-1">
-        <span className="block text-[11px] font-semibold uppercase tracking-wider text-white/40">{label}</span>
-        <span className={cx('block truncate text-[14px] font-semibold', value ? 'text-white/90' : warn ? 'text-accent' : 'text-white/45')}>{value ?? empty}</span>
+        <span className="block text-[12px] font-semibold uppercase tracking-wider text-fg-3">{label}</span>
+        <span className={cx('block truncate text-[14px] font-semibold', value ? 'text-white/90' : warn ? 'text-accent' : 'text-fg-3')}>{value ?? empty}</span>
       </span>
       {!!points && <Tag>+{points}</Tag>}
-      {onClick && <Icon name="chevron" className="size-4 shrink-0 text-white/35" />}
+      {onClick && <Icon name="chevron" className="size-4 shrink-0 text-fg-3" />}
     </button>
   );
 }

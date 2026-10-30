@@ -43,16 +43,16 @@ export function RosterPick({ game, onPick }: { game: BookingGame; onPick: (r: Bo
       >
         <Swords className="size-4 text-accent" />
         <span className="flex-1">Взять из WarpBuilder</span>
-        <span className="text-xs font-normal text-white/50">{open ? "Скрыть" : "мои ростеры"}</span>
+        <span className="text-xs font-normal text-fg-3">{open ? "Скрыть" : "мои ростеры"}</span>
       </button>
       {open && (
         <div className="space-y-1.5 rounded-lg border border-white/10 bg-white/3 p-2">
           {error ? (
             <p className="px-1 py-1 text-sm text-red-300">{error}</p>
           ) : !shown ? (
-            <LoaderCircle className="mx-auto my-2 size-5 animate-spin text-white/50" />
+            <LoaderCircle className="mx-auto my-2 size-5 animate-spin text-fg-3" />
           ) : !shown.length ? (
-            <p className="px-1 py-1 text-sm text-white/55">Для этой игры сохранённых ростеров нет.</p>
+            <p className="px-1 py-1 text-sm text-fg-3">Для этой игры сохранённых ростеров нет.</p>
           ) : (
             shown.map((r) => (
               <button
@@ -62,7 +62,7 @@ export function RosterPick({ game, onPick }: { game: BookingGame; onPick: (r: Bo
                 className="block w-full rounded-md px-2 py-1.5 text-left active:bg-white/10"
               >
                 <span className="block truncate text-sm font-semibold text-white">{r.name}</span>
-                <span className="block truncate text-xs text-white/50">
+                <span className="block truncate text-xs text-fg-3">
                   {r.army}
                   {r.points != null ? ` · ${r.points} оч.` : ""}
                 </span>

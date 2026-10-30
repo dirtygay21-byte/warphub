@@ -207,7 +207,7 @@ export function CardFace({
             {card.rarityLabel}
           </span>
           {size === "lg" ? (
-            <span className="text-[10px] uppercase tracking-wide text-white/45">{card.factionLabel}</span>
+            <span className="text-[10px] uppercase tracking-wide text-fg-3">{card.factionLabel}</span>
           ) : (
             points !== undefined && <span className="text-[9px] font-semibold" style={{ color: r.color }}>+{points}</span>
           )}
@@ -222,7 +222,7 @@ export function CardFace({
                     {card[key] as number}
                     {suffix}
                   </p>
-                  <p className="mt-0.5 text-[8px] uppercase text-white/45">{label}</p>
+                  <p className="mt-0.5 text-[8px] uppercase text-fg-3">{label}</p>
                 </div>
               ))}
             </div>
@@ -230,7 +230,7 @@ export function CardFace({
               <p className="text-[11px] font-semibold" style={{ color: r.color }}>
                 {card.ability.name}
               </p>
-              <p className="text-[11px] leading-snug text-white/70">{card.ability.text}</p>
+              <p className="text-[11px] leading-snug text-fg-2">{card.ability.text}</p>
             </div>
           </>
         )}

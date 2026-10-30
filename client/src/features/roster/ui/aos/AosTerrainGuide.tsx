@@ -17,11 +17,11 @@ function Block({ b }: { b: PlacementBlock }) {
   return (
     <section className="rounded-2xl border border-white/10 bg-white/[0.02] px-3.5 py-3">
       <p className="text-[14px] font-semibold">{b.title}</p>
-      <p className="mt-0.5 text-[11.5px] leading-snug text-white/45">{b.context}</p>
+      <p className="mt-0.5 text-[12px] leading-snug text-fg-3">{b.context}</p>
       <ul className="mt-2 space-y-1.5">
         {b.rules.map((r, i) => (
-          <li key={i} className="flex items-start gap-2 text-[12.5px] leading-snug text-white/75">
-            <span className={r.kind === 'mandatory' ? 'mt-0.5 shrink-0 rounded bg-accent/15 px-1 text-[10px] font-semibold uppercase text-accent' : 'mt-0.5 shrink-0 rounded bg-white/[0.08] px-1 text-[10px] font-semibold uppercase text-white/55'}>
+          <li key={i} className="flex items-start gap-2 text-[12.5px] leading-snug text-fg-2">
+            <span className={r.kind === 'mandatory' ? 'mt-0.5 shrink-0 rounded bg-accent/15 px-1 text-[12px] font-semibold uppercase text-accent' : 'mt-0.5 shrink-0 rounded bg-white/[0.08] px-1 text-[12px] font-semibold uppercase text-fg-3'}>
               {r.kind === 'mandatory' ? 'обяз.' : 'можно'}
             </span>
             <span>{r.text}</span>
@@ -29,7 +29,7 @@ function Block({ b }: { b: PlacementBlock }) {
         ))}
       </ul>
       {b.source.url && (
-        <button type="button" onClick={() => openExternal(b.source.url!)} className="mt-2 text-[11px] font-semibold text-accent/90 underline underline-offset-2">
+        <button type="button" onClick={() => openExternal(b.source.url!)} className="mt-2 text-[12px] font-semibold text-accent/90 underline underline-offset-2">
           Источник: {b.source.label}
         </button>
       )}
@@ -77,13 +77,13 @@ export function TerrainDiagram({ name }: { name: string }) {
           {name.length > 22 ? name.slice(0, 21) + '…' : name}
         </text>
       </svg>
-      <ul className="mt-2 grid grid-cols-1 gap-1 text-[11.5px] text-white/60 min-[400px]:grid-cols-2">
+      <ul className="mt-2 grid grid-cols-1 gap-1 text-[12px] text-fg-2 min-[400px]:grid-cols-2">
         <li><span className="text-amber-300">●</span> объектив, пунктир — 3" вокруг</li>
-        <li><span className="text-white/60">■</span> обычный террейн, пунктир — 3"</li>
+        <li><span className="text-fg-2">■</span> обычный террейн, пунктир — 3"</li>
         <li><span className="text-violet-300">■</span> террейн фракции — вне пунктиров</li>
         <li><span className="text-sky-300">■</span> ваша территория</li>
       </ul>
-      <figcaption className="mt-2 rounded-lg bg-white/[0.04] px-2.5 py-1.5 text-[11px] leading-snug text-white/50">
+      <figcaption className="mt-2 rounded-lg bg-white/[0.04] px-2.5 py-1.5 text-[12px] leading-snug text-fg-3">
         Иллюстрация правила, не официальная схема. Форма территорий и места объективов зависят от битвенного плана — смотрите его карту. Поле 60" × 44", масштаб приблизительный.
       </figcaption>
     </figure>
@@ -109,11 +109,11 @@ export function AosTerrainGuide({ ws, L, onClose }: { ws: AosWarscroll | null; L
             <p className="text-[14px] font-semibold">Правила фракции</p>
             {p.rules.length ? (
               <>
-                <p className="text-[11.5px] leading-snug text-white/45">Особые правила {L.faction.name}, которые ставят этот террейн или работают от него при расстановке. Обязательны, если вы их используете.</p>
+                <p className="text-[12px] leading-snug text-fg-3">Особые правила {L.faction.name}, которые ставят этот террейн или работают от него при расстановке. Обязательны, если вы их используете.</p>
                 {p.measures.length > 0 && (
                   <div className="flex flex-wrap gap-1 py-1">
                     {p.measures.map((m) => (
-                      <span key={m} className="rounded-md border border-violet-300/30 bg-violet-300/10 px-1.5 py-0.5 text-[11px] text-violet-100">
+                      <span key={m} className="rounded-md border border-violet-300/30 bg-violet-300/10 px-1.5 py-0.5 text-[12px] text-violet-100">
                         {m}
                       </span>
                     ))}
@@ -124,13 +124,13 @@ export function AosTerrainGuide({ ws, L, onClose }: { ws: AosWarscroll | null; L
                 ))}
               </>
             ) : (
-              <p className="text-[12px] leading-snug text-white/55">В правилах фракции нет особых правил размещения этого террейна — действует только правило Core Rules выше.</p>
+              <p className="text-[12px] leading-snug text-fg-3">В правилах фракции нет особых правил размещения этого террейна — действует только правило Core Rules выше.</p>
             )}
           </section>
           <TerrainDiagram name={ws.name} />
           <Block b={BATTLEFIELD_TERRAIN_GH} />
           <section className="space-y-1.5">
-            <p className="px-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">Варскролл террейна</p>
+            <p className="px-1 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Варскролл террейна</p>
             <Warscroll ws={ws} L={L} />
           </section>
         </div>

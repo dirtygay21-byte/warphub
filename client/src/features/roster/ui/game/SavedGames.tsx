@@ -29,15 +29,15 @@ export function SavedGames({ game, onClose }: { game: GameHook; onClose: () => v
       <div className="flex items-center gap-2">
         <IconButton icon="back" label="Назад" onClick={onClose} className="size-8" />
         <p className="font-display min-w-0 flex-1 text-xl font-semibold uppercase">Сохранённые игры</p>
-        <span className="text-xs text-white/45">{list.length}</span>
+        <span className="text-xs text-fg-3">{list.length}</span>
       </div>
-      {!list.length && <p className="py-6 text-center text-sm text-white/50">Сохранённых игр пока нет.</p>}
+      {!list.length && <p className="py-6 text-center text-sm text-fg-3">Сохранённых игр пока нет.</p>}
       <ul className="space-y-2">
         {list.map((e) => (
           <Row key={e.key} game={game} entry={e} busy={busy === e.key} disabled={!!busy} onOpen={() => void open(e)} />
         ))}
       </ul>
-      <p className="pt-1 text-[11px] text-white/40">Игры хранятся на этом телефоне (до 20); игры на двух телефонах — на сервере, здесь — ссылка.</p>
+      <p className="pt-1 text-[12px] text-fg-3">Игры хранятся на этом телефоне (до 20); игры на двух телефонах — на сервере, здесь — ссылка.</p>
     </section>
   );
 }
@@ -51,12 +51,12 @@ function Row({ game, entry, busy, disabled, onOpen }: { game: GameHook; entry: S
   return (
     <li className={cx('rounded-2xl border bg-white/[0.03]', s?.stage === 'finished' ? 'border-white/10' : 'border-accent/30')}>
       <button type="button" disabled={disabled} onClick={onOpen} className="w-full px-3 pb-2 pt-2.5 text-left active:bg-white/5 disabled:opacity-60">
-        <span className="flex items-center gap-2 text-[11px] text-white/45">
+        <span className="flex items-center gap-2 text-[12px] text-fg-3">
           <span className="min-w-0 flex-1 truncate">
             {fmtDate(entry.updatedAt)}
             {stage ? ` · ${stage}` : ''}
           </span>
-          <span className={cx('rounded-full border px-2 py-px font-semibold', online ? 'border-accent/50 text-accent' : 'border-white/15 text-white/55')}>
+          <span className={cx('rounded-full border px-2 py-px font-semibold', online ? 'border-accent/50 text-accent' : 'border-white/15 text-fg-3')}>
             {online ? `2 телефона · ${entry.online?.code ?? ''}` : '1 телефон'}
           </span>
         </span>
@@ -72,7 +72,7 @@ function Row({ game, entry, busy, disabled, onOpen }: { game: GameHook; entry: S
                 </span>
               )}
             </span>
-            <span className="mt-0.5 block text-xs leading-snug text-white/65">
+            <span className="mt-0.5 block text-xs leading-snug text-fg-2">
               {s.primary.p1 || s.primary.p2 ? (
                 <>
                   {s.names.p1}: {s.primary.p1 ?? '—'} · {s.names.p2}: {s.primary.p2 ?? '—'}
@@ -81,22 +81,22 @@ function Row({ game, entry, busy, disabled, onOpen }: { game: GameHook; entry: S
                 'Основные миссии ещё не определены'
               )}
             </span>
-            {dep && <span className="block text-[11px] text-white/45">Деплой: {dep}</span>}
+            {dep && <span className="block text-[12px] text-fg-3">Деплой: {dep}</span>}
           </>
         ) : (
-          <span className="mt-1 block text-xs text-white/55">Откройте, чтобы увидеть игроков и миссии.</span>
+          <span className="mt-1 block text-xs text-fg-3">Откройте, чтобы увидеть игроков и миссии.</span>
         )}
-        {busy && <span className="mt-1 block text-[11px] text-accent">Открываю…</span>}
+        {busy && <span className="mt-1 block text-[12px] text-accent">Открываю…</span>}
       </button>
       <div className="flex items-center justify-end gap-2 border-t border-white/5 px-3 py-1.5">
         {!confirm ? (
-          <button type="button" onClick={() => setConfirm(true)} className="flex items-center gap-1 text-[11px] font-semibold text-white/45 active:text-white/70">
+          <button type="button" onClick={() => setConfirm(true)} className="flex items-center gap-1 text-[12px] font-semibold text-fg-3 active:text-fg-2">
             <Icon name="trash" className="size-3.5" />
             {online ? 'Убрать из списка' : 'Удалить'}
           </button>
         ) : (
           <>
-            <span className="min-w-0 flex-1 text-[11px] text-warn">{online ? 'Игра останется на сервере, уберётся только ссылка.' : 'Игра будет удалена с телефона.'}</span>
+            <span className="min-w-0 flex-1 text-[12px] text-warn">{online ? 'Игра останется на сервере, уберётся только ссылка.' : 'Игра будет удалена с телефона.'}</span>
             <Button variant="danger" className="text-xs" onClick={() => game.removeSaved(entry.key)}>
               {online ? 'Убрать' : 'Удалить'}
             </Button>

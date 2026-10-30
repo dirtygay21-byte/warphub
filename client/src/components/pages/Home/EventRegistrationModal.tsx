@@ -91,7 +91,7 @@ export default function EventRegistrationModal({
             onClick={handleClose}
             disabled={registerMutation.isPending}
             aria-label="Закрыть"
-            className="flex size-9 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-white/80 transition-colors active:bg-white/10 disabled:opacity-60"
+            className="flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-white/80 transition-colors active:bg-white/10 disabled:opacity-60"
           >
             <X className="size-4" />
           </button>
@@ -106,7 +106,7 @@ export default function EventRegistrationModal({
 
           {eventQuery.isError && (
             <div className="flex min-h-48 flex-col items-center justify-center gap-4 px-5 py-10 text-center">
-              <p className="text-sm text-white/70">
+              <p className="text-sm text-fg-2">
                 Не удалось загрузить ивент. Попробуйте ещё раз.
               </p>
               <button
@@ -129,7 +129,7 @@ export default function EventRegistrationModal({
                   className="aspect-video w-full rounded-xl object-cover"
                 />
               ) : (
-                <div className="flex aspect-video w-full items-center justify-center rounded-xl bg-white/5 text-sm text-white/40">
+                <div className="flex aspect-video w-full items-center justify-center rounded-xl bg-white/5 text-sm text-fg-3">
                   Без баннера
                 </div>
               )}
@@ -139,13 +139,13 @@ export default function EventRegistrationModal({
                   {eventQuery.data.title}
                 </h3>
                 {eventQuery.data.description && (
-                  <p className="mt-2 text-sm leading-relaxed text-white/70">
+                  <p className="mt-2 text-sm leading-relaxed text-fg-2">
                     {eventQuery.data.description}
                   </p>
                 )}
               </div>
 
-              <div className="space-y-2 rounded-xl border border-white/10 bg-white/3 p-4 text-sm text-white/70">
+              <div className="space-y-2 rounded-xl border border-white/10 bg-white/3 p-4 text-sm text-fg-2">
                 <p className="flex items-start gap-2">
                   <CalendarDays className="mt-0.5 size-4 shrink-0 text-accent" />
                   <span>
@@ -177,7 +177,7 @@ export default function EventRegistrationModal({
               </div>
 
               <div>
-                <p className="mb-2 text-sm text-white/50">
+                <p className="mb-2 text-sm text-fg-3">
                   Сколько мест нужно?
                 </p>
                 <SeatCountControl

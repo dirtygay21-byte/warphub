@@ -35,9 +35,9 @@ export function StepRoles({ game, onNext }: { game: GameHook; onNext: () => void
       {mode === 'roll' && (
         <>
           <Dice rolls={roll.rolls} winner={roll.winner} names={names} />
-          <p className="text-sm text-white/70">{names[roll.winner]} решает:</p>
+          <p className="text-sm text-fg-2">{names[roll.winner]} решает:</p>
           {mine && mine !== roll.winner ? (
-            <p className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-xs text-white/60">
+            <p className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-xs text-fg-2">
               Атакующего и защитника выбирает {names[roll.winner]} на своём телефоне — экран обновится сам.
             </p>
           ) : (
@@ -55,7 +55,7 @@ export function StepRoles({ game, onNext }: { game: GameHook; onNext: () => void
 
       {mode === 'manual' && (
         <>
-          <p className="text-sm text-white/70">Кто атакующий?</p>
+          <p className="text-sm text-fg-2">Кто атакующий?</p>
           <div className="grid grid-cols-2 gap-2">
             {(['p1', 'p2'] as const).map((s) => (
               <Button key={s} onClick={() => set(s, false)}>
@@ -74,22 +74,22 @@ export function StepRoles({ game, onNext }: { game: GameHook; onNext: () => void
           {state.rolesSource === 'random' && state.rolls.roles && <Dice rolls={state.rolls.roles.rolls} winner={state.rolls.roles.winner} names={names} />}
           <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
             <p className="rounded-lg border border-[#f87171]/40 bg-[#f87171]/10 px-2.5 py-2">
-              <span className="block text-[11px] text-white/50">Атакующий</span>
+              <span className="block text-[12px] text-fg-3">Атакующий</span>
               <span className="font-semibold">{names[attacker]}</span>
             </p>
             <p className="rounded-lg border border-[#60a5fa]/40 bg-[#60a5fa]/10 px-2.5 py-2">
-              <span className="block text-[11px] text-white/50">Защитник</span>
+              <span className="block text-[12px] text-fg-3">Защитник</span>
               <span className="font-semibold">{names[other(attacker)]}</span>
             </p>
           </div>
-          <p className="mt-1.5 text-[11px] text-white/45">{state.rolesSource === 'random' ? 'По броску' : 'По договорённости'}. Зоны и края — как на карте раскладки.</p>
+          <p className="mt-1.5 text-[12px] text-fg-3">{state.rolesSource === 'random' ? 'По броску' : 'По договорённости'}. Зоны и края — как на карте раскладки.</p>
           {!locked && (
             <div className="mt-2 grid grid-cols-2 gap-2">
               <Button onClick={() => setMode('roll')}>Перебросить</Button>
               <Button onClick={() => setMode('manual')}>Изменить вручную</Button>
             </div>
           )}
-          {locked && <p className="mt-1.5 text-[11px] text-white/45">Вторичные миссии уже раскрыты — роли закреплены.</p>}
+          {locked && <p className="mt-1.5 text-[12px] text-fg-3">Вторичные миссии уже раскрыты — роли закреплены.</p>}
         </div>
       )}
 

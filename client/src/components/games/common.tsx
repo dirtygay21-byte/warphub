@@ -31,7 +31,7 @@ export function GameTopBar({
       <button
         type="button"
         onClick={() => navigate(back)}
-        className="flex size-10 items-center justify-center rounded-xl text-accent active:bg-white/10"
+        className="flex ds-hit size-10 items-center justify-center rounded-xl text-accent active:bg-white/10"
         aria-label="Назад"
       >
         <ChevronLeft className="size-6" />
@@ -110,7 +110,7 @@ export function TierList({
               "flex items-center justify-between rounded-lg border px-3 py-2 text-xs",
               reached
                 ? "border-accent/60 bg-accent/10 text-accent"
-                : "border-white/10 bg-white/3 text-white/75",
+                : "border-white/10 bg-white/3 text-fg-2",
             )}
           >
             <span>
@@ -146,14 +146,14 @@ export function RewardCodeCard({ reward }: { reward: Reward }) {
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs text-white/50">{reward.gameTitle}</p>
+          <p className="text-xs text-fg-3">{reward.gameTitle}</p>
           <p className="mt-0.5 text-lg font-semibold text-white">{reward.label}</p>
         </div>
         <span
           className={clsx(
-            "shrink-0 rounded-md px-2 py-1 text-[11px] font-semibold",
+            "shrink-0 rounded-md px-2 py-1 text-[12px] font-semibold",
             reward.status === "active" && "bg-accent text-accent-foreground",
-            reward.status === "used" && "bg-white/15 text-white/70",
+            reward.status === "used" && "bg-white/15 text-fg-2",
             reward.status === "expired" && "bg-[#b13e53]/30 text-[#ff9db0]",
           )}
         >
@@ -166,14 +166,14 @@ export function RewardCodeCard({ reward }: { reward: Reward }) {
         onClick={copy}
         className={clsx(
           "mt-3 flex w-full items-center justify-between rounded-xl border border-dashed px-3 py-2.5 font-mono text-xl font-bold tracking-[0.2em]",
-          inactive ? "border-white/20 text-white/40 line-through" : "border-accent/60 text-accent",
+          inactive ? "border-white/20 text-fg-3 line-through" : "border-accent/60 text-accent",
         )}
       >
         {reward.code}
         {copied ? <Check className="size-4" /> : <Copy className="size-4 opacity-70" />}
       </button>
 
-      <p className="mt-2 text-xs text-white/55">
+      <p className="mt-2 text-xs text-fg-3">
         {reward.status === "used" && reward.usedAt
           ? `Использована ${formatClub(reward.usedAt, { day: "numeric", month: "long" })}`
           : reward.status === "expired"
@@ -223,15 +223,15 @@ export function ResultPanel({
     <div className="mx-auto w-full max-w-md px-4 pb-10">
       {actionsOnTop && <StickyActions>{actions}</StickyActions>}
       <div className="rounded-2xl border border-white/10 bg-app-elevated p-5 text-center">
-        <p className={`text-sm uppercase tracking-widest text-white/50 ${oswald}`}>{title}</p>
+        <p className={`text-sm uppercase tracking-widest text-fg-3 ${oswald}`}>{title}</p>
         <p className={`mt-1 text-6xl font-semibold text-accent ${oswald}`}>
           {result.score}
-          <span className="ml-2 text-base text-white/60">
+          <span className="ml-2 text-base text-fg-2">
             {game?.key === "dice" ? pluralWins(result.score) : game?.scoreUnit}
           </span>
         </p>
         {result.bestScore !== null && (
-          <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-white/60">
+          <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-fg-2">
             <Trophy className="size-3.5 text-accent" /> Лучший результат: {result.bestScore}
           </p>
         )}
@@ -245,7 +245,7 @@ export function ResultPanel({
             Результат тянет на: <b className="text-accent">{result.earnedLabel}</b>
           </div>
         ) : (
-          <p className="rounded-xl border border-white/10 bg-white/3 px-3 py-2.5 text-sm text-white/70">
+          <p className="rounded-xl border border-white/10 bg-white/3 px-3 py-2.5 text-sm text-fg-2">
             {nextTier
               ? `Без награды. До «${nextTier.label}» нужно ${nextTier.minScore}${game?.key === "dice" ? ` ${pluralWins(nextTier.minScore)}` : ` ${game?.scoreUnit ?? ""}`}.`
               : "Без награды в этот раз."}
@@ -258,7 +258,7 @@ export function ResultPanel({
               "text-center text-sm font-semibold",
               result.rewardOutcome === "new" || result.rewardOutcome === "upgraded"
                 ? "text-accent"
-                : "text-white/70",
+                : "text-fg-2",
             )}
           >
             {OUTCOME_TEXT[result.rewardOutcome]}
@@ -272,7 +272,7 @@ export function ResultPanel({
       <button
         type="button"
         onClick={() => navigate("/games/rewards")}
-        className="mt-4 w-full text-center text-sm text-white/60 underline underline-offset-4"
+        className="mt-4 w-full text-center text-sm text-fg-2 underline underline-offset-4"
       >
         Мои награды
       </button>

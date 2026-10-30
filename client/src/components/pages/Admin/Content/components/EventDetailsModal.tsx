@@ -306,7 +306,7 @@ export default function EventDetailsModal({
             onClick={handleClose}
             disabled={saveMutation.isPending || deleteMutation.isPending}
             aria-label="Закрыть"
-            className="flex size-9 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-white/80 transition-colors active:bg-white/10 disabled:opacity-60"
+            className="flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-white/80 transition-colors active:bg-white/10 disabled:opacity-60"
           >
             <X className="size-4" />
           </button>
@@ -321,7 +321,7 @@ export default function EventDetailsModal({
 
           {!isCreate && eventQuery.isError && (
             <div className="flex min-h-48 flex-col items-center justify-center gap-4 px-5 py-10 text-center">
-              <p className="text-sm text-white/70">
+              <p className="text-sm text-fg-2">
                 Не удалось загрузить ивент. Попробуйте ещё раз.
               </p>
               <button
@@ -364,7 +364,7 @@ export default function EventDetailsModal({
                     className="aspect-video w-full object-cover"
                   />
                 ) : (
-                  <div className="flex aspect-video w-full items-center justify-center bg-white/5 text-sm text-white/40">
+                  <div className="flex aspect-video w-full items-center justify-center bg-white/5 text-sm text-fg-3">
                     Без баннера
                   </div>
                 )}
@@ -414,15 +414,15 @@ export default function EventDetailsModal({
                     placeholder="Описание ивента"
                   />
                 ) : (
-                  <p className="px-1 text-sm leading-relaxed text-white/70">
+                  <p className="px-1 text-sm leading-relaxed text-fg-2">
                     {draft.description || "Без описания"}
                   </p>
                 )}
               </div>
 
-              <div className="space-y-3 rounded-xl border border-white/10 bg-white/3 p-4 text-sm text-white/70">
+              <div className="space-y-3 rounded-xl border border-white/10 bg-white/3 p-4 text-sm text-fg-2">
                 <div className={editableFieldClassName(isEditing)}>
-                  <p className="mb-1.5 flex items-center gap-2 text-white/50">
+                  <p className="mb-1.5 flex items-center gap-2 text-fg-3">
                     <CalendarDays className="size-4 shrink-0 text-accent" />
                     Начало
                   </p>
@@ -446,7 +446,7 @@ export default function EventDetailsModal({
                 </div>
 
                 <div className={editableFieldClassName(isEditing)}>
-                  <p className="mb-1.5 flex items-center gap-2 text-white/50">
+                  <p className="mb-1.5 flex items-center gap-2 text-fg-3">
                     <CalendarDays className="size-4 shrink-0 text-accent" />
                     Окончание
                   </p>
@@ -470,7 +470,7 @@ export default function EventDetailsModal({
                 </div>
 
                 <div className={editableFieldClassName(isEditing)}>
-                  <p className="mb-1.5 flex items-center gap-2 text-white/50">
+                  <p className="mb-1.5 flex items-center gap-2 text-fg-3">
                     <UsersRound className="size-4 shrink-0 text-accent" />
                     Вместимость стола
                   </p>
@@ -503,18 +503,18 @@ export default function EventDetailsModal({
                 </div>
 
                 <div className={editableFieldClassName(isEditing)}>
-                  <p className="mb-1.5 flex items-center gap-2 text-white/50">
+                  <p className="mb-1.5 flex items-center gap-2 text-fg-3">
                     <Table2 className="size-4 shrink-0 text-accent" />
                     Столы
                   </p>
                   {isEditing ? (
                     <>
                       {!hasTimeRange ? (
-                        <p className="px-1 text-sm text-white/45">
+                        <p className="px-1 text-sm text-fg-3">
                           Сначала выберите временной промежуток
                         </p>
                       ) : emptyTablesQuery.isLoading ? (
-                        <div className="flex items-center gap-2 px-1 text-sm text-white/45">
+                        <div className="flex items-center gap-2 px-1 text-sm text-fg-3">
                           <LoaderCircle className="size-4 animate-spin text-accent" />
                           Загрузка столов...
                         </div>
@@ -545,7 +545,7 @@ export default function EventDetailsModal({
                           })}
                         </div>
                       ) : (
-                        <p className="px-1 text-sm text-white/45">
+                        <p className="px-1 text-sm text-fg-3">
                           Нет свободных столов
                         </p>
                       )}
@@ -557,7 +557,7 @@ export default function EventDetailsModal({
               </div>
 
               {!isCreate && eventQuery.data && (
-                <div className="space-y-1 text-xs text-white/45">
+                <div className="space-y-1 text-xs text-fg-3">
                   <p>
                     Создан:{" "}
                     {formatReservationDateTime(eventQuery.data.createdAt)}
@@ -623,7 +623,7 @@ export default function EventDetailsModal({
                   {saveMutation.isPending ? (
                     <>
                       <LoaderCircle className="size-4 animate-spin" />
-                      {isCreate ? "Создаём..." : "Сохраняем..."}
+                      {isCreate ? "Создаём…" : "Сохраняем…"}
                     </>
                   ) : (
                     "Применить"
@@ -652,10 +652,10 @@ export default function EventDetailsModal({
           >
             <div className="border-b border-white/10 px-5 py-5">
               <h2 className="text-lg font-semibold">Удалить ивент?</h2>
-              <p className="mt-2 text-sm text-white/60">{draft.title}</p>
+              <p className="mt-2 text-sm text-fg-2">{draft.title}</p>
             </div>
 
-            <p className="px-5 py-4 text-sm text-white/70">
+            <p className="px-5 py-4 text-sm text-fg-2">
               Это действие нельзя отменить.
             </p>
 

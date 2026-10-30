@@ -70,7 +70,7 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
   if (loadError) {
     return (
       <Shell onBack={onBack}>
-        <p className="mt-10 text-center text-sm text-white/50">{loadError}</p>
+        <p className="mt-10 text-center text-sm text-fg-3">{loadError}</p>
       </Shell>
     );
   }
@@ -114,9 +114,9 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
             <Icon name="map" className="size-5 text-accent" />
             <span className="min-w-0 flex-1">
               <span className="block text-sm font-semibold">Поле боя</span>
-              <span className="block text-[11px] text-white/45">Просмотр без игры: зоны деплоя и раскладки террейна</span>
+              <span className="block text-[12px] text-fg-3">Просмотр без игры: зоны деплоя и раскладки террейна</span>
             </span>
-            <Icon name="chevron" className="size-4 text-white/40" />
+            <Icon name="chevron" className="size-4 text-fg-3" />
           </button>
           {card && <CardSheet game={game} id={card.id} seat={card.seat} onClose={closeCard} />}
         </Shell>
@@ -162,13 +162,13 @@ function StartCard({ game, onStart, onStartOnline, starting }: { game: GameHook;
         <Icon name="book" className="size-5 text-accent" />
         <span className="min-w-0 flex-1">
           <span className="block font-display text-lg font-semibold uppercase leading-tight">Сохранённые игры{count ? ` (${count})` : ''}</span>
-          <span className="block text-[11px] text-white/55">{count ? (unfinished ? `Незаконченных: ${unfinished}` : 'Все законченные') : 'Пока нет — начните новую игру'}</span>
+          <span className="block text-[12px] text-fg-3">{count ? (unfinished ? `Незаконченных: ${unfinished}` : 'Все законченные') : 'Пока нет — начните новую игру'}</span>
         </span>
-        <Icon name="chevron" className="size-4 text-white/40" />
+        <Icon name="chevron" className="size-4 text-fg-3" />
       </button>
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
-        <p className="mt-1 text-sm leading-snug text-white/60">
+        <p className="mt-1 text-sm leading-snug text-fg-2">
           Подготовка по шагам правил Chapter Approved 2026–27: игроки и ростеры, типы армий, раскладка, атакующий и защитник, вторичные миссии, первый ход.
           Затем — трекер партии. Игра сохраняется на этом телефоне после каждого действия и появляется в «Сохранённых играх».
         </p>
@@ -192,8 +192,8 @@ function Setup({ game, rosters, index }: { game: GameHook; rosters: Roster[]; in
   return (
     <section>
       <div className="flex items-baseline justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Подготовка к битве</p>
-        <p className="text-[11px] text-white/45">
+        <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Подготовка к битве</p>
+        <p className="text-[12px] text-fg-3">
           {doneCount} из {steps.length}
         </p>
       </div>
@@ -217,12 +217,12 @@ function Setup({ game, rosters, index }: { game: GameHook; rosters: Roster[]; in
                 <span
                   className={cx(
                     'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                    s.done ? 'bg-accent text-black' : active ? 'border border-accent text-accent' : 'border border-white/20 text-white/50',
+                    s.done ? 'bg-accent text-black' : active ? 'border border-accent text-accent' : 'border border-white/20 text-fg-3',
                   )}
                 >
                   {s.done ? <Icon name="check" className="size-3.5" strokeWidth={3} /> : i + 1}
                 </span>
-                <span className={cx('min-w-0 flex-1 text-sm font-semibold', !s.done && !active && 'text-white/60')}>{s.title}</span>
+                <span className={cx('min-w-0 flex-1 text-sm font-semibold', !s.done && !active && 'text-fg-2')}>{s.title}</span>
               </button>
               {active && <StepBody id={s.id} game={game} rosters={rosters} index={index} onNext={() => setOpen(currentSetupStep(state) ?? 'first-turn')} />}
             </li>
@@ -260,14 +260,14 @@ function Shell({ onBack, undo, master, onMaster, children }: { onBack: () => voi
             title="Режим мастера: открывать ростеры игроков"
             className={cx(
               'mb-0.5 rounded-full border px-3 py-1.5 text-xs font-semibold',
-              master ? 'border-accent bg-accent/15 text-accent' : 'border-white/15 text-white/70 active:bg-white/10',
+              master ? 'border-accent bg-accent/15 text-accent' : 'border-white/15 text-fg-2 active:bg-white/10',
             )}
           >
             Мастер
           </button>
         )}
         {undo && (
-          <button type="button" onClick={undo} className="mb-0.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/70 active:bg-white/10">
+          <button type="button" onClick={undo} className="mb-0.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-fg-2 active:bg-white/10">
             Отменить
           </button>
         )}

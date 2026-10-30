@@ -66,7 +66,7 @@ export function ExportSheet({ open, onClose, roster, L, cr, dataVersion, credit 
       {cr.errors > 0 && fmt !== 'code' && (
         <p className="mb-3 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-[13px] text-red-200">В ростере есть ошибки ({cr.errors}) — список не пройдёт проверку.</p>
       )}
-      {fmt === 'code' && <p className="mb-3 text-sm text-white/55">Код целиком содержит ростер — вставьте его в «Импорт по коду» на другом устройстве.</p>}
+      {fmt === 'code' && <p className="mb-3 text-sm text-fg-3">Код целиком содержит ростер — вставьте его в «Импорт по коду» на другом устройстве.</p>}
       <pre className="whitespace-pre-wrap break-words rounded-xl border border-white/10 bg-black/30 p-3 font-mono text-[12px] leading-relaxed text-white/85">{text}</pre>
     </Sheet>
   );

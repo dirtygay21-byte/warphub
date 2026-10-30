@@ -279,3 +279,15 @@ body {
   0% { transform: translateY(6px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
 }
+
+/* D2b: область касания не меньше 44 px без изменения внешнего размера (кнопки-иконки) */
+.ds-hit { position: relative; }
+.ds-hit::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  transform: translate(-50%, -50%);
+}

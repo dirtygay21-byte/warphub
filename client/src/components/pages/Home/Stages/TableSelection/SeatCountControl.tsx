@@ -33,7 +33,7 @@ export default function SeatCountControl({
             onClick={() => onChange(count)}
             disabled={disabled}
             className={clsx(
-              "size-9 rounded-lg border text-sm font-semibold transition-colors",
+              "ds-hit size-9 rounded-lg border text-sm font-semibold transition-colors",
               selectedPartyCount === count
                 ? "border-accent bg-accent text-accent-foreground"
                 : "border-white/10 bg-white/5 text-white"
@@ -91,7 +91,7 @@ function SeatCountInput({
   };
 
   return (
-    <label className="mt-2 flex items-center gap-3 text-sm text-white/70">
+    <label className="mt-2 flex items-center gap-3 text-sm text-fg-2">
       <span>Мест</span>
       <input
         type="number"

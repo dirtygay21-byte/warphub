@@ -34,7 +34,7 @@ export function RosterCard({
     <li className="flex items-stretch overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
       <button type="button" onClick={() => (haptic.tap(), onOpen())} className="min-w-0 flex-1 px-4 py-3.5 text-left active:bg-white/[0.03]">
         <p className="truncate text-base font-semibold">{name}</p>
-        <p className="mt-0.5 truncate text-sm text-white/55">{sub}</p>
+        <p className="mt-0.5 truncate text-sm text-fg-3">{sub}</p>
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
           {tags}
           {status && (
@@ -42,16 +42,16 @@ export function RosterCard({
               {status.errors ? `${status.errors} ош.` : status.warnings ? `${status.warnings} пред.` : 'OK'}
             </Tag>
           )}
-          <span className="text-xs text-white/35">{date}</span>
+          <span className="text-xs text-fg-3">{date}</span>
         </div>
       </button>
       {points != null && (
         <div className="flex flex-col items-end justify-center pr-1 text-right">
           <span className={cx('font-display text-xl font-semibold leading-none tabular-nums', limit != null && points > limit ? 'text-danger' : 'text-white')}>{fmtPts(points)}</span>
-          {limit != null && <span className="mt-1 text-[11px] text-white/40">из {fmtPts(limit)}</span>}
+          {limit != null && <span className="mt-1 text-[12px] text-fg-3">из {fmtPts(limit)}</span>}
         </div>
       )}
-      <button type="button" aria-label="Действия" onClick={() => (haptic.tap(), onMenu())} className="flex w-12 items-center justify-center text-white/50 active:bg-white/5">
+      <button type="button" aria-label="Действия" onClick={() => (haptic.tap(), onMenu())} className="flex w-12 items-center justify-center text-fg-3 active:bg-white/5">
         <Icon name="more" className="size-6" strokeWidth={3} />
       </button>
     </li>
@@ -71,7 +71,7 @@ export function ToolTile({ icon, title, sub, onClick }: { icon: string; title: s
       </span>
       <span className="min-w-0">
         <span className="font-display block text-base font-semibold uppercase leading-none">{title}</span>
-        <span className="mt-1 block truncate text-[11px] text-white/45">{sub}</span>
+        <span className="mt-1 block truncate text-[12px] text-fg-3">{sub}</span>
       </span>
     </button>
   );
@@ -109,7 +109,7 @@ export function HeaderStat({ label, value, bad }: { label: string; value: string
   return (
     <div className={cx('flex min-w-12 flex-col items-center justify-center rounded-lg px-2 py-1', bad ? 'bg-danger/15 text-danger' : 'bg-white/[0.06] text-white/80')}>
       <span className="font-display text-[15px] font-semibold leading-tight tabular-nums">{value}</span>
-      <span className="text-[10px] font-semibold uppercase leading-tight opacity-60">{label}</span>
+      <span className="text-[12px] font-semibold uppercase leading-tight opacity-60">{label}</span>
     </div>
   );
 }
@@ -181,8 +181,8 @@ export function EditorHeader({
       <div className="mt-3 flex items-end justify-between gap-3">
         <p className="flex min-w-0 items-baseline gap-1.5">
           <span className={cx('font-display text-[32px] font-semibold leading-none tabular-nums max-[359px]:text-[26px]', over ? 'text-danger' : 'text-white')}>{fmtPts(big)}</span>
-          {bigLimit != null && <span className="whitespace-nowrap text-sm text-white/40">/ {fmtPts(bigLimit)}</span>}
-          {bigUnit && <span className="whitespace-nowrap text-sm text-white/40">{bigUnit}</span>}
+          {bigLimit != null && <span className="whitespace-nowrap text-sm text-fg-3">/ {fmtPts(bigLimit)}</span>}
+          {bigUnit && <span className="whitespace-nowrap text-sm text-fg-3">{bigUnit}</span>}
         </p>
         <div className="flex gap-1.5">
           {stats}
@@ -195,7 +195,7 @@ export function EditorHeader({
             )}
           >
             <Icon name={errors || warnings ? 'alert' : 'check'} className="size-4" />
-            <span className="text-[11px] font-semibold leading-tight">{errors ? errors : warnings ? warnings : 'OK'}</span>
+            <span className="text-[12px] font-semibold leading-tight">{errors ? errors : warnings ? warnings : 'OK'}</span>
           </button>
         </div>
       </div>
@@ -228,7 +228,7 @@ export function EditorHeader({
 export function SectionTitle({ children, right }: { children: ReactNode; right?: ReactNode }) {
   return (
     <div className="mb-2 flex items-center justify-between gap-2">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-white/45">{children}</p>
+      <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{children}</p>
       {right}
     </div>
   );
@@ -238,10 +238,10 @@ export function SectionTitle({ children, right }: { children: ReactNode; right?:
 export function SearchField({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
   return (
     <label className="flex h-11 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 focus-within:border-accent">
-      <Icon name="search" className="size-4 shrink-0 text-white/40" />
-      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/30" />
+      <Icon name="search" className="size-4 shrink-0 text-fg-3" />
+      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-fg-3" />
       {value && (
-        <button type="button" aria-label="Очистить" onClick={() => onChange('')} className="text-white/40">
+        <button type="button" aria-label="Очистить" onClick={() => onChange('')} className="text-fg-3">
           <Icon name="close" className="size-4" />
         </button>
       )}
@@ -262,11 +262,11 @@ export function PickTile({ title, sub, chips, active, busy, onClick }: { title: 
       )}
     >
       <span className={cx('block text-sm font-semibold', active ? 'text-accent' : 'text-white/90')}>{title}</span>
-      {sub && <span className={cx('mt-0.5 block text-[11px] font-medium', active ? 'text-accent/70' : 'text-white/40')}>{sub}</span>}
+      {sub && <span className={cx('mt-0.5 block text-[12px] font-medium', active ? 'text-accent/70' : 'text-fg-3')}>{sub}</span>}
       {chips && chips.length > 0 && (
         <span className="mt-1.5 flex flex-wrap gap-1">
           {chips.map((c) => (
-            <span key={c} className="rounded-md bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/50">
+            <span key={c} className="rounded-md bg-white/[0.06] px-1.5 py-0.5 text-[12px] font-semibold uppercase tracking-wide text-fg-3">
               {c}
             </span>
           ))}
@@ -282,7 +282,7 @@ export function StatTiles({ stats }: { stats: { label: string; value: ReactNode 
     <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))` }}>
       {stats.map((s) => (
         <div key={s.label} className="rounded-lg bg-black/25 px-1 py-1.5 text-center">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">{s.label}</p>
+          <p className="text-[12px] font-semibold uppercase tracking-wide text-fg-3">{s.label}</p>
           <p className="font-display text-[19px] font-semibold leading-tight tabular-nums">{s.value ?? '—'}</p>
         </div>
       ))}
@@ -325,10 +325,10 @@ export function DataCard({
           <div className="min-w-0 flex-1">
             <p className="font-display truncate text-[17px] font-semibold uppercase leading-tight">{title}</p>
             <div className="mt-1 h-0.5 w-12 rounded-full bg-accent" />
-            {subtitle && <p className="mt-1 truncate text-[12px] text-white/50">{subtitle}</p>}
+            {subtitle && <p className="mt-1 truncate text-[12px] text-fg-3">{subtitle}</p>}
           </div>
           {right}
-          <Icon name="down" className={cx('mt-1 size-4 shrink-0 text-white/40 transition', open && 'rotate-180')} />
+          <Icon name="down" className={cx('mt-1 size-4 shrink-0 text-fg-3 transition', open && 'rotate-180')} />
         </div>
         {badges && <div className="mt-2 flex flex-wrap gap-1">{badges}</div>}
         {stats && (
@@ -350,10 +350,10 @@ export function RuleCard({ name, sub, badge, open, children }: { name: string; s
       <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2">
         <span className="min-w-0 flex-1">
           <span className="block text-[13px] font-semibold text-white/85">{name}</span>
-          {sub && <span className="block text-[11px] text-white/40">{sub}</span>}
+          {sub && <span className="block text-[12px] text-fg-3">{sub}</span>}
         </span>
         {badge}
-        <Icon name="down" className="size-4 shrink-0 text-white/35 transition group-open:rotate-180" />
+        <Icon name="down" className="size-4 shrink-0 text-fg-3 transition group-open:rotate-180" />
       </summary>
       <div className="border-t border-white/[0.06] px-3 py-2">{children}</div>
     </details>
@@ -365,9 +365,9 @@ export function CostBadge({ children, tone = 'accent' }: { children: ReactNode; 
   return (
     <span
       className={cx(
-        'shrink-0 rounded-md px-1.5 py-0.5 text-[10.5px] font-bold uppercase tracking-wide',
+        'shrink-0 rounded-md px-1.5 py-0.5 text-[12px] font-bold uppercase tracking-wide',
         tone === 'accent' && 'bg-accent/15 text-accent',
-        tone === 'muted' && 'bg-white/[0.08] text-white/60',
+        tone === 'muted' && 'bg-white/[0.08] text-fg-2',
         tone === 'warn' && 'bg-warn/15 text-warn',
         tone === 'danger' && 'bg-danger/15 text-danger',
       )}

@@ -20,7 +20,7 @@ function SkeletonDetailRow({
   return (
     <div className="flex items-center gap-3">
       <span className="text-accent">{icon}</span>
-      <span className="text-sm text-white/50">{label}</span>
+      <span className="text-sm text-fg-3">{label}</span>
       <span className="ml-auto">
         <Skeleton width={valueWidth} height={20} />
       </span>

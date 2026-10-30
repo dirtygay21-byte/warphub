@@ -101,14 +101,14 @@ export default function AdminReservations() {
             <button
               type="button"
               onClick={() => setActivePage("Home")}
-              className="flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/70 transition-colors hover:text-white"
+              className="flex ds-hit size-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-fg-2 transition-colors hover:text-white"
               aria-label="На главную"
             >
               <ArrowLeft className="size-4" />
             </button>
             <div>
               <h1 className="text-xl font-semibold">Записи</h1>
-              <p className="text-sm text-white/50">
+              <p className="text-sm text-fg-3">
                 {total} {getRecordsLabel(total)}
               </p>
             </div>

@@ -12,7 +12,7 @@ export default function FilterSelect({
   value: string | number;
 }) {
   return (
-    <label className="flex flex-col gap-1 text-xs font-semibold text-white/50">
+    <label className="flex flex-col gap-1 text-xs font-semibold text-fg-3">
       {label}
       <span className="relative">
         <select
@@ -26,7 +26,7 @@ export default function FilterSelect({
             </option>
           ))}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-white/40" />
+        <ChevronDown className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-fg-3" />
       </span>
     </label>
   );
