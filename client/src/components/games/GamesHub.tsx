@@ -4,7 +4,8 @@ import { cardArt } from "./pixel/fantasy";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Gift, LoaderCircle, Sparkles, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { ErrorNote, GameTopBar, RewardCodeCard, TierList } from "./common";
+import { ErrorNote, GameTopBar, RewardCodeCard, TierStrip } from "./common";
+import { DsButton } from "@/components/ui/ds";
 import { errorText, useMinigames, oswald } from "./helpers";
 import { PixelSprite } from "./pixel/PixelSprite";
 import { eggSprite } from "./eggScene";
@@ -41,7 +42,7 @@ export default function GamesHub() {
   const points = useQuery({ queryKey: ["minigames", "points"], queryFn: getMyPoints });
 
   return (
-    <div className="pb-10 text-white">
+    <div className="pb-10 text-fg">
       <GameTopBar
         title="Мини-игры"
         back="/profile"
@@ -63,14 +64,14 @@ export default function GamesHub() {
         <button
           type="button"
           onClick={() => navigate("/games/rewards")}
-          className="mt-4 flex w-full items-center gap-3 rounded-2xl border border-accent/50 bg-accent/10 px-4 py-3 text-left shadow-[0_0_24px_rgb(236_254_70/0.1)]"
+          className="ds-press mt-4 flex min-h-16 w-full items-center gap-3 rounded-[18px] border border-accent/50 bg-accent/10 px-4 py-3 text-left"
         >
           <Gift className="size-6 shrink-0 text-accent" />
           <div className="flex-1">
             <p className={`text-base uppercase tracking-wide text-accent ${oswald}`}>
               Мои награды
             </p>
-            <p className="text-xs text-fg-2">
+            <p className="text-[13px] text-fg-2">
               {rewards.isLoading
                 ? "Загружаем…"
                 : activeRewards.length
@@ -96,14 +97,14 @@ export default function GamesHub() {
           {games.data?.map((game) => (
             <section
               key={game.key}
-              className={`overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${ACCENTS[game.key]} to-transparent bg-app-elevated`}
+              className={`ds-enter overflow-hidden rounded-[18px] border border-white/10 bg-gradient-to-br ${ACCENTS[game.key]} to-transparent bg-app-elevated`}
             >
               <button
                 type="button"
                 onClick={() => navigate(`/games/${game.key}`)}
-                className="flex w-full items-center gap-4 p-4 text-left"
+                className="ds-press flex w-full items-center gap-4 p-4 text-left"
               >
-                <div className="flex size-24 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-black">
+                <div className="flex size-20 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-black">
                   <PixelSprite sprite={ICONS[game.key]} scale={game.key === "egg" ? 1.5 : 2.5} title={game.title} />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -111,7 +112,7 @@ export default function GamesHub() {
                   <h2 className={`text-xl font-medium uppercase leading-tight ${oswald}`}>
                     {game.title}
                   </h2>
-                  <p className="mt-1 line-clamp-3 text-xs text-fg-2">{game.description}</p>
+                  <p className="mt-1 line-clamp-2 text-[13px] leading-snug text-fg-2">{game.description}</p>
                   {game.bestScore !== null && (
                     <p className="mt-1.5 inline-flex items-center gap-1 text-xs text-fg-2">
                       <Trophy className="size-3.5 text-accent" /> Рекорд: {game.bestScore}{" "}
@@ -133,21 +134,17 @@ export default function GamesHub() {
                     ))}
                   </div>
                 ) : (
-                  <TierList game={game} />
+                  <TierStrip game={game} />
                 )}
                 {game.weekReward && (
-                  <p className="mt-2 text-xs text-accent">
+                  <p className="mt-2 text-[13px] text-accent">
                     Награда этой недели: {game.weekReward.label}
                     {game.weekReward.status === "used" ? " (использована)" : ""}
                   </p>
                 )}
-                <button
-                  type="button"
-                  onClick={() => navigate(`/games/${game.key}`)}
-                  className="mt-3 w-full rounded-xl bg-accent py-3 text-base font-semibold text-accent-foreground transition-transform active:scale-95"
-                >
+                <DsButton variant="primary" onClick={() => navigate(`/games/${game.key}`)} className="mt-3 w-full">
                   {game.key === "cards" ? "Открыть пакет" : "Играть"}
-                </button>
+                </DsButton>
               </div>
             </section>
           ))}
