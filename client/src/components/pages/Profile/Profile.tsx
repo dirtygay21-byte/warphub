@@ -6,7 +6,9 @@ import { isOutsideTelegram } from "@/utils/telegramEnv";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getFullName, getInitials } from "@/utils/user";
 import { useQuery } from "@tanstack/react-query";
-import { AtSign, ChevronRight, Gamepad2, Hash, LoaderCircle, RefreshCw, Swords, UserRound } from "lucide-react";
+import { AtSign, Check, Copy, Gamepad2, Hash, LoaderCircle, RefreshCw, ShieldCheck, Swords, UserRound } from "lucide-react";
+import { DsButton, GroupCard, NavRow, SectionLabel } from "@/components/ui/ds";
+import { haptic } from "@/utils/haptic";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
@@ -69,7 +71,7 @@ export default function Profile() {
   const fullName = getFullName(user?.firstName ?? "", user?.lastName ?? "");
 
   return (
-    <div className="px-6 py-3 text-white lg:grid lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start lg:gap-x-6 lg:pt-8">
+    <div className="ds-enter px-5 py-3 text-fg lg:grid lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start lg:gap-x-6 lg:pt-8">
       <section className="overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.35)] lg:sticky lg:top-8 lg:row-span-6">
         <div className="relative px-6 pb-6 pt-8 text-center">
           <div className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-accent/15 to-transparent" />
@@ -93,32 +95,27 @@ export default function Profile() {
           </h1>
 
           {user?.username ? (
-            <p className="mt-2 text-sm text-white/60">@{user?.username}</p>
+            <p className="mt-2 text-[15px] text-fg-2">@{user?.username}</p>
           ) : (
-            <p className="mt-2 text-sm text-white/40">Username не указан</p>
+            <p className="mt-2 text-[15px] text-fg-3">Username не указан</p>
           )}
         </div>
       </section>
 
-      <button
-        type="button"
+      <NavRow
+        className="mt-4 lg:mt-0"
+        tone="accent-outline"
+        bareIcon
+        icon={<Gamepad2 className="size-7" />}
+        title="Мини-игры"
+        subtitle="Играйте и получайте скидки в клубе"
         onClick={() => navigate("/games")}
-        className="mt-6 flex w-full items-center gap-3 rounded-2xl border-2 border-accent/60 bg-accent/10 px-4 py-4 text-left transition-transform active:scale-[0.98] lg:mt-0"
-      >
-        <Gamepad2 className="size-7 shrink-0 text-accent" />
-        <div className="flex-1">
-          <p className="text-base font-semibold text-white">Мини-игры</p>
-          <p className="text-xs text-white/60">Играйте и получайте скидки в клубе</p>
-        </div>
-        <ChevronRight className="size-5 text-accent" />
-      </button>
+      />
 
       <section className="mt-6">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-white/50">
-          Информация
-        </h2>
+        <SectionLabel>Информация</SectionLabel>
 
-        <div className="divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
+        <GroupCard>
           <InfoRow
             icon={<UserRound className="size-5" />}
             label="Имя"
@@ -138,54 +135,49 @@ export default function Profile() {
             icon={<Hash className="size-5" />}
             label="Telegram ID"
             value={user?.telegramId ? String(user?.telegramId) : "—"}
+            copy={user?.telegramId ? String(user?.telegramId) : undefined}
           />
-        </div>
+        </GroupCard>
       </section>
 
-      <button
-        type="button"
+      <DsButton
+        className="mt-4 w-full"
+        size="lg"
         onClick={() => profileQuery.refetch()}
         disabled={profileQuery.isFetching}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/3 px-4 py-4 text-sm font-semibold text-white transition-colors active:bg-white/10 disabled:opacity-60"
       >
-        <RefreshCw
-          className={`size-4 ${profileQuery.isFetching ? "animate-spin" : ""}`}
-        />
-        {profileQuery.isFetching ? "Обновляем..." : "Обновить профиль"}
-      </button>
+        <RefreshCw className={`size-[18px] ${profileQuery.isFetching ? "animate-spin" : ""}`} />
+        {profileQuery.isFetching ? "Обновляем…" : "Обновить имя и фото из Telegram"}
+      </DsButton>
 
       {hasRosterAccess && (
-        <button
-          type="button"
+        <NavRow
+          className="mt-3"
+          tone="accent"
+          iconTone="solid"
+          icon={<Swords className="size-[22px]" />}
+          title="WarpBuilder"
+          subtitle="40K, Age of Sigmar, Kill Team, Warcry"
           onClick={() => navigate("/roster")}
-          className="mt-3 flex w-full items-center gap-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-4 text-left text-white transition-colors active:bg-accent/20"
-        >
-          <span className="flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-            <Swords className="size-5" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-sm font-semibold">WarpBuilder</span>
-            <span className="block text-xs text-white/55">40K, Age of Sigmar, Kill Team, Warcry</span>
-          </span>
-          <ChevronRight className="size-5 text-accent" />
-        </button>
+        />
       )}
 
       {isAdmin && (
-        <button
-          type="button"
+        <NavRow
+          className="mt-3"
+          iconTone="neutral"
+          icon={<ShieldCheck className="size-[22px]" />}
+          title="Админ-панель"
+          subtitle="Записи, столы, контент, доступы"
           onClick={() => navigate("/admin")}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/3 px-4 py-4 text-sm font-semibold text-white transition-colors active:bg-white/10 disabled:opacity-60"
-        >
-          Админ-панель
-        </button>
+        />
       )}
 
       {isAuthenticated && rosterAccess.isSuccess && !hasRosterAccess && (
         <button
           type="button"
           onClick={() => setCodeOpen(true)}
-          className="mx-auto mt-6 block px-3 py-2 text-xs font-medium text-white/35 transition-colors active:text-white/60"
+          className="mx-auto mt-6 block min-h-11 px-4 text-sm font-medium text-fg-3 transition-colors active:text-fg-2"
         >
           Есть код доступа?
         </button>
@@ -208,20 +200,41 @@ function InfoRow({
   icon,
   label,
   value,
+  copy,
 }: {
   icon: ReactNode;
   label: string;
   value: string;
+  /** значение для копирования (кнопка справа) */
+  copy?: string;
 }) {
+  const [copied, setCopied] = useState(false);
   return (
-    <div className="flex items-center gap-3 px-4 py-4">
+    <div className="flex items-center gap-3.5 px-4 py-3.5">
       <div className="text-accent">{icon}</div>
       <div className="min-w-0 flex-1">
-        <p className="text-xs uppercase tracking-wide text-white/45">{label}</p>
-        <p className="mt-1 truncate text-sm font-medium text-white/90">
-          {value}
-        </p>
+        <p className="text-xs font-semibold uppercase tracking-[0.06em] text-fg-3">{label}</p>
+        <p className="mt-0.5 truncate text-base font-semibold text-fg">{value}</p>
       </div>
+      {copy && (
+        <button
+          type="button"
+          aria-label={`Скопировать: ${label}`}
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(copy);
+              setCopied(true);
+              haptic.ok();
+              window.setTimeout(() => setCopied(false), 1500);
+            } catch {
+              /* буфер обмена недоступен */
+            }
+          }}
+          className="ds-press flex size-11 shrink-0 items-center justify-center rounded-xl text-fg-3 active:bg-white/[0.06]"
+        >
+          {copied ? <Check className="ds-pop size-[18px] text-accent" /> : <Copy className="size-[18px]" />}
+        </button>
+      )}
     </div>
   );
 }

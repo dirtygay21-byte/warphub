@@ -36,9 +36,18 @@
   --color-skeleton-base: #222220;
   --color-skeleton-highlight: #2e2d2a;
 
-  /* Текст */
-  --color-text-muted: #7f7f7f;
-  --color-text-subtle: #666666;
+  /* Текст (дизайн-система D2, 30.10.2026): основной, второстепенный, подписи — бледнее подписей не бывает */
+  --color-text: 244 244 240;
+  --color-text-2: 184 184 176;
+  --color-text-3: 142 142 134;
+  --color-text-muted: #8e8e86;
+  --color-text-subtle: #8e8e86;
+
+  /* Поля ввода */
+  --color-bg-field: #242422;
+
+  /* Движение: мягкое торможение, короткие длительности (120–300 мс) */
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   /* Статусы (Roster Builder) */
   --color-danger: 248 113 113;
@@ -48,7 +57,7 @@
 body {
   font-family: 'Inter Tight', sans-serif;
   background: var(--color-bg);
-  color: #ffffff;
+  color: rgb(var(--color-text));
 }
 
 @layer base {
@@ -129,6 +138,72 @@ body {
       0 14px 36px rgba(255, 255, 255, 0.07),
       0 8px 20px rgba(255, 255, 255, 0.04),
       0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* ---------- Дизайн-система: микроанимации (D2, 30.10.2026) ---------- */
+@layer utilities {
+  /* нажатие: карточки и кнопки чуть сжимаются */
+  .ds-press {
+    transition: transform 120ms var(--ease-out-soft), background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  }
+  .ds-press:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  /* появление содержимого и шагов */
+  .ds-enter {
+    animation: ds-enter 220ms var(--ease-out-soft) both;
+  }
+  /* лист снизу */
+  .ds-sheet {
+    animation: ds-sheet 280ms var(--ease-out-soft) both;
+  }
+  .ds-fade {
+    animation: ds-fade 200ms ease both;
+  }
+  /* выбранный вариант: короткое свечение */
+  .ds-selected-glow {
+    box-shadow: 0 0 18px rgb(var(--color-accent) / 0.35);
+  }
+  /* заготовка загрузки с бегущим бликом */
+  .ds-shimmer {
+    background: linear-gradient(90deg, var(--color-skeleton-base) 0%, var(--color-skeleton-highlight) 50%, var(--color-skeleton-base) 100%);
+    background-size: 400px 100%;
+    animation: ds-shimmer 1.2s linear infinite;
+  }
+  /* успех: круг пружинит */
+  .ds-pop {
+    animation: ds-pop 600ms var(--ease-out-soft) both;
+  }
+}
+
+@keyframes ds-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ds-sheet {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes ds-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ds-shimmer {
+  from { background-position: -200px 0; }
+  to { background-position: 200px 0; }
+}
+@keyframes ds-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  55% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* «Уменьшить движение» в системе — без анимаций */
+@media (prefers-reduced-motion: reduce) {
+  .ds-press, .ds-enter, .ds-sheet, .ds-fade, .ds-shimmer, .ds-pop {
+    animation: none !important;
+    transition: none !important;
   }
 }
 
