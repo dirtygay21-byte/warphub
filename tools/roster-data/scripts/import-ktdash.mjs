@@ -126,10 +126,18 @@ const title = (k) => k.toLowerCase().replace(/(^|[\s-])([a-z])/g, (m, p, c) => p
 // тот же источник, что и список команд формы записи: backend/src/config/booking.ts → killTeamGroups). Только когда
 // по ключевым словам группа не нашлась; иначе ключевые слова важнее.
 const GROUP_FALLBACK = { 'IMP-TEMPAQ': 'Astra Militarum', 'IMP-INQ': 'Agents of the Imperium', 'IMP-ESS': 'Agents of the Imperium' };
+// Решение владельца 30.10.2026: команды «Agents of the Imperium» — одной группой, как в меню Wahapedia, хотя по ключевым
+// словам у них свои группы (ADEPTUS ARBITES, NAVIS, ADEPTUS MINISTORUM). Здесь Wahapedia важнее ключевых слов.
+const GROUP_WAHAPEDIA = { 'IMP-AES': 'Agents of the Imperium', 'IMP-INB': 'Agents of the Imperium', 'IMP-SANC': 'Agents of the Imperium' };
 const labelOf = new Map();
 for (const t of teams) {
   const list = candidates.get(t.id).sort((a, b) => (freq.get(`${t.factionId}|${groupKey(b)}`) ?? 0) - (freq.get(`${t.factionId}|${groupKey(a)}`) ?? 0) || b.length - a.length);
   const k = list[0];
+  if (GROUP_WAHAPEDIA[t.id]) {
+    t.group = GROUP_WAHAPEDIA[t.id];
+    report.info.push(`${t.id}: группа «${t.group}» — по меню Wahapedia вместо ключевого слова ${k ?? '—'} (решение владельца)`);
+    continue;
+  }
   if (!k) {
     t.group = GROUP_FALLBACK[t.id] ?? null;
     if (t.group) report.info.push(`${t.id}: группа «${t.group}» — по меню Wahapedia (в ключевых словах ktdash группы нет)`);

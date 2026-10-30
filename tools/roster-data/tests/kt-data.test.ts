@@ -33,6 +33,7 @@ test('индекс: источник с коммитом и датой, кома
   assert.equal(index.teams.find((t) => t.id === 'IMP-TEMPAQ')?.group, 'Astra Militarum');
   assert.equal(index.teams.find((t) => t.id === 'IMP-INQ')?.group, 'Agents of the Imperium');
   assert.equal(index.teams.find((t) => t.id === 'IMP-ESS')?.group, 'Agents of the Imperium');
+  for (const id of ['IMP-AES', 'IMP-INB', 'IMP-SANC']) assert.equal(index.teams.find((t) => t.id === id)?.group, 'Agents of the Imperium', id);
   for (const t of index.teams) assert.ok(t.group === null || (typeof t.group === 'string' && t.group.length > 2), t.id);
 });
 
