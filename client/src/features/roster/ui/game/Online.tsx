@@ -62,7 +62,7 @@ export function OnlineBar({ game, system = '40k' }: { game: OnlineLike; system?:
   const me = game.state?.players[o.seat].name ?? (o.seat === 'p1' ? 'Игрок 1' : 'Игрок 2');
   const joined = !!o.players[opp];
   const invite = () => {
-    shareText(`Игра ${system === 'aos' ? 'Age of Sigmar' : 'Warhammer 40,000'} в WarpHub: откройте Roster Builder${system === 'aos' ? ' → Age of Sigmar' : ''} → «Начать игру» → «На двух телефонах» и введите код ${o.code}`);
+    shareText(`Игра ${system === 'aos' ? 'Age of Sigmar' : 'Warhammer 40,000'} в WarpHub: откройте WarpBuilder${system === 'aos' ? ' → Age of Sigmar' : ''} → «Начать игру» → «На двух телефонах» и введите код ${o.code}`);
     haptic.tap();
   };
   const status = game.sync.offline ? 'нет связи' : game.sync.sending ? 'отправка…' : 'на связи';

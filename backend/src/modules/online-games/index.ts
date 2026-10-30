@@ -6,7 +6,7 @@ import { appendOnlineEvent, createOnlineGame, getOnlineEvents, joinOnlineGame, l
 const CODES = { NOT_FOUND: 404, FORBIDDEN: 403, FULL_GAME: 409, BAD_CODE: 400, CONFLICT: 409, BAD_EVENT: 400, SEAT: 403, TOO_LARGE: 413, FULL: 409 } as const;
 
 async function guard<T>(user: Parameters<typeof hasRosterAccess>[0], fn: () => Promise<T>) {
-  if (!(await hasRosterAccess(user))) return status(403, { error: 'Нет доступа к Roster Builder' });
+  if (!(await hasRosterAccess(user))) return status(403, { error: 'Нет доступа к WarpBuilder' });
   try {
     return await fn();
   } catch (error) {

@@ -59,7 +59,7 @@ export const rosterModule = new Elysia({ prefix: '/roster', tags: ['Roster Build
   .get(
     '/data/:name',
     async ({ user, params, set }) => {
-      if (!(await hasRosterAccess(user))) return status(403, { error: 'Нет доступа к Roster Builder' });
+      if (!(await hasRosterAccess(user))) return status(403, { error: 'Нет доступа к WarpBuilder' });
       const file = readRosterData(params.name.replace(/\.json$/, ''));
       if (!file) return status(404, { error: 'Нет данных' });
       set.headers['content-type'] = 'application/json; charset=utf-8';
@@ -72,7 +72,7 @@ export const rosterModule = new Elysia({ prefix: '/roster', tags: ['Roster Build
   .get(
     '/data/aos/:name',
     async ({ user, params, set }) => {
-      if (!(await hasRosterAccess(user))) return status(403, { error: 'Нет доступа к Roster Builder' });
+      if (!(await hasRosterAccess(user))) return status(403, { error: 'Нет доступа к WarpBuilder' });
       const file = readRosterData(params.name.replace(/\.json$/, ''), 'aos');
       if (!file) return status(404, { error: 'Нет данных' });
       set.headers['content-type'] = 'application/json; charset=utf-8';

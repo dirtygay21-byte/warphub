@@ -407,7 +407,7 @@ function Shell({ onBack, children }: { onBack: () => void; children: ReactNode }
       <header className="mb-4 flex items-end gap-3">
         <IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" />
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Roster Builder · Age of Sigmar</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpBuilder · Age of Sigmar</p>
           <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Test Army</h1>
         </div>
       </header>

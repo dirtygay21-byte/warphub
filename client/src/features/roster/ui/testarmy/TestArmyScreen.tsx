@@ -383,7 +383,7 @@ function FieldPicker({
               placeholder="WH1.eyJ2Ijox…"
               className="w-full rounded-lg border border-white/10 bg-white/[0.04] p-2.5 font-mono text-xs text-white outline-none focus:border-accent"
             />
-            <p className="mt-1 text-[11px] text-white/45">Код ростера: Roster Builder → ростер → «Экспорт» → код.</p>
+            <p className="mt-1 text-[11px] text-white/45">Код ростера: WarpBuilder → ростер → «Экспорт» → код.</p>
             {codeError && <p className="mt-1 text-xs text-danger">{codeError}</p>}
           </div>
         )}
@@ -403,7 +403,7 @@ function Shell({ onBack, children }: { onBack: () => void; children: ReactNode }
       <header className="mb-4 flex items-end gap-3">
         <IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" />
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Roster Builder · 40K</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpBuilder · 40K</p>
           <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Test Army</h1>
         </div>
       </header>

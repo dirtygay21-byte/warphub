@@ -13,7 +13,7 @@ export async function rosterRefFor(r: Roster, source: 'own' | 'code', battlefiel
   const faction = await loadFaction(r.factionId).catch(() => null);
   if (!faction) return 'Не удалось загрузить данные фракции ростера';
   const dets = r.detachmentIds.map((id) => faction.detachments.find((d) => d.id === id)).filter((d) => !!d);
-  if (!dets.length) return 'В ростере не выбран детачмент — выберите его в Roster Builder';
+  if (!dets.length) return 'В ростере не выбран детачмент — выберите его в WarpBuilder';
   const names = [...new Set(dets.flatMap(dispositionsOf))];
   const ids = names.map((n) => battlefield.dispositions.find((d) => d.name === n)?.id);
   if (!ids.length || ids.some((x) => !x)) return `Тип армии детачмента не найден в картах миссий: ${names.join(', ') || '—'}`;
