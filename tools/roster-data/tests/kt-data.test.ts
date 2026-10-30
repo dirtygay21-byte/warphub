@@ -29,6 +29,11 @@ test('индекс: источник с коммитом и датой, кома
   // группы по ключевым словам оперативников (R1): Kasrkin — Astra Militarum, Legionaries — Heretic Astartes
   assert.equal(index.teams.find((t) => t.name === 'Kasrkin')?.group, 'Astra Militarum');
   assert.equal(index.teams.find((t) => t.name === 'Legionaries')?.group, 'Heretic Astartes');
+  // группы по меню Wahapedia для команд без группового ключевого слова
+  assert.equal(index.teams.find((t) => t.id === 'IMP-TEMPAQ')?.group, 'Astra Militarum');
+  assert.equal(index.teams.find((t) => t.id === 'IMP-INQ')?.group, 'Agents of the Imperium');
+  assert.equal(index.teams.find((t) => t.id === 'IMP-ESS')?.group, 'Agents of the Imperium');
+  for (const id of ['IMP-AES', 'IMP-INB', 'IMP-SANC']) assert.equal(index.teams.find((t) => t.id === id)?.group, 'Agents of the Imperium', id);
   for (const t of index.teams) assert.ok(t.group === null || (typeof t.group === 'string' && t.group.length > 2), t.id);
 });
 
