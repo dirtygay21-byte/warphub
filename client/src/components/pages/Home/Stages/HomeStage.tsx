@@ -5,7 +5,7 @@ import { useReservationStore } from "@/stores/useReservationStore";
 import { useQuery } from "@tanstack/react-query";
 import { s3Url } from "@/utils/s3utils";
 import { getRosterAccess } from "@/apiUtils/roster";
-import { Calendar, Swords } from "lucide-react";
+import { BookOpen, Calendar, Swords } from "lucide-react";
 import { DsButton, NavRow, Skeleton } from "@/components/ui/ds";
 import { useNavigate } from "react-router-dom";
 
@@ -57,6 +57,13 @@ export default function HomeStage() {
               />
             ))}
         </div>
+        <NavRow
+          icon={<BookOpen className="size-5" />}
+          title="Как играть"
+          subtitle="Первая игра без паники: Warhammer 40,000"
+          onClick={() => navigate("/learn")}
+          className="mt-1"
+        />
         {rosterAccess.data?.hasAccess && (
           <NavRow
             icon={<Swords className="size-5" />}
