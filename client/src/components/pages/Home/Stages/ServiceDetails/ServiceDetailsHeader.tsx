@@ -19,7 +19,7 @@ export default function ServiceDetailsHeader({
           </span>
         )}
       </div>
-      <p className="mt-3 text-sm leading-5 text-white/70">
+      <p className="mt-3 text-sm leading-5 text-fg-2">
         {description ?? "Описание услуги появится позднее."}
       </p>
     </div>

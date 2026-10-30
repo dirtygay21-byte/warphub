@@ -100,7 +100,7 @@ export function UnitCard({
       {(hasErr || hasWarn) && <span className={cx('absolute inset-y-0 left-0 w-[3px]', hasErr ? 'bg-danger' : 'bg-warn')} aria-hidden />}
       <button type="button" onClick={onToggle} className="flex w-full items-center gap-3 px-4 py-3.5 text-left active:bg-white/[0.02]">
         <div className="min-w-0 flex-1">
-          {role && <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-accent/70">{role}</p>}
+          {role && <p className="mb-0.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-accent/70">{role}</p>}
           <p className="text-[15px] font-semibold leading-tight">
             {isWarlord && <Icon name="crown" className="-mt-0.5 mr-1 inline size-[15px] text-accent" />}
             {ds.name}
@@ -109,10 +109,10 @@ export function UnitCard({
                 {OUTDATED_MARK}
               </span>
             )}
-            {c.copy > 1 && <span className="ml-1.5 text-xs font-semibold text-white/30">#{c.copy}</span>}
+            {c.copy > 1 && <span className="ml-1.5 text-xs font-semibold text-fg-3">#{c.copy}</span>}
           </p>
           {(meta.length > 0 || (!attachedTo && ds.support)) && (
-            <p className="mt-1 line-clamp-2 text-[12.5px] leading-snug text-white/45">
+            <p className="mt-1 line-clamp-2 text-[12.5px] leading-snug text-fg-3">
               {!attachedTo && ds.support && <span className="text-danger">Нужно присоединить · </span>}
               {meta.map((m, i) => (
                 <span key={i} className={cx(c.enhancement && m === c.enhancement.name && 'text-accent/80')}>
@@ -135,9 +135,9 @@ export function UnitCard({
         <div className="flex shrink-0 items-center gap-2">
           <div className="text-right">
             <p className="font-display text-[19px] font-semibold leading-none tabular-nums">{fmtPts(c.total)}</p>
-            <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-white/30">очк.</p>
+            <p className="mt-0.5 text-[12px] font-medium uppercase tracking-wide text-fg-3">очк.</p>
           </div>
-          <Icon name="down" className={cx('size-4 text-white/25 transition', expanded && 'rotate-180')} />
+          <Icon name="down" className={cx('size-4 text-fg-3 transition', expanded && 'rotate-180')} />
         </div>
       </button>
 
@@ -171,7 +171,7 @@ export function UnitCard({
             </Field>
           )}
           {c.band && c.band.options.length === 1 && c.band.to !== null && (
-            <p className="text-[13px] text-white/45">Цена для копии №{c.copy}: {c.band.options[0].cost} очк.</p>
+            <p className="text-[13px] text-fg-3">Цена для копии №{c.copy}: {c.band.options[0].cost} очк.</p>
           )}
 
           {!!c.band?.addons.length && (
@@ -196,11 +196,11 @@ export function UnitCard({
                     <div key={w.label} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">{w.label}</p>
-                        <p className="text-xs text-white/45">
+                        <p className="text-xs text-fg-3">
                           +{w.cost} за шт.{w.unverified && <span className="text-warn"> · не проверено</span>} · считается по «Снаряжению»
                         </p>
                       </div>
-                      <span className={cx('text-sm font-semibold tabular-nums', c.paidAuto[w.label] ? 'text-accent' : 'text-white/40')}>
+                      <span className={cx('text-sm font-semibold tabular-nums', c.paidAuto[w.label] ? 'text-accent' : 'text-fg-3')}>
                         {c.paidAuto[w.label]} шт. · +{c.paidAuto[w.label]! * w.cost}
                       </span>
                     </div>
@@ -226,7 +226,7 @@ export function UnitCard({
               onClick={onWarlord}
               className="flex w-full items-center gap-2.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-[13.5px] font-semibold text-white/85 active:bg-white/10"
             >
-              <Icon name="crown" className={cx('size-4', isWarlord ? 'text-accent' : 'text-white/40')} />
+              <Icon name="crown" className={cx('size-4', isWarlord ? 'text-accent' : 'text-fg-3')} />
               <span className="flex-1 text-left">Warlord</span>
               <span className={cx('relative h-5 w-9 rounded-full transition', isWarlord ? 'bg-accent' : 'bg-white/15')}>
                 <span className={cx('absolute top-0.5 size-4 rounded-full bg-white shadow transition-all', isWarlord ? 'left-[18px] bg-black' : 'left-0.5')} />
@@ -237,7 +237,7 @@ export function UnitCard({
           {(enhOptions.length > 0 || c.enhancement) && (
             <Field label="Улучшение" hint={`${cr.enhancementsUsed}/${cr.enhancementsLimit}`}>
               {enhBlocked ? (
-                <p className="text-[13px] text-white/45">{enhBlocked}</p>
+                <p className="text-[13px] text-fg-3">{enhBlocked}</p>
               ) : (
                 <div className="space-y-1">
                   <Choice active={!c.unit.enhancementId} onClick={() => onPatch({ enhancementId: null })} title="Без улучшения" />
@@ -265,7 +265,7 @@ export function UnitCard({
           {ds.leads.length > 0 && (
             <Field label={ds.support ? 'Присоединить (Support)' : 'Присоединить (Leader)'}>
               {bodyguards.length === 0 && !c.unit.attachedTo ? (
-                <p className="text-[13px] text-white/45">
+                <p className="text-[13px] text-fg-3">
                   В ростере нет подходящих отрядов. Может вести: {ds.leads.map((id) => L.ds.get(id)?.name).filter(Boolean).slice(0, 8).join(', ')}
                   {ds.leads.length > 8 ? '…' : ''}
                 </p>
@@ -283,7 +283,7 @@ export function UnitCard({
                   ))}
                 </div>
               )}
-              {ds.leaderNote && <p className="whitespace-pre-line text-xs text-white/40">{cleanRuleText(ds.leaderNote)}</p>}
+              {ds.leaderNote && <p className="whitespace-pre-line text-xs text-fg-3">{cleanRuleText(ds.leaderNote)}</p>}
             </Field>
           )}
 
@@ -331,7 +331,7 @@ function ReadOnlyChoices({ c, cr, isWarlord, attachedTo }: { c: ComputedUnit; cr
         <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] px-3 py-1">
           {lines.map(([k, v]) => (
             <div key={k} className="flex items-baseline justify-between gap-3 border-b border-white/[0.05] py-1.5 last:border-0">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{k}</span>
+              <span className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{k}</span>
               <span className="text-right text-[13px] font-semibold text-white/85">{v}</span>
             </div>
           ))}
@@ -356,7 +356,7 @@ function Row({ label, hint, warn, children }: { label: string; hint: string; war
     <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] py-1.5 pl-3 pr-1.5">
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold">{label}</p>
-        <p className="text-xs text-white/45">
+        <p className="text-xs text-fg-3">
           {hint}
           {warn && <span className="text-warn"> · {warn}</span>}
         </p>
@@ -379,10 +379,10 @@ function Choice({ active, onClick, title, right, sub, dim, detail }: { active: b
     >
       <span className="flex items-baseline gap-2">
         <span className={cx('flex-1 text-[13.5px] font-semibold', active ? 'text-accent' : 'text-white/85')}>{title}</span>
-        {right && <span className={cx('shrink-0 text-xs font-semibold tabular-nums', active ? 'text-accent' : 'text-white/50')}>{right}</span>}
+        {right && <span className={cx('shrink-0 text-xs font-semibold tabular-nums', active ? 'text-accent' : 'text-fg-3')}>{right}</span>}
       </span>
-      {sub && <span className="mt-0.5 block text-xs text-white/45">{sub}</span>}
-      {active && detail && <span className="mt-1.5 block whitespace-pre-line text-xs leading-relaxed text-white/60">{cleanRuleText(detail)}</span>}
+      {sub && <span className="mt-0.5 block text-xs text-fg-3">{sub}</span>}
+      {active && detail && <span className="mt-1.5 block whitespace-pre-line text-xs leading-relaxed text-fg-2">{cleanRuleText(detail)}</span>}
     </button>
   );
 }
@@ -401,16 +401,16 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
   const melee = shown.filter((w) => w.profiles.every((p) => p.type === 'Melee'));
   return (
     <details className="group rounded-xl border border-white/10 bg-white/[0.02]">
-      <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2.5 text-sm font-semibold text-white/75">
+      <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2.5 text-sm font-semibold text-fg-2">
         Профиль
-        <Icon name="down" className="size-4 text-white/40 transition group-open:rotate-180" />
+        <Icon name="down" className="size-4 text-fg-3 transition group-open:rotate-180" />
       </summary>
       <div className="space-y-3 border-t border-white/[0.06] px-3 pb-3 pt-3">
         {ds.stats.length > 0 && (
           <div className="no-scrollbar -mx-1 overflow-x-auto px-1">
             <table className="stat-grid w-full min-w-[320px] text-center text-[13px]">
               <thead>
-                <tr className="text-[11px] uppercase text-white/40">
+                <tr className="text-[12px] uppercase text-fg-3">
                   <th className="pb-1 text-left font-semibold"> </th>
                   {['M', 'T', 'Sv', 'W', 'Ld', 'OC'].map((h) => (
                     <th key={h} className="pb-1 font-semibold">
@@ -422,7 +422,7 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
               <tbody>
                 {ds.stats.map((m, i) => (
                   <tr key={i} className="border-t border-white/[0.05]">
-                    <td className="max-w-[9rem] truncate py-1.5 pr-2 text-left text-xs text-white/60">{m.name}</td>
+                    <td className="max-w-[9rem] truncate py-1.5 pr-2 text-left text-xs text-fg-2">{m.name}</td>
                     <td>{m.M}</td>
                     <td>{m.T}</td>
                     <td>
@@ -438,7 +438,7 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
             </table>
           </div>
         )}
-        {ds.invulnNote && <p className="text-xs text-white/50">{ds.invulnNote}</p>}
+        {ds.invulnNote && <p className="text-xs text-fg-3">{ds.invulnNote}</p>}
         {ranged.length > 0 && <WeaponTable title="Дальнобойное оружие" skill="BS" weapons={ranged} count={count} />}
         {melee.length > 0 && <WeaponTable title="Ближний бой" skill="WS" weapons={melee} count={count} />}
         {equipped.length > 0 && hidden > 0 && (
@@ -448,7 +448,7 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
         )}
         {tagAbilities.length > 0 && (
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Способности</p>
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Способности</p>
             <div className="mt-1 flex flex-wrap gap-1">
               {tagAbilities.map((a, i) => (
                 <RuleChip key={i} name={a.name + (a.param ? ' ' + a.param : '')} text={a.ref ? L.faction.rules[a.ref]?.text ?? '' : a.text} accent={a.type === 'faction'} />
@@ -461,11 +461,11 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
             <p className="text-[13px] font-semibold text-accent/90">
               {a.name}
               {a.param ? ` ${a.param}` : ''}
-              {a.type === 'wargear' && <span className="ml-1.5 text-[11px] font-medium uppercase text-white/35">снаряжение</span>}
+              {a.type === 'wargear' && <span className="ml-1.5 text-[12px] font-medium uppercase text-fg-3">снаряжение</span>}
             </p>
-            <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-white/70">{cleanRuleText(a.ref ? L.faction.rules[a.ref]?.text : a.text)}</p>
+            <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-fg-2">{cleanRuleText(a.ref ? L.faction.rules[a.ref]?.text : a.text)}</p>
             {a.incomplete && (
-              <p className="mt-1 rounded-lg bg-warn/10 px-2.5 py-1.5 text-[11.5px] leading-snug text-amber-100">
+              <p className="mt-1 rounded-lg bg-warn/10 px-2.5 py-1.5 text-[12px] leading-snug text-amber-100">
                 {INCOMPLETE_TEXT[a.incomplete]}{' '}
                 <button type="button" onClick={() => openExternal(ds.link)} className="font-semibold text-accent underline underline-offset-2">
                   Полный текст — {linkLabel(ds.link)}
@@ -484,7 +484,7 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
             <Tag key={k}>{k}</Tag>
           ))}
         </div>
-        <p className="text-[11px] text-white/30">{ds.source}</p>
+        <p className="text-[12px] text-fg-3">{ds.source}</p>
       </div>
     </details>
   );
@@ -493,8 +493,8 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
 function Txt({ title, text }: { title: string; text: string }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{title}</p>
-      <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-white/70">{cleanRuleText(text)}</p>
+      <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{title}</p>
+      <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-fg-2">{cleanRuleText(text)}</p>
     </div>
   );
 }
@@ -509,11 +509,11 @@ function countIn(loadout: Record<string, number>) {
 function WeaponTable({ title, skill, weapons, count }: { title: string; skill: string; weapons: Weapon[]; count: (name: string) => number }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{title}</p>
+      <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{title}</p>
       <div className="no-scrollbar -mx-1 mt-1 overflow-x-auto px-1">
         <table className="stat-grid w-full min-w-[340px] text-center text-[12px]">
           <thead>
-            <tr className="text-[10px] uppercase text-white/35">
+            <tr className="text-[12px] uppercase text-fg-3">
               <th className="pb-1 text-left font-semibold"> </th>
               {['Range', 'A', skill, 'S', 'AP', 'D'].map((h) => (
                 <th key={h} className="px-1 pb-1 font-semibold">
@@ -525,13 +525,13 @@ function WeaponTable({ title, skill, weapons, count }: { title: string; skill: s
           <tbody>
             {weapons.flatMap((w) =>
               w.profiles.map((p, i) => (
-                <tr key={w.name + i} className={cx('align-top', i === 0 && 'border-t border-white/[0.05]', count(w.name) ? 'text-white' : 'text-white/45')}>
+                <tr key={w.name + i} className={cx('align-top', i === 0 && 'border-t border-white/[0.05]', count(w.name) ? 'text-white' : 'text-fg-3')}>
                   <td className="max-w-[11rem] py-1.5 pr-2 text-left">
                     <span className="block text-[12px] font-semibold leading-tight">
                       {w.profiles.length > 1 ? p.name : w.name}
                       {i === 0 && count(w.name) ? <span className="ml-1 text-accent">×{count(w.name)}</span> : null}
                     </span>
-                    {p.keywords && <span className="block text-[10px] uppercase leading-tight text-accent/70">{p.keywords}</span>}
+                    {p.keywords && <span className="block text-[12px] uppercase leading-tight text-accent/70">{p.keywords}</span>}
                   </td>
                   <td className="px-1 py-1.5">{p.type === 'Melee' ? '—' : fmtRange(p.range)}</td>
                   <td className="px-1 py-1.5">{p.A}</td>
@@ -556,11 +556,11 @@ function RuleChip({ name, text, accent }: { name: string; text: string; accent?:
       <button
         type="button"
         onClick={() => text && setOpen((o) => !o)}
-        className={cx('rounded-md px-2 py-1 text-[11px] font-semibold uppercase tracking-wide', accent ? 'bg-accent/15 text-accent' : 'bg-white/[0.07] text-white/70', open && 'ring-1 ring-white/30')}
+        className={cx('rounded-md px-2 py-1 text-[12px] font-semibold uppercase tracking-wide', accent ? 'bg-accent/15 text-accent' : 'bg-white/[0.07] text-fg-2', open && 'ring-1 ring-white/30')}
       >
         {name}
       </button>
-      {open && <p className="w-full whitespace-pre-line rounded-lg bg-white/[0.04] px-2.5 py-2 text-[12px] leading-relaxed text-white/65">{cleanRuleText(text)}</p>}
+      {open && <p className="w-full whitespace-pre-line rounded-lg bg-white/[0.04] px-2.5 py-2 text-[12px] leading-relaxed text-fg-2">{cleanRuleText(text)}</p>}
     </>
   );
 }
@@ -594,8 +594,8 @@ function LoadoutEditor({ c, onPatch }: { c: ComputedUnit; onPatch: (p: Partial<R
   return (
     <Field label="Снаряжение" hint={custom ? 'изменено' : 'по умолчанию'}>
       <button type="button" onClick={() => setOpen((o) => !o)} className="flex w-full items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left">
-        <span className="min-w-0 flex-1 text-[13px] leading-snug text-white/75">{summary || 'Не выбрано'}</span>
-        <Icon name="down" className={cx('size-4 shrink-0 text-white/40 transition', open && 'rotate-180')} />
+        <span className="min-w-0 flex-1 text-[13px] leading-snug text-fg-2">{summary || 'Не выбрано'}</span>
+        <Icon name="down" className={cx('size-4 shrink-0 text-fg-3 transition', open && 'rotate-180')} />
       </button>
       {open && (
         <div className="space-y-2">
@@ -604,18 +604,18 @@ function LoadoutEditor({ c, onPatch }: { c: ComputedUnit; onPatch: (p: Partial<R
               Снаряжение было задано вручную в старой версии и не проверено. Нажмите «Вернуть стандартное» и выберите замены заново.
             </p>
           )}
-          {info.parsed.length === 0 && !notes.length && <p className="text-[13px] text-white/45">У этого юнита нет вариантов замены снаряжения.</p>}
+          {info.parsed.length === 0 && !notes.length && <p className="text-[13px] text-fg-3">У этого юнита нет вариантов замены снаряжения.</p>}
           {info.parsed.map((o) => (
             <OptionCard key={o.key} o={o} c={c} picks={picks[o.key] ?? []} paid={paid} onPick={(ci, n) => setPick(o.key, ci, n)} />
           ))}
           {notes.length > 0 && (
             <div className="rounded-xl bg-white/[0.03] px-3 py-2.5">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">
+              <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">
                 {info.unparsed.length ? 'Не выбирается автоматически — только как пояснение' : 'Пояснения'}
               </p>
               <ul className="mt-1.5 space-y-1.5">
                 {notes.map((i) => (
-                  <li key={i} className="whitespace-pre-line text-[12px] leading-relaxed text-white/60">
+                  <li key={i} className="whitespace-pre-line text-[12px] leading-relaxed text-fg-2">
                     {ds.options[i]!.star ? '* ' : '• '}
                     {ds.options[i]!.text}
                   </li>
@@ -642,13 +642,13 @@ function OptionCard({ o, c, picks, paid, onPick }: { o: ParsedOption; c: Compute
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3 pb-2 pt-2.5">
       <div className="flex items-baseline justify-between gap-2">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{whoText(o)}</p>
-        <p className={cx('shrink-0 text-[11px] font-semibold tabular-nums', limit ? 'text-white/45' : 'text-white/25')}>{limit ? `${used}/${limit}` : 'недоступно'}</p>
+        <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{whoText(o)}</p>
+        <p className={cx('shrink-0 text-[12px] font-semibold tabular-nums', limit ? 'text-fg-3' : 'text-fg-3')}>{limit ? `${used}/${limit}` : 'недоступно'}</p>
       </div>
-      {o.from.length > 0 && <p className="mt-0.5 text-[12.5px] text-white/60">Заменить: {name(o.from)}</p>}
-      {o.requires.length > 0 && <p className="mt-0.5 text-[11.5px] text-white/40">Если есть: {name(o.requires)}</p>}
-      {o.forbids.length > 0 && <p className="mt-0.5 text-[11.5px] text-white/40">Если нет: {name(o.forbids)}</p>}
-      {!limit && o.minModels > 0 && <p className="mt-0.5 text-[11.5px] text-white/40">Нужно не меньше {o.minModels} моделей в отряде.</p>}
+      {o.from.length > 0 && <p className="mt-0.5 text-[12.5px] text-fg-2">Заменить: {name(o.from)}</p>}
+      {o.requires.length > 0 && <p className="mt-0.5 text-[12px] text-fg-3">Если есть: {name(o.requires)}</p>}
+      {o.forbids.length > 0 && <p className="mt-0.5 text-[12px] text-fg-3">Если нет: {name(o.forbids)}</p>}
+      {!limit && o.minModels > 0 && <p className="mt-0.5 text-[12px] text-fg-3">Нужно не меньше {o.minModels} моделей в отряде.</p>}
       <div className="mt-1.5 space-y-1">
         {o.choices.map((choice, ci) => {
           const cost = choice.reduce((s, it) => s + (paid.get(wkey(it.weapon)) ?? 0) * it.qty, 0);
@@ -656,7 +656,7 @@ function OptionCard({ o, c, picks, paid, onPick }: { o: ParsedOption; c: Compute
             <div key={ci} className="flex items-center gap-2">
               <div className="min-w-0 flex-1">
                 <p className={cx('text-[13.5px] font-semibold leading-tight', (picks[ci] ?? 0) > 0 ? 'text-accent' : 'text-white/85')}>{name(choice)}</p>
-                {cost > 0 && <p className="text-[11px] text-white/45">+{cost} очк. за модель</p>}
+                {cost > 0 && <p className="text-[12px] text-fg-3">+{cost} очк. за модель</p>}
               </div>
               <Counter value={picks[ci] ?? 0} max={Math.max(picks[ci] ?? 0, max[ci] ?? 0)} onChange={(n) => onPick(ci, n)} />
             </div>
@@ -676,18 +676,18 @@ function CombinedUnit({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: Comput
     <details className="group rounded-xl border border-accent/25 bg-accent/[0.04]" open>
       <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5">
         <span className="min-w-0">
-          <span className="block text-[11px] font-semibold uppercase tracking-wider text-accent/80">Совместный отряд</span>
+          <span className="block text-[12px] font-semibold uppercase tracking-wider text-accent/80">Совместный отряд</span>
           <span className="block truncate text-sm font-semibold text-white/85">{members.map((m) => m.ds!.name).join(' + ')}</span>
         </span>
-        <Icon name="down" className="size-4 shrink-0 text-white/40 transition group-open:rotate-180" />
+        <Icon name="down" className="size-4 shrink-0 text-fg-3 transition group-open:rotate-180" />
       </summary>
       <div className="space-y-3 border-t border-white/[0.06] px-3 pb-3 pt-3">
-        <p className="text-[12px] leading-relaxed text-white/50">Способности каждой части отряда. Нажмите на название, чтобы прочитать текст.</p>
+        <p className="text-[12px] leading-relaxed text-fg-3">Способности каждой части отряда. Нажмите на название, чтобы прочитать текст.</p>
         {members.map((m) => (
           <div key={m.unit.uid}>
             <p className="text-[12.5px] font-semibold text-white/85">
               {m.ds!.name}
-              <span className="ml-1.5 text-[10.5px] font-semibold uppercase tracking-wider text-accent/70">{roleOf(m)}</span>
+              <span className="ml-1.5 text-[12px] font-semibold uppercase tracking-wider text-accent/70">{roleOf(m)}</span>
             </p>
             <div className="mt-1 flex flex-wrap gap-1">
               {m.ds!.abilities.map((a, i) => (
@@ -698,7 +698,7 @@ function CombinedUnit({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: Comput
         ))}
         {rules.length > 0 && (
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Правила детачмента для всего отряда</p>
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Правила детачмента для всего отряда</p>
             <div className="mt-1 flex flex-wrap gap-1">
               {rules.map((r) => (
                 <RuleChip
@@ -733,7 +733,7 @@ function UnitRules({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedR
     <div className="space-y-2">
       {detRules.length > 0 && (
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Правила детачмента для юнита</p>
+          <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Правила детачмента для юнита</p>
           <div className="mt-1 flex flex-wrap gap-1">
             {detRules.map((r) => (
               <RuleChip key={r.id} name={r.name + (r.own ? '' : ` · через ${r.via.join(', ')}`)} text={`${r.det}\n\n${r.text}`} accent />
@@ -743,7 +743,7 @@ function UnitRules({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedR
       )}
       {strats.length > 0 && (
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Стратагемы ({strats.length})</p>
+          <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Стратагемы ({strats.length})</p>
           <div className="mt-1 flex flex-wrap gap-1">
             {strats.map((st) => (
               <RuleChip key={st.id} name={`${st.name} · ${st.cp}`} text={`${st.type}${st.phase ? ' · ' + st.phase : ''}\n\n${st.text}`} accent={!!st.detachment} />

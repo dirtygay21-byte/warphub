@@ -57,7 +57,7 @@ export function Home({
           <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">WarpBuilder</h1>
         </div>
       </header>
-      <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/40">Игры</p>
+      <p className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Игры</p>
       <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
         {GAMES.map((g) => (
           <button
@@ -72,15 +72,15 @@ export function Home({
           >
             <span className="font-display block text-lg font-semibold uppercase leading-tight">{g.name}</span>
             <span className="mt-2 flex items-end justify-between gap-2">
-              <span className="text-[11px] text-white/45">{g.sub}</span>
-              {g.ready && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-semibold text-accent">{count(g.id)}</span>}
+              <span className="text-[12px] text-fg-3">{g.sub}</span>
+              {g.ready && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[12px] font-semibold text-accent">{count(g.id)}</span>}
             </span>
           </button>
         ))}
       </div>
-      <p className="mb-2 mt-6 text-[11px] font-semibold uppercase tracking-wider text-white/40">Последние ростеры</p>
+      <p className="mb-2 mt-6 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Последние ростеры</p>
       {!recent.length ? (
-        <p className="text-sm text-white/50">Ростеров пока нет — выберите игру и соберите первую армию.</p>
+        <p className="text-sm text-fg-3">Ростеров пока нет — выберите игру и соберите первую армию.</p>
       ) : (
         <ul className="space-y-2">
           {recent.map((r) => (
@@ -88,12 +88,12 @@ export function Home({
               <button type="button" onClick={() => (haptic.tap(), onOpen(r.g, r.id))} className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-3 text-left active:bg-white/10">
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold">{r.name}</span>
-                  <span className="block truncate text-[11px] text-white/45">
+                  <span className="block truncate text-[12px] text-fg-3">
                     {r.g === '40k' ? '40K · ' : r.g === 'aos' ? 'AoS · ' : ''}{r.sub}
                     {r.pts != null ? ` · ${fmtPts(r.pts)} очк.` : ''}
                   </span>
                 </span>
-                <Icon name="chevron" className="size-4 text-white/40" />
+                <Icon name="chevron" className="size-4 text-fg-3" />
               </button>
             </li>
           ))}

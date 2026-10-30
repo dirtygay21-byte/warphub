@@ -40,7 +40,7 @@ export function StepStart({ game, index }: { game: GameHook; index: DataIndex })
           )}
           <p className="mt-2 text-sm">
             Первым ходит <span className="font-semibold text-accent">{names[state.firstTurn]}</span>
-            <span className="text-white/45"> · {state.firstTurnSource === 'random' ? 'по броску' : 'по договорённости'}</span>
+            <span className="text-fg-3"> · {state.firstTurnSource === 'random' ? 'по броску' : 'по договорённости'}</span>
           </p>
           <div className="mt-2 grid grid-cols-3 gap-1.5">
             <Button onClick={rollFirst}>Перебросить</Button>
@@ -88,7 +88,7 @@ export function Summary({ game, index }: { game: GameHook; index: DataIndex }) {
   const dep = battlefield.deployments.find((d) => d.id === state.deploymentId);
   return (
     <div className="rounded-xl border border-white/10 bg-black/20 p-3 text-sm">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Сводка</p>
+      <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Сводка</p>
       {(['p1', 'p2'] as const).map((s) => {
         const p = state.players[s];
         const faction = fName(p.roster.factionId);
@@ -97,7 +97,7 @@ export function Summary({ game, index }: { game: GameHook; index: DataIndex }) {
             <p className="flex items-center gap-2 font-semibold">
               <span className="min-w-0 flex-1">
                 {p.name}
-                <span className="font-normal text-white/50"> · {p.role === 'attacker' ? 'атакующий' : p.role === 'defender' ? 'защитник' : '—'}</span>
+                <span className="font-normal text-fg-3"> · {p.role === 'attacker' ? 'атакующий' : p.role === 'defender' ? 'защитник' : '—'}</span>
               </span>
               <RosterButton seat={s} />
             </p>
@@ -139,7 +139,7 @@ export function Summary({ game, index }: { game: GameHook; index: DataIndex }) {
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
     <p className="mt-0.5 text-[13px] leading-snug">
-      <span className="text-white/45">{label}: </span>
+      <span className="text-fg-3">{label}: </span>
       {children}
     </p>
   );

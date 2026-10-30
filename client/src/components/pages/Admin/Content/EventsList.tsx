@@ -32,7 +32,7 @@ export default function EventsList() {
 
   if (eventsQuery.isLoading) {
     return (
-      <div className="flex min-h-48 items-center justify-center text-white/60">
+      <div className="flex min-h-48 items-center justify-center text-fg-2">
         <LoaderCircle className="size-8 animate-spin text-accent" />
       </div>
     );
@@ -42,7 +42,7 @@ export default function EventsList() {
     return (
       <>
         <div className="flex min-h-48 flex-col items-center justify-center gap-4 rounded-2xl border border-white/10 bg-app-elevated px-5 py-8 text-center">
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-fg-2">
             Не удалось загрузить ивенты. Попробуйте ещё раз.
           </p>
           <button
@@ -79,7 +79,7 @@ export default function EventsList() {
     <>
       <div className="space-y-4 pb-24">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm text-white/50">
+          <p className="text-sm text-fg-3">
             {events.length > 0 ? `Всего ${events.length}` : "Ивентов пока нет"}
           </p>
 
@@ -88,7 +88,7 @@ export default function EventsList() {
             onClick={() => eventsQuery.refetch()}
             disabled={eventsQuery.isFetching}
             aria-label="Обновить список"
-            className="flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/3 transition-colors active:bg-white/10 disabled:opacity-60"
+            className="flex ds-hit size-10 items-center justify-center rounded-xl border border-white/10 bg-white/3 transition-colors active:bg-white/10 disabled:opacity-60"
           >
             <RefreshCw
               className={clsx(
@@ -100,8 +100,8 @@ export default function EventsList() {
         </div>
 
         {events.length === 0 ? (
-          <div className="flex min-h-48 flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-app-elevated px-5 py-8 text-center text-white/60">
-            <CalendarX2 className="size-10 text-white/30" />
+          <div className="flex min-h-48 flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-app-elevated px-5 py-8 text-center text-fg-2">
+            <CalendarX2 className="size-10 text-fg-3" />
             <p className="text-sm">Созданных ивентов пока нет</p>
           </div>
         ) : (

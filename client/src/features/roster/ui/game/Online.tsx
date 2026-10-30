@@ -30,7 +30,7 @@ export function OnlineStart({ game, onCreate, busy }: { game: OnlineLike; onCrea
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
       <p className="font-display text-xl font-semibold uppercase">На двух телефонах</p>
-      <p className="mt-1 text-sm leading-snug text-white/60">
+      <p className="mt-1 text-sm leading-snug text-fg-2">
         Каждый игрок ведёт игру на своём телефоне: свой ростер, тайный выбор, свои карты и CP. Счёт и ход видны обоим.
         Начатые игры — в «Сохранённых играх».
       </p>
@@ -70,22 +70,22 @@ export function OnlineBar({ game, system = '40k' }: { game: OnlineLike; system?:
     <div className="mb-3 rounded-xl border border-accent/30 bg-accent/[0.06] px-3 py-2 text-xs">
       <div className="flex items-center gap-2">
         <span className="font-mono text-sm font-semibold tracking-widest text-accent">{o.code}</span>
-        <span className="min-w-0 flex-1 truncate text-white/70">
+        <span className="min-w-0 flex-1 truncate text-fg-2">
           Вы — <b className="text-white">{me}</b> · {o.seat === 'p1' ? 'игрок 1' : 'игрок 2'}
         </span>
-        <span className={cx('flex items-center gap-1', game.sync.offline ? 'text-danger' : 'text-white/55')}>
+        <span className={cx('flex items-center gap-1', game.sync.offline ? 'text-danger' : 'text-fg-3')}>
           <span className={cx('size-1.5 rounded-full', game.sync.offline ? 'bg-danger' : game.sync.sending ? 'bg-warn' : 'bg-accent')} />
           {status}
         </span>
       </div>
       <div className="mt-1.5 flex items-center gap-2">
-        <span className="min-w-0 flex-1 text-white/55">{joined ? `Соперник: ${o.players[opp]!.name}` : 'Соперник ещё не вошёл — отправьте ему код'}</span>
+        <span className="min-w-0 flex-1 text-fg-3">{joined ? `Соперник: ${o.players[opp]!.name}` : 'Соперник ещё не вошёл — отправьте ему код'}</span>
         {!joined && (
           <button type="button" onClick={invite} className="rounded-full border border-accent/50 px-2.5 py-1 font-semibold text-accent active:bg-accent/10">
             Позвать
           </button>
         )}
-        <button type="button" onClick={game.closeGame} className="rounded-full border border-white/15 px-2.5 py-1 font-semibold text-white/60 active:bg-white/10">
+        <button type="button" onClick={game.closeGame} className="rounded-full border border-white/15 px-2.5 py-1 font-semibold text-fg-2 active:bg-white/10">
           К списку
         </button>
       </div>

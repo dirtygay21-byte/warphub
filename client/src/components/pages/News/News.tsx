@@ -25,7 +25,7 @@ export default function News() {
       <div className="px-6 pb-3 pt-6 text-white lg:pt-8">
         <div className="mb-4">
           <h1 className="text-2xl font-semibold">Новости</h1>
-          <p className="mt-1 text-sm text-white/50">Загружаем новости...</p>
+          <p className="mt-1 text-sm text-fg-3">Загружаем новости…</p>
         </div>
 
         <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
@@ -40,7 +40,7 @@ export default function News() {
   if (newsQuery.isError) {
     return (
       <div className="flex min-h-[calc(100dvh-140px)] flex-col items-center justify-center gap-4 px-6 text-center text-white">
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-fg-2">
           Не удалось загрузить новости. Попробуйте ещё раз.
         </p>
         <button
@@ -60,7 +60,7 @@ export default function News() {
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Новости</h1>
-          <p className="mt-1 text-sm text-white/50">
+          <p className="mt-1 text-sm text-fg-3">
             {newsItems.length > 0
               ? `${newsItems.length} ${getNewsCountLabel(newsItems.length)}`
               : "Пока нет новостей"}
@@ -72,7 +72,7 @@ export default function News() {
           onClick={() => newsQuery.refetch()}
           disabled={newsQuery.isFetching}
           aria-label="Обновить список новостей"
-          className="flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-white transition-colors active:bg-white/10 disabled:opacity-60"
+          className="flex ds-hit size-10 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-white transition-colors active:bg-white/10 disabled:opacity-60"
         >
           <RefreshCw
             className={clsx("size-4", newsQuery.isFetching && "animate-spin")}
@@ -84,7 +84,7 @@ export default function News() {
         <div className="rounded-2xl border border-white/10 bg-app-elevated px-6 py-10 text-center">
           <Newspaper className="mx-auto size-10 text-accent" />
           <p className="mt-4 text-base font-medium">Новостей пока нет</p>
-          <p className="mt-2 text-sm text-white/50">
+          <p className="mt-2 text-sm text-fg-3">
             Загляните позже — здесь появятся анонсы клуба.
           </p>
         </div>

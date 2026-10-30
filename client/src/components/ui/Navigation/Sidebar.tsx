@@ -58,7 +58,7 @@ export default function Sidebar() {
             aria-current={item.isActive ? "page" : undefined}
             className={clsx(
               "flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[15px] font-medium transition-colors",
-              item.isActive ? "bg-accent/10 text-accent" : "text-white/70 hover:bg-white/[0.05] hover:text-white"
+              item.isActive ? "bg-accent/10 text-accent" : "text-fg-2 hover:bg-white/[0.05] hover:text-white"
             )}
           >
             <span className="size-5 [&>svg]:size-5">{item.icon}</span>
@@ -96,7 +96,7 @@ export default function Sidebar() {
             </span>
             <span className="min-w-0">
               <span className="block truncate text-sm font-semibold text-white">{getFullName(user.firstName ?? "", user.lastName ?? "") || "Профиль"}</span>
-              {user.username && <span className="block truncate text-xs text-white/45">@{user.username}</span>}
+              {user.username && <span className="block truncate text-xs text-fg-3">@{user.username}</span>}
             </span>
           </button>
         )}
@@ -110,11 +110,11 @@ function SideLink({ icon, label, onClick }: { icon: React.ReactNode; label: stri
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-white/70 transition-colors hover:bg-white/[0.05] hover:text-white"
+      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-fg-2 transition-colors hover:bg-white/[0.05] hover:text-white"
     >
       {icon}
       <span className="flex-1">{label}</span>
-      <ChevronRight className="size-4 text-white/30" />
+      <ChevronRight className="size-4 text-fg-3" />
     </button>
   );
 }

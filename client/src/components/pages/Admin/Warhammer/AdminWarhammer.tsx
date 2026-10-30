@@ -64,7 +64,7 @@ export default function AdminWarhammer() {
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Столы Warhammer</h1>
-          <p className="mt-1 text-sm text-white/50">
+          <p className="mt-1 text-sm text-fg-3">
             Игры, тренировки и покраска за день (время клуба)
           </p>
         </div>
@@ -73,7 +73,7 @@ export default function AdminWarhammer() {
           onClick={() => dayQuery.refetch()}
           disabled={dayQuery.isFetching}
           aria-label="Обновить"
-          className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/3 active:bg-white/10 disabled:opacity-60"
+          className="flex ds-hit size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/3 active:bg-white/10 disabled:opacity-60"
         >
           <RefreshCw className={clsx("size-4", dayQuery.isFetching && "animate-spin")} />
         </button>
@@ -84,7 +84,7 @@ export default function AdminWarhammer() {
           type="button"
           aria-label="Предыдущий день"
           onClick={() => setDateKey((key) => shiftDate(key, -1))}
-          className="flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/3 active:bg-white/10"
+          className="flex ds-hit size-10 items-center justify-center rounded-xl border border-white/10 bg-white/3 active:bg-white/10"
         >
           <ChevronLeft className="size-5" />
         </button>
@@ -98,12 +98,12 @@ export default function AdminWarhammer() {
           type="button"
           aria-label="Следующий день"
           onClick={() => setDateKey((key) => shiftDate(key, 1))}
-          className="flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/3 active:bg-white/10"
+          className="flex ds-hit size-10 items-center justify-center rounded-xl border border-white/10 bg-white/3 active:bg-white/10"
         >
           <ChevronRight className="size-5" />
         </button>
       </div>
-      <p className="-mt-3 mb-5 text-sm capitalize text-white/60">
+      <p className="-mt-3 mb-5 text-sm capitalize text-fg-2">
         {formatCalendarDate(keyToDate(dateKey))}
       </p>
 
@@ -112,7 +112,7 @@ export default function AdminWarhammer() {
           <LoaderCircle className="size-8 animate-spin text-accent" />
         </div>
       ) : dayQuery.isError || !day ? (
-        <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-white/60">
+        <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-fg-2">
           Не удалось загрузить данные: {dayQuery.error?.message}
         </p>
       ) : (
@@ -151,7 +151,7 @@ export default function AdminWarhammer() {
 
           <section>
             <h2 className="mb-1 text-lg font-semibold">Покраска миниатюр</h2>
-            <p className="mb-3 text-xs text-white/50">
+            <p className="mb-3 text-xs text-fg-3">
               Вместимость: {day.paintingCapacity ?? "—"} человек одновременно
             </p>
             {day.painting.length === 0 ? (
@@ -173,7 +173,7 @@ export default function AdminWarhammer() {
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="font-semibold">{userLabel(booking.user)}</p>
-                          <p className="mt-0.5 text-white/60">
+                          <p className="mt-0.5 text-fg-2">
                             {formatClubTimeRange(booking.startsAt, booking.endsAt)} ·{" "}
                             {booking.partySize} чел.
                           </p>
@@ -187,24 +187,24 @@ export default function AdminWarhammer() {
                       </div>
                       {details ? (
                         <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
-                          <dt className="text-white/45">Фракция</dt>
+                          <dt className="text-fg-3">Фракция</dt>
                           <dd>{details.faction}</dd>
-                          <dt className="text-white/45">Модель</dt>
+                          <dt className="text-fg-3">Модель</dt>
                           <dd>{details.model}</dd>
-                          <dt className="text-white/45">Краски</dt>
+                          <dt className="text-fg-3">Краски</dt>
                           <dd>
                             {options.paintSources.find((s) => s.value === details.paintSource)
                               ?.label ?? details.paintSource}
                           </dd>
                           {details.comment && (
                             <>
-                              <dt className="text-white/45">Комментарий</dt>
+                              <dt className="text-fg-3">Комментарий</dt>
                               <dd>{details.comment}</dd>
                             </>
                           )}
                         </dl>
                       ) : (
-                        <p className="mt-2 text-xs text-white/45">
+                        <p className="mt-2 text-xs text-fg-3">
                           Запись создана до обновления — данных формы нет.
                         </p>
                       )}
@@ -236,7 +236,7 @@ function SummaryTile({
         highlight ? "border-yellow-400/40 bg-yellow-400/10" : "border-white/10 bg-app-elevated",
       )}
     >
-      <p className="text-xs text-white/55">{label}</p>
+      <p className="text-xs text-fg-3">{label}</p>
       <p className="mt-1 text-xl font-semibold">{value}</p>
     </div>
   );
@@ -244,7 +244,7 @@ function SummaryTile({
 
 function EmptyBox({ children }: { children: React.ReactNode }) {
   return (
-    <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-white/60">
+    <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-fg-2">
       {children}
     </p>
   );
@@ -275,7 +275,7 @@ function SessionAdminCard({
           <p className="text-base font-semibold">
             {formatClubTimeRange(session.startsAt, session.endsAt)}
           </p>
-          <p className="mt-0.5 text-sm text-white/60">
+          <p className="mt-0.5 text-sm text-fg-2">
             {session.serviceTitle ?? session.serviceSlug} · {session.tableName}
           </p>
         </div>
@@ -354,18 +354,18 @@ function PlayerRow({
             {userLabel(player.user)}
           </p>
           {details ? (
-            <p className="mt-1 text-xs text-white/70">
+            <p className="mt-1 text-xs text-fg-2">
               {details.game === "kt" ? "Kill Team" : details.game === "warcry" ? "Warcry" : details.game === "aos" ? "Age of Sigmar" : "Warhammer 40,000"} · {details.army}
               {details.points != null ? ` · ${details.points} очков` : ""} · {experienceLabel(details.experienceLevel)}
               {clubArmy ? " · армия клуба" : ""}
             </p>
           ) : (
-            <p className="mt-1 text-xs text-white/45">
+            <p className="mt-1 text-xs text-fg-3">
               Данных игрока нет (запись до обновления)
             </p>
           )}
           {player.status === "pending" && (
-            <p className="mt-1 text-[11px] text-yellow-300">Ожидает подтверждения</p>
+            <p className="mt-1 text-[12px] text-yellow-300">Ожидает подтверждения</p>
           )}
         </div>
 
@@ -383,7 +383,7 @@ function PlayerRow({
 
       {moving && (
         <div className="mt-2 space-y-2">
-          <p className="text-xs text-white/55">Перенести за стол (время не меняется):</p>
+          <p className="text-xs text-fg-3">Перенести за стол (время не меняется):</p>
           <div className="flex flex-wrap gap-2">
             {otherTables.map((table) => (
               <button

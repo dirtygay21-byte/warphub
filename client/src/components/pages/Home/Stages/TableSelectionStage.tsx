@@ -150,7 +150,7 @@ export default function TableSelectionStage() {
       return <TableStateMessage>Сначала выберите услугу.</TableStateMessage>;
     }
     if (availabilityQuery.isLoading) {
-      return <TableStateMessage>Загружаем свободное время...</TableStateMessage>;
+      return <TableStateMessage>Загружаем свободное время…</TableStateMessage>;
     }
     if (availabilityQuery.isError || !availability || !service) {
       return (
@@ -366,7 +366,7 @@ export default function TableSelectionStage() {
         renderContent()
       )}
 
-      <div className="flex gap-3 rounded-xl border border-white/10 bg-app-elevated px-4 py-3 text-xs text-white/60">
+      <div className="flex gap-3 rounded-xl border border-white/10 bg-app-elevated px-4 py-3 text-xs text-fg-2">
         <Info className="mt-0.5 size-4 shrink-0 text-accent" />
         <p>Запись на Warhammer, покраску и посещение клуба — пятница, суббота и воскресенье.</p>
       </div>

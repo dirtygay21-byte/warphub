@@ -19,11 +19,11 @@ export function AosTracker({ game }: { game: AosGameHook }) {
           const t = aosTotals(s, seat, bp);
           return (
             <div key={seat} className={cx('rounded-2xl border py-2', s.activeSeat === seat ? 'border-accent bg-accent/10' : 'border-white/10 bg-white/[0.03]')}>
-              <p className="truncate px-2 text-[11px] font-semibold uppercase tracking-wider text-white/55">
+              <p className="truncate px-2 text-[12px] font-semibold uppercase tracking-wider text-fg-3">
                 {names[seat]} · {s.players[seat].role === 'attacker' ? 'атака' : 'защита'}
               </p>
               <p className="font-display text-[30px] font-semibold leading-none tabular-nums">{t.total}</p>
-              <p className="mt-0.5 text-[10.5px] text-white/40">
+              <p className="mt-0.5 text-[12px] text-fg-3">
                 план {t.plan} · тактики {t.tactics}
                 {t.adjust ? ` · ±${t.adjust}` : ''}
               </p>
@@ -35,7 +35,7 @@ export function AosTracker({ game }: { game: AosGameHook }) {
         <Result game={game} />
       ) : (
         <>
-          <p className="text-center text-sm text-white/65">
+          <p className="text-center text-sm text-fg-2">
             Раунд {s.round} из {bp.rounds}
             {s.activeSeat ? ` · ход: ${names[s.activeSeat]}${s.turnIndex === 0 ? ' (первый)' : ' (второй)'}` : ' · начало раунда'}
             {s.seized && s.turnIndex === 0 ? ' · перехват инициативы' : ''}
@@ -49,10 +49,10 @@ export function AosTracker({ game }: { game: AosGameHook }) {
         <summary className="cursor-pointer text-sm font-semibold">Батлплан и карты тактик</summary>
         <div className="mt-2 space-y-2">
           {s.battleplan && <BattleplanInfo bp={bp} n={s.battleplan} round={s.round} territory={s.territory} showMap />}
-          {s.territory && <p className="text-[12px] text-white/55">Территория атакующего: {territoryLabel(s.territory)}</p>}
+          {s.territory && <p className="text-[12px] text-fg-3">Территория атакующего: {territoryLabel(s.territory)}</p>}
           {SEATS.map((seat) => (
             <div key={seat}>
-              <p className="text-[12px] font-semibold text-white/60">{names[seat]}</p>
+              <p className="text-[12px] font-semibold text-fg-2">{names[seat]}</p>
               <TacticCards bp={bp} ids={s.players[seat].tacticCards} done={(c, t) => s.players[seat].tacticsDone.some((x) => x.card === c && x.tier === t)} />
             </div>
           ))}
@@ -88,8 +88,8 @@ function Priority({ game }: { game: AosGameHook }) {
   return (
     <div className="rounded-2xl border border-accent/30 bg-white/[0.03] p-4">
       <p className="font-display text-lg font-semibold uppercase">Priority · раунд {s.round}</p>
-      <p className="mt-1 text-[12.5px] leading-snug text-white/60">{bp.priority.roll}</p>
-      {s.underdog === null && s.round > 1 && <p className="mt-1 text-[11.5px] text-white/45">Очки равны — underdog нет.</p>}
+      <p className="mt-1 text-[12.5px] leading-snug text-fg-2">{bp.priority.roll}</p>
+      {s.underdog === null && s.round > 1 && <p className="mt-1 text-[12px] text-fg-3">Очки равны — underdog нет.</p>}
       {!rolled ? (
         <Button variant="primary" className="mt-3 w-full" onClick={() => setRolled(true)}>
           Бросить priority
@@ -103,7 +103,7 @@ function Priority({ game }: { game: AosGameHook }) {
               {names.p1} {r.p1} : {r.p2} {names.p2} — ничья, решает {names[r.decider]} (ходил первым в прошлом раунде).
             </p>
           )}
-          <p className="text-[12.5px] text-white/70">{game.mine(r.decider) ? `${names[r.decider]}, кто ходит первым?` : `Кто ходит первым, решает ${names[r.decider]} на своём телефоне.`}</p>
+          <p className="text-[12.5px] text-fg-2">{game.mine(r.decider) ? `${names[r.decider]}, кто ходит первым?` : `Кто ходит первым, решает ${names[r.decider]} на своём телефоне.`}</p>
           <div className="grid grid-cols-2 gap-2">
             {firstBtn(r.decider, 'random', 'Я хожу первым')}
             {firstBtn(otherSeat(r.decider), 'random', 'Соперник первым')}
@@ -111,13 +111,13 @@ function Priority({ game }: { game: AosGameHook }) {
         </div>
       )}
       {seizeBlocked && (
-        <p className="mt-2 text-[11.5px] text-warn">
+        <p className="mt-2 text-[12px] text-warn">
           {names[second!]} отстаёт на {lead} ПО: перехват инициативы недоступен ({bp.priority.seize})
         </p>
       )}
-      {second && !seizeBlocked && <p className="mt-2 text-[11.5px] text-white/45">Если первым пойдёт {names[second]} — это перехват инициативы: {bp.priority.seize}</p>}
+      {second && !seizeBlocked && <p className="mt-2 text-[12px] text-fg-3">Если первым пойдёт {names[second]} — это перехват инициативы: {bp.priority.seize}</p>}
       <details className="mt-2">
-        <summary className="cursor-pointer text-[12px] text-white/45">Без броска, по договорённости</summary>
+        <summary className="cursor-pointer text-[12px] text-fg-3">Без броска, по договорённости</summary>
         <div className="mt-2 grid grid-cols-2 gap-2">{SEATS.map((x) => firstBtn(x, 'manual', `Первым — ${names[x]}`))}</div>
       </details>
     </div>
@@ -140,13 +140,13 @@ function Turn({ game }: { game: AosGameHook }) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-center">
         <p className="font-display text-lg font-semibold uppercase">Ход соперника</p>
-        <p className="mt-1 text-[12.5px] text-white/55">{p.name} ходит и в конце хода отмечает батлплан и тактики на своём телефоне; счёт обновится здесь.</p>
+        <p className="mt-1 text-[12.5px] text-fg-3">{p.name} ходит и в конце хода отмечает батлплан и тактики на своём телефоне; счёт обновится здесь.</p>
       </div>
     );
   return (
     <div className="rounded-2xl border border-accent/30 bg-white/[0.03] p-4">
       <p className="font-display text-lg font-semibold uppercase">Конец хода · {p.name}</p>
-      <p className="mt-2 text-[12px] font-semibold text-white/55">Батлплан{plan ? `: ${plan.name}` : ''}</p>
+      <p className="mt-2 text-[12px] font-semibold text-fg-3">Батлплан{plan ? `: ${plan.name}` : ''}</p>
       <ul className="mt-1 space-y-1">
         {rows.map((i) => {
           const r = plan!.scoring[i]!;
@@ -162,7 +162,7 @@ function Turn({ game }: { game: AosGameHook }) {
                   disabled={done}
                   onChange={() => setPicked((l) => (on ? l.filter((x) => x !== i) : [...l, i]))}
                 />
-                <span className="min-w-0 flex-1 text-[12.5px] leading-snug text-white/75">{r.text}</span>
+                <span className="min-w-0 flex-1 text-[12.5px] leading-snug text-fg-2">{r.text}</span>
                 <span className="font-display shrink-0 font-semibold text-accent">{r.vp}</span>
               </label>
             </li>
@@ -173,8 +173,8 @@ function Turn({ game }: { game: AosGameHook }) {
         Засчитать отмеченное
       </Button>
 
-      <p className="mt-3 text-[12px] font-semibold text-white/55">Боевые тактики (+{bp.tactics.vp} ПО)</p>
-      {seizedTurn && <p className="text-[11.5px] text-warn">Ход перехвата инициативы: боевые тактики не выполняются.</p>}
+      <p className="mt-3 text-[12px] font-semibold text-fg-3">Боевые тактики (+{bp.tactics.vp} ПО)</p>
+      {seizedTurn && <p className="text-[12px] text-warn">Ход перехвата инициативы: боевые тактики не выполняются.</p>}
       <ul className="mt-1 space-y-1.5">
         {p.tacticCards.map((id) => {
           const c = bp.tactics.cards.find((x) => x.id === id);
@@ -186,7 +186,7 @@ function Turn({ game }: { game: AosGameHook }) {
               <p className="text-[12.5px] font-semibold">{c?.name ?? id}</p>
               {t ? (
                 <>
-                  <p className="text-[12px] leading-snug text-white/65">
+                  <p className="text-[12px] leading-snug text-fg-2">
                     <b className="text-white/85">{TIER_LABEL[t.tier]}</b> · {t.name}: {t.text}
                   </p>
                   <Button
@@ -199,7 +199,7 @@ function Turn({ game }: { game: AosGameHook }) {
                   </Button>
                 </>
               ) : (
-                <p className="text-[12px] text-white/45">Все тактики карты выполнены.</p>
+                <p className="text-[12px] text-fg-3">Все тактики карты выполнены.</p>
               )}
             </li>
           );
@@ -219,7 +219,7 @@ function Adjust({ game, seat }: { game: AosGameHook; seat: Seat }) {
   const [note, setNote] = useState('');
   if (!open)
     return (
-      <button type="button" onClick={() => setOpen(true)} className="mt-2 text-[11.5px] font-semibold text-white/45">
+      <button type="button" onClick={() => setOpen(true)} className="mt-2 text-[12px] font-semibold text-fg-3">
         Поправить ПО вручную…
       </button>
     );
@@ -267,7 +267,7 @@ function Resources({ game }: { game: AosGameHook }) {
         const p = s.players[seat];
         return (
           <div key={seat} className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-            <p className="truncate text-[12px] font-semibold text-white/70">
+            <p className="truncate text-[12px] font-semibold text-fg-2">
               {p.name}
               {s.underdog === seat ? ' · underdog' : ''}
             </p>
@@ -277,7 +277,7 @@ function Resources({ game }: { game: AosGameHook }) {
           </div>
         );
       })}
-      <p className="col-span-2 text-[11px] leading-snug text-white/40">
+      <p className="col-span-2 text-[12px] leading-snug text-fg-3">
         В начале раунда: {bp.cp.perRound} CP, +{bp.cp.underdog} underdog, +{bp.cp.fewerAuxiliaries} у кого меньше вспомогательных отрядов; неистраченные CP сгорают. Кубы ярости — по уровню ярости.
       </p>
     </div>
@@ -287,7 +287,7 @@ function Resources({ game }: { game: AosGameHook }) {
 function Counter({ label, value, onMinus, onPlus, readOnly }: { label: string; value: number; onMinus: () => void; onPlus: () => void; readOnly?: boolean }) {
   return (
     <div className="mt-1.5 flex items-center gap-1.5">
-      <span className="min-w-0 flex-1 text-[11px] text-white/50">{label}</span>
+      <span className="min-w-0 flex-1 text-[12px] text-fg-3">{label}</span>
       {!readOnly && <IconButton icon="minus" label={`${label}: меньше`} onClick={onMinus} className="size-7" />}
       <span className="font-display w-6 text-center font-semibold tabular-nums">{value}</span>
       {!readOnly && <IconButton icon="plus" label={`${label}: больше`} onClick={onPlus} className="size-7" />}
@@ -299,9 +299,9 @@ function SeasonRules({ game }: { game: AosGameHook }) {
   const bp = game.bp!;
   return (
     <div>
-      <p className="text-[12px] font-semibold text-white/60">Сезон: {bp.season.name}</p>
+      <p className="text-[12px] font-semibold text-fg-2">Сезон: {bp.season.name}</p>
       {bp.season.rules.map((r) => (
-        <p key={r.name} className="mt-1 text-[12px] leading-snug text-white/65">
+        <p key={r.name} className="mt-1 text-[12px] leading-snug text-fg-2">
           <b className="text-white/85">{r.name}</b> ({r.when}): {r.text}
         </p>
       ))}
@@ -317,7 +317,7 @@ function RoundTable({ game }: { game: AosGameHook }) {
     <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.03] p-3">
       <table className="w-full text-center text-[12px] tabular-nums">
         <thead>
-          <tr className="text-white/45">
+          <tr className="text-fg-3">
             <th className="text-left font-semibold">ПО по раундам</th>
             {totals.p1.byRound.map((_, i) => (
               <th key={i} className={cx('font-semibold', i + 1 === s.round && 'text-accent')}>
@@ -329,7 +329,7 @@ function RoundTable({ game }: { game: AosGameHook }) {
         <tbody>
           {SEATS.map((seat) => (
             <tr key={seat}>
-              <td className="max-w-24 truncate text-left text-white/70">{s.players[seat].name}</td>
+              <td className="max-w-24 truncate text-left text-fg-2">{s.players[seat].name}</td>
               {totals[seat].byRound.map((v, i) => (
                 <td key={i} className="text-white/80">
                   {v}
@@ -348,13 +348,13 @@ function EndEarly({ game }: { game: AosGameHook }) {
   const [open, setOpen] = useState(false);
   if (!open)
     return (
-      <button type="button" onClick={() => setOpen(true)} className="w-full text-center text-[12px] font-semibold text-white/40">
+      <button type="button" onClick={() => setOpen(true)} className="w-full text-center text-[12px] font-semibold text-fg-3">
         Закончить битву досрочно…
       </button>
     );
   return (
     <div className="space-y-2 rounded-2xl border border-danger/30 bg-danger/5 p-3">
-      <p className="text-[12.5px] text-white/70">Сдавшийся проигрывает независимо от ПО. По договорённости — итог по текущим ПО.</p>
+      <p className="text-[12.5px] text-fg-2">Сдавшийся проигрывает независимо от ПО. По договорённости — итог по текущим ПО.</p>
       <div className="grid grid-cols-2 gap-2">
         {SEATS.filter((x) => game.mine(x)).map((x) => (
           <Button key={x} variant="danger" className="text-xs" onClick={() => game.dispatch({ type: 'battle-ended', reason: 'concede', by: x })}>
@@ -383,9 +383,9 @@ function Result({ game }: { game: AosGameHook }) {
     r.kind === 'draw' ? 'Ничья' : r.kind === 'concede' ? `Победа: ${name(r.winner!)} (соперник сдался)` : `${r.kind === 'major' ? 'Крупная' : 'Малая'} победа: ${name(r.winner!)}`;
   return (
     <div className="rounded-2xl border border-accent/40 bg-accent/10 p-4 text-center">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-white/50">Битва окончена</p>
+      <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Битва окончена</p>
       <p className="font-display mt-1 text-2xl font-semibold uppercase">{title}</p>
-      <p className="mt-1 text-sm text-white/65">
+      <p className="mt-1 text-sm text-fg-2">
         {r.totals.p1} : {r.totals.p2}
         {r.by === 'tactics' ? ' · ПО поровну, больше выполненных тактик' : ''}
         {s.endReason === 'manual' ? ' · окончена по договорённости' : ''}

@@ -260,7 +260,7 @@ export default function CardsGame() {
                   <div className="h-full rounded-full bg-accent" style={{ width: `${(owned / state.catalog.length) * 100}%` }} />
                 </div>
               </div>
-              <span className="text-sm text-white/70">
+              <span className="text-sm text-fg-2">
                 {owned} / {state.catalog.length}
               </span>
             </button>
@@ -274,10 +274,10 @@ export default function CardsGame() {
                       onClick={phase === "idle" ? open : undefined}
                       disabled={phase !== "idle"}
                     />
-                    <p className="mt-5 text-center text-sm text-white/60">
+                    <p className="mt-5 text-center text-sm text-fg-2">
                       {phase === "idle" ? `Нажмите на пакет, чтобы открыть · ${state.cardsPerPack} карт` : "Открываем…"}
                     </p>
-                    <p className="mt-1 text-center text-xs text-white/40">
+                    <p className="mt-1 text-center text-xs text-fg-3">
                       Пакетов сегодня: {packsLeft} из {state.packsPerDay}
                     </p>
                   </>
@@ -286,7 +286,7 @@ export default function CardsGame() {
                     <div className="opacity-40 grayscale">
                       <Pack state="idle" disabled />
                     </div>
-                    <p className="mt-5 inline-flex items-center gap-2 text-sm text-white/70">
+                    <p className="mt-5 inline-flex items-center gap-2 text-sm text-fg-2">
                       <Clock className="size-4 text-accent" /> Новый пакет через {countdown ?? "—"}
                     </p>
                   </div>
@@ -317,16 +317,16 @@ export default function CardsGame() {
 
                 {!allRevealed ? (
                   <div className="mt-5 text-center">
-                    <p className="text-sm text-white/55">Нажимайте на карты, чтобы перевернуть</p>
+                    <p className="text-sm text-fg-3">Нажимайте на карты, чтобы перевернуть</p>
                     <button type="button" onClick={revealAll} className="mt-2 text-sm text-accent underline underline-offset-4">
                       Открыть все
                     </button>
                   </div>
                 ) : (
                   <div className="mt-5 rounded-2xl border border-accent/40 bg-accent/10 p-4 text-center" style={{ animation: "float-up 0.35s ease-out" }}>
-                    <p className="text-xs uppercase tracking-widest text-white/50">Получено</p>
+                    <p className="text-xs uppercase tracking-widest text-fg-3">Получено</p>
                     <p className={`text-5xl text-accent ${oswald}`}>+{pack.points.toLocaleString("ru-RU")}</p>
-                    <p className="text-sm text-white/70">
+                    <p className="text-sm text-fg-2">
                       очков · на счёте {pack.balance.toLocaleString("ru-RU")}
                       {newCount > 0 ? ` · новых карт: ${newCount}` : ""}
                     </p>
@@ -351,7 +351,7 @@ export default function CardsGame() {
                       </PixelButton>
                     </div>
                     {pack.packsLeft === 0 && (
-                      <p className="mt-3 text-xs text-white/50">Следующий пакет через {countdown ?? "—"}</p>
+                      <p className="mt-3 text-xs text-fg-3">Следующий пакет через {countdown ?? "—"}</p>
                     )}
                   </div>
                 )}
@@ -359,20 +359,20 @@ export default function CardsGame() {
             )}
 
             <div className="mt-8">
-              <p className={`mb-2 text-sm uppercase tracking-widest text-white/50 ${oswald}`}>Очки за карты</p>
+              <p className={`mb-2 text-sm uppercase tracking-widest text-fg-3 ${oswald}`}>Очки за карты</p>
               <div className="space-y-1.5">
                 {state.rarities.map((r) => (
                   <div key={r.rarity} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/3 px-3 py-2 text-xs">
                     <span className={clsx("flex items-center gap-2", RARITY_STYLE[r.rarity].text)}>
                       <span className="size-2 rotate-45" style={{ background: RARITY_STYLE[r.rarity].gem }} />
                       {r.label}
-                      <span className="text-white/35">· {r.chance}%</span>
+                      <span className="text-fg-3">· {r.chance}%</span>
                     </span>
                     <span className="font-semibold text-white">{r.points} очков</span>
                   </div>
                 ))}
               </div>
-              <p className="mt-3 text-xs text-white/45">
+              <p className="mt-3 text-xs text-fg-3">
                 Очки копятся на вашем счёте — администратор клуба может списать их в счёт скидок и призов.
               </p>
             </div>
@@ -423,9 +423,9 @@ export function CardCollection() {
               <div className="flex items-end justify-between">
                 <p className={`text-3xl text-accent ${oswald}`}>
                   {owned}
-                  <span className="text-lg text-white/50"> / {state.catalog.length}</span>
+                  <span className="text-lg text-fg-3"> / {state.catalog.length}</span>
                 </p>
-                <p className="text-xs text-white/50">пакетов открыто: {state.packsOpened}</p>
+                <p className="text-xs text-fg-3">пакетов открыто: {state.packsOpened}</p>
               </div>
               <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
                 <div className="h-full rounded-full bg-accent" style={{ width: `${(owned / state.catalog.length) * 100}%` }} />
@@ -439,7 +439,7 @@ export function CardCollection() {
                       <p className="text-sm font-semibold" style={{ color: RARITY_STYLE[r].color }}>
                         {have}/{total}
                       </p>
-                      <p className="text-[9px] uppercase text-white/40">{state.rarities.find((x) => x.rarity === r)?.label}</p>
+                      <p className="text-[9px] uppercase text-fg-3">{state.rarities.find((x) => x.rarity === r)?.label}</p>
                     </div>
                   );
                 })}
@@ -455,7 +455,7 @@ export function CardCollection() {
                     onClick={() => setFilter(id)}
                     className={clsx(
                       "shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold",
-                      filter === id ? "bg-accent text-accent-foreground" : "border border-white/10 bg-white/3 text-white/75",
+                      filter === id ? "bg-accent text-accent-foreground" : "border border-white/10 bg-white/3 text-fg-2",
                     )}
                   >
                     {label}
@@ -477,11 +477,11 @@ export function CardCollection() {
                     className="flex aspect-[5/7] flex-col items-center justify-center rounded-xl border border-dashed p-2 text-center"
                     style={{ borderColor: `${RARITY_STYLE[card.rarity].color}55` }}
                   >
-                    <span className={`text-3xl text-white/20 ${oswald}`}>?</span>
+                    <span className={`text-3xl text-fg-3 ${oswald}`}>?</span>
                     <span className="mt-1 text-[9px] uppercase" style={{ color: `${RARITY_STYLE[card.rarity].color}aa` }}>
                       {card.rarityLabel}
                     </span>
-                    <span className="text-[9px] text-white/30">{card.factionLabel}</span>
+                    <span className="text-[9px] text-fg-3">{card.factionLabel}</span>
                   </div>
                 );
               })}

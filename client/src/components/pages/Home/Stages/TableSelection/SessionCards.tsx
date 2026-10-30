@@ -58,7 +58,7 @@ export function OpenSessionCard({
           <p className="text-base font-semibold">
             {formatClubTimeRange(session.startsAt, session.endsAt)}
           </p>
-          <p className="mt-1 text-xs text-white/55">
+          <p className="mt-1 text-xs text-fg-3">
             {session.freeSeats === 1
               ? "Свободно 1 место"
               : `Свободно мест: ${session.freeSeats}`}
@@ -85,17 +85,17 @@ export function OpenSessionCard({
             </p>
             {player.army && (
               <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs">
-                <dt className="text-white/45">Игра</dt>
+                <dt className="text-fg-3">Игра</dt>
                 <dd className="text-white/85">{player.gameLabel ?? "Warhammer 40,000"}</dd>
-                <dt className="text-white/45">{player.game === "kt" ? "Команда" : player.game === "warcry" ? "Варбанда" : "Армия"}</dt>
+                <dt className="text-fg-3">{player.game === "kt" ? "Команда" : player.game === "warcry" ? "Варбанда" : "Армия"}</dt>
                 <dd className="text-white/85">{player.army}</dd>
                 {player.points != null && (
                   <>
-                    <dt className="text-white/45">Очки</dt>
+                    <dt className="text-fg-3">Очки</dt>
                     <dd className="text-white/85">{player.points}</dd>
                   </>
                 )}
-                <dt className="text-white/45">Опыт</dt>
+                <dt className="text-fg-3">Опыт</dt>
                 <dd className="text-white/85">{player.experienceLabel}</dd>
               </dl>
             )}
@@ -138,7 +138,7 @@ export function FreeSlotCard({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-base font-semibold">{label}</p>
-          <p className="mt-1 text-sm text-white/70">
+          <p className="mt-1 text-sm text-fg-2">
             Свободно {formatClubTimeRange(segment.startsAt, segment.endsAt)}
           </p>
           {formatDurationLabel(durationMinutes) && (
@@ -187,7 +187,7 @@ export function LimitNote({ limit, durationMinutes }: { limit: WindowLimit; dura
 
 export function FullSessionRow({ session }: { session: TableSession }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/3 px-3 py-2.5 text-sm text-white/60">
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/3 px-3 py-2.5 text-sm text-fg-2">
       <span>{formatClubTimeRange(session.startsAt, session.endsAt)}</span>
       <span className="flex items-center gap-2">
         <span className="text-xs">Мест нет</span>
@@ -226,7 +226,7 @@ export function PoolSlotCard({
           <p className="text-base font-semibold">
             {formatClubTimeRange(segment.startsAt, segment.endsAt)}
           </p>
-          <p className="mt-1 text-sm text-white/70">
+          <p className="mt-1 text-sm text-fg-2">
             {full
               ? "Мест нет"
               : `Занято ${occupied} из ${capacity} · свободно ${segment.freeSeats}`}
@@ -269,7 +269,7 @@ export function SectionTitle({
         {icon}
         {children}
       </h2>
-      {hint && <p className="mt-1 text-xs text-white/50">{hint}</p>}
+      {hint && <p className="mt-1 text-xs text-fg-3">{hint}</p>}
     </div>
   );
 }

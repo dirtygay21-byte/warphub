@@ -73,7 +73,7 @@ export function BattleplanMap({ bp, map, attacker, onPick }: { bp: AosBattlepack
         })}
         <rect x={0} y={0} width={W} height={H} fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth={0.25} pointerEvents="none" />
       </svg>
-      <figcaption className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[10.5px] text-white/45">
+      <figcaption className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[12px] text-fg-3">
         {types.map((t) => (
           <span key={t}>
             <b className="text-amber-300/90">{OBJ_SHORT[t] ?? t}</b> {bp.objectiveTypes.find((x) => x.id === t)?.name ?? t}
@@ -81,7 +81,7 @@ export function BattleplanMap({ bp, map, attacker, onPick }: { bp: AosBattlepack
         ))}
         {[...new Set(map.terrain.map((t) => t.type))].map((t) => (
           <span key={t}>
-            <b className="text-white/70">{TERRAIN[t].short}</b> {TERRAIN[t].label}
+            <b className="text-fg-2">{TERRAIN[t].short}</b> {TERRAIN[t].label}
           </span>
         ))}
         <span>пунктир — зона контроля {objectiveRange}″; клетка 15×11″; террейн — условно</span>

@@ -24,7 +24,7 @@ export default function NearestEventBanner() {
 
   if (nearestEventQuery.isError) {
     return (
-      <div className="flex h-full w-full items-center justify-center rounded-xl bg-app-surface px-4 text-center text-sm text-white/60">
+      <div className="flex h-full w-full items-center justify-center rounded-xl bg-app-surface px-4 text-center text-sm text-fg-2">
         Не удалось загрузить ближайший ивент
       </div>
     );
@@ -34,7 +34,7 @@ export default function NearestEventBanner() {
 
   if (!event) {
     return (
-      <div className="flex h-full w-full items-center justify-center rounded-xl bg-app-surface px-4 text-center text-sm text-white/60">
+      <div className="flex h-full w-full items-center justify-center rounded-xl bg-app-surface px-4 text-center text-sm text-fg-2">
         Ближайших ивентов пока нет
       </div>
     );
@@ -74,12 +74,12 @@ export default function NearestEventBanner() {
           <p className="mt-2 text-sm text-white/80 sm:text-base">
             {formatEventPeriod(event.startsAt, event.endsAt)}
           </p>
-          <p className="mt-auto text-sm text-white/60">
+          <p className="mt-auto text-sm text-fg-2">
             {canRegister ? "Нажми чтобы записаться" : "Мест нет"}
           </p>
         </div>
 
-        <p className="absolute bottom-3 right-3 z-10 text-sm text-white/60">
+        <p className="absolute bottom-3 right-3 z-10 text-sm text-fg-2">
           мест: {freeSeats}
         </p>
       </button>

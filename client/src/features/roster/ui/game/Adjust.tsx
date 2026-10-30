@@ -106,16 +106,16 @@ export function AdjustSheet({ game, seat, onClose }: { game: GameHook; seat: Sea
                   </Button>
                   <Button onClick={() => cp(1, 'other')}>+1 другое</Button>
                 </div>
-                <p className="mt-1.5 text-[11px] text-white/45">+1 в фазе командования, за сброс и −1 за замену начисляются сами.</p>
+                <p className="mt-1.5 text-[12px] text-fg-3">+1 в фазе командования, за сброс и −1 за замену начисляются сами.</p>
               </>
             ) : (
-              <p className="mt-1 text-xs text-white/45">Битва окончена — CP не меняются.</p>
+              <p className="mt-1 text-xs text-fg-3">Битва окончена — CP не меняются.</p>
             )}
           </section>
 
           <section className="mt-2.5 rounded-xl border border-white/10 bg-black/20 p-3">
             <p className="text-sm font-semibold">Поправка ПО</p>
-            <p className="text-[11px] text-white/45">
+            <p className="text-[12px] text-fg-3">
               Если очки нужно исправить вручную. Идёт в {finished ? 'последний раунд' : `раунд ${state.round}`}; лимиты действуют как обычно.
             </p>
             <Segmented<'primary' | 'secondary'>
@@ -128,13 +128,13 @@ export function AdjustSheet({ game, seat, onClose }: { game: GameHook; seat: Sea
               ]}
             />
             <div className="mt-2 flex items-center justify-center gap-3">
-              <button type="button" onClick={() => setDelta((d) => (d - 1 === 0 ? -1 : Math.max(-50, d - 1)))} className="size-10 rounded-lg border border-white/15 text-lg active:bg-white/10" aria-label="Меньше">
+              <button type="button" onClick={() => setDelta((d) => (d - 1 === 0 ? -1 : Math.max(-50, d - 1)))} className="ds-hit size-10 rounded-lg border border-white/15 text-lg active:bg-white/10" aria-label="Меньше">
                 −
               </button>
               <span className={cx('font-display w-16 text-center text-2xl font-semibold tabular-nums', delta < 0 ? 'text-danger' : 'text-accent')}>
                 {delta > 0 ? `+${delta}` : delta}
               </span>
-              <button type="button" onClick={() => setDelta((d) => (d + 1 === 0 ? 1 : Math.min(50, d + 1)))} className="size-10 rounded-lg border border-white/15 text-lg active:bg-white/10" aria-label="Больше">
+              <button type="button" onClick={() => setDelta((d) => (d + 1 === 0 ? 1 : Math.min(50, d + 1)))} className="ds-hit size-10 rounded-lg border border-white/15 text-lg active:bg-white/10" aria-label="Больше">
                 +
               </button>
             </div>
@@ -155,7 +155,7 @@ export function AdjustSheet({ game, seat, onClose }: { game: GameHook; seat: Sea
             {p.adjustments.length > 0 && (
               <ul className="mt-1.5 space-y-1">
                 {p.adjustments.map((a, i) => (
-                  <li key={i} className="text-xs text-white/75">
+                  <li key={i} className="text-xs text-fg-2">
                     р. {a.round} · {a.kind === 'primary' ? 'основная' : 'вторичные'} {a.delta > 0 ? `+${a.delta}` : a.delta} ПО — {a.note}
                   </li>
                 ))}
@@ -164,15 +164,15 @@ export function AdjustSheet({ game, seat, onClose }: { game: GameHook; seat: Sea
             <ul className="mt-1.5 space-y-0.5">
               {history.map((h, i) => (
                 <li key={i} className="flex gap-2 text-xs">
-                  <span className="w-8 shrink-0 text-white/45">р. {h.round}</span>
+                  <span className="w-8 shrink-0 text-fg-3">р. {h.round}</span>
                   <span className={cx('w-8 shrink-0 font-semibold tabular-nums', h.delta < 0 ? 'text-danger' : 'text-accent')}>
                     {h.delta > 0 ? `+${h.delta}` : h.delta}
                   </span>
-                  <span className="min-w-0 flex-1 text-white/70">{h.text}</span>
+                  <span className="min-w-0 flex-1 text-fg-2">{h.text}</span>
                 </li>
               ))}
             </ul>
-            {!history.length && !p.adjustments.length && <p className="mt-1 text-xs text-white/45">Пока пусто.</p>}
+            {!history.length && !p.adjustments.length && <p className="mt-1 text-xs text-fg-3">Пока пусто.</p>}
           </section>
         </div>
       </div>

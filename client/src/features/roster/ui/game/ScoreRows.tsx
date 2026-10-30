@@ -60,13 +60,13 @@ export function ScoreRows({
         const block = card.blocks[bi]!;
         return (
           <div key={bi} className="rounded-xl border border-white/10 bg-black/20 p-2.5">
-            <p className="text-[11px] font-semibold text-white/50">Когда: {block.when}</p>
+            <p className="text-[12px] font-semibold text-fg-3">Когда: {block.when}</p>
             <ul className="mt-1 space-y-1.5">
               {block.rows.map((row, ri) => {
                 const on = counts[key(bi, ri)] != null;
                 return (
                   <li key={ri}>
-                    {ri > 0 && <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-white/35">{row.or ? 'или' : row.plus ? 'и сверх того' : 'а также'}</p>}
+                    {ri > 0 && <p className="mb-1 text-[12px] font-semibold uppercase tracking-wider text-fg-3">{row.or ? 'или' : row.plus ? 'и сверх того' : 'а также'}</p>}
                     <div className={cx('flex items-start gap-2 rounded-lg border px-2 py-1.5', on ? 'border-accent bg-accent/10' : 'border-white/10')}>
                       <button type="button" onClick={() => toggle(bi, ri)} className="flex min-w-0 flex-1 items-start gap-2 text-left">
                         <span className={cx('mt-0.5 flex size-5 shrink-0 items-center justify-center rounded border', on ? 'border-accent bg-accent text-black' : 'border-white/30')}>
@@ -78,19 +78,19 @@ export function ScoreRows({
                         <span className="font-display block text-base font-semibold leading-none">
                           {row.plus ? '+' : ''}
                           {row.vp}
-                          <span className="ml-0.5 text-[10px]">ПО</span>
+                          <span className="ml-0.5 text-[12px]">ПО</span>
                         </span>
-                        {row.max != null && <span className="block text-[10px] text-white/45">макс. {row.max}</span>}
+                        {row.max != null && <span className="block text-[12px] text-fg-3">макс. {row.max}</span>}
                       </span>
                     </div>
                     {on && perEach(row.text) && (
                       <div className="mt-1 flex items-center justify-end gap-2 text-sm">
-                        <span className="text-[11px] text-white/50">сколько:</span>
-                        <button type="button" onClick={() => step(bi, ri, -1)} className="size-8 rounded-lg border border-white/15 active:bg-white/10" aria-label="Меньше">
+                        <span className="text-[12px] text-fg-3">сколько:</span>
+                        <button type="button" onClick={() => step(bi, ri, -1)} className="ds-hit size-8 rounded-lg border border-white/15 active:bg-white/10" aria-label="Меньше">
                           −
                         </button>
                         <span className="w-6 text-center font-semibold tabular-nums">{counts[key(bi, ri)]}</span>
-                        <button type="button" onClick={() => step(bi, ri, 1)} className="size-8 rounded-lg border border-white/15 active:bg-white/10" aria-label="Больше">
+                        <button type="button" onClick={() => step(bi, ri, 1)} className="ds-hit size-8 rounded-lg border border-white/15 active:bg-white/10" aria-label="Больше">
                           +
                         </button>
                       </div>

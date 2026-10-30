@@ -215,7 +215,7 @@ export default function EggGame() {
         <div className="px-4">
           <div className="mb-2 flex items-end justify-between">
             <span className={`text-4xl font-semibold leading-none text-accent ${oswald}`}>{taps}</span>
-            <span className={`text-lg text-white/70 ${oswald}`}>
+            <span className={`text-lg text-fg-2 ${oswald}`}>
               {phase === "playing" ? `${timeLeft} с` : "нажатий"}
             </span>
           </div>
@@ -232,7 +232,7 @@ export default function EggGame() {
             />
             {phase === "playing" && tier > 0 && (
               <span
-                className="pointer-events-none absolute left-3 top-3 rounded-md bg-black/60 px-2 py-0.5 text-[11px] uppercase tracking-wider"
+                className="pointer-events-none absolute left-3 top-3 rounded-md bg-black/60 px-2 py-0.5 text-[12px] uppercase tracking-wider"
                 style={{ color: TIER_GLOW[tier] }}
               >
                 {creature?.rarity}
@@ -255,7 +255,7 @@ export default function EggGame() {
             )}
           </div>
           {phase === "playing" && (
-            <p className="mt-3 text-center text-xs text-white/50">
+            <p className="mt-3 text-center text-xs text-fg-3">
               Стучите по яйцу как можно быстрее — можно несколькими пальцами
             </p>
           )}
@@ -266,8 +266,8 @@ export default function EggGame() {
           )}
           {(phase === "intro" || phase === "error") && game && (
             <div className="mt-5">
-              <p className="text-sm text-white/70">{game.description}</p>
-              <p className={`mb-2 mt-5 text-sm uppercase tracking-widest text-white/50 ${oswald}`}>Награды</p>
+              <p className="text-sm text-fg-2">{game.description}</p>
+              <p className={`mb-2 mt-5 text-sm uppercase tracking-widest text-fg-3 ${oswald}`}>Награды</p>
               <TierList game={game} />
             </div>
           )}

@@ -22,7 +22,7 @@ export function Field({
     <div>
       <FieldLabel>{label}</FieldLabel>
       {children}
-      {hint && <p className="mt-1.5 text-xs text-white/45">{hint}</p>}
+      {hint && <p className="mt-1.5 text-xs text-fg-3">{hint}</p>}
     </div>
   );
 }
@@ -75,8 +75,8 @@ export function ChoiceChips<T extends string | number>({
             {option.hint && (
               <span
                 className={clsx(
-                  "mt-0.5 block text-[11px] font-medium leading-tight",
-                  selected ? "text-accent-foreground/70" : "text-white/45",
+                  "mt-0.5 block text-[12px] font-medium leading-tight",
+                  selected ? "text-accent-foreground/70" : "text-fg-3",
                 )}
               >
                 {option.hint}
@@ -155,7 +155,7 @@ export function YesNoChips({
 }
 
 export const inputClassName =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/30 focus:border-accent";
+  "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none placeholder:text-fg-3 focus:border-accent";
 
 export function NumberChips({
   max,
@@ -178,7 +178,7 @@ export function NumberChips({
           aria-pressed={value === n}
           onClick={() => onChange(n)}
           className={clsx(
-            "size-10 rounded-lg border text-sm font-semibold transition-colors",
+            "ds-hit size-10 rounded-lg border text-sm font-semibold transition-colors",
             value === n
               ? "border-accent bg-accent text-accent-foreground"
               : "border-white/10 bg-white/5 text-white active:bg-white/10",

@@ -267,7 +267,7 @@ export default function AdminReservations() {
 
   if (reservationsQuery.isLoading) {
     return (
-      <div className="flex min-h-[calc(100dvh-140px)] items-center justify-center px-6 text-white/60">
+      <div className="flex min-h-[calc(100dvh-140px)] items-center justify-center px-6 text-fg-2">
         <LoaderCircle className="size-8 animate-spin text-accent" />
       </div>
     );
@@ -277,7 +277,7 @@ export default function AdminReservations() {
     return (
       <div className="flex min-h-[calc(100dvh-140px)] flex-col items-center justify-center gap-4 px-6 text-center text-white">
         <Shield className="size-10 text-accent" />
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-fg-2">
           Не удалось загрузить записи. Попробуйте ещё раз.
         </p>
         <button
@@ -298,7 +298,7 @@ export default function AdminReservations() {
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Все записи</h1>
-          <p className="mt-1 text-sm text-white/50">
+          <p className="mt-1 text-sm text-fg-3">
             {reservations.length > 0
               ? totalCount != null
                 ? `Показано ${rangeStart}–${rangeEnd} из ${totalCount}`
@@ -327,7 +327,7 @@ export default function AdminReservations() {
             onClick={() => reservationsQuery.refetch()}
             disabled={reservationsQuery.isFetching}
             aria-label="Обновить список"
-            className="flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/3 transition-colors active:bg-white/10 disabled:opacity-60"
+            className="flex ds-hit size-10 items-center justify-center rounded-xl border border-white/10 bg-white/3 transition-colors active:bg-white/10 disabled:opacity-60"
           >
             <RefreshCw
               className={`size-4 ${

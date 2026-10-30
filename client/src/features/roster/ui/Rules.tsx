@@ -150,12 +150,12 @@ export function Rules({
 
       {tab === 'core' ? (
         <div className="mt-4 space-y-5">
-          <p className="text-sm leading-relaxed text-white/55">
+          <p className="text-sm leading-relaxed text-fg-3">
             Полный текст основных правил — на Wahapedia. Глава откроется сразу на нужном месте и всегда в актуальной версии.
           </p>
           {CORE_RULES.map((part) => (
             <section key={part.part}>
-              <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">{part.part}</p>
+              <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">{part.part}</p>
               <ul className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
                 {part.chapters.map(([n, title, anchor], i) => (
                   <li key={anchor}>
@@ -167,16 +167,16 @@ export function Rules({
                       <span className="font-display w-6 text-sm font-semibold text-accent/80 tabular-nums">{n}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block text-[15px] font-semibold text-white/90">{title}</span>
-                        <span className="block text-[11px] text-white/40">{anchor.replace(/-1$/, '').replace(/-/g, ' ')}</span>
+                        <span className="block text-[12px] text-fg-3">{anchor.replace(/-1$/, '').replace(/-/g, ' ')}</span>
                       </span>
-                      <span className="text-white/30">↗</span>
+                      <span className="text-fg-3">↗</span>
                     </button>
                   </li>
                 ))}
               </ul>
             </section>
           ))}
-          <p className="text-center text-[11px] text-white/35">Текст правил — Games Workshop, публикация: Wahapedia</p>
+          <p className="text-center text-[12px] text-fg-3">Текст правил — Games Workshop, публикация: Wahapedia</p>
         </div>
       ) : (
         <div className="mt-4">
@@ -212,7 +212,7 @@ export function Rules({
                   onClick={() => setPhase(p.value)}
                   className={cx(
                     'rounded-full border px-3 py-1.5 text-xs font-semibold transition',
-                    phase === p.value ? 'border-accent bg-accent/15 text-white' : 'border-white/10 text-white/60 active:bg-white/10',
+                    phase === p.value ? 'border-accent bg-accent/15 text-white' : 'border-white/10 text-fg-2 active:bg-white/10',
                   )}
                 >
                   {p.label}
@@ -222,18 +222,18 @@ export function Rules({
           </div>
 
           {error ? (
-            <p className="mt-8 text-center text-sm text-white/50">{error}</p>
+            <p className="mt-8 text-center text-sm text-fg-3">{error}</p>
           ) : !faction ? (
             <div className="mx-auto mt-12 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
           ) : groups.length === 0 ? (
-            <p className="mt-8 text-center text-sm text-white/45">В этой фазе стратагем нет.</p>
+            <p className="mt-8 text-center text-sm text-fg-3">В этой фазе стратагем нет.</p>
           ) : (
             <div className="mt-4 space-y-5">
               {groups.map((g) => (
                 <section key={g.title}>
                   <div className="mb-1.5 flex items-baseline justify-between gap-2">
                     <p className="font-display text-base font-semibold uppercase">{g.title}</p>
-                    <span className="text-[11px] text-white/40">
+                    <span className="text-[12px] text-fg-3">
                       {g.sub} · {g.items.length}
                     </span>
                   </div>
@@ -244,7 +244,7 @@ export function Rules({
                   </ul>
                 </section>
               ))}
-              <p className="text-center text-[11px] text-white/35">{factionCredit(faction, index)}</p>
+              <p className="text-center text-[12px] text-fg-3">{factionCredit(faction, index)}</p>
             </div>
           )}
         </div>
@@ -260,7 +260,7 @@ function StratCard({ s }: { s: Stratagem }) {
       <button type="button" onClick={() => setOpen((v) => !v)} className="flex w-full items-start gap-3 px-3.5 py-3 text-left">
         <span className="min-w-0 flex-1">
           <span className="block text-[15px] font-semibold leading-tight text-white/90">{s.name}</span>
-          <span className="mt-0.5 block text-[11.5px] text-white/45">
+          <span className="mt-0.5 block text-[12px] text-fg-3">
             {TURN_RU[s.turn] ?? s.turn} · {s.phase}
           </span>
         </span>
@@ -268,8 +268,8 @@ function StratCard({ s }: { s: Stratagem }) {
       </button>
       {open && (
         <div className="border-t border-white/[0.06] px-3.5 pb-3 pt-2.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{s.type}</p>
-          <p className="mt-1.5 whitespace-pre-line text-[13.5px] leading-relaxed text-white/75">{cleanRuleText(s.text)}</p>
+          <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{s.type}</p>
+          <p className="mt-1.5 whitespace-pre-line text-[13.5px] leading-relaxed text-fg-2">{cleanRuleText(s.text)}</p>
         </div>
       )}
     </li>

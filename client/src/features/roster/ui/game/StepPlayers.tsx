@@ -87,7 +87,7 @@ function PlayerCard({ seat, game, rosters, index }: { seat: Seat; game: GameHook
   return (
     <section className="rounded-xl border border-white/10 bg-black/20 p-3">
       <label className="block">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'}</span>
+        <span className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'}</span>
         <input
           value={name}
           disabled={!canAct}
@@ -102,7 +102,7 @@ function PlayerCard({ seat, game, rosters, index }: { seat: Seat; game: GameHook
       <RosterSummary roster={p.roster} seat={seat} factionName={factionName} dName={dName} />
 
       {locked ? (
-        <p className="mt-2 text-[11px] text-white/45">
+        <p className="mt-2 text-[12px] text-fg-3">
           {canAct ? 'Типы армий раскрыты — ростер больше не меняется.' : `Ростер выбирает ${p.name} на своём телефоне.`}
         </p>
       ) : (
@@ -133,7 +133,7 @@ function PlayerCard({ seat, game, rosters, index }: { seat: Seat; game: GameHook
                       )}
                     >
                       <span className="block truncate text-sm font-semibold">{r.name}</span>
-                      <span className="block text-[11px] text-white/45">
+                      <span className="block text-[12px] text-fg-3">
                         {factionName(r.factionId)}
                         {r.summary ? ` · ${fmtPts(r.summary.points)} очк.` : ''}
                         {r.forceDisposition ? ` · ${r.forceDisposition}` : ''}
@@ -154,7 +154,7 @@ function PlayerCard({ seat, game, rosters, index }: { seat: Seat; game: GameHook
                 placeholder="WH1.eyJ2Ijox…"
                 className="w-full rounded-lg border border-white/10 bg-white/[0.04] p-2.5 font-mono text-xs text-white outline-none focus:border-accent"
               />
-              <p className="mt-1 text-[11px] text-white/45">Код ростера: WarpBuilder → ростер → «Экспорт» → код.</p>
+              <p className="mt-1 text-[12px] text-fg-3">Код ростера: WarpBuilder → ростер → «Экспорт» → код.</p>
               <Button className="mt-1.5 w-full" disabled={!code.trim() || busy} onClick={() => void loadCode()}>
                 Загрузить ростер по коду
               </Button>
@@ -176,12 +176,12 @@ function RosterSummary({ roster, seat, factionName, dName }: { roster: RosterRef
         <p className="min-w-0 flex-1 text-sm font-semibold">{roster.name ?? '—'}</p>
         <RosterButton seat={seat} />
       </div>
-      <p className="text-white/60">
+      <p className="text-fg-2">
         {roster.source === 'own' ? 'Свой ростер' : 'Ростер по коду'} · {factionName(roster.factionId)}
         {roster.points ? ` · ${fmtPts(roster.points)} очк.` : ''}
       </p>
-      {roster.detachments?.length ? <p className="text-white/70">Детачмент: {roster.detachments.join(', ')}</p> : null}
-      {roster.dispositions?.length ? <p className="text-white/70">Типы армий: {roster.dispositions.map(dName).join(', ')}</p> : null}
+      {roster.detachments?.length ? <p className="text-fg-2">Детачмент: {roster.detachments.join(', ')}</p> : null}
+      {roster.dispositions?.length ? <p className="text-fg-2">Типы армий: {roster.dispositions.map(dName).join(', ')}</p> : null}
     </div>
   );
 }

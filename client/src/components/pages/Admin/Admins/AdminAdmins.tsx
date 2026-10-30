@@ -41,13 +41,13 @@ export default function AdminAdmins() {
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Администраторы</h1>
-          <p className="mt-1 text-sm text-white/50">Доступ к админке по Telegram ID.</p>
+          <p className="mt-1 text-sm text-fg-3">Доступ к админке по Telegram ID.</p>
         </div>
         <button
           type="button"
           onClick={refresh}
           aria-label="Обновить"
-          className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-white/70 active:bg-white/10"
+          className="flex ds-hit size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-fg-2 active:bg-white/10"
         >
           <RefreshCw className={clsx("size-4", list.isFetching && "animate-spin")} />
         </button>
@@ -61,7 +61,7 @@ export default function AdminAdmins() {
             if (idOk) add.mutate();
           }}
         >
-          <label className="text-sm text-white/70" htmlFor="admin-tg-id">
+          <label className="text-sm text-fg-2" htmlFor="admin-tg-id">
             Telegram ID нового администратора
           </label>
           <input
@@ -87,12 +87,12 @@ export default function AdminAdmins() {
             {add.isPending ? <LoaderCircle className="size-4 animate-spin" /> : <ShieldPlus className="size-4" />}
             Добавить администратора
           </button>
-          <p className="text-xs text-white/45">
+          <p className="text-xs text-fg-3">
             Telegram ID человек может узнать, например, у бота @userinfobot. Доступ появится сразу; бот пришлёт ему сообщение, если он нажимал «Старт».
           </p>
         </form>
       ) : (
-        <p className="mb-6 rounded-xl border border-white/10 bg-white/3 px-4 py-3 text-sm text-white/60">
+        <p className="mb-6 rounded-xl border border-white/10 bg-white/3 px-4 py-3 text-sm text-fg-2">
           Добавлять и удалять администраторов могут только основные администраторы.
         </p>
       )}
@@ -117,9 +117,9 @@ export default function AdminAdmins() {
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">
                 {a.name ?? "Ещё не входил в приложение"}
-                {a.username && <span className="font-normal text-white/50"> @{a.username}</span>}
+                {a.username && <span className="font-normal text-fg-3"> @{a.username}</span>}
               </p>
-              <p className="text-xs text-white/55">
+              <p className="text-xs text-fg-3">
                 ID {a.telegramId}
                 {a.builtin ? " · основной" : a.addedAt ? ` · добавлен ${when(a.addedAt)}` : ""}
                 {a.note ? ` · ${a.note}` : ""}

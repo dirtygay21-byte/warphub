@@ -25,7 +25,7 @@ export function ReservationsFilters({
     <div className="mb-4 rounded-2xl border border-white/10 bg-app-elevated p-4">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <label className="space-y-1.5 text-sm">
-          <span className="text-white/50">Дата</span>
+          <span className="text-fg-3">Дата</span>
           <input
             type="date"
             value={values.date}
@@ -35,7 +35,7 @@ export function ReservationsFilters({
         </label>
 
         <label className="space-y-1.5 text-sm">
-          <span className="text-white/50">Услуга</span>
+          <span className="text-fg-3">Услуга</span>
           <select
             value={values.serviceId}
             onChange={(event) => onChange({ serviceId: event.target.value })}
@@ -51,7 +51,7 @@ export function ReservationsFilters({
         </label>
 
         <label className="space-y-1.5 text-sm">
-          <span className="text-white/50">Стол (ID)</span>
+          <span className="text-fg-3">Стол (ID)</span>
           <input
             type="number"
             min={1}
@@ -63,7 +63,7 @@ export function ReservationsFilters({
         </label>
 
         <label className="space-y-1.5 text-sm">
-          <span className="text-white/50">Статус</span>
+          <span className="text-fg-3">Статус</span>
           <select
             value={values.status}
             onChange={(event) => onChange({ status: event.target.value })}
@@ -78,7 +78,7 @@ export function ReservationsFilters({
         </label>
 
         <label className="space-y-1.5 text-sm sm:col-span-2 lg:col-span-1">
-          <span className="text-white/50">ID пользователя</span>
+          <span className="text-fg-3">ID пользователя</span>
           <input
             type="text"
             value={values.userId}
@@ -89,7 +89,7 @@ export function ReservationsFilters({
         </label>
 
         <label className="space-y-1.5 text-sm">
-          <span className="text-white/50">Начало от</span>
+          <span className="text-fg-3">Начало от</span>
           <input
             type="datetime-local"
             value={values.startsAt}
@@ -99,7 +99,7 @@ export function ReservationsFilters({
         </label>
 
         <label className="space-y-1.5 text-sm">
-          <span className="text-white/50">Окончание до</span>
+          <span className="text-fg-3">Окончание до</span>
           <input
             type="datetime-local"
             value={values.endsAt}

@@ -20,8 +20,8 @@ export function EndOfTurn({ game }: { game: GameHook }) {
   const order: Seat[] = [active, active === 'p1' ? 'p2' : 'p1'];
   return (
     <div className="space-y-2.5 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Конец хода · {state.players[active].name}</p>
-      <p className="text-xs text-white/55">Засчитывают оба игрока — сначала тот, чей ход. Невыполненные карты остаются активными.</p>
+      <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Конец хода · {state.players[active].name}</p>
+      <p className="text-xs text-fg-3">Засчитывают оба игрока — сначала тот, чей ход. Невыполненные карты остаются активными.</p>
       {order.map((s, i) => (
         <ActAs key={s} game={game} seat={s}>
           <PlayerScoring game={game} seat={s} first={i === 0} />
@@ -60,9 +60,9 @@ function PlayerScoring({ game, seat, first }: { game: GameHook; seat: Seat; firs
       <p className="text-sm font-semibold">
         {first ? '1. ' : '2. '}
         {p.name}
-        <span className="font-normal text-white/45"> · {seat === turn ? 'его ход' : 'ход противника'}</span>
+        <span className="font-normal text-fg-3"> · {seat === turn ? 'его ход' : 'ход противника'}</span>
       </p>
-      {nothing && <p className="mt-1 text-xs text-white/45">Сейчас засчитывать нечего.</p>}
+      {nothing && <p className="mt-1 text-xs text-fg-3">Сейчас засчитывать нечего.</p>}
 
       {(scoredNow.length > 0 || primaryDone.length > 0) && (
         <ul className="mt-1.5 space-y-1">
@@ -83,7 +83,7 @@ function PlayerScoring({ game, seat, first }: { game: GameHook; seat: Seat; firs
 
       {primary && pBlocks.length > 0 && (
         <div className="mt-2">
-          <p className="mb-1 text-[12px] font-semibold text-white/70">
+          <p className="mb-1 text-[12px] font-semibold text-fg-2">
             <CardLink id={primary.id} seat={seat} name={primary.name}>
               Основная: {primary.name}
             </CardLink>
@@ -105,10 +105,10 @@ function PlayerScoring({ game, seat, first }: { game: GameHook; seat: Seat; firs
       {secondary.map(({ a, c, blocks }) => (
         <details key={a.id} className="mt-2 rounded-lg border border-white/10 bg-black/20 px-2.5 py-2">
           <summary className="cursor-pointer text-[13px] font-semibold">
-            {a.n != null && <span className="mr-1 text-[11px] text-white/45">№{a.n}</span>}
+            {a.n != null && <span className="mr-1 text-[12px] text-fg-3">№{a.n}</span>}
             <CardLink id={a.id} seat={seat} name={c.name} />
-            {a.note && <span className="font-normal text-white/50"> · {a.note}</span>}
-            <span className="ml-1.5 text-[11px] font-normal text-accent/80">— засчитать</span>
+            {a.note && <span className="font-normal text-fg-3"> · {a.note}</span>}
+            <span className="ml-1.5 text-[12px] font-normal text-accent/80">— засчитать</span>
           </summary>
           <div className="mt-2">
             <ScoreRows
@@ -160,7 +160,7 @@ function Discard({ game, seat }: { game: GameHook; seat: Seat }) {
   return (
     <section className="rounded-xl border border-white/10 px-3 py-2.5">
       <p className="text-sm font-semibold">Сбросить карты · {p.name}</p>
-      <p className="text-[11px] text-white/50">
+      <p className="text-[12px] text-fg-3">
         По желанию, после подсчёта. {cp ? 'За первый сброс в этот ход — 1 CP.' : '1 CP за сброс в этот ход уже получен.'}
       </p>
       <div className="mt-2 space-y-1.5">

@@ -136,7 +136,7 @@ export function AosTestArmyScreen({ onBack, rosters, index, initialRosterId }: {
   if (error)
     return (
       <Shell onBack={onBack}>
-        <p className="mt-10 text-center text-sm text-white/50">{error}</p>
+        <p className="mt-10 text-center text-sm text-fg-3">{error}</p>
       </Shell>
     );
   if (!bp)
@@ -162,14 +162,14 @@ export function AosTestArmyScreen({ onBack, rosters, index, initialRosterId }: {
 
   return (
     <Shell onBack={onBack}>
-      <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/40">Ростер</p>
-      {!rosters.length && <p className="text-sm text-white/55">Сначала соберите ростер Age of Sigmar.</p>}
+      <p className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Ростер</p>
+      {!rosters.length && <p className="text-sm text-fg-3">Сначала соберите ростер Age of Sigmar.</p>}
       <ul className="space-y-1.5">
         {rosters.map((r) => (
           <li key={r.id}>
             <button type="button" onClick={() => (setRosterId(r.id), setStep('field'))} className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10">
               <span className="block truncate text-sm font-semibold">{r.name}</span>
-              <span className="block text-[11px] text-white/45">
+              <span className="block text-[12px] text-fg-3">
                 {index.factions.find((f) => f.id === r.factionId)?.name ?? r.factionId}
                 {r.summary ? ` · ${fmtPts(r.summary.points)} очк.` : ''}
               </span>
@@ -197,11 +197,11 @@ function viewAos(a: AosArmy): BoardArmy {
       return (
         <Sheet open onClose={onClose} title={u.name} tall>
           <div className="space-y-3 pb-3">
-            <p className="text-xs text-white/55">
+            <p className="text-xs text-fg-3">
               {fmtPts(u.points)} очк. · моделей: {u.models.length}
               {u.tags?.length ? ` · ${u.tags.join(' · ')}` : ''}
             </p>
-            {ws ? <Warscroll ws={ws} unit={own} L={a.L} embedded /> : <p className="text-sm text-white/50">Нет данных варскролла.</p>}
+            {ws ? <Warscroll ws={ws} unit={own} L={a.L} embedded /> : <p className="text-sm text-fg-3">Нет данных варскролла.</p>}
           </div>
         </Sheet>
       );
@@ -271,7 +271,7 @@ function SavedCard({ bp, rosterId, rosters, onContinue }: { bp: AosBattlepack; r
   const when = new Date(saved.savedAt).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   return (
     <div className="mb-4 rounded-2xl border border-accent/40 bg-accent/10 p-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">Сохранённая расстановка · {when}</p>
+      <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">Сохранённая расстановка · {when}</p>
       <p className="mt-1 text-sm">
         {plan.n}. {plan.name} · атакующий — {f.t} · {saved.side === 'attacker' ? 'вы атакующий' : 'вы защитник'} · на столе {mine.filter((u) => u.placed).length} из {mine.length}
         {foeName && ` · соперник: ${foeName}`}
@@ -279,7 +279,7 @@ function SavedCard({ bp, rosterId, rosters, onContinue }: { bp: AosBattlepack; r
       <Button variant="primary" className="mt-2 w-full" onClick={() => onContinue(saved)}>
         Продолжить расстановку
       </Button>
-      <p className="mt-1.5 text-[11px] text-white/45">Новая расстановка ниже заменит сохранённую.</p>
+      <p className="mt-1.5 text-[12px] text-fg-3">Новая расстановка ниже заменит сохранённую.</p>
     </div>
   );
 }
@@ -331,7 +331,7 @@ function FieldPicker({
         Ростер: <b>{roster.name}</b>
       </p>
       <div>
-        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">Батлплан · GH 2026-27</p>
+        <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Батлплан · GH 2026-27</p>
         <select value={plan} onChange={(e) => onPlan(Number(e.target.value))} className="w-full rounded-lg border border-white/10 bg-app-elevated px-3 py-2 text-sm outline-none">
           {bp.battleplans.map((b) => (
             <option key={b.n} value={b.n} disabled={!b.map}>
@@ -342,7 +342,7 @@ function FieldPicker({
       </div>
       {current?.map && <BattleplanMap bp={bp} map={current.map} attacker={territory} onPick={onTerritory} />}
       <div>
-        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">Территория атакующего (нажмите на карте)</p>
+        <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Территория атакующего (нажмите на карте)</p>
         <Segmented<AosTerritory>
           value={territory}
           onChange={onTerritory}
@@ -353,7 +353,7 @@ function FieldPicker({
         />
       </div>
       <div>
-        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">Ваша сторона</p>
+        <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Ваша сторона</p>
         <Segmented<Side>
           value={side}
           onChange={onSide}
@@ -364,7 +364,7 @@ function FieldPicker({
         />
       </div>
       <div>
-        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">Армия соперника</p>
+        <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Армия соперника</p>
         <Segmented<FoeSpec['kind']>
           value={foeKind}
           onChange={setFoeKind}
@@ -380,7 +380,7 @@ function FieldPicker({
               <li key={r.id}>
                 <button type="button" onClick={() => setFoeId(r.id)} className={cx('w-full rounded-lg border px-3 py-2 text-left', foeId === r.id ? 'border-accent bg-accent/10' : 'border-white/10 bg-white/[0.03] active:bg-white/10')}>
                   <span className="block truncate text-sm font-semibold">{r.name}</span>
-                  <span className="block text-[11px] text-white/45">{r.summary ? `${fmtPts(r.summary.points)} очк.` : ''}</span>
+                  <span className="block text-[12px] text-fg-3">{r.summary ? `${fmtPts(r.summary.points)} очк.` : ''}</span>
                 </button>
               </li>
             ))}
@@ -392,7 +392,7 @@ function FieldPicker({
             {codeError && <p className="mt-1 text-xs text-danger">{codeError}</p>}
           </div>
         )}
-        {foeKind !== 'none' && <p className="mt-1 text-[11px] text-white/45">Соперник встаёт за другую сторону — {side === 'attacker' ? 'защитник' : 'атакующий'}.</p>}
+        {foeKind !== 'none' && <p className="mt-1 text-[12px] text-fg-3">Соперник встаёт за другую сторону — {side === 'attacker' ? 'защитник' : 'атакующий'}.</p>}
       </div>
       <Button variant="primary" className="h-12 w-full" disabled={!current?.map || !foeSpec} onClick={() => foeSpec && onDeploy(foeSpec)}>
         {foeKind === 'none' ? 'Расставить армию' : 'Расставить армии'}

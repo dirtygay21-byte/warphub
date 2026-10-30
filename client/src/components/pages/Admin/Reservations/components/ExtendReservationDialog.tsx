@@ -48,19 +48,19 @@ export function ExtendReservationDialog({
             <Clock className="size-6" />
           </div>
           <h2 className="text-lg font-semibold">Продлить запись</h2>
-          <p className="mt-2 text-sm text-white/60">{userLabel}</p>
+          <p className="mt-2 text-sm text-fg-2">{userLabel}</p>
         </div>
 
         <div className="space-y-4 px-5 py-4 text-sm">
           <div className="space-y-2">
             <p className="font-medium text-white/90">{serviceTitle}</p>
-            <p className="text-white/60">
+            <p className="text-fg-2">
               {dateLabel} · {timeLabel}
             </p>
           </div>
 
           <label className="block space-y-1.5">
-            <span className="text-white/50">На сколько часов</span>
+            <span className="text-fg-3">На сколько часов</span>
             <select
               value={hours}
               onChange={(event) => onHoursChange(Number(event.target.value))}
@@ -74,7 +74,7 @@ export function ExtendReservationDialog({
             </select>
           </label>
 
-          <p className="text-white/60">
+          <p className="text-fg-2">
             Новое окончание:{" "}
             <span className="font-medium text-white/90">
               {formatReservationDateTime(newEndsAt)}
@@ -95,7 +95,7 @@ export function ExtendReservationDialog({
             disabled={isPending}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-400/15 px-4 py-3 text-sm font-semibold text-blue-200 disabled:opacity-60"
           >
-            {isPending ? "Продлеваем..." : "Продлить"}
+            {isPending ? "Продлеваем…" : "Продлить"}
           </button>
           <button
             type="button"

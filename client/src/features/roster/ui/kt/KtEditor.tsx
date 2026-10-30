@@ -45,7 +45,7 @@ export function KtEditor({ roster, index, onBack, onChange, onDelete }: { roster
   if (error)
     return (
       <div className="mx-auto max-w-lg px-4 pt-10 text-center">
-        <p className="text-sm text-white/55">{error}</p>
+        <p className="text-sm text-fg-3">{error}</p>
         <Button className="mt-4" onClick={onBack}>
           Назад
         </Button>
@@ -88,7 +88,7 @@ export function KtEditor({ roster, index, onBack, onChange, onDelete }: { roster
         <section className="rounded-2xl border border-white/10 bg-app-elevated">
           <button type="button" onClick={() => setTeamOpen((o) => !o)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-white/45">Kill Team · {meta ? ktTeamGroup(index, meta) : team.factionId}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-fg-3">Kill Team · {meta ? ktTeamGroup(index, meta) : team.factionId}</p>
               <p className="mt-0.5 truncate text-[15px] font-semibold">{team.name}</p>
               {team.archetypes.length > 0 && (
                 <div className="mt-1.5 flex flex-wrap gap-1">
@@ -98,16 +98,16 @@ export function KtEditor({ roster, index, onBack, onChange, onDelete }: { roster
                 </div>
               )}
             </div>
-            <Icon name="down" className={cx('size-5 shrink-0 text-white/40 transition', teamOpen && 'rotate-180')} />
+            <Icon name="down" className={cx('size-5 shrink-0 text-fg-3 transition', teamOpen && 'rotate-180')} />
           </button>
           {teamOpen && (
             <div className="space-y-3 border-t border-white/[0.06] px-4 pb-4 pt-3">
-              {team.description && <Md text={team.description} className="text-[12.5px] italic leading-snug text-white/60" />}
+              {team.description && <Md text={team.description} className="text-[12.5px] italic leading-snug text-fg-2" />}
               <div>
                 <SectionTitle>Состав команды</SectionTitle>
-                {team.composition ? <Md text={team.composition} className="text-[12.5px] leading-snug text-white/75" /> : <p className="text-sm text-white/50">Нет данных о составе.</p>}
+                {team.composition ? <Md text={team.composition} className="text-[12.5px] leading-snug text-fg-2" /> : <p className="text-sm text-fg-3">Нет данных о составе.</p>}
               </div>
-              <p className="text-[11px] text-white/35">
+              <p className="text-[12px] text-fg-3">
                 Данные: {index.source.name}, {index.source.date} ({index.source.commit}).
               </p>
             </div>
@@ -127,7 +127,7 @@ export function KtEditor({ roster, index, onBack, onChange, onDelete }: { roster
 
         {tab === 'ops' && (
           <section className="space-y-2.5">
-            {!roster.operatives.length && <p className="rounded-xl border border-dashed border-white/15 px-3 py-6 text-center text-sm text-white/45">Добавьте оперативников — первым обычно идёт лидер.</p>}
+            {!roster.operatives.length && <p className="rounded-xl border border-dashed border-white/15 px-3 py-6 text-center text-sm text-fg-3">Добавьте оперативников — первым обычно идёт лидер.</p>}
             {roster.operatives.map((x, n) => {
               const o = opOf(x);
               return o ? (
@@ -163,15 +163,15 @@ export function KtEditor({ roster, index, onBack, onChange, onDelete }: { roster
               <div className="space-y-1.5">
                 {factionRules.map((a) => (
                   <RuleCard key={a.id} name={a.name} badge={a.ap != null ? <CostBadge>{a.ap} AP</CostBadge> : undefined}>
-                    <Md text={a.text} className="text-[12.5px] leading-relaxed text-white/70" />
+                    <Md text={a.text} className="text-[12.5px] leading-relaxed text-fg-2" />
                   </RuleCard>
                 ))}
                 {teamRules.map((p) => (
                   <RuleCard key={p.id} name={p.name}>
-                    <Md text={p.text} className="text-[12.5px] leading-relaxed text-white/70" />
+                    <Md text={p.text} className="text-[12.5px] leading-relaxed text-fg-2" />
                   </RuleCard>
                 ))}
-                {!factionRules.length && !teamRules.length && <p className="text-sm text-white/50">В данных нет правил фракции.</p>}
+                {!factionRules.length && !teamRules.length && <p className="text-sm text-fg-3">В данных нет правил фракции.</p>}
               </div>
             </div>
             <WeaponRules index={index} />
@@ -189,20 +189,20 @@ export function KtEditor({ roster, index, onBack, onChange, onDelete }: { roster
                   <div className="space-y-1.5">
                     {list.map((p) => (
                       <RuleCard key={p.id} name={p.name} badge={<CostBadge tone={type === 'strategy' ? 'accent' : 'warn'}>{type === 'strategy' ? 'Strategy' : 'Firefight'}</CostBadge>}>
-                        <Md text={p.text} className="text-[12.5px] leading-relaxed text-white/70" />
+                        <Md text={p.text} className="text-[12.5px] leading-relaxed text-fg-2" />
                       </RuleCard>
                     ))}
                   </div>
                 </div>
               );
             })}
-            <p className="text-[11px] text-white/35">Стоимость уловок в CP в данных источника не записана — смотрите правила редакции.</p>
+            <p className="text-[12px] text-fg-3">Стоимость уловок в CP в данных источника не записана — смотрите правила редакции.</p>
           </section>
         )}
 
         {tab === 'equip' && (
           <section className="space-y-2">
-            {!team.equipment.length && <p className="text-sm text-white/50">В данных нет снаряжения этой команды.</p>}
+            {!team.equipment.length && <p className="text-sm text-fg-3">В данных нет снаряжения этой команды.</p>}
             {team.equipment.map((e) => {
               const on = roster.equipment.includes(e.id);
               return (
@@ -213,12 +213,12 @@ export function KtEditor({ roster, index, onBack, onChange, onDelete }: { roster
                     {on && <Tag tone="accent">Взято</Tag>}
                   </button>
                   <div className="border-t border-white/[0.06] px-3.5 py-2">
-                    <Md text={e.text} className="text-[12.5px] leading-relaxed text-white/65" />
+                    <Md text={e.text} className="text-[12.5px] leading-relaxed text-fg-2" />
                   </div>
                 </div>
               );
             })}
-            <p className="text-[11px] text-white/35">Лимит снаряжения в данных источника не записан — смотрите правила редакции.</p>
+            <p className="text-[12px] text-fg-3">Лимит снаряжения в данных источника не записан — смотрите правила редакции.</p>
           </section>
         )}
       </div>
@@ -279,7 +279,7 @@ function OpCard({
       title={x.name || o.name}
       subtitle={x.name ? o.name : o.keywords.filter((k) => k !== 'LEADER').join(' · ')}
       highlight={leader}
-      right={<span className="font-display text-lg font-semibold leading-none text-white/30">#{n}</span>}
+      right={<span className="font-display text-lg font-semibold leading-none text-fg-3">#{n}</span>}
       badges={
         <>
           {leader && <Tag tone="accent">Лидер</Tag>}
@@ -301,7 +301,7 @@ function OpCard({
           <div className="space-y-1.5">
             {own.map((a) => (
               <RuleCard key={a.id} name={a.name} badge={a.ap != null ? <CostBadge>{a.ap} AP</CostBadge> : undefined}>
-                <Md text={a.text} className="text-[12.5px] leading-relaxed text-white/70" />
+                <Md text={a.text} className="text-[12.5px] leading-relaxed text-fg-2" />
               </RuleCard>
             ))}
           </div>
@@ -313,7 +313,7 @@ function OpCard({
           <div className="space-y-1.5">
             {o.options.map((a) => (
               <RuleCard key={a.id} name={a.name}>
-                <Md text={a.text} className="text-[12.5px] leading-relaxed text-white/70" />
+                <Md text={a.text} className="text-[12.5px] leading-relaxed text-fg-2" />
               </RuleCard>
             ))}
           </div>
@@ -328,10 +328,10 @@ function OpCard({
         value={x.name}
         onChange={(e) => onChange({ name: e.target.value.slice(0, 40) })}
         placeholder="Своё имя оперативника"
-        className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none placeholder:text-white/30 focus:border-accent"
+        className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none placeholder:text-fg-3 focus:border-accent"
       />
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[11px] text-white/40">Подставка: {o.baseMm ? `${o.baseMm} мм` : 'нет данных'}</span>
+        <span className="text-[12px] text-fg-3">Подставка: {o.baseMm ? `${o.baseMm} мм` : 'нет данных'}</span>
         <Button variant="danger" className="text-xs" onClick={onRemove}>
           <Icon name="trash" /> Убрать
         </Button>
@@ -361,10 +361,10 @@ function WeaponIcon({ type }: { type: KtWeapon['type'] }) {
  * onToggle — режим выбора (отметки слева).
  */
 function WeaponTable({ list, chosen, onToggle, empty }: { list: KtWeapon[]; chosen?: string[]; onToggle?: (w: KtWeapon) => void; empty?: string }) {
-  if (!list.length) return <p className="text-[12px] text-white/45">{empty ?? 'Нет оружия'}</p>;
+  if (!list.length) return <p className="text-[12px] text-fg-3">{empty ?? 'Нет оружия'}</p>;
   return (
     <div className="overflow-hidden rounded-xl border border-white/[0.07]">
-      <div className="grid grid-cols-[1fr_2.5rem_2.5rem_2.75rem] gap-x-1 bg-white/[0.05] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/45">
+      <div className="grid grid-cols-[1fr_2.5rem_2.5rem_2.75rem] gap-x-1 bg-white/[0.05] px-2.5 py-1 text-[12px] font-semibold uppercase tracking-wide text-fg-3">
         <span>Оружие</span>
         <span className="text-center">ATK</span>
         <span className="text-center">HIT</span>
@@ -387,8 +387,8 @@ function WeaponTable({ list, chosen, onToggle, empty }: { list: KtWeapon[]; chos
             </span>
             {w.profiles.map((p, i) => (
               <span key={i} className="mt-0.5 grid grid-cols-[1fr_2.5rem_2.5rem_2.75rem] gap-x-1 text-[12.5px] tabular-nums">
-                <span className="min-w-0 pl-[1.375rem] text-[11px] leading-snug text-white/50">
-                  {p.name && <b className="text-white/75">{p.name}</b>}
+                <span className="min-w-0 pl-[1.375rem] text-[12px] leading-snug text-fg-3">
+                  {p.name && <b className="text-fg-2">{p.name}</b>}
                   {p.name && p.rules ? ' · ' : ''}
                   {p.rules}
                 </span>
@@ -412,7 +412,7 @@ function WeaponRules({ index }: { index: KtIndex }) {
     <div>
       <SectionTitle
         right={
-          <button type="button" onClick={() => setOpen((v) => !v)} className="text-[11px] font-semibold text-accent">
+          <button type="button" onClick={() => setOpen((v) => !v)} className="text-[12px] font-semibold text-accent">
             {open ? 'Скрыть' : 'Показать'}
           </button>
         }
@@ -423,7 +423,7 @@ function WeaponRules({ index }: { index: KtIndex }) {
         <div className="space-y-1.5">
           {index.weaponRules.map((r) => (
             <RuleCard key={r.code} name={r.name} sub={r.code}>
-              <Md text={r.text} className="text-[12.5px] leading-relaxed text-white/70" />
+              <Md text={r.text} className="text-[12.5px] leading-relaxed text-fg-2" />
             </RuleCard>
           ))}
         </div>
@@ -449,12 +449,12 @@ function AddSheet({ open, team, roster, onClose, onAdd }: { open: boolean; team:
           <span className="mt-1.5 grid grid-cols-4 gap-1 text-center">
             {OP_STATS(o).map((s) => (
               <span key={s.label} className="rounded-md bg-black/25 py-0.5">
-                <span className="block text-[9px] font-semibold uppercase text-white/40">{s.label}</span>
+                <span className="block text-[12px] font-semibold uppercase text-fg-3">{s.label}</span>
                 <span className="font-display block text-[14px] font-semibold leading-tight">{s.value}</span>
               </span>
             ))}
           </span>
-          <span className="mt-1 block truncate text-[11px] text-white/40">{o.weapons.map((w) => w.name).join(', ')}</span>
+          <span className="mt-1 block truncate text-[12px] text-fg-3">{o.weapons.map((w) => w.name).join(', ')}</span>
         </button>
       </li>
     );
@@ -526,7 +526,7 @@ function ExportSheet({ open, onClose, roster, team }: { open: boolean; onClose: 
           { value: 'code', label: 'Код KT1.' },
         ]}
       />
-      <pre className="whitespace-pre-wrap break-all rounded-xl border border-white/10 bg-black/30 p-3 font-mono text-[11.5px] text-white/80">{text}</pre>
+      <pre className="whitespace-pre-wrap break-all rounded-xl border border-white/10 bg-black/30 p-3 font-mono text-[12px] text-white/80">{text}</pre>
     </Sheet>
   );
 }

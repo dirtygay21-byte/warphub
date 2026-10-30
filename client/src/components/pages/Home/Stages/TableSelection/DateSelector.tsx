@@ -140,7 +140,7 @@ function DateSelectorItem({
           "border-white/10 bg-app-surface text-white active:bg-white/10",
         !isSelected &&
           !isAllowed &&
-          "cursor-not-allowed border-white/5 bg-app-muted text-white/25",
+          "cursor-not-allowed border-white/5 bg-app-muted text-fg-3",
       )}
     >
       <span className="text-sm font-semibold">
@@ -151,8 +151,8 @@ function DateSelectorItem({
           "text-xs",
           isSelected && isAllowed && "text-accent-foreground/70",
           isSelected && !isAllowed && "text-red-200/70",
-          !isSelected && isAllowed && "text-white/50",
-          !isSelected && !isAllowed && "text-white/25",
+          !isSelected && isAllowed && "text-fg-3",
+          !isSelected && !isAllowed && "text-fg-3",
         )}
       >
         {dayName}

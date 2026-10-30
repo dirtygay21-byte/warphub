@@ -54,14 +54,14 @@ export default function ReservationsTable({
       </thead>
       <tbody>
         {isFetching && reservations.length === 0 ? (
-          <EmptyRow text="Загружаем записи..." />
+          <EmptyRow text="Загружаем записи…" />
         ) : reservations.length === 0 ? (
           <tr>
             <td
               colSpan={8}
-              className="px-3 py-12 text-center text-sm text-white/40"
+              className="px-3 py-12 text-center text-sm text-fg-3"
             >
-              <CalendarDays className="mx-auto mb-2 size-6 text-white/20" />
+              <CalendarDays className="mx-auto mb-2 size-6 text-fg-3" />
               Записи не найдены
             </td>
           </tr>
@@ -86,14 +86,14 @@ function ReservationRow({ reservation }: { reservation: Reservation }) {
       <td className="whitespace-nowrap px-3 py-3 text-white/80">
         <div>{formatDateTime(reservation.startsAt)}</div>
         {reservation.endsAt && (
-          <div className="text-xs text-white/40">
+          <div className="text-xs text-fg-3">
             до {formatTime(reservation.endsAt)}
           </div>
         )}
       </td>
       <td className="px-3 py-3">
         {reservation.telegramId != null ? (
-          <span className="font-mono text-xs text-white/60">
+          <span className="font-mono text-xs text-fg-2">
             {reservation.telegramId}
           </span>
         ) : (
@@ -103,7 +103,7 @@ function ReservationRow({ reservation }: { reservation: Reservation }) {
       <td className="max-w-[180px] truncate px-3 py-3 text-white/80">
         {getServiceName(reservation.serviceId)}
       </td>
-      <td className="px-3 py-3 font-mono text-white/60">
+      <td className="px-3 py-3 font-mono text-fg-2">
         {reservation.tableId != null ? `Стол ${reservation.tableId}` : "—"}
       </td>
       <td className="px-3 py-3">
@@ -116,7 +116,7 @@ function ReservationRow({ reservation }: { reservation: Reservation }) {
           {getStatusLabel(reservation.status)}
         </span>
       </td>
-      <td className="whitespace-nowrap px-3 py-3 text-white/70">
+      <td className="whitespace-nowrap px-3 py-3 text-fg-2">
         {reservation.partySize}
         {armyCount > 0 && (
           <span className="ml-2 text-xs text-accent">
@@ -124,7 +124,7 @@ function ReservationRow({ reservation }: { reservation: Reservation }) {
           </span>
         )}
       </td>
-      <td className="whitespace-nowrap px-3 py-3 text-white/40">
+      <td className="whitespace-nowrap px-3 py-3 text-fg-3">
         {formatDateTime(reservation.createdAt)}
       </td>
     </tr>
@@ -145,7 +145,7 @@ function TableHead({
   const isActive = sort.key === sortKey;
 
   return (
-    <th className="whitespace-nowrap px-3 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white/50">
+    <th className="whitespace-nowrap px-3 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-3">
       <button
         type="button"
         onClick={() => onSortChange(sortKey)}
@@ -169,7 +169,7 @@ function TableHead({
 function EmptyRow({ text }: { text: string }) {
   return (
     <tr>
-      <td colSpan={8} className="px-3 py-12 text-center text-sm text-white/40">
+      <td colSpan={8} className="px-3 py-12 text-center text-sm text-fg-3">
         {text}
       </td>
     </tr>
@@ -178,7 +178,7 @@ function EmptyRow({ text }: { text: string }) {
 
 function CodeValue({ max, value }: { max: number; value: string }) {
   return (
-    <code className="font-mono text-xs text-white/45" title={value}>
+    <code className="font-mono text-xs text-fg-3" title={value}>
       {truncateMiddle(value, max)}
     </code>
   );

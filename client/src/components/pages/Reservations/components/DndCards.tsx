@@ -46,7 +46,7 @@ function CancelButton({
       ) : (
         <XCircle className="size-4" />
       )}
-      {isPending ? "Отменяем..." : armed ? "Нажмите ещё раз для отмены" : label}
+      {isPending ? "Отменяем…" : armed ? "Нажмите ещё раз для отмены" : label}
     </button>
   );
 }
@@ -83,12 +83,12 @@ export function DndBookingCard({
       <div className="flex items-start justify-between gap-3 border-b border-white/10 px-4 py-4">
         <div className="min-w-0">
           <h2 className="truncate text-base font-semibold">{booking.game.title}</h2>
-          <p className="mt-1 text-sm text-white/50">D&D · {booking.game.gameType}</p>
+          <p className="mt-1 text-sm text-fg-3">D&D · {booking.game.gameType}</p>
         </div>
         <span
           className={clsx(
             "shrink-0 rounded-full px-3 py-1 text-xs font-semibold",
-            inactive ? "bg-white/10 text-white/60" : "bg-green-400/15 text-green-300",
+            inactive ? "bg-white/10 text-fg-2" : "bg-green-400/15 text-green-300",
           )}
         >
           {statusLabel}
@@ -189,14 +189,14 @@ export function TrialRequestCard({
             <Sparkles className="size-4 text-accent" />
             Хочу попробовать D&D
           </h2>
-          <p className="mt-1 text-sm text-white/50">Заявка без даты</p>
+          <p className="mt-1 text-sm text-fg-3">Заявка без даты</p>
         </div>
         <span
           className={clsx(
             "shrink-0 rounded-full px-3 py-1 text-xs font-semibold",
             request.status === "new" && "bg-yellow-400/15 text-yellow-300",
             request.status === "grouped" && "bg-green-400/15 text-green-300",
-            request.status === "cancelled" && "bg-white/10 text-white/60",
+            request.status === "cancelled" && "bg-white/10 text-fg-2",
           )}
         >
           {DND_TRIAL_STATUS_LABELS[request.status]}

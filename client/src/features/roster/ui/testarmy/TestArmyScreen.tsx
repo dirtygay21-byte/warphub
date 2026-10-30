@@ -149,7 +149,7 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
   if (error)
     return (
       <Shell onBack={onBack}>
-        <p className="mt-10 text-center text-sm text-white/50">{error}</p>
+        <p className="mt-10 text-center text-sm text-fg-3">{error}</p>
       </Shell>
     );
   if (!bf)
@@ -194,8 +194,8 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
 
   return (
     <Shell onBack={onBack}>
-      <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/40">Ростер</p>
-      {!rosters.length && <p className="text-sm text-white/55">Сначала соберите ростер Warhammer 40,000.</p>}
+      <p className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Ростер</p>
+      {!rosters.length && <p className="text-sm text-fg-3">Сначала соберите ростер Warhammer 40,000.</p>}
       <ul className="space-y-1.5">
         {rosters.map((r) => (
           <li key={r.id}>
@@ -205,7 +205,7 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
               className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10"
             >
               <span className="block truncate text-sm font-semibold">{r.name}</span>
-              <span className="block text-[11px] text-white/45">
+              <span className="block text-[12px] text-fg-3">
                 {index.factions.find((f) => f.id === r.factionId)?.name ?? r.factionId}
                 {r.summary ? ` · ${fmtPts(r.summary.points)} очк.` : ''} · юнитов: {r.units.length}
               </span>
@@ -231,7 +231,7 @@ function SavedCard({ bf, rosterId, rosters, onContinue }: { bf: BattlefieldData;
   const when = new Date(saved.savedAt).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   return (
     <div className="mb-4 rounded-2xl border border-accent/40 bg-accent/10 p-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">Сохранённая расстановка · {when}</p>
+      <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">Сохранённая расстановка · {when}</p>
       <p className="mt-1 text-sm">
         {dep?.nameRu ?? '—'} · раскладка {LETTERS[layout.variant - 1] ?? layout.variant} · {saved.side === 'attacker' ? 'атакующий' : 'защитник'} · на столе {placed} из {mineUnits.length}
         {foeName && ` · соперник: ${foeName}`}
@@ -239,7 +239,7 @@ function SavedCard({ bf, rosterId, rosters, onContinue }: { bf: BattlefieldData;
       <Button variant="primary" className="mt-2 w-full" onClick={() => onContinue(saved)}>
         Продолжить расстановку
       </Button>
-      <p className="mt-1.5 text-[11px] text-white/45">Новая расстановка ниже заменит сохранённую.</p>
+      <p className="mt-1.5 text-[12px] text-fg-3">Новая расстановка ниже заменит сохранённую.</p>
     </div>
   );
 }
@@ -303,7 +303,7 @@ function FieldPicker({
           className={cx('rounded-xl border px-2.5 py-2 text-left text-sm font-semibold', value === d.id ? 'border-accent bg-accent/15' : 'border-white/10 bg-white/[0.03] active:bg-white/10')}
         >
           {d.nameRu}
-          <span className="block text-[10.5px] font-normal text-white/40">{d.name}</span>
+          <span className="block text-[12px] font-normal text-fg-3">{d.name}</span>
         </button>
       ))}
     </div>
@@ -315,11 +315,11 @@ function FieldPicker({
         Ростер: <b>{roster.name}</b>
       </p>
       <div>
-        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">Ваш тип армии</p>
+        <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Ваш тип армии</p>
         {chips(you, setYou)}
       </div>
       <div>
-        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">Противник</p>
+        <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Противник</p>
         {chips(foe, setFoe)}
       </div>
       <div className="grid grid-cols-3 gap-1.5">
@@ -330,14 +330,14 @@ function FieldPicker({
             onClick={() => onLayout(l.id)}
             className={cx('min-w-0 rounded-xl border px-2.5 py-2 text-left', layout?.id === l.id ? 'border-accent bg-accent/15' : 'border-white/10 bg-white/[0.03] active:bg-white/10')}
           >
-            <span className="block text-[10.5px] font-semibold uppercase tracking-wider text-white/45">Раскладка</span>
+            <span className="block text-[12px] font-semibold uppercase tracking-wider text-fg-3">Раскладка</span>
             <span className="font-display block text-2xl font-semibold leading-none">{LETTERS[i]}</span>
-            <span className="mt-1 block break-words text-[11px] leading-tight text-white/55">{bf.deployments.find((d) => d.id === l.deployment)?.nameRu}</span>
+            <span className="mt-1 block break-words text-[12px] leading-tight text-fg-3">{bf.deployments.find((d) => d.id === l.deployment)?.nameRu}</span>
           </button>
         ))}
       </div>
       <div>
-        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">Ваша сторона</p>
+        <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Ваша сторона</p>
         <Segmented<Side>
           value={side}
           onChange={onSide}
@@ -348,7 +348,7 @@ function FieldPicker({
         />
       </div>
       <div>
-        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">Армия соперника</p>
+        <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Армия соперника</p>
         <Segmented<FoeSpec['kind']>
           value={foeKind}
           onChange={setFoeKind}
@@ -368,7 +368,7 @@ function FieldPicker({
                   className={cx('w-full rounded-lg border px-3 py-2 text-left', foeId === r.id ? 'border-accent bg-accent/10' : 'border-white/10 bg-white/[0.03] active:bg-white/10')}
                 >
                   <span className="block truncate text-sm font-semibold">{r.name}</span>
-                  <span className="block text-[11px] text-white/45">{r.summary ? `${fmtPts(r.summary.points)} очк.` : ''}</span>
+                  <span className="block text-[12px] text-fg-3">{r.summary ? `${fmtPts(r.summary.points)} очк.` : ''}</span>
                 </button>
               </li>
             ))}
@@ -383,11 +383,11 @@ function FieldPicker({
               placeholder="WH1.eyJ2Ijox…"
               className="w-full rounded-lg border border-white/10 bg-white/[0.04] p-2.5 font-mono text-xs text-white outline-none focus:border-accent"
             />
-            <p className="mt-1 text-[11px] text-white/45">Код ростера: WarpBuilder → ростер → «Экспорт» → код.</p>
+            <p className="mt-1 text-[12px] text-fg-3">Код ростера: WarpBuilder → ростер → «Экспорт» → код.</p>
             {codeError && <p className="mt-1 text-xs text-danger">{codeError}</p>}
           </div>
         )}
-        {foeKind !== 'none' && <p className="mt-1 text-[11px] text-white/45">Соперник встаёт за другую сторону — {side === 'attacker' ? 'защитник' : 'атакующий'}.</p>}
+        {foeKind !== 'none' && <p className="mt-1 text-[12px] text-fg-3">Соперник встаёт за другую сторону — {side === 'attacker' ? 'защитник' : 'атакующий'}.</p>}
       </div>
       {layout && dep && <BattleMap layout={layout} dep={dep} guides="none" className="mx-auto block w-full max-w-[360px] rounded-xl" />}
       <Button variant="primary" className="h-12 w-full" disabled={!layout || !foeSpec} onClick={() => layout && foeSpec && onDeploy(layout.id, foeSpec)}>

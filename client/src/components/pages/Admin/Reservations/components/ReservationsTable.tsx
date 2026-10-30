@@ -52,7 +52,7 @@ export function ReservationsTable({
               {row.original.serviceTitle}
             </p>
             {row.original.disciplineTitle && (
-              <p className="mt-1 text-xs text-white/45">
+              <p className="mt-1 text-xs text-fg-3">
                 {row.original.disciplineTitle}
               </p>
             )}
@@ -157,7 +157,7 @@ export function ReservationsTable({
                           header.getContext()
                         )}
                         {header.column.getCanSort() && (
-                          <span className="text-[10px] text-white/35">
+                          <span className="text-[12px] text-fg-3">
                             {sorted === "asc"
                               ? "▲"
                               : sorted === "desc"
@@ -194,7 +194,7 @@ export function ReservationsTable({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="py-16 text-center text-sm text-white/45"
+                  className="py-16 text-center text-sm text-fg-3"
                 >
                   Нет записей
                 </td>

@@ -36,11 +36,11 @@ export function CardSheet({ game, id, seat, onClose }: { game: GameHook; id: str
         <div className="mx-auto max-w-lg">
           <div className="flex items-start gap-2">
             <div className="min-w-0 flex-1">
-              {state && seat && <p className="text-[11px] text-white/50">{state.players[seat].name}</p>}
+              {state && seat && <p className="text-[12px] text-fg-3">{state.players[seat].name}</p>}
               {status.length > 0 && (
                 <div className="mt-1 flex flex-wrap gap-1.5">
                   {status.map((s, i) => (
-                    <span key={i} className={cx('rounded-full border px-2 py-0.5 text-[11px]', i === 0 ? 'border-accent/50 text-accent' : 'border-white/15 text-white/75')}>
+                    <span key={i} className={cx('rounded-full border px-2 py-0.5 text-[12px]', i === 0 ? 'border-accent/50 text-accent' : 'border-white/15 text-fg-2')}>
                       {s}
                     </span>
                   ))}
