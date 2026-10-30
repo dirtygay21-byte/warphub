@@ -6,8 +6,8 @@ export type HoldPurpose = (typeof HOLD_PURPOSES)[number];
 
 export const HOLD_PURPOSE_LABELS: Record<HoldPurpose, string> = {
   tournament: 'Турнирная игра',
-  club_event: 'Внутреннее мероприятие клуба',
-  private_game: 'Закрытая игра',
+  club_event: 'Мероприятие клуба',
+  private_game: 'Внутренняя игра',
   dnd: 'Игра D&D',
   other: 'Другое мероприятие',
 };
@@ -37,6 +37,7 @@ export type HoldInput = {
   purpose: HoldPurpose;
   title: string;
   description: string | null;
+  reservedBy: string | null;
   dndGameId: number | null;
 };
 
@@ -84,6 +85,9 @@ export function validateHoldInput(raw: unknown, now: Date): HoldInput {
   const descriptionRaw = typeof r.description === 'string' ? r.description.trim() : '';
   if (descriptionRaw.length > 2000) bad('Описание — не длиннее 2000 символов');
 
+  const reservedByRaw = typeof r.reservedBy === 'string' ? r.reservedBy.trim() : '';
+  if (reservedByRaw.length > 100) bad('«Кто бронирует» — не длиннее 100 символов');
+
   const dndGameId = r.dndGameId == null || r.dndGameId === '' ? null : Number(r.dndGameId);
   if (dndGameId !== null && (!Number.isInteger(dndGameId) || dndGameId <= 0)) bad('Неверная игра D&D');
 
@@ -94,6 +98,7 @@ export function validateHoldInput(raw: unknown, now: Date): HoldInput {
     purpose,
     title,
     description: descriptionRaw || null,
+    reservedBy: reservedByRaw || null,
     dndGameId,
   };
 }

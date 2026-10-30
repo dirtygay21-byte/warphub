@@ -379,6 +379,7 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
         purpose: t.String({ description: 'tournament | club_event | private_game | dnd | other' }),
         title: t.String(),
         description: t.Optional(t.Nullable(t.String())),
+        reservedBy: t.Optional(t.Nullable(t.String({ description: 'Кто бронирует (мастер, организатор)' }))),
         dndGameId: t.Optional(t.Nullable(t.Number())),
       }),
       detail: {

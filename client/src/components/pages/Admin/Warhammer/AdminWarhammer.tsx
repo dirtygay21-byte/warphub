@@ -27,7 +27,8 @@ import {
   Lock,
   Swords,
 } from "lucide-react";
-import { deleteTableHold, HOLD_PURPOSE_LABELS, type TableHold } from "@/apiUtils/tableHolds";
+import HoldCard from "@/components/pages/Admin/TableHolds/HoldCard";
+import UpcomingHolds from "@/components/pages/Admin/TableHolds/UpcomingHolds";
 import TableHoldSheet from "@/components/pages/Admin/TableHolds/TableHoldSheet";
 import { DsButton } from "@/components/ui/ds";
 import { useMemo, useState } from "react";
@@ -142,7 +143,7 @@ export default function AdminWarhammer() {
 
           {day.holds.length > 0 && (
             <section>
-              <h2 className="mb-3 text-lg font-semibold">Брони столов</h2>
+              <h2 className="mb-3 text-lg font-semibold">Брони столов в этот день</h2>
               <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:items-start xl:grid-cols-3">
                 {day.holds.map((hold) => (
                   <HoldCard key={hold.id} hold={hold} />
@@ -168,6 +169,12 @@ export default function AdminWarhammer() {
                 ))}
               </div>
             )}
+          </section>
+
+          <section>
+            <h2 className="mb-1 text-lg font-semibold">Ближайшие брони столов</h2>
+            <p className="mb-3 text-xs text-fg-3">Все брони, которые ещё не закончились, — по всем дням</p>
+            <UpcomingHolds />
           </section>
 
           <section>
@@ -238,45 +245,6 @@ export default function AdminWarhammer() {
         </div>
       )}
     </div>
-  );
-}
-
-/** Бронь стола администратором: стол закрыт для записи; снять — двумя нажатиями. */
-function HoldCard({ hold }: { hold: TableHold }) {
-  const queryClient = useQueryClient();
-  const [armed, setArmed] = useState(false);
-  const remove = useMutation({
-    mutationFn: () => deleteTableHold(hold.id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-warhammer-day"] });
-      queryClient.invalidateQueries({ queryKey: ["table-holds"] });
-    },
-  });
-  return (
-    <article className="rounded-xl border border-accent/30 bg-app-elevated p-4 text-sm">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-base font-semibold">{formatClubTimeRange(hold.startsAt, hold.endsAt)}</p>
-          <p className="mt-0.5 text-fg-2">{hold.tableName}</p>
-        </div>
-        <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-accent/15 px-2 py-1 text-[12px] font-semibold text-accent">
-          <Lock className="size-3.5" />
-          {HOLD_PURPOSE_LABELS[hold.purpose]}
-        </span>
-      </div>
-      <p className="mt-2 font-semibold">{hold.title}</p>
-      {hold.description && <p className="mt-1 whitespace-pre-line text-fg-2">{hold.description}</p>}
-      <button
-        type="button"
-        disabled={remove.isPending}
-        onClick={() => (armed ? remove.mutate() : setArmed(true))}
-        onBlur={() => setArmed(false)}
-        className="ds-press mt-3 h-11 w-full rounded-[14px] border border-danger/40 text-[15px] font-semibold text-danger disabled:opacity-60"
-      >
-        {remove.isPending ? "Снимаем…" : armed ? "Нажмите ещё раз, чтобы снять" : "Снять бронь"}
-      </button>
-      {remove.isError && <p className="mt-2 text-[13px] text-danger">{remove.error.message}</p>}
-    </article>
   );
 }
 

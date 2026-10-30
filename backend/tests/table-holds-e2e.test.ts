@@ -82,11 +82,14 @@ describe('бронь стола администратором', () => {
   });
 
   test('бронь 18:00–22:00 закрывает стол для записи', async () => {
-    const r = await hold('18:00', '22:00', { description: 'финал' });
+    const r = await hold('18:00', '22:00', { description: 'финал', reservedBy: 'Организатор Олег' });
     if (r.status !== 200) console.error(`::error::hold → ${r.status}: ${JSON.stringify(r.json).slice(0, 600)}`);
     expect(r.status).toBe(200);
     holdId = r.json.id;
     expect(r.json.purpose).toBe('tournament');
+    expect(r.json.reservedBy).toBe('Организатор Олег');
+    expect(r.json.createdBy.telegramId).toBe(777);
+    expect(r.json.createdBy.name).toBe('admin');
 
     expect((await book('19:00')).status).toBeGreaterThanOrEqual(400);
     // игра в 14:00 на 4 ч заканчивается ровно к брони

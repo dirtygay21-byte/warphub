@@ -127,6 +127,13 @@
       "when": 1783992000000,
       "tag": "0017_table_holds",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1783995600000,
+      "tag": "0018_table_holds_reserved_by",
+      "breakpoints": true
     }
   ]
 }
