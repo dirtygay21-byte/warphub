@@ -82,7 +82,7 @@ export default function Sidebar() {
 
       <div className="mt-auto space-y-1 px-3 pb-4">
         {rosterAccess.data?.hasAccess && (
-          <SideLink icon={<Swords className="size-5" />} label="Roster Builder" onClick={() => navigate("/roster")} />
+          <SideLink icon={<Swords className="size-5" />} label="WarpBuilder" onClick={() => navigate("/roster")} />
         )}
         {isAdmin && <SideLink icon={<LayoutDashboard className="size-5" />} label="Админ-панель" onClick={() => navigate("/admin")} />}
         {user && (

@@ -56,7 +56,7 @@ export default function AdminRoster() {
     <div className="px-4 py-3 pb-28 text-white sm:px-6">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Roster Builder</h1>
+          <h1 className="text-2xl font-semibold">WarpBuilder</h1>
           <p className="mt-1 text-sm text-white/50">
             Скрытый раздел. Открывается по одноразовому коду из 4 цифр.
           </p>
@@ -93,7 +93,7 @@ export default function AdminRoster() {
           className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/3 px-4 py-3 text-sm font-semibold text-white/85 active:bg-white/10"
         >
           <Swords className="size-4" />
-          Открыть Roster Builder
+          Открыть WarpBuilder
         </button>
       </div>
 
@@ -163,7 +163,7 @@ export default function AdminRoster() {
                   type="button"
                   disabled={revokeAccess.isPending}
                   onClick={async () => {
-                    if (await confirmAsk(`Закрыть доступ к Roster Builder для ${u.firstName}?`)) revokeAccess.mutate(u.userId);
+                    if (await confirmAsk(`Закрыть доступ к WarpBuilder для ${u.firstName}?`)) revokeAccess.mutate(u.userId);
                   }}
                   className="flex items-center gap-1.5 rounded-lg border border-red-400/30 px-2.5 py-1.5 text-xs font-semibold text-red-300 active:bg-red-400/10"
                 >

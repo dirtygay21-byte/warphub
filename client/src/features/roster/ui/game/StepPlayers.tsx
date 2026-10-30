@@ -154,7 +154,7 @@ function PlayerCard({ seat, game, rosters, index }: { seat: Seat; game: GameHook
                 placeholder="WH1.eyJ2Ijox…"
                 className="w-full rounded-lg border border-white/10 bg-white/[0.04] p-2.5 font-mono text-xs text-white outline-none focus:border-accent"
               />
-              <p className="mt-1 text-[11px] text-white/45">Код ростера: Roster Builder → ростер → «Экспорт» → код.</p>
+              <p className="mt-1 text-[11px] text-white/45">Код ростера: WarpBuilder → ростер → «Экспорт» → код.</p>
               <Button className="mt-1.5 w-full" disabled={!code.trim() || busy} onClick={() => void loadCode()}>
                 Загрузить ростер по коду
               </Button>

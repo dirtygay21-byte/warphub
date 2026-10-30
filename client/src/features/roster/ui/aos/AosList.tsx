@@ -41,9 +41,9 @@ export function AosList({
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-4xl lg:pt-8">
       <header className="mb-4 flex items-end justify-between gap-3">
-        <IconButton icon="back" label="Назад в WarpHub" onClick={onExit} className="mb-0.5 size-9" />
+        <IconButton icon="back" label="К играм" onClick={onExit} className="mb-0.5 size-9" />
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpHub · AoS 4-я редакция</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpBuilder · AoS 4-я редакция</p>
           <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Ростеры</h1>
         </div>
         <IconButton icon="upload" label="Импорт ростера по коду" onClick={() => setImporting(true)} />
