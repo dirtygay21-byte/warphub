@@ -23,15 +23,17 @@ export function ReservationsPagination({
   const totalPages =
     totalCount != null ? Math.max(1, Math.ceil(totalCount / pageSize)) : null;
 
+  // одна строка и на телефоне (C2): раньше полоса в две строки закрывала последние записи
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-app-bg/95 px-4 py-3 backdrop-blur-sm sm:px-6 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-      <div className="mx-auto flex max-w-screen-xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 text-sm text-fg-2">
-          <span>На странице</span>
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/[0.08] bg-app-bg/95 px-4 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:px-6">
+      <div className="mx-auto flex max-w-screen-xl items-center justify-between gap-2">
+        <label className="flex items-center gap-2 text-sm text-fg-2">
+          <span className="hidden sm:inline">На странице</span>
           <select
             value={pageSize}
             onChange={(event) => onPageSizeChange(Number(event.target.value))}
-            className="rounded-lg border border-white/10 bg-app-elevated px-2 py-1.5 text-white outline-none"
+            aria-label="Записей на странице"
+            className="h-11 rounded-xl border border-white/[0.14] bg-app-elevated px-2.5 text-fg outline-none"
           >
             {PAGE_SIZE_OPTIONS.map((size) => (
               <option key={size} value={size}>
@@ -39,36 +41,30 @@ export function ReservationsPagination({
               </option>
             ))}
           </select>
-        </div>
+        </label>
 
-        <div className="flex items-center justify-between gap-3 sm:justify-end">
-          <span className="text-sm text-fg-2">
-            {totalPages != null
-              ? `Страница ${page + 1} из ${totalPages}`
-              : `Страница ${page + 1}`}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onPageChange(page - 1)}
+            disabled={page === 0}
+            className="ds-press flex size-11 items-center justify-center rounded-xl border border-white/[0.14] bg-app-elevated text-fg disabled:opacity-40"
+            aria-label="Предыдущая страница"
+          >
+            <ChevronLeft className="size-5" />
+          </button>
+          <span className="min-w-[88px] whitespace-nowrap text-center text-sm tabular-nums text-fg-2">
+            {totalPages != null ? `${page + 1} из ${totalPages}` : `Стр. ${page + 1}`}
           </span>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => onPageChange(page - 1)}
-              disabled={page === 0}
-              className="flex ds-hit size-9 items-center justify-center rounded-lg border border-white/10 bg-white/3 text-white transition-colors active:bg-white/10 disabled:opacity-40"
-              aria-label="Предыдущая страница"
-            >
-              <ChevronLeft className="size-4" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onPageChange(page + 1)}
-              disabled={!hasNextPage || itemsCount === 0}
-              className="flex ds-hit size-9 items-center justify-center rounded-lg border border-white/10 bg-white/3 text-white transition-colors active:bg-white/10 disabled:opacity-40"
-              aria-label="Следующая страница"
-            >
-              <ChevronRight className="size-4" />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => onPageChange(page + 1)}
+            disabled={!hasNextPage || itemsCount === 0}
+            className="ds-press flex size-11 items-center justify-center rounded-xl border border-white/[0.14] bg-app-elevated text-fg disabled:opacity-40"
+            aria-label="Следующая страница"
+          >
+            <ChevronRight className="size-5" />
+          </button>
         </div>
       </div>
     </div>

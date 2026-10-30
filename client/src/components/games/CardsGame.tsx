@@ -118,7 +118,7 @@ function Pack({ state, onClick, disabled }: { state: "idle" | "shake" | "tear"; 
         style={{ animation: state === "tear" ? "pack-tear 0.45s ease-in forwards" : undefined }}
       >
         <div className="absolute inset-x-0 bottom-0 h-1.5 bg-[repeating-linear-gradient(90deg,transparent_0_5px,#0b0b0a_5px_8px)]" />
-        <p className="pt-1.5 text-center text-[9px] uppercase tracking-[0.3em] text-accent/70">тянуть здесь</p>
+        <p className="pt-1 text-center text-[12px] uppercase tracking-[0.2em] text-accent/80">тянуть здесь</p>
       </div>
     </button>
   );
@@ -439,7 +439,7 @@ export function CardCollection() {
                       <p className="text-sm font-semibold" style={{ color: RARITY_STYLE[r].color }}>
                         {have}/{total}
                       </p>
-                      <p className="text-[9px] uppercase text-fg-3">{state.rarities.find((x) => x.rarity === r)?.label}</p>
+                      <p lang="ru" className="hyphens-auto break-words text-[12px] leading-tight text-fg-3">{state.rarities.find((x) => x.rarity === r)?.label}</p>
                     </div>
                   );
                 })}
@@ -454,8 +454,8 @@ export function CardCollection() {
                     type="button"
                     onClick={() => setFilter(id)}
                     className={clsx(
-                      "shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold",
-                      filter === id ? "bg-accent text-accent-foreground" : "border border-white/10 bg-white/3 text-fg-2",
+                      "ds-press min-h-11 shrink-0 rounded-xl px-3.5 text-sm font-semibold",
+                      filter === id ? "bg-accent text-accent-foreground" : "border border-white/[0.14] bg-app-elevated text-fg-2",
                     )}
                   >
                     {label}
@@ -478,10 +478,10 @@ export function CardCollection() {
                     style={{ borderColor: `${RARITY_STYLE[card.rarity].color}55` }}
                   >
                     <span className={`text-3xl text-fg-3 ${oswald}`}>?</span>
-                    <span className="mt-1 text-[9px] uppercase" style={{ color: `${RARITY_STYLE[card.rarity].color}aa` }}>
+                    <span className="mt-1 text-[12px]" style={{ color: `${RARITY_STYLE[card.rarity].color}cc` }}>
                       {card.rarityLabel}
                     </span>
-                    <span className="text-[9px] text-fg-3">{card.factionLabel}</span>
+                    <span className="line-clamp-2 text-[12px] leading-tight text-fg-3">{card.factionLabel}</span>
                   </div>
                 );
               })}

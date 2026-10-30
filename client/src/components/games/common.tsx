@@ -11,6 +11,7 @@ import { Check, ChevronLeft, Copy, Gift, RotateCcw, Trophy } from "lucide-react"
 import { useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTelegramBack } from "@/hooks/useTelegramBack";
+import { haptic } from "@/utils/haptic";
 import { oswald, pixelButton, pluralWins, tierRangeLabel } from "./helpers";
 
 
@@ -27,16 +28,19 @@ export function GameTopBar({
   // «Назад» Telegram — туда же, куда стрелка в шапке (U1)
   useTelegramBack(() => navigate(back));
   return (
-    <div className="sticky top-0 z-20 flex h-[56px] items-center gap-2 bg-app-bg/95 px-2 backdrop-blur">
+    <div className="sticky top-0 z-20 flex h-[60px] items-center gap-3 bg-app-bg/95 px-4 backdrop-blur">
       <button
         type="button"
-        onClick={() => navigate(back)}
-        className="flex ds-hit size-10 items-center justify-center rounded-xl text-accent active:bg-white/10"
+        onClick={() => {
+          haptic.tap();
+          navigate(back);
+        }}
+        className="ds-press flex size-11 shrink-0 items-center justify-center rounded-xl border border-white/[0.14] bg-app-elevated text-fg"
         aria-label="Назад"
       >
-        <ChevronLeft className="size-6" />
+        <ChevronLeft className="size-5" />
       </button>
-      <p className={`flex-1 truncate text-lg font-medium uppercase tracking-wide text-white ${oswald}`}>
+      <p className="font-display min-w-0 flex-1 truncate text-xl font-semibold uppercase leading-none text-fg">
         {title}
       </p>
       {right}
@@ -51,7 +55,7 @@ export function GameTopBar({
  */
 export function StickyActions({ children }: { children: ReactNode }) {
   return (
-    <div className="sticky top-[56px] z-10 -mx-4 mb-3 border-b border-white/10 bg-app-bg/95 px-4 py-2.5 backdrop-blur">
+    <div className="sticky top-[60px] z-10 -mx-4 mb-3 border-b border-white/10 bg-app-bg/95 px-4 py-2.5 backdrop-blur">
       {children}
     </div>
   );
@@ -107,7 +111,7 @@ export function TierList({
           <li
             key={tier.minScore}
             className={clsx(
-              "flex items-center justify-between rounded-lg border px-3 py-2 text-xs",
+              "flex items-center justify-between rounded-lg border px-3 py-2 text-[13px]",
               reached
                 ? "border-accent/60 bg-accent/10 text-accent"
                 : "border-white/10 bg-white/3 text-fg-2",
@@ -121,6 +125,23 @@ export function TierList({
         );
       })}
     </ul>
+  );
+}
+
+/** Уровни наград одной строкой, листается пальцем (C4: в списке игр уровни не занимают 3–4 строки). */
+export function TierStrip({ game }: { game: MinigameInfo }) {
+  return (
+    <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4">
+      {game.tiers.map((tier, index) => (
+        <span
+          key={tier.minScore}
+          className="inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg border border-white/10 bg-white/[0.03] px-2.5 text-[13px] text-fg-2"
+        >
+          {tierRangeLabel(game, index)}
+          <span className="font-semibold text-fg">{tier.label}</span>
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -282,7 +303,7 @@ export function ResultPanel({
 
 export function ErrorNote({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="mx-4 rounded-xl border border-[#bf3a47]/60 bg-[#8e2430]/20 p-4 text-sm text-white">
+    <div role="alert" className="mx-4 rounded-[14px] border border-danger/50 bg-danger/10 p-4 text-sm text-fg">
       <p>{message}</p>
       {onRetry && (
         <button type="button" onClick={onRetry} className="mt-2 font-semibold text-accent underline">
