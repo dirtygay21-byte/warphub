@@ -4,17 +4,21 @@ import type { KtRoster } from '../kt/roster';
 import type { WarcryRoster } from '../warcry/roster';
 import { haptic } from '../telegram';
 import { Icon, IconButton } from './kit';
-import { cx, fmtPts } from './util';
+import { cx, fmtPts, plural } from './util';
+import { BATTLE_SIZES } from '../engine/rules';
+import { WARCRY_LIMITS } from '../warcry/roster';
 
 export type GameSystem = '40k' | 'aos' | 'kt' | 'warcry';
 
-type GameTile = { id: GameSystem; name: string; sub: string; ready: boolean };
+type GameTile = { id: GameSystem; code: string; name: string; sub: string; ready: boolean; noun: [string, string, string]; tint: string };
+// плитки игр по концепту (D4b): крупный код игры, название, счёт ростеров; у каждой игры свой оттенок
 const GAMES: GameTile[] = [
-  { id: '40k', name: 'Warhammer 40,000', sub: '11-я редакция', ready: true },
-  { id: 'aos', name: 'Age of Sigmar', sub: '4-я редакция · GH 2026-27', ready: true },
-  { id: 'kt', name: 'Kill Team', sub: 'редакция 2024 · KTDash', ready: true },
-  { id: 'warcry', name: 'Warcry', sub: 'Matched Play · warcry_data', ready: true },
+  { id: '40k', code: '40K', name: 'Warhammer 40,000', sub: '11-я редакция', ready: true, noun: ['ростер', 'ростера', 'ростеров'], tint: 'from-[#26281A]' },
+  { id: 'aos', code: 'AoS', name: 'Age of Sigmar', sub: '4-я редакция · GH 2026-27', ready: true, noun: ['ростер', 'ростера', 'ростеров'], tint: 'from-[#1D2626]' },
+  { id: 'kt', code: 'KT', name: 'Kill Team', sub: 'редакция 2024', ready: true, noun: ['команда', 'команды', 'команд'], tint: 'from-[#26201D]' },
+  { id: 'warcry', code: 'WC', name: 'Warcry', sub: 'Matched Play', ready: true, noun: ['варбанда', 'варбанды', 'варбанд'], tint: 'from-[#241D26]' },
 ];
+const CODE: Record<GameSystem, string> = { '40k': '40K', aos: 'AoS', kt: 'KT', warcry: 'WC' };
 
 /**
  * WarpBuilder (30.10.2026, бывший Roster Builder): одно меню на все игры — плитки игр со счётом ростеров и последние
@@ -41,62 +45,76 @@ export function Home({
 }) {
   const count = (g: GameTile['id']) => (g === '40k' ? rosters.length : g === 'aos' ? aosRosters.length : g === 'kt' ? ktRosters.length : wcRosters.length);
   const recent = [
-    ...rosters.map((r) => ({ g: '40k' as const, id: r.id, name: r.name, pts: r.summary?.points, at: r.updatedAt, sub: 'Warhammer 40,000' })),
-    ...ktRosters.map((r) => ({ g: 'kt' as const, id: r.id, name: r.name, pts: undefined as number | undefined, at: r.updatedAt, sub: `Kill Team · оперативников: ${r.operatives.length}` })),
-    ...wcRosters.map((r) => ({ g: 'warcry' as const, id: r.id, name: r.name, pts: r.summary?.points, at: r.updatedAt, sub: `Warcry · бойцов: ${r.fighters.length}` })),
-    ...aosRosters.map((r) => ({ g: 'aos' as const, id: r.id, name: r.name, pts: r.summary?.points, at: r.updatedAt, sub: aosIndex?.factions.find((f) => f.id === r.factionId)?.name ?? 'Age of Sigmar' })),
+    ...rosters.map((r) => ({ g: '40k' as const, id: r.id, name: r.name, pts: r.summary?.points, limit: BATTLE_SIZES[r.battleSize]?.points as number | undefined, draft: false, at: r.updatedAt, sub: `Warhammer 40,000 · ${BATTLE_SIZES[r.battleSize]?.label ?? ''}` })),
+    ...ktRosters.map((r) => ({ g: 'kt' as const, id: r.id, name: r.name, pts: undefined as number | undefined, limit: undefined as number | undefined, draft: r.operatives.length === 0, at: r.updatedAt, sub: r.operatives.length ? `Kill Team · ${r.operatives.length} ${plural(r.operatives.length, ['оперативник', 'оперативника', 'оперативников'])}` : 'Пусто — добавьте оперативников' })),
+    ...wcRosters.map((r) => ({ g: 'warcry' as const, id: r.id, name: r.name, pts: r.summary?.points, limit: WARCRY_LIMITS.points as number | undefined, draft: false, at: r.updatedAt, sub: `Warcry · ${r.fighters.length} ${plural(r.fighters.length, ['боец', 'бойца', 'бойцов'])}` })),
+    ...aosRosters.map((r) => ({ g: 'aos' as const, id: r.id, name: r.name, pts: r.summary?.points, limit: r.pointsLimit as number | undefined, draft: false, at: r.updatedAt, sub: aosIndex?.factions.find((f) => f.id === r.factionId)?.name ?? 'Age of Sigmar' })),
   ]
     .sort((a, b) => b.at - a.at)
     .slice(0, 5);
   return (
-    <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-4xl lg:pt-8">
+    <div className="ds-enter mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 text-fg lg:max-w-4xl lg:pt-8">
       <header className="mb-5 flex items-end gap-3">
-        <IconButton icon="back" label="Назад в WarpHub" onClick={onExit} className="mb-0.5 size-9" />
+        <IconButton icon="back" label="Назад в WarpHub" onClick={onExit} className="mb-0.5" />
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpHub</p>
-          <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">WarpBuilder</h1>
+          <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">Ростеры и игры</p>
+          <h1 className="font-display mt-1 text-[32px] font-semibold uppercase leading-none">WarpBuilder</h1>
         </div>
       </header>
-      <p className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Игры</p>
       <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
-        {GAMES.map((g) => (
-          <button
-            key={g.id}
-            type="button"
-            disabled={!g.ready}
-            onClick={() => g.ready && (haptic.tap(), onGame(g.id))}
-            className={cx(
-              'flex min-h-28 flex-col justify-between rounded-2xl border p-3.5 text-left transition',
-              g.ready ? 'border-white/10 bg-white/[0.04] active:bg-white/10' : 'border-white/5 bg-white/[0.02] opacity-50',
-            )}
-          >
-            <span className="font-display block text-lg font-semibold uppercase leading-tight">{g.name}</span>
-            <span className="mt-2 flex items-end justify-between gap-2">
-              <span className="text-[12px] text-fg-3">{g.sub}</span>
-              {g.ready && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[12px] font-semibold text-accent">{count(g.id)}</span>}
-            </span>
-          </button>
-        ))}
+        {GAMES.map((g, i) => {
+          const n = count(g.id);
+          return (
+            <button
+              key={g.id}
+              type="button"
+              disabled={!g.ready}
+              onClick={() => g.ready && (haptic.tap(), onGame(g.id))}
+              className={cx(
+                'flex h-32 flex-col justify-between rounded-[18px] border bg-gradient-to-br to-[#1A1A18] to-70% p-3.5 text-left',
+                g.tint,
+                g.ready ? 'ds-press' : 'opacity-50',
+                i === 0 ? 'border-accent/[0.18]' : 'border-white/10',
+              )}
+            >
+              <span className="font-display text-[26px] font-bold leading-none text-accent">{g.code}</span>
+              <span className="flex flex-col gap-0.5">
+                <span className="text-base font-semibold leading-tight">{g.name}</span>
+                <span className="text-[13px] text-fg-2">{n === 0 ? 'Пока пусто' : `${n} ${plural(n, g.noun)}`}</span>
+              </span>
+            </button>
+          );
+        })}
       </div>
-      <p className="mb-2 mt-6 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Последние ростеры</p>
+      <p className="mb-2.5 mt-6 text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">Недавние</p>
       {!recent.length ? (
-        <p className="text-sm text-fg-3">Ростеров пока нет — выберите игру и соберите первую армию.</p>
+        <p className="text-sm text-fg-2">Ростеров пока нет — выберите игру и соберите первую армию.</p>
       ) : (
-        <ul className="space-y-2">
-          {recent.map((r) => (
-            <li key={r.g + r.id}>
-              <button type="button" onClick={() => (haptic.tap(), onOpen(r.g, r.id))} className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-3 text-left active:bg-white/10">
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold">{r.name}</span>
-                  <span className="block truncate text-[12px] text-fg-3">
-                    {r.g === '40k' ? '40K · ' : r.g === 'aos' ? 'AoS · ' : ''}{r.sub}
-                    {r.pts != null ? ` · ${fmtPts(r.pts)} очк.` : ''}
+        <ul className="space-y-2.5">
+          {recent.map((r) => {
+            const over = r.pts != null && r.limit != null && r.pts > r.limit;
+            return (
+              <li key={r.g + r.id}>
+                <button type="button" onClick={() => (haptic.tap(), onOpen(r.g, r.id))} className="ds-press flex min-h-16 w-full items-center gap-3 rounded-2xl border border-white/[0.08] bg-app-elevated px-3.5 py-3 text-left">
+                  <span className="font-display flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-accent/[0.12] text-sm font-bold text-accent">{CODE[r.g]}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-base font-semibold">{r.name}</span>
+                    <span className="block truncate text-sm text-fg-2">{r.sub}</span>
                   </span>
-                </span>
-                <Icon name="chevron" className="size-4 text-fg-3" />
-              </button>
-            </li>
-          ))}
+                  {r.draft ? (
+                    <span className="inline-flex h-7 shrink-0 items-center whitespace-nowrap rounded-lg bg-warn/15 px-2.5 text-[12px] font-semibold text-warn">Черновик</span>
+                  ) : r.pts != null ? (
+                    <span className="flex shrink-0 flex-col items-end">
+                      <span className={cx('text-base font-bold tabular-nums', over ? 'text-danger' : 'text-fg')}>{fmtPts(r.pts)}</span>
+                      {r.limit != null && <span className="whitespace-nowrap text-[12px] text-fg-3">из {fmtPts(r.limit)}</span>}
+                    </span>
+                  ) : (
+                    <Icon name="chevron" className="size-4 shrink-0 text-fg-3" />
+                  )}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
