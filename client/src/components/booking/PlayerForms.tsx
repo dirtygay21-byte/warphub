@@ -2,6 +2,7 @@ import type { BookingOptions } from "@/apiUtils/booking";
 import type { PaintingFormValue, PlayerFormValue } from "./formValues";
 import clsx from "clsx";
 import { useState } from "react";
+import { RosterPick } from "./RosterPick";
 import {
   ChoiceChips,
   Field,
@@ -81,7 +82,7 @@ export function FactionInput({
 }
 
 /**
- * Игра (40K / AoS / Kill Team), армия или команда, очки (кроме Kill Team), опыт — одна форма для игры и тренировок
+ * Игра (40K / AoS / Kill Team / Warcry), армия, команда или варбанда, очки (кроме Kill Team), опыт — одна форма для игры и тренировок
  * Warhammer. lockedGame — игра задана (присоединение к столу: как у первого игрока; правка записи — прежняя).
  */
 export function PlayerInfoForm({
@@ -100,7 +101,10 @@ export function PlayerInfoForm({
   const set = (patch: Partial<PlayerFormValue>) =>
     onChange({ ...value, ...patch });
   const kt = value.game === "kt";
-  const list = value.game === "aos" ? options.aosFactions : kt ? options.killTeams : options.factions;
+  const wc = value.game === "warcry";
+  const list = value.game === "aos" ? options.aosFactions : kt ? options.killTeams : wc ? options.warcryFactions : options.factions;
+  // ростер из WarpBuilder: новое значение армии — пересоздать поле выбора (фракции может не быть в списке)
+  const [picked, setPicked] = useState(0);
   // Kill Team: команды по фракциям — «Imperium · Space Marines»
   const groups = kt
     ? options.killTeamGroups.flatMap((g) =>
@@ -125,7 +129,7 @@ export function PlayerInfoForm({
           </div>
         ) : (
           <ChoiceChips
-            columns={3}
+            columns={2}
             options={options.games}
             value={value.game}
             onChange={(game) =>
@@ -136,14 +140,23 @@ export function PlayerInfoForm({
         )}
       </Field>
 
-      <Field label={kt ? "Команда (kill team)" : "Армия"}>
+      <RosterPick
+        key={value.game}
+        game={value.game}
+        onPick={(r) => {
+          setPicked((n) => n + 1);
+          set({ army: r.army.slice(0, 80), ...(r.points != null && !kt ? { points: String(r.points) } : {}) });
+        }}
+      />
+
+      <Field label={kt ? "Команда (kill team)" : wc ? "Варбанда (фракция)" : "Армия"}>
         <FactionInput
-          key={value.game}
+          key={`${value.game}-${picked}`}
           factions={list}
           groups={groups}
           value={value.army}
           onChange={(army) => set({ army })}
-          placeholder={kt ? "Выберите команду" : "Выберите армию"}
+          placeholder={kt ? "Выберите команду" : wc ? "Выберите фракцию" : "Выберите армию"}
         />
       </Field>
 

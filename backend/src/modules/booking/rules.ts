@@ -488,7 +488,7 @@ export function validateDetails(
 
   if (kind === 'wh_player') {
     const game = data.game === undefined || data.game === null ? '40k' : data.game;
-    if (!isWhGame(game)) throw new DetailsValidationError('game must be 40k, aos or kt');
+    if (!isWhGame(game)) throw new DetailsValidationError('game must be 40k, aos, kt or warcry');
     // у Kill Team нет лимита очков — поле не нужно и не сохраняется
     let points: number | null = null;
     if (game !== 'kt') {

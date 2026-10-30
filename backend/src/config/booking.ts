@@ -90,6 +90,8 @@ export const bookingOptions = {
     { value: '40k', label: 'Warhammer 40,000' },
     { value: 'aos', label: 'Age of Sigmar' },
     { value: 'kt', label: 'Kill Team' },
+    // Warcry (W6 30.10.2026): варбанды — из данных WarpBuilder (roster-data/warcry)
+    { value: 'warcry', label: 'Warcry' },
   ],
   /**
    * Команды Kill Team (3-я редакция) для поля «Команда» — по фракциям, как в меню Wahapedia (решение владельца, 29.10.2026).
@@ -173,6 +175,7 @@ export const killTeams: string[] = bookingOptions.killTeamGroups.flatMap((g) => 
 
 /** «Армия: Orks» / «Команда: Pathfinders (T'au Empire)» — строка уведомления (без HTML-экранирования). */
 export function armyLine(game: string | null | undefined, army: string): string {
+  if (game === 'warcry') return `Варбанда: ${army}`;
   if (game !== 'kt') return `Армия: ${army}`;
   const f = killTeamFaction(army);
   return `Команда: ${army}${f ? ` (${f})` : ''}`;

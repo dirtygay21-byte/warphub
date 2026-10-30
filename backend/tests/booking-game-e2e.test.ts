@@ -73,7 +73,7 @@ describe('игра в записи на Warhammer', () => {
   test('справочник: игры, фракции AoS из данных, команды Kill Team', async () => {
     const r = await api('GET', '/booking-options');
     expect(r.status).toBe(200);
-    expect(r.json.games.map((g: { value: string }) => g.value)).toEqual(['40k', 'aos', 'kt']);
+    expect(r.json.games.map((g: { value: string }) => g.value)).toEqual(['40k', 'aos', 'kt', 'warcry']);
     expect(r.json.killTeams).toContain('Pathfinders');
     expect(Array.isArray(r.json.aosFactions)).toBe(true);
   });

@@ -283,6 +283,15 @@ describe('details validation', () => {
       experienceLevel: 'beginner',
     });
     expect(validateDetails('wh_player', { game: 'kt', army: 'Kasrkin', experienceLevel: 'player' })).toMatchObject({ points: null });
+    // Warcry (W6): очки нужны, как у 40K и AoS
+    expect(validateDetails('wh_player', { game: 'warcry', army: 'Skaven', points: 1000, experienceLevel: 'player' })).toEqual({
+      kind: 'wh_player',
+      game: 'warcry',
+      army: 'Skaven',
+      points: 1000,
+      experienceLevel: 'player',
+    });
+    expect(() => validateDetails('wh_player', { game: 'warcry', army: 'Skaven', experienceLevel: 'player' })).toThrow(DetailsValidationError);
     expect(() => validateDetails('wh_player', { game: 'aos', army: 'Seraphon', experienceLevel: 'player' })).toThrow(DetailsValidationError);
     expect(() => validateDetails('wh_player', { game: 'necromunda', army: 'X', points: 100, experienceLevel: 'player' })).toThrow(DetailsValidationError);
   });
@@ -359,5 +368,6 @@ describe('Kill Team: список команд по фракциям (Wahapedia)
     expect(killTeamFaction('Своя команда')).toBeNull();
     expect(armyLine('kt', 'Своя команда')).toBe('Команда: Своя команда');
     expect(armyLine('40k', 'Orks')).toBe('Армия: Orks');
+    expect(armyLine('warcry', 'Skaven')).toBe('Варбанда: Skaven');
   });
 });
