@@ -1,7 +1,9 @@
 /**
  * Обучение «Как играть» (задача 2, 30.10.2026): короткие карточки для новичков по играм с ростер-билдером.
  * Текст — пересказ своими словами; рисунки — оригинальные схемы (diagrams.tsx, ключ `diagram`).
- * 40K — по клубным памяткам (WH40K_pamyatki_A5.pdf от владельца). AoS, Kill Team, Warcry — пока «скоро».
+ * 40K — по клубным памяткам (WH40K_pamyatki_A5.pdf от владельца).
+ * AoS — по Core Rules AoS 4 (Wahapedia, The Core Rules) и Quick Start Guide GW (4 CP, underdog, Rally).
+ * Kill Team, Warcry — пока «скоро».
  * Разметка в пунктах: **жирный** — термин.
  */
 
@@ -15,7 +17,17 @@ export type TutorialDiagram =
   | "attack"
   | "charge"
   | "fight"
-  | "ready";
+  | "ready"
+  | "aosRound"
+  | "aosPhases"
+  | "aosWarscroll"
+  | "aosCommand"
+  | "aosMove"
+  | "aosShoot"
+  | "aosCharge"
+  | "aosFight"
+  | "aosAttack"
+  | "aosObjective";
 
 export type TutorialStep = {
   title: string;
@@ -159,11 +171,134 @@ const WH40K: TutorialGame = {
   ],
 };
 
-export const TUTORIAL_GAMES: TutorialGame[] = [WH40K];
+const AOS: TutorialGame = {
+  id: "aos",
+  code: "AoS",
+  title: "Age of Sigmar",
+  source: "Пересказ Core Rules Warhammer Age of Sigmar, 4-я редакция (Wahapedia) и Quick Start Guide Games Workshop.",
+  steps: [
+    {
+      title: "Раунд битвы",
+      en: "Battle Round",
+      diagram: "aosRound",
+      points: [
+        "В раунде два хода: сначала ходит один игрок, затем другой.",
+        "Со 2-го раунда игроки бросают кубик приоритета (priority roll). Победитель решает, кто ходит первым.",
+        "В 1-м раунде решает тот, кто первым закончил расстановку.",
+      ],
+      note: "При ничьей решает тот, кто ходил первым в прошлом раунде.",
+    },
+    {
+      title: "Фазы хода",
+      en: "Turn Phases",
+      diagram: "aosPhases",
+      points: [
+        "Ход — 7 фаз по порядку.",
+        "В каждой фазе сначала действует активный игрок, затем соперник.",
+        "Юнит использует не больше одной базовой (Core) способности за фазу.",
+      ],
+    },
+    {
+      title: "Варскролл",
+      en: "Warscroll",
+      diagram: "aosWarscroll",
+      points: [
+        "**Move** — на сколько дюймов ходит модель.",
+        "**Health** — сколько урона выдерживает одна модель.",
+        "**Save** — спасбросок (меньше — лучше), **Control** — вес модели на объекте.",
+      ],
+    },
+    {
+      title: "Очки команд",
+      en: "Command Points",
+      diagram: "aosCommand",
+      points: [
+        "В начале раунда каждый игрок получает 4 CP. Отстающий по очкам (underdog) — 5.",
+        "CP тратят на команды, например **Rally** в фазе героев.",
+        "Rally: 6 кубиков, каждая 4+ — очко сбора. Очки лечат юнит или возвращают погибшие модели.",
+      ],
+      note: "Неиспользованные CP сгорают в конце раунда.",
+    },
+    {
+      title: "Фаза движения",
+      en: "Movement Phase",
+      phase: 3,
+      diagram: "aosMove",
+      points: [
+        "**Обычный ход** (Normal Move) — до Move дюймов.",
+        "**Бег** (Run) — Move + D6″.",
+        "**Отступление** (Retreat) — выйти из боя: юнит получает D3 смертельного урона.",
+      ],
+      note: "В зону боя врага (3″) обычным ходом и бегом заходить нельзя. После бега и отступления — без стрельбы и нападения.",
+    },
+    {
+      title: "Фаза стрельбы",
+      en: "Shooting Phase",
+      phase: 4,
+      diagram: "aosShoot",
+      points: [
+        "Цель должна быть видна и в пределах дальности оружия (Range).",
+        "Атаки юнита можно разделить между несколькими целями.",
+      ],
+      note: "Юнит в бою не стреляет, если у оружия нет Shoot in Combat.",
+    },
+    {
+      title: "Фаза нападения",
+      en: "Charge Phase",
+      phase: 5,
+      diagram: "aosCharge",
+      points: [
+        "Юнит не в бою и без бега или отступления бросает 2D6.",
+        "Двигается не дальше выпавшего и заканчивает в пределах ½″ от видимого врага.",
+        "Напавший юнит может бить в фазе боя.",
+      ],
+    },
+    {
+      title: "Фаза боя",
+      en: "Combat Phase",
+      phase: 6,
+      diagram: "aosFight",
+      points: [
+        "Игроки по очереди выбирают юнит для удара, начиная с активного игрока.",
+        "Перед атаками — **подход** (pile-in) до 3″, не дальше от цели.",
+        "Юнит в бою обязан сражаться, если может.",
+      ],
+    },
+    {
+      title: "Атака",
+      en: "Attack Sequence",
+      diagram: "aosAttack",
+      points: [
+        "**Попадание**: D6 ≥ Hit. **Ранение**: D6 ≥ Wound.",
+        "**Спасбросок**: защитник бросает D6 и вычитает Rend. Не меньше Save — атака отражена.",
+        "Иначе цель получает урон, равный Damage.",
+      ],
+      note: "Единица — всегда провал. Шестёрка на попадание — критическое (Crit): срабатывают способности оружия.",
+    },
+    {
+      title: "Объекты",
+      en: "Objectives",
+      diagram: "aosObjective",
+      points: [
+        "Модель борется за объект, если он в её зоне боя (3″).",
+        "Сложите Control своих моделей у объекта. У кого больше — тот контролирует.",
+        "Контроль проверяют в конце каждого хода; объект ваш, пока его не заберут.",
+      ],
+      note: "Победные очки за объекты и задания — по правилам выбранного батлплана.",
+    },
+    {
+      title: "Готов к игре",
+      en: "Next Steps",
+      diagram: "ready",
+      points: ["Вы знаете весь ход — остальное придёт в первой партии.", "Варскроллы и способности — в WarpBuilder."],
+    },
+  ],
+};
+
+export const TUTORIAL_GAMES: TutorialGame[] = [WH40K, AOS];
 
 /** Игры, для которых обучение ещё пишется (показываются как «скоро»). */
 export const TUTORIAL_SOON: { code: string; title: string }[] = [
-  { code: "AoS", title: "Age of Sigmar" },
   { code: "KT", title: "Kill Team" },
   { code: "WC", title: "Warcry" },
 ];

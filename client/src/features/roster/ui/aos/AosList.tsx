@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AOS_CODE_PREFIX, decodeAosRoster, duplicateAosRoster, newAosRoster } from '../../aos/roster';
 import { AOS_RULES, POINTS_LIMIT_LABEL } from '../../aos/rules';
 import type { AosIndex, AosPointsLimit, AosRoster } from '../../aos/types';
@@ -34,6 +35,7 @@ export function AosList({
   onDuplicate: (r: AosRoster) => void;
   onDelete: (id: string) => void;
 }) {
+  const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
   const [menu, setMenu] = useState<AosRoster | null>(null);
@@ -49,6 +51,9 @@ export function AosList({
         <ToolTile icon="map" title="Test Army" sub="Расстановка на карте батлплана" onClick={onTestArmy} />
         <ToolTile icon="book" title="Правила" sub="Core Rules · Wahapedia" onClick={() => openExternal('https://wahapedia.ru/aos4/the-rules/the-core-rules/')} />
         <ToolTile icon="shield" title="Сезон" sub="General’s Handbook 2026-27" onClick={() => openExternal('https://wahapedia.ru/aos4/the-rules/general-s-handbook-2026-27/')} />
+        <div className="col-span-2">
+          <ToolTile icon="spark" title="Как играть" sub="Обучение для новичков: ход, бой, объекты" onClick={() => navigate('/learn/aos')} />
+        </div>
       </div>
 
       {rosters.length === 0 ? (
