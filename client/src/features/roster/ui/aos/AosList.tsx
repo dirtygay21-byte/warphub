@@ -4,9 +4,9 @@ import { AOS_RULES, POINTS_LIMIT_LABEL } from '../../aos/rules';
 import type { AosIndex, AosPointsLimit, AosRoster } from '../../aos/types';
 import { cloudEnabled } from '../../storage';
 import { confirmAsk, haptic, openExternal } from '../../telegram';
-import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
+import { Button, Empty, Field, Icon, Segmented, Sheet, Tag } from '../kit';
 import { cx } from '../util';
-import { RosterCard, ToolTile } from '../common/BuilderKit';
+import { ListHeader, RosterCard, ToolTile } from '../common/BuilderKit';
 
 const ALLIANCE_RU: Record<string, string> = { ORDER: 'Порядок', CHAOS: 'Хаос', DEATH: 'Смерть', DESTRUCTION: 'Разрушение' };
 
@@ -41,14 +41,7 @@ export function AosList({
 
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-4xl lg:pt-8">
-      <header className="mb-4 flex items-end justify-between gap-3">
-        <IconButton icon="back" label="К играм" onClick={onExit} className="mb-0.5 size-9" />
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpBuilder · AoS 4-я редакция</p>
-          <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Ростеры</h1>
-        </div>
-        <IconButton icon="upload" label="Импорт ростера по коду" onClick={() => setImporting(true)} />
-      </header>
+      <ListHeader kicker="WarpBuilder · AoS 4-я редакция" title="Age of Sigmar" onBack={onExit} onImport={() => setImporting(true)} />
       {switcher}
 
       <div className="mb-5 grid grid-cols-2 gap-2">

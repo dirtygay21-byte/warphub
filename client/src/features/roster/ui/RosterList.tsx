@@ -4,7 +4,8 @@ import { decodeRoster, duplicateRoster, newRoster } from '../engine/roster';
 import type { BattleSize, DataIndex, Roster } from '../engine/types';
 import { cloudEnabled } from '../storage';
 import { confirmAsk, haptic } from '../telegram';
-import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag } from './kit';
+import { Button, Empty, Field, Icon, Segmented, Sheet, Tag } from './kit';
+import { ListHeader, ToolTile } from './common/BuilderKit';
 import { cx, fmtPts } from './util';
 import { indexCredit, indexCreditDetails } from '../engine/source';
 
@@ -43,14 +44,7 @@ export function RosterList({
 
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-4xl lg:pt-8">
-      <header className="mb-4 flex items-end justify-between gap-3">
-        <IconButton icon="back" label="К играм" onClick={onExit} className="mb-0.5 size-9" />
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpBuilder · 40K 11-я редакция</p>
-          <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Ростеры</h1>
-        </div>
-        <IconButton icon="upload" label="Импорт ростера по коду" onClick={() => setImporting(true)} />
-      </header>
+      <ListHeader kicker="WarpBuilder · 40K 11-я редакция" title="Warhammer 40,000" onBack={onExit} onImport={() => setImporting(true)} />
       {switcher}
 
       <div className="mb-5 grid grid-cols-2 gap-2">
@@ -282,23 +276,5 @@ function ImportSheet({ open, onClose, onImport, factions }: { open: boolean; onC
       />
       {err && <p className="mt-2 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{err}</p>}
     </Sheet>
-  );
-}
-
-function ToolTile({ icon, title, sub, onClick }: { icon: string; title: string; sub: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={() => (haptic.tap(), onClick())}
-      className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 text-left transition active:bg-white/10"
-    >
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent">
-        <Icon name={icon} />
-      </span>
-      <span className="min-w-0">
-        <span className="font-display block text-base font-semibold uppercase leading-none">{title}</span>
-        <span className="mt-1 block truncate text-[12px] text-fg-3">{sub}</span>
-      </span>
-    </button>
   );
 }
