@@ -14,7 +14,8 @@ const err = (input: unknown) => {
 
 describe('бронь стола: проверка ввода', () => {
   test('корректная бронь', () => {
-    const h = validateHoldInput({ ...base, description: '  финал  ', dndGameId: null }, now);
+    const h = validateHoldInput({ ...base, description: '  финал  ', reservedBy: ' Мастер Иван ', dndGameId: null }, now);
+    expect(h.reservedBy).toBe('Мастер Иван');
     expect(h.tableId).toBe(3);
     expect(h.purpose).toBe('tournament');
     expect(h.description).toBe('финал');
@@ -26,6 +27,7 @@ describe('бронь стола: проверка ввода', () => {
     expect(err({ ...base, title: '  ' })).toContain('название');
     expect(err({ ...base, purpose: 'party' })).toContain('цель');
     expect(err({ ...base, tableId: 0 })).toContain('стол');
+    expect(err({ ...base, reservedBy: 'x'.repeat(101) })).toContain('Кто бронирует');
   });
   test('в пределах одной смены: 12:00 — 10:00 следующего дня', () => {
     expect(err({ ...base, startsAt: '2026-11-07T11:00:00+05:00' })).toContain('смены');

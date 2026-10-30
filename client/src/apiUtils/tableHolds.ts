@@ -5,8 +5,8 @@ export type HoldPurpose = "tournament" | "club_event" | "private_game" | "dnd" |
 
 export const HOLD_PURPOSE_LABELS: Record<HoldPurpose, string> = {
   tournament: "Турнирная игра",
-  club_event: "Внутреннее мероприятие клуба",
-  private_game: "Закрытая игра",
+  club_event: "Мероприятие клуба",
+  private_game: "Внутренняя игра",
   dnd: "Игра D&D",
   other: "Другое мероприятие",
 };
@@ -20,7 +20,11 @@ export type TableHold = {
   purpose: HoldPurpose;
   title: string;
   description: string | null;
+  /** кто бронирует (вписано администратором) */
+  reservedBy: string | null;
   dndGameId: number | null;
+  /** кто создал бронь в приложении */
+  createdBy: { telegramId: number; name: string | null; username: string | null };
   createdAt: string;
 };
 
@@ -31,6 +35,7 @@ export type TableHoldPayload = {
   purpose: HoldPurpose;
   title: string;
   description: string | null;
+  reservedBy: string | null;
   dndGameId: number | null;
 };
 

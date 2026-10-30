@@ -21,6 +21,8 @@ export const tableHoldsTable = pgTable(
     purpose: varchar('purpose', { length: 20 }).notNull(),
     title: varchar('title', { length: 120 }).notNull(),
     description: text('description'),
+    /** кто бронирует: мастер D&D, организатор турнира и т. п. (30.10.2026) */
+    reservedBy: varchar('reserved_by', { length: 100 }),
     dndGameId: integer('dnd_game_id').references(() => dndGamesTable.id, { onDelete: 'set null' }),
     createdByTelegramId: bigint('created_by_telegram_id', { mode: 'number' }).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),

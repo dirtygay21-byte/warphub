@@ -4,6 +4,7 @@ import { ChoiceChips, Field, inputClassName } from "@/components/booking/FormCon
 import { DsButton } from "@/components/ui/ds";
 import { clubDateKeyOf, clubIso, dateKeyOf, formatClubTime, formatClubTimeRange, getClubToday } from "@/utils/clubTime";
 import { haptic } from "@/utils/haptic";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { LoaderCircle, X } from "lucide-react";
@@ -14,7 +15,7 @@ const MINUTE = 60_000;
 const SHIFT_MINUTES = 22 * 60;
 const STEP = 30;
 
-const PURPOSES: HoldPurpose[] = ["tournament", "club_event", "private_game", "dnd", "other"];
+const PURPOSES: HoldPurpose[] = ["dnd", "tournament", "private_game", "club_event", "other"];
 
 export type TableHoldPrefill = {
   dateKey?: string;
@@ -23,6 +24,7 @@ export type TableHoldPrefill = {
   purpose?: HoldPurpose;
   title?: string;
   description?: string | null;
+  reservedBy?: string | null;
   dndGameId?: number | null;
 };
 
@@ -47,6 +49,11 @@ export default function TableHoldSheet({ prefill, onClose }: { prefill?: TableHo
   const [purpose, setPurpose] = useState<HoldPurpose>(prefill?.purpose ?? "tournament");
   const [title, setTitle] = useState(prefill?.title ?? "");
   const [description, setDescription] = useState(prefill?.description ?? "");
+  // «Кто бронирует»: по умолчанию — администратор, который создаёт бронь; можно вписать мастера или организатора
+  const user = useAuthStore((state) => state.user);
+  const [reservedBy, setReservedBy] = useState(
+    prefill?.reservedBy ?? ([user?.firstName, user?.lastName].filter(Boolean).join(" ") || (user?.username ? `@${user.username}` : "")),
+  );
   const [showErrors, setShowErrors] = useState(false);
 
   useEffect(() => {
@@ -82,6 +89,7 @@ export default function TableHoldSheet({ prefill, onClose }: { prefill?: TableHo
         purpose,
         title: title.trim(),
         description: description.trim() || null,
+        reservedBy: reservedBy.trim() || null,
         dndGameId: prefill?.dndGameId ?? null,
       }),
     onSuccess: () => {
@@ -171,6 +179,10 @@ export default function TableHoldSheet({ prefill, onClose }: { prefill?: TableHo
 
           <Field label="Название">
             <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={120} placeholder="Например: Турнир Kill Team, финал" className={inputClassName} />
+          </Field>
+
+          <Field label="Кто бронирует" hint="Мастер D&D, организатор турнира или вы сами.">
+            <input value={reservedBy} onChange={(event) => setReservedBy(event.target.value)} maxLength={100} placeholder="Имя" className={inputClassName} />
           </Field>
 
           <Field label="Описание" hint="Необязательно. Видно только администраторам.">
