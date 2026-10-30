@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { loadAosIndex, loadIndex } from '../data';
-import { loadAosRosters, loadRosters, markAosDeleted, markDeleted, saveAosLocal, saveAosRosters, saveLocal, saveRosters } from '../storage';
+import { loadAosIndex, loadIndex, loadKtIndex } from '../data';
+import { loadAosRosters, loadKtRosters, loadRosters, markAosDeleted, markDeleted, markKtDeleted, saveAosLocal, saveAosRosters, saveKtLocal, saveKtRosters, saveLocal, saveRosters } from '../storage';
 import { closeTopOverlay, tg } from '../telegram';
 import type { DataIndex, Roster } from '../engine/types';
 import type { AosIndex, AosRoster } from '../aos/types';
+import type { KtIndex } from '../kt/types';
+import type { KtRoster } from '../kt/roster';
+import { KtList } from './kt/KtList';
+import { KtEditor } from './kt/KtEditor';
 import { RosterList } from './RosterList';
 import { AosList } from './aos/AosList';
 import { AosEditor } from './aos/AosEditor';
@@ -21,6 +25,7 @@ type Route =
   | { screen: 'list' }
   | { screen: 'editor'; id: string }
   | { screen: 'aos-editor'; id: string }
+  | { screen: 'kt-editor'; id: string }
   | { screen: 'rules'; back: Route; factionId?: string; detachmentIds?: string[] }
   | { screen: 'battlefield'; back: Route; disposition?: string | null }
   | { screen: 'game'; back: Route; rosterId?: string }
@@ -31,7 +36,8 @@ type Route =
 const SYSTEM_KEY = 'warphub.roster.system';
 const readSystem = (): GameSystem => {
   try {
-    return localStorage.getItem(SYSTEM_KEY) === 'aos' ? 'aos' : '40k';
+    const v = localStorage.getItem(SYSTEM_KEY);
+    return v === 'aos' || v === 'kt' ? v : '40k';
   } catch {
     return '40k';
   }
@@ -77,6 +83,8 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   const [system, setSystemState] = useState<GameSystem>(readSystem);
   const [index, setIndex] = useState<DataIndex | null>(null);
   const [aosIndex, setAosIndex] = useState<AosIndex | null>(null);
+  const [ktIndex, setKtIndex] = useState<KtIndex | null>(null);
+  const [ktRosters, setKtRosters] = useState<KtRoster[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [rosters, setRosters] = useState<Roster[] | null>(null);
   const [aosRosters, setAosRosters] = useState<AosRoster[] | null>(null);
@@ -95,15 +103,18 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     if (system === '40k') loadIndex().then(setIndex, (e) => setError(String(e.message ?? e)));
-    else loadAosIndex().then(setAosIndex, (e) => setError(String(e.message ?? e)));
+    else if (system === 'aos') loadAosIndex().then(setAosIndex, (e) => setError(String(e.message ?? e)));
+    else loadKtIndex().then(setKtIndex, (e) => setError(String(e.message ?? e)));
   }, [attempt, system]);
   useEffect(() => {
     loadRosters().then(setRosters, () => setRosters([]));
     loadAosRosters().then(setAosRosters, () => setAosRosters([]));
+    loadKtRosters().then(setKtRosters, () => setKtRosters([]));
   }, []);
 
   const persist = usePersist<Roster>(saveLocal, saveRosters);
   const persistAos = usePersist<AosRoster>(saveAosLocal, saveAosRosters);
+  const persistKt = usePersist<KtRoster>(saveKtLocal, saveKtRosters);
 
   const update = useCallback(
     (fn: (list: Roster[]) => Roster[]) => {
@@ -126,6 +137,17 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
     },
     [persistAos],
   );
+  const updateKt = useCallback(
+    (fn: (list: KtRoster[]) => KtRoster[]) => {
+      setKtRosters((prev) => {
+        const next = fn(prev ?? []);
+        persistKt(next);
+        return next;
+      });
+    },
+    [persistKt],
+  );
+  const onKtChange = useCallback((r: KtRoster) => updateKt((list) => list.map((x) => (x.id === r.id ? r : x))), [updateKt]);
   const onAosChange = useCallback((r: AosRoster) => updateAos((list) => list.map((x) => (x.id === r.id ? r : x))), [updateAos]);
 
   const goList = useCallback(() => setRoute({ screen: 'list' }), []);
@@ -135,7 +157,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   // кнопка «Назад» Telegram: из ростера — к списку, из правил/поля — туда, откуда пришли, со списка — в WarpHub
   useEffect(() => {
     if (!tg) return;
-    const nav = route.screen === 'home' ? onExit : route.screen === 'list' ? goHome : route.screen === 'editor' || route.screen === 'aos-editor' ? goList : goBack;
+    const nav = route.screen === 'home' ? onExit : route.screen === 'list' ? goHome : route.screen === 'editor' || route.screen === 'aos-editor' || route.screen === 'kt-editor' ? goList : goBack;
     // сначала закрывается открытая шторка, и только потом — экран
     const handler = () => {
       if (!closeTopOverlay()) nav();
@@ -168,19 +190,20 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
       </Centered>
     );
   }
-  if (route.screen === 'home' && rosters && aosRosters) {
+  if (route.screen === 'home' && rosters && aosRosters && ktRosters) {
     return (
       <Home
         onExit={onExit}
         rosters={rosters}
         aosRosters={aosRosters}
+        ktRosters={ktRosters}
         aosIndex={aosIndex}
         onGame={(g) => (setSystem(g), setRoute({ screen: 'list' }))}
-        onOpen={(g, id) => (setSystem(g), setRoute(g === '40k' ? { screen: 'editor', id } : { screen: 'aos-editor', id }))}
+        onOpen={(g, id) => (setSystem(g), setRoute(g === '40k' ? { screen: 'editor', id } : g === 'aos' ? { screen: 'aos-editor', id } : { screen: 'kt-editor', id }))}
       />
     );
   }
-  if ((system === '40k' ? !index : !aosIndex) || !rosters || !aosRosters) {
+  if ((system === '40k' ? !index : system === 'aos' ? !aosIndex : !ktIndex) || !rosters || !aosRosters || !ktRosters) {
     return (
       <Centered>
         <div className="size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
@@ -189,6 +212,42 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   }
 
   const switcher = null;
+
+  if (system === 'kt' && ktIndex && ktRosters) {
+    const kr = route.screen === 'kt-editor' ? ktRosters.find((r) => r.id === route.id) : undefined;
+    if (kr)
+      return (
+        <KtEditor
+          key={kr.id}
+          roster={kr}
+          index={ktIndex}
+          onBack={goList}
+          onChange={onKtChange}
+          onDelete={() => {
+            markKtDeleted(kr.id);
+            updateKt((list) => list.filter((x) => x.id !== kr.id));
+            goList();
+          }}
+        />
+      );
+    return (
+      <KtList
+        onExit={goHome}
+        index={ktIndex}
+        rosters={ktRosters}
+        onOpen={(id) => setRoute({ screen: 'kt-editor', id })}
+        onCreate={(r) => {
+          updateKt((list) => [r, ...list]);
+          setRoute({ screen: 'kt-editor', id: r.id });
+        }}
+        onDuplicate={(r) => updateKt((list) => [r, ...list])}
+        onDelete={(id) => {
+          markKtDeleted(id);
+          updateKt((list) => list.filter((x) => x.id !== id));
+        }}
+      />
+    );
+  }
 
   if (route.screen === 'aos-test-army' && aosIndex) {
     return <AosTestArmyScreen onBack={goBack} rosters={aosRosters!} index={aosIndex} initialRosterId={route.rosterId} />;

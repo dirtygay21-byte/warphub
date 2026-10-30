@@ -7,6 +7,7 @@ import { sanitizeRoster } from './engine/roster';
 import { sanitizeAosRoster } from './aos/roster';
 import type { Roster } from './engine/types';
 import type { AosRoster } from './aos/types';
+import { sanitizeKtRoster, type KtRoster } from './kt/roster';
 
 // Ключи localStorage — свои у каждого аккаунта Telegram (на одном компьютере может быть несколько аккаунтов).
 const userSuffix = tg?.initDataUnsafe.user?.id ? `.${tg.initDataUnsafe.user.id}` : '';
@@ -204,5 +205,12 @@ export const loadAosRosters = storeAos.loadRosters;
 export const saveAosLocal = storeAos.saveLocal;
 export const saveAosRosters = storeAos.saveRosters;
 export const markAosDeleted = storeAos.markDeleted;
+
+// Kill Team (W3 30.10.2026) — свои ключи
+const storeKt = createStore<KtRoster>({ ls: 'warphub.kt-rosters.v1', lsDel: 'warphub.kt-rosters.deleted.v1', index: 'kb_index', del: 'kb_deleted', chunk: 'kb_' }, sanitizeKtRoster);
+export const loadKtRosters = storeKt.loadRosters;
+export const saveKtLocal = storeKt.saveLocal;
+export const saveKtRosters = storeKt.saveRosters;
+export const markKtDeleted = storeKt.markDeleted;
 
 export const cloudEnabled = () => !!cs();

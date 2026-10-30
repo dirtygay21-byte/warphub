@@ -1,16 +1,17 @@
 import type { AosIndex, AosRoster } from '../aos/types';
 import type { Roster } from '../engine/types';
+import type { KtRoster } from '../kt/roster';
 import { haptic } from '../telegram';
 import { Icon, IconButton } from './kit';
 import { cx, fmtPts } from './util';
 
-export type GameSystem = '40k' | 'aos';
+export type GameSystem = '40k' | 'aos' | 'kt';
 
 type GameTile = { id: GameSystem | 'kt' | 'warcry'; name: string; sub: string; ready: boolean };
 const GAMES: GameTile[] = [
   { id: '40k', name: 'Warhammer 40,000', sub: '11-я редакция', ready: true },
   { id: 'aos', name: 'Age of Sigmar', sub: '4-я редакция · GH 2026-27', ready: true },
-  { id: 'kt', name: 'Kill Team', sub: 'скоро', ready: false },
+  { id: 'kt', name: 'Kill Team', sub: 'редакция 2024 · KTDash', ready: true },
   { id: 'warcry', name: 'Warcry', sub: 'скоро', ready: false },
 ];
 
@@ -22,6 +23,7 @@ export function Home({
   onExit,
   rosters,
   aosRosters,
+  ktRosters,
   aosIndex,
   onGame,
   onOpen,
@@ -29,13 +31,15 @@ export function Home({
   onExit: () => void;
   rosters: Roster[];
   aosRosters: AosRoster[];
+  ktRosters: KtRoster[];
   aosIndex: AosIndex | null;
   onGame: (g: GameSystem) => void;
   onOpen: (g: GameSystem, id: string) => void;
 }) {
-  const count = (g: GameTile['id']) => (g === '40k' ? rosters.length : g === 'aos' ? aosRosters.length : 0);
+  const count = (g: GameTile['id']) => (g === '40k' ? rosters.length : g === 'aos' ? aosRosters.length : g === 'kt' ? ktRosters.length : 0);
   const recent = [
     ...rosters.map((r) => ({ g: '40k' as const, id: r.id, name: r.name, pts: r.summary?.points, at: r.updatedAt, sub: 'Warhammer 40,000' })),
+    ...ktRosters.map((r) => ({ g: 'kt' as const, id: r.id, name: r.name, pts: undefined as number | undefined, at: r.updatedAt, sub: `Kill Team · оперативников: ${r.operatives.length}` })),
     ...aosRosters.map((r) => ({ g: 'aos' as const, id: r.id, name: r.name, pts: r.summary?.points, at: r.updatedAt, sub: aosIndex?.factions.find((f) => f.id === r.factionId)?.name ?? 'Age of Sigmar' })),
   ]
     .sort((a, b) => b.at - a.at)
@@ -81,7 +85,7 @@ export function Home({
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold">{r.name}</span>
                   <span className="block truncate text-[11px] text-white/45">
-                    {r.g === '40k' ? '40K' : 'AoS'} · {r.sub}
+                    {r.g === '40k' ? '40K · ' : r.g === 'aos' ? 'AoS · ' : ''}{r.sub}
                     {r.pts != null ? ` · ${fmtPts(r.pts)} очк.` : ''}
                   </span>
                 </span>
