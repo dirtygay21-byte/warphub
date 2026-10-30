@@ -510,6 +510,7 @@ tools/roster-data/tests/kt-data.test.ts                              струк�
 
 - id команд, оперативников, оружия, уловок и снаряжения — как в ktdash; коммит и дата источника — в `index.json → source`.
 - Тексты правил — Markdown источника (**жирный**, таблицы, списки); правила оружия — строкой профиля («Rng 6", Lethal 5+»).
+- Группа команды (`index.json → teams[].group`) — общие ключевые слова оперативников; для Tempestus Aquilon, Inquisitorial Agents и Elucidian Starstriders группы в ключевых словах нет — взята по меню Wahapedia (`GROUP_FALLBACK` в импорте).
 - Фракция `SPEC` — наборы миссий и неигровые оперативники (`special: true`), не команды для обычной игры.
 - Состав команды — текст источника (`composition`); универсального снаряжения в источнике нет.
 - Сервер: `GET /roster/data/kt/:name` (`index` или id команды), только с доступом к WarpBuilder.
