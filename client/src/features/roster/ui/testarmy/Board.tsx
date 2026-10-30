@@ -517,7 +517,7 @@ export function Board({
             {tool === 'ruler' && !rulerLine && rulerA && <circle cx={disp(rulerA)[0]} cy={disp(rulerA)[1]} r={0.35} fill="#fff" pointerEvents="none" />}
           </svg>
         </div>
-        <p className="pointer-events-none absolute left-2 right-2 top-[max(0.5rem,env(safe-area-inset-top))] truncate rounded-lg bg-black/65 px-2.5 py-1.5 text-[11.5px] text-white/80">
+        <p className="pointer-events-none absolute left-2 right-2 top-[max(0.5rem,env(safe-area-inset-top))] truncate rounded-lg bg-black/65 px-2.5 py-1.5 text-[12px] text-white/80">
           {status}
         </p>
       </div>
@@ -544,7 +544,7 @@ export function Board({
           <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2">
             <div className="min-w-0 flex-1">
               <p className="font-display truncate text-base font-semibold uppercase leading-none">Test Army</p>
-              <p className="truncate text-[11px] text-white/45">
+              <p className="truncate text-[12px] text-fg-3">
                 {me.name} · {field.title} · {side === 'attacker' ? 'атакующий' : 'защитник'}
                 {foe && ` · соперник: ${foe.name}`}
               </p>
@@ -592,7 +592,7 @@ export function Board({
                 />
               </>
             )}
-            {ranges && <p className="mt-3 text-[10.5px] text-white/40">Круги целей: {field.objectiveNote}</p>}
+            {ranges && <p className="mt-3 text-[12px] text-fg-3">Круги целей: {field.objectiveNote}</p>}
           </div>
         </aside>
       )}
@@ -609,7 +609,7 @@ function RailButton({ icon, label, active, onClick }: { icon: string; label: str
       onClick={onClick}
       className={cx(
         'flex w-12 flex-col items-center rounded-lg py-1 text-[9.5px] font-semibold leading-tight',
-        active ? 'bg-accent/20 text-accent' : 'text-white/70 active:bg-white/10',
+        active ? 'bg-accent/20 text-accent' : 'text-fg-2 active:bg-white/10',
       )}
     >
       <span className="text-lg leading-none">{icon}</span>
@@ -672,7 +672,7 @@ function UnitShapes({
 function UnitList({ units, label, color, onSelect }: { units: TAUnit[]; label: (u: TAUnit) => string; color: string; onSelect: (uid: string) => void }) {
   return (
     <div>
-      <p className="mb-2 text-[11px] text-white/50">Выберите отряд — построение, базы, характеристики; затем «Поставить на поле».</p>
+      <p className="mb-2 text-[12px] text-fg-3">Выберите отряд — построение, базы, характеристики; затем «Поставить на поле».</p>
       <ul className="space-y-1.5">
         {units.map((u) => (
           <li key={u.uid}>
@@ -681,7 +681,7 @@ function UnitList({ units, label, color, onSelect }: { units: TAUnit[]; label: (
               onClick={() => onSelect(u.uid)}
               className={cx('w-full rounded-xl border px-2.5 py-2 text-left', u.placed ? 'border-accent/40 bg-accent/[0.07]' : 'border-white/10 bg-white/[0.03] active:bg-white/10')}
             >
-              <span className="flex items-center gap-1.5 text-[11px] text-white/45">
+              <span className="flex items-center gap-1.5 text-[12px] text-fg-3">
                 <b style={{ color }}>{label(u)}</b>
                 {u.placed ? 'на столе' : 'не выставлен'} · моделей: {u.models.length}
               </span>
@@ -726,7 +726,7 @@ function ApproxPicker({ source, value, onChange }: { source: string; value: Base
           </button>
         ))}
       </div>
-      {value && <p className="text-white/45">Примерно: {baseLabel(value)}</p>}
+      {value && <p className="text-fg-3">Примерно: {baseLabel(value)}</p>}
     </div>
   );
 }
@@ -787,9 +787,9 @@ function UnitPanel({
           <p className="text-sm font-semibold leading-tight">
             {n}. {unit.name}
           </p>
-          {unit.leaders.length > 0 && <p className="text-[11px] text-white/55">с персонажами: {unit.leaders.join(', ')}</p>}
-          {unit.tags?.length ? <p className="text-[11px] text-white/55">{unit.tags.join(' · ')}</p> : null}
-          <p className={cx('text-[11px]', unknown ? 'text-warn' : 'text-white/45')}>{summary.map(([k, c]) => `${c} × ${k}`).join(' · ')}</p>
+          {unit.leaders.length > 0 && <p className="text-[12px] text-fg-3">с персонажами: {unit.leaders.join(', ')}</p>}
+          {unit.tags?.length ? <p className="text-[12px] text-fg-3">{unit.tags.join(' · ')}</p> : null}
+          <p className={cx('text-[12px]', unknown ? 'text-warn' : 'text-fg-3')}>{summary.map(([k, c]) => `${c} × ${k}`).join(' · ')}</p>
         </div>
         <IconButton icon="close" label="К списку отрядов" onClick={onDone} className="size-8" />
       </div>
@@ -798,23 +798,23 @@ function UnitPanel({
         <span className="shrink-0 font-semibold text-accent">Характеристики ›</span>
       </button>
       {info && (
-        <div className="grid grid-cols-3 gap-1.5 text-center text-[11px]">
+        <div className="grid grid-cols-3 gap-1.5 text-center text-[12px]">
           <div className={cx('rounded-lg border px-1.5 py-1', info.objective?.inRange ? 'border-[#4ade80]/50 text-[#4ade80]' : 'border-white/10')}>
-            <span className="block text-white/45">до цели</span>
+            <span className="block text-fg-3">до цели</span>
             <b className="text-sm">{info.objective ? fmtInches(info.objective.d) : '—'}</b>
             {info.objective?.inRange && <span className="block">в дальности</span>}
           </div>
           <div className="rounded-lg border border-white/10 px-1.5 py-1">
-            <span className="block text-white/45">до своей зоны</span>
+            <span className="block text-fg-3">до своей зоны</span>
             <b className="text-sm">{info.own ? (info.own.d ? fmtInches(info.own.d) : 'в зоне') : '—'}</b>
           </div>
           <div className="rounded-lg border border-white/10 px-1.5 py-1">
-            <span className="block text-white/45">до зоны {side === 'attacker' ? 'защитника' : 'атакующего'}</span>
+            <span className="block text-fg-3">до зоны {side === 'attacker' ? 'защитника' : 'атакующего'}</span>
             <b className="text-sm">{info.enemy ? (info.enemy.d ? fmtInches(info.enemy.d) : 'в зоне') : '—'}</b>
           </div>
           {info.foe && (
             <div className="col-span-3 rounded-lg border border-white/10 px-1.5 py-1">
-              <span className="text-white/45">до ближайшего врага (от края до края): </span>
+              <span className="text-fg-3">до ближайшего врага (от края до края): </span>
               <b className="text-sm">{fmtInches(info.foe.d)}</b>
             </div>
           )}
@@ -823,7 +823,7 @@ function UnitPanel({
       <Segmented<Formation> value={unit.formation} onChange={onFormation} options={FORMATIONS.map((f) => ({ value: f.id, label: f.label }))} />
       {unit.placed && (
         <div className="flex flex-wrap items-center gap-1.5 text-xs">
-          <span className="text-white/45">Поворот:</span>
+          <span className="text-fg-3">Поворот:</span>
           {[-45, -15, 15, 45].map((d) => (
             <button key={d} type="button" onClick={() => onRotate(d)} className="rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 font-semibold active:bg-white/10">
               {d > 0 ? `↻ ${d}°` : `↺ ${-d}°`}
@@ -832,7 +832,7 @@ function UnitPanel({
         </div>
       )}
       <div className="flex flex-wrap items-center gap-1.5 text-xs">
-        <span className="text-white/45">Зазор между базами:</span>
+        <span className="text-fg-3">Зазор между базами:</span>
         {GAPS.map((g) => (
           <button
             key={g}
@@ -852,7 +852,7 @@ function UnitPanel({
           {profiles.map((p) => (
             <div key={p.profile} className="text-xs">
               <p className="font-semibold">
-                {p.profile} <span className="font-normal text-white/45">· моделей: {p.count}</span>
+                {p.profile} <span className="font-normal text-fg-3">· моделей: {p.count}</span>
               </p>
               {p.options.length > 1 && (
                 <div className="mt-1 flex flex-wrap gap-1.5">
@@ -868,14 +868,14 @@ function UnitPanel({
                   ))}
                 </div>
               )}
-              {p.options.length === 1 && <p className="text-white/55">{baseLabel(p.options[0]!)} (из данных)</p>}
+              {p.options.length === 1 && <p className="text-fg-3">{baseLabel(p.options[0]!)} (из данных)</p>}
               {!p.options.length && <ApproxPicker source={p.source} value={p.custom ?? (p.customMm ? { kind: 'circle', d: p.customMm } : null)} onChange={(custom) => onBase(p.profile, { custom })} />}
             </div>
           ))}
-          <p className="text-[10.5px] text-white/40">После смены базы отряд перестраивается на том же месте.</p>
+          <p className="text-[12px] text-fg-3">После смены базы отряд перестраивается на том же месте.</p>
         </div>
       )}
-      <p className="text-[11px] text-white/50">
+      <p className="text-[12px] text-fg-3">
         Тяните базу — едет весь отряд; удерживайте базу полсекунды — двигается одна модель. Поле двигается пальцем по пустому месту, масштаб — двумя пальцами.
       </p>
       <Button variant="primary" className="w-full" onClick={onPlace}>

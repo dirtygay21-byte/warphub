@@ -216,7 +216,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
     return (
       <Centered>
         <p className="font-display text-xl uppercase">Нет данных</p>
-        <p className="mt-2 text-sm text-white/50">{error}</p>
+        <p className="mt-2 text-sm text-fg-3">{error}</p>
         <div className="mt-5 flex gap-2">
           <button type="button" onClick={onExit} className="rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold text-white/80">
             Назад

@@ -33,7 +33,7 @@ export default function FiltersPanel({
           <button
             type="button"
             onClick={() => onFilterChange("date", today)}
-            className="self-start rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white/60 transition-colors hover:text-white"
+            className="self-start rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-fg-2 transition-colors hover:text-white"
           >
             Сегодня
           </button>
@@ -91,7 +91,7 @@ export default function FiltersPanel({
         <button
           type="button"
           onClick={onReset}
-          className="mt-3 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/60 transition-colors hover:text-white"
+          className="mt-3 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-fg-2 transition-colors hover:text-white"
         >
           Сбросить
         </button>
@@ -123,14 +123,14 @@ function FilterInput({
   value: string;
 }) {
   return (
-    <label className="flex flex-col gap-1 text-xs font-semibold text-white/50">
+    <label className="flex flex-col gap-1 text-xs font-semibold text-fg-3">
       {label}
       <input
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="rounded-xl border border-white/10 bg-overlay/30 px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/30 [color-scheme:dark] focus:border-accent/60"
+        className="rounded-xl border border-white/10 bg-overlay/30 px-3 py-2.5 text-sm text-white outline-none placeholder:text-fg-3 [color-scheme:dark] focus:border-accent/60"
       />
     </label>
   );

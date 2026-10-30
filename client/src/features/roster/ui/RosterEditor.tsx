@@ -79,7 +79,7 @@ export function RosterEditor({
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
         <p className="font-display text-xl uppercase">Не удалось открыть ростер</p>
-        <p className="mt-2 text-sm text-white/50">{loadErr}</p>
+        <p className="mt-2 text-sm text-fg-3">{loadErr}</p>
         <div className="mt-5 flex gap-2">
           <Button onClick={onBack}>К списку</Button>
           <Button variant="primary" onClick={() => (setLoadErr(null), loadFaction(roster.factionId).then(setFaction, (e) => setLoadErr(String(e.message ?? e))))}>
@@ -201,8 +201,8 @@ function Editor({
           <button type="button" onClick={() => (haptic.tap(), setPointsInfo(true))} aria-label="Очки: сборка армии и партия" className="min-w-0 rounded-lg text-left active:opacity-70">
             <div className="flex items-baseline gap-1.5">
               <span className={cx('font-display text-[32px] font-semibold leading-none tabular-nums', over ? 'text-danger' : 'text-white')}>{fmtPts(cr.points)}</span>
-              <span className="text-sm text-white/40">/ {fmtPts(size.points)}</span>
-              <Icon name="info" className="size-3.5 shrink-0 self-center text-white/35" />
+              <span className="text-sm text-fg-3">/ {fmtPts(size.points)}</span>
+              <Icon name="info" className="size-3.5 shrink-0 self-center text-fg-3" />
             </div>
           </button>
           <div className="flex gap-1.5">
@@ -217,7 +217,7 @@ function Editor({
               )}
             >
               <Icon name={cr.errors || cr.warnings ? 'alert' : 'check'} className="size-4" />
-              <span className="text-[11px] font-semibold leading-tight">{cr.errors ? cr.errors : cr.warnings ? cr.warnings : 'OK'}</span>
+              <span className="text-[12px] font-semibold leading-tight">{cr.errors ? cr.errors : cr.warnings ? cr.warnings : 'OK'}</span>
             </button>
           </div>
         </div>
@@ -231,16 +231,16 @@ function Editor({
         <section className="rounded-2xl border border-white/10 bg-app-elevated">
           <button type="button" onClick={() => setSettingsOpen((o) => !o)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-white/45">
+              <p className="text-xs font-semibold uppercase tracking-wider text-fg-3">
                 {L.faction.name}
                 {cr.chapter ? ` · ${cr.chapter}` : ''} · {size.label}
               </p>
               <p className="mt-0.5 truncate text-[15px] font-semibold">
                 {cr.detachments.length ? cr.detachments.map((d) => d.name).join(' + ') : <span className="text-accent">Выберите детачмент</span>}
               </p>
-              {roster.forceDisposition && <p className="mt-0.5 text-sm text-white/55">{roster.forceDisposition}</p>}
+              {roster.forceDisposition && <p className="mt-0.5 text-sm text-fg-3">{roster.forceDisposition}</p>}
             </div>
-            <Icon name="down" className={cx('size-5 shrink-0 text-white/40 transition', settingsOpen && 'rotate-180')} />
+            <Icon name="down" className={cx('size-5 shrink-0 text-fg-3 transition', settingsOpen && 'rotate-180')} />
           </button>
           {settingsOpen && view && (
             <div className="space-y-4 border-t border-white/[0.06] px-4 pb-4 pt-3">
@@ -254,14 +254,14 @@ function Editor({
                   .filter((x): x is [string, string] => !!x[1])
                   .map(([k, v]) => (
                     <div key={k} className="flex items-baseline justify-between gap-3 border-b border-white/[0.05] py-1.5 last:border-0">
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{k}</span>
+                      <span className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{k}</span>
                       <span className="text-right text-[13.5px] font-semibold text-white/85">{v}</span>
                     </div>
                   ))}
               </div>
               {L.faction.armyRules.length > 0 && (
                 <div className="space-y-1.5">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Правила армии</p>
+                  <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Правила армии</p>
                   {L.faction.armyRules.map((id) => {
                     const r = L.faction.rules[id];
                     return r ? <RuleText key={id} name={r.name} text={r.text} /> : null;
@@ -304,7 +304,7 @@ function Editor({
                           {ruleLabel(d)}
                           <span className="ml-1.5 text-xs font-semibold text-accent">подробнее</span>
                         </p>
-                        <p className="text-xs text-white/45">
+                        <p className="text-xs text-fg-3">
                           {dpOf(d, cr.chapter)} DP · {dispositionsOf(d).join(' / ') || '—'}
                           {d.tag ? ` · ${d.tag}` : ''}
                         </p>
@@ -329,8 +329,8 @@ function Editor({
               {L.faction.armyRules.length > 0 && (
                 <details className="group">
                   <summary className="flex cursor-pointer list-none items-baseline justify-between gap-2">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-white/45">Правила армии</span>
-                    <span className="flex items-center gap-1 text-xs text-white/40">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-fg-3">Правила армии</span>
+                    <span className="flex items-center gap-1 text-xs text-fg-3">
                       {L.faction.armyRules.length}
                       <Icon name="down" className="size-3.5 transition group-open:rotate-180" />
                     </span>
@@ -384,11 +384,11 @@ function Editor({
           grouped.map((g) => (
             <section key={g.key}>
               <div className="mb-2.5 flex items-baseline justify-between px-1">
-                <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-white/70">
+                <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-fg-2">
                   {g.title}
-                  <span className="ml-2 font-sans text-xs font-semibold text-white/30">{g.list.reduce((n, c) => n + 1 + c.attached.length, 0)}</span>
+                  <span className="ml-2 font-sans text-xs font-semibold text-fg-3">{g.list.reduce((n, c) => n + 1 + c.attached.length, 0)}</span>
                 </h2>
-                <span className="text-xs font-semibold tabular-nums text-white/40">{fmtPts(g.list.reduce((s, c) => s + c.total + c.attached.reduce((a, u) => a + (cr.byUid.get(u.uid)?.total ?? 0), 0), 0))}</span>
+                <span className="text-xs font-semibold tabular-nums text-fg-3">{fmtPts(g.list.reduce((s, c) => s + c.total + c.attached.reduce((a, u) => a + (cr.byUid.get(u.uid)?.total ?? 0), 0), 0))}</span>
               </div>
               <div className="space-y-2.5">
                 {g.list.map((c) => (
@@ -410,7 +410,7 @@ function Editor({
           ))
         )}
 
-        <p className="pt-2 text-center text-xs text-white/30">{factionCredit(L.faction, index)}</p>
+        <p className="pt-2 text-center text-xs text-fg-3">{factionCredit(L.faction, index)}</p>
       </div>
 
       {/* ---- нижняя панель ---- */}
@@ -462,7 +462,7 @@ function Editor({
               <Icon name="check" className="size-6" />
             </div>
             <p className="mt-3 font-semibold">Ростер соответствует правилам</p>
-            <p className="mt-1 text-sm text-white/50">Очки, детачменты, улучшения, лимиты и присоединения в порядке.</p>
+            <p className="mt-1 text-sm text-fg-3">Очки, детачменты, улучшения, лимиты и присоединения в порядке.</p>
           </div>
         ) : (
           <ul className="space-y-2 pb-2">
@@ -539,7 +539,7 @@ function Stat({ label, value, bad }: { label: string; value: string; bad?: boole
   return (
     <div className={cx('flex min-w-12 flex-col items-center justify-center rounded-lg px-2 py-1', bad ? 'bg-danger/15 text-danger' : 'bg-white/[0.06] text-white/85')}>
       <span className="text-[13px] font-semibold leading-tight tabular-nums">{value}</span>
-      <span className="text-[10px] font-semibold uppercase leading-tight tracking-wide opacity-55">{label}</span>
+      <span className="text-[12px] font-semibold uppercase leading-tight tracking-wide opacity-55">{label}</span>
     </div>
   );
 }
@@ -622,7 +622,7 @@ function UnitGroup({
   return (
     <div className="overflow-hidden rounded-2xl border border-accent/25 bg-app-elevated">
       <div className="flex items-baseline justify-between bg-accent/[0.06] px-4 py-2">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent/85">Отряд</p>
+        <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent/85">Отряд</p>
         <p className="text-[12px] font-semibold tabular-nums text-accent/85">{fmtPts(total)} очк.</p>
       </div>
       <div className="divide-y divide-white/[0.06]">
@@ -641,7 +641,7 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
   const sorted = [...list].sort((a, b) => a.dp - b.dp || a.name.localeCompare(b.name));
   return (
     <Sheet open={open} onClose={onClose} title="Детачменты" tall>
-      <p className="mb-3 text-sm text-white/55">
+      <p className="mb-3 text-sm text-fg-3">
         Осталось <b className="text-white">{Math.max(0, left)} DP</b>. Детачменты с одинаковым тегом взять вместе нельзя.
       </p>
       <ul className="space-y-1.5 pb-2">
@@ -655,7 +655,7 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
             <li key={d.id} className={cx('rounded-xl border bg-white/[0.03]', tooMuch || tagClash ? 'border-white/[0.06]' : 'border-white/10')}>
               <div className="flex items-center gap-2 py-2 pl-3 pr-2">
                 <button type="button" className="min-w-0 flex-1 text-left" onClick={() => setInfo(open_ ? null : d.id)}>
-                  <p className={cx('text-sm font-semibold', (tooMuch || tagClash) && 'text-white/45')}>{ruleLabel(d)}</p>
+                  <p className={cx('text-sm font-semibold', (tooMuch || tagClash) && 'text-fg-3')}>{ruleLabel(d)}</p>
                   {d.outdated && <p className="mt-0.5 text-xs text-amber-200">{OUTDATED_RULE_NOTE} Был в этом ростере — можно вернуть.</p>}
                   <div className="mt-1 flex flex-wrap gap-1">
                     <Tag tone={tooMuch ? 'danger' : 'accent'}>{dp} DP</Tag>
@@ -675,7 +675,7 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
                   {d.abilities.map((a, i) => (
                     <div key={i}>
                       <p className="font-semibold text-accent">{a.name}</p>
-                      <p className="mt-1 whitespace-pre-line text-white/70">{cleanRuleText(a.text)}</p>
+                      <p className="mt-1 whitespace-pre-line text-fg-2">{cleanRuleText(a.text)}</p>
                     </div>
                   ))}
                   {L.faction.stratagems.some((st) => st.detachment === d.id && visibleStratagem(st, L.det)) && (
@@ -693,7 +693,7 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
                   {enh.length > 0 && (
                     <div>
                       <p className="font-semibold text-white/85">Улучшения</p>
-                      <ul className="mt-1 space-y-1 text-white/65">
+                      <ul className="mt-1 space-y-1 text-fg-2">
                         {enh.map((e) => (
                           <li key={e.id}>
                             {e.name} — {e.cost} очк.{e.upgrade ? ' · Upgrade' : ''}

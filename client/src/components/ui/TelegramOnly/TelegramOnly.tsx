@@ -12,7 +12,7 @@ export default function TelegramOnly({ what }: { what: string }) {
       </span>
       <div className="space-y-1.5">
         <p className="text-lg font-semibold">Откройте WarpHub в Telegram</p>
-        <p className="text-sm text-white/65">{what} доступны после входа через Telegram — откройте бота и нажмите «Открыть».</p>
+        <p className="text-sm text-fg-2">{what} доступны после входа через Telegram — откройте бота и нажмите «Открыть».</p>
       </div>
       <a
         href="https://t.me/WarpHubBot"

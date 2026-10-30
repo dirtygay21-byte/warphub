@@ -68,7 +68,7 @@ export function AosList({
         </ul>
       )}
 
-      <p className="mt-8 text-center text-xs leading-relaxed text-white/35">
+      <p className="mt-8 text-center text-xs leading-relaxed text-fg-3">
         Данные: powered by Wahapedia · обновлено {index.lastUpdate?.slice(0, 10) ?? '—'}
         <br />
         {cloudEnabled() ? 'Ростеры синхронизируются через Telegram' : 'Ростеры хранятся в этом браузере'}
@@ -171,7 +171,7 @@ function CreateSheet({ open, index, onClose, onCreate }: { open: boolean; index:
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Например: Турнир в субботу"
-            className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-white outline-none placeholder:text-white/30 focus:border-accent"
+            className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-white outline-none placeholder:text-fg-3 focus:border-accent"
           />
         </Field>
         <Field label="Лимит очков">
@@ -195,7 +195,7 @@ function CreateSheet({ open, index, onClose, onCreate }: { open: boolean; index:
                   )}
                 >
                   {f.name}
-                  <span className={cx('mt-0.5 block text-[11px] font-medium', faction === f.id ? 'text-accent/70' : 'text-white/40')}>
+                  <span className={cx('mt-0.5 block text-[12px] font-medium', faction === f.id ? 'text-accent/70' : 'text-fg-3')}>
                     {f.legendsOnly ? 'только Legends' : `${f.units} варскроллов`}
                   </span>
                 </button>
@@ -244,7 +244,7 @@ function ImportSheet({ open, onClose, onImport, factions }: { open: boolean; onC
         </Button>
       }
     >
-      <p className="mb-3 text-sm text-white/55">Вставьте код из «Экспорт → Код» на другом устройстве. После импорта ростер проверяется по всем правилам.</p>
+      <p className="mb-3 text-sm text-fg-3">Вставьте код из «Экспорт → Код» на другом устройстве. После импорта ростер проверяется по всем правилам.</p>
       <textarea
         value={code}
         onChange={(e) => setCode(e.target.value)}

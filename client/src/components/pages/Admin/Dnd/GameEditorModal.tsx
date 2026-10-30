@@ -143,7 +143,7 @@ export function GameEditorModal({
             type="button"
             aria-label="Закрыть"
             onClick={onClose}
-            className="flex size-9 items-center justify-center rounded-lg border border-white/10 active:bg-white/10"
+            className="flex size-11 items-center justify-center rounded-lg border border-white/10 active:bg-white/10"
           >
             <X className="size-4" />
           </button>
@@ -289,13 +289,13 @@ export function GameEditorModal({
                   </button>
                 </div>
               )}
-              <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-white/20 px-4 py-3 text-sm text-white/75 active:bg-white/5">
+              <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-white/20 px-4 py-3 text-sm text-fg-2 active:bg-white/5">
                 {uploading ? (
                   <LoaderCircle className="size-4 animate-spin" />
                 ) : (
                   <ImagePlus className="size-4" />
                 )}
-                {uploading ? "Загружаем..." : "Загрузить изображение"}
+                {uploading ? "Загружаем…" : "Загрузить изображение"}
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/gif"

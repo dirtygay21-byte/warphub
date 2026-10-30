@@ -50,7 +50,7 @@ function ChoiceList({ choices, selected, onPick, onClear, clearLabel }: { choice
           <Icon name="close" className="size-4" /> {clearLabel ?? 'Убрать выбор'}
         </Button>
       )}
-      {choices.length === 0 && <p className="py-8 text-center text-sm text-white/45">Вариантов нет.</p>}
+      {choices.length === 0 && <p className="py-8 text-center text-sm text-fg-3">Вариантов нет.</p>}
       {choices.map((c) => {
         const sel = c.id === selected;
         const usable = c.fit.ok || (sel && !c.strict);
@@ -58,11 +58,11 @@ function ChoiceList({ choices, selected, onPick, onClear, clearLabel }: { choice
           <div key={c.id} className={cx('overflow-hidden rounded-2xl border', sel ? 'border-accent/60 bg-accent/[0.06]' : 'border-white/10 bg-white/[0.02]')}>
             <div className="flex items-start gap-2 px-3 py-2.5">
               <button type="button" onClick={() => setOpen(open === c.id ? null : c.id)} className="min-w-0 flex-1 text-left">
-                <p className={cx('text-[14px] font-semibold leading-snug', !usable && 'text-white/45')}>
+                <p className={cx('text-[14px] font-semibold leading-snug', !usable && 'text-fg-3')}>
                   {c.title}
-                  {c.body && <Icon name="down" className={cx('ml-1 inline size-3.5 text-white/35 transition', open === c.id && 'rotate-180')} />}
+                  {c.body && <Icon name="down" className={cx('ml-1 inline size-3.5 text-fg-3 transition', open === c.id && 'rotate-180')} />}
                 </p>
-                {c.sub && <p className="mt-0.5 text-[12px] leading-snug text-white/45">{c.sub}</p>}
+                {c.sub && <p className="mt-0.5 text-[12px] leading-snug text-fg-3">{c.sub}</p>}
                 {!!c.tags?.length && (
                   <div className="mt-1 flex flex-wrap gap-1">
                     {c.tags.map((t) => (
@@ -72,7 +72,7 @@ function ChoiceList({ choices, selected, onPick, onClear, clearLabel }: { choice
                 )}
                 {!c.fit.ok && !sel && <p className="mt-1 text-[12px] leading-snug text-amber-200/80">{c.fit.reason}</p>}
               </button>
-              <span className="shrink-0 pt-0.5 text-right text-xs font-semibold tabular-nums text-white/60">{c.points == null ? '—' : c.points ? `+${c.points}` : '0'}</span>
+              <span className="shrink-0 pt-0.5 text-right text-xs font-semibold tabular-nums text-fg-2">{c.points == null ? '—' : c.points ? `+${c.points}` : '0'}</span>
               <Button variant={sel ? 'primary' : 'ghost'} className="h-9 shrink-0 px-3 text-xs" disabled={!usable} onClick={() => (haptic.ok(), onPick(c.id))}>
                 {sel ? <Icon name="check" className="size-4" /> : 'Взять'}
               </Button>
@@ -103,7 +103,7 @@ export function FormationSheet({ open, onClose, roster, L, onPick }: { open: boo
         fit: formationFit(f, roster, L),
         body: (
           <>
-            {notes && <p className="rounded-lg bg-white/[0.05] px-2.5 py-1.5 text-[11.5px] leading-snug text-white/60">{notes}</p>}
+            {notes && <p className="rounded-lg bg-white/[0.05] px-2.5 py-1.5 text-[12px] leading-snug text-fg-2">{notes}</p>}
             {rules(f.rules, L)}
           </>
         ),
@@ -111,9 +111,9 @@ export function FormationSheet({ open, onClose, roster, L, onPick }: { open: boo
     });
   return (
     <Sheet open={open} onClose={onClose} title="Боевое построение" tall>
-      <p className="mb-3 text-[12.5px] text-white/50">Армия выбирает одно построение — оно даёт способность на бой. Нажмите на название, чтобы прочитать правило.</p>
+      <p className="mb-3 text-[12.5px] text-fg-3">Армия выбирает одно построение — оно даёт способность на бой. Нажмите на название, чтобы прочитать правило.</p>
       <ChoiceList choices={choices} selected={roster.formationId} onPick={onPick} />
-      {hiddenLegends > 0 && <p className="pb-2 text-center text-[12px] text-white/45">Ещё в Warhammer Legends: {hiddenLegends} — включите «Показывать Warhammer Legends» в меню ростера (⋯).</p>}
+      {hiddenLegends > 0 && <p className="pb-2 text-center text-[12px] text-fg-3">Ещё в Warhammer Legends: {hiddenLegends} — включите «Показывать Warhammer Legends» в меню ростера (⋯).</p>}
     </Sheet>
   );
 }
@@ -137,7 +137,7 @@ export function LoreSheet({ kind, onClose, roster, L, onPick }: { kind: LoreKind
           const w = L.ws.get(id);
           return w ? (
             <div key={id}>
-              <p className="mb-1 mt-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">Манифестация: {w.name}</p>
+              <p className="mb-1 mt-1 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Манифестация: {w.name}</p>
               <Warscroll ws={w} />
             </div>
           ) : null;
@@ -149,7 +149,7 @@ export function LoreSheet({ kind, onClose, roster, L, onPick }: { kind: LoreKind
   const own = choices.filter((c) => !universal.includes(c));
   return (
     <Sheet open={!!kind} onClose={onClose} title={kind ? `${LORE_LABEL[kind]} · ${LORE_TITLE[kind]}` : ''} tall>
-      <p className="mb-3 text-[12.5px] text-white/50">
+      <p className="mb-3 text-[12.5px] text-fg-3">
         {kind === 'manifestation'
           ? 'Один лор манифестаций на армию: его знают все WIZARD и PRIEST.'
           : kind === 'spell'
@@ -192,7 +192,7 @@ export function TerrainSheet({ open, onClose, roster, L, onPick, onGuide }: { op
     }));
   return (
     <Sheet open={open} onClose={onClose} title="Террейн фракции" tall>
-      <p className="mb-3 text-[12.5px] text-white/50">Не больше одного террейна фракции. Ставится целиком в своей территории, дальше 3" от объективов и другого террейна (Core Rules 10.1).</p>
+      <p className="mb-3 text-[12.5px] text-fg-3">Не больше одного террейна фракции. Ставится целиком в своей территории, дальше 3" от объективов и другого террейна (Core Rules 10.1).</p>
       <ChoiceList choices={choices} selected={roster.terrainId} onPick={onPick} onClear={() => onPick(null)} clearLabel="Без террейна" />
     </Sheet>
   );
@@ -216,7 +216,7 @@ export function RorSheet({ open, onClose, roster, L, onPick }: { open: boolean; 
         <>
           {r.built && (
             <div className="space-y-1">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Состав (от 1)</p>
+              <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Состав (от 1)</p>
               {r.units
                 .filter((u) => u.optional)
                 .map((u) => {
@@ -226,7 +226,7 @@ export function RorSheet({ open, onClose, roster, L, onPick }: { open: boolean; 
                       key={u.id}
                       type="button"
                       onClick={() => setPicks((p) => ({ ...p, [r.id]: on ? picked.filter((x) => x !== u.id) : [...picked, u.id] }))}
-                      className={cx('flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px]', on ? 'bg-accent/15 text-accent' : 'bg-white/[0.04] text-white/75')}
+                      className={cx('flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px]', on ? 'bg-accent/15 text-accent' : 'bg-white/[0.04] text-fg-2')}
                     >
                       <Icon name={on ? 'check' : 'plus'} className="size-4" />
                       <span className="flex-1">{L.ws.get(u.id)?.name}</span>
@@ -239,7 +239,7 @@ export function RorSheet({ open, onClose, roster, L, onPick }: { open: boolean; 
           {r.abilities.map((a, i) => (
             <AosRuleCard key={i} rule={a} L={L} link={r.link} />
           ))}
-          {r.notes && <p className="whitespace-pre-line text-[12px] text-white/45">{cleanRuleText(r.notes)}</p>}
+          {r.notes && <p className="whitespace-pre-line text-[12px] text-fg-3">{cleanRuleText(r.notes)}</p>}
           {r.units.map((u) => {
             const w = L.ws.get(u.id);
             return w ? <Warscroll key={u.id} ws={w} /> : null;
@@ -250,7 +250,7 @@ export function RorSheet({ open, onClose, roster, L, onPick }: { open: boolean; 
   });
   return (
     <Sheet open={open} onClose={onClose} title="Полк славы" tall>
-      <p className="mb-3 text-[12.5px] text-white/50">
+      <p className="mb-3 text-[12.5px] text-fg-3">
         Regiment of Renown — готовый отряд союзников, не больше одного, сверх 5 полков. Его юниты не могут быть генералом и не получают улучшения и правила вашей фракции.
       </p>
       <ChoiceList choices={choices} selected={roster.ror?.id ?? null} onPick={(id) => onPick({ id, picked: pickedOf(L.ror.get(id)!) })} onClear={() => onPick(null)} clearLabel="Без полка славы" />
@@ -288,7 +288,7 @@ export function EnhancementSheet({
       : [];
   return (
     <Sheet open={!!target} onClose={onClose} title={type?.name ?? ''} tall>
-      <p className="mb-3 text-[12.5px] text-white/50">Одно улучшение из каждой таблицы на армию; у юнита — не больше одного улучшения каждого типа; UNIQUE улучшать нельзя.</p>
+      <p className="mb-3 text-[12.5px] text-fg-3">Одно улучшение из каждой таблицы на армию; у юнита — не больше одного улучшения каждого типа; UNIQUE улучшать нельзя.</p>
       <ChoiceList choices={choices} selected={unit && target ? unit.enhancements[target.typeKey] ?? null : null} onPick={onPick} onClear={() => onPick(null)} clearLabel="Убрать улучшение" />
     </Sheet>
   );

@@ -25,12 +25,12 @@ export function Result({ game }: { game: GameHook }) {
   return (
     <div className="space-y-2.5">
       <div className="rounded-2xl border border-accent/50 bg-accent/15 p-4 text-center">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">Итог · {how}</p>
+        <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">Итог · {how}</p>
         <p className="font-display mt-1 text-3xl font-semibold uppercase leading-none">{r.winner ? `Победа: ${name(r.winner)}` : 'Ничья'}</p>
         <p className="font-display mt-2 text-2xl font-semibold tabular-nums">
           {r.totals.p1} : {r.totals.p2}
         </p>
-        <p className="text-[11px] text-white/55">
+        <p className="text-[12px] text-fg-3">
           {name('p1')} — {name('p2')}
           {r.by === 'concede' ? ' · сдавшийся проигрывает независимо от ПО' : ''}
         </p>
@@ -53,7 +53,7 @@ export function Result({ game }: { game: GameHook }) {
               </p>
               <p>
                 Основная: <b>{t.primary.total}</b>
-                {t.primary.end ? <span className="text-white/50"> (конец битвы {t.primary.end})</span> : null}
+                {t.primary.end ? <span className="text-fg-3"> (конец битвы {t.primary.end})</span> : null}
               </p>
               <p>
                 Вторичные: <b>{t.secondary.total}</b>
@@ -63,7 +63,7 @@ export function Result({ game }: { game: GameHook }) {
               </p>
               {t.primary.cut + t.secondary.cut > 0 && <p className="text-warn">Сверх лимитов: {t.primary.cut + t.secondary.cut}</p>}
               <p className="mt-1 border-t border-white/10 pt-1 font-semibold">Всего: {t.total} ПО</p>
-              <p className="text-white/50">CP осталось: {state.players[s].cp}</p>
+              <p className="text-fg-3">CP осталось: {state.players[s].cp}</p>
             </div>
           );
         })}
@@ -86,7 +86,7 @@ function EndScoring({ game, seat }: { game: GameHook; seat: Seat }) {
     <section className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
       <button type="button" onClick={() => setOpen((v) => !v)} className="flex w-full items-center gap-2 text-left">
         <span className="min-w-0 flex-1 text-sm font-semibold">{p.name}: конец битвы</span>
-        <Icon name="down" className={cx('size-4 text-white/50 transition', open && 'rotate-180')} />
+        <Icon name="down" className={cx('size-4 text-fg-3 transition', open && 'rotate-180')} />
       </button>
       {open && (
         <div className="mt-2 space-y-2">
@@ -109,7 +109,7 @@ function EndScoring({ game, seat }: { game: GameHook; seat: Seat }) {
               }}
             />
           )}
-          {card && !blocks.length && !scored.length && <p className="text-xs text-white/45">У «{card.name}» нет блоков конца битвы.</p>}
+          {card && !blocks.length && !scored.length && <p className="text-xs text-fg-3">У «{card.name}» нет блоков конца битвы.</p>}
           <label className="flex items-center gap-2.5 rounded-lg border border-white/10 px-2.5 py-2">
             <input
               type="checkbox"
@@ -121,7 +121,7 @@ function EndScoring({ game, seat }: { game: GameHook; seat: Seat }) {
             />
             <span className="min-w-0 flex-1 text-sm">
               Армия полностью покрашена (Battle Ready)
-              <span className="block text-[11px] text-white/45">+{BATTLE_READY_VP} ПО</span>
+              <span className="block text-[12px] text-fg-3">+{BATTLE_READY_VP} ПО</span>
             </span>
           </label>
         </div>
@@ -145,14 +145,14 @@ export function EndEarly({ game }: { game: GameHook }) {
   };
   if (!open)
     return (
-      <button type="button" onClick={() => setOpen(true)} className="w-full py-1 text-center text-xs font-semibold text-white/45 active:text-white/70">
+      <button type="button" onClick={() => setOpen(true)} className="w-full py-1 text-center text-xs font-semibold text-fg-3 active:text-fg-2">
         Завершить битву досрочно
       </button>
     );
   return (
     <div className="space-y-2 rounded-xl border border-danger/40 bg-danger/[0.06] p-3">
       <p className="text-sm font-semibold">Завершить битву досрочно?</p>
-      <p className="text-[11px] text-white/55">Если игрок сдаётся — победа сопернику независимо от ПО. «Отменить» вернёт битву.</p>
+      <p className="text-[12px] text-fg-3">Если игрок сдаётся — победа сопернику независимо от ПО. «Отменить» вернёт битву.</p>
       <div className="grid grid-cols-2 gap-1.5">
         {SEATS.filter((s) => !mine || s === mine).map((s) => (
           <Button key={s} variant="danger" onClick={() => end(s)}>

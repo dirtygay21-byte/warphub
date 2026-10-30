@@ -45,7 +45,7 @@ export function SecondaryCard({ game, seat, hidden = false }: { game: GameHook; 
         {role && (
           <span
             className={cx(
-              'rounded-full px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-wider',
+              'rounded-full px-2 py-0.5 text-[12px] font-bold uppercase tracking-wider',
               tone === 'atk' ? 'bg-[#f87171]/20 text-[#f87171]' : 'bg-[#60a5fa]/20 text-[#60a5fa]',
             )}
           >
@@ -53,12 +53,12 @@ export function SecondaryCard({ game, seat, hidden = false }: { game: GameHook; 
           </span>
         )}
         <span className="min-w-0 flex-1 truncate text-sm font-semibold">{p.name}</span>
-        <span className={cx('text-xs font-semibold', hidden || !mode ? 'text-white/45' : 'text-accent')}>
+        <span className={cx('text-xs font-semibold', hidden || !mode ? 'text-fg-3' : 'text-accent')}>
           {hidden ? (mode ? 'выбрано' : 'не выбрано') : mode === 'fixed' ? 'Фиксированные' : mode === 'tactical' ? 'Тактические' : '—'}
         </span>
       </header>
       {hidden ? (
-        <p className="flex items-center justify-center gap-2 px-3 py-4 text-sm text-white/50">
+        <p className="flex items-center justify-center gap-2 px-3 py-4 text-sm text-fg-3">
           <Icon name="lock" className="size-4" />
           Выбор скрыт до раскрытия
         </p>
@@ -94,7 +94,7 @@ function Fixed({ game, seat }: { game: GameHook; seat: Seat }) {
           </CardRow>
         );
       })}
-      <p className="text-[11.5px] leading-snug text-white/50">
+      <p className="text-[12px] leading-snug text-fg-3">
         Сбросить нельзя.{cap != null ? ` С одной карты — не больше ${cap} ПО;` : ''} вторичные — не больше {missions.caps.secondaryRound} ПО за раунд и{' '}
         {missions.caps.secondaryGame} за битву.
       </p>
@@ -133,7 +133,7 @@ function Tactical({ game, seat }: { game: GameHook; seat: Seat }) {
         <Stat value={p.scored.length} label="выполнены" />
         <Stat value={p.discarded.length} label="сброшены" />
       </div>
-      <p className="mt-2 text-[11.5px] leading-snug text-white/50">
+      <p className="mt-2 text-[12px] leading-snug text-fg-3">
         {all.length} карт, одинаковых у атакующего и защитника. Колода перемешана, порядок скрыт. В начале каждой своей фазы командования — 2 карты
         сверху колоды. Карта активна до выполнения или сброса, предела руки нет.
       </p>
@@ -149,7 +149,7 @@ function Tactical({ game, seat }: { game: GameHook; seat: Seat }) {
               </CardRow>
             );
           })}
-          <p className="text-[11px] text-white/45">№ — порядок, в котором карты вышли из колоды.</p>
+          <p className="text-[12px] text-fg-3">№ — порядок, в котором карты вышли из колоды.</p>
         </div>
       )}
 
@@ -162,9 +162,9 @@ function Tactical({ game, seat }: { game: GameHook; seat: Seat }) {
             <ul className="mt-1.5 space-y-1.5">
               {past.map((x, i) => (
                 <li key={`${x.id}-${i}`} className="flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2">
-                  <span className="w-7 shrink-0 text-[11px] font-semibold text-white/45">{x.n != null ? `№${x.n}` : ''}</span>
+                  <span className="w-7 shrink-0 text-[12px] font-semibold text-fg-3">{x.n != null ? `№${x.n}` : ''}</span>
                   <CardLink id={x.id} seat={seat} name={byId(x.id)?.name ?? x.id} className="flex-1 text-sm font-semibold" />
-                  <span className="shrink-0 text-[11px] text-white/50">{x.text}</span>
+                  <span className="shrink-0 text-[12px] text-fg-3">{x.text}</span>
                 </li>
               ))}
             </ul>
@@ -197,9 +197,9 @@ export function DeckList({ cards, status, seat }: { cards: MissionCard[]; status
             >
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-semibold">{c.name}</span>
-                <span className="block text-[11px] text-white/45">{turnsOf(c, 'tactical').map((t) => TURN_RU[t][1]).join(' · ')}</span>
+                <span className="block text-[12px] text-fg-3">{turnsOf(c, 'tactical').map((t) => TURN_RU[t][1]).join(' · ')}</span>
               </span>
-              {st && <span className="shrink-0 text-[11px] text-accent/90">{st}</span>}
+              {st && <span className="shrink-0 text-[12px] text-accent/90">{st}</span>}
               <Icon name="info" className="size-4 shrink-0 text-accent/80" />
             </button>
           </li>
@@ -230,7 +230,7 @@ function CardRow({
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2.5">
       <div className="flex w-full items-baseline gap-2">
-        {n != null && <span className="shrink-0 text-[11px] font-semibold text-white/45">№{n}</span>}
+        {n != null && <span className="shrink-0 text-[12px] font-semibold text-fg-3">№{n}</span>}
         <CardLink id={card.id} seat={seat} name={card.name} className="flex-1 text-sm font-bold" />
       </div>
       <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -245,16 +245,16 @@ function CardRow({
         ))}
       </div>
       {showDrawn && card.drawn && (
-        <p className="mt-1.5 text-[12px] leading-snug text-white/70">
-          <span className={cx('font-semibold', card.drawnRequired ? 'text-warn' : 'text-white/50')}>
+        <p className="mt-1.5 text-[12px] leading-snug text-fg-2">
+          <span className={cx('font-semibold', card.drawnRequired ? 'text-warn' : 'text-fg-3')}>
             {card.drawnRequired ? 'Когда взята — обязательно: ' : 'Когда взята: '}
           </span>
           {card.drawn}
         </p>
       )}
       {note && (
-        <p className="mt-1 text-[12px] text-white/70">
-          <span className="font-semibold text-white/50">Заметка: </span>
+        <p className="mt-1 text-[12px] text-fg-2">
+          <span className="font-semibold text-fg-3">Заметка: </span>
           {note}
         </p>
       )}
@@ -264,7 +264,7 @@ function CardRow({
 
 function Chip({ tone, children }: { tone?: 'accent'; children: ReactNode }) {
   return (
-    <span className={cx('rounded-full border px-2 py-0.5 text-[11px]', tone === 'accent' ? 'border-accent/40 text-accent' : 'border-white/15 text-white/75')}>
+    <span className={cx('rounded-full border px-2 py-0.5 text-[12px]', tone === 'accent' ? 'border-accent/40 text-accent' : 'border-white/15 text-fg-2')}>
       {children}
     </span>
   );
@@ -274,7 +274,7 @@ function Stat({ value, label }: { value: number; label: string }) {
   return (
     <div className="rounded-xl border border-white/10 px-1 py-1.5 text-center">
       <span className="font-display block text-xl font-semibold leading-none">{value}</span>
-      <span className="text-[10.5px] text-white/50">{label}</span>
+      <span className="text-[12px] text-fg-3">{label}</span>
     </div>
   );
 }
@@ -287,7 +287,7 @@ function Toggle({ open, onClick, children }: { open: boolean; onClick: () => voi
       className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] py-2 text-[13px] font-semibold active:bg-white/10"
     >
       {children}
-      <Icon name="down" className={cx('size-4 text-white/50 transition', open && 'rotate-180')} />
+      <Icon name="down" className={cx('size-4 text-fg-3 transition', open && 'rotate-180')} />
     </button>
   );
 }

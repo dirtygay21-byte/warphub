@@ -85,7 +85,7 @@ export function IconButton({ icon, onClick, label, className }: { icon: string; 
         haptic.tap();
         onClick();
       }}
-      className={cx('flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-white/80 transition hover:bg-white/[0.08] hover:text-white active:bg-white/10', className)}
+      className={cx('ds-hit flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-white/80 transition hover:bg-white/[0.08] hover:text-white active:bg-white/10', className)}
     >
       <Icon name={icon} />
     </button>
@@ -149,7 +149,7 @@ export function Segmented<T extends string>({ value, options, onChange, classNam
             )}
           >
             <span className="block leading-tight">{o.label}</span>
-            {o.hint != null && <span className={cx('block text-xs font-medium', active ? 'text-accent/70' : 'text-white/45')}>{o.hint}</span>}
+            {o.hint != null && <span className={cx('block text-xs font-medium', active ? 'text-accent/70' : 'text-fg-3')}>{o.hint}</span>}
           </button>
         );
       })}
@@ -176,8 +176,8 @@ export function Field({ label, children, hint }: { label: ReactNode; children: R
   return (
     <div className="space-y-2">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-white/45">{label}</span>
-        {hint && <span className="text-xs text-white/40">{hint}</span>}
+        <span className="text-xs font-semibold uppercase tracking-wider text-fg-3">{label}</span>
+        {hint && <span className="text-xs text-fg-3">{hint}</span>}
       </div>
       {children}
     </div>
@@ -188,8 +188,8 @@ export function Tag({ children, tone = 'muted' }: { children: ReactNode; tone?: 
   return (
     <span
       className={cx(
-        'inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-semibold uppercase leading-none tracking-wide',
-        tone === 'muted' && 'bg-white/[0.07] text-white/60',
+        'inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[12px] font-semibold uppercase leading-none tracking-wide',
+        tone === 'muted' && 'bg-white/[0.07] text-fg-2',
         tone === 'accent' && 'bg-accent/15 text-accent',
         tone === 'danger' && 'bg-danger/15 text-danger',
         tone === 'warn' && 'bg-warn/15 text-warn',
@@ -204,7 +204,7 @@ export function Empty({ title, children }: { title: string; children?: ReactNode
   return (
     <div className="rounded-2xl border border-dashed border-white/10 px-5 py-8 text-center">
       <p className="font-display text-base font-semibold uppercase text-white/80">{title}</p>
-      {children && <div className="mt-1.5 text-sm text-white/50">{children}</div>}
+      {children && <div className="mt-1.5 text-sm text-fg-3">{children}</div>}
     </div>
   );
 }

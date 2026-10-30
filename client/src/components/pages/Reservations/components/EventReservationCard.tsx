@@ -45,7 +45,7 @@ export function EventReservationCard({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h2 className="truncate text-base font-semibold">{event.title}</h2>
-            <p className="mt-1 text-sm text-white/50">Ближайший ивент</p>
+            <p className="mt-1 text-sm text-fg-3">Ближайший ивент</p>
           </div>
 
           <span className="shrink-0 rounded-full bg-green-400/15 px-3 py-1 text-xs font-semibold text-green-300">
@@ -96,7 +96,7 @@ export function EventReservationCard({
             ) : (
               <XCircle className="size-4" />
             )}
-            {isCancelling ? "Отменяем..." : "Не смогу посетить"}
+            {isCancelling ? "Отменяем…" : "Не смогу посетить"}
           </button>
         </div>
       )}

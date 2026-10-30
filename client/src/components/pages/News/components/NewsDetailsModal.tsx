@@ -38,7 +38,7 @@ export default function NewsDetailsModal({
             type="button"
             onClick={handleClose}
             aria-label="Закрыть"
-            className="flex size-9 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-white/80 transition-colors active:bg-white/10"
+            className="flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-white/80 transition-colors active:bg-white/10"
           >
             <X className="size-4" />
           </button>
@@ -53,7 +53,7 @@ export default function NewsDetailsModal({
 
           {newsQuery.isError && (
             <div className="flex min-h-48 flex-col items-center justify-center gap-4 px-5 py-10 text-center">
-              <p className="text-sm text-white/70">
+              <p className="text-sm text-fg-2">
                 Не удалось загрузить новость. Попробуйте ещё раз.
               </p>
               <button
@@ -76,7 +76,7 @@ export default function NewsDetailsModal({
                   className="aspect-video w-full rounded-xl object-cover"
                 />
               ) : (
-                <div className="flex aspect-video w-full items-center justify-center rounded-xl bg-white/5 text-sm text-white/40">
+                <div className="flex aspect-video w-full items-center justify-center rounded-xl bg-white/5 text-sm text-fg-3">
                   Без обложки
                 </div>
               )}
@@ -85,7 +85,7 @@ export default function NewsDetailsModal({
                 <h3 className="text-xl font-bold uppercase leading-tight tracking-wide">
                   {newsQuery.data.title}
                 </h3>
-                <p className="mt-3 flex items-center gap-2 text-sm text-white/60">
+                <p className="mt-3 flex items-center gap-2 text-sm text-fg-2">
                   <CalendarDays className="size-4 shrink-0 text-accent" />
                   <span>
                     Опубликовано{" "}

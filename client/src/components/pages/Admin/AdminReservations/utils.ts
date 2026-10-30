@@ -61,11 +61,11 @@ export const getStatusStyles = (status: string) => {
   const styles: Record<string, string> = {
     pending: "bg-yellow-400/15 text-yellow-300",
     confirmed: "bg-green-400/15 text-green-300",
-    completed: "bg-white/10 text-white/60",
+    completed: "bg-white/10 text-fg-2",
     cancelled: "bg-red-400/15 text-red-300",
   };
 
-  return styles[status.toLowerCase()] ?? "bg-white/10 text-white/70";
+  return styles[status.toLowerCase()] ?? "bg-white/10 text-fg-2";
 };
 
 export const truncateMiddle = (value: string, max: number) => {

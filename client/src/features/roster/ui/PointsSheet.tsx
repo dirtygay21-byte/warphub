@@ -27,21 +27,21 @@ function SystemCard({ s }: { s: PointSystem }) {
         <p className="min-w-0 flex-1 text-[14px] font-semibold leading-snug">{s.title}</p>
         <Tag tone={STATUS[s.status].tone}>{STATUS[s.status].label}</Tag>
       </div>
-      <p className="mt-1 text-[12px] leading-snug text-white/50">{s.about}</p>
+      <p className="mt-1 text-[12px] leading-snug text-fg-3">{s.about}</p>
       <div className="mt-2">
         {s.lines.map((l, i) => (
           <div key={i} className="border-b border-white/[0.05] py-1.5 last:border-0">
             <div className="flex items-baseline justify-between gap-3">
-              <span className="text-[12.5px] text-white/70">{l.label}</span>
+              <span className="text-[12.5px] text-fg-2">{l.label}</span>
               <span className={cx('shrink-0 text-[13.5px] font-semibold tabular-nums', l.bad ? 'text-danger' : 'text-white/90')}>{l.value}</span>
             </div>
-            {l.note && <p className="mt-0.5 text-[11px] leading-snug text-white/40">{l.note}</p>}
+            {l.note && <p className="mt-0.5 text-[12px] leading-snug text-fg-3">{l.note}</p>}
           </div>
         ))}
       </div>
-      {s.context && <p className="mt-2 rounded-lg bg-white/[0.04] px-2.5 py-1.5 text-[11.5px] leading-snug text-white/55">{s.context}</p>}
+      {s.context && <p className="mt-2 rounded-lg bg-white/[0.04] px-2.5 py-1.5 text-[12px] leading-snug text-fg-3">{s.context}</p>}
       {!!s.sources?.length && (
-        <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-white/40">
+        <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-fg-3">
           Источник:
           {s.sources.map((src) =>
             src.url ? (
@@ -65,8 +65,8 @@ export function PointsSheet({ open, onClose, systems, extra }: { open: boolean; 
         {(['army', 'game'] as PointCategory[]).map((cat) => (
           <section key={cat} className="space-y-2" aria-label={CATEGORY[cat].title}>
             <div className="px-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-white/45">{CATEGORY[cat].title}</p>
-              <p className="text-[11.5px] text-white/40">{CATEGORY[cat].hint}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-fg-3">{CATEGORY[cat].title}</p>
+              <p className="text-[12px] text-fg-3">{CATEGORY[cat].hint}</p>
             </div>
             {systems
               .filter((s) => s.category === cat)

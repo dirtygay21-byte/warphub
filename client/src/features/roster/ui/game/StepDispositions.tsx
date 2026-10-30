@@ -37,7 +37,7 @@ export function StepDispositions({ game, onNext }: { game: GameHook; onNext: () 
       <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-4 text-center">
         {phase === 'pass' ? (
           <>
-            <p className="text-sm text-white/70">Выбор игрока «{state.players.p1.name}» сохранён и скрыт.</p>
+            <p className="text-sm text-fg-2">Выбор игрока «{state.players.p1.name}» сохранён и скрыт.</p>
             <p className="font-display mt-2 text-lg font-semibold uppercase">Передайте телефон: {who}</p>
             <Button variant="primary" className="mt-3 w-full" onClick={() => setPhase('p2')}>
               Я — {who}, выбрать тип армии
@@ -46,7 +46,7 @@ export function StepDispositions({ game, onNext }: { game: GameHook; onNext: () 
         ) : (
           <>
             <p className="font-display text-lg font-semibold uppercase">Оба игрока выбрали</p>
-            <p className="mt-1 text-sm text-white/60">Положите телефон так, чтобы видели оба, и раскройте выбор.</p>
+            <p className="mt-1 text-sm text-fg-2">Положите телефон так, чтобы видели оба, и раскройте выбор.</p>
             <Button
               variant="primary"
               className="mt-3 w-full"
@@ -88,9 +88,9 @@ function Choose({ seat, game, onDone }: { seat: Seat; game: GameHook; onDone: ()
     <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
       <p className="text-sm">
         Выбирает <span className="font-semibold text-accent">{p.name}</span>
-        <span className="text-white/50"> — втайне от соперника</span>
+        <span className="text-fg-3"> — втайне от соперника</span>
       </p>
-      <p className="mt-0.5 text-[11px] text-white/45">
+      <p className="mt-0.5 text-[12px] text-fg-3">
         {list.length === 1
           ? `Ростер «${p.roster.name ?? ''}» даёт один тип армии — подтвердите его.`
           : `Типы армий, которые дают детачменты ростера «${p.roster.name ?? ''}».`}
@@ -107,7 +107,7 @@ function Choose({ seat, game, onDone }: { seat: Seat; game: GameHook; onDone: ()
             )}
           >
             <span className="block text-sm font-semibold">{d.nameRu}</span>
-            <span className="block text-[11px] text-white/45">
+            <span className="block text-[12px] text-fg-3">
               {d.name}
               {d.id === fromRoster ? ' · из ростера' : ''}
             </span>
@@ -139,9 +139,9 @@ function Revealed({ game, onNext }: { game: GameHook; onNext: () => void }) {
             onClick={() => setSide(s)}
             className={cx('min-w-0 rounded-xl border px-2.5 py-2 text-left transition', side === s ? 'border-accent bg-accent/15' : 'border-white/10 bg-white/[0.03] active:bg-white/10')}
           >
-            <span className="block truncate text-[11px] text-white/45">{state.players[s].name}</span>
+            <span className="block truncate text-[12px] text-fg-3">{state.players[s].name}</span>
             <span className="block text-sm font-semibold">{dName(state.players[s].disposition)}</span>
-            <span className="block truncate text-[11px] text-accent">{missions.cards.find((c) => c.id === state.primary[s])?.name ?? '—'}</span>
+            <span className="block truncate text-[12px] text-accent">{missions.cards.find((c) => c.id === state.primary[s])?.name ?? '—'}</span>
           </button>
         ))}
       </div>

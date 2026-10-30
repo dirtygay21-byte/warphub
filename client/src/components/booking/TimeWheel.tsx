@@ -97,7 +97,7 @@ export function TimeWheel({
                 style={{ height: ITEM }}
               >
                 {format(option)}
-                {selected && sub && <span className="text-[11px] font-medium opacity-90">{sub}</span>}
+                {selected && sub && <span className="text-[12px] font-medium opacity-90">{sub}</span>}
               </button>
             );
           })}

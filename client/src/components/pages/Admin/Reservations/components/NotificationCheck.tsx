@@ -14,7 +14,7 @@ export function NotificationCheck() {
     <div className="mb-4 rounded-2xl border border-white/10 bg-white/3 p-3">
       <div className="flex items-center gap-3">
         <BellRing className="size-5 shrink-0 text-accent" />
-        <p className="min-w-0 flex-1 text-sm text-white/70">Уведомления о записях приходят администраторам от бота.</p>
+        <p className="min-w-0 flex-1 text-sm text-fg-2">Уведомления о записях приходят администраторам от бота.</p>
         <button
           type="button"
           disabled={test.isPending}
@@ -29,8 +29,8 @@ export function NotificationCheck() {
         <p className={clsx("mt-2 text-sm", result.ok ? "text-accent" : "text-red-300")}>
           {result.ok ? "✅ " : "⚠️ "}
           {result.message}
-          {result.detail && <span className="block text-xs text-white/50">Ответ Telegram: {result.detail}</span>}
-          <span className="block text-xs text-white/50">Получателей уведомлений: {result.recipients}</span>
+          {result.detail && <span className="block text-xs text-fg-3">Ответ Telegram: {result.detail}</span>}
+          <span className="block text-xs text-fg-3">Получателей уведомлений: {result.recipients}</span>
         </p>
       )}
       {test.isError && <p className="mt-2 text-sm text-red-300">Не удалось выполнить проверку — сервер не ответил.</p>}

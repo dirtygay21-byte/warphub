@@ -55,7 +55,7 @@ export default function GamesHub() {
       />
 
       <div className="px-4">
-        <p className="text-sm text-white/60">
+        <p className="text-sm text-fg-2">
           Играйте и получайте скидки в клубе. За каждую игру — одна награда в неделю:
           засчитывается лучший результат недели.
         </p>
@@ -70,7 +70,7 @@ export default function GamesHub() {
             <p className={`text-base uppercase tracking-wide text-accent ${oswald}`}>
               Мои награды
             </p>
-            <p className="text-xs text-white/60">
+            <p className="text-xs text-fg-2">
               {rewards.isLoading
                 ? "Загружаем…"
                 : activeRewards.length
@@ -107,13 +107,13 @@ export default function GamesHub() {
                   <PixelSprite sprite={ICONS[game.key]} scale={game.key === "egg" ? 1.5 : 2.5} title={game.title} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[10px] uppercase tracking-wider text-white/40">{FACTION_TAG[game.key]}</p>
+                  <p className="text-[12px] uppercase tracking-wider text-fg-3">{FACTION_TAG[game.key]}</p>
                   <h2 className={`text-xl font-medium uppercase leading-tight ${oswald}`}>
                     {game.title}
                   </h2>
-                  <p className="mt-1 line-clamp-3 text-xs text-white/60">{game.description}</p>
+                  <p className="mt-1 line-clamp-3 text-xs text-fg-2">{game.description}</p>
                   {game.bestScore !== null && (
-                    <p className="mt-1.5 inline-flex items-center gap-1 text-xs text-white/70">
+                    <p className="mt-1.5 inline-flex items-center gap-1 text-xs text-fg-2">
                       <Trophy className="size-3.5 text-accent" /> Рекорд: {game.bestScore}{" "}
                       {game.key === "dice" ? "" : game.scoreUnit}
                     </p>
@@ -123,12 +123,12 @@ export default function GamesHub() {
 
               <div className="px-4 pb-4">
                 {game.key === "cards" && game.cards ? (
-                  <div className="grid grid-cols-5 gap-1.5">
+                  <div className="grid grid-cols-3 gap-1.5">
                     {game.cards.rarities.map((r) => (
                       <div key={r.rarity} className="rounded-lg border border-white/10 bg-white/3 py-1.5 text-center">
                         <span className="mx-auto mb-1 block size-2 rotate-45" style={{ background: RARITY_STYLE[r.rarity].gem }} />
-                        <p className="text-[11px] font-semibold text-white">{r.points}</p>
-                        <p className="text-[8px] uppercase text-white/40">{r.label}</p>
+                        <p className="text-[12px] font-semibold text-white">{r.points}</p>
+                        <p className="text-[12px] text-fg-3">{r.label}</p>
                       </div>
                     ))}
                   </div>
@@ -171,13 +171,13 @@ export function MyRewards() {
       <div className="px-4">
         {points.data && (
           <div className="mb-4 rounded-2xl border border-accent/40 bg-accent/10 p-4">
-            <p className="text-xs uppercase tracking-widest text-white/50">Очки на счёте</p>
+            <p className="text-xs uppercase tracking-widest text-fg-3">Очки на счёте</p>
             <p className={`text-4xl text-accent ${oswald}`}>{points.data.balance.toLocaleString("ru-RU")}</p>
-            <p className="mt-1 text-xs text-white/55">
+            <p className="mt-1 text-xs text-fg-3">
               Очки дают карты «Легенд Warp Hub». Администратор может списать их в счёт скидок и призов.
             </p>
             {points.data.history.length > 0 && (
-              <ul className="mt-3 space-y-1 text-xs text-white/60">
+              <ul className="mt-3 space-y-1 text-xs text-fg-2">
                 {points.data.history.slice(0, 5).map((h) => (
                   <li key={h.id} className="flex justify-between gap-2">
                     <span className="truncate">{h.note ?? (h.delta > 0 ? "Начисление" : "Списание")}</span>
@@ -191,7 +191,7 @@ export function MyRewards() {
             )}
           </div>
         )}
-        <p className="mb-4 text-sm text-white/60">
+        <p className="mb-4 text-sm text-fg-2">
           Покажите код администратору в клубе — он отметит награду как использованную.
           Код также приходит сообщением от бота.
         </p>
@@ -204,7 +204,7 @@ export function MyRewards() {
           <ErrorNote message={errorText(rewards.error)} onRetry={() => rewards.refetch()} />
         )}
         {rewards.data && sorted.length === 0 && (
-          <p className="rounded-2xl border border-dashed border-white/15 p-6 text-center text-sm text-white/50">
+          <p className="rounded-2xl border border-dashed border-white/15 p-6 text-center text-sm text-fg-3">
             Наград пока нет. Сыграйте в мини-игру — награда появится здесь.
           </p>
         )}

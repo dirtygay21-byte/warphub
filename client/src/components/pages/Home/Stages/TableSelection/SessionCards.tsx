@@ -3,8 +3,11 @@ import { formatClubTime, formatClubTimeRange } from "@/utils/clubTime";
 import { getWindowLimit, hoursLabel } from "@/utils/slots";
 import { formatDurationLabel } from "@/utils/duration";
 import clsx from "clsx";
-import { GraduationCap, Swords, UserRound, UsersRound } from "lucide-react";
+import { ChevronDown, ChevronRight, GraduationCap, Swords, UserRound, UsersRound } from "lucide-react";
+import { useState } from "react";
 import type { ReactNode } from "react";
+import { Badge, DsButton } from "@/components/ui/ds";
+import { haptic } from "@/utils/haptic";
 
 type WindowLimit = ReturnType<typeof getWindowLimit>;
 
@@ -17,31 +20,22 @@ function OccupancyBadge({
 }) {
   const full = occupied >= capacity;
   return (
-    <span
-      className={clsx(
-        "shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold",
-        full
-          ? "bg-red-400/15 text-red-300"
-          : occupied > 0
-            ? "bg-yellow-400/15 text-yellow-200"
-            : "bg-green-400/15 text-green-300",
-      )}
-    >
+    <Badge tone={full ? "danger" : occupied > 0 ? "warn" : "muted"} className="tabular-nums" >
       {occupied}/{capacity}
-    </span>
+    </Badge>
   );
 }
 
 export function TrainerBadge({ players }: { players: number }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2.5 py-1 text-xs font-semibold text-accent">
+    <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg bg-accent/15 px-2 py-1 text-[12px] font-semibold text-accent">
       <GraduationCap className="size-3.5" />
       {players === 1 ? "1 игрок + тренер" : `${players} игрока + тренер`}
     </span>
   );
 }
 
-/** Игра 1/2: виден первый игрок, можно присоединиться */
+/** Игра 1/2: свёрнутая карточка (время, игрок, игра); по нажатию — армия, очки, опыт и «Присоединиться» */
 export function OpenSessionCard({
   session,
   hasTrainer,
@@ -51,67 +45,111 @@ export function OpenSessionCard({
   hasTrainer: boolean;
   onJoin: () => void;
 }) {
+  const [open, setOpen] = useState(false);
+  const first = session.players[0];
+  const summary = [first?.firstName, first?.experienceLabel, first?.army ? first.gameLabel ?? "Warhammer 40,000" : null]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
-    <article className="rounded-xl border border-accent bg-app-elevated p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-base font-semibold">
-            {formatClubTimeRange(session.startsAt, session.endsAt)}
-          </p>
-          <p className="mt-1 text-xs text-white/55">
-            {session.freeSeats === 1
-              ? "Свободно 1 место"
-              : `Свободно мест: ${session.freeSeats}`}
-          </p>
-        </div>
-        <OccupancyBadge occupied={session.occupied} capacity={session.capacity} />
-      </div>
-
-      {hasTrainer && (
-        <div className="mt-3">
-          <TrainerBadge players={session.capacity} />
-        </div>
-      )}
-
-      <ul className="mt-3 space-y-2">
-        {session.players.map((player, index) => (
-          <li
-            key={index}
-            className="rounded-lg border border-white/10 bg-white/3 px-3 py-2.5"
-          >
-            <p className="flex items-center gap-2 text-sm font-semibold">
-              <UserRound className="size-4 text-accent" />
-              {player.firstName}
-            </p>
-            {player.army && (
-              <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs">
-                <dt className="text-white/45">Игра</dt>
-                <dd className="text-white/85">{player.gameLabel ?? "Warhammer 40,000"}</dd>
-                <dt className="text-white/45">{player.game === "kt" ? "Команда" : player.game === "warcry" ? "Варбанда" : "Армия"}</dt>
-                <dd className="text-white/85">{player.army}</dd>
-                {player.points != null && (
-                  <>
-                    <dt className="text-white/45">Очки</dt>
-                    <dd className="text-white/85">{player.points}</dd>
-                  </>
-                )}
-                <dt className="text-white/45">Опыт</dt>
-                <dd className="text-white/85">{player.experienceLabel}</dd>
-              </dl>
-            )}
-          </li>
-        ))}
-      </ul>
-
+    <article className={clsx("overflow-hidden rounded-[16px] border bg-app-elevated transition-colors duration-200", open ? "border-accent" : "border-accent/40")}>
       <button
         type="button"
-        onClick={onJoin}
-        className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground transition-transform active:scale-95"
+        onClick={() => {
+          haptic.tap();
+          setOpen((value) => !value);
+        }}
+        aria-expanded={open}
+        className="ds-press flex min-h-[64px] w-full items-center gap-3 px-4 py-3 text-left"
       >
-        <Swords className="size-4" />
-        Присоединиться
+        <span className="min-w-0 flex-1">
+          <span className="block text-base font-bold">{formatClubTimeRange(session.startsAt, session.endsAt)}</span>
+          {summary && <span className="mt-0.5 block truncate text-sm text-fg-2">{summary}</span>}
+        </span>
+        <OccupancyBadge occupied={session.occupied} capacity={session.capacity} />
+        <ChevronDown className={clsx("size-5 shrink-0 text-accent transition-transform duration-200", open && "rotate-180")} />
       </button>
+
+      {open && (
+        <div className="ds-fade border-t border-white/[0.06] px-4 pb-4 pt-3">
+          {hasTrainer && (
+            <div className="mb-3">
+              <TrainerBadge players={session.capacity} />
+            </div>
+          )}
+          <ul className="space-y-2">
+            {session.players.map((player, index) => (
+              <li key={index} className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
+                <p className="flex items-center gap-2 text-sm font-semibold">
+                  <UserRound className="size-4 text-accent" />
+                  {player.firstName}
+                </p>
+                {player.army && (
+                  <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+                    <dt className="text-fg-3">Игра</dt>
+                    <dd className="text-fg">{player.gameLabel ?? "Warhammer 40,000"}</dd>
+                    <dt className="text-fg-3">{player.game === "kt" ? "Команда" : player.game === "warcry" ? "Варбанда" : "Армия"}</dt>
+                    <dd className="text-fg">{player.army}</dd>
+                    {player.points != null && (
+                      <>
+                        <dt className="text-fg-3">Очки</dt>
+                        <dd className="text-fg">{player.points}</dd>
+                      </>
+                    )}
+                    <dt className="text-fg-3">Опыт</dt>
+                    <dd className="text-fg">{player.experienceLabel}</dd>
+                  </dl>
+                )}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-[13px] text-fg-2">
+            {session.freeSeats === 1 ? "Свободно 1 место" : `Свободно мест: ${session.freeSeats}`}
+          </p>
+          <DsButton variant="primary" onClick={onJoin} className="mt-3 w-full">
+            <Swords className="size-4" />
+            Присоединиться к игре
+          </DsButton>
+        </div>
+      )}
     </article>
+  );
+}
+
+/** Строка-выбор: вся карточка нажимается (концепт «Начать новую игру»). */
+function PickCard({
+  disabled,
+  tone,
+  onSelect,
+  children,
+  aside,
+}: {
+  disabled: boolean;
+  tone: "normal" | "limited" | "none";
+  onSelect: () => void;
+  children: ReactNode;
+  aside: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => {
+        haptic.tap();
+        onSelect();
+      }}
+      className={clsx(
+        "flex min-h-[64px] w-full items-center gap-3.5 rounded-[16px] border bg-app-elevated px-4 py-3.5 text-left",
+        disabled ? "cursor-not-allowed border-white/[0.08] opacity-60" : "ds-press active:border-accent",
+        !disabled && (tone === "limited" ? "border-danger/50" : "border-white/[0.14]"),
+      )}
+    >
+      <span className="min-w-0 flex-1">{children}</span>
+      <span className="flex shrink-0 items-center gap-2">
+        {aside}
+        {!disabled && <ChevronRight className="size-5 text-fg-3" />}
+      </span>
+    </button>
   );
 }
 
@@ -133,40 +171,26 @@ export function FreeSlotCard({
   hasTrainer: boolean;
   onSelect: () => void;
 }) {
+  const duration = formatDurationLabel(durationMinutes);
   return (
-    <article className={clsx("rounded-xl border bg-app-elevated p-4", limit.state === "none" ? "border-white/10 opacity-60" : limit.state === "limited" ? "border-red-400/50" : "border-white/15")}>
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-base font-semibold">{label}</p>
-          <p className="mt-1 text-sm text-white/70">
-            Свободно {formatClubTimeRange(segment.startsAt, segment.endsAt)}
-          </p>
-          {formatDurationLabel(durationMinutes) && (
-            <p className="mt-1 text-xs font-medium text-accent">
-              {formatDurationLabel(durationMinutes)}
-            </p>
-          )}
-          <LimitNote limit={limit} durationMinutes={durationMinutes} />
-        </div>
-        <OccupancyBadge occupied={0} capacity={capacity} />
-      </div>
-
+    <PickCard
+      disabled={limit.state === "none"}
+      tone={limit.state === "limited" ? "limited" : limit.state === "none" ? "none" : "normal"}
+      onSelect={onSelect}
+      aside={<OccupancyBadge occupied={0} capacity={capacity} />}
+    >
+      <span className="block text-base font-bold">{label}</span>
+      <span className="mt-0.5 block text-sm text-fg-2">
+        Свободно {formatClubTimeRange(segment.startsAt, segment.endsAt)}
+        {duration && <span className="whitespace-nowrap"> · {duration}</span>}
+      </span>
       {hasTrainer && (
-        <div className="mt-3">
+        <span className="mt-2 block">
           <TrainerBadge players={capacity} />
-        </div>
+        </span>
       )}
-
-      {limit.state !== "none" && (
-        <button
-          type="button"
-          onClick={onSelect}
-          className="mt-4 w-full rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground transition-transform active:scale-95"
-        >
-          Выбрать
-        </button>
-      )}
-    </article>
+      <LimitNote limit={limit} durationMinutes={durationMinutes} />
+    </PickCard>
   );
 }
 
@@ -177,20 +201,20 @@ export function FreeSlotCard({
 export function LimitNote({ limit, durationMinutes }: { limit: WindowLimit; durationMinutes: number }) {
   if (limit.state === "full") return null;
   if (limit.state === "none")
-    return <p className="mt-1.5 text-xs font-semibold text-red-300">Свободного времени не хватает даже на укороченную запись</p>;
+    return <span className="mt-1.5 block text-[13px] font-semibold text-danger">Свободного времени не хватает даже на укороченную запись</span>;
   return (
-    <p className="mt-1.5 rounded-lg border border-red-400/40 bg-red-400/10 px-2 py-1 text-xs font-semibold text-red-300">
+    <span className="mt-1.5 block rounded-lg border border-danger/40 bg-danger/10 px-2 py-1 text-[13px] font-semibold text-danger">
       Только {hoursLabel(limit.maxMinutes)} вместо {hoursLabel(durationMinutes)} — до {formatClubTime(limit.until)}
-    </p>
+    </span>
   );
 }
 
 export function FullSessionRow({ session }: { session: TableSession }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/3 px-3 py-2.5 text-sm text-white/60">
+    <div className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-fg-2">
       <span>{formatClubTimeRange(session.startsAt, session.endsAt)}</span>
       <span className="flex items-center gap-2">
-        <span className="text-xs">Мест нет</span>
+        <span className="text-[13px]">Мест нет</span>
         <OccupancyBadge occupied={session.occupied} capacity={session.capacity} />
       </span>
     </div>
@@ -213,44 +237,22 @@ export function PoolSlotCard({
 }) {
   const occupied = capacity - segment.freeSeats;
   const full = segment.freeSeats <= 0 || limit.state === "none";
+  const duration = formatDurationLabel(durationMinutes);
 
   return (
-    <article
-      className={clsx(
-        "rounded-xl border bg-app-elevated p-4",
-        full ? "border-white/10 opacity-60" : "border-accent",
-      )}
+    <PickCard
+      disabled={full}
+      tone={limit.state === "limited" ? "limited" : "normal"}
+      onSelect={onSelect}
+      aside={<OccupancyBadge occupied={occupied} capacity={capacity} />}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-base font-semibold">
-            {formatClubTimeRange(segment.startsAt, segment.endsAt)}
-          </p>
-          <p className="mt-1 text-sm text-white/70">
-            {full
-              ? "Мест нет"
-              : `Занято ${occupied} из ${capacity} · свободно ${segment.freeSeats}`}
-          </p>
-          {formatDurationLabel(durationMinutes) && (
-            <p className="mt-1 text-xs font-medium text-accent">
-              {formatDurationLabel(durationMinutes)}
-            </p>
-          )}
-          {segment.freeSeats > 0 && <LimitNote limit={limit} durationMinutes={durationMinutes} />}
-        </div>
-        <OccupancyBadge occupied={occupied} capacity={capacity} />
-      </div>
-
-      {!full && (
-        <button
-          type="button"
-          onClick={onSelect}
-          className="mt-4 w-full rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground transition-transform active:scale-95"
-        >
-          Выбрать
-        </button>
-      )}
-    </article>
+      <span className="block text-base font-bold">{formatClubTimeRange(segment.startsAt, segment.endsAt)}</span>
+      <span className="mt-0.5 block text-sm text-fg-2">
+        {full ? "Мест нет" : `Занято ${occupied} из ${capacity} · свободно ${segment.freeSeats}`}
+        {!full && duration && <span className="whitespace-nowrap"> · {duration}</span>}
+      </span>
+      {segment.freeSeats > 0 && <LimitNote limit={limit} durationMinutes={durationMinutes} />}
+    </PickCard>
   );
 }
 
@@ -265,11 +267,11 @@ export function SectionTitle({
 }) {
   return (
     <div className="mb-3">
-      <h2 className="flex items-center gap-2 text-xl font-medium">
+      <h2 className="flex items-center gap-2 font-display text-lg font-semibold uppercase leading-tight">
         {icon}
         {children}
       </h2>
-      {hint && <p className="mt-1 text-xs text-white/50">{hint}</p>}
+      {hint && <p className="mt-1 text-sm text-fg-2">{hint}</p>}
     </div>
   );
 }

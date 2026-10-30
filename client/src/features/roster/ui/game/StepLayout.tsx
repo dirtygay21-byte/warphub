@@ -43,9 +43,9 @@ export function StepLayout({ game, onNext }: { game: GameHook; onNext: () => voi
               state.layoutId === l.id ? 'border-accent bg-accent/15' : 'border-white/10 bg-white/[0.03] active:bg-white/10',
             )}
           >
-            <span className="block text-[10.5px] font-semibold uppercase tracking-wider text-white/45">Раскладка</span>
+            <span className="block text-[12px] font-semibold uppercase tracking-wider text-fg-3">Раскладка</span>
             <span className="font-display block text-2xl font-semibold leading-none">{LETTERS[i]}</span>
-            <span className="mt-1 block break-words text-[11px] leading-tight text-white/55">{depName(l.deployment)}</span>
+            <span className="mt-1 block break-words text-[12px] leading-tight text-fg-3">{depName(l.deployment)}</span>
           </button>
         ))}
       </div>
@@ -54,7 +54,7 @@ export function StepLayout({ game, onNext }: { game: GameHook; onNext: () => voi
           {state.layoutId ? 'Тянуть раскладку заново' : 'Случайная раскладка'}
         </Button>
       )}
-      {locked && <p className="text-xs text-white/45">Атакующий и защитник уже определены — раскладка закреплена.</p>}
+      {locked && <p className="text-xs text-fg-3">Атакующий и защитник уже определены — раскладка закреплена.</p>}
 
       {chosen && dep && <MapPanel key={chosen.id} layout={chosen} dep={dep} letter={LETTERS[opts.findIndex((l) => l.id === chosen.id)] ?? ''} />}
 

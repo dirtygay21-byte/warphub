@@ -58,7 +58,7 @@ function Message({ title, text, children }: { title: string; text?: string; chil
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-app-bg px-6 text-center text-white">
       <p className="text-lg font-semibold">{title}</p>
-      {text && <p className="mt-2 text-sm text-white/50">{text}</p>}
+      {text && <p className="mt-2 text-sm text-fg-3">{text}</p>}
       <div className="mt-5 flex gap-2">{children}</div>
     </div>
   );

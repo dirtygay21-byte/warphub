@@ -23,7 +23,7 @@ export function MissionCardView({ card, foeName, className }: { card: Card; foeN
   return (
     <article className={cx('overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]', className)}>
       <header className={cx('border-b border-white/10 px-3.5 py-2.5', card.type === 'primary' ? 'bg-accent/10' : 'bg-white/[0.04]')}>
-        <p className="text-[10.5px] font-semibold uppercase tracking-wider text-white/45">
+        <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">
           {kind}
           {foeName && <> · против: {foeName}</>}
         </p>
@@ -36,7 +36,7 @@ export function MissionCardView({ card, foeName, className }: { card: Card; foeN
           <Block key={i} block={b} showMode={(card.modes?.length ?? 0) > 1} />
         ))}
         {card.actions?.map((a) => <Action key={a.name} action={a} />)}
-        {card.note && <p className="text-[11.5px] leading-snug text-white/50">Примечание: {card.note}</p>}
+        {card.note && <p className="text-[12px] leading-snug text-fg-3">Примечание: {card.note}</p>}
       </div>
     </article>
   );
@@ -44,7 +44,7 @@ export function MissionCardView({ card, foeName, className }: { card: Card; foeN
 
 function Lead({ label, children }: { label: string; children: string }) {
   return (
-    <p className="border-l-2 border-accent/60 pl-2.5 text-[13px] leading-snug text-white/75">
+    <p className="border-l-2 border-accent/60 pl-2.5 text-[13px] leading-snug text-fg-2">
       <span className="font-semibold text-white/90">{label}: </span>
       {children}
     </p>
@@ -59,12 +59,12 @@ function Block({ block, showMode }: { block: MissionBlock; showMode: boolean }) 
         <Tag tone={end ? 'accent' : 'muted'}>{ROUNDS_RU[block.rounds] ?? block.rounds}</Tag>
         {showMode && block.mode && <Tag tone={block.mode === 'fixed' ? 'warn' : 'muted'}>{MODE_RU[block.mode]}</Tag>}
       </div>
-      {!end && <p className="px-3 pt-1.5 text-[12px] font-semibold leading-snug text-white/60">Когда: {block.when}</p>}
+      {!end && <p className="px-3 pt-1.5 text-[12px] font-semibold leading-snug text-fg-2">Когда: {block.when}</p>}
       <ul className="px-3 pb-2.5">
         {block.rows.map((r, i) => (
           <li key={i}>
             {i > 0 && (
-              <p className="my-1.5 flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-wider text-white/35">
+              <p className="my-1.5 flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-fg-3">
                 <span className="h-px flex-1 bg-white/10" />
                 {r.or ? 'или' : r.plus ? 'и сверх того' : 'а также'}
                 <span className="h-px flex-1 bg-white/10" />
@@ -76,9 +76,9 @@ function Block({ block, showMode }: { block: MissionBlock; showMode: boolean }) 
                 <span className={cx('font-display rounded-lg px-2 py-1 text-lg font-semibold leading-none', end ? 'bg-accent text-black' : 'bg-white/10 text-white')}>
                   {r.plus ? '+' : ''}
                   {r.vp}
-                  <span className="ml-0.5 text-[10px] font-semibold">ПО</span>
+                  <span className="ml-0.5 text-[12px] font-semibold">ПО</span>
                 </span>
-                {r.max != null && <span className="mt-1 text-[10px] font-semibold uppercase text-white/45">макс. {r.max} ПО</span>}
+                {r.max != null && <span className="mt-1 text-[12px] font-semibold uppercase text-fg-3">макс. {r.max} ПО</span>}
               </span>
             </div>
           </li>
@@ -102,7 +102,7 @@ function Action({ action }: { action: MissionAction }) {
       <div className="flex items-center gap-2 px-3 pt-2.5">
         <Tag tone="warn">Действие</Tag>
         <p className="min-w-0 text-sm font-semibold">
-          {action.nameRu} <span className="font-normal text-white/45">· {action.name}</span>
+          {action.nameRu} <span className="font-normal text-fg-3">· {action.name}</span>
         </p>
       </div>
       <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 px-3 pb-2.5 pt-1.5 text-[12.5px] leading-snug">
@@ -110,7 +110,7 @@ function Action({ action }: { action: MissionAction }) {
           .filter((r): r is [string, string] => !!r[1])
           .map(([k, v]) => (
             <div key={k} className="contents">
-              <dt className="font-semibold text-white/55">{k}</dt>
+              <dt className="font-semibold text-fg-3">{k}</dt>
               <dd className="text-white/85">{v}</dd>
             </div>
           ))}
@@ -122,7 +122,7 @@ function Action({ action }: { action: MissionAction }) {
 /** Лимиты ПО одной строкой (из missions.json). */
 export function CapsNote({ caps }: { caps: MissionsData['caps'] }) {
   return (
-    <p className="mt-2 text-[11.5px] leading-snug text-white/50">
+    <p className="mt-2 text-[12px] leading-snug text-fg-3">
       Лимит ПО: основная миссия — до {caps.primaryRound} за раунд и {caps.primaryGame} за битву
       {caps.endOfBattleOutsideRoundCap ? ' (ПО «в конце битвы» в лимит раунда не входят)' : ''}; вторичные — до {caps.secondaryRound} за раунд и{' '}
       {caps.secondaryGame} за битву
@@ -154,7 +154,7 @@ export function SecondaryList({ cards }: { cards: Card[] }) {
           <li key={c.id}>
             {open === c.id ? (
               <div>
-                <button type="button" onClick={() => setOpen(null)} className="mb-1 flex w-full items-center gap-1 text-xs font-semibold text-white/55">
+                <button type="button" onClick={() => setOpen(null)} className="mb-1 flex w-full items-center gap-1 text-xs font-semibold text-fg-3">
                   <Icon name="down" className="size-4 rotate-180" />
                   Свернуть
                 </button>
@@ -168,9 +168,9 @@ export function SecondaryList({ cards }: { cards: Card[] }) {
               >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold">{c.name}</span>
-                  <span className="block text-[11px] text-white/45">{(c.modes ?? []).map((m) => MODE_RU[m]).join(' / ')}</span>
+                  <span className="block text-[12px] text-fg-3">{(c.modes ?? []).map((m) => MODE_RU[m]).join(' / ')}</span>
                 </span>
-                <Icon name="chevron" className="size-4 text-white/40" />
+                <Icon name="chevron" className="size-4 text-fg-3" />
               </button>
             )}
           </li>

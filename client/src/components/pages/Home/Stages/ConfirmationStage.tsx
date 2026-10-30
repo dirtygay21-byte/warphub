@@ -125,7 +125,7 @@ export default function ConfirmationStage({
               ? "Ты в игре!"
               : "Ты записан!"}
         </h2>
-        <p className="mt-2 text-base text-white/60">
+        <p className="mt-2 text-base text-fg-2">
           {isSuccess
             ? "Мы ждем тебя в клубе"
             : "Не удалось подтвердить запись. Попробуй еще раз."}
@@ -135,11 +135,11 @@ export default function ConfirmationStage({
           <div className="mb-3 flex items-start justify-between gap-3">
             <h3 className="text-base font-semibold leading-tight">
               {serviceQuery.isLoading
-                ? "Загрузка..."
+                ? "Загрузка…"
                 : (activity ?? "Услуга")}
             </h3>
             {discipline && (
-              <span className="shrink-0 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/75">
+              <span className="shrink-0 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-fg-2">
                 {discipline}
               </span>
             )}
@@ -168,7 +168,7 @@ export default function ConfirmationStage({
 
         {isSuccess ? (
           <>
-            <div className="mt-3 w-full rounded-xl bg-white/6 px-4 py-3 text-sm text-white/70">
+            <div className="mt-3 w-full rounded-xl bg-white/6 px-4 py-3 text-sm text-fg-2">
               Мы напомним тебе за 1 час до начала игры.
             </div>
 
@@ -206,7 +206,7 @@ export default function ConfirmationStage({
 function InfoRow({ icon, value }: { icon: ReactNode; value: string }) {
   return (
     <div className="flex items-center gap-3 text-sm text-white/85">
-      <span className="text-white/75">{icon}</span>
+      <span className="text-fg-2">{icon}</span>
       <span>{value}</span>
     </div>
   );

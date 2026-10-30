@@ -25,7 +25,7 @@ export default function EventCard({ event, onClick }: EventCardProps) {
           className="aspect-[16/7] w-full object-cover"
         />
       ) : (
-        <div className="flex aspect-[16/7] w-full items-center justify-center bg-white/5 text-sm text-white/40">
+        <div className="flex aspect-[16/7] w-full items-center justify-center bg-white/5 text-sm text-fg-3">
           Без баннера
         </div>
       )}
@@ -34,13 +34,13 @@ export default function EventCard({ event, onClick }: EventCardProps) {
         <div>
           <h3 className="text-lg font-semibold text-white">{event.title}</h3>
           {event.description && (
-            <p className="mt-1 line-clamp-2 text-sm text-white/60">
+            <p className="mt-1 line-clamp-2 text-sm text-fg-2">
               {event.description}
             </p>
           )}
         </div>
 
-        <div className="space-y-2 text-sm text-white/70">
+        <div className="space-y-2 text-sm text-fg-2">
           <p className="flex items-start gap-2">
             <CalendarDays className="mt-0.5 size-4 shrink-0 text-accent" />
             <span>{formatEventPeriod(event.startsAt, event.endsAt)}</span>

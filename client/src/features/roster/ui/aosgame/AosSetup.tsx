@@ -21,7 +21,7 @@ export function AosSetup({ game, rosters, index }: { game: AosGameHook; rosters:
         {SEATS.map((seat) => (
           <PlayerRow key={seat} game={game} seat={seat} rosters={rosters} index={index} />
         ))}
-        <p className="text-[11px] text-white/40">Число вспомогательных отрядов берётся из ростера: у кого их меньше, получает +{bp.cp.fewerAuxiliaries} CP в каждом раунде.</p>
+        <p className="text-[12px] text-fg-3">Число вспомогательных отрядов берётся из ростера: у кого их меньше, получает +{bp.cp.fewerAuxiliaries} CP в каждом раунде.</p>
       </Step>
       <Step n={2} title="Батлплан" done={!!s.battleplan}>
         <StepBattleplan game={game} />
@@ -30,20 +30,20 @@ export function AosSetup({ game, rosters, index }: { game: AosGameHook; rosters:
         <StepRoles game={game} />
       </Step>
       <Step n={4} title="Территория атакующего" done={!!s.territory}>
-        {atk ? <StepTerritory game={game} attacker={atk} /> : <p className="text-sm text-white/50">Сначала определите атакующего.</p>}
+        {atk ? <StepTerritory game={game} attacker={atk} /> : <p className="text-sm text-fg-3">Сначала определите атакующего.</p>}
       </Step>
       <Step n={5} title="Боевые тактики" done={s.tacticsRevealed}>
         <StepTactics game={game} />
       </Step>
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        {missing.length ? <p className="text-sm text-white/55">Не готово: {missing.join(', ')}.</p> : <p className="text-sm text-white/70">Всё готово. Расставьте армии по правилам батлплана и начинайте.</p>}
+        {missing.length ? <p className="text-sm text-fg-3">Не готово: {missing.join(', ')}.</p> : <p className="text-sm text-fg-2">Всё готово. Расставьте армии по правилам батлплана и начинайте.</p>}
         <Button variant="primary" className="mt-3 w-full" disabled={!!missing.length} onClick={() => game.dispatch({ type: 'battle-started' })}>
           Начать битву
         </Button>
       </div>
       <details className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
         <summary className="cursor-pointer text-sm font-semibold">Порядок подготовки (GH 2026-27)</summary>
-        <ol className="mt-2 list-decimal space-y-1 pl-5 text-[12.5px] leading-snug text-white/65">
+        <ol className="mt-2 list-decimal space-y-1 pl-5 text-[12.5px] leading-snug text-fg-2">
           {bp.setup.map((x, i) => (
             <li key={i}>{x}</li>
           ))}
@@ -57,7 +57,7 @@ function Step({ n, title, done, children }: { n: number; title: string; done: bo
   return (
     <div className={cx('rounded-2xl border bg-white/[0.03] p-4', done ? 'border-white/10' : 'border-accent/30')}>
       <p className="mb-2 flex items-center gap-2">
-        <span className={cx('flex size-6 items-center justify-center rounded-full text-xs font-semibold', done ? 'bg-accent text-black' : 'bg-white/10 text-white/70')}>
+        <span className={cx('flex size-6 items-center justify-center rounded-full text-xs font-semibold', done ? 'bg-accent text-black' : 'bg-white/10 text-fg-2')}>
           {done ? <Icon name="check" className="size-3.5" /> : n}
         </span>
         <span className="font-display text-lg font-semibold uppercase">{title}</span>
@@ -100,21 +100,21 @@ function PlayerRow({ game, seat, rosters, index }: { game: AosGameHook; seat: Se
       />
       {p.roster.source !== 'none' ? (
         <div className="mt-2 flex items-start gap-2">
-          <p className="min-w-0 flex-1 text-[12.5px] leading-snug text-white/75">
+          <p className="min-w-0 flex-1 text-[12.5px] leading-snug text-fg-2">
             {p.roster.name}
-            <span className="block text-[11px] text-white/45">
+            <span className="block text-[12px] text-fg-3">
               {p.roster.points != null ? `${fmtPts(p.roster.points)} очк.` : 'очки не посчитаны'} · вспомогательных: {p.roster.auxiliaries ?? '—'}
               {p.roster.source === 'code' ? ' · по коду' : ''}
             </span>
           </p>
           {!locked && (
-            <button type="button" onClick={() => setRoster({ source: 'none' })} className="text-[11px] font-semibold text-white/45">
+            <button type="button" onClick={() => setRoster({ source: 'none' })} className="text-[12px] font-semibold text-fg-3">
               Сменить
             </button>
           )}
         </div>
       ) : !own ? (
-        <p className="mt-2 text-[12px] text-white/50">Соперник ещё выбирает ростер на своём телефоне.</p>
+        <p className="mt-2 text-[12px] text-fg-3">Соперник ещё выбирает ростер на своём телефоне.</p>
       ) : (
         <div className="mt-2 space-y-2">
           <Segmented value={mode} onChange={setMode} options={[{ value: 'own', label: 'Мой ростер' }, { value: 'code', label: 'По коду' }]} />
@@ -136,7 +136,7 @@ function PlayerRow({ game, seat, rosters, index }: { game: AosGameHook; seat: Se
                 ))}
               </select>
             ) : (
-              <p className="text-[12px] text-white/50">На этом телефоне нет ростеров AoS — вставьте код соперника.</p>
+              <p className="text-[12px] text-fg-3">На этом телефоне нет ростеров AoS — вставьте код соперника.</p>
             )
           ) : (
             <>
@@ -161,22 +161,22 @@ function PlayerRow({ game, seat, rosters, index }: { game: AosGameHook; seat: Se
 
 export function BattleplanInfo({ bp, n, round, territory, showMap }: { bp: AosBattlepack; n: number; round?: number; territory?: string | null; showMap?: boolean }) {
   const plan = bp.battleplans.find((b) => b.n === n);
-  if (!plan) return <p className="text-sm text-white/50">Нет данных о батлплане №{n}.</p>;
+  if (!plan) return <p className="text-sm text-fg-3">Нет данных о батлплане №{n}.</p>;
   const label = { all: 'каждый раунд', '1': 'раунд 1', '2+': 'раунды 2+' } as const;
   return (
     <div className="rounded-xl border border-white/10 bg-black/20 p-3">
       <p className="text-sm font-semibold">
-        {plan.n}. {plan.name} <span className="text-[11px] font-normal text-white/45">· таблица {plan.table}</span>
+        {plan.n}. {plan.name} <span className="text-[12px] font-normal text-fg-3">· таблица {plan.table}</span>
       </p>
-      <p className="mt-1 text-[12.5px] leading-snug text-white/70">{plan.rules}</p>
+      <p className="mt-1 text-[12.5px] leading-snug text-fg-2">{plan.rules}</p>
       <ul className="mt-2 space-y-1">
         {plan.scoring.map((r, i) => {
           const active = round == null || r.rounds === 'all' || (r.rounds === '1' ? round === 1 : round >= 2);
           return (
-            <li key={i} className={cx('flex gap-2 text-[12px] leading-snug', active ? 'text-white/75' : 'text-white/30')}>
+            <li key={i} className={cx('flex gap-2 text-[12px] leading-snug', active ? 'text-fg-2' : 'text-fg-3')}>
               <span className="font-display w-9 shrink-0 text-right font-semibold text-accent">{r.vp} ПО</span>
               <span className="min-w-0 flex-1">
-                {r.text} <span className="text-white/40">({label[r.rounds]})</span>
+                {r.text} <span className="text-fg-3">({label[r.rounds]})</span>
               </span>
             </li>
           );
@@ -204,7 +204,7 @@ function StepBattleplan({ game }: { game: AosGameHook }) {
     <>
       {s.battleplan && <BattleplanInfo bp={bp} n={s.battleplan} showMap />}
       {last && (
-        <p className="text-[11.5px] text-white/50">
+        <p className="text-[12px] text-fg-3">
           Бросок: D6 таблицы — {last.tableDie} (таблица {last.table}), D6 батлплана — {last.planDie}.
         </p>
       )}
@@ -250,12 +250,12 @@ function StepRoles({ game }: { game: AosGameHook }) {
   return (
     <>
       {atk && (
-        <p className="text-sm text-white/75">
+        <p className="text-sm text-fg-2">
           Атакующий — <b>{names[atk]}</b>, защитник — <b>{names[otherSeat(atk)]}</b>
           {s.rolesSource === 'manual' ? ' (по договорённости)' : ''}.
         </p>
       )}
-      {s.rolesRoll && atk && !rolled && <p className="text-[11.5px] text-white/45">Бросок: {s.rolesRoll.map((x) => `${x.p1}:${x.p2}`).join(', ')}</p>}
+      {s.rolesRoll && atk && !rolled && <p className="text-[12px] text-fg-3">Бросок: {s.rolesRoll.map((x) => `${x.p1}:${x.p2}`).join(', ')}</p>}
       {!rolled ? (
         <div className="flex gap-2">
           <Button variant={atk ? 'ghost' : 'primary'} className="flex-1" onClick={() => setRolled(true)}>
@@ -265,7 +265,7 @@ function StepRoles({ game }: { game: AosGameHook }) {
       ) : (
         <>
           <Dice rolls={r.rolls} winner={r.winner} names={names} />
-          <p className="text-[12.5px] text-white/65">{names[r.winner]} решает, кто атакующий{game.mine(r.winner) ? ':' : ' — ждём выбор на его телефоне.'}</p>
+          <p className="text-[12.5px] text-fg-2">{names[r.winner]} решает, кто атакующий{game.mine(r.winner) ? ':' : ' — ждём выбор на его телефоне.'}</p>
           <div className={cx('grid grid-cols-2 gap-2', !game.mine(r.winner) && 'hidden')}>
             <Button variant="primary" onClick={() => choose(r.winner, 'random')}>
               Я атакую
@@ -277,7 +277,7 @@ function StepRoles({ game }: { game: AosGameHook }) {
         </>
       )}
       <details>
-        <summary className="cursor-pointer text-[12px] text-white/45">Без броска, по договорённости</summary>
+        <summary className="cursor-pointer text-[12px] text-fg-3">Без броска, по договорённости</summary>
         <div className="mt-2 grid grid-cols-2 gap-2">
           {SEATS.map((x) => (
             <Button key={x} variant="outline" className="text-xs" onClick={() => choose(x, 'manual')}>
@@ -299,14 +299,14 @@ function StepTerritory({ game, attacker }: { game: AosGameHook; attacker: Seat }
   const pick = (v: string) => canPick && v !== s.territory && game.dispatch({ type: 'territory-set', territory: v });
   return (
     <>
-      <p className="text-[12.5px] leading-snug text-white/65">
+      <p className="text-[12.5px] leading-snug text-fg-2">
         Защитник ставит цели и террейн по карте, затем {s.players[attacker].name} (атакующий) выбирает свою территорию; вторая достаётся защитнику.
         {map ? ' Нажмите на территорию на карте.' : ' Карты этого батлплана нет — запишите выбор словами.'}
       </p>
       {map && (
         <>
           <BattleplanMap bp={bp} map={map} attacker={isMapTerritory(s.territory) ? s.territory : null} onPick={canPick ? pick : undefined} />
-          {!canPick && <p className="text-[12px] text-white/50">Территорию выбирает {s.players[attacker].name} на своём телефоне.</p>}
+          {!canPick && <p className="text-[12px] text-fg-3">Территорию выбирает {s.players[attacker].name} на своём телефоне.</p>}
           <div className={cx('grid grid-cols-2 gap-2', !canPick && 'hidden')}>
             {(['A', 'B'] as const).map((x) => (
               <Button key={x} variant={s.territory === x ? 'primary' : 'outline'} onClick={() => pick(x)}>
@@ -330,7 +330,7 @@ function StepTerritory({ game, attacker }: { game: AosGameHook; attacker: Seat }
           </Button>
         </div>
       )}
-      {s.territory && <p className="text-[12px] text-white/55">Территория атакующего: {territoryLabel(s.territory)}</p>}
+      {s.territory && <p className="text-[12px] text-fg-3">Территория атакующего: {territoryLabel(s.territory)}</p>}
     </>
   );
 }
@@ -359,7 +359,7 @@ function StepTactics({ game }: { game: AosGameHook }) {
   };
   return (
     <>
-      <p className="text-[12.5px] leading-snug text-white/65">{bp.tactics.rule}</p>
+      <p className="text-[12.5px] leading-snug text-fg-2">{bp.tactics.rule}</p>
       {SEATS.map((seat) => {
         const p = s.players[seat];
         const shown = open === seat;
@@ -367,14 +367,14 @@ function StepTactics({ game }: { game: AosGameHook }) {
           <div key={seat} className="rounded-xl border border-white/10 bg-black/20 p-3">
             <div className="flex items-center gap-2">
               <p className="min-w-0 flex-1 text-sm font-semibold">
-                {p.name} <span className="text-[11px] font-normal text-white/45">· выбрано {p.tacticCards.length} из {bp.tactics.pick}</span>
+                {p.name} <span className="text-[12px] font-normal text-fg-3">· выбрано {p.tacticCards.length} из {bp.tactics.pick}</span>
               </p>
               {game.mine(seat) ? (
                 <Button variant="outline" className="min-h-8 px-3 text-xs" onClick={() => setOpen(shown ? null : seat)}>
                   {shown ? 'Скрыть' : 'Выбрать тайно'}
                 </Button>
               ) : (
-                <span className="text-[11px] text-white/45">{p.tacticCards.length ? 'выбрал' : 'выбирает…'}</span>
+                <span className="text-[12px] text-fg-3">{p.tacticCards.length ? 'выбрал' : 'выбирает…'}</span>
               )}
             </div>
             {shown && (
@@ -391,7 +391,7 @@ function StepTactics({ game }: { game: AosGameHook }) {
                         className={cx('w-full rounded-lg border px-3 py-2 text-left disabled:opacity-40', on ? 'border-accent bg-accent/10' : 'border-white/10 bg-white/[0.03]')}
                       >
                         <span className="text-[13px] font-semibold">{c.name}</span>
-                        <span className="block text-[11px] leading-snug text-white/50">{c.tactics.map((t) => t.name).join(' → ')}</span>
+                        <span className="block text-[12px] leading-snug text-fg-3">{c.tactics.map((t) => t.name).join(' → ')}</span>
                       </button>
                     </li>
                   );
@@ -409,7 +409,7 @@ function StepTactics({ game }: { game: AosGameHook }) {
       >
         Раскрыть карты обоих
       </Button>
-      <p className="text-[11px] text-white/40">{game.online ? 'Каждый выбирает карты на своём телефоне; раскрыть может любой, когда выбрали оба.' : 'Передайте телефон: каждый выбирает свои карты и нажимает «Скрыть».'} После раскрытия карты не меняются.</p>
+      <p className="text-[12px] text-fg-3">{game.online ? 'Каждый выбирает карты на своём телефоне; раскрыть может любой, когда выбрали оба.' : 'Передайте телефон: каждый выбирает свои карты и нажимает «Скрыть».'} После раскрытия карты не меняются.</p>
     </>
   );
 }
@@ -423,9 +423,9 @@ export function TacticCards({ bp, ids, done }: { bp: AosBattlepack; ids: string[
         return (
           <li key={id} className="rounded-lg bg-white/[0.03] px-3 py-2">
             <p className="text-[13px] font-semibold">{c.name}</p>
-            {c.setup && <p className="text-[11.5px] leading-snug text-white/50">Подготовка: {c.setup}</p>}
+            {c.setup && <p className="text-[12px] leading-snug text-fg-3">Подготовка: {c.setup}</p>}
             {c.tactics.map((t) => (
-              <p key={t.tier} className={cx('mt-1 text-[12px] leading-snug', done?.(id, t.tier) ? 'text-white/35 line-through' : 'text-white/70')}>
+              <p key={t.tier} className={cx('mt-1 text-[12px] leading-snug', done?.(id, t.tier) ? 'text-fg-3 line-through' : 'text-fg-2')}>
                 <b className="text-white/85">{TIER_LABEL[t.tier]}</b> · {t.name}: {t.text}
               </p>
             ))}

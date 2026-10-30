@@ -26,7 +26,7 @@ export function AosGameScreen({ onBack, rosters, index, initialRosterId }: { onB
   const startOnline = async () => {
     await game.startOnline(initial());
   };
-  if (loadError) return <Shell onBack={onBack}><p className="mt-10 text-center text-sm text-white/50">Нет данных батлпака: {loadError}</p></Shell>;
+  if (loadError) return <Shell onBack={onBack}><p className="mt-10 text-center text-sm text-fg-3">Нет данных батлпака: {loadError}</p></Shell>;
   if (!bp) {
     return (
       <Shell onBack={onBack}>
@@ -49,7 +49,7 @@ export function AosGameScreen({ onBack, rosters, index, initialRosterId }: { onB
           </div>
         </div>
       )}
-      <p className="mt-6 text-[11px] leading-snug text-white/35">
+      <p className="mt-6 text-[12px] leading-snug text-fg-3">
         Источник: {bp.title}. {bp.source.note}
       </p>
     </Shell>
@@ -66,7 +66,7 @@ function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => vo
           <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Игра</h1>
         </div>
         {undo && (
-          <button type="button" onClick={undo} className="mb-0.5 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-white/75 active:bg-white/10">
+          <button type="button" onClick={undo} className="mb-0.5 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-fg-2 active:bg-white/10">
             Отменить
           </button>
         )}
@@ -88,13 +88,13 @@ function StartCard({ game, onStart, onStartOnline }: { game: AosGameHook; onStar
         <Icon name="book" className="size-5 text-accent" />
         <span className="min-w-0 flex-1">
           <span className="block font-display text-lg font-semibold uppercase leading-tight">Сохранённые игры{count ? ` (${count})` : ''}</span>
-          <span className="block text-[11px] text-white/55">{count ? (unfinished ? `Незаконченных: ${unfinished}` : 'Все законченные') : 'Пока нет — начните новую игру'}</span>
+          <span className="block text-[12px] text-fg-3">{count ? (unfinished ? `Незаконченных: ${unfinished}` : 'Все законченные') : 'Пока нет — начните новую игру'}</span>
         </span>
-        <Icon name="chevron" className="size-4 text-white/40" />
+        <Icon name="chevron" className="size-4 text-fg-3" />
       </button>
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
-        <p className="mt-1 text-sm leading-snug text-white/60">
+        <p className="mt-1 text-sm leading-snug text-fg-2">
           Подготовка по General’s Handbook 2026-27: игроки и ростеры, батлплан, атакующий и защитник, территория, карты боевых тактик. Затем — трекер раундов: priority,
           CP, кубы ярости, батлплан и тактики в конце хода. Игра сохраняется на этом телефоне после каждого действия.
         </p>
@@ -120,15 +120,15 @@ function SavedList({ game, onClose }: { game: AosGameHook; onClose: () => void }
       <div className="flex items-center gap-2">
         <IconButton icon="back" label="Назад" onClick={onClose} className="size-8" />
         <p className="font-display min-w-0 flex-1 text-xl font-semibold uppercase">Сохранённые игры</p>
-        <span className="text-xs text-white/45">{list.length}</span>
+        <span className="text-xs text-fg-3">{list.length}</span>
       </div>
-      {!list.length && <p className="py-6 text-center text-sm text-white/50">Сохранённых игр пока нет.</p>}
+      {!list.length && <p className="py-6 text-center text-sm text-fg-3">Сохранённых игр пока нет.</p>}
       <ul className="space-y-2">
         {list.map((e) => (
           <SavedRow key={e.key} entry={e} rounds={game.bp!.rounds} onOpen={() => void game.openSaved(e.key).then((ok) => ok && haptic.ok())} onRemove={() => game.removeSaved(e.key)} />
         ))}
       </ul>
-      <p className="pt-1 text-[11px] text-white/40">Игры хранятся на этом телефоне (до 20).</p>
+      <p className="pt-1 text-[12px] text-fg-3">Игры хранятся на этом телефоне (до 20).</p>
     </section>
   );
 }
@@ -140,7 +140,7 @@ function SavedRow({ entry, rounds, onOpen, onRemove }: { entry: AosSavedEntry; r
   return (
     <li className={cx('rounded-2xl border bg-white/[0.03]', s.stage === 'finished' ? 'border-white/10' : 'border-accent/30')}>
       <button type="button" onClick={onOpen} className="w-full px-3 pb-2 pt-2.5 text-left active:bg-white/5">
-        <span className="block text-[11px] text-white/45">
+        <span className="block text-[12px] text-fg-3">
           {fmtDate(entry.updatedAt)} · {stage} · {entry.online ? `2 телефона · ${entry.online.code}` : '1 телефон'}
         </span>
         <span className="mt-1 flex items-baseline gap-2">
@@ -153,17 +153,17 @@ function SavedRow({ entry, rounds, onOpen, onRemove }: { entry: AosSavedEntry; r
             </span>
           )}
         </span>
-        <span className="mt-0.5 block text-xs text-white/65">{s.battleplan ? `Батлплан: ${s.battleplan}` : 'Батлплан ещё не выбран'}</span>
+        <span className="mt-0.5 block text-xs text-fg-2">{s.battleplan ? `Батлплан: ${s.battleplan}` : 'Батлплан ещё не выбран'}</span>
       </button>
       <div className="flex items-center justify-end gap-2 border-t border-white/5 px-3 py-1.5">
         {!confirm ? (
-          <button type="button" onClick={() => setConfirm(true)} className="flex items-center gap-1 text-[11px] font-semibold text-white/45 active:text-white/70">
+          <button type="button" onClick={() => setConfirm(true)} className="flex items-center gap-1 text-[12px] font-semibold text-fg-3 active:text-fg-2">
             <Icon name="trash" className="size-3.5" />
             Удалить
           </button>
         ) : (
           <>
-            <span className="min-w-0 flex-1 text-[11px] text-warn">{entry.online ? 'Игра останется на сервере, уберётся только ссылка.' : 'Игра будет удалена с телефона.'}</span>
+            <span className="min-w-0 flex-1 text-[12px] text-warn">{entry.online ? 'Игра останется на сервере, уберётся только ссылка.' : 'Игра будет удалена с телефона.'}</span>
             <Button variant="danger" className="text-xs" onClick={onRemove}>
               Удалить
             </Button>

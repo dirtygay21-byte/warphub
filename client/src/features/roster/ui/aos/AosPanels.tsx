@@ -31,7 +31,7 @@ export function CastBadge({ value, className }: { value?: string | null; classNa
       title={value ?? undefined}
       aria-label={`${c.label} ${c.short}`}
     >
-      <span className="text-[9px] font-semibold uppercase tracking-wider opacity-75">{c.label}</span>
+      <span className="text-[12px] font-semibold uppercase tracking-wider opacity-75">{c.label}</span>
       <span className="font-display text-[17px] font-semibold tabular-nums">{c.short}</span>
     </span>
   );
@@ -43,7 +43,7 @@ export function RefChips({ text, L }: { text: string; L: AosLookup }) {
   if (!refs.tables.length && !refs.lores.length) return null;
   return (
     <div className="mt-2 flex flex-wrap items-center gap-1">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-white/35">Даёт:</span>
+      <span className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Даёт:</span>
       {refs.tables.map(({ type, table }) => (
         <Tag key={table.id} tone="accent">
           {type.name}: {table.name}
@@ -95,14 +95,14 @@ export function SpellsPanel({ roster, L, open, onToggle }: { roster: AosRoster; 
     <section className="rounded-2xl border border-white/10 bg-app-elevated" aria-label="Заклинания и молитвы">
       <div className="flex items-center gap-2 px-4 py-3">
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/45">Заклинания и молитвы · {s.total}</p>
-          <p className="mt-0.5 truncate text-[13px] text-white/60">{s.lores.map((x) => x.lore.name).join(' · ') || 'Лоры не выбраны'}</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-fg-3">Заклинания и молитвы · {s.total}</p>
+          <p className="mt-0.5 truncate text-[13px] text-fg-2">{s.lores.map((x) => x.lore.name).join(' · ') || 'Лоры не выбраны'}</p>
         </div>
         <button
           type="button"
           onClick={() => (haptic.tap(), onToggle())}
           aria-expanded={open}
-          className="flex shrink-0 items-center gap-1 rounded-lg bg-white/[0.06] px-2.5 py-1.5 text-[12px] font-semibold text-white/75 active:bg-white/10"
+          className="flex shrink-0 items-center gap-1 rounded-lg bg-white/[0.06] px-2.5 py-1.5 text-[12px] font-semibold text-fg-2 active:bg-white/10"
         >
           {open ? 'Скрыть лоры' : 'Показать лоры'}
           <Icon name="down" className={cx('size-3.5 transition', open && 'rotate-180')} />
@@ -110,10 +110,10 @@ export function SpellsPanel({ roster, L, open, onToggle }: { roster: AosRoster; 
       </div>
       {open && (
         <div className="space-y-4 border-t border-white/[0.06] px-4 pb-4 pt-3">
-          {casters.length > 0 && <p className="text-[12px] leading-snug text-white/45">{casters.join(' · ')}</p>}
+          {casters.length > 0 && <p className="text-[12px] leading-snug text-fg-3">{casters.join(' · ')}</p>}
           {s.lores.map(({ kind, lore }) => (
             <div key={lore.id} className="space-y-1.5">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">
+              <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">
                 {LORE_LABEL[kind]} · {lore.name}
                 {seasonLabel(lore.season) ? ` · ${seasonLabel(lore.season)}` : ''}
               </p>
@@ -124,13 +124,13 @@ export function SpellsPanel({ roster, L, open, onToggle }: { roster: AosRoster; 
           ))}
           {s.own.map((g) => (
             <div key={g.ws.id} className="space-y-1.5">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Свои · {g.ws.name}</p>
+              <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Свои · {g.ws.name}</p>
               {g.rules.map((it, i) => (
                 <AosRuleCard key={i} rule={it} L={L} />
               ))}
             </div>
           ))}
-          {!s.lores.length && <p className="text-[12.5px] text-white/45">Лоры заклинаний и молитв выбираются в блоке армии выше.</p>}
+          {!s.lores.length && <p className="text-[12.5px] text-fg-3">Лоры заклинаний и молитв выбираются в блоке армии выше.</p>}
         </div>
       )}
     </section>
@@ -154,7 +154,7 @@ export function ManifestationsPanel({ roster, L, open, onToggle }: { roster: Aos
         <Icon name="spark" className="size-5 shrink-0 text-violet-200/80" />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-wider text-violet-200/70">Манифестации{m ? ` · ${m.entries.length}` : ''}</p>
-          <p className="mt-0.5 truncate text-[13px] text-white/60">
+          <p className="mt-0.5 truncate text-[13px] text-fg-2">
             {m ? `${m.lore.name}${m.lore.points ? ` · ${m.lore.points} очк.` : ''}${seasonLabel(m.lore.season) ? ` · ${seasonLabel(m.lore.season)}` : ''}` : 'Лор манифестаций не выбран'}
           </p>
         </div>
@@ -163,7 +163,7 @@ export function ManifestationsPanel({ roster, L, open, onToggle }: { roster: Aos
             type="button"
             onClick={() => (haptic.tap(), onToggle())}
             aria-expanded={open}
-            className="flex shrink-0 items-center gap-1 rounded-lg bg-white/[0.06] px-2.5 py-1.5 text-[12px] font-semibold text-white/75 active:bg-white/10"
+            className="flex shrink-0 items-center gap-1 rounded-lg bg-white/[0.06] px-2.5 py-1.5 text-[12px] font-semibold text-fg-2 active:bg-white/10"
           >
             {open ? 'Скрыть' : 'Показать'}
             <Icon name="down" className={cx('size-3.5 transition', open && 'rotate-180')} />
@@ -172,7 +172,7 @@ export function ManifestationsPanel({ roster, L, open, onToggle }: { roster: Aos
       </div>
       {m && open && (
         <div className="space-y-2.5 border-t border-violet-300/15 px-4 pb-4 pt-3">
-          <p className="text-[12px] leading-snug text-white/45">
+          <p className="text-[12px] leading-snug text-fg-3">
             Манифестации призываются заклинаниями лора и не занимают места в полках; очки платятся один раз — за лор.
           </p>
           {m.entries.map((e, i) => (
@@ -180,7 +180,7 @@ export function ManifestationsPanel({ roster, L, open, onToggle }: { roster: Aos
           ))}
         </div>
       )}
-      {!m && <p className="border-t border-violet-300/15 px-4 py-3 text-[12.5px] text-white/45">Выберите лор манифестаций в блоке армии выше — здесь появятся заклинания призыва и варскроллы манифестаций.</p>}
+      {!m && <p className="border-t border-violet-300/15 px-4 py-3 text-[12.5px] text-fg-3">Выберите лор манифестаций в блоке армии выше — здесь появятся заклинания призыва и варскроллы манифестаций.</p>}
     </section>
   );
 }
@@ -193,27 +193,27 @@ function ManifestationCard({ entry, L }: { entry: ManifestationEntry; L: AosLook
       <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2.5">
         <span className="min-w-0 flex-1">
           <span className="block text-[14px] font-semibold leading-snug text-white/90">{ws?.name ?? spell?.name ?? 'Манифестация'}</span>
-          <span className="block text-[11px] text-violet-200/60">{[ws?.role, ws?.bases ? `подставка ${ws.bases}` : null].filter(Boolean).join(' · ') || 'Манифестация'}</span>
+          <span className="block text-[12px] text-violet-200/60">{[ws?.role, ws?.bases ? `подставка ${ws.bases}` : null].filter(Boolean).join(' · ') || 'Манифестация'}</span>
         </span>
         {cast && <CastBadge value={spell!.value} />}
-        <Icon name="down" className="size-4 shrink-0 text-white/35 transition group-open:rotate-180" />
+        <Icon name="down" className="size-4 shrink-0 text-fg-3 transition group-open:rotate-180" />
       </summary>
       <div className="space-y-3 border-t border-white/[0.06] px-3 pb-3 pt-3">
         {spell ? (
           <div className="space-y-1.5">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-violet-200/60">Призыв</p>
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-violet-200/60">Призыв</p>
             <AosRuleCard rule={spell} L={L} open />
           </div>
         ) : (
-          <p className="rounded-lg bg-warn/10 px-2.5 py-1.5 text-[11.5px] leading-snug text-amber-100">В данных лора нет заклинания призыва для этой манифестации.</p>
+          <p className="rounded-lg bg-warn/10 px-2.5 py-1.5 text-[12px] leading-snug text-amber-100">В данных лора нет заклинания призыва для этой манифестации.</p>
         )}
         {ws ? (
           <div className="space-y-1.5">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-violet-200/60">Варскролл</p>
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-violet-200/60">Варскролл</p>
             <Warscroll ws={ws} L={L} embedded />
           </div>
         ) : (
-          <p className="rounded-lg bg-warn/10 px-2.5 py-1.5 text-[11.5px] leading-snug text-amber-100">Варскролл манифестации не найден в данных — характеристики и способности не показаны.</p>
+          <p className="rounded-lg bg-warn/10 px-2.5 py-1.5 text-[12px] leading-snug text-amber-100">Варскролл манифестации не найден в данных — характеристики и способности не показаны.</p>
         )}
       </div>
     </details>
@@ -247,11 +247,11 @@ export function EnhancementsPanel({ roster, L, onUnit }: { roster: AosRoster; L:
   const taken = [...holders.keys()].filter((id) => L.enh.has(id)).length;
   return (
     <section className="rounded-2xl border border-white/10 bg-app-elevated px-4 py-3" aria-label="Улучшения армии">
-      <p className="text-xs font-semibold uppercase tracking-wider text-white/45">Улучшения армии · выбрано {taken}</p>
+      <p className="text-xs font-semibold uppercase tracking-wider text-fg-3">Улучшения армии · выбрано {taken}</p>
       <div className="mt-2 space-y-2">
         {types.map(({ type, tables }) => (
           <div key={type.key} className="space-y-1.5">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">{type.name}</p>
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{type.name}</p>
             {tables.map((tb) => {
               const picked = tb.items.find((it) => holders.has(it.id));
               // сезонная таблица делит слот с обычной того же типа: выбор в одной занимает и другую
@@ -270,8 +270,8 @@ export function EnhancementsPanel({ roster, L, onUnit }: { roster: AosRoster; L:
                           </span>
                         )}
                       </span>
-                      <span className="block text-[11.5px] leading-snug text-white/45">{tb.eligibility.text}</span>
-                      <span className={cx('mt-0.5 block text-[12px] font-semibold', picked ? 'text-accent/90' : 'text-white/40')}>
+                      <span className="block text-[12px] leading-snug text-fg-3">{tb.eligibility.text}</span>
+                      <span className={cx('mt-0.5 block text-[12px] font-semibold', picked ? 'text-accent/90' : 'text-fg-3')}>
                         {picked
                           ? `${picked.name} — ${holders.get(picked.id)?.ws?.name ?? 'юнит'}`
                           : elsewhere
@@ -279,7 +279,7 @@ export function EnhancementsPanel({ roster, L, onUnit }: { roster: AosRoster; L:
                             : 'не выбрано'}
                       </span>
                     </span>
-                    <Icon name="down" className={cx('mt-1 size-4 shrink-0 text-white/35 transition', isOpen && 'rotate-180')} />
+                    <Icon name="down" className={cx('mt-1 size-4 shrink-0 text-fg-3 transition', isOpen && 'rotate-180')} />
                   </button>
                   {isOpen && (
                     <div className="space-y-1.5 border-t border-white/[0.06] px-3 pb-3 pt-2">
@@ -295,7 +295,7 @@ export function EnhancementsPanel({ roster, L, onUnit }: { roster: AosRoster; L:
         ))}
         {grants.length > 0 && (
           <div className="space-y-1.5">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Улучшения от способностей</p>
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Улучшения от способностей</p>
             {grants.map((g, i) => (
               <AosRuleCard key={i} rule={g.rule} L={L} extraSub={g.source} />
             ))}

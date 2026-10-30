@@ -203,7 +203,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       onClick={onClick}
       className={cx(
         'rounded-xl border px-2.5 py-2 text-left text-[13px] font-semibold leading-tight transition',
-        active ? 'border-accent bg-accent/15 text-white' : 'border-white/10 bg-white/[0.03] text-white/70 active:bg-white/10',
+        active ? 'border-accent bg-accent/15 text-white' : 'border-white/10 bg-white/[0.03] text-fg-2 active:bg-white/10',
       )}
     >
       {children}
@@ -238,7 +238,7 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
   if (error) {
     return (
       <Shell onBack={onBack}>
-        <p className="mt-10 text-center text-sm text-white/50">{error}</p>
+        <p className="mt-10 text-center text-sm text-fg-3">{error}</p>
       </Shell>
     );
   }
@@ -257,23 +257,23 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
     <Shell onBack={onBack}>
       <section className="space-y-3">
         <div>
-          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">Ваш тип армии</p>
+          <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Ваш тип армии</p>
           <div className="grid grid-cols-2 gap-1.5 min-[380px]:grid-cols-3">
             {data.dispositions.map((d) => (
               <Chip key={d.id} active={you === d.id} onClick={() => setYou(d.id)}>
                 {d.nameRu}
-                <span className="block text-[10.5px] font-normal text-white/40">{d.name}</span>
+                <span className="block text-[12px] font-normal text-fg-3">{d.name}</span>
               </Chip>
             ))}
           </div>
         </div>
         <div>
-          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">Противник</p>
+          <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Противник</p>
           <div className="grid grid-cols-2 gap-1.5 min-[380px]:grid-cols-3">
             {data.dispositions.map((d) => (
               <Chip key={d.id} active={foe === d.id} onClick={() => setFoe(d.id)}>
                 {d.nameRu}
-                <span className="block text-[10.5px] font-normal text-white/40">{d.name}</span>
+                <span className="block text-[12px] font-normal text-fg-3">{d.name}</span>
               </Chip>
             ))}
           </div>
@@ -294,9 +294,9 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
                 layout?.id === l.id ? 'border-accent bg-accent/15' : 'border-white/10 bg-white/[0.03] active:bg-white/10',
               )}
             >
-              <span className="block text-[10.5px] font-semibold uppercase tracking-wider text-white/45">Раскладка</span>
+              <span className="block text-[12px] font-semibold uppercase tracking-wider text-fg-3">Раскладка</span>
               <span className="font-display block text-2xl font-semibold leading-none">{LETTERS[i]}</span>
-              <span className="mt-1 block break-words text-[11px] leading-tight text-white/55">{d?.nameRu}</span>
+              <span className="mt-1 block break-words text-[12px] leading-tight text-fg-3">{d?.nameRu}</span>
             </button>
           );
         })}
@@ -325,14 +325,14 @@ export function MapPanel({ layout, dep, letter, className }: { layout: BfLayout;
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
           <p className="font-display text-lg font-semibold uppercase leading-none">{dep.nameRu}</p>
-          <p className="mt-0.5 text-xs text-white/45">{dep.name}</p>
+          <p className="mt-0.5 text-xs text-fg-3">{dep.name}</p>
         </div>
         <GuidesToggle on={showGuides} onChange={setShowGuides} />
       </div>
       <button type="button" onClick={() => setZoom(true)} className="mt-2 block w-full rounded-2xl border border-white/10 bg-black/30 p-2" aria-label="Открыть карту крупно">
         <BattleMap layout={layout} dep={dep} guides={showGuides ? 'all' : 'none'} className="mx-auto block w-full max-w-[420px]" />
       </button>
-      <p className="mt-1.5 text-center text-[11px] leading-relaxed text-white/40">
+      <p className="mt-1.5 text-center text-[12px] leading-relaxed text-fg-3">
         Нажмите на карту, чтобы увеличить. На большой карте нажмите на элемент — останутся только его размеры.
         <br />
         Размеры — от края стола до отмеченной точки элемента · сетка 6″ · стол 44″ × 60″
@@ -368,11 +368,11 @@ export function MapPanel({ layout, dep, letter, className }: { layout: BfLayout;
 /** Источник геометрии раскладок — под картой на обоих экранах. */
 export function MapCredit({ data }: { data: BattlefieldData }) {
   return (
-    <p className="mt-6 text-center text-[11px] leading-relaxed text-white/35">
+    <p className="mt-6 text-center text-[12px] leading-relaxed text-fg-3">
       Раскладки Chapter Approved 2026–27 (Games Workshop), перерисованы по размерам.
       <br />
       Геометрия: Battlemaster ·{' '}
-      <button type="button" className="font-semibold text-white/55 underline" onClick={() => openExternal(data.source.url)}>
+      <button type="button" className="font-semibold text-fg-3 underline" onClick={() => openExternal(data.source.url)}>
         {data.source.credit}
       </button>{' '}
       v{data.source.version} (CC BY 4.0)
@@ -387,7 +387,7 @@ function GuidesToggle({ on, onChange }: { on: boolean; onChange: (v: boolean) =>
       onClick={() => onChange(!on)}
       className={cx(
         'shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition',
-        on ? 'border-accent bg-accent/15 text-accent' : 'border-white/15 text-white/60 active:bg-white/10',
+        on ? 'border-accent bg-accent/15 text-accent' : 'border-white/15 text-fg-2 active:bg-white/10',
       )}
     >
       {on ? 'Размеры: вкл' : 'Размеры: выкл'}
@@ -410,14 +410,14 @@ function PieceInfo({ layout, index, onClose }: { layout: BfLayout; index: number
           {gs.map((g, i) => (
             <li key={i} className="rounded-xl border border-accent/30 bg-accent/10 px-3 py-2">
               <span className="font-display block text-xl font-semibold leading-none text-accent">{inches(g.d)}</span>
-              <span className="mt-1 block text-[11px] text-white/60">{EDGE_RU[SCREEN_EDGE[g.edge]]}</span>
+              <span className="mt-1 block text-[12px] text-fg-2">{EDGE_RU[SCREEN_EDGE[g.edge]]}</span>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="mt-2 text-xs text-white/50">Для этого элемента размеров на карте нет.</p>
+        <p className="mt-2 text-xs text-fg-3">Для этого элемента размеров на карте нет.</p>
       )}
-      <p className="mt-2 text-[11px] text-white/40">Меряйте от края стола до точки, отмеченной на карте. Ориентация — как на экране.</p>
+      <p className="mt-2 text-[12px] text-fg-3">Меряйте от края стола до точки, отмеченной на карте. Ориентация — как на экране.</p>
     </div>
   );
 }
@@ -431,7 +431,7 @@ export function Legend() {
   );
   const box = (c: string) => <span className="size-3 rounded-[3px] border" style={{ background: c + '4d', borderColor: c }} />;
   return (
-    <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-white/65">
+    <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-fg-2">
       {item(box(C.dense), 'Плотный террейн')}
       {item(box(C.light), 'Лёгкий террейн')}
       {item(box(C.defender), 'Зона защитника')}

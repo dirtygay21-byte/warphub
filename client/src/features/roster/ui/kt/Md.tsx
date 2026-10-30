@@ -28,10 +28,10 @@ export function Md({ text, className }: { text: string; className?: string }) {
       }
       blocks.push(
         <div key={blocks.length} className="my-1.5 overflow-x-auto">
-          <table className="w-full text-[11.5px] tabular-nums">
+          <table className="w-full text-[12px] tabular-nums">
             <tbody>
               {rows.map((r, j) => (
-                <tr key={j} className={j === 0 ? 'text-white/55' : 'text-white/80'}>
+                <tr key={j} className={j === 0 ? 'text-fg-3' : 'text-white/80'}>
                   {r.map((c, k) => (
                     <td key={k} className="border-b border-white/5 px-1 py-0.5">
                       {inline(c)}
@@ -56,7 +56,7 @@ export function Md({ text, className }: { text: string; className?: string }) {
         <ul key={blocks.length} className="my-1 space-y-0.5">
           {items.map((it, j) => (
             <li key={j} className="flex gap-1.5" style={{ paddingLeft: it.depth * 12 }}>
-              <span className="text-white/35">•</span>
+              <span className="text-fg-3">•</span>
               <span className="min-w-0 flex-1">{inline(it.text)}</span>
             </li>
           ))}
@@ -72,5 +72,5 @@ export function Md({ text, className }: { text: string; className?: string }) {
       </p>,
     );
   }
-  return <div className={className ?? 'text-[12.5px] leading-snug text-white/75'}>{blocks}</div>;
+  return <div className={className ?? 'text-[12.5px] leading-snug text-fg-2'}>{blocks}</div>;
 }

@@ -34,11 +34,11 @@ export function OnlineSecret({
   const both = chosen(seat) && chosen(opp);
   return (
     <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-4 text-center">
-      <p className="text-sm text-white/70">Ваш выбор ({what}) сохранён и скрыт от соперника.</p>
+      <p className="text-sm text-fg-2">Ваш выбор ({what}) сохранён и скрыт от соперника.</p>
       <p className="font-display mt-2 text-lg font-semibold uppercase">
         {both ? 'Оба игрока выбрали' : `Ждём: ${state.players[opp].name}`}
       </p>
-      {!both && <p className="mt-1 text-[11px] text-white/45">Соперник выбирает на своём телефоне — экран обновится сам.</p>}
+      {!both && <p className="mt-1 text-[12px] text-fg-3">Соперник выбирает на своём телефоне — экран обновится сам.</p>}
       {extra && <div className="mt-3 space-y-2 text-left">{extra}</div>}
       {both && (
         <Button

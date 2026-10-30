@@ -2,7 +2,7 @@ import { LoaderCircle, RefreshCw } from "lucide-react";
 
 export function LoadingView() {
   return (
-    <div className="flex min-h-[calc(100dvh-140px)] items-center justify-center px-6 text-white/60">
+    <div className="flex min-h-[calc(100dvh-140px)] items-center justify-center px-6 text-fg-2">
       <LoaderCircle className="size-8 animate-spin text-accent" />
     </div>
   );
@@ -11,7 +11,7 @@ export function LoadingView() {
 export function ErrorView({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="flex min-h-[calc(100dvh-140px)] flex-col items-center justify-center gap-4 px-6 text-center text-white">
-      <p className="text-sm text-white/70">
+      <p className="text-sm text-fg-2">
         Не удалось загрузить брони. Проверьте подключение к API.
       </p>
       <button

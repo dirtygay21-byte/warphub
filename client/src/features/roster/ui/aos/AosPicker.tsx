@@ -67,21 +67,21 @@ export function AosPicker({
     <Sheet open={!!target} onClose={onClose} title={title} tall>
       <div className="sticky top-0 z-10 -mx-4 space-y-2.5 bg-app-elevated px-4 pb-3">
         {reg && leader && (
-          <p className="rounded-lg bg-white/[0.04] px-3 py-2 text-[12px] leading-snug text-white/55">
+          <p className="rounded-lg bg-white/[0.04] px-3 py-2 text-[12px] leading-snug text-fg-3">
             Места: {slotsUsed(reg, L)}/{regimentCap(reg, roster)} · Варианты: {optionsText(leader)}
           </p>
         )}
         {target?.kind === 'aux' && (
-          <p className="rounded-lg bg-white/[0.04] px-3 py-2 text-[12px] leading-snug text-white/55">
+          <p className="rounded-lg bg-white/[0.04] px-3 py-2 text-[12px] leading-snug text-fg-3">
             Юниты вне полков. Каждый следующий дороже: {roster.auxiliaries.length ? `доплата за этот +${nextAuxiliarySurcharge(roster.auxiliaries.length)} очк.` : 'первый — без доплаты, дальше +20, +40, +60…'}
           </p>
         )}
-        {target?.kind === 'leader' && <p className="rounded-lg bg-white/[0.04] px-3 py-2 text-[12px] leading-snug text-white/55">Полк — это герой-лидер и до 3 юнитов (у генерала — до 4). В армии до 5 полков.</p>}
+        {target?.kind === 'leader' && <p className="rounded-lg bg-white/[0.04] px-3 py-2 text-[12px] leading-snug text-fg-3">Полк — это герой-лидер и до 3 юнитов (у генерала — до 4). В армии до 5 полков.</p>}
         <label className="flex h-11 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 focus-within:border-accent">
-          <Icon name="search" className="size-4 text-white/40" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск по названию" className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/30" />
+          <Icon name="search" className="size-4 text-fg-3" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск по названию" className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-fg-3" />
           {q && (
-            <button type="button" aria-label="Очистить" onClick={() => setQ('')} className="text-white/40">
+            <button type="button" aria-label="Очистить" onClick={() => setQ('')} className="text-fg-3">
               <Icon name="close" className="size-4" />
             </button>
           )}
@@ -106,7 +106,7 @@ export function AosPicker({
         </div>
       </div>
       {visible.length === 0 ? (
-        <div className="py-10 text-center text-sm text-white/45">
+        <div className="py-10 text-center text-sm text-fg-3">
           {rows.length && onlyOk ? (
             <>
               Подходящих юнитов нет.
@@ -129,16 +129,16 @@ export function AosPicker({
                 className={cx('flex w-full items-center gap-3 px-3.5 py-3 text-left transition active:bg-white/[0.06]', !fit.ok && 'cursor-not-allowed')}
               >
                 <div className="min-w-0 flex-1">
-                  <p className={cx('text-[14px] font-semibold leading-snug', !fit.ok && 'text-white/45')}>{w.name}</p>
-                  <p className="mt-0.5 text-[12px] leading-snug text-white/40">
+                  <p className={cx('text-[14px] font-semibold leading-snug', !fit.ok && 'text-fg-3')}>{w.name}</p>
+                  <p className="mt-0.5 text-[12px] leading-snug text-fg-3">
                     {[w.role, w.unitSize > 1 ? `${w.unitSize} мод.` : null, w.unique ? 'Unique' : null, w.warmaster ? 'Warmaster' : null, seasonLabel(w.season), w.legends ? 'Legends' : null]
                       .filter(Boolean)
                       .join(' · ')}
                   </p>
                   {!fit.ok && <p className="mt-1 text-[12px] leading-snug text-amber-200/80">{fit.reason}</p>}
                 </div>
-                <span className={cx('font-display w-11 shrink-0 text-right text-[17px] font-semibold tabular-nums', !fit.ok && 'text-white/35')}>{w.cost ?? '—'}</span>
-                <span className={cx('flex size-8 shrink-0 items-center justify-center rounded-full', fit.ok ? 'bg-accent/15 text-accent' : 'bg-white/[0.04] text-white/25')}>
+                <span className={cx('font-display w-11 shrink-0 text-right text-[17px] font-semibold tabular-nums', !fit.ok && 'text-fg-3')}>{w.cost ?? '—'}</span>
+                <span className={cx('flex size-8 shrink-0 items-center justify-center rounded-full', fit.ok ? 'bg-accent/15 text-accent' : 'bg-white/[0.04] text-fg-3')}>
                   <Icon name={fit.ok ? 'plus' : 'close'} className="size-4" strokeWidth={2.5} />
                 </span>
               </button>
@@ -147,7 +147,7 @@ export function AosPicker({
         </ul>
       )}
       {legendsCount > 0 && (
-        <button type="button" onClick={onToggleLegends} className="mt-4 w-full rounded-xl border border-dashed border-white/10 px-3 py-2.5 text-xs font-semibold text-white/50">
+        <button type="button" onClick={onToggleLegends} className="mt-4 w-full rounded-xl border border-dashed border-white/10 px-3 py-2.5 text-xs font-semibold text-fg-3">
           {roster.showLegends ? 'Скрыть' : 'Показать'} Warhammer Legends ({legendsCount})
         </button>
       )}
@@ -160,7 +160,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
     <button
       type="button"
       onClick={() => (haptic.select(), onClick())}
-      className={cx('shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition', active ? 'bg-accent text-accent-foreground' : 'bg-white/[0.06] text-white/70')}
+      className={cx('shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition', active ? 'bg-accent text-accent-foreground' : 'bg-white/[0.06] text-fg-2')}
     >
       {children}
     </button>

@@ -39,7 +39,7 @@ export function CancelConfirmDialog({
             <h2 id="cancel-dialog-title" className="text-lg font-semibold">
               Отменить запись?
             </h2>
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-fg-2">
               Это действие нельзя будет отменить.
             </p>
           </div>
@@ -49,7 +49,7 @@ export function CancelConfirmDialog({
           {serviceTitle && (
             <p className="font-medium text-white/90">{serviceTitle}</p>
           )}
-          <p className="text-white/60">
+          <p className="text-fg-2">
             {dateLabel} · {timeLabel}
           </p>
         </div>
@@ -72,7 +72,7 @@ export function CancelConfirmDialog({
             ) : (
               <XCircle className="size-4" />
             )}
-            {isPending ? "Отменяем..." : "Да, отменить"}
+            {isPending ? "Отменяем…" : "Да, отменить"}
           </button>
           <button
             type="button"

@@ -42,7 +42,7 @@ export default function AdminRewards() {
     <div className="px-4 py-3 pb-28 text-white sm:px-6">
       <div className="mb-4">
         <h1 className="text-2xl font-semibold">Награды мини-игр</h1>
-        <p className="mt-1 text-sm text-white/50">
+        <p className="mt-1 text-sm text-fg-3">
           Проверка кодов, отметка использования и таблицы наград
         </p>
       </div>
@@ -73,7 +73,7 @@ export default function AdminRewards() {
 
 const STATUS_STYLE: Record<RewardStatus, string> = {
   active: "bg-accent/20 text-accent",
-  used: "bg-white/10 text-white/60",
+  used: "bg-white/10 text-fg-2",
   expired: "bg-[#b13e53]/25 text-[#ff9db0]",
 };
 
@@ -94,16 +94,16 @@ function RewardRow({ reward }: { reward: AdminReward }) {
         <div className="min-w-0">
           <p className="font-mono text-lg font-bold tracking-widest text-accent">{reward.code}</p>
           <p className="mt-1 text-base font-semibold">{reward.label}</p>
-          <p className="text-xs text-white/55">
+          <p className="text-xs text-fg-3">
             {reward.gameTitle} · результат {reward.score}
           </p>
         </div>
-        <span className={clsx("shrink-0 rounded-md px-2 py-1 text-[11px] font-semibold", STATUS_STYLE[reward.status])}>
+        <span className={clsx("shrink-0 rounded-md px-2 py-1 text-[12px] font-semibold", STATUS_STYLE[reward.status])}>
           {REWARD_STATUS_LABELS[reward.status]}
         </span>
       </div>
       <p className="mt-2 text-sm text-white/80">{userLabel(reward.user)}</p>
-      <p className="mt-1 text-xs text-white/50">
+      <p className="mt-1 text-xs text-fg-3">
         Получена {formatClub(reward.createdAt, { day: "numeric", month: "short" })} · действует до{" "}
         {formatClub(reward.expiresAt, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
         {reward.usedAt && ` · использована ${formatClub(reward.usedAt, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`}
@@ -175,11 +175,11 @@ function CheckTab() {
           <Search className="size-4" /> Найти
         </button>
       </form>
-      <p className="text-xs text-white/45">Можно вводить без «WH-», регистр не важен.</p>
+      <p className="text-xs text-fg-3">Можно вводить без «WH-», регистр не важен.</p>
       {query.isFetching && <LoaderCircle className="size-6 animate-spin text-accent" />}
       {query.isError && <p className="text-sm text-[#ff9db0]">{(query.error as Error).message}</p>}
       {query.data && query.data.length === 0 && (
-        <p className="rounded-xl border border-dashed border-white/15 p-4 text-sm text-white/60">
+        <p className="rounded-xl border border-dashed border-white/15 p-4 text-sm text-fg-2">
           Код не найден. Проверьте, нет ли опечатки.
         </p>
       )}
@@ -195,13 +195,13 @@ function Stats() {
   return (
     <div className="mt-6 rounded-xl border border-white/10 bg-white/3 p-4">
       <p className="mb-2 text-sm font-semibold">Неделя {stats.data.weekKey}</p>
-      <div className="space-y-1 text-xs text-white/70">
+      <div className="space-y-1 text-xs text-fg-2">
         {stats.data.games.map((g) => (
           <p key={g.key}>
             {g.title}: игр за 7 дней — {g.playsLast7Days}, наград на этой неделе — {g.rewardsThisWeek}
           </p>
         ))}
-        <p className="text-white/45">Отклонено подозрительных результатов за 7 дней: {stats.data.rejectedLast7Days}</p>
+        <p className="text-fg-3">Отклонено подозрительных результатов за 7 дней: {stats.data.rejectedLast7Days}</p>
       </div>
     </div>
   );
@@ -229,7 +229,7 @@ function ListTab() {
             onClick={() => setStatus(id)}
             className={clsx(
               "rounded-md px-2.5 py-1.5 text-xs",
-              status === id ? "bg-white/15 text-white" : "text-white/55",
+              status === id ? "bg-white/15 text-white" : "text-fg-3",
             )}
           >
             {label}
@@ -237,7 +237,7 @@ function ListTab() {
         ))}
       </div>
       {query.isLoading && <LoaderCircle className="size-6 animate-spin text-accent" />}
-      {query.data?.length === 0 && <p className="text-sm text-white/50">Пусто.</p>}
+      {query.data?.length === 0 && <p className="text-sm text-fg-3">Пусто.</p>}
       {query.data?.map((reward) => <RewardRow key={reward.id} reward={reward} />)}
     </div>
   );
@@ -268,7 +268,7 @@ function NumberField({
 }) {
   return (
     <label className="block">
-      <span className="text-xs text-white/60">{label}</span>
+      <span className="text-xs text-fg-2">{label}</span>
       <input
         type="number"
         step={step}
@@ -276,7 +276,7 @@ function NumberField({
         onChange={(e) => onChange(Number(e.target.value))}
         className={clsx(input, "mt-1")}
       />
-      {hint && <span className="mt-1 block text-[11px] text-white/40">{hint}</span>}
+      {hint && <span className="mt-1 block text-[12px] text-fg-3">{hint}</span>}
     </label>
   );
 }
@@ -342,7 +342,7 @@ function SettingsForm({ initial }: { initial: MinigameSettings }) {
               </label>
             </div>
 
-            <p className="mb-2 text-xs text-white/50">
+            <p className="mb-2 text-xs text-fg-3">
               Награда по результату (от скольких {SCORE_UNITS[key]}). Ниже первого порога — без награды.
             </p>
             <div className="space-y-2">
@@ -382,7 +382,7 @@ function SettingsForm({ initial }: { initial: MinigameSettings }) {
                   <button
                     type="button"
                     onClick={() => update((d) => void d.games[key].tiers.splice(index, 1))}
-                    className="p-2 text-white/50"
+                    className="p-2 text-fg-3"
                     aria-label="Удалить уровень"
                   >
                     <Trash2 className="size-4" />
@@ -478,7 +478,7 @@ function SettingsForm({ initial }: { initial: MinigameSettings }) {
           />
           В каждом пакете хотя бы одна «Необычная» или лучше
         </label>
-        <p className="mb-2 mt-4 text-xs text-white/50">Шанс (вес) выпадения и очки за каждую редкость</p>
+        <p className="mb-2 mt-4 text-xs text-fg-3">Шанс (вес) выпадения и очки за каждую редкость</p>
         <div className="space-y-2">
           {(Object.keys(RARITY_NAMES) as CardRarity[]).map((r) => {
             const total = (Object.keys(RARITY_NAMES) as CardRarity[]).reduce((sum, k) => sum + draft.games.cards.params.rarities[k].weight, 0) || 1;
@@ -486,7 +486,7 @@ function SettingsForm({ initial }: { initial: MinigameSettings }) {
             return (
               <div key={r} className="grid grid-cols-[1.3fr_1fr_1fr] items-center gap-2">
                 <span className="text-sm">
-                  {RARITY_NAMES[r]} <span className="text-xs text-white/40">{pct}%</span>
+                  {RARITY_NAMES[r]} <span className="text-xs text-fg-3">{pct}%</span>
                 </span>
                 <input
                   type="number"
@@ -505,7 +505,7 @@ function SettingsForm({ initial }: { initial: MinigameSettings }) {
               </div>
             );
           })}
-          <p className="text-[11px] text-white/40">Столбцы: вес шанса · очки за карту</p>
+          <p className="text-[12px] text-fg-3">Столбцы: вес шанса · очки за карту</p>
         </div>
       </section>
 
@@ -519,7 +519,7 @@ function SettingsForm({ initial }: { initial: MinigameSettings }) {
         {save.isPending && <LoaderCircle className="size-4 animate-spin" />}
         {saved ? "Сохранено ✓" : "Сохранить настройки"}
       </button>
-      <p className="text-xs text-white/45">
+      <p className="text-xs text-fg-3">
         Изменения действуют для новых попыток. Уже выданные награды не меняются.
       </p>
     </div>
@@ -548,9 +548,9 @@ function PointsTab() {
           <Search className="size-4" /> Найти
         </button>
       </form>
-      <p className="text-xs text-white/45">Очки игроки получают за карты «Легенд Warp Hub». Здесь их можно списать (например, в счёт скидки) или начислить.</p>
+      <p className="text-xs text-fg-3">Очки игроки получают за карты «Легенд Warp Hub». Здесь их можно списать (например, в счёт скидки) или начислить.</p>
       {query.isFetching && <LoaderCircle className="size-6 animate-spin text-accent" />}
-      {query.data && query.data.length === 0 && <p className="text-sm text-white/50">Никого не нашли.</p>}
+      {query.data && query.data.length === 0 && <p className="text-sm text-fg-3">Никого не нашли.</p>}
       {query.data?.map((player) => <PlayerPoints key={player.id} player={player} />)}
     </div>
   );
@@ -576,7 +576,7 @@ function PlayerPoints({ player }: { player: AdminPlayerPoints }) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-semibold">{userLabel(player)}</p>
-          <p className="text-xs text-white/50">
+          <p className="text-xs text-fg-3">
             Карт: {player.totalCards} (разных {player.uniqueCards})
           </p>
         </div>
@@ -606,7 +606,7 @@ function PlayerPoints({ player }: { player: AdminPlayerPoints }) {
       </div>
       {adjust.isError && <p className="mt-2 text-sm text-[#ff9db0]">{(adjust.error as Error).message}</p>}
       {history.data && history.data.history.length > 0 && (
-        <ul className="mt-3 space-y-1 border-t border-white/10 pt-2 text-xs text-white/60">
+        <ul className="mt-3 space-y-1 border-t border-white/10 pt-2 text-xs text-fg-2">
           {history.data.history.slice(0, 6).map((h) => (
             <li key={h.id} className="flex justify-between gap-2">
               <span className="truncate">

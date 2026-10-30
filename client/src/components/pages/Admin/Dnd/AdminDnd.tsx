@@ -46,7 +46,7 @@ export default function AdminDnd() {
     <div className="px-4 py-3 pb-28 text-white sm:px-6">
       <div className="mb-4">
         <h1 className="text-2xl font-semibold">D&D</h1>
-        <p className="mt-1 text-sm text-white/50">
+        <p className="mt-1 text-sm text-fg-3">
           Игры по расписанию и заявки на пробную игру
         </p>
       </div>
@@ -83,7 +83,7 @@ const gameDateLabel = (game: AdminDndGame) =>
 const notPast = (game: AdminDndGame, now: number) => !game.startsAt || new Date(game.startsAt).getTime() >= now;
 
 const STATUS_STYLES: Record<string, string> = {
-  draft: "bg-white/10 text-white/70",
+  draft: "bg-white/10 text-fg-2",
   open: "bg-green-400/15 text-green-300",
   closed: "bg-yellow-400/15 text-yellow-200",
   cancelled: "bg-red-400/15 text-red-300",
@@ -135,7 +135,7 @@ function GamesTab() {
       ) : (
         <div className="space-y-3 lg:grid lg:grid-cols-2 lg:items-start lg:gap-3 lg:space-y-0">
           {upcoming.length === 0 && (
-            <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-white/60 lg:col-span-2">
+            <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-fg-2 lg:col-span-2">
               Предстоящих игр нет. Нажмите «Новая игра», чтобы создать первую.
             </p>
           )}
@@ -147,7 +147,7 @@ function GamesTab() {
             <button
               type="button"
               onClick={() => setShowPast((value) => !value)}
-              className="mt-2 text-left text-sm font-medium text-white/60 hover:text-white lg:col-span-2"
+              className="mt-2 text-left text-sm font-medium text-fg-2 hover:text-white lg:col-span-2"
             >
               {showPast ? "Скрыть прошедшие" : `Показать прошедшие (${past.length})`}
             </button>
@@ -202,16 +202,16 @@ function AdminGameCard({
           <div className="flex flex-wrap items-center gap-2">
             <span
               className={clsx(
-                "rounded-full px-2 py-0.5 text-[11px] font-semibold",
+                "rounded-full px-2 py-0.5 text-[12px] font-semibold",
                 STATUS_STYLES[game.status],
               )}
             >
               {DND_GAME_STATUS_LABELS[game.status]}
             </span>
-            <span className="text-xs text-white/50">{game.gameType}</span>
+            <span className="text-xs text-fg-3">{game.gameType}</span>
           </div>
           <h3 className="mt-1 truncate text-base font-semibold">{game.title}</h3>
-          <p className="text-sm text-white/60">{gameDateLabel(game)}</p>
+          <p className="text-sm text-fg-2">{gameDateLabel(game)}</p>
           <p className="mt-1 text-sm">
             Занято <b>{game.occupied}</b> из {game.capacity} · записей: {game.bookingsCount}
           </p>
@@ -259,7 +259,7 @@ function AdminGameCard({
           {bookingsQuery.isLoading ? (
             <LoaderCircle className="size-5 animate-spin text-accent" />
           ) : (bookingsQuery.data ?? []).length === 0 ? (
-            <p className="text-sm text-white/50">Пока никто не записался.</p>
+            <p className="text-sm text-fg-3">Пока никто не записался.</p>
           ) : (
             <ul className="space-y-2">
               {bookingsQuery.data!.map((booking) => (
@@ -271,7 +271,7 @@ function AdminGameCard({
                   )}
                 >
                   <p className="font-semibold">{userLabel(booking.user)}</p>
-                  <p className="text-xs text-white/65">
+                  <p className="text-xs text-fg-2">
                     Мест: {booking.quantity} · время удобно:{" "}
                     {booking.timeIsConvenient ? "да" : "нет"} · опыт:{" "}
                     {booking.experienceLabel ?? "—"}
@@ -376,7 +376,7 @@ function TrialsTab() {
 
       {filter === "new" && (
         <div className="mb-4 rounded-xl border border-white/10 bg-app-elevated p-3 text-sm">
-          <p className="text-white/70">
+          <p className="text-fg-2">
             Отметьте заявки и объедините их в игру — участники получат
             приглашение в Telegram и смогут записаться.
           </p>
@@ -397,7 +397,7 @@ function TrialsTab() {
           <LoaderCircle className="size-8 animate-spin text-accent" />
         </div>
       ) : trials.length === 0 ? (
-        <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-white/60">
+        <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-fg-2">
           Заявок нет.
         </p>
       ) : (
@@ -434,7 +434,7 @@ function TrialsTab() {
             onClick={(event) => event.stopPropagation()}
           >
             <h2 className="text-lg font-semibold">Объединить в игру</h2>
-            <p className="mt-1 text-sm text-white/60">
+            <p className="mt-1 text-sm text-fg-2">
               Заявок: {selected.length}, игроков: {selectedPlayers}
             </p>
 
@@ -453,7 +453,7 @@ function TrialsTab() {
             {gamesQuery.isLoading ? (
               <LoaderCircle className="size-5 animate-spin text-accent" />
             ) : upcomingGames.length === 0 ? (
-              <p className="text-sm text-white/50">Предстоящих игр нет.</p>
+              <p className="text-sm text-fg-3">Предстоящих игр нет.</p>
             ) : (
               <div className="space-y-2">
                 {upcomingGames.map((game) => (
@@ -465,7 +465,7 @@ function TrialsTab() {
                     className="w-full rounded-lg border border-white/10 bg-white/3 px-3 py-2.5 text-left text-sm active:bg-white/10 disabled:opacity-60"
                   >
                     <p className="font-semibold">{game.title}</p>
-                    <p className="text-xs text-white/60">
+                    <p className="text-xs text-fg-2">
                       {gameDateLabel(game)} · свободно {game.available} из {game.capacity}
                     </p>
                   </button>
@@ -537,11 +537,11 @@ function TrialCard({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-semibold">{userLabel(trial.user)}</p>
-            <span className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-semibold text-white/75">
+            <span className="rounded-full bg-white/10 px-2 py-0.5 text-[12px] font-semibold text-fg-2">
               {DND_TRIAL_STATUS_LABELS[trial.status]}
             </span>
           </div>
-          <p className="mt-1 text-white/75">
+          <p className="mt-1 text-fg-2">
             Игроков: <b>{trial.playersCount}</b>
             {trial.isPrivate && (
               <span className="ml-2 inline-flex items-center gap-1 text-xs text-accent">
@@ -549,13 +549,13 @@ function TrialCard({
               </span>
             )}
           </p>
-          <p className="text-white/75">
+          <p className="text-fg-2">
             Время:{" "}
             {trial.preferredTimeLabels.length ? trial.preferredTimeLabels.join(", ") : "любое"}
             {" · "}Опыт: {trial.experienceLabel ?? "не указан"}
           </p>
-          {trial.notes && <p className="mt-1 text-white/60">«{trial.notes}»</p>}
-          <p className="mt-1 text-xs text-white/40">
+          {trial.notes && <p className="mt-1 text-fg-2">«{trial.notes}»</p>}
+          <p className="mt-1 text-xs text-fg-3">
             {formatClub(trial.createdAt, {
               day: "numeric",
               month: "short",

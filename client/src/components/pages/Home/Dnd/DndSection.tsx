@@ -78,7 +78,7 @@ function BackLink({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-white/60 active:text-white"
+      className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-fg-2 active:text-white"
     >
       <ChevronLeft className="size-4" />
       Назад к D&D
@@ -123,7 +123,7 @@ function DndHome({
           </span>
           <div>
             <h2 className="text-xl font-semibold">Хочу попробовать</h2>
-            <p className="mt-1 text-sm text-white/65">
+            <p className="mt-1 text-sm text-fg-2">
               Никогда не играли или хотите собрать свою компанию? Оставьте
               заявку без даты — мы подберём группу и предложим удобную игру.
             </p>
@@ -140,20 +140,20 @@ function DndHome({
 
       <section>
         <h2 className="mb-1 text-2xl font-medium">Игры по расписанию</h2>
-        <p className="mb-3 text-sm text-white/50">
+        <p className="mb-3 text-sm text-fg-3">
           Конкретная игра с датой и временем — запишитесь сами или с друзьями.
         </p>
 
         {gamesQuery.isLoading ? (
-          <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-white/60">
+          <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-fg-2">
             Загружаем игры...
           </p>
         ) : gamesQuery.isError ? (
-          <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-white/60">
+          <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-fg-2">
             Не удалось загрузить игры. Попробуйте позже.
           </p>
         ) : games.length === 0 ? (
-          <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-white/60">
+          <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-fg-2">
             Ближайших игр пока нет. Оставьте заявку «Хочу попробовать» — мы
             сообщим, когда соберём группу.
           </p>
@@ -194,7 +194,7 @@ export function DndGameCard({
         </span>
         <h3 className="mt-2 text-lg font-semibold leading-tight">{game.title}</h3>
         {game.description && (
-          <p className="mt-1.5 line-clamp-3 text-sm text-white/60">
+          <p className="mt-1.5 line-clamp-3 text-sm text-fg-2">
             {game.description}
           </p>
         )}
@@ -210,7 +210,7 @@ export function DndGameCard({
           </p>
           <p className="flex items-center gap-2">
             <UsersRound className="size-4 text-accent" />
-            <span className={game.isBookable ? "text-green-300" : "text-white/50"}>
+            <span className={game.isBookable ? "text-green-300" : "text-fg-3"}>
               {availabilityLabel(game)}
             </span>
           </p>
@@ -310,7 +310,7 @@ function TrialForm({
         <label className="flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-white/3 px-3 py-3 text-sm text-white/85">
           <span>
             Хотим отдельную игру для своей компании
-            <span className="mt-0.5 block text-xs text-white/45">
+            <span className="mt-0.5 block text-xs text-fg-3">
               Без чужих игроков — например, день с друзьями
             </span>
           </span>
@@ -341,7 +341,7 @@ function TrialForm({
           onClick={() => mutation.mutate()}
           className="w-full rounded-xl bg-accent px-4 py-4 text-base font-semibold text-accent-foreground transition-transform active:scale-95 disabled:opacity-50"
         >
-          {mutation.isPending ? "Отправляем..." : "Отправить заявку"}
+          {mutation.isPending ? "Отправляем…" : "Отправить заявку"}
         </button>
       </div>
     </div>
@@ -428,7 +428,7 @@ function JoinForm({
           }}
           className="w-full rounded-xl bg-accent px-4 py-4 text-base font-semibold text-accent-foreground transition-transform active:scale-95 disabled:opacity-50"
         >
-          {mutation.isPending ? "Записываем..." : "Подтвердить запись"}
+          {mutation.isPending ? "Записываем…" : "Подтвердить запись"}
         </button>
       </div>
     </div>
@@ -454,7 +454,7 @@ function DndDone({ kind, game }: { kind: "trial" | "join"; game?: DndGame }) {
       <h2 className="text-2xl font-semibold">
         {kind === "trial" ? "Заявка отправлена!" : "Ты записан!"}
       </h2>
-      <p className="mt-2 text-base text-white/60">
+      <p className="mt-2 text-base text-fg-2">
         {kind === "trial"
           ? "Мы подберём группу и напишем вам в Telegram."
           : game

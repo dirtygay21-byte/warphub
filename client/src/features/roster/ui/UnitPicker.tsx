@@ -121,10 +121,10 @@ export function UnitPicker({
     <Sheet open={open} onClose={onClose} title="Добавить юнит" tall>
       <div className="sticky top-0 z-10 -mx-4 space-y-2.5 bg-app-elevated px-4 pb-3">
         <label className="flex h-11 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 focus-within:border-accent">
-          <Icon name="search" className="size-4 text-white/40" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск по названию" className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/30" />
+          <Icon name="search" className="size-4 text-fg-3" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск по названию" className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-fg-3" />
           {q && (
-            <button type="button" aria-label="Очистить" onClick={() => setQ('')} className="text-white/40">
+            <button type="button" aria-label="Очистить" onClick={() => setQ('')} className="text-fg-3">
               <Icon name="close" className="size-4" />
             </button>
           )}
@@ -135,10 +135,10 @@ export function UnitPicker({
               key={t.key}
               type="button"
               onClick={() => (haptic.select(), setTab(t.key))}
-              className={cx('shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition', active === t.key ? 'bg-accent text-accent-foreground' : 'bg-white/[0.06] text-white/70')}
+              className={cx('shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition', active === t.key ? 'bg-accent text-accent-foreground' : 'bg-white/[0.06] text-fg-2')}
             >
               {t.chip}
-              <span className={cx('ml-1 tabular-nums', active === t.key ? 'text-accent-foreground/60' : 'text-white/35')}>{t.items.length}</span>
+              <span className={cx('ml-1 tabular-nums', active === t.key ? 'text-accent-foreground/60' : 'text-fg-3')}>{t.items.length}</span>
             </button>
           ))}
         </div>
@@ -147,25 +147,25 @@ export function UnitPicker({
       {allyInfo.length > 0 && (
         <div className="mb-3 space-y-1.5">
           {allyInfo.map((a) => (
-            <details key={a.key} className="group rounded-lg bg-white/[0.04] px-3 py-2 text-xs text-white/55">
+            <details key={a.key} className="group rounded-lg bg-white/[0.04] px-3 py-2 text-xs text-fg-3">
               <summary className="cursor-pointer list-none">
                 <b className="text-white/80">{a.name}:</b> {a.note}
               </summary>
-              {a.text && <p className="mt-1.5 whitespace-pre-line leading-relaxed text-white/60">{cleanRuleText(a.text)}</p>}
+              {a.text && <p className="mt-1.5 whitespace-pre-line leading-relaxed text-fg-2">{cleanRuleText(a.text)}</p>}
             </details>
           ))}
         </div>
       )}
 
       {list.length === 0 ? (
-        <p className="py-10 text-center text-sm text-white/45">Ничего не найдено</p>
+        <p className="py-10 text-center text-sm text-fg-3">Ничего не найдено</p>
       ) : (
         <div className="space-y-5">
           {visible.map((sec) => (
             <section key={sec.key}>
-              <h3 className="mb-2 flex items-baseline justify-between px-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/40">
+              <h3 className="mb-2 flex items-baseline justify-between px-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-fg-3">
                 <span>{sec.title}</span>
-                <span className="tabular-nums text-white/25">{sec.items.length}</span>
+                <span className="tabular-nums text-fg-3">{sec.items.length}</span>
               </h3>
               <ul className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02]">
                 {sec.items.map((ds) => (
@@ -186,7 +186,7 @@ export function UnitPicker({
       )}
 
       {legendsCount > 0 && (
-        <button type="button" onClick={onToggleLegends} className="mt-4 w-full rounded-xl border border-dashed border-white/10 px-3 py-2.5 text-xs font-semibold text-white/50">
+        <button type="button" onClick={onToggleLegends} className="mt-4 w-full rounded-xl border border-dashed border-white/10 px-3 py-2.5 text-xs font-semibold text-fg-3">
           {roster.showLegends ? 'Скрыть' : 'Показать'} Warhammer Legends ({legendsCount})
         </button>
       )}
@@ -216,15 +216,15 @@ function PickerRow({ ds, count, limit, chapter, factionName, onAdd }: { ds: Data
           <p className="text-[14px] font-semibold leading-snug" title={outdatedNote(ds) ?? undefined}>
             {dsLabel(ds)}
           </p>
-          {sub.length > 0 && <p className="mt-0.5 text-[12px] leading-snug text-white/45">{sub.join(' · ')}</p>}
+          {sub.length > 0 && <p className="mt-0.5 text-[12px] leading-snug text-fg-3">{sub.join(' · ')}</p>}
         </div>
         {count > 0 && (
-          <span className={cx('shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-semibold tabular-nums', full ? 'bg-danger/15 text-danger' : 'bg-accent/15 text-accent')}>
+          <span className={cx('shrink-0 rounded-md px-1.5 py-0.5 text-[12px] font-semibold tabular-nums', full ? 'bg-danger/15 text-danger' : 'bg-accent/15 text-accent')}>
             {count}/{limit}
           </span>
         )}
         <span className="w-11 shrink-0 text-right">
-          {opts.length > 1 && <span className="block text-[10px] leading-none text-white/35">от</span>}
+          {opts.length > 1 && <span className="block text-[12px] leading-none text-fg-3">от</span>}
           <span className="font-display text-[17px] font-semibold leading-tight tabular-nums">{price ?? '—'}</span>
         </span>
         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">

@@ -90,7 +90,7 @@ export function ReservationCard({
               {isServiceLoading ? (
                 <Skeleton width={80} height={20} />
               ) : (
-                <p className="mt-1 text-sm text-white/50">{disciplineTitle}</p>
+                <p className="mt-1 text-sm text-fg-3">{disciplineTitle}</p>
               )}
             </div>
 
@@ -172,7 +172,7 @@ export function ReservationCard({
                 ) : (
                   <XCircle className="size-4" />
                 )}
-                {isCancelling ? "Отменяем..." : "Отменить запись"}
+                {isCancelling ? "Отменяем…" : "Отменить запись"}
               </button>
             )}
           </div>

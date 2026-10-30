@@ -102,20 +102,20 @@ function AttackSteps({
 
   return (
     <div className={clsx("rounded-2xl border bg-app-elevated p-3", FACTION_BORDER[faction])}>
-      <p className={`mb-2 text-sm uppercase tracking-wide text-white/70 ${oswald}`}>
+      <p className={`mb-2 text-sm uppercase tracking-wide text-fg-2 ${oswald}`}>
         {title} · <span className="text-white">{attackerName}</span>
       </p>
       <div className="space-y-2">
         {rows.map((row, index) =>
           index < shown ? (
             <div key={row.label}>
-              <div className="flex items-center justify-between text-[11px] text-white/55">
+              <div className="flex items-center justify-between text-[12px] text-fg-3">
                 <span>{row.label}</span>
                 <span>{row.summary}</span>
               </div>
               <div className="mt-1 flex flex-wrap gap-1">
                 {row.rolls.length === 0 ? (
-                  <span className="text-[11px] text-white/30">—</span>
+                  <span className="text-[12px] text-fg-3">—</span>
                 ) : (
                   row.rolls.map((roll, i) => (
                     <Die key={i} value={roll} state={row.good(roll) ? "ok" : "fail"} />
@@ -135,7 +135,7 @@ function AttackSteps({
           <p
             className={clsx(
               `pt-1 text-lg font-semibold ${oswald}`,
-              attack.damage > 0 ? "text-[#ff5a4a]" : "text-white/40",
+              attack.damage > 0 ? "text-[#ff5a4a]" : "text-fg-3",
             )}
           >
             {attack.damage > 0 ? `Урон −${attack.damage}` : "Без урона"}
@@ -167,13 +167,13 @@ function FighterPanel({ fighter, wounds, align }: { fighter: Fighter; wounds: nu
   return (
     <div className={clsx("min-w-0 flex-1", align === "right" && "text-right")}>
       <p className={`truncate text-base font-medium uppercase leading-tight ${oswald}`}>{fighter.name}</p>
-      <p className={clsx("text-[10px] uppercase tracking-wider", FACTION_TEXT[faction])}>{FACTION_LABELS[faction]}</p>
+      <p className={clsx("text-[12px] uppercase tracking-wider", FACTION_TEXT[faction])}>{FACTION_LABELS[faction]}</p>
       <div className={clsx("mt-1.5 flex flex-wrap gap-[3px]", align === "right" && "justify-end")}>
         {Array.from({ length: Math.max(fighter.wounds, wounds) }, (_, i) => (
           <span key={i} className={clsx("h-2 w-3 rounded-[2px]", i < wounds ? FACTION_PIP[faction] : "bg-white/10")} />
         ))}
       </div>
-      <p className="mt-1 text-[10px] leading-relaxed text-white/45">
+      <p className="mt-1 text-[12px] leading-relaxed text-fg-3">
         А{fighter.attacks} · П{fighter.skill}+ · С{fighter.strength} · Ст{fighter.toughness} · ПБ{fighter.ap} · У{fighter.damage} · Сп{fighter.save}+
       </p>
     </div>
@@ -320,7 +320,7 @@ export default function DiceGame() {
           actionsOnTop
         >
           {battle && (
-            <p className="mt-3 text-xs text-white/60">
+            <p className="mt-3 text-xs text-fg-2">
               {battle.player.name} · раундов: {battle.round}
               {battle.clutchWins > 0 ? ` · побед на последнем издыхании: ${battle.clutchWins}` : ""}
             </p>
@@ -355,17 +355,17 @@ export default function DiceGame() {
           )}
           {game && (
             <div className="mt-5">
-              <p className="text-sm text-white/70">{game.description}</p>
-              <ol className="mt-3 list-decimal space-y-1 pl-5 text-xs text-white/55">
+              <p className="text-sm text-fg-2">{game.description}</p>
+              <ol className="mt-3 list-decimal space-y-1 pl-5 text-xs text-fg-3">
                 <li>Попадание: каждая атака — кубик, нужен навык бойца или больше.</li>
                 <li>Ранение: сила против стойкости определяет нужное значение.</li>
                 <li>Спасбросок: враг защищается бронёй; пробитие её ухудшает.</li>
                 <li>Урон: каждое неспасённое ранение снимает раны.</li>
               </ol>
-              <p className="mt-2 text-xs text-white/55">
+              <p className="mt-2 text-xs text-fg-3">
                 Единица — всегда промах, шестёрка — всегда успех. Все броски делает сервер.
               </p>
-              <p className={`mb-2 mt-5 text-sm uppercase tracking-widest text-white/50 ${oswald}`}>Награды</p>
+              <p className={`mb-2 mt-5 text-sm uppercase tracking-widest text-fg-3 ${oswald}`}>Награды</p>
               <TierList game={game} />
             </div>
           )}
@@ -375,7 +375,7 @@ export default function DiceGame() {
       {inBattle && battle && (
         <div className="px-4">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs text-white/50">Раунд {battle.round + 1}</span>
+            <span className="text-xs text-fg-3">Раунд {battle.round + 1}</span>
             <span className={`text-lg font-semibold text-accent ${oswald}`}>
               {battle.wins} {pluralWins(battle.wins)}
             </span>
@@ -417,7 +417,7 @@ export default function DiceGame() {
                     type="button"
                     onClick={() => act("stop")}
                     disabled={phase === "sending"}
-                    className="w-full text-center text-xs text-white/45 underline underline-offset-4"
+                    className="w-full text-center text-xs text-fg-3 underline underline-offset-4"
                   >
                     Отступить (без награды)
                   </button>
@@ -426,7 +426,7 @@ export default function DiceGame() {
             )}
           </div>
 
-          <p className="mt-2 text-center text-xs text-white/45">
+          <p className="mt-2 text-center text-xs text-fg-3">
             {next ? `До «${next.label}»: ${next.minScore} ${pluralWins(next.minScore)}. ` : "Максимальная награда! "}
             При поражении награда за эту попытку сгорает.
           </p>

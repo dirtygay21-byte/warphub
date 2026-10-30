@@ -21,8 +21,8 @@ const when = (value: string) => formatClub(value, { day: "numeric", month: "shor
 
 const STATUS: Record<RosterCode["status"], { label: string; className: string }> = {
   active: { label: "Активен", className: "bg-accent/15 text-accent" },
-  used: { label: "Использован", className: "bg-white/10 text-white/70" },
-  expired: { label: "Истёк", className: "bg-white/5 text-white/40" },
+  used: { label: "Использован", className: "bg-white/10 text-fg-2" },
+  expired: { label: "Истёк", className: "bg-white/5 text-fg-3" },
   revoked: { label: "Отозван", className: "bg-red-400/10 text-red-300" },
 };
 
@@ -57,7 +57,7 @@ export default function AdminRoster() {
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">WarpBuilder</h1>
-          <p className="mt-1 text-sm text-white/50">
+          <p className="mt-1 text-sm text-fg-3">
             Скрытый раздел. Открывается по одноразовому коду из 4 цифр.
           </p>
         </div>
@@ -65,7 +65,7 @@ export default function AdminRoster() {
           type="button"
           onClick={refresh}
           aria-label="Обновить"
-          className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-white/70 active:bg-white/10"
+          className="flex ds-hit size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-fg-2 active:bg-white/10"
         >
           <RefreshCw className={clsx("size-4", (codes.isFetching || access.isFetching) && "animate-spin")} />
         </button>
@@ -83,7 +83,7 @@ export default function AdminRoster() {
             Создать код доступа
           </button>
         ) : (
-          <p className="rounded-xl border border-white/10 bg-white/3 px-4 py-3 text-sm text-white/60">
+          <p className="rounded-xl border border-white/10 bg-white/3 px-4 py-3 text-sm text-fg-2">
             Коды создаёт владелец раздела. Здесь можно посмотреть и отозвать доступ.
           </p>
         )}
@@ -115,20 +115,20 @@ export default function AdminRoster() {
               {created.delivered ? (
                 <>
                   <p className="font-semibold">Код отправлен вам в Telegram</p>
-                  <p className="mt-1 text-white/60">Действует до {when(created.expiresAt)}, один раз.</p>
+                  <p className="mt-1 text-fg-2">Действует до {when(created.expiresAt)}, один раз.</p>
                 </>
               ) : (
                 <>
                   <p className="font-semibold">Бот не смог отправить сообщение</p>
-                  <p className="mt-1 text-white/60">
+                  <p className="mt-1 text-fg-2">
                     Нажмите «Старт» у @WarpHubBot. Код показан только вам — передайте его сами:
                   </p>
                   <p className="mt-3 text-center text-3xl font-semibold tracking-[0.4em] text-accent tabular-nums">{created.code}</p>
-                  <p className="mt-2 text-white/60">Действует до {when(created.expiresAt)}, один раз.</p>
+                  <p className="mt-2 text-fg-2">Действует до {when(created.expiresAt)}, один раз.</p>
                 </>
               )}
             </div>
-            <button type="button" aria-label="Скрыть" onClick={() => setCreated(null)} className="text-white/40">
+            <button type="button" aria-label="Скрыть" onClick={() => setCreated(null)} className="text-fg-3">
               <X className="size-4" />
             </button>
           </div>
@@ -136,16 +136,16 @@ export default function AdminRoster() {
       )}
 
       <section className="mb-6">
-        <h2 className="mb-3 flex items-baseline justify-between text-sm font-semibold uppercase tracking-wide text-white/50">
+        <h2 className="mb-3 flex items-baseline justify-between text-sm font-semibold uppercase tracking-wide text-fg-3">
           <span>Доступ открыт</span>
-          <span className="text-white/30">{access.data?.length ?? 0}</span>
+          <span className="text-fg-3">{access.data?.length ?? 0}</span>
         </h2>
         {access.isLoading ? (
           <LoaderCircle className="mx-auto size-6 animate-spin text-accent" />
         ) : access.isError ? (
           <LoadError message={access.error.message} onRetry={() => access.refetch()} />
         ) : !access.data?.length ? (
-          <p className="rounded-xl border border-dashed border-white/10 px-4 py-6 text-center text-sm text-white/45">
+          <p className="rounded-xl border border-dashed border-white/10 px-4 py-6 text-center text-sm text-fg-3">
             Пока ни у кого. Администраторы видят раздел всегда.
           </p>
         ) : (
@@ -155,9 +155,9 @@ export default function AdminRoster() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold">
                     {[u.firstName, u.lastName].filter(Boolean).join(" ")}
-                    {u.username && <span className="ml-1.5 font-normal text-white/50">@{u.username}</span>}
+                    {u.username && <span className="ml-1.5 font-normal text-fg-3">@{u.username}</span>}
                   </p>
-                  <p className="text-xs text-white/40">с {when(u.grantedAt)}</p>
+                  <p className="text-xs text-fg-3">с {when(u.grantedAt)}</p>
                 </div>
                 <button
                   type="button"
@@ -177,16 +177,16 @@ export default function AdminRoster() {
       </section>
 
       <section>
-        <h2 className="mb-3 flex items-baseline justify-between text-sm font-semibold uppercase tracking-wide text-white/50">
+        <h2 className="mb-3 flex items-baseline justify-between text-sm font-semibold uppercase tracking-wide text-fg-3">
           <span>Коды</span>
-          <span className="text-white/30">активных: {activeCount}</span>
+          <span className="text-fg-3">активных: {activeCount}</span>
         </h2>
         {codes.isLoading ? (
           <LoaderCircle className="mx-auto size-6 animate-spin text-accent" />
         ) : codes.isError ? (
           <LoadError message={codes.error.message} onRetry={() => codes.refetch()} />
         ) : !codes.data?.length ? (
-          <p className="rounded-xl border border-dashed border-white/10 px-4 py-6 text-center text-sm text-white/45">Кодов ещё не было.</p>
+          <p className="rounded-xl border border-dashed border-white/10 px-4 py-6 text-center text-sm text-fg-3">Кодов ещё не было.</p>
         ) : (
           <ul className="divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
             {codes.data.map((c) => (
@@ -194,11 +194,11 @@ export default function AdminRoster() {
                 <div className="min-w-0 flex-1 text-sm">
                   <p className="font-medium">
                     Код №{c.id}
-                    <span className={clsx("ml-2 rounded-md px-1.5 py-0.5 text-[11px] font-semibold", STATUS[c.status].className)}>
+                    <span className={clsx("ml-2 rounded-md px-1.5 py-0.5 text-[12px] font-semibold", STATUS[c.status].className)}>
                       {STATUS[c.status].label}
                     </span>
                   </p>
-                  <p className="mt-0.5 text-xs leading-snug text-white/40">
+                  <p className="mt-0.5 text-xs leading-snug text-fg-3">
                     {c.status === "used"
                       ? `${c.usedByName ?? "—"}${c.usedByUsername ? ` (@${c.usedByUsername})` : ""} · ${when(c.usedAt!)}`
                       : `создан ${when(c.createdAt)} · до ${when(c.expiresAt)}`}
@@ -209,7 +209,7 @@ export default function AdminRoster() {
                     type="button"
                     disabled={revokeCode.isPending}
                     onClick={() => revokeCode.mutate(c.id)}
-                    className="rounded-lg border border-white/10 px-2.5 py-1.5 text-xs font-semibold text-white/70 active:bg-white/10"
+                    className="rounded-lg border border-white/10 px-2.5 py-1.5 text-xs font-semibold text-fg-2 active:bg-white/10"
                   >
                     Отозвать
                   </button>

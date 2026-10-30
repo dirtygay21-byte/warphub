@@ -47,12 +47,12 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
       <div className="rounded-2xl border border-accent/40 bg-accent/10 p-4">
         <div className="flex items-baseline justify-between gap-2">
           <p className="font-display text-2xl font-semibold uppercase leading-none">{finished ? 'Битва окончена' : `Раунд ${state.round} из ${ROUNDS}`}</p>
-          {!finished && <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">{STEP_RU[state.step]}</p>}
+          {!finished && <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">{STEP_RU[state.step]}</p>}
         </div>
         {!finished && active && (
           <p className="mt-1.5 text-sm">
             Ход: <span className={cx('font-semibold', roleText(state.players[active].role))}>{state.players[active].name}</span>
-            <span className="text-white/45"> · {state.players[active].role === 'attacker' ? 'атакующий' : 'защитник'}</span>
+            <span className="text-fg-3"> · {state.players[active].role === 'attacker' ? 'атакующий' : 'защитник'}</span>
           </p>
         )}
         <RoundDots round={state.round} finished={finished} />
@@ -74,7 +74,7 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
           <Button variant="primary" className="h-12 w-full" disabled={!!pending || !myTurn} onClick={next}>
             {myTurn ? nextLabel : `Ход соперника: ${active ? state.players[active].name : ''}`}
           </Button>
-          {state.step === 'start' && <p className="text-center text-[11px] text-white/45">В начале фазы командования оба игрока получают 1 CP.</p>}
+          {state.step === 'start' && <p className="text-center text-[12px] text-fg-3">В начале фазы командования оба игрока получают 1 CP.</p>}
           <EndEarly game={game} />
         </>
       )}
@@ -82,7 +82,7 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
       <RoundTable game={game} />
 
       <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Основные миссии</p>
+        <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Основные миссии</p>
         {(['p1', 'p2'] as Seat[]).map((s) => {
           const id = state.primary[s];
           const c = id ? game.data!.missions.cards.find((x) => x.id === id) : undefined;
@@ -95,7 +95,7 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
         })}
       </div>
 
-      <p className="pt-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">Вторичные миссии</p>
+      <p className="pt-1 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Вторичные миссии</p>
       {(['p1', 'p2'] as const).map((s) => (
         <SecondaryCard key={s} game={game} seat={s} />
       ))}
@@ -106,7 +106,7 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
         className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] py-2 text-[13px] font-semibold active:bg-white/10"
       >
         Подготовка к битве
-        <Icon name="down" className={cx('size-4 text-white/50 transition', summary && 'rotate-180')} />
+        <Icon name="down" className={cx('size-4 text-fg-3 transition', summary && 'rotate-180')} />
       </button>
       {summary && <Summary game={game} index={index} />}
     </section>
@@ -150,16 +150,16 @@ function Scoreboard({ game }: { game: GameHook }) {
             <span className={cx('block truncate text-[12px] font-semibold', roleText(p.role))}>{p.name}</span>
             <span className="block font-display mt-0.5 text-3xl font-semibold leading-none">
               {t.total}
-              <span className="ml-1 text-sm text-white/50">ПО</span>
+              <span className="ml-1 text-sm text-fg-3">ПО</span>
             </span>
-            <span className="block mt-1 text-[11px] leading-snug text-white/55">
+            <span className="block mt-1 text-[12px] leading-snug text-fg-3">
               основная {t.primary.total} · вторичные {t.secondary.total}
               {t.battleReady ? ` · покраска ${t.battleReady}` : ''}
             </span>
-            {cut > 0 && <span className="block text-[11px] text-warn">сверх лимитов: {cut}</span>}
+            {cut > 0 && <span className="block text-[12px] text-warn">сверх лимитов: {cut}</span>}
             <span className="mt-1.5 flex items-center justify-between gap-1">
               <span className="rounded-full border border-white/15 px-2 py-0.5 text-[12px] font-semibold">CP: {p.cp}</span>
-              {(!mine || mine === s) && <span className="text-[11px] font-semibold text-accent/90">Изменить</span>}
+              {(!mine || mine === s) && <span className="text-[12px] font-semibold text-accent/90">Изменить</span>}
             </span>
           </button>
         );
@@ -178,7 +178,7 @@ function MasterRosters({ game }: { game: GameHook }) {
       <span className="font-semibold text-accent">Режим мастера</span>
       {(['p1', 'p2'] as Seat[]).map((s) => (
         <span key={s} className="flex items-center gap-1.5">
-          <span className="text-white/70">{state.players[s].name}:</span>
+          <span className="text-fg-2">{state.players[s].name}:</span>
           <RosterButton seat={s} />
         </span>
       ))}
@@ -196,7 +196,7 @@ function RoundTable({ game }: { game: GameHook }) {
     <div className="overflow-x-auto rounded-xl border border-white/10 bg-black/20 p-2.5">
       <table className="w-full text-center text-[12px]">
         <thead>
-          <tr className="text-white/45">
+          <tr className="text-fg-3">
             <th className="pb-1 text-left font-semibold">ПО</th>
             {Array.from({ length: ROUNDS }, (_, i) => (
               <th key={i} className={cx('pb-1 font-semibold', i + 1 === state.round && state.stage === 'battle' && 'text-accent')}>
@@ -213,7 +213,7 @@ function RoundTable({ game }: { game: GameHook }) {
               {t[s].primary.byRound.map((v, i) => (
                 <td key={i} className="py-1 tabular-nums">
                   {v}
-                  <span className="text-white/40">/{t[s].secondary.byRound[i]}</span>
+                  <span className="text-fg-3">/{t[s].secondary.byRound[i]}</span>
                 </td>
               ))}
               <td className="py-1 tabular-nums">{t[s].primary.end}</td>
@@ -221,7 +221,7 @@ function RoundTable({ game }: { game: GameHook }) {
           ))}
         </tbody>
       </table>
-      <p className="mt-1.5 text-[10.5px] leading-snug text-white/40">
+      <p className="mt-1.5 text-[12px] leading-snug text-fg-3">
         основная / вторичные. Лимит за раунд: {caps.primaryRound} и {caps.secondaryRound}; за битву: {caps.primaryGame} и {caps.secondaryGame}.
       </p>
     </div>

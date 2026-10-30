@@ -63,7 +63,7 @@ export function WarcryList({
           })}
         </ul>
       )}
-      <p className="mt-8 text-center text-xs leading-relaxed text-white/35">
+      <p className="mt-8 text-center text-xs leading-relaxed text-fg-3">
         Данные: {index.source.name} · {index.source.date} ({index.source.commit}) · правила построения — warcrier.net
         <br />
         {cloudEnabled() ? 'Варбанды синхронизируются через Telegram' : 'Варбанды хранятся в этом браузере'}
@@ -148,17 +148,17 @@ function CreateSheet({ open, index, onClose, onCreate }: { open: boolean; index:
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="По умолчанию — название фракции"
-            className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-white outline-none placeholder:text-white/30 focus:border-accent"
+            className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-white outline-none placeholder:text-fg-3 focus:border-accent"
           />
         </Field>
         <SearchField value={q} onChange={setQ} placeholder="Поиск: фракция или подфракция" />
         {err && <p className="rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{err}</p>}
-        {!sections.length && <p className="text-sm text-white/50">Ничего не найдено.</p>}
+        {!sections.length && <p className="text-sm text-fg-3">Ничего не найдено.</p>}
         {sections.map(({ ga, list }) => (
           <section key={ga}>
             <p className="font-display mb-2 flex items-baseline justify-between border-b border-white/10 pb-1 text-lg font-semibold uppercase leading-none">
               {ALLIANCE[ga] ?? ga}
-              <span className="text-[11px] font-semibold text-white/35">{list.length}</span>
+              <span className="text-[12px] font-semibold text-fg-3">{list.length}</span>
             </p>
             <div className="grid grid-cols-1 gap-1.5 min-[400px]:grid-cols-2">
               {list.map((f) => (
@@ -167,7 +167,7 @@ function CreateSheet({ open, index, onClose, onCreate }: { open: boolean; index:
             </div>
           </section>
         ))}
-        <p className="text-[11px] text-white/35">Метки — подфракции (Bladeborn и другие) из данных warcry_data; их бойцы берутся в варбанду своей фракции.</p>
+        <p className="text-[12px] text-fg-3">Метки — подфракции (Bladeborn и другие) из данных warcry_data; их бойцы берутся в варбанду своей фракции.</p>
       </div>
     </Sheet>
   );
