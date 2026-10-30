@@ -5,6 +5,7 @@ import {
   eventsTable,
   eventsTablesTable,
   reservationsTable,
+  tableHoldsTable,
   tablesTable,
   usersEventsTable,
 } from '../../db/schema';
@@ -153,6 +154,16 @@ async function assertEventTablesAvailable(
       ),
     )
     .limit(1);
+
+  // брони столов администратором (table_holds) — ивент поверх них не ставим
+  const [conflictingHold] = await db
+    .select({ tableId: tableHoldsTable.tableId })
+    .from(tableHoldsTable)
+    .where(and(inArray(tableHoldsTable.tableId, tableIds), lt(tableHoldsTable.startsAt, endsAt), gt(tableHoldsTable.endsAt, startsAt)))
+    .limit(1);
+  if (conflictingHold) {
+    throw new EventError('TABLES_UNAVAILABLE', 'One or more tables are reserved by the club at this time');
+  }
 
   if (conflictingEvents.length > 0) {
     throw new EventError(
@@ -620,7 +631,13 @@ export async function listEmptyTables(
       ),
     );
 
+  const occupiedByHolds = await db
+    .selectDistinct({ tableId: tableHoldsTable.tableId })
+    .from(tableHoldsTable)
+    .where(and(inArray(tableHoldsTable.tableId, tableIds), lt(tableHoldsTable.startsAt, resolvedEndsAt), gt(tableHoldsTable.endsAt, startsAt)));
+
   const occupiedIds = new Set<number>();
+  for (const row of occupiedByHolds) occupiedIds.add(row.tableId);
   for (const row of occupiedByReservations) {
     if (row.tableId !== null) occupiedIds.add(row.tableId);
   }

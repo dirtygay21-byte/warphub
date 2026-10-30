@@ -29,6 +29,7 @@ import {
   Users,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import TableHoldSheet from "@/components/pages/Admin/TableHolds/TableHoldSheet";
 import { GameEditorModal } from "./GameEditorModal";
 import { emptyGameDraft } from "./gameDraft";
 
@@ -178,6 +179,8 @@ function AdminGameCard({
 }) {
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState(false);
+  // бронь стола на время игры (30.10.2026): время и название — из игры
+  const [holdOpen, setHoldOpen] = useState(false);
   const bookingsQuery = useQuery({
     queryKey: ["admin-dnd-bookings", game.id],
     queryFn: () => getAdminDndGameBookings(game.id),
@@ -227,6 +230,16 @@ function AdminGameCard({
           <PencilLine className="size-3.5" />
           Изменить
         </button>
+        {game.startsAt && game.endsAt && (
+          <button
+            type="button"
+            onClick={() => setHoldOpen(true)}
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-accent/40 px-3 py-2 text-[13px] font-semibold text-accent active:bg-accent/10"
+          >
+            <Lock className="size-3.5" />
+            Забронировать стол
+          </button>
+        )}
         <button
           type="button"
           onClick={() => setExpanded((value) => !value)}
@@ -250,6 +263,12 @@ function AdminGameCard({
           </button>
         )}
       </div>
+      {holdOpen && (
+        <TableHoldSheet
+          prefill={{ startsAt: game.startsAt, endsAt: game.endsAt, purpose: "dnd", title: game.title, dndGameId: game.id }}
+          onClose={() => setHoldOpen(false)}
+        />
+      )}
       {deleteMutation.isError && (
         <p className="px-4 pb-3 text-xs text-red-300">{deleteMutation.error.message}</p>
       )}

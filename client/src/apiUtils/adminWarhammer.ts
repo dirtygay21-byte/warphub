@@ -1,3 +1,4 @@
+import type { TableHold } from "@/apiUtils/tableHolds";
 import { apiRequest } from "@/apiUtils/general";
 import type { ReservationDetails } from "@/apiUtils/booking";
 
@@ -45,6 +46,8 @@ export type AdminWarhammerDay = {
   sessions: AdminSession[];
   painting: AdminPaintingBooking[];
   paintingCapacity: number | null;
+  /** брони столов администратором в эту смену */
+  holds: TableHold[];
 };
 
 export const getAdminWarhammerDay = (date: string) =>

@@ -120,6 +120,13 @@
       "when": 1783988400000,
       "tag": "0016_dnd_flexible_schedule",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1783992000000,
+      "tag": "0017_table_holds",
+      "breakpoints": true
     }
   ]
 }
