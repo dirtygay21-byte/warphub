@@ -29,6 +29,17 @@ describe('roster data files', () => {
     expect(JSON.parse(new TextDecoder().decode(Bun.gunzipSync(bp!.body))).battleplans.length).toBe(12);
     expect(readRosterData('battlepack')).toBeNull();
   });
+  test('Kill Team: index and team files from roster-data/kt', () => {
+    const idx = readRosterData('index', 'kt');
+    expect(idx).not.toBeNull();
+    const json = JSON.parse(new TextDecoder().decode(Bun.gunzipSync(idx!.body)));
+    expect(json.system).toBe('kt');
+    expect(json.teams.length).toBeGreaterThan(40);
+    const t = readRosterData('AEL-BOK', 'kt');
+    expect(t).not.toBeNull();
+    expect(JSON.parse(new TextDecoder().decode(Bun.gunzipSync(t!.body))).operatives.length).toBeGreaterThan(0);
+    for (const bad of ['../index', 'SE', 'battlepack', 'AEL-BOK/..', 't/AEL-BOK', '']) expect(readRosterData(bad, 'kt')).toBeNull();
+  });
   test('rejects paths outside the data folder', () => {
     for (const bad of ['../index', 'aos/index', '..', 'f/SM', 'index.json/..', '']) {
       expect(readRosterData(bad)).toBeNull();

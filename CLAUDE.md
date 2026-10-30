@@ -24,6 +24,9 @@ Mini App WarpHub (Telegram) и скрытый раздел Roster Builder (Warha
 > **Решение владельца от 30.10.2026: источники AoS** — выгрузка Wahapedia (основной, как раньше) и sigdex.io / BSData
 > `age-of-sigmar-4th` (второй: сверка очков и юнитов `scripts/bsdata-aos-compare.py` → `aos/bsdata-compare.json`,
 > карты батлпланов `aos/sigdex-battleplans-2026-27.json`). Официальные документы GW важнее обоих (`curated.json → officialUpdates`).
+>
+> **Kill Team (2024), решение владельца 30.10.2026:** источник — ktdash-v4-public (`prisma/seed-data.json`, лицензии нет),
+> импорт `scripts/import-ktdash.mjs` → `backend/roster-data/kt/`. Подробности — `tools/roster-data/README.md`.
 
 1. **Приложение.** Сначала смотреть, что уже есть в данных и коде:
    `backend/roster-data/` (40K) и `backend/roster-data/aos/` (AoS), импортёры `tools/roster-data/scripts/`,

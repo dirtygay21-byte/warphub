@@ -80,7 +80,20 @@ export const rosterModule = new Elysia({ prefix: '/roster', tags: ['Roster Build
       set.headers['cache-control'] = 'private, max-age=3600';
       return file.body;
     },
-    { detail: { summary: 'Данные Roster Builder: Age of Sigmar (index или код фракции)', hide: true } },
+    { detail: { summary: 'Данные WarpBuilder: Age of Sigmar (index или код фракции)', hide: true } },
+  )
+  .get(
+    '/data/kt/:name',
+    async ({ user, params, set }) => {
+      if (!(await hasRosterAccess(user))) return status(403, { error: 'Нет доступа к WarpBuilder' });
+      const file = readRosterData(params.name.replace(/\.json$/, ''), 'kt');
+      if (!file) return status(404, { error: 'Нет данных' });
+      set.headers['content-type'] = 'application/json; charset=utf-8';
+      set.headers['content-encoding'] = 'gzip';
+      set.headers['cache-control'] = 'private, max-age=3600';
+      return file.body;
+    },
+    { detail: { summary: 'Данные WarpBuilder: Kill Team (index или id команды)', hide: true } },
   );
 
 /** Управление доступом — только администраторы. */
