@@ -3,7 +3,9 @@
  * Текст — пересказ своими словами; рисунки — оригинальные схемы (diagrams.tsx, ключ `diagram`).
  * 40K — по клубным памяткам (WH40K_pamyatki_A5.pdf от владельца).
  * AoS — по Core Rules AoS 4 (Wahapedia, The Core Rules) и Quick Start Guide GW (4 CP, underdog, Rally).
- * Kill Team, Warcry — пока «скоро».
+ * Kill Team — по Kill Team Lite Rules GW (файл jul25, © 2024); контроль объекта — Core Rules (Wahapedia).
+ *   Значения на схеме датакарты — пример, не профиль реального оперативника.
+ * Warcry — пока «скоро».
  * Разметка в пунктах: **жирный** — термин.
  */
 
@@ -27,7 +29,17 @@ export type TutorialDiagram =
   | "aosCharge"
   | "aosFight"
   | "aosAttack"
-  | "aosObjective";
+  | "aosObjective"
+  | "ktGame"
+  | "ktCard"
+  | "ktStrategy"
+  | "ktFirefight"
+  | "ktOrders"
+  | "ktMove"
+  | "ktCover"
+  | "ktShoot"
+  | "ktFight"
+  | "ktObjective";
 
 export type TutorialStep = {
   title: string;
@@ -295,11 +307,129 @@ const AOS: TutorialGame = {
   ],
 };
 
-export const TUTORIAL_GAMES: TutorialGame[] = [WH40K, AOS];
+const KT: TutorialGame = {
+  id: "kt",
+  code: "KT",
+  title: "Kill Team",
+  source: "Пересказ Kill Team Lite Rules (Games Workshop) и Core Rules Kill Team (Wahapedia).",
+  steps: [
+    {
+      title: "Как устроен бой",
+      en: "Battle Sequence",
+      diagram: "ktGame",
+      points: [
+        "Партия — 4 переломных момента (Turning Points).",
+        "Каждый — фаза стратегии, затем фаза перестрелки.",
+        "Поле — 30″ × 22″, у каждого игрока 10 кубиков D6.",
+      ],
+    },
+    {
+      title: "Датакарта",
+      en: "Operative Datacard",
+      diagram: "ktCard",
+      points: [
+        "**APL** — сколько очков действий (AP) у оперативника за активацию.",
+        "**Move** — движение, **Save** — спасбросок, **Wounds** — раны.",
+        "Оружие: **Atk** — кубики атаки, **Hit** — сколько нужно, **Dmg** — урон.",
+      ],
+    },
+    {
+      title: "Фаза стратегии",
+      en: "Strategy Phase",
+      phase: 1,
+      diagram: "ktStrategy",
+      points: [
+        "Игроки бросают по D6 — у кого больше, тот получает инициативу (Initiative).",
+        "При ничьей решает игрок без инициативы.",
+        "Затем начисляются CP, и игроки по очереди используют гамбиты и приёмы (ploys) — по 1 CP.",
+      ],
+    },
+    {
+      title: "Фаза перестрелки",
+      en: "Firefight Phase",
+      phase: 2,
+      diagram: "ktFirefight",
+      points: [
+        "Игроки по очереди активируют по одному оперативнику, начиная с игрока с инициативой.",
+        "Активация: выбрать приказ и потратить AP на действия — не больше APL.",
+        "Одно действие нельзя повторить в одной активации.",
+      ],
+      note: "Когда у вас все отработали, а у врага нет — один ваш оперативник с Engage может сделать контрдействие (Counteract) за 1 AP.",
+    },
+    {
+      title: "Приказы",
+      en: "Orders",
+      diagram: "ktOrders",
+      points: ["**Engage** — обычные действия и контрдействие.", "**Conceal** — в укрытии оперативник не может быть целью."],
+      note: "С приказом Conceal нельзя стрелять и нападать.",
+    },
+    {
+      title: "Движение",
+      en: "Movement Actions",
+      diagram: "ktMove",
+      points: [
+        "**Reposition** (1 AP) — до Move. **Dash** (1 AP) — до 3″.",
+        "**Charge** (1 AP) — Move + 2″, закончить в 1″ от врага.",
+        "**Fall Back** (2 AP) — выйти из 1″ от врага.",
+      ],
+      note: "Дистанция контроля (control range) — 1″. Подходить в неё можно только нападением.",
+    },
+    {
+      title: "Видимость и укрытие",
+      en: "Cover",
+      diagram: "ktCover",
+      points: [
+        "Цель видна, если от головы стрелка можно провести линию до любой части цели.",
+        "Цель в укрытии, если между ними есть террейн в 1″ от цели.",
+        "В укрытии один кубик защиты сразу считается успехом.",
+      ],
+      note: "Ближе 2″ от стрелка укрытие не работает.",
+    },
+    {
+      title: "Стрельба",
+      en: "Shoot",
+      diagram: "ktShoot",
+      points: [
+        "Атакующий бросает Atk кубиков: ≥ Hit — успех.",
+        "Защитник бросает 3 кубика: ≥ Save — блок.",
+        "Неотбитые попадания наносят урон: обычный или критический.",
+      ],
+      note: "Нельзя стрелять, если враг уже в 1″ от вас.",
+    },
+    {
+      title: "Ближний бой",
+      en: "Fight",
+      diagram: "ktFight",
+      points: [
+        "Действие **Fight** (1 AP) — если враг в 1″.",
+        "Оба бросают кубики атаки оружия ближнего боя.",
+        "По очереди каждый успех — удар (урон) или блок (снять успех врага).",
+      ],
+    },
+    {
+      title: "Раны и объекты",
+      en: "Injured · Objectives",
+      diagram: "ktObjective",
+      points: [
+        "Меньше половины ран — оперативник ранен: −2″ к Move, Hit хуже на 1.",
+        "Объект оспаривают оперативники в 1″ от него.",
+        "Сложите APL: у кого сумма больше — тот контролирует объект.",
+      ],
+      note: "Победные очки — по заданиям выбранной миссии.",
+    },
+    {
+      title: "Готов к игре",
+      en: "Next Steps",
+      diagram: "ready",
+      points: ["Вы знаете весь ход — остальное придёт в первой партии.", "Команды и датакарты — в WarpBuilder."],
+    },
+  ],
+};
+
+export const TUTORIAL_GAMES: TutorialGame[] = [WH40K, AOS, KT];
 
 /** Игры, для которых обучение ещё пишется (показываются как «скоро»). */
 export const TUTORIAL_SOON: { code: string; title: string }[] = [
-  { code: "KT", title: "Kill Team" },
   { code: "WC", title: "Warcry" },
 ];
 
