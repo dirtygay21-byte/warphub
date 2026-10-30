@@ -1,18 +1,19 @@
 import type { AosIndex, AosRoster } from '../aos/types';
 import type { Roster } from '../engine/types';
 import type { KtRoster } from '../kt/roster';
+import type { WarcryRoster } from '../warcry/roster';
 import { haptic } from '../telegram';
 import { Icon, IconButton } from './kit';
 import { cx, fmtPts } from './util';
 
-export type GameSystem = '40k' | 'aos' | 'kt';
+export type GameSystem = '40k' | 'aos' | 'kt' | 'warcry';
 
-type GameTile = { id: GameSystem | 'kt' | 'warcry'; name: string; sub: string; ready: boolean };
+type GameTile = { id: GameSystem; name: string; sub: string; ready: boolean };
 const GAMES: GameTile[] = [
   { id: '40k', name: 'Warhammer 40,000', sub: '11-я редакция', ready: true },
   { id: 'aos', name: 'Age of Sigmar', sub: '4-я редакция · GH 2026-27', ready: true },
   { id: 'kt', name: 'Kill Team', sub: 'редакция 2024 · KTDash', ready: true },
-  { id: 'warcry', name: 'Warcry', sub: 'скоро', ready: false },
+  { id: 'warcry', name: 'Warcry', sub: 'Matched Play · warcry_data', ready: true },
 ];
 
 /**
@@ -24,6 +25,7 @@ export function Home({
   rosters,
   aosRosters,
   ktRosters,
+  wcRosters,
   aosIndex,
   onGame,
   onOpen,
@@ -32,14 +34,16 @@ export function Home({
   rosters: Roster[];
   aosRosters: AosRoster[];
   ktRosters: KtRoster[];
+  wcRosters: WarcryRoster[];
   aosIndex: AosIndex | null;
   onGame: (g: GameSystem) => void;
   onOpen: (g: GameSystem, id: string) => void;
 }) {
-  const count = (g: GameTile['id']) => (g === '40k' ? rosters.length : g === 'aos' ? aosRosters.length : g === 'kt' ? ktRosters.length : 0);
+  const count = (g: GameTile['id']) => (g === '40k' ? rosters.length : g === 'aos' ? aosRosters.length : g === 'kt' ? ktRosters.length : wcRosters.length);
   const recent = [
     ...rosters.map((r) => ({ g: '40k' as const, id: r.id, name: r.name, pts: r.summary?.points, at: r.updatedAt, sub: 'Warhammer 40,000' })),
     ...ktRosters.map((r) => ({ g: 'kt' as const, id: r.id, name: r.name, pts: undefined as number | undefined, at: r.updatedAt, sub: `Kill Team · оперативников: ${r.operatives.length}` })),
+    ...wcRosters.map((r) => ({ g: 'warcry' as const, id: r.id, name: r.name, pts: r.summary?.points, at: r.updatedAt, sub: `Warcry · бойцов: ${r.fighters.length}` })),
     ...aosRosters.map((r) => ({ g: 'aos' as const, id: r.id, name: r.name, pts: r.summary?.points, at: r.updatedAt, sub: aosIndex?.factions.find((f) => f.id === r.factionId)?.name ?? 'Age of Sigmar' })),
   ]
     .sort((a, b) => b.at - a.at)
@@ -60,7 +64,7 @@ export function Home({
             key={g.id}
             type="button"
             disabled={!g.ready}
-            onClick={() => g.ready && (haptic.tap(), onGame(g.id as GameSystem))}
+            onClick={() => g.ready && (haptic.tap(), onGame(g.id))}
             className={cx(
               'flex min-h-28 flex-col justify-between rounded-2xl border p-3.5 text-left transition',
               g.ready ? 'border-white/10 bg-white/[0.04] active:bg-white/10' : 'border-white/5 bg-white/[0.02] opacity-50',

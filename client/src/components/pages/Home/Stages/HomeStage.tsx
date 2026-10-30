@@ -61,7 +61,7 @@ export default function HomeStage() {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-lg font-medium">WarpBuilder</span>
-                <span className="block text-xs text-white/55">Ростеры и игры: 40K, Age of Sigmar, Kill Team · скоро Warcry</span>
+                <span className="block text-xs text-white/55">Ростеры и игры: 40K, Age of Sigmar, Kill Team, Warcry</span>
               </span>
               <ChevronRight className="size-5 text-accent" />
             </button>
