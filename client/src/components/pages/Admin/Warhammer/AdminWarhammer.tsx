@@ -24,8 +24,12 @@ import {
   LoaderCircle,
   RefreshCw,
   Repeat,
+  Lock,
   Swords,
 } from "lucide-react";
+import { deleteTableHold, HOLD_PURPOSE_LABELS, type TableHold } from "@/apiUtils/tableHolds";
+import TableHoldSheet from "@/components/pages/Admin/TableHolds/TableHoldSheet";
+import { DsButton } from "@/components/ui/ds";
 import { useMemo, useState } from "react";
 
 const shiftDate = (dateKey: string, days: number) => {
@@ -40,6 +44,7 @@ const keyToDate = (dateKey: string) => {
 
 export default function AdminWarhammer() {
   const [dateKey, setDateKey] = useState(() => dateKeyOf(getClubToday()));
+  const [holdOpen, setHoldOpen] = useState(false);
   const options = useBookingOptions();
 
   const dayQuery = useQuery({
@@ -103,9 +108,14 @@ export default function AdminWarhammer() {
           <ChevronRight className="size-5" />
         </button>
       </div>
-      <p className="-mt-3 mb-5 text-sm capitalize text-fg-2">
+      <p className="-mt-3 mb-4 text-sm capitalize text-fg-2">
         {formatCalendarDate(keyToDate(dateKey))}
       </p>
+      <DsButton variant="secondary" onClick={() => setHoldOpen(true)} className="mb-5 w-full">
+        <Lock className="size-4" />
+        Забронировать стол
+      </DsButton>
+      {holdOpen && <TableHoldSheet prefill={{ dateKey }} onClose={() => setHoldOpen(false)} />}
 
       {dayQuery.isLoading ? (
         <div className="flex justify-center py-16">
@@ -129,6 +139,17 @@ export default function AdminWarhammer() {
               highlight={helpNeeded.length > 0}
             />
           </div>
+
+          {day.holds.length > 0 && (
+            <section>
+              <h2 className="mb-3 text-lg font-semibold">Брони столов</h2>
+              <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:items-start xl:grid-cols-3">
+                {day.holds.map((hold) => (
+                  <HoldCard key={hold.id} hold={hold} />
+                ))}
+              </div>
+            </section>
+          )}
 
           <section>
             <h2 className="mb-3 text-lg font-semibold">Игры и тренировки</h2>
@@ -217,6 +238,45 @@ export default function AdminWarhammer() {
         </div>
       )}
     </div>
+  );
+}
+
+/** Бронь стола администратором: стол закрыт для записи; снять — двумя нажатиями. */
+function HoldCard({ hold }: { hold: TableHold }) {
+  const queryClient = useQueryClient();
+  const [armed, setArmed] = useState(false);
+  const remove = useMutation({
+    mutationFn: () => deleteTableHold(hold.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-warhammer-day"] });
+      queryClient.invalidateQueries({ queryKey: ["table-holds"] });
+    },
+  });
+  return (
+    <article className="rounded-xl border border-accent/30 bg-app-elevated p-4 text-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-base font-semibold">{formatClubTimeRange(hold.startsAt, hold.endsAt)}</p>
+          <p className="mt-0.5 text-fg-2">{hold.tableName}</p>
+        </div>
+        <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-accent/15 px-2 py-1 text-[12px] font-semibold text-accent">
+          <Lock className="size-3.5" />
+          {HOLD_PURPOSE_LABELS[hold.purpose]}
+        </span>
+      </div>
+      <p className="mt-2 font-semibold">{hold.title}</p>
+      {hold.description && <p className="mt-1 whitespace-pre-line text-fg-2">{hold.description}</p>}
+      <button
+        type="button"
+        disabled={remove.isPending}
+        onClick={() => (armed ? remove.mutate() : setArmed(true))}
+        onBlur={() => setArmed(false)}
+        className="ds-press mt-3 h-11 w-full rounded-[14px] border border-danger/40 text-[15px] font-semibold text-danger disabled:opacity-60"
+      >
+        {remove.isPending ? "Снимаем…" : armed ? "Нажмите ещё раз, чтобы снять" : "Снять бронь"}
+      </button>
+      {remove.isError && <p className="mt-2 text-[13px] text-danger">{remove.error.message}</p>}
+    </article>
   );
 }
 
