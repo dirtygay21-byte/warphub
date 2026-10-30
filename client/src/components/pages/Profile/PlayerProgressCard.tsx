@@ -1,9 +1,8 @@
 import { CATEGORY_LABELS, RANK_MIN, type CategoryProgress, type ProgressCategory } from "@/apiUtils/progress";
-import { SectionLabel } from "@/components/ui/ds";
 import { haptic } from "@/utils/haptic";
 import clsx from "clsx";
-import { Brush, Check, Dice5, Swords, Users } from "lucide-react";
-import type { ReactNode } from "react";
+import { Brush, Check, ChevronDown, Dice5, Swords, Trophy, Users } from "lucide-react";
+import { useState, type ReactNode } from "react";
 
 const ICONS: Record<ProgressCategory, ReactNode> = {
   warhammer: <Swords className="size-5" />,
@@ -33,9 +32,33 @@ export default function PlayerProgressCard({
   selected: ProgressCategory | null;
   onSelect: (category: ProgressCategory) => void;
 }) {
+  // свёрнуто по умолчанию: строка «Мой прогресс» раскрывает категории (решение владельца 30.10.2026)
+  const [open, setOpen] = useState(false);
+  const total = categories.reduce((sum, c) => sum + c.games, 0);
   return (
     <section className="mt-6">
-      <SectionLabel>Мой прогресс</SectionLabel>
+      <button
+        type="button"
+        onClick={() => {
+          haptic.tap();
+          setOpen((v) => !v);
+        }}
+        aria-expanded={open}
+        className="ds-press flex min-h-[64px] w-full items-center gap-3.5 rounded-[18px] border border-white/10 bg-app-elevated px-4 py-3 text-left"
+      >
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent">
+          <Trophy className="size-5" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[17px] font-bold leading-tight">Мой прогресс</span>
+          <span className="mt-0.5 block text-sm text-fg-2">
+            {total} {gamesWord(total)} · ранги и рамки аватара
+          </span>
+        </span>
+        <ChevronDown className={clsx("size-5 shrink-0 text-fg-3 transition-transform duration-200", open && "rotate-180")} />
+      </button>
+      {open && (
+      <div className="ds-fade mt-2.5">
       <div className="divide-y divide-white/[0.06] overflow-hidden rounded-[18px] border border-white/10 bg-app-elevated">
         {categories.map((c) => {
           const from = RANK_MIN[c.rank];
@@ -76,6 +99,8 @@ export default function PlayerProgressCard({
       <p className="mt-2 text-[13px] text-fg-3">
         Считаются подтверждённые записи после того, как игра прошла. Нажмите на категорию, чтобы выбрать рамку аватара.
       </p>
+      </div>
+      )}
     </section>
   );
 }

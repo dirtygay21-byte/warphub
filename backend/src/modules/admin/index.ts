@@ -58,6 +58,7 @@ import {
   updateTrialRequest,
 } from '../dnd/service';
 import { mapDndError } from '../dnd/http';
+import { findPlayers, listSupporters, setSupporter, SupporterError } from '../supporters/service';
 import { createTableHold, deleteTableHold, HoldError, listTableHolds } from '../table-holds/service';
 
 const dndGameBody = t.Object({
@@ -348,6 +349,27 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
         description:
           'Все игры и тренировки по столам (с занятостью 1/2, 2/2 и данными игроков) и записи на покраску с формой.',
       },
+    },
+  )
+  .get('/supporters', async () => listSupporters(), { detail: { tags: ['Admin'], summary: 'Поддержка клуба: игроки со званием' } })
+  .get('/supporters/search', async ({ query }) => findPlayers(query.q ?? ''), {
+    query: t.Object({ q: t.Optional(t.String({ description: '@username или Telegram ID' })) }),
+    detail: { tags: ['Admin'], summary: 'Поддержка клуба: поиск игрока' },
+  })
+  .put(
+    '/supporters/:userId',
+    async ({ params, body, user }) => {
+      try {
+        return await setSupporter(params.userId, body.title, Number(user.telegramId));
+      } catch (error) {
+        if (error instanceof SupporterError) return status(error.code === 'USER_NOT_FOUND' ? 404 : 400, { error: error.message, code: error.code });
+        return status(500, { error: (error as Error).message });
+      }
+    },
+    {
+      params: t.Object({ userId: t.String({ format: 'uuid' }) }),
+      body: t.Object({ title: t.Nullable(t.String({ description: 'flame | crown | banner; null — снять звание' })) }),
+      detail: { tags: ['Admin'], summary: 'Поддержка клуба: назначить или снять звание' },
     },
   )
   .get(
