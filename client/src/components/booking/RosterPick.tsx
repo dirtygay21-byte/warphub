@@ -39,16 +39,16 @@ export function RosterPick({ game, onPick }: { game: BookingGame; onPick: (r: Bo
       <button
         type="button"
         onClick={() => void load()}
-        className="flex w-full items-center gap-2 rounded-lg border border-accent/30 bg-accent/10 px-3 py-2 text-left text-sm font-semibold text-white active:bg-accent/20"
+        className="ds-press flex min-h-11 w-full items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-3.5 py-2 text-left text-[15px] font-semibold text-fg"
       >
         <Swords className="size-4 text-accent" />
         <span className="flex-1">Взять из WarpBuilder</span>
-        <span className="text-xs font-normal text-fg-3">{open ? "Скрыть" : "мои ростеры"}</span>
+        <span className="text-[13px] font-normal text-fg-2">{open ? "Скрыть" : "мои ростеры"}</span>
       </button>
       {open && (
-        <div className="space-y-1.5 rounded-lg border border-white/10 bg-white/3 p-2">
+        <div className="ds-fade space-y-1 rounded-xl border border-white/10 bg-app-elevated p-1.5">
           {error ? (
-            <p className="px-1 py-1 text-sm text-red-300">{error}</p>
+            <p className="px-1 py-1 text-sm text-danger">{error}</p>
           ) : !shown ? (
             <LoaderCircle className="mx-auto my-2 size-5 animate-spin text-fg-3" />
           ) : !shown.length ? (
@@ -59,10 +59,10 @@ export function RosterPick({ game, onPick }: { game: BookingGame; onPick: (r: Bo
                 key={r.id}
                 type="button"
                 onClick={() => (onPick(r), setOpen(false))}
-                className="block w-full rounded-md px-2 py-1.5 text-left active:bg-white/10"
+                className="block min-h-11 w-full rounded-lg px-2.5 py-2 text-left active:bg-white/10"
               >
-                <span className="block truncate text-sm font-semibold text-white">{r.name}</span>
-                <span className="block truncate text-xs text-fg-3">
+                <span className="block truncate text-[15px] font-semibold text-fg">{r.name}</span>
+                <span className="block truncate text-[13px] text-fg-2">
                   {r.army}
                   {r.points != null ? ` · ${r.points} оч.` : ""}
                 </span>

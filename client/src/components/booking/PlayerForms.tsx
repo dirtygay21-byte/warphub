@@ -116,7 +116,7 @@ export function PlayerInfoForm({
     <div className="space-y-5">
       {playerName && (
         <Field label="Имя" hint="Берём из Telegram">
-          <div className="rounded-lg border border-white/10 bg-white/3 px-3 py-2.5 text-sm text-white/80">
+          <div className="flex min-h-12 items-center rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-3 text-base text-fg-2">
             {playerName}
           </div>
         </Field>
@@ -124,7 +124,7 @@ export function PlayerInfoForm({
 
       <Field label="Игра" hint={lockedGame ? "Как у соперника за этим столом" : undefined}>
         {lockedGame ? (
-          <div className="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2.5 text-sm font-semibold text-white">
+          <div className="flex min-h-12 items-center rounded-xl border border-accent/40 bg-accent/10 px-3.5 py-3 text-[15px] font-semibold text-fg">
             {options.games.find((g) => g.value === lockedGame)?.label ?? lockedGame}
           </div>
         ) : (

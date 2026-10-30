@@ -1,9 +1,10 @@
 import clsx from "clsx";
 import type { ReactNode } from "react";
+import { haptic } from "@/utils/haptic";
 
 export function FieldLabel({ children }: { children: ReactNode }) {
   return (
-    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-accent">
+    <p className="mb-2.5 text-[13px] font-semibold uppercase tracking-[0.08em] text-accent">
       {children}
     </p>
   );
@@ -22,7 +23,7 @@ export function Field({
     <div>
       <FieldLabel>{label}</FieldLabel>
       {children}
-      {hint && <p className="mt-1.5 text-xs text-fg-3">{hint}</p>}
+      {hint && <p className="mt-1.5 text-[13px] text-fg-3">{hint}</p>}
     </div>
   );
 }
@@ -63,12 +64,15 @@ export function ChoiceChips<T extends string | number>({
             type="button"
             disabled={disabled}
             aria-pressed={selected}
-            onClick={() => onChange(option.value)}
+            onClick={() => {
+              haptic.select();
+              onChange(option.value);
+            }}
             className={clsx(
-              "min-h-10 rounded-lg border px-3 py-2 text-left text-sm font-semibold transition-colors disabled:opacity-50",
+              "ds-press min-h-12 rounded-xl border px-3 py-2 text-left text-[15px] font-semibold transition-colors duration-200 disabled:opacity-50",
               selected
                 ? "border-accent bg-accent text-accent-foreground"
-                : "border-white/10 bg-white/5 text-white active:bg-white/10",
+                : "border-white/[0.14] bg-app-elevated text-fg",
             )}
           >
             <span className="block leading-tight">{option.label}</span>
@@ -108,18 +112,19 @@ export function MultiChoiceChips({
             key={option.value}
             type="button"
             aria-pressed={selected}
-            onClick={() =>
+            onClick={() => {
+              haptic.select();
               onChange(
                 selected
                   ? values.filter((value) => value !== option.value)
                   : [...values, option.value],
-              )
-            }
+              );
+            }}
             className={clsx(
-              "min-h-10 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors",
+              "ds-press min-h-12 rounded-xl border px-4 py-2 text-[15px] font-semibold transition-colors duration-200",
               selected
                 ? "border-accent bg-accent text-accent-foreground"
-                : "border-white/10 bg-white/5 text-white active:bg-white/10",
+                : "border-white/[0.14] bg-app-elevated text-fg",
             )}
           >
             {option.label}
@@ -155,7 +160,7 @@ export function YesNoChips({
 }
 
 export const inputClassName =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none placeholder:text-fg-3 focus:border-accent";
+  "min-h-12 w-full rounded-xl border border-white/[0.14] bg-field px-3.5 py-3 text-base text-fg outline-none placeholder:text-fg-3 focus:border-accent";
 
 export function NumberChips({
   max,
@@ -176,12 +181,15 @@ export function NumberChips({
           key={n}
           type="button"
           aria-pressed={value === n}
-          onClick={() => onChange(n)}
+          onClick={() => {
+            haptic.select();
+            onChange(n);
+          }}
           className={clsx(
-            "ds-hit size-10 rounded-lg border text-sm font-semibold transition-colors",
+            "ds-press ds-hit size-11 rounded-xl border text-base font-semibold tabular-nums transition-colors duration-200",
             value === n
               ? "border-accent bg-accent text-accent-foreground"
-              : "border-white/10 bg-white/5 text-white active:bg-white/10",
+              : "border-white/[0.14] bg-app-elevated text-fg",
           )}
         >
           {n}

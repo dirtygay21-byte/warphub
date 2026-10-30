@@ -39,7 +39,7 @@ function CancelButton({
       disabled={isPending}
       onClick={() => (armed ? onConfirm() : setArmed(true))}
       onBlur={() => setArmed(false)}
-      className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm font-semibold text-red-200 transition-colors active:bg-red-400/20 disabled:opacity-60"
+      className="ds-press flex h-11 w-full items-center justify-center gap-2 rounded-[14px] border border-danger/40 bg-transparent px-4 text-[15px] font-semibold text-danger disabled:opacity-60"
     >
       {isPending ? (
         <LoaderCircle className="size-4 animate-spin" />
@@ -76,19 +76,19 @@ export function DndBookingCard({
   return (
     <article
       className={clsx(
-        "overflow-hidden rounded-2xl border bg-app-elevated",
-        inactive ? "border-white/10 opacity-60" : "border-accent/30",
+        "ds-enter overflow-hidden rounded-[18px] border bg-app-elevated",
+        inactive ? "border-white/[0.08] opacity-60" : "border-white/10",
       )}
     >
-      <div className="flex items-start justify-between gap-3 border-b border-white/10 px-4 py-4">
+      <div className="flex items-start justify-between gap-3 border-b border-white/[0.06] px-4 py-4">
         <div className="min-w-0">
-          <h2 className="truncate text-base font-semibold">{booking.game.title}</h2>
+          <h2 className="truncate text-[17px] font-bold">{booking.game.title}</h2>
           <p className="mt-1 text-sm text-fg-3">D&D · {booking.game.gameType}</p>
         </div>
         <span
           className={clsx(
-            "shrink-0 rounded-full px-3 py-1 text-xs font-semibold",
-            inactive ? "bg-white/10 text-fg-2" : "bg-green-400/15 text-green-300",
+            "inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg px-2 text-[12px] font-semibold",
+            inactive ? "bg-white/[0.08] text-fg-2" : "bg-accent/15 text-accent",
           )}
         >
           {statusLabel}
@@ -150,7 +150,7 @@ export function DndBookingCard({
       {!inactive && (
         <div className="space-y-2 border-t border-white/10 px-4 py-4">
           {errorMessage && (
-            <p className="text-sm text-red-200">{errorMessage}</p>
+            <p className="text-sm text-danger">{errorMessage}</p>
           )}
           <CancelButton
             label="Отменить запись"
@@ -179,11 +179,11 @@ export function TrialRequestCard({
   return (
     <article
       className={clsx(
-        "overflow-hidden rounded-2xl border bg-app-elevated",
-        inactive ? "border-white/10 opacity-60" : "border-accent/30",
+        "ds-enter overflow-hidden rounded-[18px] border bg-app-elevated",
+        inactive ? "border-white/[0.08] opacity-60" : "border-white/10",
       )}
     >
-      <div className="flex items-start justify-between gap-3 border-b border-white/10 px-4 py-4">
+      <div className="flex items-start justify-between gap-3 border-b border-white/[0.06] px-4 py-4">
         <div className="min-w-0">
           <h2 className="flex items-center gap-2 text-base font-semibold">
             <Sparkles className="size-4 text-accent" />
@@ -193,10 +193,10 @@ export function TrialRequestCard({
         </div>
         <span
           className={clsx(
-            "shrink-0 rounded-full px-3 py-1 text-xs font-semibold",
-            request.status === "new" && "bg-yellow-400/15 text-yellow-300",
-            request.status === "grouped" && "bg-green-400/15 text-green-300",
-            request.status === "cancelled" && "bg-white/10 text-fg-2",
+            "inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg px-2 text-[12px] font-semibold",
+            request.status === "new" && "bg-warn/15 text-warn",
+            request.status === "grouped" && "bg-accent/15 text-accent",
+            request.status === "cancelled" && "bg-white/[0.08] text-fg-2",
           )}
         >
           {DND_TRIAL_STATUS_LABELS[request.status]}
@@ -229,7 +229,7 @@ export function TrialRequestCard({
           />
         )}
         {request.status === "grouped" && (
-          <p className="rounded-lg bg-green-400/10 px-3 py-2 text-sm text-green-200">
+          <p className="rounded-xl bg-accent/10 px-3 py-2 text-sm text-fg">
             Мы подобрали вам игру! Запишитесь в разделе D&D → «Игры по расписанию».
           </p>
         )}
@@ -237,7 +237,7 @@ export function TrialRequestCard({
 
       {request.status === "new" && (
         <div className="space-y-2 border-t border-white/10 px-4 py-4">
-          {errorMessage && <p className="text-sm text-red-200">{errorMessage}</p>}
+          {errorMessage && <p className="text-sm text-danger">{errorMessage}</p>}
           <CancelButton
             label="Отменить заявку"
             isPending={isCancelling}
