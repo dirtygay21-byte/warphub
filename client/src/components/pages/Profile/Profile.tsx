@@ -1,6 +1,8 @@
 import { getMe } from "@/apiUtils/user";
 import { getRosterAccess } from "@/apiUtils/roster";
 import { AccessCodeDialog } from "./AccessCodeDialog";
+import TelegramOnly from "@/components/ui/TelegramOnly/TelegramOnly";
+import { isOutsideTelegram } from "@/utils/telegramEnv";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getFullName, getInitials } from "@/utils/user";
 import { useQuery } from "@tanstack/react-query";
@@ -34,6 +36,8 @@ export default function Profile() {
       setUser(profileQuery.data);
     }
   }, [profileQuery.data, setUser]);
+
+  if (isOutsideTelegram()) return <TelegramOnly what="Профиль, мини-игры и WarpBuilder" />;
 
   if (profileQuery.isLoading) {
     return (

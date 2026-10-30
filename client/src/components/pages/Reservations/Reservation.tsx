@@ -36,6 +36,8 @@ import {
   EyeOff,
   RefreshCw,
 } from "lucide-react";
+import TelegramOnly from "@/components/ui/TelegramOnly/TelegramOnly";
+import { isOutsideTelegram } from "@/utils/telegramEnv";
 import { useMemo, useState } from "react";
 
 const RESERVATION_SKELETON_COUNT = 5;
@@ -216,6 +218,8 @@ export default function Reservation() {
     disciplinesQuery.isLoading ||
     serviceQueries.some((query) => query.isLoading);
 
+  if (isOutsideTelegram()) return <TelegramOnly what="Ваши записи" />;
+
   if (reservationsQuery.isError) {
     return (
       <div className="flex min-h-[calc(100dvh-140px)] flex-col items-center justify-center gap-4 px-6 text-center text-white">
@@ -236,7 +240,7 @@ export default function Reservation() {
 
   if (isPageLoading) {
     return (
-      <div className="px-6 py-3 text-white lg:pt-8">
+      <div className="px-6 pb-3 pt-6 text-white lg:pt-8">
         <div className="mb-4">
           <h1 className="text-2xl font-semibold">Мои записи</h1>
           <p className="mt-1 text-sm text-white/50">Загружаем записи...</p>
@@ -252,7 +256,7 @@ export default function Reservation() {
   }
 
   return (
-    <div className="px-6 py-3 text-white lg:pt-8">
+    <div className="px-6 pb-3 pt-6 text-white lg:pt-8">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Мои записи</h1>
