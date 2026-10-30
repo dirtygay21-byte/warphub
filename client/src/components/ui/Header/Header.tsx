@@ -2,6 +2,7 @@ import { useRegistrationStageStore } from "@/stores/useRegistrationStageStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useReservationStore } from "@/stores/useReservationStore";
 import { ChevronLeft } from "lucide-react";
+import { useTelegramBack } from "@/hooks/useTelegramBack";
 import { useLocation, useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import { s3Url } from "@/utils/s3utils";
@@ -24,6 +25,8 @@ export default function Header() {
   const isAdminRoute = pathname.startsWith("/admin");
   const isHomeRoute = pathname === "/";
   const isTitleOnlyRoute = ["/reservations", "/news", "/profile"].some((p) => pathname.startsWith(p));
+  // у «Моих записей» и «Новостей» свой крупный заголовок — шапка с тем же названием не нужна (U8)
+  const pageHasOwnTitle = ["/reservations", "/news"].some((p) => pathname.startsWith(p));
   const adminSection = pathname.includes("/content")
     ? "ContentManagement"
     : pathname.includes("/warhammer")
@@ -60,6 +63,8 @@ export default function Header() {
     }
     previousStage();
   };
+  // шаги записи — «Назад» Telegram ведёт на шаг назад (U1)
+  useTelegramBack(isHomeRoute && currentStage !== "Home" ? handleBackBtnClick : null);
 
   return (
     <>
@@ -68,21 +73,10 @@ export default function Header() {
           "sticky top-0 z-50 w-full flex items-center h-[60px] gap-6 px-4 text-accent bg-app-bg",
           // на широком экране раздел видно в боковой панели, а у страницы свой крупный заголовок
           isTitleOnlyRoute && "lg:hidden",
+          pageHasOwnTitle && "hidden",
           isAdminRoute && "lg:px-6"
         )}
       >
-        {pathname.startsWith("/reservations") && (
-          <p className="text-white text-md font-medium text-center w-full">
-            Список записей
-          </p>
-        )}
-
-        {pathname.startsWith("/news") && (
-          <p className="text-white text-md font-medium text-center w-full">
-            Новости
-          </p>
-        )}
-
         {pathname.startsWith("/profile") && (
           <p className="text-white text-md font-medium text-center w-full">
             Профиль
@@ -91,6 +85,15 @@ export default function Header() {
 
         {isAdminRoute && (
           <div className="flex w-full items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {/* выход из админки — первым, чтобы на телефоне не уезжал за край ряда вкладок (C1) */}
+            <button
+              type="button"
+              onClick={() => navigate("/profile")}
+              aria-label="Выйти из админ-панели"
+              className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/3 text-white/80 transition-colors active:bg-white/10"
+            >
+              <ChevronLeft className="size-5" />
+            </button>
             {adminTabs.map((tab) => (
               <button
                 key={tab.id}
@@ -107,13 +110,6 @@ export default function Header() {
               </button>
             ))}
 
-            <button
-              type="button"
-              onClick={() => navigate("/")}
-              className="ml-auto shrink-0 rounded-lg border border-white/10 bg-white/3 px-3 py-2 text-xs font-semibold text-white/80 transition-colors active:bg-white/10 sm:text-sm"
-            >
-              На главную
-            </button>
           </div>
         )}
 

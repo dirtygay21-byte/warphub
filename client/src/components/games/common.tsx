@@ -10,6 +10,7 @@ import clsx from "clsx";
 import { Check, ChevronLeft, Copy, Gift, RotateCcw, Trophy } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTelegramBack } from "@/hooks/useTelegramBack";
 import { oswald, pixelButton, pluralWins, tierRangeLabel } from "./helpers";
 
 
@@ -23,6 +24,8 @@ export function GameTopBar({
   right?: ReactNode;
 }) {
   const navigate = useNavigate();
+  // «Назад» Telegram — туда же, куда стрелка в шапке (U1)
+  useTelegramBack(() => navigate(back));
   return (
     <div className="sticky top-0 z-20 flex h-[56px] items-center gap-2 bg-app-bg/95 px-2 backdrop-blur">
       <button

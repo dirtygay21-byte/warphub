@@ -22,7 +22,7 @@ export default function News() {
 
   if (newsQuery.isLoading) {
     return (
-      <div className="px-6 py-3 text-white lg:pt-8">
+      <div className="px-6 pb-3 pt-6 text-white lg:pt-8">
         <div className="mb-4">
           <h1 className="text-2xl font-semibold">Новости</h1>
           <p className="mt-1 text-sm text-white/50">Загружаем новости...</p>
@@ -56,7 +56,7 @@ export default function News() {
   }
 
   return (
-    <div className="px-6 py-3 text-white lg:pt-8">
+    <div className="px-6 pb-3 pt-6 text-white lg:pt-8">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Новости</h1>

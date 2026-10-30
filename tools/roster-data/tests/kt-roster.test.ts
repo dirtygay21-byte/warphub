@@ -29,6 +29,12 @@ test('проверки: нужен ровно один LEADER, численно�
   assert.ok(checkKtRoster(r, t).some((i) => /Лидеров 2/.test(i.message)));
 });
 
+test('пустая команда — не «OK»: замечание «нет оперативников» (UI-аудит B1)', () => {
+  const t = team('IMP-AOD');
+  const issues = checkKtRoster(newKtRoster(t, 'x'), t);
+  assert.ok(issues.some((i) => i.level === 'warning' && /нет оперативников/.test(i.message)));
+});
+
 test('код KT1.: туда и обратно, чужая команда — ошибка, мусор отбрасывается', () => {
   const t = team('AEL-BOK');
   let r = addOperative(newKtRoster(t, 'abc'), t.operatives[0]!);

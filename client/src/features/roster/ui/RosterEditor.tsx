@@ -356,7 +356,8 @@ function Editor({
         {cr.detachments.length > 0 && (
           <div className="-mt-3 space-y-3">
             {!shownDet && (
-              <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4">
+              // переносятся на новую строку, а не уезжают за край экрана (UI-аудит B10); при нескольких — без подписи
+              <div className="flex flex-wrap gap-1.5">
                 {cr.detachments.map((d) => (
                   <button
                     key={d.id}
@@ -365,7 +366,7 @@ function Editor({
                     className="flex min-h-9 max-w-full shrink-0 items-center gap-1.5 rounded-xl border border-accent/25 bg-accent/10 px-3 py-1.5 text-left text-xs font-semibold text-accent transition active:scale-[0.98]"
                   >
                     <Icon name="book" className="size-3.5 shrink-0" />
-                    <span className="text-accent/70">Детачмент:</span>
+                    {cr.detachments.length === 1 && <span className="text-accent/70">Детачмент:</span>}
                     <span className="truncate text-white/90">{d.name}</span>
                     <Icon name="down" className="size-3.5 shrink-0" />
                   </button>
