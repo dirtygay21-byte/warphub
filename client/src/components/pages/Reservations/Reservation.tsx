@@ -18,7 +18,6 @@ import { Segmented } from "@/components/ui/ds";
 import { haptic } from "@/utils/haptic";
 import ReservationCardSkeleton from "@/components/skeletons/ReservationCardSkeleton";
 import { formatReservationDate } from "@/utils/date";
-import { getRecordsLabel } from "@/utils/plural";
 import {
   isInactiveReservation,
   isPastReservation,
