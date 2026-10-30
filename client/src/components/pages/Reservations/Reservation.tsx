@@ -14,6 +14,8 @@ import {
   isDndBookingInactive,
 } from "@/apiUtils/dnd";
 import { isPastEvent } from "./utils";
+import { Segmented } from "@/components/ui/ds";
+import { haptic } from "@/utils/haptic";
 import ReservationCardSkeleton from "@/components/skeletons/ReservationCardSkeleton";
 import { formatReservationDate } from "@/utils/date";
 import { getRecordsLabel } from "@/utils/plural";
@@ -29,11 +31,8 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import clsx from "clsx";
 import {
   CalendarDays,
-  Eye,
-  EyeOff,
   RefreshCw,
 } from "lucide-react";
 import TelegramOnly from "@/components/ui/TelegramOnly/TelegramOnly";
@@ -44,7 +43,9 @@ const RESERVATION_SKELETON_COUNT = 5;
 
 export default function Reservation() {
   const queryClient = useQueryClient();
-  const [showInactive, setShowInactive] = useState(false);
+  // «Активные / Прошедшие» вместо значка-глаза (UI-аудит A7, D2)
+  const [tab, setTab] = useState<"active" | "past">("active");
+  const showPast = tab === "past";
   const [reservationToCancel, setReservationToCancel] = useState<string | null>(
     null
   );
@@ -159,12 +160,10 @@ export default function Reservation() {
 
   const visibleReservations = useMemo(
     () =>
-      showInactive
-        ? reservations
-        : reservations.filter(
-            (reservation) => !isInactiveReservation(reservation)
-          ),
-    [reservations, showInactive]
+      reservations.filter(
+        (reservation) => isInactiveReservation(reservation) === showPast
+      ),
+    [reservations, showPast]
   );
 
   const dndBookings = useMemo(
@@ -182,16 +181,13 @@ export default function Reservation() {
     () => dndQuery.data?.trialRequests ?? [],
     [dndQuery.data]
   );
-  const visibleDndBookings = showInactive
-    ? dndBookings
-    : dndBookings.filter((booking) => !isDndBookingInactive(booking));
-  const visibleTrials = showInactive
-    ? trialRequests
-    : trialRequests.filter((request) => request.status !== "cancelled");
+  const visibleDndBookings = dndBookings.filter((booking) => isDndBookingInactive(booking) === showPast);
+  const visibleTrials = trialRequests.filter((request) => (request.status === "cancelled") === showPast);
+  const visibleEvent = registeredEvent && isPastEvent(registeredEvent) === showPast ? registeredEvent : null;
 
   const visibleCount =
     visibleReservations.length +
-    (registeredEvent ? 1 : 0) +
+    (visibleEvent ? 1 : 0) +
     visibleDndBookings.length +
     visibleTrials.length;
   const inactiveCount = useMemo(
@@ -202,6 +198,8 @@ export default function Reservation() {
       trialRequests.filter((request) => request.status === "cancelled").length,
     [reservations, dndBookings, trialRequests]
   );
+  const activeCount =
+    reservations.length + dndBookings.length + trialRequests.length + (registeredEvent ? 1 : 0) - inactiveCount;
   const reservationBeingEdited = reservationToEdit
     ? reservations.find((reservation) => reservation.id === reservationToEdit)
     : undefined;
@@ -240,10 +238,10 @@ export default function Reservation() {
 
   if (isPageLoading) {
     return (
-      <div className="px-6 pb-3 pt-6 text-white lg:pt-8">
+      <div className="px-5 pb-3 pt-6 text-fg lg:pt-8">
         <div className="mb-4">
-          <h1 className="text-2xl font-semibold">Мои записи</h1>
-          <p className="mt-1 text-sm text-white/50">Загружаем записи...</p>
+          <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Мои записи</h1>
+          <p className="mt-2 text-sm text-fg-2">Загружаем записи…</p>
         </div>
 
         <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start">
@@ -256,81 +254,49 @@ export default function Reservation() {
   }
 
   return (
-    <div className="px-6 pb-3 pt-6 text-white lg:pt-8">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold">Мои записи</h1>
-          <p className="mt-1 text-sm text-white/50">
-            {visibleCount > 0
-              ? `${visibleCount} ${getRecordsLabel(visibleCount)}`
-              : inactiveCount > 0 && !showInactive
-              ? "Нет активных записей"
-              : "Пока нет записей"}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {inactiveCount > 0 && (
-            <button
-              type="button"
-              onClick={() => setShowInactive((current) => !current)}
-              aria-label={
-                showInactive ? "Скрыть неактивные" : "Показать неактивные"
-              }
-              className={clsx(
-                "flex size-10 items-center justify-center rounded-xl border transition-colors",
-                showInactive
-                  ? "border-accent/40 bg-accent/10 text-accent"
-                  : "border-white/10 bg-white/3 text-white/80 active:bg-white/10"
-              )}
-            >
-              {showInactive ? (
-                <EyeOff className="size-4" />
-              ) : (
-                <Eye className="size-4" />
-              )}
-            </button>
-          )}
-
+    <div className="ds-enter px-5 pb-3 pt-6 text-fg lg:pt-8">
+      <div className="mb-4 flex flex-col gap-3.5">
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Мои записи</h1>
           <button
             type="button"
             onClick={() => {
+              haptic.tap();
               reservationsQuery.refetch();
               dndQuery.refetch();
             }}
             disabled={reservationsQuery.isFetching}
             aria-label="Обновить список записей"
-            className="flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/3 text-white transition-colors active:bg-white/10 disabled:opacity-60"
+            title="Обновить"
+            className="ds-press flex size-11 items-center justify-center rounded-xl border border-white/10 bg-app-elevated text-fg disabled:opacity-60"
           >
-            <RefreshCw
-              className={`size-4 ${
-                reservationsQuery.isFetching ? "animate-spin" : ""
-              }`}
-            />
+            <RefreshCw className={`size-[18px] ${reservationsQuery.isFetching ? "animate-spin" : ""}`} />
           </button>
         </div>
+        <Segmented
+          value={tab}
+          onChange={setTab}
+          options={[
+            { value: "active", label: `Активные${activeCount > 0 ? ` · ${activeCount}` : ""}` },
+            { value: "past", label: `Прошедшие${inactiveCount > 0 ? ` · ${inactiveCount}` : ""}` },
+          ]}
+        />
       </div>
 
       {visibleCount === 0 ? (
-        <div className="rounded-2xl border border-white/10 bg-app-elevated px-6 py-10 text-center">
+        <div className="ds-enter rounded-[18px] border border-white/10 bg-app-elevated px-6 py-10 text-center">
           <CalendarDays className="mx-auto size-10 text-accent" />
-          <p className="mt-4 text-base font-medium">
-            {inactiveCount > 0 && !showInactive
-              ? "Активных записей нет"
-              : "Записей пока нет"}
-          </p>
-          <p className="mt-2 text-sm text-white/50">
-            {inactiveCount > 0 && !showInactive
-              ? "Нажмите «Показать неактивные», чтобы увидеть прошлые и отменённые записи."
-              : "Запишитесь на главной странице."}
+          <p className="mt-4 text-base font-semibold">{showPast ? "Прошедших записей нет" : "Активных записей нет"}</p>
+          <p className="mt-2 text-sm text-fg-2">
+            {showPast ? "Здесь появятся прошлые и отменённые записи." : "Запишитесь на главной — новые записи появятся здесь."}
           </p>
         </div>
       ) : (
         <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start">
-          {registeredEvent && (
+          {visibleEvent && (
             <EventReservationCard
-              event={registeredEvent}
-              isPast={isPastEvent(registeredEvent)}
+              event={visibleEvent}
+              isPast={isPastEvent(visibleEvent)}
               isCancelling={cancelEventMutation.isPending}
               onCancel={() => setShowEventCancelDialog(true)}
             />

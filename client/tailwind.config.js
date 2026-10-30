@@ -24,10 +24,20 @@ export default {
         danger: 'rgb(var(--color-danger) / <alpha-value>)',
         warn: 'rgb(var(--color-warn) / <alpha-value>)',
         muted: 'var(--color-text-muted)',
+        // текст дизайн-системы: fg — основной, fg-2 — второстепенный, fg-3 — подписи (D2)
+        fg: {
+          DEFAULT: 'rgb(var(--color-text) / <alpha-value>)',
+          2: 'rgb(var(--color-text-2) / <alpha-value>)',
+          3: 'rgb(var(--color-text-3) / <alpha-value>)',
+        },
+        field: 'var(--color-bg-field)',
         subtle: 'var(--color-text-subtle)',
       },
       fontFamily: {
         display: ['Oswald', 'sans-serif'],
+      },
+      transitionTimingFunction: {
+        'out-soft': 'cubic-bezier(0.2, 0.8, 0.2, 1)',
       },
     },
   },
