@@ -369,6 +369,317 @@ function Ready() {
   );
 }
 
+
+/* ---------- Age of Sigmar ---------- */
+const GOLD = "#E8B84A";
+
+function AosRound({ ids }: { ids: Ids }) {
+  return (
+    <>
+      <Die x={20} y={26} pips={[[11, 11]]} />
+      <Die x={50} y={26} pips={[[6, 6], [16, 16]]} />
+      <text x={46} y={68} textAnchor="middle" fontSize={11} fill={F2}>
+        бросок
+      </text>
+      <text x={46} y={82} textAnchor="middle" fontSize={11} fill={F2}>
+        приоритета
+      </text>
+      <path d="M84 46h22" stroke={A} strokeWidth={2} markerEnd={`url(#${ids.accent})`} />
+      {[
+        [114, "Ход 1", A],
+        [214, "Ход 2", W],
+      ].map(([x, t, c]) => (
+        <g key={t as string}>
+          <rect x={x as number} y={24} width={90} height={56} rx={10} fill={PANEL} />
+          <text x={(x as number) + 45} y={48} textAnchor="middle" fontSize={12} fontWeight={700} fill={c as string}>
+            {t}
+          </text>
+          <text x={(x as number) + 45} y={66} textAnchor="middle" fontSize={10.5} fill={F2}>
+            7 фаз
+          </text>
+        </g>
+      ))}
+      <Tag x={160} y={112} c={A}>
+        Победитель решает, кто ходит первым
+      </Tag>
+    </>
+  );
+}
+
+function AosPhases() {
+  const names = ["Начало хода", "Фаза героев", "Движение", "Стрельба", "Нападение", "Бой", "Конец хода"];
+  return (
+    <>
+      {names.map((name, i) => {
+        const y = 20 + i * 21;
+        return (
+          <g key={name}>
+            <rect x={20} y={y} width={280} height={18} rx={6} fill={PANEL} />
+            <text x={34} y={y + 13} fontSize={11} fontWeight={800} fill={i > 0 && i < 6 ? A : F3}>
+              {i + 1}
+            </text>
+            <text x={52} y={y + 13} fontSize={11.5} fill={W}>
+              {name}
+            </text>
+          </g>
+        );
+      })}
+    </>
+  );
+}
+
+function AosWarscroll() {
+  const vals: [string, number, number][] = [
+    ["5″", 133, 58],
+    ["2", 187, 58],
+    ["4+", 133, 104],
+    ["1", 187, 104],
+  ];
+  const labels: [string, number, number][] = [
+    ["Move — движение", 60, 46],
+    ["Health — здоровье", 262, 46],
+    ["Save — спасбросок", 60, 112],
+    ["Control — контроль", 262, 112],
+  ];
+  return (
+    <>
+      <circle cx={160} cy={76} r={54} fill={PANEL} stroke={A} strokeWidth={2} />
+      <line x1={106} y1={76} x2={214} y2={76} stroke="rgba(255,255,255,.18)" />
+      <line x1={160} y1={22} x2={160} y2={130} stroke="rgba(255,255,255,.18)" />
+      {vals.map(([v, x, y]) => (
+        <text key={`${x}-${y}`} x={x} y={y} textAnchor="middle" fontSize={18} fontWeight={800} fill={W}>
+          {v}
+        </text>
+      ))}
+      {labels.map(([t, x, y]) => (
+        <text key={t} x={x} y={y} textAnchor="middle" fontSize={10.5} fill={F2}>
+          {t}
+        </text>
+      ))}
+      <text x={160} y={152} textAnchor="middle" fontSize={11} fill={F3}>
+        Пример варскролла пехоты
+      </text>
+    </>
+  );
+}
+
+function AosCommand() {
+  return (
+    <>
+      {[0, 1, 2, 3, 4].map((i) => {
+        const c = i < 4 ? A : W;
+        return (
+          <g key={i}>
+            <circle cx={36 + i * 34} cy={44} r={13} fill="none" stroke={c} strokeWidth={2.4} strokeDasharray={i === 4 ? "3 3" : undefined} />
+            <text x={36 + i * 34} y={48} textAnchor="middle" fontSize={10} fontWeight={800} fill={c}>
+              CP
+            </text>
+          </g>
+        );
+      })}
+      <text x={88} y={78} textAnchor="middle" fontSize={11} fill={F2}>
+        4 CP каждому
+      </text>
+      <text x={172} y={78} textAnchor="middle" fontSize={11} fill={W}>
+        +1 отстающему
+      </text>
+      <rect x={210} y={26} width={96} height={40} rx={10} fill={PANEL} />
+      <text x={258} y={44} textAnchor="middle" fontSize={11} fontWeight={700} fill={A}>
+        Rally
+      </text>
+      <text x={258} y={59} textAnchor="middle" fontSize={10} fill={F2}>
+        6 кубиков, 4+
+      </text>
+      {[6, 2, 4, 5, 1, 4].map((v, i) => {
+        const ok = v >= 4;
+        const x = 40 + i * 40;
+        return (
+          <g key={i}>
+            <rect x={x} y={100} width={26} height={26} rx={6} fill={ok ? LIGHT : "#3A3A36"} />
+            <text x={x + 13} y={118} textAnchor="middle" fontSize={13} fontWeight={800} fill={ok ? "#141413" : F3}>
+              {v}
+            </text>
+          </g>
+        );
+      })}
+      <text x={160} y={148} textAnchor="middle" fontSize={11} fill={F2}>
+        4 очка сбора: лечение или возврат моделей
+      </text>
+    </>
+  );
+}
+
+const CombatRange = ({ x, y, r }: { x: number; y: number; r: number }) => (
+  <circle cx={x} cy={y} r={r} fill="rgba(248,113,113,.07)" stroke={R} strokeDasharray="4 4" />
+);
+
+function AosMove({ ids }: { ids: Ids }) {
+  return (
+    <>
+      <CombatRange x={270} y={128} r={40} />
+      <Base x={270} y={128} c={R} />
+      <text x={270} y={82} textAnchor="middle" fontSize={10.5} fill={R}>
+        зона боя 3″
+      </text>
+      <Base x={40} y={46} />
+      <line x1={56} y1={46} x2={186} y2={46} stroke={A} strokeWidth={2} markerEnd={`url(#${ids.accent})`} />
+      <Tag x={120} y={28} c={A}>
+        Обычный ход: до Move
+      </Tag>
+      <Ghost x={200} y={46} />
+      <Base x={40} y={112} />
+      <line x1={56} y1={112} x2={206} y2={112} stroke={A} strokeWidth={2} markerEnd={`url(#${ids.accent})`} />
+      <Tag x={124} y={94} c={A}>
+        Бег: Move + D6″
+      </Tag>
+      <text x={130} y={160} textAnchor="middle" fontSize={11} fill={F2}>
+        в зону боя врага заходить нельзя
+      </text>
+    </>
+  );
+}
+
+function AosShoot({ ids }: { ids: Ids }) {
+  return (
+    <>
+      <Base x={36} y={56} />
+      <Base x={286} y={56} r={14} c={R} />
+      <line x1={52} y1={56} x2={270} y2={56} stroke={W} strokeWidth={1.6} markerEnd={`url(#${ids.white})`} />
+      <Tag x={160} y={40}>
+        Видит и в пределах Range
+      </Tag>
+      <Tick x={36} y1={70} y2={92} />
+      <Tick x={286} y1={70} y2={92} />
+      <Measure x1={36} x2={286} y={86} label="Range = 18″" marker={ids.white} />
+      <CombatRange x={80} y={140} r={34} />
+      <Base x={64} y={140} />
+      <Base x={98} y={140} c={R} />
+      <text x={210} y={136} textAnchor="middle" fontSize={11.5} fontWeight={700} fill={R}>
+        В бою — не стреляет
+      </text>
+      <text x={210} y={152} textAnchor="middle" fontSize={10.5} fill={F2}>
+        если нет Shoot in Combat
+      </text>
+    </>
+  );
+}
+
+function AosCharge({ ids }: { ids: Ids }) {
+  return (
+    <>
+      <Tag x={160} y={30} c={A}>
+        Бросок 2D6 = 7″
+      </Tag>
+      <Base x={40} y={86} />
+      <Base x={282} y={86} r={14} c={R} />
+      <line x1={56} y1={86} x2={250} y2={86} stroke={A} strokeWidth={2} markerEnd={`url(#${ids.accent})`} />
+      <Ghost x={256} y={86} />
+      <Tag x={262} y={124} c={A}>
+        ½″
+      </Tag>
+      <text x={130} y={124} textAnchor="middle" fontSize={11} fill={F2}>
+        закончить в ½″ от видимого врага
+      </text>
+    </>
+  );
+}
+
+function AosFight({ ids }: { ids: Ids }) {
+  return (
+    <>
+      <CombatRange x={150} y={84} r={58} />
+      <Base x={150} y={84} r={14} c={R} />
+      <Base x={108} y={52} />
+      <Base x={104} y={110} />
+      <Base x={236} y={140} />
+      <path d="M222 134 C200 124 186 116 172 104" fill="none" stroke={A} strokeWidth={1.8} markerEnd={`url(#${ids.accent})`} />
+      <Tag x={250} y={164} c={A}>
+        Подход до 3″
+      </Tag>
+      <text x={150} y={18} textAnchor="middle" fontSize={10.5} fill={R}>
+        зона боя 3″
+      </text>
+      <text x={266} y={46} textAnchor="middle" fontSize={11} fill={F2}>
+        игроки по очереди
+      </text>
+      <text x={266} y={62} textAnchor="middle" fontSize={11} fill={F2}>
+        выбирают юнит
+      </text>
+    </>
+  );
+}
+
+function AosAttack({ ids }: { ids: Ids }) {
+  const cols = ["Atk", "Hit", "Wnd", "Rnd", "Dmg"];
+  const vals = ["2", "3+", "3+", "1", "1"];
+  const steps = [
+    ["Попадание", "≥ Hit"],
+    ["Ранение", "≥ Wnd"],
+    ["Спасбросок", "− Rend"],
+    ["Урон", "= Dmg"],
+  ];
+  return (
+    <>
+      {cols.map((c, i) => {
+        const x = 10 + i * 61;
+        return (
+          <g key={c}>
+            <rect x={x} y={20} width={57} height={22} rx={6} fill={HEAD} />
+            <text x={x + 28.5} y={35} textAnchor="middle" fontSize={11} fontWeight={700} fill={W}>
+              {c}
+            </text>
+            <rect x={x} y={46} width={57} height={24} rx={6} fill={LIGHT} />
+            <text x={x + 28.5} y={63} textAnchor="middle" fontSize={13} fontWeight={800} fill="#141413">
+              {vals[i]}
+            </text>
+          </g>
+        );
+      })}
+      {steps.map(([t, s], i) => {
+        const x = 10 + i * 78;
+        return (
+          <g key={t}>
+            <rect x={x} y={86} width={70} height={56} rx={10} fill={PANEL} />
+            <text x={x + 35} y={108} textAnchor="middle" fontSize={11} fontWeight={700} fill={W}>
+              {t}
+            </text>
+            <text x={x + 35} y={126} textAnchor="middle" fontSize={10.5} fill={F2}>
+              {s}
+            </text>
+            {i < 3 && <path d={`M${x + 71} 114h6`} stroke={A} strokeWidth={2} markerEnd={`url(#${ids.accent})`} />}
+          </g>
+        );
+      })}
+    </>
+  );
+}
+
+function AosObjective() {
+  return (
+    <>
+      <circle cx={160} cy={84} r={62} fill="none" stroke="rgba(232,184,74,.5)" strokeDasharray="4 4" />
+      <circle cx={160} cy={84} r={16} fill={GOLD} opacity={0.9} />
+      <text x={160} y={88} textAnchor="middle" fontSize={10} fontWeight={800} fill="#111">
+        ОБ
+      </text>
+      <Base x={110} y={58} />
+      <Base x={108} y={92} />
+      <Base x={122} y={124} />
+      <Base x={210} y={60} c={R} />
+      <Base x={214} y={104} c={R} />
+      <Tag x={60} y={160} c={A}>
+        Control 3
+      </Tag>
+      <Tag x={262} y={160} c={R}>
+        Control 2
+      </Tag>
+      <text x={160} y={16} textAnchor="middle" fontSize={10.5} fill={GOLD}>
+        объект в зоне боя модели (3″)
+      </text>
+    </>
+  );
+}
+
 const HEIGHT: Record<TutorialDiagram, number> = {
   round: 200,
   profile: 160,
@@ -380,6 +691,16 @@ const HEIGHT: Record<TutorialDiagram, number> = {
   charge: 162,
   fight: 174,
   ready: 150,
+  aosRound: 130,
+  aosPhases: 176,
+  aosWarscroll: 166,
+  aosCommand: 162,
+  aosMove: 170,
+  aosShoot: 170,
+  aosCharge: 140,
+  aosFight: 176,
+  aosAttack: 152,
+  aosObjective: 176,
 };
 
 const ALT: Record<TutorialDiagram, string> = {
@@ -393,6 +714,16 @@ const ALT: Record<TutorialDiagram, string> = {
   charge: "Схема: бросок 2D6 = 8, до одного врага 9 дюймов, до другого 8",
   fight: "Схема: сближение до 3 дюймов и атаки в 2 дюймах",
   ready: "Что сделать перед первой игрой",
+  aosRound: "Схема: бросок приоритета и два хода по 7 фаз",
+  aosPhases: "Схема: семь фаз хода",
+  aosWarscroll: "Схема: характеристики варскролла Move, Health, Save, Control",
+  aosCommand: "Схема: 4 очка команд, +1 отстающему, команда Rally",
+  aosMove: "Схема: обычный ход, бег и зона боя врага 3 дюйма",
+  aosShoot: "Схема: стрельба на дальность оружия; юнит в бою не стреляет",
+  aosCharge: "Схема: бросок 2D6 и конец нападения в полудюйме от врага",
+  aosFight: "Схема: зона боя 3 дюйма и подход до 3 дюймов",
+  aosAttack: "Схема: профиль оружия и четыре шага атаки",
+  aosObjective: "Схема: контроль объекта, сумма Control 3 против 2",
 };
 
 export default function TutorialDiagramView({ diagram }: { diagram: TutorialDiagram }) {
@@ -410,6 +741,16 @@ export default function TutorialDiagramView({ diagram }: { diagram: TutorialDiag
     charge: <Charge ids={ids} />,
     fight: <Fight ids={ids} />,
     ready: <Ready />,
+    aosRound: <AosRound ids={ids} />,
+    aosPhases: <AosPhases />,
+    aosWarscroll: <AosWarscroll />,
+    aosCommand: <AosCommand />,
+    aosMove: <AosMove ids={ids} />,
+    aosShoot: <AosShoot ids={ids} />,
+    aosCharge: <AosCharge ids={ids} />,
+    aosFight: <AosFight ids={ids} />,
+    aosAttack: <AosAttack ids={ids} />,
+    aosObjective: <AosObjective />,
   };
   const marker = (id: string, fill: string) => (
     <marker id={id} viewBox="0 0 10 10" refX={9} refY={5} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
