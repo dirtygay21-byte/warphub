@@ -39,6 +39,7 @@ import {
   startSession,
 } from '../minigames/service';
 import { handleMinigame } from '../minigames/http';
+import { getPlayerProgress } from '../progress/service';
 import { getCardsState, getPointsHistory, openPack } from '../minigames/cards';
 import { getNewsById, listPublishedNews } from '../news/service';
 import { jwtPlugin } from '../../plugins/jwt-plugin';
@@ -373,6 +374,13 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
       tags: ['Users'],
       summary: 'Текущий пользователь',
       description: 'Возвращает профиль авторизованного пользователя.',
+    },
+  })
+  .get('/me/progress', async ({ user }) => getPlayerProgress(user.id), {
+    detail: {
+      tags: ['Users'],
+      summary: 'Прогресс игрока',
+      description: 'Сыгранные игры и ранг по категориям (Warhammer, D&D, покраска, посещение): только подтверждённые и прошедшие записи.',
     },
   })
   .get('/reservations/my', async ({ user }) => getUserReservations(user.id), {

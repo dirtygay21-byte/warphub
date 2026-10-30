@@ -1,4 +1,8 @@
 import { getMe } from "@/apiUtils/user";
+import { CATEGORY_LABELS, getMyProgress, RANK_ORDER, type ProgressCategory } from "@/apiUtils/progress";
+import AvatarFrame from "@/components/ui/AvatarFrame/AvatarFrame";
+import PlayerProgressCard from "./PlayerProgressCard";
+import { pickFrame, saveFrame } from "./progressChoice";
 import { getRosterAccess } from "@/apiUtils/roster";
 import { AccessCodeDialog } from "./AccessCodeDialog";
 import TelegramOnly from "@/components/ui/TelegramOnly/TelegramOnly";
@@ -32,6 +36,13 @@ export default function Profile() {
     queryKey: ["me"],
     queryFn: getMe,
   });
+
+  // прогресс игрока и рамка аватара (30.10.2026)
+  const progressQuery = useQuery({ queryKey: ["me-progress"], queryFn: getMyProgress, enabled: isAuthenticated });
+  const [frameChoice, setFrameChoice] = useState<ProgressCategory | null>(null);
+  const frame = progressQuery.data
+    ? (progressQuery.data.categories.find((c) => c.category === frameChoice) ?? pickFrame(progressQuery.data.categories))
+    : null;
 
   useEffect(() => {
     if (profileQuery.data) {
@@ -76,19 +87,25 @@ export default function Profile() {
         <div className="relative px-6 pb-6 pt-8 text-center">
           <div className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-accent/15 to-transparent" />
 
-          <div className="relative mx-auto mb-4 flex size-24 items-center justify-center overflow-hidden rounded-full border-2 border-accent/70 bg-app-subtle">
-            {user?.photoUrl ? (
-              <img
-                src={user?.photoUrl}
-                alt={fullName || "Аватар пользователя"}
-                className="size-full object-cover"
-              />
-            ) : (
-              <span className="text-2xl font-semibold text-accent">
-                {getInitials(user?.firstName ?? "", user?.lastName ?? "")}
-              </span>
-            )}
-          </div>
+          <AvatarFrame
+            category={frame?.category ?? "warhammer"}
+            tier={frame ? RANK_ORDER.indexOf(frame.rank) : 0}
+            size={96}
+            label={frame ? `Рамка: ${CATEGORY_LABELS[frame.category]} · ${frame.rankLabel}` : undefined}
+          >
+            <div className="flex size-full items-center justify-center bg-app-subtle">
+              {user?.photoUrl ? (
+                <img src={user?.photoUrl} alt={fullName || "Аватар пользователя"} className="size-full object-cover" />
+              ) : (
+                <span className="text-2xl font-semibold text-accent">{getInitials(user?.firstName ?? "", user?.lastName ?? "")}</span>
+              )}
+            </div>
+          </AvatarFrame>
+          {frame && (
+            <p className="relative -mt-1 mb-3 text-[13px] font-semibold uppercase tracking-[0.08em] text-accent">
+              {frame.rankLabel} · {CATEGORY_LABELS[frame.category]}
+            </p>
+          )}
 
           <h1 className="text-2xl font-semibold leading-tight">
             {fullName || "Пользователь"}
@@ -102,8 +119,19 @@ export default function Profile() {
         </div>
       </section>
 
+      {progressQuery.data && (
+        <PlayerProgressCard
+          categories={progressQuery.data.categories}
+          selected={frame?.category ?? null}
+          onSelect={(category) => {
+            saveFrame(category);
+            setFrameChoice(category);
+          }}
+        />
+      )}
+
       <NavRow
-        className="mt-4 lg:mt-0"
+        className="mt-4"
         tone="accent-outline"
         bareIcon
         icon={<Gamepad2 className="size-7" />}
