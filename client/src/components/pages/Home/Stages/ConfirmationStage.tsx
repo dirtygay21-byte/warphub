@@ -16,6 +16,7 @@ import { hoursLabel } from "@/utils/slots";
 import type { ReactNode } from "react";
 import { getServiceDetailsMeta } from "./ServiceDetails/utils";
 import { formatSelectedDate } from "@/utils/date";
+import { DsButton } from "@/components/ui/ds";
 
 type ConfirmationStatus = "Success" | "Succes" | "Error";
 
@@ -91,7 +92,7 @@ export default function ConfirmationStage({
   };
 
   return (
-    <div className="relative min-h-[calc(100dvh-160px)] overflow-hidden px-6 py-8 text-center text-white">
+    <div className="ds-enter relative min-h-[calc(100dvh-160px)] overflow-hidden px-5 py-8 text-center text-fg">
       {isSuccess && (
         <div className="pointer-events-none absolute inset-x-0 top-0 h-52">
           {confetti.map((className) => (
@@ -105,20 +106,20 @@ export default function ConfirmationStage({
 
       <div className="relative mx-auto flex max-w-sm flex-col items-center">
         <div
-          className={`mb-5 flex size-28 items-center justify-center rounded-full border shadow-[0_0_36px_currentColor] ${
+          className={`ds-pop mb-5 flex size-24 items-center justify-center rounded-full border shadow-[0_0_36px_currentColor] ${
             isSuccess
-              ? "border-green-400/70 bg-green-400/15 text-green-400"
-              : "border-red-400/70 bg-red-400/15 text-red-400"
+              ? "border-accent/70 bg-accent/15 text-accent"
+              : "border-danger/70 bg-danger/15 text-danger"
           }`}
         >
           {isSuccess ? (
-            <CheckCircle2 className="size-16" />
+            <CheckCircle2 className="size-14" />
           ) : (
-            <XCircle className="size-16" />
+            <XCircle className="size-14" />
           )}
         </div>
 
-        <h2 className="text-2xl font-semibold">
+        <h2 className="font-display text-[28px] font-semibold uppercase leading-none">
           {!isSuccess
             ? "Запись не создана"
             : lastBooking?.joined
@@ -131,15 +132,15 @@ export default function ConfirmationStage({
             : "Не удалось подтвердить запись. Попробуй еще раз."}
         </p>
 
-        <div className="mt-5 w-full rounded-xl border border-white/10 bg-app-elevated/90 p-4 text-left">
+        <div className="mt-6 w-full rounded-[18px] border border-white/10 bg-app-elevated p-4 text-left">
           <div className="mb-3 flex items-start justify-between gap-3">
-            <h3 className="text-base font-semibold leading-tight">
+            <h3 className="text-[17px] font-bold leading-tight">
               {serviceQuery.isLoading
                 ? "Загрузка…"
                 : (activity ?? "Услуга")}
             </h3>
             {discipline && (
-              <span className="shrink-0 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-fg-2">
+              <span className="shrink-0 whitespace-nowrap rounded-lg bg-white/[0.08] px-2 py-1 text-[12px] font-semibold text-fg-2">
                 {discipline}
               </span>
             )}
@@ -156,11 +157,11 @@ export default function ConfirmationStage({
         </div>
 
         {isSuccess && limited && fullMinutes && lastBooking?.endsAt && (
-          <div className="mt-3 w-full rounded-xl border border-red-400/60 bg-red-400/15 px-4 py-3 text-left text-sm text-red-100">
-            <p className="font-semibold text-red-200">
+          <div role="status" className="mt-3 w-full rounded-[14px] border border-danger/50 bg-danger/10 px-4 py-3 text-left text-sm text-fg">
+            <p className="font-semibold text-danger">
               ⚠️ Время ограничено: {hoursLabel(limited)} вместо {hoursLabel(fullMinutes)} — до {formatClubTime(lastBooking.endsAt)}
             </p>
-            <p className="mt-1 text-red-100/85">
+            <p className="mt-1 text-fg-2">
               Если не успеете, попросим освободить место к следующей записи; если будет свободно — постараемся продлить.
             </p>
           </div>
@@ -168,36 +169,24 @@ export default function ConfirmationStage({
 
         {isSuccess ? (
           <>
-            <div className="mt-3 w-full rounded-xl bg-white/6 px-4 py-3 text-sm text-fg-2">
+            <div className="mt-3 w-full rounded-[14px] bg-white/[0.05] px-4 py-3 text-sm text-fg-2">
               Мы напомним тебе за 1 час до начала игры.
             </div>
 
-            <button
-              type="button"
-              onClick={handleMyRecordsClick}
-              className="mt-4 w-full rounded-xl bg-accent px-4 py-4 text-base font-semibold text-accent-foreground transition-transform active:scale-95"
-            >
+            <DsButton variant="primary" size="lg" onClick={handleMyRecordsClick} className="mt-5 w-full">
               Мои записи
-            </button>
+            </DsButton>
           </>
         ) : (
-          <button
-            type="button"
-            onClick={previousStage}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-4 text-base font-semibold text-accent-foreground transition-transform active:scale-95"
-          >
+          <DsButton variant="primary" size="lg" onClick={previousStage} className="mt-5 w-full">
             <RotateCcw className="size-5" />
             Попробовать снова
-          </button>
+          </DsButton>
         )}
 
-        <button
-          type="button"
-          onClick={handleHomeClick}
-          className="mt-3 w-full rounded-xl border border-white/15 bg-white/3 px-4 py-4 text-base font-semibold text-white transition-colors active:bg-white/10"
-        >
+        <DsButton variant="secondary" size="lg" onClick={handleHomeClick} className="mt-3 w-full">
           На главную
-        </button>
+        </DsButton>
       </div>
     </div>
   );
@@ -205,7 +194,7 @@ export default function ConfirmationStage({
 
 function InfoRow({ icon, value }: { icon: ReactNode; value: string }) {
   return (
-    <div className="flex items-center gap-3 text-sm text-white/85">
+    <div className="flex items-center gap-3 text-[15px] text-fg">
       <span className="text-fg-2">{icon}</span>
       <span>{value}</span>
     </div>

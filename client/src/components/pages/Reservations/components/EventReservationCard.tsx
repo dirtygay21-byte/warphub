@@ -2,9 +2,8 @@ import { DetailRow } from "./DetailRow";
 import { formatReservationDate } from "@/utils/date";
 import { formatTimeRange } from "@/utils/reservationDisplay";
 import clsx from "clsx";
+import { DsButton } from "@/components/ui/ds";
 import {
-  CalendarDays,
-  Clock3,
   LoaderCircle,
   Table2,
   UsersRound,
@@ -28,9 +27,9 @@ export function EventReservationCard({
   return (
     <article
       className={clsx(
-        "overflow-hidden rounded-2xl border bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.25)]",
-        isPast && "pointer-events-none border-white/10 opacity-45",
-        !isPast && "border-accent/30",
+        "ds-enter overflow-hidden rounded-[18px] border bg-app-elevated",
+        isPast && "pointer-events-none border-white/[0.08] opacity-60",
+        !isPast && "border-white/10",
       )}
     >
       {event.bannerUrl && (
@@ -41,32 +40,19 @@ export function EventReservationCard({
         />
       )}
 
-      <div className="border-b border-white/10 px-4 py-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="truncate text-base font-semibold">{event.title}</h2>
-            <p className="mt-1 text-sm text-fg-3">Ближайший ивент</p>
-          </div>
-
-          <span className="shrink-0 rounded-full bg-green-400/15 px-3 py-1 text-xs font-semibold text-green-300">
+      <div className="space-y-1 px-4 pt-4">
+        <div className="flex items-center justify-between gap-2">
+          <span className="min-w-0 truncate text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">Ивент · {event.title}</span>
+          <span className="inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg bg-accent/15 px-2 text-[12px] font-semibold text-accent">
             Записан
           </span>
         </div>
+        <p className="text-lg font-bold leading-snug">
+          {formatReservationDate(event.startsAt)} · <span className="whitespace-nowrap">{formatTimeRange(event.startsAt, event.endsAt)}</span>
+        </p>
       </div>
 
-      <div className="space-y-3 px-4 py-4 text-sm">
-        <DetailRow
-          icon={<CalendarDays className="size-4" />}
-          label="Дата"
-          value={formatReservationDate(event.startsAt)}
-          isLoading={false}
-        />
-        <DetailRow
-          icon={<Clock3 className="size-4" />}
-          label="Время"
-          value={formatTimeRange(event.startsAt, event.endsAt)}
-          isLoading={false}
-        />
+      <div className="space-y-2.5 px-4 py-3 text-sm">
         <DetailRow
           icon={<UsersRound className="size-4" />}
           label="Гостей"
@@ -84,20 +70,15 @@ export function EventReservationCard({
       </div>
 
       {!isPast && (
-        <div className="border-t border-white/10 px-4 py-4">
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={isCancelling}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm font-semibold text-red-200 transition-colors active:bg-red-400/20 disabled:opacity-60"
-          >
+        <div className="px-4 pb-4">
+          <DsButton variant="danger" onClick={onCancel} disabled={isCancelling} className="w-full">
             {isCancelling ? (
               <LoaderCircle className="size-4 animate-spin" />
             ) : (
               <XCircle className="size-4" />
             )}
             {isCancelling ? "Отменяем…" : "Не смогу посетить"}
-          </button>
+          </DsButton>
         </div>
       )}
     </article>

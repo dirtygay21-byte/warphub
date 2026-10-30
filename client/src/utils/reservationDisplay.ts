@@ -8,10 +8,10 @@ export const STATUS_LABELS: Record<string, string> = {
 };
 
 export const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-yellow-400/15 text-yellow-300",
-  confirmed: "bg-green-400/15 text-green-300",
-  cancelled: "bg-red-400/15 text-red-300",
-  completed: "bg-white/10 text-fg-2",
+  pending: "bg-warn/15 text-warn",
+  confirmed: "bg-accent/15 text-accent",
+  cancelled: "bg-danger/15 text-danger",
+  completed: "bg-white/[0.08] text-fg-2",
 };
 
 export const formatReservationDateTime = (date: string | null) => {

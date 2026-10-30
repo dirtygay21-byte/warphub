@@ -1,7 +1,8 @@
 import { createBooking, detailsKindForSlug } from "@/apiUtils/booking";
 import { getDisciplines, getServiceById } from "@/apiUtils/disciplines";
 import { FieldLabel, NumberChips } from "@/components/booking/FormControls";
-import { TimeWheel } from "@/components/booking/TimeWheel";
+import { DayBar, TimeChips } from "@/components/booking/TimeChips";
+import { DsButton, ToggleRow } from "@/components/ui/ds";
 import { PaintingForm, PlayerInfoForm } from "@/components/booking/PlayerForms";
 import {
   emptyPaintingForm,
@@ -174,170 +175,142 @@ export default function ServiceDetailsStage() {
 
   if (!selectedSlot) {
     return (
-      <div className="px-6 py-6 text-sm text-fg-2">
+      <div className="px-5 py-6 text-sm text-fg-2">
         Сначала выберите время на предыдущем шаге.
       </div>
     );
   }
 
   const isJoin = selectedSlot.kind === "join";
+  const partySize = selectedSlot.kind === "pool" ? partyCount : 1;
 
   return (
-    <div className="w-full h-full px-6 py-3 pb-10 text-white">
-      <article className="overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
+    <div className="ds-enter h-full w-full space-y-6 px-5 py-3 pb-10 text-fg">
+      <article className="overflow-hidden rounded-[18px] border border-white/10 bg-app-elevated">
         <ServiceDetailsImage
           imageUrl={service?.slug ? s3Url(`services/${service.slug}.webp`) : undefined}
           alt={service?.title ?? ""}
         />
-
-        <div className="space-y-6 p-4">
+        <div className="space-y-3 p-4">
           <ServiceDetailsHeader
             activity={service?.title ?? undefined}
             discipline={discipline?.title}
             description={service?.description ?? undefined}
           />
-
-          <div className="space-y-2.5 rounded-xl border border-white/10 bg-white/3 p-3 text-sm">
-            <InfoLine icon={<CalendarDays className="size-4" />}>
-              {formatSelectedDate(selectedDate)}
-            </InfoLine>
+          <div className="space-y-2 border-t border-white/[0.06] pt-3 text-[15px]">
+            <InfoLine icon={<CalendarDays className="size-4" />}>{formatSelectedDate(selectedDate)}</InfoLine>
             {startsAt && (
               <InfoLine icon={<Clock3 className="size-4" />}>
                 {formatClubTimeRange(startsAt, endsAt)}
+                {endsAt && <span className="text-fg-2"> · {hoursLabel(minutesOf(startsAt, endsAt))}</span>}
               </InfoLine>
             )}
             {selectedSlot.kind === "pool" && !isClubVisit && (
               <InfoLine icon={<UsersRound className="size-4" />}>
-                Свободно мест: {minFreeSeats(selectedSlot.segments)} из{" "}
-                {selectedSlot.capacity}
+                Свободно мест: {minFreeSeats(selectedSlot.segments)} из {selectedSlot.capacity}
               </InfoLine>
             )}
             {service?.hasTrainer ? (
               <div className="pt-1">
-                <TrainerBadge
-                  players={selectedSlot.kind === "pool" ? 1 : selectedSlot.capacity}
-                />
+                <TrainerBadge players={selectedSlot.kind === "pool" ? 1 : selectedSlot.capacity} />
               </div>
             ) : null}
           </div>
-
-          {limited && <LimitedTimeBanner minutes={limited.minutes} until={limited.until} fullMinutes={durationMinutes} place={selectedSlot.kind === "pool" ? "место" : "стол"} />}
-
-          {isJoin && (
-            <div className="rounded-xl border border-accent/40 bg-accent/10 p-3">
-              <p className="flex items-center gap-2 text-sm font-semibold text-accent">
-                <Swords className="size-4" />
-                Ваш соперник
-              </p>
-              {selectedSlot.players.map((p, index) => (
-                <p key={index} className="mt-1.5 text-sm text-white/85">
-                  {p.firstName}
-                  {p.army ? ` · ${p.gameLabel ?? "Warhammer 40,000"} · ${p.army}${p.points != null ? ` · ${p.points} очков` : ""} · ${p.experienceLabel}` : ""}
-                </p>
-              ))}
-            </div>
-          )}
-
-          {selectedSlot.kind === "pool" && maxParty > 1 && (
-            <div>
-              <FieldLabel>Сколько мест</FieldLabel>
-              <NumberChips
-                max={Math.min(maxParty, 10)}
-                value={Math.min(partyCount, maxParty)}
-                onChange={(count) => {
-                  setPartyCount(count);
-                  setChosenStart(null);
-                }}
-              />
-            </div>
-          )}
-
-          {!isJoin && (
-            <div>
-              <FieldLabel>{isClubVisit ? "Время прихода" : "Время начала"}</FieldLabel>
-              {timeOptions.length === 0 ? (
-                <p className="text-sm text-fg-3">
-                  В этом окне не помещается запись. Вернитесь и выберите другое время.
-                </p>
-              ) : (
-                <>
-                  <TimeWheel
-                    options={timeOptions}
-                    value={startsAt}
-                    onChange={setChosenStart}
-                    format={formatClubTime}
-                    short={(option) => minutesOf(option, endOf(option)) < durationMinutes}
-                    hint={(option) => {
-                      const end = endOf(option);
-                      const minutes = minutesOf(option, end);
-                      return minutes < durationMinutes ? `до ${formatClubTime(end)} · только ${hoursLabel(minutes)}` : `до ${formatClubTime(end)}`;
-                    }}
-                  />
-                  <p className="mt-1.5 text-xs text-fg-3">Прокрутите вверх или вниз, чтобы выбрать время.</p>
-                </>
-              )}
-              {showErrors && timeError && (
-                <p className="mt-2 text-sm text-red-300">{timeError}</p>
-              )}
-            </div>
-          )}
-
-          {detailsKind === "wh_player" && (
-            <>
-              <PlayerInfoForm
-                value={player}
-                onChange={setPlayer}
-                lockedGame={lockedGame}
-                options={options}
-                playerName={
-                  user ? [user.firstName, user.lastName].filter(Boolean).join(" ") : undefined
-                }
-              />
-              <label className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/3 px-3 py-3 text-sm text-white/85">
-                <span>Нужна армия клуба</span>
-                <input
-                  type="checkbox"
-                  checked={clubArmy}
-                  onChange={(event) => setClubArmy(event.target.checked)}
-                  className="size-4 accent-accent"
-                />
-              </label>
-            </>
-          )}
-
-          {detailsKind === "painting" && (
-            <PaintingForm value={painting} onChange={setPainting} options={options} />
-          )}
-
-          {showErrors && formError && (
-            <div className="rounded-xl border border-red-400/40 bg-red-400/10 px-4 py-3 text-sm text-red-200">
-              {formError}
-            </div>
-          )}
-
-          {mutation.isError && (
-            <div className="rounded-xl border border-red-400/40 bg-red-400/10 px-4 py-3 text-sm text-red-200">
-              {mutation.error.message}
-            </div>
-          )}
-
-          {limited && <LimitedTimeBanner minutes={limited.minutes} until={limited.until} fullMinutes={durationMinutes} place={selectedSlot.kind === "pool" ? "место" : "стол"} compact />}
-
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={mutation.isPending || serviceQuery.isLoading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-4 text-base font-semibold text-accent-foreground transition-transform active:scale-95 disabled:opacity-50"
-          >
-            {isJoin ? <Swords className="size-5" /> : <Dice6 className="size-5" />}
-            {mutation.isPending
-              ? "Записываем…"
-              : isJoin
-                ? "Присоединиться к игре"
-                : "Записаться"}
-          </button>
         </div>
       </article>
+
+      {limited && <LimitedTimeBanner minutes={limited.minutes} until={limited.until} fullMinutes={durationMinutes} place={selectedSlot.kind === "pool" ? "место" : "стол"} />}
+
+      {isJoin && (
+        <div className="rounded-[16px] border border-accent/40 bg-accent/10 p-4">
+          <p className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.08em] text-accent">
+            <Swords className="size-4" />
+            Ваш соперник
+          </p>
+          {selectedSlot.players.map((p, index) => (
+            <p key={index} className="mt-2 text-[15px] text-fg">
+              <span className="font-semibold">{p.firstName}</span>
+              {p.army ? <span className="text-fg-2"> · {p.gameLabel ?? "Warhammer 40,000"} · {p.army}{p.points != null ? ` · ${p.points} очков` : ""} · {p.experienceLabel}</span> : null}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {selectedSlot.kind === "pool" && maxParty > 1 && (
+        <div>
+          <FieldLabel>Сколько мест</FieldLabel>
+          <NumberChips
+            max={Math.min(maxParty, 10)}
+            value={Math.min(partyCount, maxParty)}
+            onChange={(count) => {
+              setPartyCount(count);
+              setChosenStart(null);
+            }}
+          />
+        </div>
+      )}
+
+      {!isJoin && (
+        <section>
+          <div className="mb-2.5 flex items-baseline justify-between gap-3">
+            <FieldLabel>{isClubVisit ? "Время прихода" : "Время начала"}</FieldLabel>
+            {startsAt && endsAt && (
+              <span className="whitespace-nowrap text-[15px] font-semibold tabular-nums">{formatClubTimeRange(startsAt, endsAt)}</span>
+            )}
+          </div>
+          {timeOptions.length === 0 ? (
+            <p className="text-sm text-fg-2">В этом окне не помещается запись. Вернитесь и выберите другое время.</p>
+          ) : (
+            <>
+              <TimeChips
+                options={timeOptions}
+                value={startsAt}
+                onChange={setChosenStart}
+                within={selectedSlot.window}
+                segments={selectedSlot.segments}
+                partySize={partySize}
+                short={(option) => minutesOf(option, endOf(option)) < durationMinutes}
+              />
+              <DayBar segments={selectedSlot.segments} partySize={partySize} startsAt={startsAt} endsAt={endsAt} />
+            </>
+          )}
+          {showErrors && timeError && <p className="mt-2 text-sm text-danger">{timeError}</p>}
+        </section>
+      )}
+
+      {detailsKind === "wh_player" && (
+        <>
+          <PlayerInfoForm
+            value={player}
+            onChange={setPlayer}
+            lockedGame={lockedGame}
+            options={options}
+            playerName={user ? [user.firstName, user.lastName].filter(Boolean).join(" ") : undefined}
+          />
+          <ToggleRow title="Нужна армия клуба" checked={clubArmy} onChange={setClubArmy} />
+        </>
+      )}
+
+      {detailsKind === "painting" && <PaintingForm value={painting} onChange={setPainting} options={options} />}
+
+      {showErrors && formError && (
+        <div role="alert" className="rounded-[14px] border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
+          {formError}
+        </div>
+      )}
+
+      {mutation.isError && (
+        <div role="alert" className="rounded-[14px] border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
+          {mutation.error.message}
+        </div>
+      )}
+
+      {limited && <LimitedTimeBanner minutes={limited.minutes} until={limited.until} fullMinutes={durationMinutes} place={selectedSlot.kind === "pool" ? "место" : "стол"} compact />}
+
+      <DsButton variant="primary" size="lg" onClick={handleSubmit} disabled={mutation.isPending || serviceQuery.isLoading} className="w-full">
+        {isJoin ? <Swords className="size-5" /> : <Dice6 className="size-5" />}
+        {mutation.isPending ? "Записываем…" : isJoin ? "Присоединиться к игре" : "Записаться"}
+      </DsButton>
     </div>
   );
 }
@@ -348,12 +321,12 @@ export default function ServiceDetailsStage() {
  */
 function LimitedTimeBanner({ minutes, until, fullMinutes, place, compact = false }: { minutes: number; until: string; fullMinutes: number; place: string; compact?: boolean }) {
   return (
-    <div className="rounded-xl border border-red-400/60 bg-red-400/15 px-4 py-3 text-sm text-red-100">
-      <p className="font-semibold text-red-200">
+    <div role="status" className="rounded-[14px] border border-danger/50 bg-danger/10 px-4 py-3 text-sm text-fg">
+      <p className="font-semibold text-danger">
         ⚠️ Время ограничено: только {hoursLabel(minutes)} вместо {hoursLabel(fullMinutes)} — до {formatClubTime(until)}
       </p>
       {!compact && (
-        <p className="mt-1 text-red-100/85">
+        <p className="mt-1 text-fg-2">
           Записаться можно. Если не успеете, попросим освободить {place} к следующей записи; если {place === "стол" ? "стол будет свободен" : "место будет свободно"} — постараемся продлить время.
         </p>
       )}
@@ -363,7 +336,7 @@ function LimitedTimeBanner({ minutes, until, fullMinutes, place, compact = false
 
 function InfoLine({ icon, children }: { icon: ReactNode; children: ReactNode }) {
   return (
-    <p className="flex items-center gap-2.5 text-white/85">
+    <p className="flex items-center gap-2.5 text-fg">
       <span className="text-accent">{icon}</span>
       {children}
     </p>

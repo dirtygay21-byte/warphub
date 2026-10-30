@@ -15,7 +15,7 @@ export function DetailRow({ icon, label, value, isLoading }: DetailRowProps) {
       <div className="flex items-center gap-3">
         <span className="text-accent">{icon}</span>
         <span className="text-fg-3">{label}</span>
-        <span className="ml-auto font-medium text-white/90">
+        <span className="ml-auto text-right font-medium text-fg">
           {isLoading ? <Skeleton width={40} height={20} /> : value}
         </span>
       </div>
