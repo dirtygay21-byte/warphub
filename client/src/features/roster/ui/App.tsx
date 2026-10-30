@@ -1,6 +1,23 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { loadAosIndex, loadIndex, loadKtIndex } from '../data';
-import { loadAosRosters, loadKtRosters, loadRosters, markAosDeleted, markDeleted, markKtDeleted, saveAosLocal, saveAosRosters, saveKtLocal, saveKtRosters, saveLocal, saveRosters } from '../storage';
+import { loadAosIndex, loadIndex, loadKtIndex, loadWarcryIndex } from '../data';
+import {
+  loadAosRosters,
+  loadKtRosters,
+  loadRosters,
+  loadWarcryRosters,
+  markAosDeleted,
+  markDeleted,
+  markKtDeleted,
+  markWarcryDeleted,
+  saveAosLocal,
+  saveAosRosters,
+  saveKtLocal,
+  saveKtRosters,
+  saveLocal,
+  saveRosters,
+  saveWarcryLocal,
+  saveWarcryRosters,
+} from '../storage';
 import { closeTopOverlay, tg } from '../telegram';
 import type { DataIndex, Roster } from '../engine/types';
 import type { AosIndex, AosRoster } from '../aos/types';
@@ -8,6 +25,10 @@ import type { KtIndex } from '../kt/types';
 import type { KtRoster } from '../kt/roster';
 import { KtList } from './kt/KtList';
 import { KtEditor } from './kt/KtEditor';
+import type { WarcryIndex } from '../warcry/types';
+import type { WarcryRoster } from '../warcry/roster';
+import { WarcryList } from './warcry/WarcryList';
+import { WarcryEditor } from './warcry/WarcryEditor';
 import { RosterList } from './RosterList';
 import { AosList } from './aos/AosList';
 import { AosEditor } from './aos/AosEditor';
@@ -26,6 +47,7 @@ type Route =
   | { screen: 'editor'; id: string }
   | { screen: 'aos-editor'; id: string }
   | { screen: 'kt-editor'; id: string }
+  | { screen: 'wc-editor'; id: string }
   | { screen: 'rules'; back: Route; factionId?: string; detachmentIds?: string[] }
   | { screen: 'battlefield'; back: Route; disposition?: string | null }
   | { screen: 'game'; back: Route; rosterId?: string }
@@ -37,7 +59,7 @@ const SYSTEM_KEY = 'warphub.roster.system';
 const readSystem = (): GameSystem => {
   try {
     const v = localStorage.getItem(SYSTEM_KEY);
-    return v === 'aos' || v === 'kt' ? v : '40k';
+    return v === 'aos' || v === 'kt' || v === 'warcry' ? v : '40k';
   } catch {
     return '40k';
   }
@@ -85,6 +107,8 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   const [aosIndex, setAosIndex] = useState<AosIndex | null>(null);
   const [ktIndex, setKtIndex] = useState<KtIndex | null>(null);
   const [ktRosters, setKtRosters] = useState<KtRoster[] | null>(null);
+  const [wcIndex, setWcIndex] = useState<WarcryIndex | null>(null);
+  const [wcRosters, setWcRosters] = useState<WarcryRoster[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [rosters, setRosters] = useState<Roster[] | null>(null);
   const [aosRosters, setAosRosters] = useState<AosRoster[] | null>(null);
@@ -104,17 +128,20 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   useEffect(() => {
     if (system === '40k') loadIndex().then(setIndex, (e) => setError(String(e.message ?? e)));
     else if (system === 'aos') loadAosIndex().then(setAosIndex, (e) => setError(String(e.message ?? e)));
-    else loadKtIndex().then(setKtIndex, (e) => setError(String(e.message ?? e)));
+    else if (system === 'kt') loadKtIndex().then(setKtIndex, (e) => setError(String(e.message ?? e)));
+    else loadWarcryIndex().then(setWcIndex, (e) => setError(String(e.message ?? e)));
   }, [attempt, system]);
   useEffect(() => {
     loadRosters().then(setRosters, () => setRosters([]));
     loadAosRosters().then(setAosRosters, () => setAosRosters([]));
     loadKtRosters().then(setKtRosters, () => setKtRosters([]));
+    loadWarcryRosters().then(setWcRosters, () => setWcRosters([]));
   }, []);
 
   const persist = usePersist<Roster>(saveLocal, saveRosters);
   const persistAos = usePersist<AosRoster>(saveAosLocal, saveAosRosters);
   const persistKt = usePersist<KtRoster>(saveKtLocal, saveKtRosters);
+  const persistWc = usePersist<WarcryRoster>(saveWarcryLocal, saveWarcryRosters);
 
   const update = useCallback(
     (fn: (list: Roster[]) => Roster[]) => {
@@ -147,6 +174,17 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
     },
     [persistKt],
   );
+  const updateWc = useCallback(
+    (fn: (list: WarcryRoster[]) => WarcryRoster[]) => {
+      setWcRosters((prev) => {
+        const next = fn(prev ?? []);
+        persistWc(next);
+        return next;
+      });
+    },
+    [persistWc],
+  );
+  const onWcChange = useCallback((r: WarcryRoster) => updateWc((list) => list.map((x) => (x.id === r.id ? r : x))), [updateWc]);
   const onKtChange = useCallback((r: KtRoster) => updateKt((list) => list.map((x) => (x.id === r.id ? r : x))), [updateKt]);
   const onAosChange = useCallback((r: AosRoster) => updateAos((list) => list.map((x) => (x.id === r.id ? r : x))), [updateAos]);
 
@@ -157,7 +195,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   // кнопка «Назад» Telegram: из ростера — к списку, из правил/поля — туда, откуда пришли, со списка — в WarpHub
   useEffect(() => {
     if (!tg) return;
-    const nav = route.screen === 'home' ? onExit : route.screen === 'list' ? goHome : route.screen === 'editor' || route.screen === 'aos-editor' || route.screen === 'kt-editor' ? goList : goBack;
+    const nav = route.screen === 'home' ? onExit : route.screen === 'list' ? goHome : route.screen === 'editor' || route.screen === 'aos-editor' || route.screen === 'kt-editor' || route.screen === 'wc-editor' ? goList : goBack;
     // сначала закрывается открытая шторка, и только потом — экран
     const handler = () => {
       if (!closeTopOverlay()) nav();
@@ -190,20 +228,21 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
       </Centered>
     );
   }
-  if (route.screen === 'home' && rosters && aosRosters && ktRosters) {
+  if (route.screen === 'home' && rosters && aosRosters && ktRosters && wcRosters) {
     return (
       <Home
         onExit={onExit}
         rosters={rosters}
         aosRosters={aosRosters}
         ktRosters={ktRosters}
+        wcRosters={wcRosters}
         aosIndex={aosIndex}
         onGame={(g) => (setSystem(g), setRoute({ screen: 'list' }))}
-        onOpen={(g, id) => (setSystem(g), setRoute(g === '40k' ? { screen: 'editor', id } : g === 'aos' ? { screen: 'aos-editor', id } : { screen: 'kt-editor', id }))}
+        onOpen={(g, id) => (setSystem(g), setRoute(g === '40k' ? { screen: 'editor', id } : g === 'aos' ? { screen: 'aos-editor', id } : g === 'kt' ? { screen: 'kt-editor', id } : { screen: 'wc-editor', id }))}
       />
     );
   }
-  if ((system === '40k' ? !index : system === 'aos' ? !aosIndex : !ktIndex) || !rosters || !aosRosters || !ktRosters) {
+  if ((system === '40k' ? !index : system === 'aos' ? !aosIndex : system === 'kt' ? !ktIndex : !wcIndex) || !rosters || !aosRosters || !ktRosters || !wcRosters) {
     return (
       <Centered>
         <div className="size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
@@ -212,6 +251,42 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   }
 
   const switcher = null;
+
+  if (system === 'warcry' && wcIndex && wcRosters) {
+    const wr = route.screen === 'wc-editor' ? wcRosters.find((r) => r.id === route.id) : undefined;
+    if (wr)
+      return (
+        <WarcryEditor
+          key={wr.id}
+          roster={wr}
+          index={wcIndex}
+          onBack={goList}
+          onChange={onWcChange}
+          onDelete={() => {
+            markWarcryDeleted(wr.id);
+            updateWc((list) => list.filter((x) => x.id !== wr.id));
+            goList();
+          }}
+        />
+      );
+    return (
+      <WarcryList
+        onExit={goHome}
+        index={wcIndex}
+        rosters={wcRosters}
+        onOpen={(id) => setRoute({ screen: 'wc-editor', id })}
+        onCreate={(r) => {
+          updateWc((list) => [r, ...list]);
+          setRoute({ screen: 'wc-editor', id: r.id });
+        }}
+        onDuplicate={(r) => updateWc((list) => [r, ...list])}
+        onDelete={(id) => {
+          markWarcryDeleted(id);
+          updateWc((list) => list.filter((x) => x.id !== id));
+        }}
+      />
+    );
+  }
 
   if (system === 'kt' && ktIndex && ktRosters) {
     const kr = route.screen === 'kt-editor' ? ktRosters.find((r) => r.id === route.id) : undefined;

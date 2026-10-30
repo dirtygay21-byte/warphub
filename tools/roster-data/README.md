@@ -532,3 +532,15 @@ tools/roster-data/tests/warcry-data.test.ts                              стр�
 - Универсальные способности (Rush, Onslaught…) — в `index.json → universal`. Тексты — английский оригинал.
 - 0 очков в источнике (Brimstone Horrors — появляются по ходу боя) сохраняются как есть и отмечены в отчёте.
 - Сервер: `GET /roster/data/warcry/:name` (`index` или id фракции), только с доступом к WarpBuilder.
+
+### Варбанда Warcry — W5, 30.10.2026
+
+Модель и проверки — `client/src/features/roster/warcry/roster.ts`, экраны — `client/src/features/roster/ui/warcry/`,
+тесты — `tools/roster-data/tests/warcry-roster.test.ts`. Правила построения — warcrier.net (The Warbands; Allies, Thralls and
+Monsters; Bladeborn; страницы фракций): 3–15 бойцов, ≤1000 очков, лидер — первый боец, герой своей фракции; ≤3 героев;
+союзники ≤2 (Hero/Ally другой фракции альянса), траллы ≤3, монстр 1 (один в группе); Bladeborn — по одному, спутники
+героя-Bladeborn союзника вне лимита; «Heroes All» (флаги warcry_data). Код варбанды — `WC1.…`.
+
+Конфликты источников (берётся warcrier, записано в `SINGLETON_OVERRIDES`):
+- Blacktalons — warcrier: каждый боец один раз; warcry_data: `singleton: false`.
+- Gladiatorium (Thunderstrike) — warcrier: каждый боец один раз; warcry_data: `singleton: false`.
