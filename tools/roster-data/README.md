@@ -513,3 +513,22 @@ tools/roster-data/tests/kt-data.test.ts                              струк�
 - Фракция `SPEC` — наборы миссий и неигровые оперативники (`special: true`), не команды для обычной игры.
 - Состав команды — текст источника (`composition`); универсального снаряжения в источнике нет.
 - Сервер: `GET /roster/data/kt/:name` (`index` или id команды), только с доступом к WarpBuilder.
+
+## Warcry — W4, 30.10.2026
+
+Источник — открытый репозиторий [warcry_data](https://github.com/krisling049/warcry_data) (krisling049), папка `data/`
+(Matched Play: бойцы, способности, фракции). Лицензии в репозитории нет — использование по решению владельца 30.10.2026.
+Правила построения варбанды (3–15 бойцов, ≤1000 очков, ≤3 героев, группы Dagger/Shield/Hammer) — [warcrier.net](https://warcrier.net/docs/warbands), в W5.
+
+```
+tools/roster-data/scripts/import-warcry.mjs <клон warcry_data> [--check]  → backend/roster-data/warcry/{index.json, f/<id фракции>.json}
+tools/roster-data/warcry/import-report.json                              отчёт импорта
+tools/roster-data/tests/warcry-data.test.ts                              структура данных; сверка с клоном (WARCRY_DATA_DIR), если он есть
+```
+
+- id фракции — имя папки источника через дефис (`blades-of-khorne-bloodbound`); id бойцов и способностей — `_id` источника.
+- Папки альянсов (`chaos`, `death`, `destruction`, `order`) — общие союзники, траллы и монстры (`generic: true`).
+- Способности подфракций (bladeborn) лежат в файле родительской фракции с полем `subfaction`; способности монстров — с полем `monster`.
+- Универсальные способности (Rush, Onslaught…) — в `index.json → universal`. Тексты — английский оригинал.
+- 0 очков в источнике (Brimstone Horrors — появляются по ходу боя) сохраняются как есть и отмечены в отчёте.
+- Сервер: `GET /roster/data/warcry/:name` (`index` или id фракции), только с доступом к WarpBuilder.
