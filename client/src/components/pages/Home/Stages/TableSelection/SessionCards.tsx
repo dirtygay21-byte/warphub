@@ -87,7 +87,7 @@ export function OpenSessionCard({
               <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs">
                 <dt className="text-white/45">Игра</dt>
                 <dd className="text-white/85">{player.gameLabel ?? "Warhammer 40,000"}</dd>
-                <dt className="text-white/45">{player.game === "kt" ? "Команда" : "Армия"}</dt>
+                <dt className="text-white/45">{player.game === "kt" ? "Команда" : player.game === "warcry" ? "Варбанда" : "Армия"}</dt>
                 <dd className="text-white/85">{player.army}</dd>
                 {player.points != null && (
                   <>

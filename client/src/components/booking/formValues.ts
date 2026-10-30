@@ -30,7 +30,7 @@ export const validatePlayerForm = (
   value: PlayerFormValue,
   maxPoints: number,
 ): string | null => {
-  if (!value.army.trim()) return value.game === "kt" ? "Укажите команду" : "Укажите армию";
+  if (!value.army.trim()) return value.game === "kt" ? "Укажите команду" : value.game === "warcry" ? "Укажите варбанду" : "Укажите армию";
   // у Kill Team лимита очков нет
   if (value.game !== "kt") {
     const points = Number(value.points);
