@@ -1,15 +1,16 @@
 import { useMemo, useState } from 'react';
 import { loadWarcryFaction } from '../../data';
 import { uid } from '../../engine/roster';
-import { decodeWarcryRoster, newWarcryRoster, WARCRY_CODE_PREFIX, type WarcryRoster } from '../../warcry/roster';
+import { cloudEnabled } from '../../storage';
+import { decodeWarcryRoster, newWarcryRoster, WARCRY_CODE_PREFIX, WARCRY_LIMITS, type WarcryRoster } from '../../warcry/roster';
 import type { WarcryIndex } from '../../warcry/types';
 import { confirmAsk, haptic } from '../../telegram';
-import { Button, Empty, Icon, IconButton, Sheet, Tag } from '../kit';
-import { cx, fmtPts } from '../util';
+import { Button, Empty, Field, Icon, Sheet, Tag } from '../kit';
+import { BottomAction, ListHeader, PickTile, RosterCard, SearchField } from '../common/BuilderKit';
 
 const ALLIANCE: Record<string, string> = { chaos: 'Chaos', death: 'Death', destruction: 'Destruction', order: 'Order' };
 
-/** Список варбанд Warcry (W5 30.10.2026): свои варбанды, создание по фракции, импорт по коду WC1.…. */
+/** Список варбанд Warcry (W5, вид R2 30.10.2026 — как в AoS): варбанды, создание по фракции, импорт по коду WC1.…. */
 export function WarcryList({
   onExit,
   index,
@@ -30,41 +31,44 @@ export function WarcryList({
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
   const [menu, setMenu] = useState<WarcryRoster | null>(null);
-  const factionName = useMemo(() => Object.fromEntries(index.factions.map((f) => [f.id, f.name])), [index]);
+  const factionOf = useMemo(() => new Map(index.factions.map((f) => [f.id, f])), [index]);
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-4xl lg:pt-8">
-      <header className="mb-4 flex items-end justify-between gap-3">
-        <IconButton icon="back" label="К играм" onClick={onExit} className="mb-0.5 size-9" />
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpBuilder · Matched Play</p>
-          <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Warcry</h1>
-        </div>
-        <IconButton icon="upload" label="Импорт варбанды по коду" onClick={() => setImporting(true)} />
-      </header>
+      <ListHeader kicker="WarpBuilder · Warcry Matched Play" title="Warcry" onBack={onExit} onImport={() => setImporting(true)} />
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Выберите фракцию и наберите бойцов: союзники, траллы, монстр, группы Dagger / Shield / Hammer и проверка правил построения.</Empty>
       ) : (
         <ul className="space-y-2.5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-2.5 lg:space-y-0">
-          {rosters.map((r) => (
-            <li key={r.id} className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-3">
-              <button type="button" onClick={() => (haptic.tap(), onOpen(r.id))} className="min-w-0 flex-1 text-left">
-                <span className="block truncate text-[15px] font-semibold">{r.name}</span>
-                <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11px] text-white/45">
-                  {factionName[r.factionId] ?? r.factionId} · бойцов: {r.fighters.length}
-                  {r.summary ? ` · ${fmtPts(r.summary.points)} очк.` : ''}
-                  {r.summary?.errors ? <Tag tone="danger">ошибок: {r.summary.errors}</Tag> : r.summary?.warnings ? <Tag tone="warn">замечаний: {r.summary.warnings}</Tag> : null}
-                </span>
-              </button>
-              <IconButton icon="more" label="Меню" onClick={() => setMenu(r)} className="size-9" />
-            </li>
-          ))}
+          {rosters.map((r) => {
+            const f = factionOf.get(r.factionId);
+            return (
+              <RosterCard
+                key={r.id}
+                name={r.name}
+                sub={f ? `${f.name} · ${ALLIANCE[f.grandAlliance] ?? f.grandAlliance}` : r.factionId}
+                tags={
+                  <>
+                    <Tag>Warcry</Tag>
+                    <Tag>{r.fighters.length} бойц.</Tag>
+                  </>
+                }
+                status={r.summary}
+                points={r.summary?.points}
+                limit={WARCRY_LIMITS.points}
+                updatedAt={r.updatedAt}
+                onOpen={() => onOpen(r.id)}
+                onMenu={() => setMenu(r)}
+              />
+            );
+          })}
         </ul>
       )}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-app/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
-        <Button variant="primary" className="mx-auto h-12 w-full max-w-lg" onClick={() => setCreating(true)}>
-          <Icon name="plus" /> Новая варбанда
-        </Button>
-      </div>
+      <p className="mt-8 text-center text-xs leading-relaxed text-white/35">
+        Данные: {index.source.name} · {index.source.date} ({index.source.commit}) · правила построения — warcrier.net
+        <br />
+        {cloudEnabled() ? 'Варбанды синхронизируются через Telegram' : 'Варбанды хранятся в этом браузере'}
+      </p>
+      <BottomAction onClick={() => setCreating(true)}>Новая варбанда</BottomAction>
       <CreateSheet open={creating} index={index} onClose={() => setCreating(false)} onCreate={(r) => (setCreating(false), onCreate(r))} />
       <ImportSheet open={importing} index={index} onClose={() => setImporting(false)} onImport={(r) => (setImporting(false), onCreate(r))} />
       <Sheet open={!!menu} onClose={() => setMenu(null)} title={menu?.name ?? ''}>
@@ -92,47 +96,79 @@ export function WarcryList({
   );
 }
 
+/** Выбор фракции: Великие альянсы, поиск, подфракции (Bladeborn и др.) метками. Как создание ростера AoS. */
 function CreateSheet({ open, index, onClose, onCreate }: { open: boolean; index: WarcryIndex; onClose: () => void; onCreate: (r: WarcryRoster) => void }) {
-  const [busy, setBusy] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const pick = async (id: string) => {
-    setBusy(id);
+  const [q, setQ] = useState('');
+  const [picked, setPicked] = useState<string | null>(null);
+  const [name, setName] = useState('');
+  const sections = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return index.grandAlliances
+      .map((ga) => ({
+        ga,
+        list: index.factions.filter((f) => f.grandAlliance === ga && !f.generic && (!needle || [f.name, ...f.subfactions].some((s) => s.toLowerCase().includes(needle)))),
+      }))
+      .filter((s) => s.list.length);
+  }, [index, q]);
+  const create = async () => {
+    if (!picked) return;
+    setBusy(true);
     setErr(null);
     try {
-      const f = await loadWarcryFaction(id);
-      onCreate(newWarcryRoster(f, index.source.commit));
+      const f = await loadWarcryFaction(picked);
+      const r = newWarcryRoster(f, index.source.commit);
+      if (name.trim()) r.name = name.trim().slice(0, 80);
+      haptic.ok();
+      onCreate(r);
+      setPicked(null);
+      setName('');
+      setQ('');
     } catch (e) {
       setErr(e instanceof Error ? e.message : String(e));
     }
-    setBusy(null);
+    setBusy(false);
   };
   return (
-    <Sheet open={open} onClose={onClose} title="Фракция" tall>
-      {err && <p className="mb-2 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{err}</p>}
-      {index.grandAlliances.map((ga) => (
-        <div key={ga} className="mb-3">
-          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">{ALLIANCE[ga] ?? ga}</p>
-          <div className="grid grid-cols-1 gap-1.5 min-[420px]:grid-cols-2">
-            {index.factions
-              .filter((f) => f.grandAlliance === ga && !f.generic)
-              .map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  disabled={!!busy}
-                  onClick={() => void pick(f.id)}
-                  className={cx('rounded-xl border px-3 py-2 text-left active:bg-white/10 disabled:opacity-50', busy === f.id ? 'border-accent bg-accent/10' : 'border-white/10 bg-white/[0.03]')}
-                >
-                  <span className="block text-sm font-semibold">{f.name}</span>
-                  <span className="block truncate text-[11px] text-white/45">{f.subfactions.length ? f.subfactions.join(' · ') : `профилей: ${f.fighters}`}</span>
-                </button>
+    <Sheet
+      open={open}
+      onClose={onClose}
+      title="Новая варбанда · Warcry"
+      tall
+      footer={
+        <Button variant="primary" className="h-12 w-full text-base" disabled={!picked || busy} onClick={() => void create()}>
+          {busy ? 'Загрузка…' : 'Создать'}
+        </Button>
+      }
+    >
+      <div className="space-y-4">
+        <Field label="Название">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="По умолчанию — название фракции"
+            className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-white outline-none placeholder:text-white/30 focus:border-accent"
+          />
+        </Field>
+        <SearchField value={q} onChange={setQ} placeholder="Поиск: фракция или подфракция" />
+        {err && <p className="rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{err}</p>}
+        {!sections.length && <p className="text-sm text-white/50">Ничего не найдено.</p>}
+        {sections.map(({ ga, list }) => (
+          <section key={ga}>
+            <p className="font-display mb-2 flex items-baseline justify-between border-b border-white/10 pb-1 text-lg font-semibold uppercase leading-none">
+              {ALLIANCE[ga] ?? ga}
+              <span className="text-[11px] font-semibold text-white/35">{list.length}</span>
+            </p>
+            <div className="grid grid-cols-1 gap-1.5 min-[400px]:grid-cols-2">
+              {list.map((f) => (
+                <PickTile key={f.id} title={f.name} sub={`профилей бойцов: ${f.fighters}`} chips={f.subfactions} active={picked === f.id} onClick={() => setPicked(f.id)} />
               ))}
-          </div>
-        </div>
-      ))}
-      <p className="mt-3 text-[11px] text-white/35">
-        Данные: {index.source.name}, {index.source.date} ({index.source.commit}). Правила построения — warcrier.net.
-      </p>
+            </div>
+          </section>
+        ))}
+        <p className="text-[11px] text-white/35">Метки — подфракции (Bladeborn и другие) из данных warcry_data; их бойцы берутся в варбанду своей фракции.</p>
+      </div>
     </Sheet>
   );
 }
