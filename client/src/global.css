@@ -291,3 +291,33 @@ body {
   height: max(100%, 44px);
   transform: translate(-50%, -50%);
 }
+
+/* Рамки аватара (прогресс игрока, 30.10.2026) — анимации из макета; классы и id с префиксом af- */
+@keyframes af-spin { to { transform: rotate(360deg); } }
+@keyframes af-spin-rev { to { transform: rotate(-360deg); } }
+@keyframes af-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.75; transform: scale(1.08); } }
+@keyframes af-twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.6); } 50% { opacity: 1; transform: scale(1); } }
+@keyframes af-drip { 0% { transform: translateY(-4px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(6px); opacity: 0; } }
+@keyframes af-pop { 0%, 100% { transform: scale(0.4); opacity: 0.3; } 50% { transform: scale(1); opacity: 1; } }
+@keyframes af-roll { 0%, 70% { transform: rotate(0); } 85%, 100% { transform: rotate(90deg); } }
+@keyframes af-flicker { 0%, 100% { opacity: 0.95; } 40% { opacity: 0.6; } 60% { opacity: 1; } 80% { opacity: 0.75; } }
+@keyframes af-breathe { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+@keyframes af-sway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+@keyframes af-eyes { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+.af-spin { animation: af-spin 18s linear infinite; transform-origin: 0 0; transform-box: view-box; }
+.af-spin-slow { animation: af-spin 40s linear infinite; transform-origin: 0 0; transform-box: view-box; }
+.af-spin-rev { animation: af-spin-rev 30s linear infinite; transform-origin: 0 0; transform-box: view-box; }
+.af-pulse { animation: af-pulse 2.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+.af-twinkle { animation: af-twinkle 2.2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+.af-drip { animation: af-drip 2.6s ease-in infinite; }
+.af-pop { animation: af-pop 2.8s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+.af-roll { animation: af-roll 3.2s ease-in-out infinite; transform-box: view-box; }
+.af-glass { fill: url(#af-glassg); animation: af-flicker 3.4s ease-in-out infinite; }
+.af-glass-static { fill: url(#af-glassg); opacity: 0.85; }
+.af-glass-dim { fill: #3b4214; }
+.af-breathe { animation: af-breathe 4s ease-in-out infinite; }
+.af-sway { animation: af-sway 3.6s ease-in-out infinite; transform-box: view-box; }
+.af-eyes { animation: af-eyes 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  [class^="af-"], [class*=" af-"] { animation: none !important; }
+}
