@@ -12,14 +12,13 @@ import {
 } from "@/utils/reservationDisplay";
 import clsx from "clsx";
 import {
-  CalendarDays,
-  Clock3,
   LoaderCircle,
   PencilLine,
   UsersRound,
   XCircle,
 } from "lucide-react";
 import { BookingDetailsRows } from "./BookingDetailsRows";
+import { DsButton } from "@/components/ui/ds";
 import { detailsKindForSlug } from "@/apiUtils/booking";
 import type { Reservation } from "@/types";
 import { getSkeletonColors } from "@/theme/colors";
@@ -71,57 +70,31 @@ export function ReservationCard({
     <SkeletonTheme baseColor={getSkeletonColors().baseColor} highlightColor={getSkeletonColors().highlightColor}>
       <article
         className={clsx(
-          "overflow-hidden rounded-2xl border bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.25)]",
-          isPast && "pointer-events-none border-white/10 opacity-45",
-          !isPast && cancelled && "border-white/10 opacity-75",
-          !isPast && !cancelled && "border-accent/30",
+          "ds-enter overflow-hidden rounded-[18px] border bg-app-elevated",
+          isPast && "pointer-events-none border-white/[0.08] opacity-60",
+          !isPast && cancelled && "border-white/[0.08] opacity-75",
+          !isPast && !cancelled && "border-white/10",
         )}
       >
-        <div className="border-b border-white/10 px-4 py-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h2 className="truncate text-base font-semibold">
-                {isServiceLoading ? (
-                  <Skeleton width={160} height={20} />
-                ) : (
-                  serviceTitle
-                )}
-              </h2>
-              {isServiceLoading ? (
-                <Skeleton width={80} height={20} />
-              ) : (
-                <p className="mt-1 text-sm text-fg-3">{disciplineTitle}</p>
-              )}
-            </div>
-
+        <div className="space-y-1 px-4 pt-4">
+          <div className="flex items-center justify-between gap-2">
+            <span className="min-w-0 truncate text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">
+              {isServiceLoading ? <Skeleton width={140} height={14} /> : [disciplineTitle, serviceTitle].filter(Boolean).join(" · ")}
+            </span>
             {isServiceLoading ? (
-              <Skeleton width={80} height={20} />
+              <Skeleton width={80} height={24} />
             ) : (
-              <span
-                className={clsx(
-                  "shrink-0 rounded-full px-3 py-1 text-xs font-semibold",
-                  getStatusStyle(reservation.status),
-                )}
-              >
+              <span className={clsx("inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg px-2 text-[12px] font-semibold", getStatusStyle(reservation.status))}>
                 {getStatusLabel(reservation.status)}
               </span>
             )}
           </div>
+          <p className="text-lg font-bold leading-snug">
+            {formatReservationDate(reservation.startsAt)} · <span className="whitespace-nowrap">{formatTimeRange(reservation.startsAt, reservation.endsAt)}</span>
+          </p>
         </div>
 
-        <div className="space-y-3 px-4 py-4 text-sm">
-          <DetailRow
-            icon={<CalendarDays className="size-4" />}
-            label="Дата"
-            value={formatReservationDate(reservation.startsAt)}
-            isLoading={isServiceLoading}
-          />
-          <DetailRow
-            icon={<Clock3 className="size-4" />}
-            label="Время"
-            value={formatTimeRange(reservation.startsAt, reservation.endsAt)}
-            isLoading={isServiceLoading}
-          />
+        <div className="space-y-2.5 px-4 py-3 text-sm">
           <DetailRow
             icon={<UsersRound className="size-4" />}
             label="Мест"
@@ -129,7 +102,7 @@ export function ReservationCard({
             isLoading={isServiceLoading}
           />
           {limitedMinutes != null && serviceDuration && (
-            <p className="rounded-lg border border-red-400/50 bg-red-400/10 px-3 py-2 text-xs font-semibold text-red-200">
+            <p className="rounded-xl border border-danger/50 bg-danger/10 px-3 py-2 text-[13px] font-semibold text-danger">
               ⚠️ Время ограничено: {hoursLabel(limitedMinutes)} вместо {hoursLabel(serviceDuration)}. Если не успеете — попросим освободить место к следующей записи; если будет свободно — постараемся продлить.
             </p>
           )}
@@ -145,35 +118,20 @@ export function ReservationCard({
         </div>
 
         {!isInactive && (
-          <div className="space-y-2 border-t border-white/10 px-4 py-4">
+          <div className={clsx("grid gap-2 px-4 pb-4", canEdit && !isServiceLoading ? "grid-cols-2" : "grid-cols-1")}>
             {canEdit && !isServiceLoading && (
-              <button
-                type="button"
-                onClick={onEdit}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/3 px-4 py-3 text-sm font-semibold text-white transition-colors active:bg-white/10"
-              >
+              <DsButton variant="secondary" onClick={onEdit} aria-label={detailsKindForSlug(reservation.serviceSlug) === "painting" ? "Изменить данные покраски" : "Изменить армию, очки, опыт"} title={detailsKindForSlug(reservation.serviceSlug) === "painting" ? "Изменить данные покраски" : "Изменить армию, очки, опыт"}>
                 <PencilLine className="size-4" />
-                {detailsKindForSlug(reservation.serviceSlug) === "painting"
-                  ? "Изменить данные покраски"
-                  : "Изменить армию, очки, опыт"}
-              </button>
+                Изменить
+              </DsButton>
             )}
             {isServiceLoading ? (
-              <Skeleton height={40} />
+              <Skeleton height={44} />
             ) : (
-              <button
-                type="button"
-                onClick={onCancel}
-                disabled={isCancelling}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm font-semibold text-red-200 transition-colors active:bg-red-400/20 disabled:opacity-60"
-              >
-                {isCancelling ? (
-                  <LoaderCircle className="size-4 animate-spin" />
-                ) : (
-                  <XCircle className="size-4" />
-                )}
-                {isCancelling ? "Отменяем…" : "Отменить запись"}
-              </button>
+              <DsButton variant="danger" onClick={onCancel} disabled={isCancelling}>
+                {isCancelling ? <LoaderCircle className="size-4 animate-spin" /> : <XCircle className="size-4" />}
+                {isCancelling ? "Отменяем…" : "Отменить"}
+              </DsButton>
             )}
           </div>
         )}

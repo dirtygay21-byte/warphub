@@ -8,7 +8,7 @@ export default function ServiceDetailsImage({
   if (!imageUrl) return null;
 
   return (
-    <div className="h-25 w-full bg-app-surface lg:h-64">
+    <div className="h-28 w-full bg-app-surface lg:h-64">
       <img
         src={imageUrl}
         alt={alt ?? "Услуга"}
