@@ -30,8 +30,8 @@ import {
   tablesTable,
   usersTable,
 } from '../../db/schema';
+import { getTableBlocks, listHoldsBetween, type TableHoldView } from '../table-holds/service';
 import {
-  getEventTableBlocks,
   getNearestUpcomingEventForUser,
   type EventTableBlock,
   type UserUpcomingEventView,
@@ -570,7 +570,7 @@ export async function getServiceAvailability(
     window.openAt,
     window.closeAt,
   );
-  const eventBlocks = await getEventTableBlocks(
+  const eventBlocks = await getTableBlocks(
     tableIds,
     window.openAt,
     window.closeAt,
@@ -923,7 +923,7 @@ export async function createReservation(
     }
 
     const bookings = await getTableReservations(tx, [tableId], openAt, closeAt);
-    const eventBlocks = await getEventTableBlocks([tableId], openAt, closeAt);
+    const eventBlocks = await getTableBlocks([tableId], openAt, closeAt);
     // B1: присоединение — время уже идущей сессии; новая игра — полная длительность или до следующей занятости стола
     const session = bookings.find(
       (b) => b.tableId === tableId && b.serviceId === service.id && b.startsAt.getTime() === startsAt.getTime(),
@@ -947,7 +947,7 @@ export async function createReservation(
 
     if (!check.ok) {
       const messages = {
-        BLOCKED: 'The table is reserved for an event at this time',
+        BLOCKED: 'The table is reserved at this time',
         BUSY: 'The table is already taken at this time',
         FULL: 'This game is already full',
         TOO_MANY: `partySize cannot exceed ${mode.seatsPerTable}`,
@@ -1699,6 +1699,8 @@ export type AdminWarhammerDayView = {
   sessions: AdminSessionView[];
   painting: AdminPoolBookingView[];
   paintingCapacity: number | null;
+  /** брони столов администратором в эту смену */
+  holds: TableHoldView[];
 };
 
 export async function getAdminWarhammerDay(
@@ -1832,7 +1834,9 @@ export async function getAdminWarhammerDay(
     (a, b) => a.startsAt.localeCompare(b.startsAt) || a.tableId - b.tableId,
   );
 
-  return { date, tables, sessions, painting, paintingCapacity };
+  const holds = await listHoldsBetween(openAt, closeAt);
+
+  return { date, tables, sessions, painting, paintingCapacity, holds };
 }
 
 /** Администратор пересаживает игрока за другой стол (то же время) */
@@ -1893,7 +1897,7 @@ export async function moveReservationToTable(
     const bookings = (
       await getTableReservations(tx, [targetTableId], openAt, closeAt)
     ).filter((booking) => booking.id !== reservation.id);
-    const blocks = await getEventTableBlocks([targetTableId], openAt, closeAt);
+    const blocks = await getTableBlocks([targetTableId], openAt, closeAt);
     const check = checkTableSession({
       tableId: targetTableId,
       serviceId: reservation.serviceId,

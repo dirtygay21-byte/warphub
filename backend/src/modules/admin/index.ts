@@ -58,6 +58,7 @@ import {
   updateTrialRequest,
 } from '../dnd/service';
 import { mapDndError } from '../dnd/http';
+import { createTableHold, deleteTableHold, HoldError, listTableHolds } from '../table-holds/service';
 
 const dndGameBody = t.Object({
   title: t.Optional(t.String({ description: 'Название' })),
@@ -151,6 +152,11 @@ function mapBookingError(error: BookingError) {
       return status(500, { error: 'Unexpected booking error' });
     }
   }
+}
+
+function mapHoldError(error: HoldError) {
+  const code = error.code === 'TABLE_NOT_FOUND' || error.code === 'DND_GAME_NOT_FOUND' || error.code === 'HOLD_NOT_FOUND' ? 404 : error.code === 'INVALID_INPUT' ? 400 : 409;
+  return status(code, { error: error.message, code: error.code });
 }
 
 function mapEventError(error: EventError) {
@@ -343,6 +349,56 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
           'Все игры и тренировки по столам (с занятостью 1/2, 2/2 и данными игроков) и записи на покраску с формой.',
       },
     },
+  )
+  .get(
+    '/table-holds',
+    async ({ query }) => listTableHolds({ from: query.from ? new Date(query.from) : undefined, to: query.to ? new Date(query.to) : undefined }),
+    {
+      query: t.Object({
+        from: t.Optional(t.String({ description: 'С какого момента (ISO 8601), по умолчанию — сейчас' })),
+        to: t.Optional(t.String({ description: 'До какого момента (ISO 8601)' })),
+      }),
+      detail: { tags: ['Admin'], summary: 'Брони столов администратором (ещё не закончившиеся)' },
+    },
+  )
+  .post(
+    '/table-holds',
+    async ({ body, user }) => {
+      try {
+        return await createTableHold(body, Number(user.telegramId));
+      } catch (error) {
+        if (error instanceof HoldError) return mapHoldError(error);
+        return status(500, { error: (error as Error).message });
+      }
+    },
+    {
+      body: t.Object({
+        tableId: t.Number(),
+        startsAt: t.String({ description: 'Начало (ISO 8601)' }),
+        endsAt: t.String({ description: 'Конец (ISO 8601)' }),
+        purpose: t.String({ description: 'tournament | club_event | private_game | dnd | other' }),
+        title: t.String(),
+        description: t.Optional(t.Nullable(t.String())),
+        dndGameId: t.Optional(t.Nullable(t.Number())),
+      }),
+      detail: {
+        tags: ['Admin'],
+        summary: 'Забронировать стол',
+        description: 'Стол закрывается для записи игроков на интервал (одна смена клуба). Отказ, если за столом есть записи, ивент или другая бронь.',
+      },
+    },
+  )
+  .delete(
+    '/table-holds/:id',
+    async ({ params }) => {
+      try {
+        return await deleteTableHold(params.id);
+      } catch (error) {
+        if (error instanceof HoldError) return mapHoldError(error);
+        return status(500, { error: (error as Error).message });
+      }
+    },
+    { params: t.Object({ id: t.Number() }), detail: { tags: ['Admin'], summary: 'Снять бронь стола' } },
   )
   .patch(
     '/reservations/:id/move',
