@@ -5,7 +5,8 @@ import { useReservationStore } from "@/stores/useReservationStore";
 import { useQuery } from "@tanstack/react-query";
 import { s3Url } from "@/utils/s3utils";
 import { getRosterAccess } from "@/apiUtils/roster";
-import { Calendar, ChevronRight, Swords } from "lucide-react";
+import { Calendar, Swords } from "lucide-react";
+import { DsButton, NavRow, Skeleton } from "@/components/ui/ds";
 import { useNavigate } from "react-router-dom";
 
 export default function HomeStage() {
@@ -26,77 +27,53 @@ export default function HomeStage() {
   };
 
   return (
-    <>
-      <div className="relative z-[50] flex flex-col space-y-12 px-4 py-3 pb-8 lg:grid lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start lg:gap-8 lg:space-y-0 lg:pb-12 lg:pt-4">
-        <section className="space-y-3">
-          <h2 className="text-2xl font-semibold text-white">Ближайший ивент</h2>
-          <div className="event-banner-glow aspect-[5/3] w-full overflow-hidden rounded-xl">
-            <NearestEventBanner />
-          </div>
-          {/* «Записаться» — в потоке страницы под ивентом, а не поверх списка услуг (A1); на компьютере — в боковой панели */}
-          <button
-            type="button"
-            onClick={() => handleRegistartionClick(null)}
-            className="register-btn-glow flex w-full items-center justify-center gap-2.5 rounded-xl bg-accent px-6 py-3.5 text-lg font-semibold text-accent-foreground transition-transform active:scale-95 lg:hidden"
-          >
-            <Calendar className="size-5" />
-            Записаться
-          </button>
-        </section>
+    <div className="ds-enter relative z-[50] flex flex-col gap-8 px-5 py-3 pb-8 text-fg lg:grid lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start lg:gap-8 lg:pb-12 lg:pt-4">
+      <section className="flex flex-col gap-3">
+        <SectionTitle>Ближайший ивент</SectionTitle>
+        <div className="event-banner-glow aspect-[16/9] w-full overflow-hidden rounded-[18px]">
+          <NearestEventBanner />
+        </div>
+        {/* «Записаться» — в потоке страницы под ивентом (A1); на компьютере — в боковой панели */}
+        <DsButton variant="primary" size="lg" onClick={() => handleRegistartionClick(null)} className="register-btn-glow w-full lg:hidden">
+          <Calendar className="size-5" />
+          Записаться
+        </DsButton>
+      </section>
 
-        <section className="flex w-full flex-col gap-3 text-white">
-          <h2 className="text-2xl font-semibold">Наши услуги</h2>
+      <section className="flex w-full flex-col gap-3">
+        <SectionTitle>Наши услуги</SectionTitle>
 
-          <div className="flex flex-col gap-2 md:grid md:grid-cols-2 lg:flex">
-            {disciplinesQuery.isSuccess &&
-              disciplinesQuery.data.map((discipline) => (
-                <QuickSelectionButton
-                  key={discipline.id}
-                  imageUrl={s3Url(`disciplines/${discipline.slug}.webp`)}
-                  onClick={() => handleRegistartionClick(discipline.id)}
-                >
-                  {discipline.title}
-                </QuickSelectionButton>
-              ))}
-          </div>
-          {rosterAccess.data?.hasAccess && (
-            <button
-              type="button"
-              onClick={() => navigate("/roster")}
-              className="mt-1 flex w-full items-center gap-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3.5 text-left transition-all duration-300 active:scale-95"
-            >
-              <span className="flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-                <Swords className="size-5" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-lg font-medium">WarpBuilder</span>
-                <span className="block text-xs text-fg-3">Ростеры и игры: 40K, Age of Sigmar, Kill Team, Warcry</span>
-              </span>
-              <ChevronRight className="size-5 text-accent" />
-            </button>
-          )}
-        </section>
-      </div>
-    </>
+        <div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 lg:flex">
+          {disciplinesQuery.isLoading &&
+            Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-[68px] rounded-[18px]" />)}
+          {disciplinesQuery.isSuccess &&
+            disciplinesQuery.data.map((discipline) => (
+              <NavRow
+                key={discipline.id}
+                icon={<img src={s3Url(`disciplines/${discipline.slug}.webp`)} alt="" className="size-7" />}
+                iconTone="neutral"
+                title={discipline.title}
+                onClick={() => handleRegistartionClick(discipline.id)}
+              />
+            ))}
+        </div>
+        {rosterAccess.data?.hasAccess && (
+          <NavRow
+            icon={<Swords className="size-5" />}
+            tone="accent"
+            iconTone="solid"
+            title="WarpBuilder"
+            subtitle="Ростеры и игры: 40K, Age of Sigmar, Kill Team, Warcry"
+            onClick={() => navigate("/roster")}
+            className="mt-1"
+          />
+        )}
+      </section>
+    </div>
   );
 }
 
-function QuickSelectionButton({
-  children,
-  onClick,
-  imageUrl,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  imageUrl: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex w-full items-center justify-start gap-2 rounded-xl bg-app-subtle px-4 py-3.5 text-lg font-medium text-white transition-all duration-300 active:scale-95 active:border-accent/70 hover:cursor-pointer hover:bg-white/[0.06] hover:ring-1 hover:ring-accent/40"
-    >
-      <img src={imageUrl} alt={""} className="mr-1 size-7" />
-      {children}
-    </button>
-  );
+/** Заголовок блока главной (Oswald, заглавные). */
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return <h2 className="font-display text-xl font-semibold uppercase leading-none text-fg">{children}</h2>;
 }

@@ -19,6 +19,8 @@ import {
 import TableStateMessage from "./TableSelection/TableStateMessage";
 import { getDateKey, getToday, isDateInSchedule } from "./TableSelection/utils";
 import { getWindowLimit, minFreeSeats } from "@/utils/slots";
+import { DsButton } from "@/components/ui/ds";
+import { pluralizeRu } from "@/utils/plural";
 
 const CLUB_VISIT_SLUG = "club_visit";
 
@@ -181,8 +183,8 @@ export default function TableSelectionStage() {
       }
       return (
         <section className="space-y-4">
-          <div className="rounded-xl border border-white/10 bg-app-elevated p-4">
-            <p className="text-xs uppercase tracking-wide text-accent">
+          <div className="rounded-[16px] border border-white/10 bg-app-elevated p-4">
+            <p className="text-[13px] font-bold uppercase tracking-[0.08em] text-fg-3">
               Сколько человек придёт
             </p>
             <SeatCountControl
@@ -194,13 +196,9 @@ export default function TableSelectionStage() {
               }
             />
           </div>
-          <button
-            type="button"
-            onClick={handleClubVisitContinue}
-            className="w-full rounded-xl bg-accent px-4 py-4 text-base font-semibold text-accent-foreground transition-transform active:scale-95"
-          >
+          <DsButton variant="primary" size="lg" onClick={handleClubVisitContinue} className="w-full">
             Продолжить
-          </button>
+          </DsButton>
         </section>
       );
     }
@@ -251,7 +249,7 @@ export default function TableSelectionStage() {
               icon={<Swords className="size-5 text-accent" />}
               hint="Здесь уже есть игрок — посмотрите его армию и присоединяйтесь"
             >
-              Ищут соперника
+              Ищут соперника{openSessions.length > 0 ? ` · ${openSessions.length}` : ""}
             </SectionTitle>
             <div className="flex flex-col gap-3">
               {openSessions.length === 0 ? (
@@ -347,13 +345,23 @@ export default function TableSelectionStage() {
     );
   };
 
+  // строка под лентой дней: какой день выбран и сколько столов свободно (концепт «Выберите день и стол»)
+  const dayTitle = `${selectedDateKey === getDateKey(getToday()) ? "Сегодня, " : ""}${selectedDate.toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" })}`;
+  const freeTables = new Set(freeSlots.map((slot) => slot.tableId)).size;
+  const dayInfo = !isSelectedDateAllowed
+    ? `${dayTitle} · запись закрыта`
+    : availability && service?.mode === "table" && availability.dateAllowed
+      ? `${dayTitle} · ${freeTables > 0 ? `свободно ${freeTables} ${pluralizeRu(freeTables, { one: "стол", few: "стола", many: "столов" })}` : "свободных столов нет"}`
+      : dayTitle;
+
   return (
-    <div className="w-full h-full text-white px-6 py-3 space-y-6">
-      <div className="sticky top-[60px] z-40 -mx-6 bg-overlay-strong/95 px-6 py-3 backdrop-blur">
+    <div className="ds-enter h-full w-full space-y-6 px-5 py-3 text-fg">
+      <div className="sticky top-[60px] z-40 -mx-5 bg-app-bg/95 px-5 pb-3 pt-2 backdrop-blur">
         <DateSelector
           selectedDate={selectedDate}
           scheduleWeekdays={allowedWeekdays}
           onDateSelected={setSelectedDate}
+          info={dayInfo.charAt(0).toUpperCase() + dayInfo.slice(1)}
         />
       </div>
 
@@ -366,7 +374,7 @@ export default function TableSelectionStage() {
         renderContent()
       )}
 
-      <div className="flex gap-3 rounded-xl border border-white/10 bg-app-elevated px-4 py-3 text-xs text-fg-2">
+      <div className="flex gap-3 rounded-[16px] border border-white/10 bg-app-elevated px-4 py-3 text-[13px] text-fg-2">
         <Info className="mt-0.5 size-4 shrink-0 text-accent" />
         <p>Запись на Warhammer, покраску и посещение клуба — пятница, суббота и воскресенье.</p>
       </div>

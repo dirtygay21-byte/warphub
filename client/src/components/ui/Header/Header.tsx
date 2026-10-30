@@ -6,6 +6,13 @@ import { useTelegramBack } from "@/hooks/useTelegramBack";
 import { useLocation, useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import { s3Url } from "@/utils/s3utils";
+import { useQuery } from "@tanstack/react-query";
+import { getDisciplines } from "@/apiUtils/disciplines";
+import { StepBar } from "@/components/ui/ds";
+
+/** шаг записи для полосы прогресса (D3): услуга → дата и слот → детали → подтверждение */
+const STAGE_STEP: Record<string, number> = { ServiceSelection: 1, TableSelection: 2, ServiceDetails: 3, Confirmation: 4 };
+const STAGE_COUNT = 4;
 
 const STAGE_TITLES = {
   ServiceSelection: "Выберите услугу",
@@ -19,7 +26,11 @@ export default function Header() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { resetReservation, setSelectedTable } = useReservationStore();
+  const { resetReservation, setSelectedTable, disciplineId } = useReservationStore();
+  // у D&D свой порядок экранов — полосу шагов не показываем
+  const disciplinesQuery = useQuery({ queryKey: ["disciplines"], queryFn: getDisciplines });
+  const isDnd = disciplinesQuery.data?.find((d) => d.id === disciplineId)?.slug === "dnd";
+  const step = STAGE_STEP[currentStage];
 
   const username = user ? user.firstName?.toUpperCase() : "";
   const isAdminRoute = pathname.startsWith("/admin");
@@ -125,13 +136,19 @@ export default function Header() {
           <div className="w-full text-center relative lg:mx-auto lg:max-w-3xl">
             <button
               onClick={handleBackBtnClick}
-              className="text-white flex items-center gap-2 hover:cursor-pointer absolute left-0 top-1/2 -translate-y-1/2"
+              aria-label="Назад"
+              className="absolute left-0 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center text-fg hover:cursor-pointer"
             >
               <ChevronLeft className="size-8" />
             </button>
-            <p className="text-white text-md font-medium">
+            <p className="text-md font-medium text-fg">
               {STAGE_TITLES[currentStage]}
             </p>
+          </div>
+        )}
+        {isHomeRoute && step && !isDnd && (
+          <div className="absolute inset-x-4 bottom-1 lg:mx-auto lg:max-w-3xl">
+            <StepBar step={step} total={STAGE_COUNT} />
           </div>
         )}
       </div>
