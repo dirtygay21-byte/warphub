@@ -7,6 +7,8 @@ import { useReservationStore } from "@/stores/useReservationStore";
 import { s3Url } from "@/utils/s3utils";
 import DndSection from "../Dnd/DndSection";
 import { CalendarDays, Sparkles } from "lucide-react";
+import { NavRow } from "@/components/ui/ds";
+import { haptic } from "@/utils/haptic";
 
 const DND_SLUG = "dnd";
 
@@ -31,7 +33,7 @@ export default function ServiceSelectionStage() {
     : disciplines.map((discipline) => discipline.id);
 
   return (
-    <div className="w-full h-full text-white px-6 py-3 space-y-6">
+    <div className="ds-enter h-full w-full space-y-7 px-5 py-3 text-fg">
       {disciplineIds.map((id) => (
         <ServiceBlock key={id} disciplineId={id} />
       ))}
@@ -68,16 +70,16 @@ function ServiceBlock({ disciplineId }: { disciplineId: number }) {
 
     return (
       <div>
-        <h2 className="text-2xl font-medium mb-2">{title}</h2>
-        <ul className="flex flex-col gap-2">
+        <h2 className="mb-3 font-display text-xl font-semibold uppercase leading-none">{title}</h2>
+        <ul className="flex flex-col gap-2.5">
           <DndEntryItem
-            icon={<Sparkles className="size-6 text-accent" />}
+            icon={<Sparkles className="size-5" />}
             title="Хочу попробовать"
             description="Заявка без даты — подберём группу и игру"
             onClick={() => openDnd("trial")}
           />
           <DndEntryItem
-            icon={<CalendarDays className="size-6 text-accent" />}
+            icon={<CalendarDays className="size-5" />}
             title="Игры по расписанию"
             description="Запись на конкретную игру с датой и временем"
             onClick={() => openDnd("home")}
@@ -95,8 +97,8 @@ function ServiceBlock({ disciplineId }: { disciplineId: number }) {
 
   return (
     <div>
-      <h2 className="text-2xl font-medium mb-2">{title}</h2>
-      <ul className="flex flex-col gap-2">
+      <h2 className="mb-3 font-display text-xl font-semibold uppercase leading-none">{title}</h2>
+      <ul className="flex flex-col gap-2.5">
         {services.map((service) => (
           <ServiceItemComponent
             key={service.id}
@@ -120,28 +122,23 @@ function ServiceItemComponent({
   onClick: () => void;
 }) {
   return (
-    <li
-      className="flex items-center gap-2 rounded-md bg-app-subtle px-2 py-2 transition-colors hover:cursor-pointer hover:bg-white/[0.05]"
-      onClick={onClick}
-    >
-      <img
-        src={imgUrl}
-        alt=""
-        className="h-[4rem] w-[7rem] mr-3 rounded-[1vw] object-cover"
-      />
-
-      <div className="">
-        <h3 className="text-md font-medium leading-4 mb-1">{service.title}</h3>
-        <span className="text-xs text-subtle w-[75%] block pt-2">
-          {service.description}
+    <li>
+      <button
+        type="button"
+        onClick={() => {
+          haptic.tap();
+          onClick();
+        }}
+        className="ds-press flex w-full items-center gap-3.5 rounded-[18px] border border-white/10 bg-app-elevated p-2.5 pr-4 text-left"
+      >
+        <img src={imgUrl} alt="" className="h-16 w-24 shrink-0 rounded-xl object-cover" />
+        <span className="min-w-0 flex-1">
+          <span className="block text-base font-bold leading-tight">{service.title}</span>
+          {service.description && <span className="mt-1 block text-sm leading-snug text-fg-2">{service.description}</span>}
+          {service.visitorsCapacity && <span className="mt-0.5 block text-[13px] text-fg-3">до {service.visitorsCapacity} чел.</span>}
         </span>
-        {service.visitorsCapacity && (
-          <p className="text-xs text-subtle">
-            до {service.visitorsCapacity} чел.
-          </p>
-        )}
-      </div>
-      <ChevronRightIcon className="size-6 text-white ml-auto" />
+        <ChevronRightIcon className="size-5 shrink-0 text-fg-3" />
+      </button>
     </li>
   );
 }
@@ -158,18 +155,8 @@ function DndEntryItem({
   onClick: () => void;
 }) {
   return (
-    <li
-      className="flex items-center gap-3 rounded-md bg-app-subtle px-3 py-3 transition-colors hover:cursor-pointer hover:bg-white/[0.05]"
-      onClick={onClick}
-    >
-      <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-accent/10">
-        {icon}
-      </span>
-      <div>
-        <h3 className="text-md font-medium leading-4 mb-1">{title}</h3>
-        <span className="text-xs text-subtle block">{description}</span>
-      </div>
-      <ChevronRightIcon className="size-6 text-white ml-auto" />
+    <li>
+      <NavRow icon={icon} title={title} subtitle={description} onClick={onClick} />
     </li>
   );
 }

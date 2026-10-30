@@ -5,6 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
+import { Badge } from "@/components/ui/ds";
+import { haptic } from "@/utils/haptic";
+import { getSeatsLabel } from "@/utils/plural";
 
 export default function NearestEventBanner() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,7 +19,7 @@ export default function NearestEventBanner() {
 
   if (nearestEventQuery.isLoading) {
     return (
-      <div className="flex h-full w-full items-center justify-center rounded-xl bg-app-surface">
+      <div className="flex h-full w-full items-center justify-center rounded-[18px] bg-app-surface">
         <LoaderCircle className="size-8 animate-spin text-accent" />
       </div>
     );
@@ -24,7 +27,7 @@ export default function NearestEventBanner() {
 
   if (nearestEventQuery.isError) {
     return (
-      <div className="flex h-full w-full items-center justify-center rounded-xl bg-app-surface px-4 text-center text-sm text-fg-2">
+      <div className="flex h-full w-full items-center justify-center rounded-[18px] bg-app-surface px-4 text-center text-sm text-fg-2">
         Не удалось загрузить ближайший ивент
       </div>
     );
@@ -34,7 +37,7 @@ export default function NearestEventBanner() {
 
   if (!event) {
     return (
-      <div className="flex h-full w-full items-center justify-center rounded-xl bg-app-surface px-4 text-center text-sm text-fg-2">
+      <div className="flex h-full w-full items-center justify-center rounded-[18px] bg-app-surface px-4 text-center text-sm text-fg-2">
         Ближайших ивентов пока нет
       </div>
     );
@@ -47,41 +50,40 @@ export default function NearestEventBanner() {
     <>
       <button
         type="button"
-        onClick={() => canRegister && setIsModalOpen(true)}
+        onClick={() => {
+          if (!canRegister) return;
+          haptic.tap();
+          setIsModalOpen(true);
+        }}
         disabled={!canRegister}
-        aria-label={canRegister ? "Записаться на ивент" : "Мест нет"}
+        aria-label={canRegister ? `Записаться на ивент «${event.title}»` : "Мест нет"}
         className={clsx(
-          "relative h-full w-full overflow-hidden rounded-xl text-left",
-          canRegister
-            ? "cursor-pointer transition-transform active:scale-[0.99]"
-            : "cursor-not-allowed opacity-70"
+          "relative block h-full w-full overflow-hidden rounded-[18px] text-left",
+          canRegister ? "ds-press cursor-pointer" : "cursor-not-allowed"
         )}
       >
         {event.bannerUrl ? (
-          <img
-            src={event.bannerUrl}
-            alt={event.title}
-            className="absolute inset-0 size-full object-cover"
-          />
+          <img src={event.bannerUrl} alt="" className="absolute inset-0 size-full object-cover" />
         ) : (
           <div className="absolute inset-0 bg-app-surface" />
         )}
 
-        <div className="absolute inset-0 bg-overlay/60" />
+        {/* затемнение снизу — текст читается на любой картинке */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent" />
 
-        <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 py-6 text-center text-white">
-          <h2 className="text-xl font-semibold sm:text-2xl">{event.title}</h2>
-          <p className="mt-2 text-sm text-white/80 sm:text-base">
-            {formatEventPeriod(event.startsAt, event.endsAt)}
-          </p>
-          <p className="mt-auto text-sm text-fg-2">
-            {canRegister ? "Нажми чтобы записаться" : "Мест нет"}
-          </p>
+        <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col gap-2 p-4 text-fg">
+          <h3 className="text-[19px] font-bold leading-tight">{event.title}</h3>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="text-sm text-white/85">{formatEventPeriod(event.startsAt, event.endsAt)}</span>
+            {canRegister ? (
+              <Badge tone="accent" className="bg-accent/20">
+                Свободно {freeSeats} {getSeatsLabel(freeSeats)}
+              </Badge>
+            ) : (
+              <Badge tone="danger">Мест нет</Badge>
+            )}
+          </div>
         </div>
-
-        <p className="absolute bottom-3 right-3 z-10 text-sm text-fg-2">
-          мест: {freeSeats}
-        </p>
       </button>
 
       {isModalOpen && (
