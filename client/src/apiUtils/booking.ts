@@ -6,12 +6,14 @@ export type OptionItem = { value: string; label: string; hint?: string };
 
 export type BookingOptions = {
   experienceLevels: OptionItem[];
-  /** игры в записи на Warhammer: 40k / aos / kt */
+  /** игры в записи на Warhammer: 40k / aos / kt / warcry */
   games: OptionItem[];
   /** фракции 40K */
   factions: string[];
   /** фракции Age of Sigmar (из данных Roster Builder) */
   aosFactions: string[];
+  /** фракции Warcry (из данных WarpBuilder) */
+  warcryFactions: string[];
   /** команды Kill Team списком */
   killTeams: string[];
   /** команды Kill Team по фракциям (как на Wahapedia): Imperium → Space Marines → [Deathwatch, …] */
@@ -37,9 +39,11 @@ export const DEFAULT_BOOKING_OPTIONS: BookingOptions = {
     { value: "40k", label: "Warhammer 40,000" },
     { value: "aos", label: "Age of Sigmar" },
     { value: "kt", label: "Kill Team" },
+    { value: "warcry", label: "Warcry" },
   ],
   factions: [],
   aosFactions: [],
+  warcryFactions: [],
   killTeams: [],
   killTeamGroups: [],
   paintSources: [
@@ -70,13 +74,13 @@ export const experienceLabelOf = (
 
 // -------------------------- Данные записи --------------------------
 
-export type WhGame = "40k" | "aos" | "kt";
+export type WhGame = "40k" | "aos" | "kt" | "warcry";
 
 export type WhPlayerDetails = {
   kind?: "wh_player";
   /** игра; в старых записях нет — 40K */
   game?: WhGame;
-  /** армия (40K, AoS) или команда (Kill Team) */
+  /** армия (40K, AoS), команда (Kill Team) или варбанда (Warcry) */
   army: string;
   /** у Kill Team очков нет — null */
   points: number | null;

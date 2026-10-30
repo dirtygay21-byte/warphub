@@ -11,7 +11,7 @@ import {
   updateReservationDetails,
 } from '../booking/service';
 import { bookingConfig, bookingOptions, killTeams } from '../../config/booking';
-import { aosFactionNames } from '../roster/data';
+import { aosFactionNames, warcryFactionNames } from '../roster/data';
 import { mapDndError } from '../dnd/http';
 import {
   bookDndGame,
@@ -147,6 +147,7 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
     () => ({
       ...bookingOptions,
       aosFactions: aosFactionNames(),
+      warcryFactions: warcryFactionNames(),
       killTeams,
       allowedWeekdays: bookingConfig.allowedWeekdays,
       timeZone: bookingConfig.timeZone,

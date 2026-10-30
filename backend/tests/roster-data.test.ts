@@ -51,6 +51,13 @@ describe('roster data files', () => {
     expect(JSON.parse(new TextDecoder().decode(Bun.gunzipSync(f!.body))).fighters.length).toBeGreaterThan(0);
     for (const bad of ['../index', 'AEL-BOK', 'f/chaos', 'chaos/..', '.hidden', '']) expect(readRosterData(bad, 'warcry')).toBeNull();
   });
+  test('Warcry: faction names for the booking form (no grand-alliance files)', async () => {
+    const { warcryFactionNames } = await import('../src/modules/roster/data');
+    const names = warcryFactionNames();
+    expect(names.length).toBeGreaterThan(60);
+    expect(names).toContain('Skaven');
+    expect(names).not.toContain('chaos');
+  });
   test('rejects paths outside the data folder', () => {
     for (const bad of ['../index', 'aos/index', '..', 'f/SM', 'index.json/..', '']) {
       expect(readRosterData(bad)).toBeNull();

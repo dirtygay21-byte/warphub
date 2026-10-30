@@ -51,6 +51,27 @@ export function readRosterData(name: string, system: '40k' | 'aos' | 'kt' | 'war
   return { body, gzip: true };
 }
 
+const warcryFactionsCache: { mtime: number; names: string[] } = { mtime: -1, names: [] };
+
+/**
+ * Фракции Warcry для формы записи (W6 30.10.2026) — из данных WarpBuilder (warcry/index.json), без общих файлов альянсов.
+ * Нет файла — пустой список (в форме остаётся «Другая…»).
+ */
+export function warcryFactionNames(): string[] {
+  const file = path.join(rosterDataDir(), 'warcry', 'index.json');
+  try {
+    const mtime = fs.statSync(file).mtimeMs;
+    if (mtime !== warcryFactionsCache.mtime) {
+      const data = JSON.parse(fs.readFileSync(file, 'utf8')) as { factions?: { name: string; generic?: boolean }[] };
+      warcryFactionsCache.names = (data.factions ?? []).filter((f) => !f.generic).map((f) => f.name).sort((a, b) => a.localeCompare(b));
+      warcryFactionsCache.mtime = mtime;
+    }
+    return warcryFactionsCache.names;
+  } catch {
+    return [];
+  }
+}
+
 const aosFactionsCache: { mtime: number; names: string[] } = { mtime: -1, names: [] };
 
 /**
