@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { loadKtTeam } from '../../data';
 import { uid } from '../../engine/roster';
 import { decodeKtRoster, KT_CODE_PREFIX, ktTeamGroup, newKtRoster, type KtRoster } from '../../kt/roster';
@@ -6,7 +7,7 @@ import type { KtIndex } from '../../kt/types';
 import { cloudEnabled } from '../../storage';
 import { confirmAsk, haptic } from '../../telegram';
 import { Button, Empty, Field, Icon, Segmented, Sheet, Tag } from '../kit';
-import { BottomAction, ListHeader, PickTile, RosterCard, SearchField } from '../common/BuilderKit';
+import { BottomAction, ListHeader, PickTile, RosterCard, SearchField, ToolTile } from '../common/BuilderKit';
 
 type Team = KtIndex['teams'][number];
 
@@ -28,6 +29,7 @@ export function KtList({
   onDuplicate: (r: KtRoster) => void;
   onDelete: (id: string) => void;
 }) {
+  const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
   const [menu, setMenu] = useState<KtRoster | null>(null);
@@ -35,6 +37,9 @@ export function KtList({
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-4xl lg:pt-8">
       <ListHeader kicker={`WarpBuilder · ${index.edition}`} title="Kill Team" onBack={onExit} onImport={() => setImporting(true)} />
+      <div className="mb-5">
+        <ToolTile icon="spark" title="Как играть" sub="Обучение для новичков: активации, стрельба, бой" onClick={() => navigate('/learn/kt')} />
+      </div>
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Выберите команду и наберите оперативников: датакарты, оружие, снаряжение и уловки — из данных KTDash.</Empty>
       ) : (
