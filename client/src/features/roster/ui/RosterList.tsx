@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BATTLE_SIZES, BATTLE_SIZE_ORDER } from '../engine/rules';
 import { decodeRoster, duplicateRoster, newRoster } from '../engine/roster';
 import type { BattleSize, DataIndex, Roster } from '../engine/types';
@@ -36,6 +37,7 @@ export function RosterList({
   onDuplicate: (r: Roster) => void;
   onDelete: (id: string) => void;
 }) {
+  const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
   const [menu, setMenu] = useState<Roster | null>(null);
@@ -52,6 +54,9 @@ export function RosterList({
         <ToolTile icon="map" title="Начать игру" sub="Миссии · раскладки · трекер" onClick={onStartGame} />
         <div className="col-span-2">
           <ToolTile icon="shield" title="Test Army" sub="Расставить армию на поле · построения · линейка" onClick={onTestArmy} />
+        </div>
+        <div className="col-span-2">
+          <ToolTile icon="spark" title="Как играть" sub="Обучение для новичков: ход, стрельба, бой" onClick={() => navigate('/learn/40k')} />
         </div>
       </div>
 

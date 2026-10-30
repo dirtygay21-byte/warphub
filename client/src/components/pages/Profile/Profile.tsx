@@ -11,7 +11,7 @@ import { isOutsideTelegram } from "@/utils/telegramEnv";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getFullName, getInitials } from "@/utils/user";
 import { useQuery } from "@tanstack/react-query";
-import { AtSign, Check, Copy, Gamepad2, Hash, LoaderCircle, RefreshCw, ShieldCheck, Swords, UserRound } from "lucide-react";
+import { AtSign, BookOpen, Check, Copy, Gamepad2, Hash, LoaderCircle, RefreshCw, ShieldCheck, Swords, UserRound } from "lucide-react";
 import { DsButton, GroupCard, NavRow, SectionLabel } from "@/components/ui/ds";
 import { haptic } from "@/utils/haptic";
 import { useEffect, useState } from "react";
@@ -150,6 +150,14 @@ export default function Profile() {
         title="Мини-игры"
         subtitle="Играйте и получайте скидки в клубе"
         onClick={() => navigate("/games")}
+      />
+
+      <NavRow
+        className="mt-3"
+        icon={<BookOpen className="size-5" />}
+        title="Как играть"
+        subtitle="Обучение для новичков: схемы и короткие правила"
+        onClick={() => navigate("/learn")}
       />
 
       <section className="mt-6">

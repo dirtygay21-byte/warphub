@@ -15,6 +15,7 @@ import DiceGame from "@/components/games/DiceGame";
 import EggGame from "@/components/games/EggGame";
 import CardsGame, { CardCollection } from "@/components/games/CardsGame";
 import GamesLayout from "@/layouts/GamesLayout";
+import { TutorialHub, TutorialViewer } from "@/components/tutorial/TutorialPages";
 import Reservation from "@/components/pages/Reservations/Reservation";
 import News from "@/components/pages/News/News";
 import Profile from "@/components/pages/Profile/Profile";
@@ -46,6 +47,12 @@ export default function App() {
             <Route path="egg" element={<EggGame />} />
             <Route path="cards" element={<CardsGame />} />
             <Route path="cards/collection" element={<CardCollection />} />
+          </Route>
+
+          {/* «Как играть» — тот же полноэкранный каркас без нижнего меню, что у мини-игр */}
+          <Route path="/learn" element={<GamesLayout />}>
+            <Route index element={<TutorialHub />} />
+            <Route path=":game" element={<TutorialViewer />} />
           </Route>
 
           <Route
