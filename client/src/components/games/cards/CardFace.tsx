@@ -175,7 +175,7 @@ export function CardFace({
             className={clsx(
               "min-w-0 uppercase leading-tight text-white",
               oswald,
-              size === "lg" ? "text-lg" : "line-clamp-2 h-[2.5em] text-[10px]",
+              size === "lg" ? "text-lg" : "line-clamp-2 h-[2.5em] text-[12px]",
             )}
           >
             {card.name}
@@ -192,25 +192,26 @@ export function CardFace({
             <CardArt card={card} />
           </div>
           {isNew && (
-            <span className="absolute left-1 top-1 rounded bg-accent px-1 text-[9px] font-bold uppercase text-accent-foreground">
+            <span className="absolute left-1 top-1 rounded bg-accent px-1 text-[12px] font-bold text-accent-foreground">
               Новая
             </span>
           )}
+          {size === "sm" && points !== undefined && (
+            <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1 text-[12px] font-semibold" style={{ color: r.color }}>+{points}</span>
+          )}
           {count !== undefined && count > 1 && (
-            <span className="absolute right-1 top-1 rounded bg-black/70 px-1 text-[10px] font-semibold text-white">×{count}</span>
+            <span className="absolute right-1 top-1 rounded bg-black/70 px-1 text-[12px] font-semibold text-white">×{count}</span>
           )}
         </div>
 
         <div className={clsx("flex items-center justify-between", size === "lg" ? "px-3 pt-1.5" : "px-1.5 py-1")}>
-          <span className={clsx("flex items-center gap-1 uppercase tracking-wide", r.text, size === "lg" ? "text-[11px]" : "text-[8px]")}>
+          <span className={clsx("flex min-w-0 items-center gap-1", r.text, size === "lg" ? "text-[12px] uppercase tracking-wide" : "truncate text-[12px]")}>
             <span className="inline-block size-1.5 rotate-45" style={{ background: r.gem }} />
             {card.rarityLabel}
           </span>
           {size === "lg" ? (
-            <span className="text-[10px] uppercase tracking-wide text-fg-3">{card.factionLabel}</span>
-          ) : (
-            points !== undefined && <span className="text-[9px] font-semibold" style={{ color: r.color }}>+{points}</span>
-          )}
+            <span className="text-[12px] uppercase tracking-wide text-fg-3">{card.factionLabel}</span>
+          ) : null}
         </div>
 
         {size === "lg" && (
@@ -222,15 +223,15 @@ export function CardFace({
                     {card[key] as number}
                     {suffix}
                   </p>
-                  <p className="mt-0.5 text-[8px] uppercase text-fg-3">{label}</p>
+                  <p className="mt-0.5 text-[12px] text-fg-3">{label}</p>
                 </div>
               ))}
             </div>
             <div className="mx-2 mb-2.5 mt-2 rounded-md border border-white/10 bg-black/30 px-2 py-1.5">
-              <p className="text-[11px] font-semibold" style={{ color: r.color }}>
+              <p className="text-[13px] font-semibold" style={{ color: r.color }}>
                 {card.ability.name}
               </p>
-              <p className="text-[11px] leading-snug text-fg-2">{card.ability.text}</p>
+              <p className="text-[13px] leading-snug text-fg-2">{card.ability.text}</p>
             </div>
           </>
         )}
@@ -263,7 +264,7 @@ export function CardBack({ rarity, hint = true }: { rarity?: CardRarity; hint?: 
         }}
       />
       <img src={s3Url("logo.png")} alt="" className="relative w-1/2 opacity-90 [image-rendering:pixelated]" />
-      <span className={`absolute bottom-2 text-[9px] uppercase tracking-[0.2em] text-accent/70 ${oswald}`}>Легенды</span>
+      <span className={`absolute bottom-2 text-[12px] uppercase tracking-[0.15em] text-accent/80 ${oswald}`}>Легенды</span>
     </div>
   );
 }
