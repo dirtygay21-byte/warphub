@@ -94,6 +94,19 @@ export const rosterModule = new Elysia({ prefix: '/roster', tags: ['Roster Build
       return file.body;
     },
     { detail: { summary: 'Данные WarpBuilder: Kill Team (index или id команды)', hide: true } },
+  )
+  .get(
+    '/data/warcry/:name',
+    async ({ user, params, set }) => {
+      if (!(await hasRosterAccess(user))) return status(403, { error: 'Нет доступа к WarpBuilder' });
+      const file = readRosterData(params.name.replace(/\.json$/, ''), 'warcry');
+      if (!file) return status(404, { error: 'Нет данных' });
+      set.headers['content-type'] = 'application/json; charset=utf-8';
+      set.headers['content-encoding'] = 'gzip';
+      set.headers['cache-control'] = 'private, max-age=3600';
+      return file.body;
+    },
+    { detail: { summary: 'Данные WarpBuilder: Warcry (index или id фракции)', hide: true } },
   );
 
 /** Управление доступом — только администраторы. */
