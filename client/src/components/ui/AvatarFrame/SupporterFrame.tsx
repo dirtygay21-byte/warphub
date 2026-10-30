@@ -1,0 +1,63 @@
+import type { ReactNode } from "react";
+import { SUPPORTER_DEFS, SUPPORTER_MARKUP, SUPPORTER_VIEWBOX } from "./supporters.generated";
+
+export type SupporterTitle = "flame" | "crown" | "banner";
+
+const AVATAR_R = 52;
+
+const reducedMotion = () => {
+  try {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  } catch {
+    return false;
+  }
+};
+
+/** SMIL-анимации (развевающееся знамя) CSS-правило не останавливает — при «уменьшить движение» убираем их. */
+const still = (markup: string) => (reducedMotion() ? markup.replace(/<animate(Transform)?\b[^>]*\/>/g, "") : markup);
+
+/**
+ * Рамка «Поддержка клуба» (макет «Поддержка клуба», 30.10.2026): Пламя варпа, Корона клуба, Знамя.
+ * Слой back рисуется под фото (знамя, буря), слой front — поверх края. Разметка — статичный SVG из макета.
+ */
+export default function SupporterFrame({
+  title,
+  size,
+  children,
+  label,
+}: {
+  title: SupporterTitle;
+  /** диаметр аватара, px */
+  size: number;
+  children: ReactNode;
+  label?: string;
+}) {
+  const [vx, vy, vw, vh] = SUPPORTER_VIEWBOX[title];
+  const unit = size / (AVATAR_R * 2);
+  const w = vw * unit;
+  const h = vh * unit;
+  // положение svg относительно аватара (центр аватара — точка 0,0 макета)
+  const left = size / 2 + vx * unit;
+  const top = size / 2 + vy * unit;
+  const markup = SUPPORTER_MARKUP[title];
+  const viewBox = `${vx} ${vy} ${vw} ${vh}`;
+  const box = { width: w, height: h, left, top };
+  return (
+    <div
+      className="relative mx-auto"
+      style={{ width: size, height: size, marginTop: -top, marginBottom: h + top - size, marginLeft: "auto", marginRight: "auto" }}
+      role={label ? "img" : undefined}
+      aria-label={label}
+    >
+      <svg aria-hidden="true" className="pointer-events-none absolute" style={box} viewBox={viewBox}>
+        <defs dangerouslySetInnerHTML={{ __html: SUPPORTER_DEFS }} />
+        <g dangerouslySetInnerHTML={{ __html: still(markup.back) }} />
+      </svg>
+      <div className="relative size-full overflow-hidden rounded-full">{children}</div>
+      <svg aria-hidden="true" className="pointer-events-none absolute" style={box} viewBox={viewBox}>
+        <defs dangerouslySetInnerHTML={{ __html: SUPPORTER_DEFS }} />
+        <g dangerouslySetInnerHTML={{ __html: still(markup.front) }} />
+      </svg>
+    </div>
+  );
+}

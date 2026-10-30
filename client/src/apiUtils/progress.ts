@@ -13,7 +13,16 @@ export type CategoryProgress = {
   nextLabel: string | null;
 };
 
-export type PlayerProgress = { categories: CategoryProgress[]; total: number };
+export type SupporterTitle = "flame" | "crown" | "banner";
+
+/** Звания «Поддержка клуба» (назначает администратор) */
+export const SUPPORTER_LABELS: Record<SupporterTitle, string> = {
+  flame: "Пламя варпа",
+  crown: "Корона клуба",
+  banner: "Знамя",
+};
+
+export type PlayerProgress = { categories: CategoryProgress[]; total: number; supporter: SupporterTitle | null };
 
 export const RANK_ORDER: RankKey[] = ["beginner", "player", "experienced", "veteran"];
 export const RANK_MIN: Record<RankKey, number> = { beginner: 0, player: 5, experienced: 15, veteran: 40 };

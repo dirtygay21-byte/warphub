@@ -4,6 +4,7 @@ import {
   CalendarDays,
   ChevronDown,
   ChevronLeft,
+  Crown,
   Dice5,
   Gift,
   KeyRound,
@@ -32,6 +33,7 @@ const GROUPS: { title: string; items: Section[] }[] = [
     items: [
       { path: "/admin/content", label: "Контент", sub: "Ивенты и новости", icon: Newspaper },
       { path: "/admin/rewards", label: "Награды", sub: "Скидки за мини-игры", icon: Gift },
+      { path: "/admin/supporters", label: "Поддержка клуба", sub: "Особые звания и рамки аватара", icon: Crown },
     ],
   },
   {

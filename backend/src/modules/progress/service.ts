@@ -10,8 +10,9 @@ import {
   type CategoryProgress,
   type ProgressCategory,
 } from './rules';
+import { getSupporterTitle, type SupporterTitle } from '../supporters/service';
 
-export type PlayerProgress = { categories: CategoryProgress[]; total: number };
+export type PlayerProgress = { categories: CategoryProgress[]; total: number; supporter: SupporterTitle | null };
 
 /** Прогресс игрока: считается по записям при каждом запросе (своих таблиц нет — прошлые игры учтены). */
 export async function getPlayerProgress(userId: string, now = new Date()): Promise<PlayerProgress> {
@@ -45,5 +46,5 @@ export async function getPlayerProgress(userId: string, now = new Date()): Promi
   for (const b of dnd) if (dndBookingCounts(b, now)) counts.dnd += 1;
 
   const categories = PROGRESS_CATEGORIES.map((c) => progressOf(c, counts[c]));
-  return { categories, total: categories.reduce((sum, c) => sum + c.games, 0) };
+  return { categories, total: categories.reduce((sum, c) => sum + c.games, 0), supporter: await getSupporterTitle(userId) };
 }
