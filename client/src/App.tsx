@@ -4,6 +4,7 @@ import TanstackProvider from "@/apiUtils/provider";
 import AdminLayout from "@/layouts/AdminLayout";
 import MainLayout from "@/layouts/MainLayout";
 import AdminReservations from "@/components/pages/Admin/Reservations";
+import AdminSupporters from "@/components/pages/Admin/Supporters/AdminSupporters";
 import ContentManagment from "@/components/pages/Admin/ContentManagment";
 import AdminWarhammer from "@/components/pages/Admin/Warhammer/AdminWarhammer";
 import AdminDnd from "@/components/pages/Admin/Dnd/AdminDnd";
@@ -62,6 +63,7 @@ export default function App() {
             <Route path="roster" element={<AdminRoster />} />
             <Route path="rewards" element={<AdminRewards />} />
             <Route path="admins" element={<AdminAdmins />} />
+            <Route path="supporters" element={<AdminSupporters />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

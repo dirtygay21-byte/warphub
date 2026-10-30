@@ -1,6 +1,7 @@
 import { getMe } from "@/apiUtils/user";
-import { CATEGORY_LABELS, getMyProgress, RANK_ORDER, type ProgressCategory } from "@/apiUtils/progress";
+import { CATEGORY_LABELS, getMyProgress, RANK_ORDER, SUPPORTER_LABELS, type ProgressCategory } from "@/apiUtils/progress";
 import AvatarFrame from "@/components/ui/AvatarFrame/AvatarFrame";
+import SupporterFrame from "@/components/ui/AvatarFrame/SupporterFrame";
 import PlayerProgressCard from "./PlayerProgressCard";
 import { pickFrame, saveFrame } from "./progressChoice";
 import { getRosterAccess } from "@/apiUtils/roster";
@@ -80,6 +81,16 @@ export default function Profile() {
 
   const user = profileQuery.data;
   const fullName = getFullName(user?.firstName ?? "", user?.lastName ?? "");
+  const supporter = progressQuery.data?.supporter ?? null;
+  const avatar = (
+    <div className="flex size-full items-center justify-center bg-app-subtle">
+      {user?.photoUrl ? (
+        <img src={user?.photoUrl} alt={fullName || "Аватар пользователя"} className="size-full object-cover" />
+      ) : (
+        <span className="text-2xl font-semibold text-accent">{getInitials(user?.firstName ?? "", user?.lastName ?? "")}</span>
+      )}
+    </div>
+  );
 
   return (
     <div className="ds-enter px-5 py-3 text-fg lg:grid lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start lg:gap-x-6 lg:pt-8">
@@ -87,25 +98,21 @@ export default function Profile() {
         <div className="relative px-6 pb-6 pt-8 text-center">
           <div className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-accent/15 to-transparent" />
 
-          <AvatarFrame
-            category={frame?.category ?? "warhammer"}
-            tier={frame ? RANK_ORDER.indexOf(frame.rank) : 0}
-            size={96}
-            label={frame ? `Рамка: ${CATEGORY_LABELS[frame.category]} · ${frame.rankLabel}` : undefined}
-          >
-            <div className="flex size-full items-center justify-center bg-app-subtle">
-              {user?.photoUrl ? (
-                <img src={user?.photoUrl} alt={fullName || "Аватар пользователя"} className="size-full object-cover" />
-              ) : (
-                <span className="text-2xl font-semibold text-accent">{getInitials(user?.firstName ?? "", user?.lastName ?? "")}</span>
-              )}
-            </div>
-          </AvatarFrame>
-          {frame && (
-            <p className="relative -mt-1 mb-3 text-[13px] font-semibold uppercase tracking-[0.08em] text-accent">
-              {frame.rankLabel} · {CATEGORY_LABELS[frame.category]}
-            </p>
+          {supporter ? (
+            <SupporterFrame title={supporter} size={104} label={`Поддерживает клуб: ${SUPPORTER_LABELS[supporter]}`}>
+              {avatar}
+            </SupporterFrame>
+          ) : (
+            <AvatarFrame
+              category={frame?.category ?? "warhammer"}
+              tier={frame ? RANK_ORDER.indexOf(frame.rank) : 0}
+              size={96}
+              label={frame ? `Рамка: ${CATEGORY_LABELS[frame.category]} · ${frame.rankLabel}` : undefined}
+            >
+              {avatar}
+            </AvatarFrame>
           )}
+
 
           <h1 className="text-2xl font-semibold leading-tight">
             {fullName || "Пользователь"}
@@ -116,13 +123,18 @@ export default function Profile() {
           ) : (
             <p className="mt-2 text-[15px] text-fg-3">Username не указан</p>
           )}
+          {supporter && (
+            <p className="relative mt-3 inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-[13px] font-bold uppercase tracking-[0.04em] text-accent-foreground">
+              ★ {SUPPORTER_LABELS[supporter]} · Поддерживает клуб
+            </p>
+          )}
         </div>
       </section>
 
       {progressQuery.data && (
         <PlayerProgressCard
           categories={progressQuery.data.categories}
-          selected={frame?.category ?? null}
+          selected={supporter ? null : (frame?.category ?? null)}
           onSelect={(category) => {
             saveFrame(category);
             setFrameChoice(category);

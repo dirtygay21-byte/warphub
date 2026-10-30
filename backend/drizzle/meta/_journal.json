@@ -134,6 +134,13 @@
       "when": 1783995600000,
       "tag": "0018_table_holds_reserved_by",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1783999200000,
+      "tag": "0019_club_supporters",
+      "breakpoints": true
     }
   ]
 }

@@ -321,3 +321,41 @@ body {
 @media (prefers-reduced-motion: reduce) {
   [class^="af-"], [class*=" af-"] { animation: none !important; }
 }
+
+/* Рамки «Поддержка клуба» (30.10.2026) — анимации из макета; классы sp-, id af-sp- */
+@keyframes sp-sweep{to{transform:rotate(360deg)}}
+@keyframes sp-throb{0%,100%{opacity:.75}50%{opacity:1}}
+@keyframes sp-current{to{stroke-dashoffset:-76}}
+@keyframes sp-drift{0%{transform:translate(0,0);opacity:0}25%{opacity:1}100%{transform:translate(var(--dx),var(--dy));opacity:0}}
+@keyframes sp-glint{0%,70%,100%{opacity:.35}80%{opacity:1}}
+@keyframes sp-fire{0%,100%{transform:scaleY(1) skewX(0)}25%{transform:scaleY(1.18) skewX(4deg)}50%{transform:scaleY(.86) skewX(-3deg)}75%{transform:scaleY(1.08) skewX(2deg)}}
+@keyframes sp-flash{0%,82%,100%{opacity:0;transform:scale(.4)}88%{opacity:1;transform:scale(1.15)}94%{opacity:.4;transform:scale(1)}}
+@keyframes sp-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes sp-banner{0%,100%{transform:skewX(0)}50%{transform:skewX(1.2deg)}}
+@keyframes sp-rune{0%,100%{opacity:.75}50%{opacity:1}}
+@keyframes sp-wave{0%,100%{transform:translateY(0)}50%{transform:translateY(1.2px)}}
+.sp-sweep{animation:sp-sweep 6s cubic-bezier(.45,0,.55,1) infinite;transform-origin:0 0;transform-box:view-box}
+.sp-throb{animation:sp-throb 2.6s ease-in-out infinite}
+.sp-current{animation:sp-current 2.4s linear infinite}
+.sp-drift{animation:sp-drift 2.4s ease-out infinite}
+.sp-glint{animation:sp-glint 4s ease-in-out infinite}
+.sp-fire{animation:sp-fire 1.3s ease-in-out infinite;transform-origin:center bottom;transform-box:fill-box}
+.sp-flash{animation:sp-flash 3.3s ease-out infinite;transform-origin:center;transform-box:fill-box}
+.sp-float{animation:sp-float 3.4s ease-in-out infinite}
+.sp-banner{animation:sp-banner 5s ease-in-out infinite;transform-origin:50% 0;transform-box:fill-box}
+.sp-flag{animation:sp-flag 3.6s ease-in-out infinite;transform-origin:0 0;transform-box:view-box}
+@keyframes sp-flag{0%,100%{transform:skewY(0)}50%{transform:skewY(-2.5deg)}}
+.sp-shimmer{animation:sp-shimmer 1.8s ease-in-out infinite}
+@keyframes sp-shimmer{0%,100%{opacity:.55}25%{opacity:1}40%{opacity:.75}60%{opacity:1}80%{opacity:.65}}
+.sp-glowpulse{animation:sp-glowpulse 3s ease-in-out infinite;transform-origin:0 0;transform-box:view-box}
+@keyframes sp-glowpulse{0%,100%{opacity:.6;transform:scale(.97)}50%{opacity:1;transform:scale(1.04)}}
+.sp-bolt{animation:sp-bolt 2.6s steps(1,end) infinite}
+@keyframes sp-bolt{0%,100%{opacity:0}6%{opacity:1}9%{opacity:.2}12%{opacity:1}20%{opacity:0}}
+.sp-drift-x{animation:sp-drift-x 9s ease-in-out infinite}
+.sp-drift-x2{animation:sp-drift-x 7s ease-in-out infinite reverse}
+@keyframes sp-drift-x{0%,100%{transform:translateX(-10px)}50%{transform:translateX(12px)}}
+.sp-rune{animation:sp-rune 4s ease-in-out infinite}
+.sp-wave{animation:sp-wave 3.2s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce) {
+  [class^="sp-"], [class*=" sp-"] { animation: none !important; }
+}
