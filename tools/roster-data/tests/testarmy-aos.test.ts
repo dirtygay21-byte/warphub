@@ -68,3 +68,19 @@ test('территории карт: контуры объединения пр�
   assert.equal(baseToZone({ x: 15, y: 20, rx: 0.63, ry: 0.63, angle: 0 }, a!).whollyInside, true);
   assert.equal(baseToZone({ x: 15, y: 5, rx: 0.63, ry: 0.63, angle: 0 }, a!).whollyInside, false);
 });
+
+test('на стол — и террейн фракции, и манифестации выбранного лора (с пометкой, без своих очков у манифестаций)', () => {
+  const data = load('SE');
+  const L = makeAosLookup(data);
+  const terrain = data.warscrolls.find((w: { kind: string }) => w.kind === 'terrain');
+  const lore = data.lores.find((l: { kind: string; summons: string[] }) => l.kind === 'manifestation' && l.summons.length > 0);
+  assert.ok(terrain && lore);
+  const r = { ...newAosRoster('SE'), terrainId: terrain.id };
+  r.lores = { ...r.lores, manifestation: lore.id };
+  const units = buildAosUnits(r, L);
+  const t = units.find((u) => u.datasheetIds[0] === terrain.id)!;
+  assert.deepEqual(t.tags, ['террейн фракции']);
+  const m = units.filter((u) => u.tags?.[0]?.startsWith('манифестация'));
+  assert.equal(m.length, lore.summons.length);
+  assert.ok(m.every((u) => u.points === 0 && u.models.length >= 1));
+});

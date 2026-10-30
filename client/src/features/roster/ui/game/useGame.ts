@@ -4,6 +4,7 @@ import { uid } from '../../engine/roster';
 import {
   GAME_SCHEMA,
   appendRemote,
+  isAosLog,
   applyEvent,
   loadLocalGame,
   newSeed,
@@ -192,6 +193,10 @@ export function useGame(): GameHook {
     if (!r.data.events.length) {
       commit([], null);
       return true;
+    }
+    if (isAosLog(r.data.events)) {
+      setError('Это игра Age of Sigmar — откройте её в разделе Age of Sigmar → «Начать игру».');
+      return false;
     }
     const rp = replay(r.data.events, data.catalog);
     if (!rp.ok) {

@@ -70,7 +70,8 @@ function Step({ n, title, done, children }: { n: number; title: string; done: bo
 function PlayerRow({ game, seat, rosters, index }: { game: AosGameHook; seat: Seat; rosters: AosRoster[]; index: AosIndex }) {
   const s = game.state!;
   const p = s.players[seat];
-  const locked = s.tacticsRevealed;
+  const own = game.mine(seat);
+  const locked = s.tacticsRevealed || !own;
   const [name, setName] = useState(p.name);
   const [mode, setMode] = useState<'own' | 'code'>(p.roster.source === 'code' ? 'code' : 'own');
   const [code, setCode] = useState('');
@@ -93,6 +94,7 @@ function PlayerRow({ game, seat, rosters, index }: { game: AosGameHook; seat: Se
         maxLength={24}
         onChange={(e) => setName(e.target.value)}
         onBlur={saveName}
+        disabled={!own}
         className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-semibold outline-none focus:border-accent"
         aria-label={`Имя игрока ${seat === 'p1' ? 1 : 2}`}
       />
@@ -111,6 +113,8 @@ function PlayerRow({ game, seat, rosters, index }: { game: AosGameHook; seat: Se
             </button>
           )}
         </div>
+      ) : !own ? (
+        <p className="mt-2 text-[12px] text-white/50">Соперник ещё выбирает ростер на своём телефоне.</p>
       ) : (
         <div className="mt-2 space-y-2">
           <Segmented value={mode} onChange={setMode} options={[{ value: 'own', label: 'Мой ростер' }, { value: 'code', label: 'По коду' }]} />
@@ -261,8 +265,8 @@ function StepRoles({ game }: { game: AosGameHook }) {
       ) : (
         <>
           <Dice rolls={r.rolls} winner={r.winner} names={names} />
-          <p className="text-[12.5px] text-white/65">{names[r.winner]} решает, кто атакующий:</p>
-          <div className="grid grid-cols-2 gap-2">
+          <p className="text-[12.5px] text-white/65">{names[r.winner]} решает, кто атакующий{game.mine(r.winner) ? ':' : ' — ждём выбор на его телефоне.'}</p>
+          <div className={cx('grid grid-cols-2 gap-2', !game.mine(r.winner) && 'hidden')}>
             <Button variant="primary" onClick={() => choose(r.winner, 'random')}>
               Я атакую
             </Button>
@@ -291,7 +295,8 @@ function StepTerritory({ game, attacker }: { game: AosGameHook; attacker: Seat }
   const bp = game.bp!;
   const map = bp.battleplans.find((b) => b.n === s.battleplan)?.map;
   const [t, setT] = useState(s.territory && !isMapTerritory(s.territory) ? s.territory : '');
-  const pick = (v: string) => v !== s.territory && game.dispatch({ type: 'territory-set', territory: v });
+  const canPick = game.mine(attacker);
+  const pick = (v: string) => canPick && v !== s.territory && game.dispatch({ type: 'territory-set', territory: v });
   return (
     <>
       <p className="text-[12.5px] leading-snug text-white/65">
@@ -300,8 +305,9 @@ function StepTerritory({ game, attacker }: { game: AosGameHook; attacker: Seat }
       </p>
       {map && (
         <>
-          <BattleplanMap bp={bp} map={map} attacker={isMapTerritory(s.territory) ? s.territory : null} onPick={pick} />
-          <div className="grid grid-cols-2 gap-2">
+          <BattleplanMap bp={bp} map={map} attacker={isMapTerritory(s.territory) ? s.territory : null} onPick={canPick ? pick : undefined} />
+          {!canPick && <p className="text-[12px] text-white/50">Территорию выбирает {s.players[attacker].name} на своём телефоне.</p>}
+          <div className={cx('grid grid-cols-2 gap-2', !canPick && 'hidden')}>
             {(['A', 'B'] as const).map((x) => (
               <Button key={x} variant={s.territory === x ? 'primary' : 'outline'} onClick={() => pick(x)}>
                 Атакую из {x}
@@ -310,7 +316,7 @@ function StepTerritory({ game, attacker }: { game: AosGameHook; attacker: Seat }
           </div>
         </>
       )}
-      {(!map || (s.territory && !isMapTerritory(s.territory))) && (
+      {canPick && (!map || (s.territory && !isMapTerritory(s.territory))) && (
         <div className="flex gap-2">
           <input
             value={t}
@@ -363,9 +369,13 @@ function StepTactics({ game }: { game: AosGameHook }) {
               <p className="min-w-0 flex-1 text-sm font-semibold">
                 {p.name} <span className="text-[11px] font-normal text-white/45">· выбрано {p.tacticCards.length} из {bp.tactics.pick}</span>
               </p>
-              <Button variant="outline" className="min-h-8 px-3 text-xs" onClick={() => setOpen(shown ? null : seat)}>
-                {shown ? 'Скрыть' : 'Выбрать тайно'}
-              </Button>
+              {game.mine(seat) ? (
+                <Button variant="outline" className="min-h-8 px-3 text-xs" onClick={() => setOpen(shown ? null : seat)}>
+                  {shown ? 'Скрыть' : 'Выбрать тайно'}
+                </Button>
+              ) : (
+                <span className="text-[11px] text-white/45">{p.tacticCards.length ? 'выбрал' : 'выбирает…'}</span>
+              )}
             </div>
             {shown && (
               <ul className="mt-2 space-y-1.5">
@@ -399,7 +409,7 @@ function StepTactics({ game }: { game: AosGameHook }) {
       >
         Раскрыть карты обоих
       </Button>
-      <p className="text-[11px] text-white/40">Передайте телефон: каждый выбирает свои карты и нажимает «Скрыть». После раскрытия карты не меняются.</p>
+      <p className="text-[11px] text-white/40">{game.online ? 'Каждый выбирает карты на своём телефоне; раскрыть может любой, когда выбрали оба.' : 'Передайте телефон: каждый выбирает свои карты и нажимает «Скрыть».'} После раскрытия карты не меняются.</p>
     </>
   );
 }

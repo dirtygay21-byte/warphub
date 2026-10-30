@@ -3,7 +3,8 @@
  * (герои не присоединяются, как в 40K). Моделей — размер юнита (Battle Profile), у усиленного — вдвое больше;
  * база — из Battle Profile (`bases`): «40mm», «90 × 52mm», «Use model» / пусто — размера нет (игрок задаёт сам),
  * у составных юнитов — «Имя: 40mm, 2 x Имя: 28.5mm, Остальные: 25mm» (модели по порядку, последний размер — остальным).
- * Полк славы — его юниты с числом моделей из записи полка. Террейн фракции и манифестации не расставляются.
+ * Полк славы — его юниты с числом моделей из записи полка. Террейн фракции ростера и манифестации его лора манифестаций
+ * (30.10.2026) — тоже на стол, с пометкой; у большинства манифестаций и террейна база «Use model» — размер задаёт игрок.
  */
 import { AOS_RULES } from '../aos/rules';
 import { placedUnits, rorUnitsOf, unitTotal, type AosLookup } from '../aos/engine';
@@ -58,5 +59,13 @@ export function buildAosUnits(r: AosRoster, L: AosLookup, prefix = ''): TAUnit[]
   rorUnitsOf(r, L).forEach((x, k) => {
     for (let c = 0; c < x.count; c++) out.push(unitOf(`${prefix}ror.${k}.${c}`, x.ws, x.models || x.ws.unitSize, x.points ?? 0, ['полк славы']));
   });
+  const terrain = r.terrainId ? L.ws.get(r.terrainId) : undefined;
+  if (terrain) out.push(unitOf(`${prefix}terrain.${terrain.id}`, terrain, terrain.unitSize || 1, terrain.cost ?? 0, ['террейн фракции']));
+  // манифестации выбранного лора: очки платятся за лор, на столе — призванные заклинанием
+  const lore = r.lores.manifestation ? L.lore.get(r.lores.manifestation) : undefined;
+  for (const id of lore?.summons ?? []) {
+    const ws = L.ws.get(id);
+    if (ws) out.push(unitOf(`${prefix}manif.${id}`, ws, ws.unitSize || 1, 0, [`манифестация · ${lore!.name}`]));
+  }
   return out;
 }

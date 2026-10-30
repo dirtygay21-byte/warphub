@@ -114,7 +114,8 @@ interface EventBase {
 }
 
 export type AosEventBody =
-  | { type: 'game-created'; schema: number; seed: string; names: Record<Seat, string> }
+  /** system: 'aos' — метка для игры на двух телефонах (сервер общий с 40K) */
+  | { type: 'game-created'; schema: number; seed: string; names: Record<Seat, string>; system?: 'aos' }
   | { type: 'player-set'; target: Seat; patch: Partial<Pick<AosPlayerSetup, 'name' | 'roster' | 'tacticCards'>> }
   | { type: 'battleplan-set'; n: number; source: Source; roll?: { attempt: number } }
   | { type: 'roles-set'; attacker: Seat; source: Source; roll?: { attempt: number } }
