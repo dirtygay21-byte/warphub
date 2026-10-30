@@ -680,6 +680,350 @@ function AosObjective() {
   );
 }
 
+/* ---------- Kill Team ---------- */
+function KtDie({ x, y, v, ok = true, crit = false, size = 24 }: { x: number; y: number; v: string | number; ok?: boolean; crit?: boolean; size?: number }) {
+  return (
+    <g>
+      <rect x={x} y={y} width={size} height={size} rx={6} fill={ok ? LIGHT : "#3A3A36"} stroke={crit ? A : undefined} strokeWidth={crit ? 2.5 : undefined} />
+      <text x={x + size / 2} y={y + size / 2 + 5} textAnchor="middle" fontSize={13} fontWeight={800} fill={ok ? "#141413" : F3}>
+        {v}
+      </text>
+    </g>
+  );
+}
+
+function KtGame() {
+  return (
+    <>
+      {[0, 1, 2, 3].map((i) => {
+        const x = 12 + i * 76;
+        return (
+          <g key={i}>
+            <rect x={x} y={26} width={70} height={92} rx={10} fill={PANEL} />
+            <text x={x + 35} y={46} textAnchor="middle" fontSize={11.5} fontWeight={800} fill={A}>
+              TP {i + 1}
+            </text>
+            <rect x={x + 6} y={56} width={58} height={22} rx={6} fill={HEAD} />
+            <text x={x + 35} y={71} textAnchor="middle" fontSize={10} fill={W}>
+              Стратегия
+            </text>
+            <rect x={x + 6} y={84} width={58} height={22} rx={6} fill="rgba(236,254,70,.18)" />
+            <text x={x + 35} y={99} textAnchor="middle" fontSize={10} fill={A}>
+              Перестрелка
+            </text>
+          </g>
+        );
+      })}
+      <text x={160} y={146} textAnchor="middle" fontSize={11} fill={F2}>
+        4 переломных момента (Turning Points)
+      </text>
+    </>
+  );
+}
+
+function KtCard() {
+  const stats = [
+    ["APL", "2"],
+    ["Move", "6″"],
+    ["Save", "3+"],
+    ["Wounds", "8"],
+  ];
+  const weapon = [
+    ["Atk", "4"],
+    ["Hit", "3+"],
+    ["Dmg", "3/4"],
+  ];
+  return (
+    <>
+      {stats.map(([k, v], i) => {
+        const x = 14 + i * 76;
+        return (
+          <g key={k}>
+            <text x={x + 34} y={36} textAnchor="middle" fontSize={11.5} fontWeight={700} fill={F2}>
+              {k}
+            </text>
+            <rect x={x} y={44} width={68} height={40} rx={9} fill={LIGHT} />
+            <text x={x + 34} y={71} textAnchor="middle" fontSize={18} fontWeight={800} fill="#141413">
+              {v}
+            </text>
+          </g>
+        );
+      })}
+      {weapon.map(([k, v], i) => {
+        const x = 14 + i * 100;
+        return (
+          <g key={k}>
+            <rect x={x} y={100} width={92} height={20} rx={6} fill={HEAD} />
+            <text x={x + 46} y={114} textAnchor="middle" fontSize={11} fontWeight={700} fill={W}>
+              {k}
+            </text>
+            <rect x={x} y={122} width={92} height={22} rx={6} fill={PANEL} />
+            <text x={x + 46} y={138} textAnchor="middle" fontSize={13} fontWeight={800} fill={A}>
+              {v}
+            </text>
+          </g>
+        );
+      })}
+      <text x={160} y={164} textAnchor="middle" fontSize={11} fill={F3}>
+        Пример: Dmg 3/4 — обычный / критический урон
+      </text>
+    </>
+  );
+}
+
+function KtStrategy() {
+  return (
+    <>
+      <KtDie x={40} y={30} v={5} />
+      <KtDie x={70} y={30} v={3} ok={false} />
+      <text x={66} y={76} textAnchor="middle" fontSize={11} fill={F2}>
+        D6 против D6
+      </text>
+      <Tag x={66} y={98} c={A}>
+        Инициатива
+      </Tag>
+      <rect x={150} y={24} width={156} height={92} rx={12} fill={PANEL} />
+      <text x={228} y={44} textAnchor="middle" fontSize={11.5} fontWeight={700} fill={W}>
+        Очки команд (CP)
+      </text>
+      <text x={162} y={68} fontSize={11} fill={F2}>
+        с инициативой
+      </text>
+      <text x={296} y={68} textAnchor="end" fontSize={13} fontWeight={800} fill={A}>
+        +1
+      </text>
+      <text x={162} y={92} fontSize={11} fill={F2}>
+        без инициативы
+      </text>
+      <text x={296} y={92} textAnchor="end" fontSize={13} fontWeight={800} fill={A}>
+        +2
+      </text>
+      <text x={160} y={146} textAnchor="middle" fontSize={11} fill={F3}>
+        Старт — 2 CP, в 1-й фазе стратегии +1 каждому
+      </text>
+    </>
+  );
+}
+
+function KtFirefight() {
+  const seq: [boolean, number][] = [
+    [true, 2],
+    [false, 2],
+    [true, 3],
+    [false, 2],
+    [true, 2],
+  ];
+  return (
+    <>
+      {seq.map(([mine, apl], i) => {
+        const x = 14 + i * 60;
+        const c = mine ? A : R;
+        return (
+          <g key={i}>
+            <rect x={x} y={30} width={52} height={64} rx={10} fill={PANEL} stroke={c} strokeWidth={1.5} />
+            <text x={x + 26} y={54} textAnchor="middle" fontSize={12} fontWeight={800} fill={c}>
+              {mine ? "Вы" : "Враг"}
+            </text>
+            {Array.from({ length: apl }, (_, k) => (
+              <circle key={k} cx={x + 26 - (apl - 1) * 7 + k * 14} cy={76} r={5} fill={c} />
+            ))}
+            {i < 4 && <path d={`M${x + 53} 62h6`} stroke={W} strokeWidth={1.5} />}
+          </g>
+        );
+      })}
+      <text x={160} y={118} textAnchor="middle" fontSize={11} fill={F2}>
+        точки — очки действий (AP), не больше APL
+      </text>
+      <Tag x={160} y={146}>
+        Активировал — оперативник «отработан»
+      </Tag>
+    </>
+  );
+}
+
+function KtOrders() {
+  return (
+    <>
+      <rect x={20} y={24} width={130} height={96} rx={12} fill={PANEL} />
+      <polygon points="85,38 103,56 85,74 67,56" fill={A} />
+      <text x={85} y={96} textAnchor="middle" fontSize={12.5} fontWeight={800} fill={A}>
+        Engage
+      </text>
+      <text x={85} y={112} textAnchor="middle" fontSize={10.5} fill={F2}>
+        атака и контрдействие
+      </text>
+      <rect x={170} y={24} width={130} height={96} rx={12} fill={PANEL} />
+      <polygon points="235,38 253,56 235,74 217,56" fill="none" stroke={W} strokeWidth={2.5} />
+      <text x={235} y={96} textAnchor="middle" fontSize={12.5} fontWeight={800} fill={W}>
+        Conceal
+      </text>
+      <text x={235} y={112} textAnchor="middle" fontSize={10.5} fill={F2}>
+        скрыт в укрытии
+      </text>
+      <text x={160} y={146} textAnchor="middle" fontSize={11} fill={F3}>
+        Приказ выбирают при каждой активации
+      </text>
+    </>
+  );
+}
+
+function KtMove({ ids }: { ids: Ids }) {
+  return (
+    <>
+      <Base x={36} y={40} />
+      <line x1={52} y1={40} x2={176} y2={40} stroke={A} strokeWidth={2} markerEnd={`url(#${ids.accent})`} />
+      <Tag x={112} y={22} c={A}>
+        Reposition 1AP: до Move
+      </Tag>
+      <Base x={36} y={86} />
+      <line x1={52} y1={86} x2={96} y2={86} stroke={A} strokeWidth={2} markerEnd={`url(#${ids.accent})`} />
+      <Tag x={150} y={86} c={A}>
+        Dash 1AP: до 3″
+      </Tag>
+      <CombatRange x={270} y={132} r={26} />
+      <Base x={270} y={132} c={R} />
+      <Base x={36} y={132} />
+      <line x1={52} y1={132} x2={230} y2={132} stroke={A} strokeWidth={2} markerEnd={`url(#${ids.accent})`} />
+      <Tag x={140} y={114} c={A}>
+        Charge 1AP: Move + 2″
+      </Tag>
+      <text x={270} y={172} textAnchor="middle" fontSize={10.5} fill={R}>
+        дистанция контроля 1″
+      </text>
+    </>
+  );
+}
+
+function KtCover() {
+  return (
+    <>
+      <Base x={36} y={70} />
+      <Base x={286} y={70} c={R} />
+      <path d="M248 48v44h12V48z" fill="#3A3A36" stroke="#5A5A54" strokeWidth={1.5} />
+      <circle cx={286} cy={70} r={26} fill="none" stroke={R} strokeDasharray="3 3" />
+      <line x1={52} y1={70} x2={244} y2={70} stroke={W} strokeWidth={1.6} strokeDasharray="5 4" />
+      <Tag x={150} y={52}>
+        Видит, но цель в укрытии
+      </Tag>
+      <text x={286} y={112} textAnchor="middle" fontSize={10.5} fill={F2}>
+        террейн в 1″
+      </text>
+      <KtDie x={60} y={124} v="✓" size={26} />
+      <KtDie x={92} y={124} v="?" ok={false} size={26} />
+      <KtDie x={124} y={124} v="?" ok={false} size={26} />
+      <text x={166} y={141} fontSize={11} fill={F2}>
+        1 кубик — сразу успех
+      </text>
+    </>
+  );
+}
+
+function KtShoot() {
+  return (
+    <>
+      <text x={14} y={30} fontSize={11} fontWeight={700} fill={A}>
+        Атака: Atk 4, Hit 3+
+      </text>
+      <KtDie x={14} y={40} v={6} crit />
+      <KtDie x={46} y={40} v={4} />
+      <KtDie x={78} y={40} v={3} />
+      <KtDie x={110} y={40} v={1} ok={false} />
+      <text x={170} y={30} fontSize={11} fontWeight={700} fill={R}>
+        Защита: 3 кубика, Save 4+
+      </text>
+      <KtDie x={170} y={40} v={5} />
+      <KtDie x={202} y={40} v={2} ok={false} />
+      <KtDie x={234} y={40} v={6} crit />
+      <text x={14} y={94} fontSize={11} fill={F2}>
+        <tspan fill={A} fontWeight={700}>
+          6
+        </tspan>{" "}
+        — критический успех,{" "}
+        <tspan fill={W} fontWeight={700}>
+          1
+        </tspan>{" "}
+        — всегда провал
+      </text>
+      <text x={14} y={114} fontSize={11} fill={F2}>
+        Обычный блок снимает обычный успех
+      </text>
+      <text x={14} y={132} fontSize={11} fill={F2}>
+        Критический блок — любой; 2 обычных — критический
+      </text>
+      <Tag x={160} y={154} c={A}>
+        Осталось 1 попадание → урон Dmg
+      </Tag>
+    </>
+  );
+}
+
+function KtFight() {
+  const seq: [string, string, string][] = [
+    ["Вы", "удар", A],
+    ["Враг", "блок", R],
+    ["Вы", "удар", A],
+    ["Враг", "удар", R],
+  ];
+  return (
+    <>
+      <circle cx={130} cy={60} r={27} fill="none" stroke={A} strokeDasharray="3 3" opacity={0.6} />
+      <Base x={130} y={60} />
+      <Base x={170} y={60} c={R} />
+      <Tag x={150} y={22}>
+        Враг в 1″ — бой
+      </Tag>
+      {seq.map(([p, a, c], i) => {
+        const x = 14 + i * 76;
+        return (
+          <g key={i}>
+            <rect x={x} y={100} width={68} height={42} rx={9} fill={PANEL} stroke={c} strokeWidth={1.2} />
+            <text x={x + 34} y={117} textAnchor="middle" fontSize={11} fontWeight={700} fill={c}>
+              {p}
+            </text>
+            <text x={x + 34} y={133} textAnchor="middle" fontSize={10.5} fill={F2}>
+              {a}
+            </text>
+          </g>
+        );
+      })}
+      <text x={160} y={162} textAnchor="middle" fontSize={11} fill={F3}>
+        по одному кубику по очереди, начиная с атакующего
+      </text>
+    </>
+  );
+}
+
+function KtObjective() {
+  const ops: [number, number, string, string][] = [
+    [124, 62, "2", A],
+    [126, 104, "2", A],
+    [198, 80, "3", R],
+  ];
+  return (
+    <>
+      <circle cx={160} cy={80} r={46} fill="none" stroke="rgba(232,184,74,.5)" strokeDasharray="4 4" />
+      <circle cx={160} cy={80} r={16} fill={GOLD} opacity={0.9} />
+      {ops.map(([x, y, apl, c]) => (
+        <g key={`${x}-${y}`}>
+          <Base x={x} y={y} c={c} />
+          <text x={x} y={y + 4} textAnchor="middle" fontSize={10} fontWeight={800} fill={c}>
+            {apl}
+          </text>
+        </g>
+      ))}
+      <Tag x={60} y={150} c={A}>
+        APL 2 + 2 = 4
+      </Tag>
+      <Tag x={260} y={150} c={R}>
+        APL 3
+      </Tag>
+      <text x={160} y={20} textAnchor="middle" fontSize={10.5} fill={GOLD}>
+        объект в 1″ от оперативника
+      </text>
+    </>
+  );
+}
+
 const HEIGHT: Record<TutorialDiagram, number> = {
   round: 200,
   profile: 160,
@@ -701,6 +1045,16 @@ const HEIGHT: Record<TutorialDiagram, number> = {
   aosFight: 176,
   aosAttack: 152,
   aosObjective: 176,
+  ktGame: 160,
+  ktCard: 176,
+  ktStrategy: 160,
+  ktFirefight: 160,
+  ktOrders: 160,
+  ktMove: 182,
+  ktCover: 166,
+  ktShoot: 168,
+  ktFight: 172,
+  ktObjective: 166,
 };
 
 const ALT: Record<TutorialDiagram, string> = {
@@ -724,6 +1078,16 @@ const ALT: Record<TutorialDiagram, string> = {
   aosFight: "Схема: зона боя 3 дюйма и подход до 3 дюймов",
   aosAttack: "Схема: профиль оружия и четыре шага атаки",
   aosObjective: "Схема: контроль объекта, сумма Control 3 против 2",
+  ktGame: "Схема: 4 переломных момента, в каждом фаза стратегии и перестрелки",
+  ktCard: "Схема: пример датакарты APL, Move, Save, Wounds и оружия Atk, Hit, Dmg",
+  ktStrategy: "Схема: бросок инициативы и очки команд",
+  ktFirefight: "Схема: игроки по очереди активируют оперативников",
+  ktOrders: "Схема: приказы Engage и Conceal",
+  ktMove: "Схема: Reposition, Dash и Charge, дистанция контроля 1 дюйм",
+  ktCover: "Схема: цель в укрытии, один кубик защиты сразу успех",
+  ktShoot: "Схема: кубики атаки против трёх кубиков защиты",
+  ktFight: "Схема: в ближнем бою игроки по очереди бьют или блокируют",
+  ktObjective: "Схема: контроль объекта по сумме APL, 4 против 3",
 };
 
 export default function TutorialDiagramView({ diagram }: { diagram: TutorialDiagram }) {
@@ -751,6 +1115,16 @@ export default function TutorialDiagramView({ diagram }: { diagram: TutorialDiag
     aosFight: <AosFight ids={ids} />,
     aosAttack: <AosAttack ids={ids} />,
     aosObjective: <AosObjective />,
+    ktGame: <KtGame />,
+    ktCard: <KtCard />,
+    ktStrategy: <KtStrategy />,
+    ktFirefight: <KtFirefight />,
+    ktOrders: <KtOrders />,
+    ktMove: <KtMove ids={ids} />,
+    ktCover: <KtCover />,
+    ktShoot: <KtShoot />,
+    ktFight: <KtFight />,
+    ktObjective: <KtObjective />,
   };
   const marker = (id: string, fill: string) => (
     <marker id={id} viewBox="0 0 10 10" refX={9} refY={5} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
