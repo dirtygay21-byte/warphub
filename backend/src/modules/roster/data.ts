@@ -16,7 +16,7 @@ export function rosterDataDir(): string {
 /** Проверка при старте: без данных раздел откроется, но покажет «Нет данных». */
 export function checkRosterData(): void {
   const dir = rosterDataDir();
-  const missing = ['index.json', 'battlefield.json', 'missions.json', 'aos/index.json', 'kt/index.json'].filter((f) => !fs.existsSync(path.join(dir, f)));
+  const missing = ['index.json', 'battlefield.json', 'missions.json', 'aos/index.json', 'kt/index.json', 'warcry/index.json'].filter((f) => !fs.existsSync(path.join(dir, f)));
   if (missing.length) console.warn(`[roster] Нет данных Roster Builder в ${dir}: ${missing.join(', ')}. Скопируйте backend/roster-data на сервер или задайте ROSTER_DATA_DIR.`);
 }
 
@@ -27,12 +27,14 @@ const gzCache = new Map<string, { mtime: number; body: Uint8Array }>();
  * Warhammer 40K: name — 'index', 'battlefield', 'missions' или код фракции (папка roster-data).
  * Age of Sigmar: name — 'index', 'battlepack' или код фракции (папка roster-data/aos).
  */
-export function readRosterData(name: string, system: '40k' | 'aos' | 'kt' = '40k'): { body: Uint8Array; gzip: boolean } | null {
+export function readRosterData(name: string, system: '40k' | 'aos' | 'kt' | 'warcry' = '40k'): { body: Uint8Array; gzip: boolean } | null {
   // Kill Team (W2 30.10.2026): 'index' или id команды из ktdash (AEL-BOK, IMP-TEMPAQ…) — файлы roster-data/kt/t
   if (system === 'kt' && !/^(index|[A-Z]{2,6}-[A-Z0-9]{2,8})$/.test(name)) return null;
+  // Warcry (W4 30.10.2026): 'index' или id фракции из warcry_data (blades-of-khorne-bloodbound, chaos…) — файлы roster-data/warcry/f
+  if (system === 'warcry' && !/^(index|[a-z][a-z0-9-]{1,59})$/.test(name)) return null;
   if (system === '40k' && !/^(index|battlefield|missions|[A-Za-z]{1,6})$/.test(name)) return null;
   if (system === 'aos' && !/^(index|battlepack|[A-Za-z]{1,6})$/.test(name)) return null;
-  const dir = system === 'aos' ? path.join(rosterDataDir(), 'aos') : system === 'kt' ? path.join(rosterDataDir(), 'kt') : rosterDataDir();
+  const dir = system === '40k' ? rosterDataDir() : path.join(rosterDataDir(), system);
   // AoS: battlepack — данные General's Handbook (батлпланы, тактики) рядом с index.json
   const top = name === 'index' || (system === '40k' && (name === 'battlefield' || name === 'missions')) || (system === 'aos' && name === 'battlepack');
   const file = top ? path.join(dir, `${name}.json`) : path.join(dir, system === 'kt' ? 't' : 'f', `${name}.json`);

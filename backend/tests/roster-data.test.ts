@@ -40,6 +40,17 @@ describe('roster data files', () => {
     expect(JSON.parse(new TextDecoder().decode(Bun.gunzipSync(t!.body))).operatives.length).toBeGreaterThan(0);
     for (const bad of ['../index', 'SE', 'battlepack', 'AEL-BOK/..', 't/AEL-BOK', '']) expect(readRosterData(bad, 'kt')).toBeNull();
   });
+  test('Warcry: index and faction files from roster-data/warcry', () => {
+    const idx = readRosterData('index', 'warcry');
+    expect(idx).not.toBeNull();
+    const json = JSON.parse(new TextDecoder().decode(Bun.gunzipSync(idx!.body)));
+    expect(json.system).toBe('warcry');
+    expect(json.factions.length).toBeGreaterThan(60);
+    const f = readRosterData('blades-of-khorne-bloodbound', 'warcry');
+    expect(f).not.toBeNull();
+    expect(JSON.parse(new TextDecoder().decode(Bun.gunzipSync(f!.body))).fighters.length).toBeGreaterThan(0);
+    for (const bad of ['../index', 'AEL-BOK', 'f/chaos', 'chaos/..', '.hidden', '']) expect(readRosterData(bad, 'warcry')).toBeNull();
+  });
   test('rejects paths outside the data folder', () => {
     for (const bad of ['../index', 'aos/index', '..', 'f/SM', 'index.json/..', '']) {
       expect(readRosterData(bad)).toBeNull();

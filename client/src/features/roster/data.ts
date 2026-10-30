@@ -2,6 +2,7 @@ import { apiRequest } from '@/apiUtils/general';
 import type { DataIndex, FactionData } from './engine/types';
 import type { AosBattlepack, AosFactionData, AosIndex } from './aos/types';
 import type { KtIndex, KtTeam } from './kt/types';
+import type { WarcryFaction, WarcryIndex } from './warcry/types';
 
 // Данные Wahapedia отдаёт backend (GET /roster/data/:name) — только пользователям с доступом.
 let indexPromise: Promise<DataIndex> | null = null;
@@ -182,4 +183,23 @@ export function loadKtTeam(id: string): Promise<KtTeam> {
     p.catch(() => ktCache.delete(id));
   }
   return ktCache.get(id)!;
+}
+
+// ---------- Warcry (backend: GET /roster/data/warcry/:name, W4 30.10.2026) ----------
+let warcryIndexPromise: Promise<WarcryIndex> | null = null;
+const warcryCache = new Map<string, Promise<WarcryFaction>>();
+
+export function loadWarcryIndex(): Promise<WarcryIndex> {
+  warcryIndexPromise ??= apiRequest<WarcryIndex>('/roster/data/warcry/index');
+  warcryIndexPromise.catch(() => (warcryIndexPromise = null));
+  return warcryIndexPromise;
+}
+
+export function loadWarcryFaction(id: string): Promise<WarcryFaction> {
+  if (!warcryCache.has(id)) {
+    const p = apiRequest<WarcryFaction>(`/roster/data/warcry/${encodeURIComponent(id)}`);
+    warcryCache.set(id, p);
+    p.catch(() => warcryCache.delete(id));
+  }
+  return warcryCache.get(id)!;
 }

@@ -8,6 +8,7 @@ import { sanitizeAosRoster } from './aos/roster';
 import type { Roster } from './engine/types';
 import type { AosRoster } from './aos/types';
 import { sanitizeKtRoster, type KtRoster } from './kt/roster';
+import { sanitizeWarcryRoster, type WarcryRoster } from './warcry/roster';
 
 // Ключи localStorage — свои у каждого аккаунта Telegram (на одном компьютере может быть несколько аккаунтов).
 const userSuffix = tg?.initDataUnsafe.user?.id ? `.${tg.initDataUnsafe.user.id}` : '';
@@ -212,5 +213,15 @@ export const loadKtRosters = storeKt.loadRosters;
 export const saveKtLocal = storeKt.saveLocal;
 export const saveKtRosters = storeKt.saveRosters;
 export const markKtDeleted = storeKt.markDeleted;
+
+// Warcry (W5 30.10.2026) — свои ключи
+const storeWarcry = createStore<WarcryRoster>(
+  { ls: 'warphub.warcry-rosters.v1', lsDel: 'warphub.warcry-rosters.deleted.v1', index: 'wb_index', del: 'wb_deleted', chunk: 'wb_' },
+  sanitizeWarcryRoster,
+);
+export const loadWarcryRosters = storeWarcry.loadRosters;
+export const saveWarcryLocal = storeWarcry.saveLocal;
+export const saveWarcryRosters = storeWarcry.saveRosters;
+export const markWarcryDeleted = storeWarcry.markDeleted;
 
 export const cloudEnabled = () => !!cs();

@@ -27,6 +27,9 @@ Mini App WarpHub (Telegram) и скрытый раздел Roster Builder (Warha
 >
 > **Kill Team (2024), решение владельца 30.10.2026:** источник — ktdash-v4-public (`prisma/seed-data.json`, лицензии нет),
 > импорт `scripts/import-ktdash.mjs` → `backend/roster-data/kt/`. Подробности — `tools/roster-data/README.md`.
+>
+> **Warcry, решение владельца 30.10.2026:** источник — krisling049/warcry_data (`data/`, лицензии нет),
+> импорт `scripts/import-warcry.mjs` → `backend/roster-data/warcry/`; правила построения варбанды — warcrier.net.
 
 1. **Приложение.** Сначала смотреть, что уже есть в данных и коде:
    `backend/roster-data/` (40K) и `backend/roster-data/aos/` (AoS), импортёры `tools/roster-data/scripts/`,
