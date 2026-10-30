@@ -30,12 +30,15 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import TableHoldSheet from "@/components/pages/Admin/TableHolds/TableHoldSheet";
+import UpcomingHolds from "@/components/pages/Admin/TableHolds/UpcomingHolds";
+import { DsButton } from "@/components/ui/ds";
 import { GameEditorModal } from "./GameEditorModal";
 import { emptyGameDraft } from "./gameDraft";
 
 const TABS = [
   { id: "games", label: "Игры" },
   { id: "trials", label: "Заявки «Хочу попробовать»" },
+  { id: "holds", label: "Брони столов" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -48,7 +51,7 @@ export default function AdminDnd() {
       <div className="mb-4">
         <h1 className="text-2xl font-semibold">D&D</h1>
         <p className="mt-1 text-sm text-fg-3">
-          Игры по расписанию и заявки на пробную игру
+          Игры по расписанию, заявки на пробную игру и брони столов
         </p>
       </div>
 
@@ -70,7 +73,7 @@ export default function AdminDnd() {
         ))}
       </div>
 
-      {tab === "games" ? <GamesTab /> : <TrialsTab />}
+      {tab === "games" ? <GamesTab /> : tab === "trials" ? <TrialsTab /> : <HoldsTab />}
     </div>
   );
 }
@@ -89,6 +92,24 @@ const STATUS_STYLES: Record<string, string> = {
   closed: "bg-yellow-400/15 text-yellow-200",
   cancelled: "bg-red-400/15 text-red-300",
 };
+
+/** Брони столов из раздела D&D (30.10.2026): та же бронь, что в «Столах Warhammer», по умолчанию — «Игра D&D». */
+function HoldsTab() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-fg-2">
+        Стол закрывается для записи игроков на выбранное время. Брони общие для всего клуба — их видно и в «Столах Warhammer».
+      </p>
+      <DsButton variant="primary" onClick={() => setOpen(true)} className="w-full">
+        <Lock className="size-4" />
+        Забронировать стол
+      </DsButton>
+      {open && <TableHoldSheet prefill={{ purpose: "dnd" }} onClose={() => setOpen(false)} />}
+      <UpcomingHolds focus="dnd" focusLabel="Только D&D" />
+    </div>
+  );
+}
 
 function GamesTab() {
   const gamesQuery = useQuery({

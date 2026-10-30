@@ -22,9 +22,15 @@ export type TableHoldView = {
   purpose: HoldPurpose;
   title: string;
   description: string | null;
+  /** кто бронирует (вписано администратором) */
+  reservedBy: string | null;
   dndGameId: number | null;
+  /** кто создал бронь в приложении */
+  createdBy: { telegramId: number; name: string | null; username: string | null };
   createdAt: string;
 };
+
+const creatorColumns = { firstName: usersTable.firstName, lastName: usersTable.lastName, username: usersTable.username };
 
 /** Занятость столов для записи игроков: столы ивентов + брони администратора. */
 export async function getTableBlocks(tableIds: number[], rangeStart: Date, rangeEnd: Date): Promise<EventTableBlock[]> {
@@ -39,7 +45,9 @@ export async function getTableBlocks(tableIds: number[], rangeStart: Date, range
   return [...events, ...holds];
 }
 
-const view = (row: typeof tableHoldsTable.$inferSelect, tableName: string): TableHoldView => ({
+type Creator = { firstName: string | null; lastName: string | null; username: string | null } | null;
+
+const view = (row: typeof tableHoldsTable.$inferSelect, tableName: string, creator: Creator): TableHoldView => ({
   id: row.id,
   tableId: row.tableId,
   tableName,
@@ -48,7 +56,13 @@ const view = (row: typeof tableHoldsTable.$inferSelect, tableName: string): Tabl
   purpose: row.purpose as HoldPurpose,
   title: row.title,
   description: row.description,
+  reservedBy: row.reservedBy,
   dndGameId: row.dndGameId,
+  createdBy: {
+    telegramId: row.createdByTelegramId,
+    name: creator ? [creator.firstName, creator.lastName].filter(Boolean).join(' ') || null : null,
+    username: creator?.username ?? null,
+  },
   createdAt: row.createdAt.toISOString(),
 });
 
@@ -58,12 +72,13 @@ export async function listTableHolds(range?: { from?: Date; to?: Date }): Promis
   const conditions = [gt(tableHoldsTable.endsAt, from)];
   if (range?.to) conditions.push(lt(tableHoldsTable.startsAt, range.to));
   const rows = await db
-    .select({ hold: tableHoldsTable, tableName: tablesTable.name })
+    .select({ hold: tableHoldsTable, tableName: tablesTable.name, creator: creatorColumns })
     .from(tableHoldsTable)
     .innerJoin(tablesTable, eq(tableHoldsTable.tableId, tablesTable.id))
+    .leftJoin(usersTable, eq(usersTable.telegramId, tableHoldsTable.createdByTelegramId))
     .where(and(...conditions))
     .orderBy(asc(tableHoldsTable.startsAt), asc(tableHoldsTable.tableId));
-  return rows.map((r) => view(r.hold, r.tableName));
+  return rows.map((r) => view(r.hold, r.tableName, r.creator));
 }
 
 export async function createTableHold(input: unknown, createdByTelegramId: number): Promise<TableHoldView> {
@@ -121,7 +136,8 @@ export async function createTableHold(input: unknown, createdByTelegramId: numbe
       .insert(tableHoldsTable)
       .values({ ...hold, createdByTelegramId })
       .returning();
-    return view(row!, table.name);
+    const [creator] = await tx.select(creatorColumns).from(usersTable).where(eq(usersTable.telegramId, createdByTelegramId));
+    return view(row!, table.name, creator ?? null);
   });
 }
 
@@ -134,9 +150,10 @@ export async function deleteTableHold(id: number): Promise<{ id: number }> {
 /** Для дневного расписания «Столы Warhammer»: брони, пересекающие смену. */
 export async function listHoldsBetween(openAt: Date, closeAt: Date, excludeId?: number): Promise<TableHoldView[]> {
   const rows = await db
-    .select({ hold: tableHoldsTable, tableName: tablesTable.name })
+    .select({ hold: tableHoldsTable, tableName: tablesTable.name, creator: creatorColumns })
     .from(tableHoldsTable)
     .innerJoin(tablesTable, eq(tableHoldsTable.tableId, tablesTable.id))
+    .leftJoin(usersTable, eq(usersTable.telegramId, tableHoldsTable.createdByTelegramId))
     .where(
       and(
         lt(tableHoldsTable.startsAt, closeAt),
@@ -145,5 +162,5 @@ export async function listHoldsBetween(openAt: Date, closeAt: Date, excludeId?: 
       ),
     )
     .orderBy(asc(tableHoldsTable.startsAt));
-  return rows.map((r) => view(r.hold, r.tableName));
+  return rows.map((r) => view(r.hold, r.tableName, r.creator));
 }
