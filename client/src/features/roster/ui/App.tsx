@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { loadAosIndex, loadIndex } from '../data';
 import { loadAosRosters, loadRosters, markAosDeleted, markDeleted, saveAosLocal, saveAosRosters, saveLocal, saveRosters } from '../storage';
-import { closeTopOverlay, haptic, tg } from '../telegram';
+import { closeTopOverlay, tg } from '../telegram';
 import type { DataIndex, Roster } from '../engine/types';
 import type { AosIndex, AosRoster } from '../aos/types';
 import { RosterList } from './RosterList';
 import { AosList } from './aos/AosList';
 import { AosEditor } from './aos/AosEditor';
-import { Segmented } from './kit';
+import { Home, type GameSystem } from './Home';
 import { RosterEditor } from './RosterEditor';
 import { Battlefield } from './Battlefield';
 import { GameScreen } from './game/GameScreen';
@@ -17,6 +17,7 @@ import { AosTestArmyScreen } from './testarmy/AosTestArmyScreen';
 import { Rules } from './Rules';
 
 type Route =
+  | { screen: 'home' }
   | { screen: 'list' }
   | { screen: 'editor'; id: string }
   | { screen: 'aos-editor'; id: string }
@@ -27,7 +28,6 @@ type Route =
   | { screen: 'aos-game'; back: Route; rosterId?: string }
   | { screen: 'aos-test-army'; back: Route; rosterId?: string };
 
-type GameSystem = '40k' | 'aos';
 const SYSTEM_KEY = 'warphub.roster.system';
 const readSystem = (): GameSystem => {
   try {
@@ -72,7 +72,7 @@ function usePersist<T>(saveLocalFn: (l: T[]) => void, saveCloudFn: (l: T[]) => v
   return persist;
 }
 
-/** Roster Builder внутри WarpHub. onExit — вернуться в приложение (кнопка «Назад» на списке ростеров). */
+/** WarpBuilder (бывший Roster Builder) внутри WarpHub. onExit — вернуться в приложение (кнопка «Назад» на списке ростеров). */
 export function RosterBuilder({ onExit }: { onExit: () => void }) {
   const [system, setSystemState] = useState<GameSystem>(readSystem);
   const [index, setIndex] = useState<DataIndex | null>(null);
@@ -80,7 +80,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [rosters, setRosters] = useState<Roster[] | null>(null);
   const [aosRosters, setAosRosters] = useState<AosRoster[] | null>(null);
-  const [route, setRoute] = useState<Route>({ screen: 'list' });
+  const [route, setRoute] = useState<Route>({ screen: 'home' });
 
   const setSystem = (s: GameSystem) => {
     setError(null);
@@ -130,11 +130,12 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
 
   const goList = useCallback(() => setRoute({ screen: 'list' }), []);
   const goBack = useCallback(() => setRoute((r) => ('back' in r ? r.back : { screen: 'list' })), []);
+  const goHome = useCallback(() => setRoute({ screen: 'home' }), []);
 
   // кнопка «Назад» Telegram: из ростера — к списку, из правил/поля — туда, откуда пришли, со списка — в WarpHub
   useEffect(() => {
     if (!tg) return;
-    const nav = route.screen === 'list' ? onExit : route.screen === 'editor' || route.screen === 'aos-editor' ? goList : goBack;
+    const nav = route.screen === 'home' ? onExit : route.screen === 'list' ? goHome : route.screen === 'editor' || route.screen === 'aos-editor' ? goList : goBack;
     // сначала закрывается открытая шторка, и только потом — экран
     const handler = () => {
       if (!closeTopOverlay()) nav();
@@ -145,7 +146,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
       tg!.BackButton.offClick(handler);
       tg!.BackButton.hide();
     };
-  }, [route, goList, goBack, onExit]);
+  }, [route, goList, goBack, goHome, onExit]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -167,6 +168,18 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
       </Centered>
     );
   }
+  if (route.screen === 'home' && rosters && aosRosters) {
+    return (
+      <Home
+        onExit={onExit}
+        rosters={rosters}
+        aosRosters={aosRosters}
+        aosIndex={aosIndex}
+        onGame={(g) => (setSystem(g), setRoute({ screen: 'list' }))}
+        onOpen={(g, id) => (setSystem(g), setRoute(g === '40k' ? { screen: 'editor', id } : { screen: 'aos-editor', id }))}
+      />
+    );
+  }
   if ((system === '40k' ? !index : !aosIndex) || !rosters || !aosRosters) {
     return (
       <Centered>
@@ -175,17 +188,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
     );
   }
 
-  const switcher = (
-    <Segmented
-      className="mb-4"
-      value={system}
-      onChange={(s) => (haptic.select(), setSystem(s))}
-      options={[
-        { value: '40k', label: 'Warhammer 40,000' },
-        { value: 'aos', label: 'Age of Sigmar' },
-      ]}
-    />
-  );
+  const switcher = null;
 
   if (route.screen === 'aos-test-army' && aosIndex) {
     return <AosTestArmyScreen onBack={goBack} rosters={aosRosters!} index={aosIndex} initialRosterId={route.rosterId} />;
@@ -223,7 +226,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   if (system === 'aos' && aosIndex) {
     return (
       <AosList
-        onExit={onExit}
+        onExit={goHome}
         switcher={switcher}
         index={aosIndex}
         rosters={aosRosters!}
@@ -286,7 +289,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
 
   return (
     <RosterList
-      onExit={onExit}
+      onExit={goHome}
       switcher={switcher}
       onRules={() => setRoute({ screen: 'rules', back: route })}
       onStartGame={() => setRoute({ screen: 'game', back: route })}

@@ -4,6 +4,9 @@ import { getDisciplines } from "@/apiUtils/disciplines";
 import { useReservationStore } from "@/stores/useReservationStore";
 import { useQuery } from "@tanstack/react-query";
 import { s3Url } from "@/utils/s3utils";
+import { getRosterAccess } from "@/apiUtils/roster";
+import { ChevronRight, Swords } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function HomeStage() {
   const { nextStage } = useRegistrationStageStore();
@@ -13,6 +16,9 @@ export default function HomeStage() {
     queryKey: ["disciplines"],
     queryFn: getDisciplines,
   });
+  // WarpBuilder — скрытый раздел: карточка только у тех, у кого есть доступ по коду (как в профиле и боковом меню)
+  const navigate = useNavigate();
+  const rosterAccess = useQuery({ queryKey: ["roster-access"], queryFn: getRosterAccess, retry: false });
 
   const handleRegistartionClick = (disciplineId: number | null = null) => {
     setDisciplineId(disciplineId);
@@ -44,6 +50,22 @@ export default function HomeStage() {
                 </QuickSelectionButton>
               ))}
           </div>
+          {rosterAccess.data?.hasAccess && (
+            <button
+              type="button"
+              onClick={() => navigate("/roster")}
+              className="mt-1 flex w-full items-center gap-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3.5 text-left transition-all duration-300 active:scale-95"
+            >
+              <span className="flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+                <Swords className="size-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-lg font-medium">WarpBuilder</span>
+                <span className="block text-xs text-white/55">Ростеры и игры: 40K, Age of Sigmar · скоро Kill Team и Warcry</span>
+              </span>
+              <ChevronRight className="size-5 text-accent" />
+            </button>
+          )}
         </section>
       </div>
     </>

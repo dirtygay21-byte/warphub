@@ -65,7 +65,7 @@ export function exportAos(r: AosRoster, L: AosLookup): string {
     const t = L.ws.get(r.terrainId);
     if (t) out.push('Faction Terrain', `${t.name} (${pts(t.cost ?? 0)})`, '');
   }
-  out.push(`Created with WarpHub Roster Builder (data: Wahapedia, ${r.dataVersion ?? '?'})`);
+  out.push(`Created with WarpHub WarpBuilder (data: Wahapedia, ${r.dataVersion ?? '?'})`);
   return out.join('\n');
 }
 
