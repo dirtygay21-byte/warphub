@@ -19,7 +19,7 @@ import {
 } from "./TableSelection/SessionCards";
 import TableStateMessage from "./TableSelection/TableStateMessage";
 import { getDateKey, getToday, isDateInSchedule } from "./TableSelection/utils";
-import { getWindowLimit, minFreeSeats } from "@/utils/slots";
+import { getWindowLimit, maxFreeSeats } from "@/utils/slots";
 import { DsButton } from "@/components/ui/ds";
 import { pluralizeRu } from "@/utils/plural";
 
@@ -142,7 +142,9 @@ export default function TableSelectionStage() {
       window: { startsAt: first.startsAt, endsAt: last.endsAt },
       segments: poolSlot.segments,
       capacity: service.poolCapacity ?? poolSlot.table.seatCapacity,
-      freeSeats: minFreeSeats(poolSlot.segments),
+      // посещение: свободно хоть когда-то за день (закрытие на D&D — только на время игры + 1 ч, 31.10.2026);
+      // время прихода дальше выбирается только из свободных интервалов
+      freeSeats: maxFreeSeats(poolSlot.segments),
       minMinutes: service.minDuration,
     });
     nextStage();
@@ -172,7 +174,7 @@ export default function TableSelectionStage() {
     }
 
     if (service.mode === "pool" && isClubVisit) {
-      const free = poolSlot ? minFreeSeats(poolSlot.segments) : 0;
+      const free = poolSlot ? maxFreeSeats(poolSlot.segments) : 0;
       const maxVisitors = Math.max(
         1,
         Math.min(service.visitorsCapacity ?? free, free),
