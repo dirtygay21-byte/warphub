@@ -3,7 +3,8 @@ import { formatClubTime, formatClubTimeRange } from "@/utils/clubTime";
 import { getWindowLimit, hoursLabel } from "@/utils/slots";
 import { formatDurationLabel } from "@/utils/duration";
 import clsx from "clsx";
-import { ChevronDown, ChevronRight, GraduationCap, Swords, UserRound, UsersRound } from "lucide-react";
+import { ChevronDown, ChevronRight, GraduationCap, Swords, UsersRound } from "lucide-react";
+import { PlayerInfo } from "@/components/booking/PlayerInfo";
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { Badge, DsButton } from "@/components/ui/ds";
@@ -35,7 +36,7 @@ export function TrainerBadge({ players }: { players: number }) {
   );
 }
 
-/** Игра 1/2: свёрнутая карточка (время, игрок, игра); по нажатию — армия, очки, опыт и «Присоединиться» */
+/** Игра 1/2: свёрнутая карточка (время, игрок, игра); по нажатию — игроки (ник, армия, очки, опыт) и «Присоединиться» */
 export function OpenSessionCard({
   session,
   hasTrainer,
@@ -79,27 +80,8 @@ export function OpenSessionCard({
           )}
           <ul className="space-y-2">
             {session.players.map((player, index) => (
-              <li key={index} className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
-                <p className="flex items-center gap-2 text-sm font-semibold">
-                  <UserRound className="size-4 text-accent" />
-                  {player.firstName}
-                </p>
-                {player.army && (
-                  <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
-                    <dt className="text-fg-3">Игра</dt>
-                    <dd className="text-fg">{player.gameLabel ?? "Warhammer 40,000"}</dd>
-                    <dt className="text-fg-3">{player.game === "kt" ? "Команда" : player.game === "warcry" ? "Варбанда" : "Армия"}</dt>
-                    <dd className="text-fg">{player.army}</dd>
-                    {player.points != null && (
-                      <>
-                        <dt className="text-fg-3">Очки</dt>
-                        <dd className="text-fg">{player.points}</dd>
-                      </>
-                    )}
-                    <dt className="text-fg-3">Опыт</dt>
-                    <dd className="text-fg">{player.experienceLabel}</dd>
-                  </dl>
-                )}
+              <li key={index}>
+                <PlayerInfo player={player} />
               </li>
             ))}
           </ul>
