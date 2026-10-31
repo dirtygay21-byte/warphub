@@ -9,6 +9,7 @@ import { CardSheet } from './CardSheet';
 import { CardViewerContext, MySeatContext, RosterViewerContext } from './cardViewer';
 import { OnlineBar, OnlineStart } from './Online';
 import { SavedGames } from './SavedGames';
+import { DominatusCampaign } from './DominatusCampaign';
 import { rosterRefFor } from './players';
 import { RosterViewer } from './RosterViewer';
 import { StepAgendas, StepCampaign } from './StepDominatus';
@@ -156,6 +157,8 @@ const writeMaster = (on: boolean) => {
 function StartCard({ game, onStart, onStartOnline, starting }: { game: GameHook; onStart: (mode: GameMode) => void; onStartOnline: (mode: GameMode) => Promise<void>; starting: boolean }) {
   const [list, setList] = useState(false);
   const closeList = useCallback(() => setList(false), []);
+  const [campaign, setCampaign] = useState(false);
+  const closeCampaign = useCallback(() => setCampaign(false), []);
   // DM1 (решение владельца 31.10.2026): «Начать подготовку» открывает выбор режима — обычная игра или Dominatus
   const [picking, setPicking] = useState<'local' | 'online' | null>(null);
   const resolveOnline = useRef<(() => void) | null>(null);
@@ -166,6 +169,7 @@ function StartCard({ game, onStart, onStartOnline, starting }: { game: GameHook;
     else if (where === 'online') void onStartOnline(mode).finally(() => resolveOnline.current?.());
   };
   if (list) return <SavedGames game={game} onClose={closeList} />;
+  if (campaign) return <DominatusCampaign onClose={closeCampaign} />;
   const count = game.library?.length ?? 0;
   const unfinished = game.library?.filter((e) => e.summary?.stage !== 'finished').length ?? 0;
   return (
@@ -182,6 +186,20 @@ function StartCard({ game, onStart, onStartOnline, starting }: { game: GameHook;
         </span>
         <Icon name="chevron" className="size-4 text-fg-3" />
       </button>
+      {game.data?.dominatus && (
+        <button
+          type="button"
+          onClick={() => setCampaign(true)}
+          className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left active:bg-white/10"
+        >
+          <Icon name="map" className="size-5 text-accent" />
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-lg font-semibold uppercase leading-tight">Кампания Dominatus</span>
+            <span className="block text-[12px] text-fg-3">Фазы, альянсы, мои карты, битвы</span>
+          </span>
+          <Icon name="chevron" className="size-4 text-fg-3" />
+        </button>
+      )}
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
         <p className="mt-1 text-sm leading-snug text-fg-2">

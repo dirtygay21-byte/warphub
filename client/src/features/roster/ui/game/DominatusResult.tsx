@@ -3,6 +3,7 @@ import { AGENDA_ACHIEVED_VP, dominatusRewards } from '../../dominatus/rewards';
 import { haptic } from '../../telegram';
 import { Segmented } from '../kit';
 import { ActAs } from './ActAs';
+import { RecordBattle } from './DominatusCampaign';
 import type { GameHook } from './useGame';
 
 const SEATS: Seat[] = ['p1', 'p2'];
@@ -70,6 +71,7 @@ export function DominatusResult({ game }: { game: GameHook }) {
         Карты Agenda Achieved — держать не больше 3. Контроль локации{location ? ` «${location.name}» (бонус ${location.bonus})` : ''}, Ascendancy и Relics — в
         конце фазы кампании.
       </p>
+      <RecordBattle game={game} />
     </div>
   );
 }

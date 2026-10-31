@@ -4,6 +4,7 @@ import { agendasFor, upgradeLimit, type AllianceId, type CampaignPhase, type Dom
 import { haptic } from '../../telegram';
 import { Button, Field, Segmented } from '../kit';
 import { ActAs } from './ActAs';
+import { CampaignFill } from './DominatusCampaign';
 import { useOpenCard } from './cardViewer';
 import type { GameHook } from './useGame';
 
@@ -36,6 +37,7 @@ export function StepCampaign({ game, onNext }: { game: GameHook; onNext: () => v
 
   return (
     <div className="mt-3 space-y-4">
+      <CampaignFill game={game} onPhase={setPhase} />
       <Field label="Фаза кампании">
         <Segmented
           value={String(phase) as '1' | '2' | '3'}

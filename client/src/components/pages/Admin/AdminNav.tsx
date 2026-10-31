@@ -8,6 +8,7 @@ import {
   Dice5,
   Gift,
   KeyRound,
+  Map as MapIcon,
   Newspaper,
   ShieldCheck,
   Swords,
@@ -34,6 +35,7 @@ const GROUPS: { title: string; items: Section[] }[] = [
       { path: "/admin/content", label: "Контент", sub: "Ивенты и новости", icon: Newspaper },
       { path: "/admin/rewards", label: "Награды", sub: "Скидки за мини-игры", icon: Gift },
       { path: "/admin/supporters", label: "Поддержка клуба", sub: "Особые звания и рамки аватара", icon: Crown },
+      { path: "/admin/dominatus", label: "Dominatus", sub: "Кампания 40K: игроки, альянсы, фазы", icon: MapIcon },
     ],
   },
   {
