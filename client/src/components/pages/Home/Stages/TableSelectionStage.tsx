@@ -4,7 +4,8 @@ import { useBookingOptions } from "@/hooks/useBookingOptions";
 import { useRegistrationStageStore } from "@/stores/useRegistrationStageStore";
 import { useReservationStore } from "@/stores/useReservationStore";
 import { useQuery } from "@tanstack/react-query";
-import { Info, Swords } from "lucide-react";
+import { Dices, Info, Swords } from "lucide-react";
+import { formatClubTimeRange } from "@/utils/clubTime";
 import { useEffect, useMemo, useState } from "react";
 import DateSelector from "./TableSelection/DateSelector";
 import ScheduleUnavailableMessage from "./TableSelection/ScheduleUnavailableMessage";
@@ -371,7 +372,22 @@ export default function TableSelectionStage() {
           scheduleWeekdays={allowedWeekdays}
         />
       ) : (
-        renderContent()
+        <>
+          {/* игра D&D закрывает весь клуб с часом после игры (31.10.2026) */}
+          {availability?.closures.map((closure) => (
+            <div
+              key={`${closure.startsAt}-${closure.endsAt}`}
+              className="flex gap-3 rounded-[16px] border border-warn/40 bg-warn/10 px-4 py-3 text-sm text-fg"
+            >
+              <Dices className="mt-0.5 size-4 shrink-0 text-warn" />
+              <p>
+                Клуб закрыт {formatClubTimeRange(closure.startsAt, closure.endsAt)}: игра D&D «{closure.title}». В это время
+                записаться нельзя.
+              </p>
+            </div>
+          ))}
+          {renderContent()}
+        </>
       )}
 
       <div className="flex gap-3 rounded-[16px] border border-white/10 bg-app-elevated px-4 py-3 text-[13px] text-fg-2">

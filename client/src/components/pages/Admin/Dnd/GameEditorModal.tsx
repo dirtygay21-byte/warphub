@@ -15,13 +15,15 @@ import {
   MultiChoiceChips,
 } from "@/components/booking/FormControls";
 import { useBookingOptions } from "@/hooks/useBookingOptions";
-import { fromClubDatetimeLocal } from "@/utils/clubTime";
+import { formatClubTime, fromClubDatetimeLocal } from "@/utils/clubTime";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { ImagePlus, LoaderCircle, X } from "lucide-react";
 import { useState } from "react";
 import {
   emptyGameDraft,
+  DND_CLOSURE_BUFFER_HOURS,
+  DND_HOURS,
   GAME_TYPE_PRESETS,
   gameToDraft,
   type GameDraft,
@@ -34,15 +36,19 @@ const validateDraft = (draft: GameDraft): string | null => {
     if (!draft.daysOfWeek.length) return "Выберите хотя бы один день недели";
     if (!draft.timesOfDay.length) return "Выберите время суток";
   } else if (!draft.startsAt) return "Укажите дату и время начала";
-  else if (draft.endsAt && draft.endsAt <= draft.startsAt) {
-    return "Окончание должно быть позже начала";
-  }
+  else if (!draft.hours) return "Выберите длительность игры";
   const capacity = Number(draft.capacity);
   if (!Number.isInteger(capacity) || capacity < 1 || capacity > 100) {
     return "Мест — целое число от 1 до 100";
   }
   return null;
 };
+
+/** Конец игры (ISO): начало + выбранные часы */
+const dndEnd = (draft: GameDraft) =>
+  draft.startsAt && draft.hours
+    ? new Date(new Date(fromClubDatetimeLocal(draft.startsAt)).getTime() + Number(draft.hours) * 3_600_000).toISOString()
+    : null;
 
 const draftToPayload = (draft: GameDraft): DndGamePayload => ({
   title: draft.title.trim(),
@@ -51,7 +57,7 @@ const draftToPayload = (draft: GameDraft): DndGamePayload => ({
   ...(draft.timeMode === "exact"
     ? {
         startsAt: fromClubDatetimeLocal(draft.startsAt),
-        endsAt: draft.endsAt ? fromClubDatetimeLocal(draft.endsAt) : null,
+        endsAt: dndEnd(draft)!,
         daysOfWeek: [],
         timesOfDay: [],
       }
@@ -238,7 +244,7 @@ export function GameEditorModal({
               </Field>
             </>
           ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-4">
             <Field label="Начало (время клуба)">
               <input
                 type="datetime-local"
@@ -247,14 +253,20 @@ export function GameEditorModal({
                 className={clsx(inputClassName, "[color-scheme:dark]")}
               />
             </Field>
-            <Field label="Окончание (необязательно)">
-              <input
-                type="datetime-local"
-                value={draft.endsAt}
-                onChange={(event) => set({ endsAt: event.target.value })}
-                className={clsx(inputClassName, "[color-scheme:dark]")}
+            <Field label="Длительность игры" hint="Клуб закрыт на всё время игры и ещё на час после: записаться на столы, покраску и посещение нельзя.">
+              <ChoiceChips
+                columns={4}
+                options={DND_HOURS.map((h) => ({ value: h, label: `${h} ч` }))}
+                value={draft.hours}
+                onChange={(hours) => set({ hours })}
               />
             </Field>
+            {draft.startsAt && draft.hours && (
+              <p className="rounded-[14px] border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-fg">
+                Игра {formatClubTime(fromClubDatetimeLocal(draft.startsAt))}–{formatClubTime(dndEnd(draft)!)} · клуб закрыт до{" "}
+                <b>{formatClubTime(new Date(new Date(dndEnd(draft)!).getTime() + DND_CLOSURE_BUFFER_HOURS * 3_600_000))}</b> (+1 ч)
+              </p>
+            )}
           </div>
           )}
 
