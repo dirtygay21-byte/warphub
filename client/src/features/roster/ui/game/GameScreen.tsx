@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { DataIndex, Roster } from '../../engine/types';
-import { currentSetupStep, setupSteps, type EventBody, type Seat, type SetupStepId } from '../../game';
+import { currentSetupStep, setupSteps, type EventBody, type GameMode, type Seat, type SetupStepId } from '../../game';
 import { pushOverlay } from '../../telegram';
 import { Battlefield } from '../Battlefield';
-import { Button, Icon, IconButton } from '../kit';
+import { Button, Icon, IconButton, Sheet } from '../kit';
 import { cx } from '../util';
 import { CardSheet } from './CardSheet';
 import { CardViewerContext, MySeatContext, RosterViewerContext } from './cardViewer';
@@ -11,6 +11,7 @@ import { OnlineBar, OnlineStart } from './Online';
 import { SavedGames } from './SavedGames';
 import { rosterRefFor } from './players';
 import { RosterViewer } from './RosterViewer';
+import { StepAgendas, StepCampaign } from './StepDominatus';
 import { StepDispositions } from './StepDispositions';
 import { StepLayout } from './StepLayout';
 import { StepRoles } from './StepRoles';
@@ -35,16 +36,16 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
     const ref = r && data ? await rosterRefFor(r, 'own', data.battlefield) : null;
     return ref && typeof ref !== 'string' ? [{ type: 'player-set', target: 'p1', patch: { roster: ref } }] : [];
   };
-  const start = async () => {
+  const start = async (mode: GameMode) => {
     setStarting(true);
     const initial = await initialEvents();
     setStarting(false);
-    game.newGame({}, initial);
+    game.newGame({}, initial, mode);
   };
   // два телефона (T3): создатель — игрок 1, его ростер из меню — так же первым событием
-  const startOnline = async () => {
+  const startOnline = async (mode: GameMode) => {
     setStarting(true);
-    await game.startOnline(await initialEvents());
+    await game.startOnline(await initialEvents(), mode);
     setStarting(false);
   };
   // режим мастера (G2.12): ростеры игроков можно открыть для просмотра; запоминается на этом телефоне
@@ -86,7 +87,13 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
     <CardViewerContext.Provider value={openCard}>
       <RosterViewerContext.Provider value={master ? openRoster : null}>
        <MySeatContext.Provider value={game.online?.seat ?? null}>
-        <Shell onBack={state || game.online ? game.closeGame : onBack} undo={state && game.canUndo ? game.undo : undefined} master={master} onMaster={toggleMaster}>
+        <Shell
+          onBack={state || game.online ? game.closeGame : onBack}
+          undo={state && game.canUndo ? game.undo : undefined}
+          master={master}
+          onMaster={toggleMaster}
+          kicker={state?.mode === 'dominatus' ? dominatusKicker(game) : undefined}
+        >
           <OnlineBar game={game} />
           {game.online && !state ? (
             <div className="mx-auto mt-16 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
@@ -146,9 +153,18 @@ const writeMaster = (on: boolean) => {
  * Начало: новая игра на одном телефоне, игра на двух телефонах и кнопка «Сохранённые игры» — список с датой,
  * игроками и миссиями (новая игра старые не затирает).
  */
-function StartCard({ game, onStart, onStartOnline, starting }: { game: GameHook; onStart: () => void; onStartOnline: () => Promise<void>; starting: boolean }) {
+function StartCard({ game, onStart, onStartOnline, starting }: { game: GameHook; onStart: (mode: GameMode) => void; onStartOnline: (mode: GameMode) => Promise<void>; starting: boolean }) {
   const [list, setList] = useState(false);
   const closeList = useCallback(() => setList(false), []);
+  // DM1 (решение владельца 31.10.2026): «Начать подготовку» открывает выбор режима — обычная игра или Dominatus
+  const [picking, setPicking] = useState<'local' | 'online' | null>(null);
+  const resolveOnline = useRef<(() => void) | null>(null);
+  const pick = (mode: GameMode) => {
+    const where = picking;
+    setPicking(null);
+    if (where === 'local') onStart(mode);
+    else if (where === 'online') void onStartOnline(mode).finally(() => resolveOnline.current?.());
+  };
   if (list) return <SavedGames game={game} onClose={closeList} />;
   const count = game.library?.length ?? 0;
   const unfinished = game.library?.filter((e) => e.summary?.stage !== 'finished').length ?? 0;
@@ -169,16 +185,71 @@ function StartCard({ game, onStart, onStartOnline, starting }: { game: GameHook;
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
         <p className="mt-1 text-sm leading-snug text-fg-2">
-          Подготовка по шагам правил Chapter Approved 2026–27: игроки и ростеры, типы армий, раскладка, атакующий и защитник, вторичные миссии, первый ход.
+          Сначала выберите режим: обычная партия 11-й редакции (Chapter Approved 2026–27) или битва кампании Dominatus. Дальше — подготовка по шагам правил: игроки и ростеры, типы армий, раскладка, атакующий и защитник, вторичные миссии, первый ход.
           Затем — трекер партии. Игра сохраняется на этом телефоне после каждого действия и появляется в «Сохранённых играх».
         </p>
-        <Button variant="primary" className="mt-3 w-full" disabled={starting} onClick={onStart}>
+        <Button variant="primary" className="mt-3 w-full" disabled={starting} onClick={() => setPicking('local')}>
           Начать подготовку
         </Button>
       </div>
-      <OnlineStart game={game} onCreate={onStartOnline} busy={starting} />
+      <OnlineStart
+        game={game}
+        busy={starting}
+        onCreate={() =>
+          new Promise<void>((resolve) => {
+            resolveOnline.current = resolve;
+            setPicking('online');
+          })
+        }
+      />
+      <ModeSheet
+        open={picking !== null}
+        dominatus={!!game.data?.dominatus}
+        onClose={() => {
+          setPicking(null);
+          resolveOnline.current?.();
+        }}
+        onPick={pick}
+      />
     </section>
   );
+}
+
+/** Выбор режима игры (DM1): обычная партия 11-й редакции или битва кампании Dominatus — дальше правила ветвятся. */
+function ModeSheet({ open, dominatus, onClose, onPick }: { open: boolean; dominatus: boolean; onClose: () => void; onPick: (mode: GameMode) => void }) {
+  const option = (mode: GameMode, title: string, text: string, disabled = false) => (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => onPick(mode)}
+      className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left active:bg-white/10 disabled:opacity-50"
+    >
+      <span className="font-display block text-lg font-semibold uppercase leading-tight">{title}</span>
+      <span className="mt-0.5 block text-[13px] leading-snug text-fg-2">{text}</span>
+    </button>
+  );
+  return (
+    <Sheet open={open} onClose={onClose} title="Режим игры">
+      <div className="space-y-2">
+        {option('standard', 'Warhammer 40,000 · 11-я редакция', 'Обычная партия по колоде миссий Chapter Approved 2026–27.')}
+        {option(
+          'dominatus',
+          'Dominatus',
+          dominatus
+            ? 'Битва нарративной кампании: фаза и локация, альянсы, Agenda вместо основной миссии, улучшения и награды после битвы.'
+            : 'Данные Dominatus не загрузились — попробуйте позже.',
+          !dominatus,
+        )}
+      </div>
+    </Sheet>
+  );
+}
+
+/** Подпись в шапке для битвы Dominatus: фаза и локация. */
+function dominatusKicker(game: GameHook): string {
+  const d = game.state!.dominatus!;
+  const loc = game.data?.dominatus?.locations.find((l) => l.id === d.locationId);
+  return ['Dominatus', d.phase ? `фаза ${d.phase}` : null, loc?.name].filter(Boolean).join(' · ');
 }
 
 function Setup({ game, rosters, index }: { game: GameHook; rosters: Roster[]; index: DataIndex }) {
@@ -236,20 +307,22 @@ function Setup({ game, rosters, index }: { game: GameHook; rosters: Roster[]; in
 /** Содержимое открытого шага. */
 function StepBody({ id, game, rosters, index, onNext }: { id: SetupStepId; game: GameHook; rosters: Roster[]; index: DataIndex; onNext: () => void }) {
   if (id === 'players') return <StepPlayers game={game} rosters={rosters} index={index} onNext={onNext} />;
+  if (id === 'campaign') return <StepCampaign game={game} onNext={onNext} />;
   if (id === 'dispositions') return <StepDispositions game={game} onNext={onNext} />;
+  if (id === 'agendas') return <StepAgendas game={game} onNext={onNext} />;
   if (id === 'layout') return <StepLayout game={game} onNext={onNext} />;
   if (id === 'roles') return <StepRoles game={game} onNext={onNext} />;
   if (id === 'secondaries') return <StepSecondaries game={game} onNext={onNext} />;
   return <StepStart game={game} index={index} />;
 }
 
-function Shell({ onBack, undo, master, onMaster, children }: { onBack: () => void; undo?: () => void; master?: boolean; onMaster?: () => void; children: ReactNode }) {
+function Shell({ onBack, undo, master, onMaster, kicker, children }: { onBack: () => void; undo?: () => void; master?: boolean; onMaster?: () => void; kicker?: string; children: ReactNode }) {
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-24 pt-5 lg:max-w-4xl lg:pt-8">
       <header className="mb-4 flex items-end gap-3">
         <IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" />
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Chapter Approved 2026–27</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{kicker ?? 'Chapter Approved 2026–27'}</p>
           <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Начать игру</h1>
         </div>
         {onMaster && (

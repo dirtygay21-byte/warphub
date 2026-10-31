@@ -38,15 +38,34 @@ export function blockTurnOk(turn: BlockTurn | undefined, ownTurn: boolean, lastT
  * «Конец фазы командования» засчитывается, пока идёт ваша фаза командования; own-command-r5-turn в 5-м раунде —
  * в конце вашего хода. Без at — как раньше (по раундам блока).
  */
-export function primaryAtOk(at: PrimaryAt | undefined, ctx: { end: boolean; step: TurnStep; ownTurn: boolean; round: Round }): boolean {
+export function primaryAtOk(
+  at: PrimaryAt | undefined,
+  ctx: { end: boolean; step: TurnStep; ownTurn: boolean; round: Round; /** ход второго игрока раунда (DM1) */ lastTurnOfRound?: boolean },
+): boolean {
   if (!at) return true;
   if (ctx.end) return at === 'battle-end';
   if (at === 'battle-end') return false;
   if (at === 'any-turn') return ctx.step === 'main';
+  // конец раунда (Agenda Dominatus): после фаз хода игрока, ходящего вторым, — засчитывают оба
+  if (at === 'round-end') return ctx.step === 'main' && !!ctx.lastTurnOfRound;
   if (!ctx.ownTurn) return false;
   if (at === 'own-turn') return ctx.step === 'main';
   if (at === 'own-command') return ctx.step === 'command';
   return ctx.round === ROUNDS ? ctx.step === 'main' : ctx.step === 'command';
+}
+
+/**
+ * Контекст «когда засчитывается» для основной миссии игрока seat в текущем состоянии — один для движка и экранов.
+ * lastTurnOfRound — идёт ход игрока, который ходит в раунде вторым (конец раунда — после его фаз).
+ */
+export function primaryContext(state: GameState, seat: Seat, end = false) {
+  return {
+    end,
+    step: state.step,
+    ownTurn: state.activeSeat === seat,
+    round: (end ? ROUNDS : state.round) as Round,
+    lastTurnOfRound: !!state.activeSeat && !!state.firstTurn && state.activeSeat !== state.firstTurn,
+  };
 }
 
 /** Группа «или»: индекс первой строки цепочки, к которой относится строка. */

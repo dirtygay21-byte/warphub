@@ -320,6 +320,19 @@ npm run missions     # 40kdc-data в tools/roster-data/40kdc-data → backend/ro
   Таблица Briefing (две Force Disposition → Agenda) из Wahapedia не читается — нужна фотография карт.
 - Тесты: `tests/dominatus.test.ts`.
 
+### Режим Dominatus в «Начать игру» — DM1, 31.10.2026
+
+- «Начать подготовку» (и игра на двух телефонах) открывает выбор режима: «Warhammer 40,000 · 11-я редакция» или «Dominatus».
+  Режим пишется в `game-created.mode` (у обычной игры поля нет — старые журналы читаются как раньше).
+- Шаги подготовки Dominatus: «Кампания» (фаза, локация броском D6 по seed или выбором, альянсы — разные) после игроков;
+  «Agenda и улучшения» после раскрытия типов армий (Agenda — только если играют оба; выбор из трёх Agenda альянса в фазе,
+  пока нет таблицы Briefing; улучшения до 3, в Titangrave до 4, без повторов карт и отрядов).
+- События: `dom-location-set`, `dom-player-set`, `dom-achieved`; `primaryFor` даёт Agenda вместо основной миссии колоды.
+- Момент `round-end` (конец раунда) — после фаз хода игрока, ходящего вторым; контекст подсчёта один для движка и экранов
+  (`primaryContext`).
+- Итог: `dominatus/rewards.ts` — Battle Honour / Battle Skill / Path to Conquest, +1 карта на выбор при Agenda Achieved,
+  подсказка 35+ ПО. Тесты: `tests/game-dominatus.test.ts`.
+
 ## Доступ по коду
 
 - Код создаёт владелец в админке (вкладка «Ростеры» → «Создать код доступа»). Бот присылает его в Telegram.

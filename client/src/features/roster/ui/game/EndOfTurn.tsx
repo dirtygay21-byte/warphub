@@ -1,5 +1,5 @@
 import type { MissionCard } from '../../data';
-import { blockInRound, blockTurnOk, primaryAtOk, ROUNDS, type GameState, type Seat } from '../../game';
+import { blockInRound, blockTurnOk, primaryAtOk, primaryContext, ROUNDS, type GameState, type Seat } from '../../game';
 import { haptic } from '../../telegram';
 import { Button } from '../kit';
 import { cx } from '../util';
@@ -143,7 +143,7 @@ function secondaryBlocks(state: GameState, seat: Seat, card: MissionCard): numbe
 
 /** Блоки основной миссии, которые засчитываются в конце этого хода. */
 function primaryBlocks(state: GameState, seat: Seat, card: MissionCard): number[] {
-  const ctx = { end: false, step: state.step, ownTurn: state.activeSeat === seat, round: state.round };
+  const ctx = primaryContext(state, seat);
   return card.blocks
     .map((b, i) => [b, i] as const)
     .filter(([b]) => blockInRound(b.rounds, state.round) && primaryAtOk(b.at, ctx))
