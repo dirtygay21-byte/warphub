@@ -5,7 +5,8 @@
  * AoS — по Core Rules AoS 4 (Wahapedia, The Core Rules) и Quick Start Guide GW (4 CP, underdog, Rally).
  * Kill Team — по Kill Team Lite Rules GW (файл jul25, © 2024); контроль объекта — Core Rules (Wahapedia).
  *   Значения на схеме датакарты — пример, не профиль реального оперативника.
- * Warcry — по Core Rules Warcry (Heart of Ghur, 2023) в пересказе rulespal.com; warcrier.net недоступен из сессии.
+ * Warcry — по warcrier.net (сборник правил Warcry; общие способности — по обновлению 05.11.2025:
+ *   Rush/Respite — дубль, Onslaught/Inspiring Presence — тройка, Reckoning — четвёрка; Rampage убран).
  *   Значения на схеме карточки бойца — пример.
  * Разметка в пунктах: **жирный** — термин.
  */
@@ -438,7 +439,7 @@ const WARCRY: TutorialGame = {
   id: "warcry",
   code: "WC",
   title: "Warcry",
-  source: "Пересказ Core Rules Warcry (Heart of Ghur, 2023) по изложению rulespal.com.",
+  source: "Пересказ правил Warcry по warcrier.net (с обновлением общих способностей от 05.11.2025).",
   steps: [
     {
       title: "Как устроен бой",
@@ -478,7 +479,7 @@ const WARCRY: TutorialGame = {
       diagram: "wcAbilities",
       points: [
         "Совпавшие кубики — дубль, тройка или четвёрка: ими платят за способности.",
-        "Есть общие способности для всех и особые — у вашей варбанды.",
+        "Общие способности есть у всех, особые — у вашей варбанды. Одна способность за активацию.",
         "Старшая группа может заменить младшую.",
       ],
       note: "Один дикий кубик (wild) можно добавить к группе или сохранить на потом.",
