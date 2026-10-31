@@ -1,3 +1,4 @@
+import type { DominatusData } from './dominatus/types';
 import { apiRequest } from '@/apiUtils/general';
 import type { DataIndex, FactionData } from './engine/types';
 import type { AosBattlepack, AosFactionData, AosIndex } from './aos/types';
@@ -164,6 +165,15 @@ export function loadMissions(): Promise<MissionsData> {
   missionsPromise ??= apiRequest<MissionsData>('/roster/data/missions');
   missionsPromise.catch(() => (missionsPromise = null));
   return missionsPromise;
+}
+
+// ---------- Dominatus (DM0 31.10.2026): нарративная кампания 40K, dominatus.json ----------
+let dominatusPromise: Promise<DominatusData> | null = null;
+
+export function loadDominatus(): Promise<DominatusData> {
+  dominatusPromise ??= apiRequest<DominatusData>('/roster/data/dominatus');
+  dominatusPromise.catch(() => (dominatusPromise = null));
+  return dominatusPromise;
 }
 
 // ---------- Kill Team 2024 (backend: GET /roster/data/kt/:name, W2 30.10.2026) ----------

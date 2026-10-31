@@ -28,6 +28,10 @@ Mini App WarpHub (Telegram) и скрытый раздел Roster Builder (Warha
 > **Kill Team (2024), решение владельца 30.10.2026:** источник — ktdash-v4-public (`prisma/seed-data.json`, лицензии нет),
 > импорт `scripts/import-ktdash.mjs` → `backend/roster-data/kt/`. Подробности — `tools/roster-data/README.md`.
 >
+> **Dominatus (40K, нарративная кампания), решение владельца 31.10.2026:** источник — Wahapedia «Dominatus»
+> (https://wahapedia.ru/wh40k11ed/the-rules/dominatus/), сверка — каталог сайта Dominatus владельца (`dirtygay21-byte/dominatus`).
+> Данные — `backend/roster-data/dominatus.json` (кураторский файл, тесты `tests/dominatus.test.ts`); карты с полем `review` сверить с колодой.
+>
 > **Warcry, решение владельца 30.10.2026:** источник — krisling049/warcry_data (`data/`, лицензии нет),
 > импорт `scripts/import-warcry.mjs` → `backend/roster-data/warcry/`; правила построения варбанды — warcrier.net.
 
