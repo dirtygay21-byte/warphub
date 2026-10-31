@@ -51,6 +51,8 @@ export interface CampaignView {
   standings: Record<AllianceId, CampaignStanding>;
   battles: {
     id: number;
+    /** id игры «Начать игру» (на двух телефонах — общий): по нему второй телефон видит, что битва записана */
+    gameKey: string;
     phase: number;
     location: string | null;
     player1: string;

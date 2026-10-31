@@ -54,7 +54,7 @@ function Row({ game, entry, busy, disabled, onOpen }: { game: GameHook; entry: S
         <span className="flex items-center gap-2 text-[12px] text-fg-3">
           <span className="min-w-0 flex-1 truncate">
             {fmtDate(entry.updatedAt)}
-            {s?.mode === 'dominatus' ? ' · Dominatus' : ''}
+            {s?.mode === 'dominatus' ? ` · Dominatus${s.domPhase ? `, фаза ${s.domPhase}` : ''}` : ''}
             {stage ? ` · ${stage}` : ''}
           </span>
           <span className={cx('rounded-full border px-2 py-px font-semibold', online ? 'border-accent/50 text-accent' : 'border-white/15 text-fg-3')}>

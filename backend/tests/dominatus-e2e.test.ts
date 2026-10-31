@@ -124,6 +124,7 @@ describe('dominatus campaign (DM2)', () => {
     const v = await view('cara');
     expect(v.battles.length).toBe(1);
     expect(v.battles[0].vp1).toBe(72);
+    expect(v.battles[0].gameKey).toBe('dom-e2e-game-1');
     expect(v.standings.liberators.wins).toBe(1);
   });
 

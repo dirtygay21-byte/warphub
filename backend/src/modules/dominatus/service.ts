@@ -186,6 +186,7 @@ export async function getCampaignView(userId: string | null) {
     standings: standings(players, battles, cards, phases, open?.phase ?? null),
     battles: battles.slice(0, 50).map((b) => ({
       id: b.id,
+      gameKey: b.gameKey,
       phase: b.phase,
       location: loc(b.locationId)?.name ?? null,
       player1: playerName.get(b.player1Id) ?? '—',

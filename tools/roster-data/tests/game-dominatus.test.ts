@@ -140,3 +140,28 @@ describe('Dominatus: «конец раунда»', () => {
     expect(primaryAtOk('round-end', { end: false, step: 'command', ownTurn: true, round: 2, lastTurnOfRound: true })).toBe(false);
   });
 });
+
+// DM3 (31.10.2026): игра Dominatus на двух телефонах — событие с seat (чей телефон) меняет только свои данные.
+describe('Dominatus: два телефона', () => {
+  test('локация — общее событие; альянс, Agenda, улучшения, Agenda Achieved — только свои', async () => {
+    const { seatForEvent } = await import('../../../client/src/features/roster/game/online');
+    expect(seatForEvent('dom-location-set', 'p2')).toBeNull();
+    expect(seatForEvent('dom-player-set', 'p2')).toBe('p2');
+    expect(seatForEvent('dom-achieved', 'p1')).toBe('p1');
+
+    const [, p1, p2] = base;
+    const head: Body[] = [created, p1!, p2!];
+    expect(run([...head, { type: 'dom-location-set', phase: 1, locationId: 'mannheim-gap', source: 'manual', seat: 'p1' } as Body]).ok).toBe(false);
+    expect(run([...head, { type: 'dom-player-set', target: 'p2', patch: { alliance: 'raiders' }, seat: 'p1' } as Body]).ok).toBe(false);
+    expect(run([...head, { type: 'dom-player-set', target: 'p2', patch: { alliance: 'raiders' }, seat: 'p2' } as Body]).ok).toBe(true);
+  });
+
+  test('Agenda Achieved второго игрока отмечает только его телефон', () => {
+    const bodies = [...domSetup(), { type: 'battle-ended', reason: 'manual' }] as Body[];
+    expect(run([...bodies, { type: 'dom-achieved', target: 'p2', cards: 1, seat: 'p1' } as Body]).ok).toBe(false);
+    const r = run([...bodies, { type: 'dom-achieved', target: 'p2', cards: 1, seat: 'p2' } as Body]);
+    if (!r.ok) throw new Error(r.error);
+    expect(r.state.dominatus!.players.p2.achieved).toBe(1);
+  });
+
+});

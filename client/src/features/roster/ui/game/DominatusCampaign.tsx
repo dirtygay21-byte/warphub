@@ -139,6 +139,13 @@ function ClaimRow({ view, card, reload }: { view: CampaignView; card: CampaignCa
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (!deck.length)
+    return (
+      <p className="rounded-xl border border-white/10 p-2.5 text-sm text-fg-3">
+        {KIND_RU[card.kind]}: все карты колоды уже у вас — выбрать нечего. Скажите Warmaster.
+      </p>
+    );
   const save = async () => {
     setBusy(true);
     const r = await claimCampaignCard(card.id, name);
@@ -294,6 +301,12 @@ export function RecordBattle({ game }: { game: GameHook }) {
     );
 
   const player = (id: number | null) => campaign.players.find((p) => p.id === id) ?? null;
+  const recorded = campaign.battles.find((b) => b.gameKey === state.id) ?? null;
+  // предел Agenda Achieved (3 на руках): видно только свои карты
+  const mine = SEATS.find((s) => seats[s] === campaign.me!.playerId) ?? null;
+  const held = campaign.me.cards.filter((c) => c.kind === 'agenda').length;
+  const gaining = mine && active && !recorded ? d.players[mine].achieved ?? 0 : 0;
+  const overLimit = gaining > 0 && held + gaining > 3 ? held + gaining - 3 : 0;
   const p1 = player(seats.p1);
   const p2 = player(seats.p2);
   const achievedMissing = active && SEATS.some((s) => d.players[s].achieved === null);
@@ -361,11 +374,17 @@ export function RecordBattle({ game }: { game: GameHook }) {
           </select>
         </label>
       ))}
+      {recorded && !done && (
+        <p className="text-xs text-accent">
+          Битва уже записана: {recorded.player1} {recorded.vp1} : {recorded.vp2} {recorded.player2}. Записать ещё раз — обновить запись (пока никто не выбрал карту).
+        </p>
+      )}
+      {overLimit > 0 && <p className="text-xs text-warn">У вас {held} Agenda Achieved из 3 — {overLimit === 1 ? 'одна новая карта пропадёт' : `${overLimit} новые карты пропадут`}.</p>}
       {problem && <p className="text-xs text-warn">{problem}</p>}
       {error && <p className="text-xs text-warn">{error}</p>}
       {done && <p className="text-xs text-accent">{done}</p>}
       <Button variant="primary" className="w-full" disabled={!!problem || busy} onClick={() => void submit()}>
-        {done ? 'Обновить запись' : 'Записать битву в кампанию'}
+        {done || recorded ? 'Обновить запись' : 'Записать битву в кампанию'}
       </Button>
     </div>
   );
