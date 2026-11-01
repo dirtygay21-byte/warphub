@@ -24,19 +24,19 @@ const LINKS = [
     key: "instagram",
     label: "Instagram",
     href: "https://www.instagram.com/warpboysandgirls?cplk=MWRnZm9kaTN2MTJqZA==",
-    icon: <InstagramIcon className="size-7" />,
+    icon: <InstagramIcon className="size-6" />,
   },
   {
     key: "tiktok",
     label: "TikTok",
     href: "https://www.tiktok.com/@warp.boys.and.gir?_r=1&_t=ZS-9AtxngY4O4z",
-    icon: <TikTokIcon className="size-7" />,
+    icon: <TikTokIcon className="size-6" />,
   },
   {
     key: "boosty",
     label: "Boosty",
     href: "https://boosty.to/wbg",
-    icon: <HeartHandshake className="size-7" />,
+    icon: <HeartHandshake className="size-6" />,
   },
 ];
 
@@ -53,11 +53,11 @@ function openExternal(url: string) {
 /** Блок «Вы можете поддержать нас» внизу профиля (Instagram / TikTok / Boosty). */
 export default function SupportSection() {
   return (
-    <section className="mt-8 lg:col-span-2">
-      <p className="mb-2.5 text-center text-[13px] font-bold uppercase tracking-[0.08em] text-fg-3">
+    <section className="mt-5 lg:col-span-2">
+      <p className="mb-1 text-center text-[13px] font-bold uppercase tracking-[0.08em] text-fg-3">
         Вы можете поддержать нас
       </p>
-      <div className="mx-auto grid w-full max-w-md grid-cols-3 gap-2.5">
+      <div className="flex items-center justify-center gap-6">
         {LINKS.map(({ key, label, href, icon }) => (
           <button
             key={key}
@@ -68,7 +68,7 @@ export default function SupportSection() {
               haptic.tap();
               openExternal(href);
             }}
-            className="ds-press flex h-[72px] items-center justify-center rounded-[18px] border border-white/10 bg-app-elevated text-accent"
+            className="ds-press flex size-11 items-center justify-center text-accent"
           >
             {icon}
           </button>
