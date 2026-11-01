@@ -14,6 +14,10 @@ import { sortRosterUnits } from '../engine/sort';
 import { UnitPicker } from './UnitPicker';
 import { ExportSheet } from './ExportSheet';
 import { DetachmentPanel, RuleText } from './DetachmentPanel';
+import { useRu } from './common/useRu';
+import { ruDetachmentRule, ruName, ruRule, ruStratagem } from '../ru';
+import { RuleRichText } from './common/RulePopover';
+import { useGlossary } from './common/useGlossary';
 import { cleanRuleText } from '../text';
 import { w40kPointSystems } from '../points';
 import { PointsSheet } from './PointsSheet';
@@ -128,6 +132,7 @@ function Editor({
   viewOnly?: boolean;
 }) {
   const [expanded, setExpanded] = useState<string | null>(null);
+  const ru = useRu(L.faction.id);
   const [picker, setPicker] = useState(false);
   const [problems, setProblems] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -264,7 +269,7 @@ function Editor({
                   <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Правила армии</p>
                   {L.faction.armyRules.map((id) => {
                     const r = L.faction.rules[id];
-                    return r ? <RuleText key={id} name={r.name} text={r.text} /> : null;
+                    return r ? <RuleText key={id} name={r.name} text={r.text} ru={ruRule(ru, id)} /> : null;
                   })}
                 </div>
               )}
@@ -338,7 +343,7 @@ function Editor({
                   <div className="mt-2 space-y-1.5">
                     {L.faction.armyRules.map((id) => {
                       const r = L.faction.rules[id];
-                      return r ? <RuleText key={id} name={r.name} text={r.text} /> : null;
+                      return r ? <RuleText key={id} name={r.name} text={r.text} ru={ruRule(ru, id)} /> : null;
                     })}
                   </div>
                 </details>
@@ -635,6 +640,8 @@ function UnitGroup({
 
 function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boolean; onClose: () => void; roster: Roster; L: DataLookup; cr: ComputedRoster; onPick: (d: Detachment) => void }) {
   const [info, setInfo] = useState<string | null>(null);
+  const ru = useRu(L.faction.id);
+  const g = useGlossary();
   const list = availableDetachments(L, roster.chapter ?? cr.chapter, legacyIds(roster).detachments).filter((d) => !roster.detachmentIds.includes(d.id));
   const usedTags = new Set(cr.detachments.map((d) => d.tag).filter(Boolean));
   const left = cr.dpLimit - cr.dp;
@@ -672,12 +679,15 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
               </div>
               {open_ && (
                 <div className="space-y-3 border-t border-white/[0.06] px-3 py-3 text-sm">
-                  {d.abilities.map((a, i) => (
-                    <div key={i}>
-                      <p className="font-semibold text-accent">{a.name}</p>
-                      <p className="mt-1 whitespace-pre-line text-fg-2">{cleanRuleText(a.text)}</p>
-                    </div>
-                  ))}
+                  {d.abilities.map((a, i) => {
+                    const r = ruDetachmentRule(ru, d.id, a.id);
+                    return (
+                      <div key={i}>
+                        <p className="font-semibold text-accent">{r ? ruName(r.name, a.name) : a.name}</p>
+                        {r ? <RuleRichText text={r.text} g={g} className="mt-1 text-fg-2" /> : <p className="mt-1 whitespace-pre-line text-fg-2">{cleanRuleText(a.text)}</p>}
+                      </div>
+                    );
+                  })}
                   {L.faction.stratagems.some((st) => st.detachment === d.id && visibleStratagem(st, L.det)) && (
                     <div>
                       <p className="font-semibold text-white/85">Стратагемы</p>
@@ -685,7 +695,7 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
                         {L.faction.stratagems
                           .filter((st) => st.detachment === d.id && visibleStratagem(st, L.det))
                           .map((st) => (
-                            <RuleText key={st.id} name={`${st.name} · ${st.cp} CP`} sub={[st.type, st.turn, st.phase].filter(Boolean).join(' · ')} text={st.text} />
+                            <RuleText key={st.id} name={st.name} sub={[`${st.cp} CP`, st.type, st.turn, st.phase].filter(Boolean).join(' · ')} text={st.text} ru={ruStratagem(ru, st.id)} />
                           ))}
                       </div>
                     </div>

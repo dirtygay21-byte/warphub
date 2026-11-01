@@ -13,14 +13,14 @@ import { cx } from '../util';
  * Термины в тексте подчёркнуты: нажатие открывает термин в той же карточке («‹» — назад). Закрытие — ✕, нажатие мимо,
  * «Назад» Telegram или Escape. Одновременно открыта одна подсказка.
  *
- * Что показать: lookup — поиск в глоссарии 40K (glossary.json, текст wh-rules.ru), или text — готовый текст правила
- * (правила фракции, детачмента, Kill Team, Warcry…).
+ * Что показать: lookup — поиск в глоссарии 40K (glossary.json, текст wh-rules.ru): способность, ключевое слово или термин по id;
+ * или text — готовый текст правила (правила фракции, детачмента, Kill Team, Warcry…); rich — текст с разметкой wh-rules.ru
+ * (русские тексты 40K: термины и основные способности в нём нажимаются).
  */
-export type RuleSource =
-  | { lookup: 'ability' | 'keyword'; label: string }
-  | { title: string; text: string; sub?: string };
+export type RuleLookup = { lookup: 'ability' | 'keyword'; label: string } | { lookup: 'term'; id: string; label: string };
+export type RuleSource = RuleLookup | { title: string; text: string; sub?: string; rich?: boolean };
 
-type Shown = { kind: 'hit'; hit: GlossaryHit } | { kind: 'missing'; label: string } | { kind: 'text'; title: string; text: string; sub?: string };
+type Shown = { kind: 'hit'; hit: GlossaryHit } | { kind: 'missing'; label: string } | { kind: 'text'; title: string; text: string; sub?: string; rich?: boolean };
 
 let closeOpen: (() => void) | null = null;
 
@@ -48,8 +48,8 @@ export function RuleTrigger({ source, className, children, title }: { source: Ru
   );
 }
 
-function resolve(g: Glossary, source: { lookup: 'ability' | 'keyword'; label: string }): Shown {
-  const hit = source.lookup === 'ability' ? findAbility(g, source.label) : findKeyword(g, source.label);
+function resolve(g: Glossary, source: RuleLookup): Shown {
+  const hit = source.lookup === 'term' ? termHit(g, source.id) : source.lookup === 'ability' ? findAbility(g, source.label) : findKeyword(g, source.label);
   return hit ? { kind: 'hit', hit } : { kind: 'missing', label: source.label };
 }
 
@@ -57,11 +57,11 @@ function RulePopover({ anchor, source, onClose }: { anchor: DOMRect; source: Rul
   const box = useRef<HTMLDivElement>(null);
   const [g, setG] = useState<Glossary | null>(null);
   const [failed, setFailed] = useState(false);
-  // стек термина: нажатие на термин в тексте открывает его в той же карточке
-  const [stack, setStack] = useState<string[]>([]);
+  // стек: нажатие на термин или способность в тексте открывает их в той же карточке
+  const [stack, setStack] = useState<RuleLookup[]>([]);
 
-  // готовый текст (правила фракции и т. п.) глоссарий не ждёт
-  const needsGlossary = !('text' in source);
+  // готовый текст без разметки (правила фракции по-английски и т. п.) глоссарий не ждёт
+  const needsGlossary = !('text' in source) || !!source.rich;
   useEffect(() => {
     let alive = true;
     if (needsGlossary)
@@ -97,11 +97,7 @@ function RulePopover({ anchor, source, onClose }: { anchor: DOMRect; source: Rul
   }, [onClose]);
 
   const top = stack.at(-1);
-  const termShown = (gl: Glossary, id: string): Shown => {
-    const hit = termHit(gl, id);
-    return hit ? { kind: 'hit', hit } : { kind: 'missing', label: id };
-  };
-  const shown: Shown | null = 'text' in source ? { kind: 'text', title: source.title, text: source.text, sub: source.sub } : !g ? null : top ? termShown(g, top) : resolve(g, source);
+  const shown: Shown | null = top ? (g ? resolve(g, top) : null) : 'text' in source ? { kind: 'text', title: source.title, text: source.text, sub: source.sub, rich: source.rich } : !g ? null : resolve(g, source);
 
   // под нажатым элементом; если снизу мало места — над ним
   const vw = window.innerWidth;
@@ -111,10 +107,16 @@ function RulePopover({ anchor, source, onClose }: { anchor: DOMRect; source: Rul
   const below = vh - anchor.bottom > 220 || anchor.top < vh / 2;
   const style = below ? { top: anchor.bottom + 6, left, width, maxHeight: Math.max(160, vh - anchor.bottom - 18) } : { bottom: vh - anchor.top + 6, left, width, maxHeight: Math.max(160, anchor.top - 18) };
 
-  const openTerm = (id: string) => {
-    setStack((s) => [...s, id]);
+  const openLink = (l: RuleLookup) => {
+    setStack((s) => [...s, l]);
     haptic.select();
   };
+  // ссылка внутри карточки открывает правило в ней же
+  const link: LinkRender = (l, label, key) => (
+    <button key={key} type="button" onClick={() => openLink(l)} className="font-semibold text-fg underline decoration-accent/60 decoration-dotted underline-offset-2 active:text-accent">
+      {label}
+    </button>
+  );
 
   return createPortal(
     <div ref={box} role="dialog" aria-modal={false} style={style} className="fade-enter fixed z-[60] flex flex-col overflow-hidden rounded-xl border border-accent/30 bg-app-elevated shadow-2xl shadow-black/60">
@@ -125,7 +127,7 @@ function RulePopover({ anchor, source, onClose }: { anchor: DOMRect; source: Rul
         <IconButton icon="close" label="Закрыть" onClick={onClose} className="size-7" />
       </div>
       <div className="overflow-y-auto overscroll-contain px-3 py-2.5 text-[13px] leading-relaxed text-fg-2">
-        {failed ? <p className="text-fg-3">Не удалось загрузить правила — проверьте связь.</p> : shown ? <Body shown={shown} g={g} onTerm={openTerm} /> : null}
+        {failed ? <p className="text-fg-3">Не удалось загрузить правила — проверьте связь.</p> : shown ? <Body shown={shown} g={g} link={link} /> : null}
       </div>
     </div>,
     document.body,
@@ -141,12 +143,12 @@ function Head({ shown }: { shown: Shown }) {
   return name.startsWith('[') ? <span className="rounded border border-accent/50 px-1 py-px text-[12px] font-semibold text-accent">{name}</span> : <span className="text-[13px] font-semibold">{name}</span>;
 }
 
-function Body({ shown, g, onTerm }: { shown: Shown; g: Glossary | null; onTerm: (id: string) => void }) {
+function Body({ shown, g, link }: { shown: Shown; g: Glossary | null; link: LinkRender }) {
   if (shown.kind === 'text')
     return (
       <>
         {shown.sub && <p className="mb-1 text-[12px] text-fg-3">{shown.sub}</p>}
-        <p className="whitespace-pre-line">{cleanRuleText(shown.text) || 'Нет данных.'}</p>
+        {shown.rich ? <Rich text={shown.text} g={g} link={link} /> : <p className="whitespace-pre-line">{cleanRuleText(shown.text) || 'Нет данных.'}</p>}
       </>
     );
   if (shown.kind === 'missing') return <p className="text-fg-3">Нет данных: этого правила нет в глоссарии (wh-rules.ru, версия {g?.source.dataVersion ?? '—'}).</p>;
@@ -155,12 +157,12 @@ function Body({ shown, g, onTerm }: { shown: Shown; g: Glossary | null; onTerm: 
   return (
     <div className="space-y-2">
       {texts.map((t, i) => (
-        <Rich key={i} text={t} g={g} onTerm={onTerm} />
+        <Rich key={i} text={t} g={g} link={link} />
       ))}
       {h.kind === 'ability' && h.ability.example && (
         <div className="rounded-lg bg-white/[0.04] px-2.5 py-2 text-[12px]">
           <span className="font-semibold text-fg-3">Пример. </span>
-          <Rich text={h.ability.example} g={g} onTerm={onTerm} inline />
+          <Rich text={h.ability.example} g={g} link={link} inline />
         </div>
       )}
       <p className="text-[11px] text-fg-3">Источник: wh-rules.ru · версия данных {g?.source.dataVersion}</p>
@@ -168,32 +170,79 @@ function Body({ shown, g, onTerm }: { shown: Shown; g: Glossary | null; onTerm: 
   );
 }
 
-/** Текст с разметкой wh-rules: **жирный**, [gloss:id:термин] — нажимается (если термин есть в глоссарии). */
-function Rich({ text, g, onTerm, inline }: { text: string; g: Glossary | null; onTerm: (id: string) => void; inline?: boolean }) {
+type LinkRender = (l: RuleLookup, label: string, key: number) => ReactNode;
+
+/** Заголовок раздела «### Da Boss | Босс» → «Босс (Da Boss)», как названия в приложении. */
+const heading = (h: string) => {
+  const [en, ru] = h.split(/\s*\|\s*/);
+  return ru ? `${ru} (${en})` : en!;
+};
+
+/**
+ * Текст с разметкой wh-rules: **жирный**, __выделение__, [gloss:id:термин] и [core:Deep Strike] — нажимаются
+ * (если термин есть в глоссарии), «### заголовок» — строкой-заголовком. link — как показать ссылку.
+ */
+function Rich({ text, g, link, inline }: { text: string; g: Glossary | null; link: LinkRender; inline?: boolean }) {
   const Tag = inline ? 'span' : 'p';
+  let n = 0;
+  const chunk = (t: string) =>
+    parseRich(t).map((p) => {
+      const key = n++;
+      if (p.t === 'text') return p.s;
+      if (p.t === 'bold')
+        return (
+          <b key={key} className="font-semibold text-fg">
+            {p.s}
+          </b>
+        );
+      if (p.t === 'em')
+        return (
+          <u key={key} className="decoration-fg-3 underline-offset-2">
+            {p.s}
+          </u>
+        );
+      if (p.t === 'core') return link({ lookup: 'ability', label: p.s }, p.s, key);
+      return g?.terms[p.id] ? (
+        link({ lookup: 'term', id: p.id, label: p.s }, p.s, key)
+      ) : (
+        <b key={key} className="font-semibold text-fg">
+          {p.s}
+        </b>
+      );
+    });
+  // «### заголовок» — отдельной строкой
+  const parts = text.split(/(?:^|\n)### ([^\n]+)\n?/);
   return (
     <Tag className="whitespace-pre-line">
-      {parseRich(text).map((p, i) =>
-        p.t === 'text' ? (
-          p.s
-        ) : p.t === 'bold' ? (
-          <b key={i} className="font-semibold text-fg">
-            {p.s}
-          </b>
-        ) : g?.terms[p.id] ? (
-          <button key={i} type="button" onClick={() => onTerm(p.id)} className="font-semibold text-fg underline decoration-accent/60 decoration-dotted underline-offset-2 active:text-accent">
-            {p.s}
-          </button>
+      {parts.map((t, i) =>
+        i % 2 ? (
+          <span key={`h${i}`} className="mt-2 block font-semibold text-fg">
+            {heading(t)}
+          </span>
         ) : (
-          <b key={i} className="font-semibold text-fg">
-            {p.s}
-          </b>
+          chunk(t)
         ),
       )}
     </Tag>
   );
 }
 
+/**
+ * Русский текст правила с разметкой wh-rules.ru вне карточки (способности инфолиста, правила детачмента…): термины и основные
+ * способности подчёркнуты и открывают подсказку. Глоссарий — для проверки, какие термины нажимаются (useGlossary).
+ */
+export function RuleRichText({ text, g, className }: { text: string; g: Glossary | null; className?: string }) {
+  const link: LinkRender = (l, label, key) => (
+    <RuleTrigger key={key} source={l} className="font-semibold text-fg underline decoration-accent/60 decoration-dotted underline-offset-2">
+      {label}
+    </RuleTrigger>
+  );
+  return (
+    <div className={className}>
+      <Rich text={text} g={g} link={link} />
+    </div>
+  );
+}
 
 /** Способность оружия как на wh-rules.ru: [BLAST 1] в рамке; нажатие — подсказка. */
 export function WeaponAbilityTag({ label }: { label: string }) {

@@ -1,0 +1,2287 @@
+{
+ "schema": "warphub-ru-coverage/1",
+ "snapshot": {
+  "file": "tools/roster-data/40k/whrules-995-ru.json",
+  "fingerprint": "6397b96131d1bf4a3a47740fe0829761a26380b2655686bf5754848ed069bf3f",
+  "source": {
+   "site": "https://wh-rules.ru",
+   "dataVersion": 995,
+   "mfm": "1.6",
+   "date": "2026-10-16",
+   "extractedAt": "2026-11-01T01:25:08.634Z"
+  }
+ },
+ "total": {
+  "datasheets": {
+   "total": 2911,
+   "ru": 2773
+  },
+  "factionAbilities": {
+   "total": 2803,
+   "ru": 2648
+  },
+  "abilities": {
+   "total": 6159,
+   "ru": 5717
+  },
+  "detachments": {
+   "total": 295,
+   "ru": 254
+  },
+  "detRules": {
+   "total": 310,
+   "ru": 246
+  },
+  "stratagems": {
+   "total": 1445,
+   "ru": 1180
+  },
+  "enhancements": {
+   "total": 976,
+   "ru": 751
+  },
+  "armyRules": {
+   "total": 59,
+   "ru": 52
+  }
+ },
+ "factions": {
+  "AS": {
+   "name": "Adepta Sororitas",
+   "counts": {
+    "datasheets": {
+     "total": 110,
+     "ru": 110
+    },
+    "factionAbilities": {
+     "total": 123,
+     "ru": 123
+    },
+    "abilities": {
+     "total": 286,
+     "ru": 253
+    },
+    "detachments": {
+     "total": 8,
+     "ru": 8
+    },
+    "detRules": {
+     "total": 8,
+     "ru": 8
+    },
+    "stratagems": {
+     "total": 36,
+     "ru": 36
+    },
+    "enhancements": {
+     "total": 25,
+     "ru": 25
+    },
+    "armyRules": {
+     "total": 1,
+     "ru": 1
+    }
+   },
+   "missing": {
+    "abilities": [
+     "Canoness: One Shot",
+     "Dominion Squad: Holy Vanguard",
+     "Sororitas Rhino: One Shot",
+     "Immolator: One Shot",
+     "Exorcist: One Shot",
+     "Repressor: One Shot",
+     "Ministorum Priest: Holy Mission",
+     "Morvenn Vahl: SUPREME COMMANDER",
+     "Castigator: One Shot",
+     "Sanctifiers: One Shot",
+     "Vindicare Assassin: SHADOW ASSIGNMENT",
+     "Callidus Assassin: SHADOW ASSIGNMENT",
+     "Eversor Assassin: SHADOW ASSIGNMENT",
+     "Culexus Assassin: SHADOW ASSIGNMENT",
+     "Voidsmen-at-Arms: NAVY BODYGUARD",
+     "Inquisitorial Agents: INQUISITORIAL HENCHMEN",
+     "Ministorum Priest: Holy Hatred",
+     "Grey Knights Terminator Squad: Rites of Teleportation",
+     "Watch Master: Strategic Acumen",
+     "Sisters of Battle Squad: Simulacrum Imperials",
+     "Deathwatch Terminator Squad: ATTACHED UNIT",
+     "Fortis Kill Team: Kill Team",
+     "Fortis Kill Team: ATTACHED UNIT",
+     "Fortis Kill Team: TRANSPORT",
+     "Indomitor Kill Team: Kill Team",
+     "Indomitor Kill Team: ATTACHED UNIT",
+     "Indomitor Kill Team: TRANSPORT",
+     "Indomitor Kill Team: Jump Pack",
+     "Spectrus Kill Team: Kill Team",
+     "Spectrus Kill Team: ATTACHED UNIT",
+     "Spectrus Kill Team: TRANSPORT",
+     "Spectrus Kill Team: Infiltrator Comms Array",
+     "Spectrus Kill Team: Jump Pack"
+    ]
+   }
+  },
+  "AC": {
+   "name": "Adeptus Custodes",
+   "counts": {
+    "datasheets": {
+     "total": 108,
+     "ru": 108
+    },
+    "factionAbilities": {
+     "total": 149,
+     "ru": 149
+    },
+    "abilities": {
+     "total": 250,
+     "ru": 224
+    },
+    "detachments": {
+     "total": 18,
+     "ru": 12
+    },
+    "detRules": {
+     "total": 18,
+     "ru": 12
+    },
+    "stratagems": {
+     "total": 82,
+     "ru": 37
+    },
+    "enhancements": {
+     "total": 56,
+     "ru": 23
+    },
+    "armyRules": {
+     "total": 6,
+     "ru": 6
+    }
+   },
+   "missing": {
+    "abilities": [
+     "Shield-Captain in Allarus Terminator Armour: Archeotech Teleport-shunter (Once per battle, per unit)",
+     "Trajann Valoris: Captain-General (Aura)",
+     "Trajann Valoris: SUPREME COMMANDER",
+     "Vindicare Assassin: SHADOW ASSIGNMENT",
+     "Callidus Assassin: SHADOW ASSIGNMENT",
+     "Eversor Assassin: SHADOW ASSIGNMENT",
+     "Culexus Assassin: SHADOW ASSIGNMENT",
+     "Voidsmen-at-Arms: NAVY BODYGUARD",
+     "Inquisitorial Agents: INQUISITORIAL HENCHMEN",
+     "Ministorum Priest: Holy Hatred",
+     "Grey Knights Terminator Squad: Rites of Teleportation",
+     "Watch Master: Strategic Acumen",
+     "Sisters of Battle Squad: Simulacrum Imperials",
+     "Deathwatch Terminator Squad: ATTACHED UNIT",
+     "Fortis Kill Team: Kill Team",
+     "Fortis Kill Team: ATTACHED UNIT",
+     "Fortis Kill Team: TRANSPORT",
+     "Indomitor Kill Team: Kill Team",
+     "Indomitor Kill Team: ATTACHED UNIT",
+     "Indomitor Kill Team: TRANSPORT",
+     "Indomitor Kill Team: Jump Pack",
+     "Spectrus Kill Team: Kill Team",
+     "Spectrus Kill Team: ATTACHED UNIT",
+     "Spectrus Kill Team: TRANSPORT",
+     "Spectrus Kill Team: Infiltrator Comms Array",
+     "Spectrus Kill Team: Jump Pack"
+    ],
+    "detachments": [
+     "Grav-Assault Force",
+     "Shield Host",
+     "Talons Of The Emperor",
+     "Solar Spearhead",
+     "Silent Hunters",
+     "Tharanatoi Hammerblow"
+    ],
+    "detRules": [
+     "Grav-Assault Force: Flare Shields",
+     "Shield Host: Martial Mastery",
+     "Talons Of The Emperor: Revered Companions",
+     "Solar Spearhead: Auric Armour",
+     "Silent Hunters: Skin-Crawling Disorientation",
+     "Tharanatoi Hammerblow: The Hammer Falls"
+    ],
+    "stratagems": [
+     "VICTORY BEFORE DEATH",
+     "ADVANCED STABILISERS",
+     "INEVITABLE ANNIHILATION",
+     "PSY-CHAFF VOLLEY",
+     "SLAYER OF CHAMPIONS",
+     "SHOULDER THE MANTLE",
+     "VIGIL UNENDING",
+     "EARNING OF A NAME",
+     "THE EMPEROR’S AUSPICE",
+     "SUPERHUMAN RESERVES",
+     "PEERLESS WARRIOR",
+     "SWIFT AS THE EAGLE",
+     "MANOEUVRE AND FIRE",
+     "DEFIANT TO THE LAST",
+     "GILDED CHAMPION",
+     "PRIORITISED ERADICATION",
+     "FLAWLESS CONSTRUCTION",
+     "UNSTOPPABLE ADVANCE",
+     "WITCH HUNTERS",
+     "PSYCHIC ABOMINATIONS",
+     "DESPERATION’S PRICE",
+     "ARCHEOTECH MUNITIONS",
+     "ARCANE GENETIC ALCHEMY",
+     "VIGILANCE ETERNAL",
+     "MULTIPOTENTIALITY",
+     "UNWAVERING SENTINELS",
+     "AVENGE THE FALLEN",
+     "UMBRAL PROSECUTION",
+     "DEATHSONG SCYTHES",
+     "SYNCHRONISED INFERNO",
+     "WRATHFUL ADVANCE",
+     "EMPEROR’S VENGEANCE",
+     "FLAWLESS CONSTRUCTION",
+     "UNSTOPPABLE",
+     "RELENTLESS PERSECUTION",
+     "PUNISHMENT INESCAPABLE",
+     "EMPYRIC SEVERANCE",
+     "EMPEROR’S EXECUTIONERS",
+     "TALONED PINCER",
+     "TALONS INTERLOCKED",
+     "SHIELD OF HONOUR",
+     "HUNT AS ONE",
+     "ELECTROEXORCIST SATURATION",
+     "UNLEASH THE LIONS",
+     "HARDENED RESOLVE"
+    ],
+    "enhancements": [
+     "Auric Eagle",
+     "Memento Moritoi (one per army)",
+     "Augury Uplink (one per army)",
+     "Anti-gravitic Mobility",
+     "Combat Deployment",
+     "Celeritous Sentries",
+     "Interred Expertise",
+     "Mnemo-Locked Shrine Cipher",
+     "Enhanced Voidsheen Cloak",
+     "Adamantine Talisman",
+     "Superior Creation",
+     "Aegis Projector",
+     "Blade Imperator",
+     "Auric Mantle",
+     "Encircling Hunter",
+     "Psyk-Out Grenades",
+     "Efficient Aggression",
+     "Auramite Sarcophagus",
+     "Praesidius",
+     "Augury Uplink",
+     "Champion of the Imperium",
+     "Castellan’s Mark",
+     "Martial Philosopher",
+     "From the Hall of Armouries",
+     "Gift of Terran Artifice",
+     "Fierce Conqueror",
+     "Honoured Fallen (Aura)",
+     "Raptor Blade",
+     "Veteran of the Kataphraktoi",
+     "Veiled Blade",
+     "Panoptispex",
+     "Admonimortis",
+     "Radiant Mantle"
+    ]
+   }
+  },
+  "AdM": {
+   "name": "Adeptus Mechanicus",
+   "counts": {
+    "datasheets": {
+     "total": 110,
+     "ru": 110
+    },
+    "factionAbilities": {
+     "total": 123,
+     "ru": 123
+    },
+    "abilities": {
+     "total": 283,
+     "ru": 255
+    },
+    "detachments": {
+     "total": 10,
+     "ru": 10
+    },
+    "detRules": {
+     "total": 10,
+     "ru": 10
+    },
+    "stratagems": {
+     "total": 51,
+     "ru": 49
+    },
+    "enhancements": {
+     "total": 34,
+     "ru": 34
+    },
+    "armyRules": {
+     "total": 1,
+     "ru": 1
+    }
+   },
+   "missing": {
+    "abilities": [
+     "Belisarius Cawl: SUPREME COMMANDER",
+     "Tech-priest Dominus: Data-spike",
+     "Secutarii Hoplites: ATTACHED UNIT",
+     "Sydonian Skatros: SYDONIAN SENTINEL",
+     "Thulia Ghuld: SUPREME COMMANDER",
+     "Vindicare Assassin: SHADOW ASSIGNMENT",
+     "Callidus Assassin: SHADOW ASSIGNMENT",
+     "Eversor Assassin: SHADOW ASSIGNMENT",
+     "Culexus Assassin: SHADOW ASSIGNMENT",
+     "Voidsmen-at-Arms: NAVY BODYGUARD",
+     "Inquisitorial Agents: INQUISITORIAL HENCHMEN",
+     "Ministorum Priest: Holy Hatred",
+     "Grey Knights Terminator Squad: Rites of Teleportation",
+     "Watch Master: Strategic Acumen",
+     "Sisters of Battle Squad: Simulacrum Imperials",
+     "Deathwatch Terminator Squad: ATTACHED UNIT",
+     "Fortis Kill Team: Kill Team",
+     "Fortis Kill Team: ATTACHED UNIT",
+     "Fortis Kill Team: TRANSPORT",
+     "Indomitor Kill Team: Kill Team",
+     "Indomitor Kill Team: ATTACHED UNIT",
+     "Indomitor Kill Team: TRANSPORT",
+     "Indomitor Kill Team: Jump Pack",
+     "Spectrus Kill Team: Kill Team",
+     "Spectrus Kill Team: ATTACHED UNIT",
+     "Spectrus Kill Team: TRANSPORT",
+     "Spectrus Kill Team: Infiltrator Comms Array",
+     "Spectrus Kill Team: Jump Pack"
+    ],
+    "stratagems": [
+     "THREAT‑COGITATION TARGETERS",
+     "SERVO‑DRIVEN CHARGE"
+    ]
+   }
+  },
+  "AE": {
+   "name": "Aeldari",
+   "counts": {
+    "datasheets": {
+     "total": 99,
+     "ru": 99
+    },
+    "factionAbilities": {
+     "total": 107,
+     "ru": 88
+    },
+    "abilities": {
+     "total": 196,
+     "ru": 196
+    },
+    "detachments": {
+     "total": 15,
+     "ru": 15
+    },
+    "detRules": {
+     "total": 17,
+     "ru": 15
+    },
+    "stratagems": {
+     "total": 78,
+     "ru": 76
+    },
+    "enhancements": {
+     "total": 52,
+     "ru": 51
+    },
+    "armyRules": {
+     "total": 2,
+     "ru": 1
+    }
+   },
+   "missing": {
+    "detRules": [
+     "Eldritch Raiders: Veterans of the Void",
+     "Corsair Coterie: Veterans of the Void"
+    ],
+    "stratagems": [
+     "RAIDERS’ SPOILS",
+     "WEAVERS’ COILS"
+    ],
+    "enhancements": [
+     "Infamy (Aura)"
+    ],
+    "armyRules": [
+     "Disparate Paths"
+    ]
+   }
+  },
+  "AM": {
+   "name": "Astra Militarum",
+   "counts": {
+    "datasheets": {
+     "total": 207,
+     "ru": 206
+    },
+    "factionAbilities": {
+     "total": 105,
+     "ru": 105
+    },
+    "abilities": {
+     "total": 486,
+     "ru": 399
+    },
+    "detachments": {
+     "total": 11,
+     "ru": 11
+    },
+    "detRules": {
+     "total": 11,
+     "ru": 11
+    },
+    "stratagems": {
+     "total": 57,
+     "ru": 56
+    },
+    "enhancements": {
+     "total": 38,
+     "ru": 36
+    },
+    "armyRules": {
+     "total": 1,
+     "ru": 1
+    }
+   },
+   "missing": {
+    "datasheets": [
+     "Regimental Attachés"
+    ],
+    "abilities": [
+     "Leman Russ Commander: ORDERS",
+     "Leman Russ Commander: One Shot",
+     "Cadian Heavy Weapons Squad: EMBARKING",
+     "Scout Sentinels: One Shot",
+     "Armoured Sentinels: One Shot",
+     "Chimera: One Shot",
+     "Hellhound: One Shot",
+     "Basilisk: One Shot",
+     "Hydra: One Shot",
+     "Wyvern: One Shot",
+     "Manticore: One Shot",
+     "Deathstrike: One Shot",
+     "Leman Russ Battle Tank: One Shot",
+     "Leman Russ Demolisher: One Shot",
+     "Militarum Tempestus Command Squad: ORDERS",
+     "Atlas Recovery Vehicle: One Shot",
+     "Salamander Command Vehicle: One Shot",
+     "Centaur Light Carrier: One Shot",
+     "Trojan Support Vehicle: One Shot",
+     "Salamander Scout Vehicle: One Shot",
+     "Tauros Assault Vehicle: One Shot",
+     "Tauros Venator: One Shot",
+     "Armageddon-pattern Medusa: One Shot",
+     "Colossus: One Shot",
+     "Cyclops Demolition Vehicle: COMPACT",
+     "Malcador Annihilator: One Shot",
+     "Malcador Defender: One Shot",
+     "Malcador: One Shot",
+     "Malcador Infernus: One Shot",
+     "Stygies Destroyer Tank Hunter: One Shot",
+     "Stormblade: One Shot",
+     "Arkurian Stormhammer: One Shot",
+     "Dominus Armoured Siege Bombard: One Shot",
+     "Gorgon Heavy Transport: One Shot",
+     "Macharius: One Shot",
+     "Macharius Omega: One Shot",
+     "Macharius Vanquisher: One Shot",
+     "Macharius Vulcan: One Shot",
+     "Valdor: One Shot",
+     "Sly Marbo: LONER",
+     "Rein And Raus: One Shot",
+     "Carnodon: One Shot",
+     "Storm Chimera: One Shot",
+     "Gaunt’s Ghosts: ORDERS",
+     "Lord Solar Leontus: SUPREME COMMANDER",
+     "Lord Solar Leontus: ORDERS",
+     "Ursula Creed: ORDERS",
+     "Cadian Castellan: ORDERS",
+     "Cadian Command Squad: ORDERS",
+     "Aegis Defence Line: DEPLOYMENT",
+     "Elysian Drop Sentinel: One Shot",
+     "Leman Russ Eradicator: One Shot",
+     "Leman Russ Executioner: One Shot",
+     "Leman Russ Exterminator: One Shot",
+     "Leman Russ Punisher: One Shot",
+     "Leman Russ Vanquisher: One Shot",
+     "Krieg Command Squad: ORDERS",
+     "Lord Marshal Dreir: ORDERS",
+     "Catachan Command Squad: ORDERS",
+     "Rogal Dorn Commander: ORDERS",
+     "Catachan Heavy Weapons Squad: EMBARKING",
+     "Krieg Heavy Weapons Squad: EMBARKING",
+     "Hell’s Last: One Shot",
+     "Vindicare Assassin: SHADOW ASSIGNMENT",
+     "Callidus Assassin: SHADOW ASSIGNMENT",
+     "Eversor Assassin: SHADOW ASSIGNMENT",
+     "Culexus Assassin: SHADOW ASSIGNMENT",
+     "Voidsmen-at-Arms: NAVY BODYGUARD",
+     "Inquisitorial Agents: INQUISITORIAL HENCHMEN",
+     "Ministorum Priest: Holy Hatred",
+     "Ministorum Priest: Zealot",
+     "Grey Knights Terminator Squad: Rites of Teleportation",
+     "Watch Master: Strategic Acumen",
+     "Sisters of Battle Squad: Simulacrum Imperials",
+     "Deathwatch Terminator Squad: ATTACHED UNIT",
+     "Fortis Kill Team: Kill Team",
+     "Fortis Kill Team: ATTACHED UNIT",
+     "Fortis Kill Team: TRANSPORT",
+     "Indomitor Kill Team: Kill Team",
+     "Indomitor Kill Team: ATTACHED UNIT",
+     "Indomitor Kill Team: TRANSPORT",
+     "Indomitor Kill Team: Jump Pack",
+     "Spectrus Kill Team: Kill Team",
+     "Spectrus Kill Team: ATTACHED UNIT",
+     "Spectrus Kill Team: TRANSPORT",
+     "Spectrus Kill Team: Infiltrator Comms Array",
+     "Spectrus Kill Team: Jump Pack"
+    ],
+    "stratagems": [
+     "SERVO‑DESIGNATORS"
+    ],
+    "enhancements": [
+     "Sharp eyes, Light fingers",
+     "Omnissian Unguents (Aura)"
+    ]
+   }
+  },
+  "CD": {
+   "name": "Chaos Daemons",
+   "counts": {
+    "datasheets": {
+     "total": 121,
+     "ru": 119
+    },
+    "factionAbilities": {
+     "total": 133,
+     "ru": 133
+    },
+    "abilities": {
+     "total": 265,
+     "ru": 258
+    },
+    "detachments": {
+     "total": 9,
+     "ru": 9
+    },
+    "detRules": {
+     "total": 12,
+     "ru": 6
+    },
+    "stratagems": {
+     "total": 46,
+     "ru": 44
+    },
+    "enhancements": {
+     "total": 29,
+     "ru": 22
+    },
+    "armyRules": {
+     "total": 2,
+     "ru": 2
+    }
+   },
+   "missing": {
+    "datasheets": [
+     "An’ggrath the Unbound",
+     "Aetaos’rau’keres"
+    ],
+    "abilities": [
+     "Exalted Flamer: MANIFESTATION OF DESTRUCTION",
+     "Be’lakor: Shadow Form",
+     "Be’lakor: SUPREME COMMANDER",
+     "Daemon Prince of Chaos: DAEMONIC ALLEGIANCE",
+     "Pink Horrors: HORRORS ARE PINK. HORRORS ARE BLUE. WHEREONCE THERE WAS ONE, NOW THERE ARE TWO.",
+     "Daemon Prince Of Chaos With Wings: DAEMONIC ALLEGIANCE",
+     "Accursed Cultists: Accursed Horde"
+    ],
+    "detRules": [
+     "Legion of Excess: Beguiling Aura",
+     "Legion of Excess: Seductive Gambit",
+     "Blood Legion: Murdercall",
+     "Blood Legion: Blood Tainted",
+     "Shadow Legion: Thralls of the First Prince",
+     "Shadow Legion: First Prince of Chaos"
+    ],
+    "stratagems": [
+     "FOOLS’ FLIGHT",
+     "THIEVES OF PAIN"
+    ],
+    "enhancements": [
+     "False Majesty (Aura)",
+     "Slaughterthirst (Aura)",
+     "Mantle of Gloom (Aura)",
+     "Dreaming Crown (Aura)",
+     "Droning Shroud (Aura)",
+     "Improbable Shield (Aura)",
+     "Font of Spores (Aura)"
+    ]
+   }
+  },
+  "QT": {
+   "name": "Chaos Knights",
+   "counts": {
+    "datasheets": {
+     "total": 138,
+     "ru": 136
+    },
+    "factionAbilities": {
+     "total": 150,
+     "ru": 150
+    },
+    "abilities": {
+     "total": 293,
+     "ru": 285
+    },
+    "detachments": {
+     "total": 8,
+     "ru": 8
+    },
+    "detRules": {
+     "total": 8,
+     "ru": 8
+    },
+    "stratagems": {
+     "total": 39,
+     "ru": 39
+    },
+    "enhancements": {
+     "total": 28,
+     "ru": 24
+    },
+    "armyRules": {
+     "total": 3,
+     "ru": 3
+    }
+   },
+   "missing": {
+    "datasheets": [
+     "An’ggrath the Unbound",
+     "Aetaos’rau’keres"
+    ],
+    "abilities": [
+     "Accursed Cultists: Accursed Horde",
+     "Exalted Flamer: MANIFESTATION OF DESTRUCTION",
+     "Be’lakor: Shadow Form",
+     "Be’lakor: SUPREME COMMANDER",
+     "Daemon Prince of Chaos: DAEMONIC ALLEGIANCE",
+     "Pink Horrors: HORRORS ARE PINK. HORRORS ARE BLUE. WHEREONCE THERE WAS ONE, NOW THERE ARE TWO.",
+     "Daemon Prince Of Chaos With Wings: DAEMONIC ALLEGIANCE",
+     "Accursed Cultists: Accursed Horde"
+    ],
+    "enhancements": [
+     "Cruel Lashmaster (Aura)",
+     "Final Howl (Aura)",
+     "Iconoclast Idol (Aura)",
+     "Panoply of the Cursed Knight"
+    ]
+   }
+  },
+  "CSM": {
+   "name": "Chaos Space Marines",
+   "counts": {
+    "datasheets": {
+     "total": 232,
+     "ru": 215
+    },
+    "factionAbilities": {
+     "total": 229,
+     "ru": 229
+    },
+    "abilities": {
+     "total": 447,
+     "ru": 431
+    },
+    "detachments": {
+     "total": 17,
+     "ru": 17
+    },
+    "detRules": {
+     "total": 20,
+     "ru": 16
+    },
+    "stratagems": {
+     "total": 93,
+     "ru": 91
+    },
+    "enhancements": {
+     "total": 62,
+     "ru": 62
+    },
+    "armyRules": {
+     "total": 5,
+     "ru": 5
+    }
+   },
+   "missing": {
+    "datasheets": [
+     "Land Raider Achilles",
+     "Land Raider Proteus",
+     "Fire Raptor Gunship",
+     "Spartan",
+     "Deredeo Dreadnought",
+     "Sokar-pattern Stormbird",
+     "Sicaran Battle Tank",
+     "Leviathan Dreadnought",
+     "Fellblade",
+     "Relic Contemptor Dreadnought",
+     "Whirlwind Scorpius",
+     "Xiphon Interceptor",
+     "Storm Eagle Gunship",
+     "Sicaran Venator",
+     "Sicaran Punisher",
+     "An’ggrath the Unbound",
+     "Aetaos’rau’keres"
+    ],
+    "abilities": [
+     "Abaddon The Despoiler: The Warmaster",
+     "Abaddon The Despoiler: SUPREME COMMANDER",
+     "Chaos Bikers: Outmanoeuvre",
+     "Kytan Ravager: Super-heavy Walker",
+     "Greater Brass Scorpion: Super-heavy Walker",
+     "Chaos Deimos Predator: One Shot",
+     "Accursed Cultists: Accursed Horde",
+     "Kratos: One Shot",
+     "Nemesis Claw: ATTACHED UNIT",
+     "Exalted Flamer: MANIFESTATION OF DESTRUCTION",
+     "Be’lakor: Shadow Form",
+     "Be’lakor: SUPREME COMMANDER",
+     "Daemon Prince of Chaos: DAEMONIC ALLEGIANCE",
+     "Pink Horrors: HORRORS ARE PINK. HORRORS ARE BLUE. WHEREONCE THERE WAS ONE, NOW THERE ARE TWO.",
+     "Daemon Prince Of Chaos With Wings: DAEMONIC ALLEGIANCE",
+     "Accursed Cultists: Accursed Horde"
+    ],
+    "detRules": [
+     "Chaos Cult: KEYWORDS",
+     "Renegade Warband: Slaves to None",
+     "Renegade Warband: Vendetta",
+     "Renegade Warband: Twisted Doctrine"
+    ],
+    "stratagems": [
+     "SOUL-TALLY OFFERING",
+     "REAVERS’ HASTE"
+    ]
+   }
+  },
+  "DG": {
+   "name": "Death Guard",
+   "counts": {
+    "datasheets": {
+     "total": 192,
+     "ru": 175
+    },
+    "factionAbilities": {
+     "total": 189,
+     "ru": 183
+    },
+    "abilities": {
+     "total": 363,
+     "ru": 352
+    },
+    "detachments": {
+     "total": 9,
+     "ru": 9
+    },
+    "detRules": {
+     "total": 9,
+     "ru": 9
+    },
+    "stratagems": {
+     "total": 45,
+     "ru": 45
+    },
+    "enhancements": {
+     "total": 30,
+     "ru": 29
+    },
+    "armyRules": {
+     "total": 2,
+     "ru": 1
+    }
+   },
+   "missing": {
+    "datasheets": [
+     "Land Raider Achilles",
+     "Land Raider Proteus",
+     "Fire Raptor Gunship",
+     "Spartan",
+     "Deredeo Dreadnought",
+     "Sokar-pattern Stormbird",
+     "Sicaran Battle Tank",
+     "Leviathan Dreadnought",
+     "Fellblade",
+     "Relic Contemptor Dreadnought",
+     "Whirlwind Scorpius",
+     "Xiphon Interceptor",
+     "Storm Eagle Gunship",
+     "Sicaran Venator",
+     "Sicaran Punisher",
+     "An’ggrath the Unbound",
+     "Aetaos’rau’keres"
+    ],
+    "abilities": [
+     "Typhus: The Destroyer Hive",
+     "Kratos: One Shot",
+     "Exalted Flamer: MANIFESTATION OF DESTRUCTION",
+     "Great Unclean One: Greater Daemon of Nurgle (Aura)",
+     "Be’lakor: Shadow Form",
+     "Be’lakor: SUPREME COMMANDER",
+     "Daemon Prince of Chaos: DAEMONIC ALLEGIANCE",
+     "Rotigus: Greater Daemon of Nurgle (Aura)",
+     "Pink Horrors: HORRORS ARE PINK. HORRORS ARE BLUE. WHEREONCE THERE WAS ONE, NOW THERE ARE TWO.",
+     "Daemon Prince Of Chaos With Wings: DAEMONIC ALLEGIANCE",
+     "Accursed Cultists: Accursed Horde"
+    ],
+    "enhancements": [
+     "Parasitic Woe‑Reaper"
+    ],
+    "armyRules": [
+     "Pact of Decay"
+    ]
+   }
+  },
+  "DRU": {
+   "name": "Drukhari",
+   "counts": {
+    "datasheets": {
+     "total": 62,
+     "ru": 62
+    },
+    "factionAbilities": {
+     "total": 74,
+     "ru": 58
+    },
+    "abilities": {
+     "total": 159,
+     "ru": 156
+    },
+    "detachments": {
+     "total": 9,
+     "ru": 9
+    },
+    "detRules": {
+     "total": 9,
+     "ru": 9
+    },
+    "stratagems": {
+     "total": 45,
+     "ru": 45
+    },
+    "enhancements": {
+     "total": 30,
+     "ru": 29
+    },
+    "armyRules": {
+     "total": 3,
+     "ru": 2
+    }
+   },
+   "missing": {
+    "abilities": [
+     "Urien Rakarth: One Shot",
+     "Razorwing Jetfighter: Ground Attack Craft",
+     "Hand of the Archon: ARCHON’S RETINUE"
+    ],
+    "enhancements": [
+     "Master Repugnomancer (Aura)"
+    ],
+    "armyRules": [
+     "Disparate Paths"
+    ]
+   }
+  },
+  "EC": {
+   "name": "Emperor’s Children",
+   "counts": {
+    "datasheets": {
+     "total": 144,
+     "ru": 142
+    },
+    "factionAbilities": {
+     "total": 156,
+     "ru": 156
+    },
+    "abilities": {
+     "total": 311,
+     "ru": 300
+    },
+    "detachments": {
+     "total": 10,
+     "ru": 10
+    },
+    "detRules": {
+     "total": 11,
+     "ru": 9
+    },
+    "stratagems": {
+     "total": 51,
+     "ru": 50
+    },
+    "enhancements": {
+     "total": 34,
+     "ru": 34
+    },
+    "armyRules": {
+     "total": 2,
+     "ru": 2
+    }
+   },
+   "missing": {
+    "datasheets": [
+     "An’ggrath the Unbound",
+     "Aetaos’rau’keres"
+    ],
+    "abilities": [
+     "Exalted Flamer: MANIFESTATION OF DESTRUCTION",
+     "Keeper Of Secrets: Greater Daemon of Slaanesh (Aura)",
+     "Be’lakor: Shadow Form",
+     "Be’lakor: SUPREME COMMANDER",
+     "Daemon Prince of Chaos: DAEMONIC ALLEGIANCE",
+     "Shalaxi Helbane: Greater Daemon of Slaanesh (Aura)",
+     "Pink Horrors: HORRORS ARE PINK. HORRORS ARE BLUE. WHEREONCE THERE WAS ONE, NOW THERE ARE TWO.",
+     "Daemon Prince Of Chaos With Wings: DAEMONIC ALLEGIANCE",
+     "Accursed Cultists: Accursed Horde",
+     "Sorcerer: Prescience (Psychic)",
+     "Sorcerer: Gift of Chaos (Psychic)"
+    ],
+    "detRules": [
+     "Court of the Phoenician: Sensational Performance",
+     "Court of the Phoenician: Master of the Pageant"
+    ],
+    "stratagems": [
+     "ONTO THE NEXT"
+    ]
+   }
+  },
+  "GC": {
+   "name": "Genestealer Cults",
+   "counts": {
+    "datasheets": {
+     "total": 146,
+     "ru": 145
+    },
+    "abilities": {
+     "total": 290,
+     "ru": 230
+    },
+    "factionAbilities": {
+     "total": 25,
+     "ru": 11
+    },
+    "detachments": {
+     "total": 9,
+     "ru": 8
+    },
+    "detRules": {
+     "total": 10,
+     "ru": 8
+    },
+    "stratagems": {
+     "total": 45,
+     "ru": 39
+    },
+    "enhancements": {
+     "total": 30,
+     "ru": 26
+    },
+    "armyRules": {
+     "total": 3,
+     "ru": 2
+    }
+   },
+   "missing": {
+    "datasheets": [
+     "Regimental Attachés"
+    ],
+    "abilities": [
+     "Patriarch: SUPREME COMMANDER",
+     "Goliath Rockgrinder: Grinding Clearance",
+     "Reductus Saboteur: One Shot",
+     "Acolyte Hybrids With Hand Flamers: One Shot",
+     "Deathleaper: HUNTER ORGANISM",
+     "Cadian Castellan: ORDERS",
+     "Cadian Command Squad: ORDERS",
+     "Catachan Command Squad: ORDERS",
+     "Krieg Command Squad: ORDERS",
+     "Leman Russ Commander: ORDERS",
+     "Leman Russ Commander: One Shot",
+     "Rogal Dorn Commander: ORDERS",
+     "Hell’s Last: One Shot",
+     "Chimera: One Shot",
+     "Storm Chimera: One Shot",
+     "Aegis Defence Line: DEPLOYMENT",
+     "Armoured Sentinels: One Shot",
+     "Basilisk: One Shot",
+     "Cadian Heavy Weapons Squad: EMBARKING",
+     "Catachan Heavy Weapons Squad: EMBARKING",
+     "Deathstrike: One Shot",
+     "Hellhound: One Shot",
+     "Hydra: One Shot",
+     "Krieg Heavy Weapons Squad: EMBARKING",
+     "Leman Russ Battle Tank: One Shot",
+     "Leman Russ Demolisher: One Shot",
+     "Leman Russ Eradicator: One Shot",
+     "Leman Russ Executioner: One Shot",
+     "Leman Russ Exterminator: One Shot",
+     "Leman Russ Punisher: One Shot",
+     "Leman Russ Vanquisher: One Shot",
+     "Manticore: One Shot",
+     "Scout Sentinels: One Shot",
+     "Wyvern: One Shot",
+     "Cyclops Demolition Vehicle: COMPACT",
+     "Arkurian Stormhammer: One Shot",
+     "Armageddon-pattern Medusa: One Shot",
+     "Atlas Recovery Vehicle: One Shot",
+     "Carnodon: One Shot",
+     "Centaur Light Carrier: One Shot",
+     "Colossus: One Shot",
+     "Dominus Armoured Siege Bombard: One Shot",
+     "Elysian Drop Sentinel: One Shot",
+     "Gorgon Heavy Transport: One Shot",
+     "Macharius: One Shot",
+     "Macharius Omega: One Shot",
+     "Macharius Vanquisher: One Shot",
+     "Macharius Vulcan: One Shot",
+     "Malcador: One Shot",
+     "Malcador Annihilator: One Shot",
+     "Malcador Defender: One Shot",
+     "Malcador Infernus: One Shot",
+     "Salamander Command Vehicle: One Shot",
+     "Salamander Scout Vehicle: One Shot",
+     "Stormblade: One Shot",
+     "Stygies Destroyer Tank Hunter: One Shot",
+     "Tauros Assault Vehicle: One Shot",
+     "Tauros Venator: One Shot",
+     "Trojan Support Vehicle: One Shot",
+     "Valdor: One Shot"
+    ],
+    "detachments": [
+     "Brood Brother Auxilia"
+    ],
+    "detRules": [
+     "Brood Brother Auxilia: Integrated Tactics",
+     "Brood Brother Auxilia: BROOD BROTHERS"
+    ],
+    "stratagems": [
+     "SYMBIOTIC DESTRUCTION",
+     "A DARK NETWORK",
+     "SUPPRESS AND OVERWHELM",
+     "REGIMENTAL REINFORCEMENTS",
+     "IN THE SHADOW OF IRON",
+     "ACCEPTABLE LOSSES"
+    ],
+    "enhancements": [
+     "Martial Espionage",
+     "Adaptive Reprisal",
+     "The Hero Returned",
+     "Firepoint Commander"
+    ],
+    "armyRules": [
+     "Synapse"
+    ]
+   }
+  },
+  "GK": {
+   "name": "Grey Knights",
+   "counts": {
+    "datasheets": {
+     "total": 103,
+     "ru": 103
+    },
+    "factionAbilities": {
+     "total": 105,
+     "ru": 105
+    },
+    "abilities": {
+     "total": 250,
+     "ru": 219
+    },
+    "detachments": {
+     "total": 9,
+     "ru": 9
+    },
+    "detRules": {
+     "total": 9,
+     "ru": 9
+    },
+    "stratagems": {
+     "total": 45,
+     "ru": 45
+    },
+    "enhancements": {
+     "total": 30,
+     "ru": 28
+    },
+    "armyRules": {
+     "total": 1,
+     "ru": 1
+    }
+   },
+   "missing": {
+    "abilities": [
+     "Kaldor Draigo: SUPREME COMMANDER",
+     "Castellan Crowe: Foresight (Psychic)",
+     "Land Raider: One Shot",
+     "Land Raider Crusader: One Shot",
+     "Land Raider Redeemer: One Shot",
+     "Razorback: One Shot",
+     "Rhino: One Shot",
+     "Grey Knights Relic Razorback: One Shot",
+     "Vindicare Assassin: SHADOW ASSIGNMENT",
+     "Callidus Assassin: SHADOW ASSIGNMENT",
+     "Eversor Assassin: SHADOW ASSIGNMENT",
+     "Culexus Assassin: SHADOW ASSIGNMENT",
+     "Voidsmen-at-Arms: NAVY BODYGUARD",
+     "Inquisitorial Agents: INQUISITORIAL HENCHMEN",
+     "Ministorum Priest: Holy Hatred",
+     "Grey Knights Terminator Squad: Rites of Teleportation",
+     "Watch Master: Strategic Acumen",
+     "Sisters of Battle Squad: Simulacrum Imperials",
+     "Deathwatch Terminator Squad: ATTACHED UNIT",
+     "Fortis Kill Team: Kill Team",
+     "Fortis Kill Team: ATTACHED UNIT",
+     "Fortis Kill Team: TRANSPORT",
+     "Indomitor Kill Team: Kill Team",
+     "Indomitor Kill Team: ATTACHED UNIT",
+     "Indomitor Kill Team: TRANSPORT",
+     "Indomitor Kill Team: Jump Pack",
+     "Spectrus Kill Team: Kill Team",
+     "Spectrus Kill Team: ATTACHED UNIT",
+     "Spectrus Kill Team: TRANSPORT",
+     "Spectrus Kill Team: Infiltrator Comms Array",
+     "Spectrus Kill Team: Jump Pack"
+    ],
+    "enhancements": [
+     "The Ephemeral Tome",
+     "The Sixty-sixth Seal"
+    ]
+   }
+  },
+  "AoI": {
+   "name": "Imperial Agents",
+   "counts": {
+    "datasheets": {
+     "total": 72,
+     "ru": 72
+    },
+    "abilities": {
+     "total": 193,
+     "ru": 185
+    },
+    "factionAbilities": {
+     "total": 85,
+     "ru": 85
+    },
+    "detachments": {
+     "total": 5,
+     "ru": 5
+    },
+    "detRules": {
+     "total": 5,
+     "ru": 5
+    },
+    "stratagems": {
+     "total": 30,
+     "ru": 30
+    },
+    "enhancements": {
+     "total": 20,
+     "ru": 20
+    },
+    "armyRules": {
+     "total": 1,
+     "ru": 1
+    }
+   },
+   "missing": {
+    "abilities": [
+     "Callidus Assassin: SHADOW ASSIGNMENT",
+     "Culexus Assassin: SHADOW ASSIGNMENT",
+     "Eversor Assassin: SHADOW ASSIGNMENT",
+     "Grey Knights Terminator Squad: Rites of Teleportation",
+     "Inquisitorial Agents: INQUISITORIAL HENCHMEN",
+     "Sisters of Battle Squad: Simulacrum Imperials",
+     "Vindicare Assassin: SHADOW ASSIGNMENT",
+     "Voidsmen-at-Arms: NAVY BODYGUARD"
+    ]
+   }
+  },
+  "QI": {
+   "name": "Imperial Knights",
+   "counts": {
+    "datasheets": {
+     "total": 78,
+     "ru": 78
+    },
+    "factionAbilities": {
+     "total": 90,
+     "ru": 90
+    },
+    "abilities": {
+     "total": 206,
+     "ru": 182
+    },
+    "detachments": {
+     "total": 8,
+     "ru": 8
+    },
+    "detRules": {
+     "total": 9,
+     "ru": 7
+    },
+    "stratagems": {
+     "total": 39,
+     "ru": 37
+    },
+    "enhancements": {
+     "total": 26,
+     "ru": 25
+    },
+    "armyRules": {
+     "total": 3,
+     "ru": 3
+    }
+   },
+   "missing": {
+    "abilities": [
+     "Tech-priest Dominus: Data-spike",
+     "Vindicare Assassin: SHADOW ASSIGNMENT",
+     "Callidus Assassin: SHADOW ASSIGNMENT",
+     "Eversor Assassin: SHADOW ASSIGNMENT",
+     "Culexus Assassin: SHADOW ASSIGNMENT",
+     "Voidsmen-at-Arms: NAVY BODYGUARD",
+     "Inquisitorial Agents: INQUISITORIAL HENCHMEN",
+     "Ministorum Priest: Holy Hatred",
+     "Grey Knights Terminator Squad: Rites of Teleportation",
+     "Watch Master: Strategic Acumen",
+     "Sisters of Battle Squad: Simulacrum Imperials",
+     "Deathwatch Terminator Squad: ATTACHED UNIT",
+     "Fortis Kill Team: Kill Team",
+     "Fortis Kill Team: ATTACHED UNIT",
+     "Fortis Kill Team: TRANSPORT",
+     "Indomitor Kill Team: Kill Team",
+     "Indomitor Kill Team: ATTACHED UNIT",
+     "Indomitor Kill Team: TRANSPORT",
+     "Indomitor Kill Team: Jump Pack",
+     "Spectrus Kill Team: Kill Team",
+     "Spectrus Kill Team: ATTACHED UNIT",
+     "Spectrus Kill Team: TRANSPORT",
+     "Spectrus Kill Team: Infiltrator Comms Array",
+     "Spectrus Kill Team: Jump Pack"
+    ],
+    "detRules": [
+     "Questoris Companions: Heroes of Legend",
+     "Questoris Companions: Valour’s Reward"
+    ],
+    "stratagems": [
+     "POINT‑BLANK BARRAGE",
+     "SQUIRES OFTHE HUNT"
+    ],
+    "enhancements": [
+     "Knight of the Opus Machina (Aura)"
+    ]
+   }
+  },
+  "LoV": {
+   "name": "Leagues of Votann",
+   "counts": {
+    "datasheets": {
+     "total": 22,
+     "ru": 22
+    },
+    "factionAbilities": {
+     "total": 22,
+     "ru": 22
+    },
+    "abilities": {
+     "total": 55,
+     "ru": 53
+    },
+    "detachments": {
+     "total": 10,
+     "ru": 10
+    },
+    "detRules": {
+     "total": 10,
+     "ru": 10
+    },
+    "stratagems": {
+     "total": 51,
+     "ru": 51
+    },
+    "enhancements": {
+     "total": 34,
+     "ru": 33
+    },
+    "armyRules": {
+     "total": 1,
+     "ru": 1
+    }
+   },
+   "missing": {
+    "abilities": [
+     "Hearthkyn Warriors: Luck Has. Need Keeps. Toil Earns",
+     "Hekaton Land Fortress: One Shot"
+    ],
+    "enhancements": [
+     "Dêlvwerke Navigator"
+    ]
+   }
+  },
+  "NEC": {
+   "name": "Necrons",
+   "counts": {
+    "datasheets": {
+     "total": 64,
+     "ru": 64
+    },
+    "factionAbilities": {
+     "total": 64,
+     "ru": 64
+    },
+    "abilities": {
+     "total": 138,
+     "ru": 132
+    },
+    "detachments": {
+     "total": 12,
+     "ru": 12
+    },
+    "detRules": {
+     "total": 12,
+     "ru": 11
+    },
+    "stratagems": {
+     "total": 63,
+     "ru": 63
+    },
+    "enhancements": {
+     "total": 42,
+     "ru": 38
+    },
+    "armyRules": {
+     "total": 1,
+     "ru": 1
+    }
+   },
+   "missing": {
+    "abilities": [
+     "Overlord: One Shot",
+     "Anrakyr The Traveller: One Shot",
+     "The Silent King: Voice of the Triarch",
+     "The Silent King: Phaeron of the Stars (Aura)",
+     "The Silent King: Phaeron of the Blades (Aura)",
+     "The Silent King: Relentless March (Aura)"
+    ],
+    "detRules": [
+     "Cryptek Conclave: Technosorcerous Augmentations"
+    ],
+    "enhancements": [
+     "Relocational Optimiser",
+     "Dread Majesty (Aura)",
+     "Mortality Shroud (Aura)",
+     "Phasal Subjugator (Aura)"
+    ]
+   }
+  },
+  "ORK": {
+   "name": "Orks",
+   "counts": {
+    "datasheets": {
+     "total": 67,
+     "ru": 67
+    },
+    "factionAbilities": {
+     "total": 77,
+     "ru": 77
+    },
+    "abilities": {
+     "total": 128,
+     "ru": 117
+    },
+    "detachments": {
+     "total": 15,
+     "ru": 15
+    },
+    "detRules": {
+     "total": 15,
+     "ru": 15
+    },
+    "stratagems": {
+     "total": 40,
+     "ru": 40
+    },
+    "enhancements": {
+     "total": 38,
+     "ru": 25
+    },
+    "armyRules": {
+     "total": 3,
+     "ru": 3
+    }
+   },
+   "missing": {
+    "abilities": [
+     "Weirdboy: Da Jump (psychic level 1, once per army, per battle round)",
+     "Weirdboy: Warpath (psychic level 1)",
+     "Ghazghkull Thraka: SUPREME COMMANDER",
+     "Warbikers: High-speed Carnage",
+     "Gargantuan Squiggoth: Gargantuan",
+     "Kill Rig: Beastscent (psychic level 1)",
+     "Kill Rig: Warpath (psychic level 1)",
+     "Wazdakka Gutsmek: Turbo Engine",
+     "Wazdakka Gutsmek: Shokk Attack Engine",
+     "Wazdakka Gutsmek: Pulse Jet",
+     "Nazdreg: Nazdreg’s Know-wotz"
+    ],
+    "enhancements": [
+     "Wimp-kickaz",
+     "Extra Sneaky",
+     "Flyboss",
+     "Targetin' Gizmos",
+     "Smoky Gubbinz",
+     "Minefield Detail",
+     "Impulsive Recon",
+     "Boss Boomer",
+     "'Ardboyz",
+     "Temperamental Shokka",
+     "Supa-snazz Dakka",
+     "Throat-slittas",
+     "Enhanced Runt-maw"
+    ]
+   }
+  },
+  "SM": {
+   "name": "Space Marines",
+   "counts": {
+    "datasheets": {
+     "total": 357,
+     "ru": 295
+    },
+    "factionAbilities": {
+     "total": 353,
+     "ru": 321
+    },
+    "abilities": {
+     "total": 640,
+     "ru": 616
+    },
+    "detachments": {
+     "total": 69,
+     "ru": 35
+    },
+    "detRules": {
+     "total": 71,
+     "ru": 35
+    },
+    "stratagems": {
+     "total": 343,
+     "ru": 142
+    },
+    "enhancements": {
+     "total": 225,
+     "ru": 79
+    },
+    "armyRules": {
+     "total": 11,
+     "ru": 11
+    }
+   },
+   "missing": {
+    "datasheets": [
+     "Assault Squad",
+     "Apothecary on Bike",
+     "Assault Squad with Jump Packs",
+     "Suppressor Squad",
+     "Tactical Squad",
+     "Caestus Assault Ram",
+     "Carab Culln The Risen",
+     "Relic Terminator Squad",
+     "Javelin Attack Speeder",
+     "Mortis Dreadnought",
+     "Storm Eagle Gunship",
+     "Bike Squad",
+     "Uriel Ventris",
+     "Dreadnought Drop Pod",
+     "Leviathan Dreadnought",
+     "Land Speeder Storm",
+     "Astartes Servitors",
+     "Hunter",
+     "Imperial Space Marine",
+     "Sergeant Telion",
+     "Thunderfire Cannon",
+     "Company Veterans On Bikes",
+     "Land Speeder Tempest",
+     "Land Speeder Tornado",
+     "Vindicator Laser Destroyer",
+     "Sokar-pattern Stormbird",
+     "Ancient on Bike",
+     "Terminus Ultra",
+     "Chaplain Venerable Dreadnought",
+     "Librarian with Jump Pack",
+     "Lieutenant In Reiver Armour",
+     "Land Raider Prometheus",
+     "Librarian on Bike",
+     "Scout Sniper Squad",
+     "Sergeant Chronus",
+     "Techmarine on Bike",
+     "Land Raider Achilles",
+     "Land Raider Proteus",
+     "Fire Raptor Gunship",
+     "Attack Bike Squad",
+     "Land Speeder Typhoon",
+     "Command Squad",
+     "Devastator Squad",
+     "Primaris Company Champion",
+     "Spartan",
+     "Stalker",
+     "Deathstorm Drop Pod",
+     "Deimos Predator",
+     "Deredeo Dreadnought",
+     "Death Company Marines with Bolt Rifles",
+     "Chaplain Cassius",
+     "Fellblade",
+     "Ironclad Dreadnought",
+     "Land Raider Helios",
+     "Pedro Kantor",
+     "Relic Contemptor Dreadnought",
+     "Thunderhawk Transporter",
+     "Tyrannic War Veterans",
+     "Whirlwind Scorpius",
+     "Xiphon Interceptor",
+     "Ferren Areios",
+     "Company Champion on Bike"
+    ],
+    "abilities": [
+     "Death Company Marines with Boltguns and Jump Packs: An Honourable Death in Combat",
+     "Callidus Assassin: SHADOW ASSIGNMENT",
+     "Culexus Assassin: SHADOW ASSIGNMENT",
+     "Deathwatch Terminator Squad: ATTACHED UNIT",
+     "Eversor Assassin: SHADOW ASSIGNMENT",
+     "Fortis Kill Team: Kill Team",
+     "Fortis Kill Team: ATTACHED UNIT",
+     "Fortis Kill Team: TRANSPORT",
+     "Grey Knights Terminator Squad: Rites of Teleportation",
+     "Indomitor Kill Team: Kill Team",
+     "Indomitor Kill Team: ATTACHED UNIT",
+     "Indomitor Kill Team: TRANSPORT",
+     "Indomitor Kill Team: Jump Pack",
+     "Inquisitorial Agents: INQUISITORIAL HENCHMEN",
+     "Ministorum Priest: Holy Hatred",
+     "Sisters of Battle Squad: Simulacrum Imperials",
+     "Spectrus Kill Team: Kill Team",
+     "Spectrus Kill Team: ATTACHED UNIT",
+     "Spectrus Kill Team: TRANSPORT",
+     "Spectrus Kill Team: Infiltrator Comms Array",
+     "Spectrus Kill Team: Jump Pack",
+     "Vindicare Assassin: SHADOW ASSIGNMENT",
+     "Voidsmen-at-Arms: NAVY BODYGUARD",
+     "Watch Master: Strategic Acumen"
+    ],
+    "detachments": [
+     "Liberator Assault Group",
+     "Anvil Siege Force",
+     "Firestorm Assault Force",
+     "Vanguard Spearhead",
+     "1st Company Task Force",
+     "Unforgiven Task Force",
+     "Company of Hunters",
+     "The Lost Brethren",
+     "The Angelic Host",
+     "Lion’s Blade Task Force",
+     "Librarius Conclave",
+     "Wrathful Procession",
+     "Saga of the Hunter",
+     "Saga of the Bold",
+     "Companions of Vehemence",
+     "Vindication Task Force",
+     "Godhammer Assault Force",
+     "Emperor’s Shield",
+     "Hammer of Avernii",
+     "Rage-cursed Onslaught",
+     "Bastion Task Force",
+     "Orbital Assault Force",
+     "Reclamation Force",
+     "Armoured Speartip",
+     "Headhunter Task Force",
+     "The Living Miracle",
+     "Legacy of Grace",
+     "Dark Age Arsenal",
+     "Interrogation Conclave",
+     "Legends of Saga and Song",
+     "Veterans of the Fang",
+     "Vengeful Hosts",
+     "Fulguris Task Force",
+     "Subversion Assets"
+    ],
+    "detRules": [
+     "Liberator Assault Group: Red Thirst",
+     "Anvil Siege Force: Shield of the Imperium",
+     "Firestorm Assault Force: Close-range Eradication",
+     "Vanguard Spearhead: Shadow Masters",
+     "1st Company Task Force: Extremis-level Threat",
+     "Unforgiven Task Force: Grim Resolve",
+     "Company of Hunters: Masters of Manoeuvre",
+     "The Lost Brethren: A Noble Death in Combat",
+     "The Angelic Host: Upon Wings of Fire",
+     "Lion’s Blade Task Force: In The Lion’s Claws",
+     "Librarius Conclave: Psychic Disciplines",
+     "Wrathful Procession: Chant of Deathless Devotion",
+     "Saga of the Hunter: Pack’s Quarry",
+     "Saga of the Bold: Heroes All",
+     "Companions of Vehemence: Righteous Fervour",
+     "Vindication Task Force: Purge and Sanctify",
+     "Godhammer Assault Force: Shock and Awe",
+     "Emperor’s Shield: Wrath of Dorn",
+     "Hammer of Avernii: Calculated Annihilation",
+     "Hammer of Avernii: Recalculating",
+     "Hammer of Avernii: Restrictions",
+     "Rage-cursed Onslaught: Maddened Ferocity",
+     "Bastion Task Force: Interlocking Tactics",
+     "Orbital Assault Force: Rapid-drop Deployment",
+     "Reclamation Force: Oath of Reclamation",
+     "Armoured Speartip: Rapid Deployment",
+     "Headhunter Task Force: Target Sighted",
+     "The Living Miracle: Anointed Champion",
+     "Legacy of Grace: Legacy of the Angel",
+     "Dark Age Arsenal: Invocations of Ancient Fury",
+     "Interrogation Conclave: Dread Catechism",
+     "Legends of Saga and Song: Loping Charge",
+     "Veterans of the Fang: Old Greymanes",
+     "Vengeful Hosts: Imperator Unleashed",
+     "Fulguris Task Force: Skystrike",
+     "Subversion Assets: Nowhere to Hide"
+    ],
+    "stratagems": [
+     "LEGENDARY FORTITUDE",
+     "ARMOUR OF CONTEMPT",
+     "HEROES OF THE CHAPTER",
+     "ORBITAL TELEPORTARIUM",
+     "DUTY AND HONOUR",
+     "TERRIFYING PROFICIENCY",
+     "ARMOUR OF CONTEMPT",
+     "NO THREAT TOO GREAT",
+     "ARMOUR OF CONTEMPT",
+     "BATTLE DRILL RECALL",
+     "HAIL OF VENGEANCE",
+     "NOT ONE BACKWARDS STEP",
+     "RIGID DISCIPLINE",
+     "PURGATION DOCTRINE",
+     "MACHINE WRATH",
+     "ADVANCED DEPLOYMENT",
+     "ARMOUR OF CONTEMPT",
+     "CERAMITE SLEDGEHAMMER",
+     "RAPID EMBARKATION",
+     "LIGHT OF VENGEANCE",
+     "CODEX DISCIPLINE",
+     "HERESY UNDONE",
+     "SHOCK BOMBARDMENT",
+     "GUIDED DISRUPTION",
+     "ARMOUR OF CONTEMPT",
+     "STALK BETWEEN WORLDS",
+     "RUNES OF CLAIMING",
+     "WOLF TOTEMS",
+     "DEVOUT PUSH",
+     "FOR THE EMPEROR'S HONOUR!",
+     "PIOUS ENMITY",
+     "HERESY BEGETS RETRIBUTION",
+     "HEARTS HARDENED TO DUTY",
+     "DREAD CRUSADERS",
+     "RAPID REAPPRAISAL",
+     "HIGH-SPEED FOCUS",
+     "DEATH ON THE WIND",
+     "ARMOUR OF CONTEMPT",
+     "TALON STRIKE",
+     "HUNTERS’ TRAIL",
+     "SEARING BURSTS",
+     "NO SACRIFICE TOO GREAT",
+     "REVELATION OF GUILT",
+     "FURY OF THE FIRST",
+     "ARMOUR OF CONTEMPT",
+     "DROPSHIP EXTRACTION",
+     "DISCIPLINED EXTERMINATION",
+     "OBDURATE VENGEANCE",
+     "WRATHFUL CONQUERORS",
+     "BURNING VENGEANCE",
+     "IMMOLATION PROTOCOLS",
+     "ARMOUR OF CONTEMPT",
+     "ONSLAUGHT OF FIRE",
+     "CRUCIBLE OF BATTLE",
+     "RAPID EMBARKATION",
+     "ARMOUR OF CONTEMPT",
+     "WRATHFUL INFERNO",
+     "DATA-LINK AUGURY",
+     "ANTI-GRAV SURGE",
+     "REACTIVE EVASION",
+     "HONOUR THE CHAPTER",
+     "STORM OF FIRE",
+     "ONLY IN DEATH DOES DUTY END",
+     "SQUAD TACTICS",
+     "BLESSED HULL",
+     "CONDEMNATORY INFO-SCREED",
+     "FOCUSED HATRED",
+     "GAUNTLET OF THE GOD-EMPEROR",
+     "UNCOMPROMISING EGRESS",
+     "A CEASELESS CAUSE",
+     "RUTHLESS BUTCHERY",
+     "AUGMETIC FORTITUDE",
+     "ARMOUR OF CONTEMPT",
+     "DOMINATOR BEACON",
+     "COGITATED FEROCITY",
+     "DROPSHIP EXTRACTION",
+     "TARGET WEAK POINT",
+     "KILL SHOT",
+     "MACHINE VENGEANCE",
+     "ARMOUR OF CONTEMPT",
+     "RAPID GUNNERY",
+     "REACTIVE REPOSITIONING",
+     "ARMOUR OF CONTEMPT",
+     "UNMATCHED FORTITUDE",
+     "MARTIAL MASTERY",
+     "EXACTING PUNISHMENT",
+     "TERRIFYING ZEAL",
+     "WAGES OF COWARDICE",
+     "MERCY IS WEAKNESS",
+     "ARMOUR OF CONTEMPT",
+     "UNBOWED CONVICTION",
+     "POWER OF THE MACHINE SPIRIT",
+     "ANCIENT FURY",
+     "VENGEFUL ANIMUS",
+     "AURA OF THE ANGEL’S GRACE",
+     "SOUL-DARKENED FURY",
+     "MARTIAL PARAGON",
+     "FANGS OF THE PACK",
+     "CHILLING HOWL",
+     "WINGS OF THE BLIZZARD",
+     "ARMOUR OF CONTEMPT",
+     "SAVAGE ECHOES",
+     "RED RAMPAGE",
+     "ANGELIC GRACE",
+     "AGGRESSIVE ONSLAUGHT",
+     "RELENTLESS ASSAULT",
+     "ILLUMINATING FIRE",
+     "STRENGTH IN UNITY",
+     "ARMOUR OF CONTEMPT",
+     "KNIGHTS OF IRON",
+     "INESCAPABLE WRATH",
+     "OVERPOWERING EXACTION",
+     "AUTO‑SENSE COORDINATION",
+     "TACTICAL DECAPITATION",
+     "SHOCK ONSLAUGHT",
+     "SUPPRESSION STRAFING",
+     "BLIND SCREEN",
+     "ONWARD FOR THE EMPEROR",
+     "A GRIM WARNING",
+     "LIMB FROM LIMB",
+     "RED WRATH",
+     "ARMOUR OF CONTEMPT",
+     "DEATHLESS DUTY",
+     "INSENSATE RAMPAGE",
+     "FIGHT TO THE END",
+     "FURIOUS DEDICATION",
+     "CRUSADING CONQUERORS",
+     "ULTRAMARIAN DESTINY",
+     "SCIONS OF GUILLIMAN",
+     "MARCHING EVER ON",
+     "SHOCK CAVALRY",
+     "PINNING FIRE",
+     "THUNDEROUS PURSUIT",
+     "COORDINATED STRIKE",
+     "HEROIC RESOLVE",
+     "ALPHA STRIKE",
+     "COUNTERCHARGE",
+     "CHAMPION’S GUIDANCE",
+     "BIRTH OF A SAGA",
+     "INSPIRING PRESENCE",
+     "UNRELENTING HUNTERS",
+     "THE FOE FORESEEN",
+     "OVERWHELMING ONSLAUGHT",
+     "MARKED FOR DESTRUCTION",
+     "TERRITORIAL ADVANTAGE",
+     "HUNTERS’ TRAIL",
+     "BOUNDING ADVANCE",
+     "CHOSEN PREY",
+     "STUNNING FUSILLADE",
+     "ARMOUR OF CONTEMPT",
+     "EVASIVE MANOEUVRES",
+     "ARMOUR OF CONTEMPT",
+     "ARMOUR OF CONTEMPT",
+     "RIDE HARD, RIDE FAST",
+     "SHOCK ASSAULT",
+     "BLITZING FUSILLADE",
+     "FULL THROTTLE",
+     "ADAPTIVE OPERATIONS",
+     "STRIKE FROM THE SHADOWS",
+     "CLOAKED POSITION",
+     "MARTIAL EXEMPLARS",
+     "ANGEL’S SACRIFICE",
+     "ARMOUR OF CONTEMPT",
+     "DESCENT OF ANGELS",
+     "DEATH FROM THE SKIES",
+     "UNBRIDLED ARDOUR",
+     "ARMOUR OF CONTEMPT",
+     "FURIOUS ONSLAUGHT",
+     "LOST TO RAGE",
+     "FINAL RETRIBUTION",
+     "GLORIOUS SACRIFICE",
+     "WRATHFUL RAMPAGE",
+     "ARMOUR OF CONTEMPT",
+     "UNBREAKABLE LINES",
+     "FIRE DISCIPLINE",
+     "UNFORGIVEN FURY",
+     "GRIM RETRIBUTION",
+     "INTRACTABLE",
+     "ARMOUR OF CONTEMPT",
+     "SURGICAL STRIKES",
+     "STRIKE FROM THE SHADOWS",
+     "GUERRILLA TACTICS",
+     "CALCULATED FEINT",
+     "A DEADLY PRIZE",
+     "METEORIC ONSLAUGHT",
+     "PURGE BY SECTORS",
+     "KNOW NO FEAR",
+     "GRIZZLED KILLERS",
+     "ICY CALM",
+     "BLADE-KEEN SENSES",
+     "SPOOR OF THE UNHOLY",
+     "LITANIES OF PURGATION",
+     "REFUSAL TO YIELD",
+     "RECLAIM OUR HONOUR!",
+     "RECITATION OF THE REVERED",
+     "PERFERVID INTERVENTION",
+     "ARMOUR OF CONTEMPT",
+     "LEONINE AGGRESSION",
+     "RITE OF PERFERVID WRATH",
+     "CASTIGATE THE DEMAGOGUES",
+     "FUELLED BY FAITH"
+    ],
+    "enhancements": [
+     "Venerable Champion (Aura)",
+     "Artificer Sarcophagus",
+     "Redoubtable Machine Spirit",
+     "Gunnery Honours",
+     "Auspex Triangulation Shrines",
+     "Supercharged Engines",
+     "Immovable Conquerors",
+     "Furious Assault",
+     "Chogorian Huntmaster",
+     "Fervent Exemplars",
+     "Inheritors of Sigismund",
+     "Righteous Fervour",
+     "Nightforged Battery",
+     "Thundercowl Turbines",
+     "Limitless Zeal",
+     "Carmine Reliquary",
+     "Eye of the Primarch",
+     "Laurels of Thunder",
+     "Shroud Field",
+     "Seals of Reconquest",
+     "Thirst For Glory",
+     "Liberator",
+     "Eye of the Hunter",
+     "Bellicose Weapon Spirits",
+     "Celerity",
+     "Master-crafted Weapon",
+     "Avenging Angel",
+     "Thief of Secrets",
+     "The Blade Driven Deep",
+     "The Imperium’s Sword",
+     "Petition of Stability",
+     "Calibanite Armaments",
+     "Shroud of Heroes",
+     "Sanguinius’ Grace",
+     "Artisan of War",
+     "Speed of the Primarch",
+     "Redoubtable Machine Spirit",
+     "Paragon of Fury",
+     "Champion of Humanity",
+     "Guiding Omens",
+     "Champion of the Feast",
+     "Target Augury Web",
+     "Fury of the Storm",
+     "Benediction of Fury",
+     "Swift Hunter",
+     "Braggart’s Steel",
+     "Incendiary Animus",
+     "Imperialis of the Eternal Crusade",
+     "Blood Boil",
+     "Spiritus Ferrum",
+     "Indomitable Fury",
+     "Orksbane",
+     "Consecrating Aura",
+     "Mounted Strategist",
+     "Avenging Avatar (Aura)",
+     "Prescience",
+     "Fierce Example",
+     "Blood Shard",
+     "Skjald",
+     "Fleet Commander",
+     "Raptorial Cogitator Core",
+     "Fenrisian Grit",
+     "Weaver of Sagas",
+     "Death in the Dark",
+     "Adaptable Executioner",
+     "Battle-psalm Precentor",
+     "The Honour Vehement",
+     "Oathbound Exemplar",
+     "Portents of Wisdom",
+     "Troubling Visions",
+     "The Flesh is Weak",
+     "Gunnery Honours",
+     "Tip of the Spear",
+     "Eye of the Unseen",
+     "Visage of Death",
+     "War-tempered Artifice",
+     "Stubborn Tenacity",
+     "Inescapable Interrogation",
+     "Hero of the Chapter",
+     "Fear Made Manifest (Aura)",
+     "Ghostweave Cloak",
+     "Veteran of the Vanguard",
+     "Disciple of Rhetoricus",
+     "Aureole of the Angel",
+     "Master of the Red Thirst",
+     "Lord of the Hunt",
+     "Entreaty of Perpetual Ardour",
+     "Medusan Roar (Aura)",
+     "Rage-fuelled Warrior",
+     "Master of Manoeuvre",
+     "To Slay the Warmaster",
+     "Shock Deployment",
+     "Firestorm Coordinators",
+     "Orb of the Emperor’s Aegis",
+     "Elder’s Guidance",
+     "Hordeslayer",
+     "Wolf Master",
+     "Adept of the Omnissiah",
+     "Merciless Denunciation",
+     "Archangel’s Shard",
+     "Augury Servo-host",
+     "Blades of Valour",
+     "Icon of the Angel",
+     "Indomitable Champion",
+     "Execute and Redeploy",
+     "Weapons of the First Legion",
+     "Rites of War",
+     "Obfuscation",
+     "Iron Laurel",
+     "Stalwart Champion",
+     "Scroll of Proclamation",
+     "Sanguinary Tear (Aura)",
+     "Feinting Withdrawal",
+     "Orbital Uplink Reliquary",
+     "Stoic Defender",
+     "Forged in Battle",
+     "Fire Discipline",
+     "Warden of Honour",
+     "Fulgus Magna",
+     "Shadow War Veteran",
+     "Gift of Foresight",
+     "Architect of War",
+     "Master of Machine War",
+     "Iron Resolve",
+     "Gleaming Pinions",
+     "Malodraxian Standard",
+     "Bombast Omnivox",
+     "Temporal Corridor",
+     "Recon Hunter",
+     "Helm of the Beastslayer",
+     "Liberatum",
+     "Steel Font",
+     "Thunderwolf’s Fortitude",
+     "Herald of Sacred Slaughter",
+     "Dedicated Gunship",
+     "Feral Rage",
+     "Vengeful Onslaught",
+     "Zealous Vanguard",
+     "Astartes Tank Ace (Aura)",
+     "Deathwing Assault",
+     "Armoured Commander",
+     "Hunter’s Instincts",
+     "Pennant of Remembrance",
+     "Angel’s Fang",
+     "Adamantine Mantle",
+     "Fusillade"
+    ]
+   }
+  },
+  "TAU": {
+   "name": "T’au Empire",
+   "counts": {
+    "datasheets": {
+     "total": 62,
+     "ru": 62
+    },
+    "factionAbilities": {
+     "total": 42,
+     "ru": 42
+    },
+    "abilities": {
+     "total": 151,
+     "ru": 134
+    },
+    "detachments": {
+     "total": 7,
+     "ru": 7
+    },
+    "detRules": {
+     "total": 9,
+     "ru": 6
+    },
+    "stratagems": {
+     "total": 31,
+     "ru": 30
+    },
+    "enhancements": {
+     "total": 23,
+     "ru": 23
+    },
+    "armyRules": {
+     "total": 1,
+     "ru": 1
+    }
+   },
+   "missing": {
+    "abilities": [
+     "Commander Farsight: INDEPENDENT POWER",
+     "Commander Shadowsun: SUPREME COMMANDER",
+     "Kroot Carnivores: BODYGUARD",
+     "Piranhas: One Shot",
+     "Devilfish: One Shot",
+     "Razorshark Strike Fighter: One Shot",
+     "Sun Shark Bomber: One Shot",
+     "Longstrike: One Shot",
+     "Hammerhead Gunship: One Shot",
+     "Broadside Battlesuits: One Shot",
+     "Remora Stealth Drones: One Shot",
+     "Barracuda: One Shot",
+     "Tiger Shark: One Shot",
+     "AX-1-0 Tiger Shark: One Shot",
+     "Manta: One Shot",
+     "Crisis Fireknife Battlesuits: Weapon Support System",
+     "Crisis Starscythe Battlesuits: Battlesuit Support System"
+    ],
+    "detRules": [
+     "Kroot Hunting Pack: Hunter’s Instincts",
+     "Kroot Hunting Pack: Skirmish Fighters",
+     "Kroot Hunting Pack: KEYWORDS"
+    ],
+    "stratagems": [
+     "GUIDED FIRE"
+    ]
+   }
+  },
+  "TS": {
+   "name": "Thousand Sons",
+   "counts": {
+    "datasheets": {
+     "total": 181,
+     "ru": 164
+    },
+    "factionAbilities": {
+     "total": 152,
+     "ru": 146
+    },
+    "abilities": {
+     "total": 341,
+     "ru": 325
+    },
+    "detachments": {
+     "total": 9,
+     "ru": 9
+    },
+    "detRules": {
+     "total": 9,
+     "ru": 9
+    },
+    "stratagems": {
+     "total": 45,
+     "ru": 45
+    },
+    "enhancements": {
+     "total": 30,
+     "ru": 27
+    },
+    "armyRules": {
+     "total": 2,
+     "ru": 1
+    }
+   },
+   "missing": {
+    "datasheets": [
+     "Land Raider Achilles",
+     "Land Raider Proteus",
+     "Fire Raptor Gunship",
+     "Spartan",
+     "Deredeo Dreadnought",
+     "Sokar-pattern Stormbird",
+     "Sicaran Battle Tank",
+     "Leviathan Dreadnought",
+     "Fellblade",
+     "Relic Contemptor Dreadnought",
+     "Whirlwind Scorpius",
+     "Xiphon Interceptor",
+     "Storm Eagle Gunship",
+     "Sicaran Venator",
+     "Sicaran Punisher",
+     "An’ggrath the Unbound",
+     "Aetaos’rau’keres"
+    ],
+    "abilities": [
+     "Kratos: One Shot",
+     "Pink Horrors: HORRORS ARE PINK. HORRORS ARE BLUE. WHEREONCE THERE WAS ONE, NOW THERE ARE TWO.",
+     "Kairos Fateweaver: Greater Daemon of Tzeentch (Aura)",
+     "Lord of Change: Greater Daemon of Tzeentch (Aura)",
+     "Exalted Flamer: MANIFESTATION OF DESTRUCTION",
+     "Be’lakor: Shadow Form",
+     "Be’lakor: SUPREME COMMANDER",
+     "Daemon Prince of Chaos: DAEMONIC ALLEGIANCE",
+     "Pink Horrors: HORRORS ARE PINK. HORRORS ARE BLUE. WHEREONCE THERE WAS ONE, NOW THERE ARE TWO.",
+     "Daemon Prince Of Chaos With Wings: DAEMONIC ALLEGIANCE",
+     "Accursed Cultists: Accursed Horde",
+     "Sorcerer: Prescience (Psychic)",
+     "Sorcerer: Gift of Chaos (Psychic)",
+     "Sorcerer In Terminator Armour: Chaos Familiar",
+     "Sorcerer In Terminator Armour: Warptime (Psychic)",
+     "Sorcerer In Terminator Armour: Death Hex (Psychic)"
+    ],
+    "enhancements": [
+     "Arcane Thralls (Aura)",
+     "The Perplexing Cloak",
+     "The Stave Abominus"
+    ],
+    "armyRules": [
+     "Pact of Sorcery"
+    ]
+   }
+  },
+  "TYR": {
+   "name": "Tyranids",
+   "counts": {
+    "datasheets": {
+     "total": 57,
+     "ru": 57
+    },
+    "factionAbilities": {
+     "total": 74,
+     "ru": 17
+    },
+    "abilities": {
+     "total": 87,
+     "ru": 86
+    },
+    "detachments": {
+     "total": 10,
+     "ru": 10
+    },
+    "detRules": {
+     "total": 10,
+     "ru": 10
+    },
+    "stratagems": {
+     "total": 51,
+     "ru": 51
+    },
+    "enhancements": {
+     "total": 34,
+     "ru": 32
+    },
+    "armyRules": {
+     "total": 2,
+     "ru": 1
+    }
+   },
+   "missing": {
+    "abilities": [
+     "Deathleaper: HUNTER ORGANISM"
+    ],
+    "enhancements": [
+     "Biophagic Flow (Aura)",
+     "The Dirgeheart of Kharis (Aura)"
+    ],
+    "armyRules": [
+     "Synapse"
+    ]
+   }
+  },
+  "WE": {
+   "name": "World Eaters",
+   "counts": {
+    "datasheets": {
+     "total": 179,
+     "ru": 162
+    },
+    "factionAbilities": {
+     "total": 176,
+     "ru": 171
+    },
+    "abilities": {
+     "total": 341,
+     "ru": 329
+    },
+    "detachments": {
+     "total": 8,
+     "ru": 8
+    },
+    "detRules": {
+     "total": 8,
+     "ru": 8
+    },
+    "stratagems": {
+     "total": 39,
+     "ru": 39
+    },
+    "enhancements": {
+     "total": 26,
+     "ru": 26
+    },
+    "armyRules": {
+     "total": 2,
+     "ru": 1
+    }
+   },
+   "missing": {
+    "datasheets": [
+     "Land Raider Achilles",
+     "Land Raider Proteus",
+     "Fire Raptor Gunship",
+     "Spartan",
+     "Deredeo Dreadnought",
+     "Sokar-pattern Stormbird",
+     "Sicaran Battle Tank",
+     "Leviathan Dreadnought",
+     "Fellblade",
+     "Relic Contemptor Dreadnought",
+     "Whirlwind Scorpius",
+     "Xiphon Interceptor",
+     "Storm Eagle Gunship",
+     "Sicaran Venator",
+     "Sicaran Punisher",
+     "An’ggrath the Unbound",
+     "Aetaos’rau’keres"
+    ],
+    "abilities": [
+     "Greater Brass Scorpion: Super-heavy Walker",
+     "Kytan Ravager: Super-heavy Walker",
+     "Kratos: One Shot",
+     "Skarbrand: Greater Daemon of Khorne (Aura)",
+     "Exalted Flamer: MANIFESTATION OF DESTRUCTION",
+     "Be’lakor: Shadow Form",
+     "Be’lakor: SUPREME COMMANDER",
+     "Daemon Prince of Chaos: DAEMONIC ALLEGIANCE",
+     "Bloodthirster: Greater Daemon of Khorne (Aura)",
+     "Pink Horrors: HORRORS ARE PINK. HORRORS ARE BLUE. WHEREONCE THERE WAS ONE, NOW THERE ARE TWO.",
+     "Daemon Prince Of Chaos With Wings: DAEMONIC ALLEGIANCE",
+     "Accursed Cultists: Accursed Horde"
+    ],
+    "armyRules": [
+     "Pact of Blood"
+    ]
+   }
+  }
+ }
+}

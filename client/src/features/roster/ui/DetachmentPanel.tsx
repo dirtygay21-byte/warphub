@@ -5,6 +5,10 @@ import type { Detachment, UnitMatcher } from '../engine/types';
 import { openExternal, pushOverlay } from '../telegram';
 import { cleanRuleText, INCOMPLETE_TEXT, rawIncomplete, type IncompleteKind } from '../text';
 import { Icon, IconButton, Tag } from './kit';
+import { RuleRichText } from './common/RulePopover';
+import { useGlossary } from './common/useGlossary';
+import { useRu } from './common/useRu';
+import { ruDetachmentName, ruDetachmentRule, ruEnhancement, ruName, ruStratagem, type RuText } from '../ru';
 import { cx } from './util';
 
 const TURN_RU: Record<string, string> = { 'Your turn': 'ваш ход', 'Opponent’s turn': 'ход противника', 'Either player’s turn': 'любой ход' };
@@ -24,9 +28,12 @@ export function RuleText({
   open,
   incomplete,
   link,
+  ru,
 }: {
   name: string;
   text: string;
+  /** русский текст с wh-rules.ru (01.11.2026): название «Русское (English)», текст с разметкой сайта; нет — английский */
+  ru?: RuText | null;
   sub?: string;
   right?: ReactNode;
   badge?: ReactNode;
@@ -38,12 +45,12 @@ export function RuleText({
   link?: string | null;
 }) {
   const subText = cleanRuleText(sub);
-  const missing = incomplete ?? rawIncomplete(text);
+  const missing = ru ? null : (incomplete ?? rawIncomplete(text));
   return (
     <details open={open} className="group rounded-xl border border-white/10 bg-white/[0.03]">
       <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2">
         <span className="min-w-0 flex-1">
-          <span className="block text-[13px] font-semibold text-white/85">{cleanRuleText(name)}</span>
+          <span className="block text-[13px] font-semibold text-white/85">{ru ? ruName(ru.name, cleanRuleText(name)) : cleanRuleText(name)}</span>
           {subText && <span className="block text-[12px] text-fg-3">{subText}</span>}
         </span>
         {badge}
@@ -51,7 +58,7 @@ export function RuleText({
         <Icon name="down" className="size-4 shrink-0 text-fg-3 transition group-open:rotate-180" />
       </summary>
       <div className="border-t border-white/[0.06] px-3 py-2">
-        <p className="whitespace-pre-line text-[12px] leading-relaxed text-fg-2">{cleanRuleText(text)}</p>
+        {ru ? <RuRuleBody text={ru.text} /> : <p className="whitespace-pre-line text-[12px] leading-relaxed text-fg-2">{cleanRuleText(text)}</p>}
         {missing && (
           <p className="mt-2 rounded-lg bg-warn/10 px-2.5 py-1.5 text-[12px] leading-snug text-amber-100">
             {INCOMPLETE_TEXT[missing]}
@@ -69,6 +76,12 @@ export function RuleText({
       </div>
     </details>
   );
+}
+
+/** Русский текст правила: термины и основные способности нажимаются (глоссарий грузится, только когда есть русский текст). */
+function RuRuleBody({ text }: { text: string }) {
+  const g = useGlossary();
+  return <RuleRichText text={text} g={g} className="text-[12px] leading-relaxed text-fg-2" />;
 }
 
 const title = (s: string) => s.toLowerCase().replace(/(^|[\s-])\S/g, (c) => c.toUpperCase());
@@ -129,6 +142,7 @@ export function DetachmentPanel({
   onClose: () => void;
 }) {
   useEffect(() => pushOverlay(onClose), [onClose]);
+  const ru = useRu(L.faction.id);
   const d = cr.detachments.find((x) => x.id === id);
   if (!d) return null;
   // у действующего детачмента — только записи текущего источника; у устаревшего — сохранённые прежние
@@ -141,6 +155,7 @@ export function DetachmentPanel({
         <div className="min-w-0 flex-1">
           <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent/80">Детачмент</p>
           <h2 className="font-display mt-0.5 text-xl font-semibold uppercase leading-tight">{ruleLabel(d)}</h2>
+          {ruDetachmentName(ru, d.id) && <p className="text-[13px] text-fg-3">{ruDetachmentName(ru, d.id)}</p>}
           {d.outdated && <p className="mt-1 text-xs text-amber-200">{OUTDATED_RULE_NOTE}</p>}
         </div>
         <IconButton icon="close" label="Закрыть" onClick={onClose} className="size-9" />
@@ -170,7 +185,7 @@ export function DetachmentPanel({
       <div className="space-y-2 border-t border-white/[0.06] px-4 pb-4 pt-3">
         <Section label="Правила детачмента" count={d.abilities.length} open>
           {d.abilities.map((a) => (
-            <RuleText key={a.id} name={a.name} text={a.text} />
+            <RuleText key={a.id} name={a.name} text={a.text} ru={ruDetachmentRule(ru, d.id, a.id)} />
           ))}
         </Section>
         <Section label="Стратагемы" count={strats.length}>
@@ -181,6 +196,7 @@ export function DetachmentPanel({
               sub={[s.type.replace(/ Stratagem$/, ''), TURN_RU[s.turn] ?? s.turn, s.phase].filter(Boolean).join(' · ')}
               right={<span className="shrink-0 rounded-md bg-accent/15 px-1.5 py-0.5 text-[12px] font-semibold text-accent">{s.cp} CP</span>}
               text={s.text}
+              ru={ruStratagem(ru, s.id)}
             />
           ))}
         </Section>
@@ -192,6 +208,7 @@ export function DetachmentPanel({
               sub={[e.upgrade ? 'Upgrade · до 3 юнитов' : '', e.restriction].filter(Boolean).join(' · ') || undefined}
               right={<span className="shrink-0 text-xs font-semibold tabular-nums text-fg-2">{e.cost} очк.</span>}
               text={e.text}
+              ru={ruEnhancement(ru, e.id)}
             />
           ))}
         </Section>
