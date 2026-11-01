@@ -1,0 +1,41 @@
+# Roster data checks: engine and data tests, AoS repair stability. No secrets.
+# Runs only on pull requests that touch roster data or WarpBuilder engines (and by hand: Actions → CI roster data → Run workflow).
+# Not on plain pushes and merges: the PR already checked that code. Sync PRs main → roster-builder are skipped.
+# Why: GitHub Actions free minutes (docs: ops/README.md, «CI и минуты GitHub»).
+name: CI roster data
+
+on:
+  pull_request:
+    paths:
+      - "tools/roster-data/**"
+      - "backend/roster-data/**"
+      - "client/src/features/roster/**"
+      - "client/src/apiUtils/**"
+      - ".github/workflows/ci-roster.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-roster-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  roster-data:
+    name: Roster data tests
+    if: ${{ github.event_name != 'pull_request' || !(github.head_ref == 'main' && github.base_ref == 'roster-builder') }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # 40K tests rebuild their baseline from git history (scripts/baseline-40k.mjs)
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+      - name: Tests (engines, data; CSV cross-checks skip without the export)
+        working-directory: tools/roster-data
+        run: bun test tests/
+      - name: AoS data is stable under repair
+        working-directory: tools/roster-data
+        run: node scripts/repair-aos-data.mjs --check
