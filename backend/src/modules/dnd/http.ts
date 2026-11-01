@@ -11,6 +11,7 @@ export function mapDndError(error: DndError) {
     case 'ALREADY_BOOKED':
     case 'REQUEST_ALREADY_OPEN':
     case 'GAME_HAS_BOOKINGS':
+    case 'CLUB_BUSY':
       return status(409, { error: error.message });
     case 'GAME_NOT_OPEN':
     case 'GAME_STARTED':

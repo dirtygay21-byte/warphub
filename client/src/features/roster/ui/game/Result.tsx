@@ -4,6 +4,7 @@ import { haptic } from '../../telegram';
 import { Button, Icon } from '../kit';
 import { cx } from '../util';
 import { ActAs } from './ActAs';
+import { DominatusResult } from './DominatusResult';
 import { useMySeat } from './cardViewer';
 import { RosterButton } from './RosterViewer';
 import { ScoreRows } from './ScoreRows';
@@ -41,6 +42,8 @@ export function Result({ game }: { game: GameHook }) {
           <EndScoring game={game} seat={s} />
         </ActAs>
       ))}
+
+      {state.mode === 'dominatus' && <DominatusResult game={game} />}
 
       <div className="grid grid-cols-2 gap-2">
         {SEATS.map((s) => {

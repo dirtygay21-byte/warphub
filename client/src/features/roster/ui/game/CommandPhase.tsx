@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { MissionCard } from '../../data';
-import { blockInRound, commandPhasePending, nextDraw, primaryAtOk, type Seat } from '../../game';
+import { blockInRound, commandPhasePending, nextDraw, primaryAtOk, primaryContext, type Seat } from '../../game';
 import { haptic } from '../../telegram';
 import { Button } from '../kit';
 import { cx } from '../util';
@@ -198,7 +198,7 @@ function PrimaryNow({ game, seat }: { game: GameHook; seat: Seat }) {
   const id = state.primary[seat];
   const card = missions.cards.find((c) => c.id === id);
   if (!card) return null;
-  const ctx = { end: false, step: state.step, ownTurn: true, round: state.round };
+  const ctx = { ...primaryContext(state, state.activeSeat ?? 'p1'), ownTurn: true };
   const done = state.players[seat].primaryScored.filter((x) => !x.end && x.round === state.round && x.turn === seat).flatMap((x) => x.picks.map((k) => k.block));
   const blocks = card.blocks
     .map((b, i) => [b, i] as const)

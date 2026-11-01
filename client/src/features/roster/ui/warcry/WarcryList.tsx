@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { loadWarcryFaction } from '../../data';
 import { uid } from '../../engine/roster';
 import { cloudEnabled } from '../../storage';
@@ -6,7 +7,7 @@ import { decodeWarcryRoster, newWarcryRoster, WARCRY_CODE_PREFIX, WARCRY_LIMITS,
 import type { WarcryIndex } from '../../warcry/types';
 import { confirmAsk, haptic } from '../../telegram';
 import { Button, Empty, Field, Icon, Sheet, Tag } from '../kit';
-import { BottomAction, ListHeader, PickTile, RosterCard, SearchField } from '../common/BuilderKit';
+import { BottomAction, ListHeader, PickTile, RosterCard, SearchField, ToolTile } from '../common/BuilderKit';
 
 const ALLIANCE: Record<string, string> = { chaos: 'Chaos', death: 'Death', destruction: 'Destruction', order: 'Order' };
 
@@ -28,6 +29,7 @@ export function WarcryList({
   onDuplicate: (r: WarcryRoster) => void;
   onDelete: (id: string) => void;
 }) {
+  const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
   const [menu, setMenu] = useState<WarcryRoster | null>(null);
@@ -35,6 +37,9 @@ export function WarcryList({
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-4xl lg:pt-8">
       <ListHeader kicker="WarpBuilder · Warcry Matched Play" title="Warcry" onBack={onExit} onImport={() => setImporting(true)} />
+      <div className="mb-5">
+        <ToolTile icon="spark" title="Как играть" sub="Обучение для новичков: инициатива, действия, атака" onClick={() => navigate('/learn/warcry')} />
+      </div>
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Выберите фракцию и наберите бойцов: союзники, траллы, монстр, группы Dagger / Shield / Hammer и проверка правил построения.</Empty>
       ) : (

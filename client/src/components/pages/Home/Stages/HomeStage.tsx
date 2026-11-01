@@ -60,7 +60,7 @@ export default function HomeStage() {
         <NavRow
           icon={<BookOpen className="size-5" />}
           title="Как играть"
-          subtitle="Первая игра без паники: 40K, Age of Sigmar, Kill Team"
+          subtitle="Первая игра без паники: 40K, AoS, Kill Team, Warcry"
           onClick={() => navigate("/learn")}
           className="mt-1"
         />

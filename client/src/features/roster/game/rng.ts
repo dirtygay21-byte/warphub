@@ -69,6 +69,11 @@ export function rollOff(seed: string, key: string, attempt = 0): { rolls: { p1: 
   }
 }
 
+/** Бросок одного D6 по seed (Dominatus: выбор локации фазы). attempt — номер повторного броска. */
+export function rollD6(seed: string, key: string, attempt = 0): number {
+  return pickIndex(makeRng(seed, 'd6', key, attempt), 6) + 1;
+}
+
 /**
  * Случайная раскладка: индекс среди раскладок пары (в порядке A, B, C) по seed и номеру выбора.
  * Отмена возвращает номер — повторный случайный выбор даёт ту же раскладку.
