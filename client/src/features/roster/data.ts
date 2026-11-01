@@ -1,5 +1,6 @@
 import type { DominatusData } from './dominatus/types';
 import { apiRequest } from '@/apiUtils/general';
+import type { Glossary } from './glossary';
 import type { DataIndex, FactionData } from './engine/types';
 import type { AosBattlepack, AosFactionData, AosIndex } from './aos/types';
 import type { KtIndex, KtTeam } from './kt/types';
@@ -174,6 +175,15 @@ export function loadDominatus(): Promise<DominatusData> {
   dominatusPromise ??= apiRequest<DominatusData>('/roster/data/dominatus');
   dominatusPromise.catch(() => (dominatusPromise = null));
   return dominatusPromise;
+}
+
+// ---------- Глоссарий правил 40K для подсказок (wh-rules.ru, 01.11.2026) ----------
+let glossaryPromise: Promise<Glossary> | null = null;
+/** Загрузка один раз — при первом открытии подсказки. */
+export function loadGlossary(): Promise<Glossary> {
+  glossaryPromise ??= apiRequest<Glossary>('/roster/data/glossary');
+  glossaryPromise.catch(() => (glossaryPromise = null));
+  return glossaryPromise;
 }
 
 // ---------- Kill Team 2024 (backend: GET /roster/data/kt/:name, W2 30.10.2026) ----------

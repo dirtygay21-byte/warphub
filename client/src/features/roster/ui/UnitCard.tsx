@@ -9,6 +9,9 @@ import { Button, Counter, Field, Icon, Segmented, Tag } from './kit';
 import { cx, fmtPts } from './util';
 import { cleanRuleText, INCOMPLETE_TEXT } from '../text';
 import { RuleText } from './DetachmentPanel';
+import { RuleTrigger, WeaponAbilityTag } from './common/RulePopover';
+import { useGlossary } from './common/useGlossary';
+import { findKeyword, splitWeaponKeywords } from '../glossary';
 
 /** В выгрузке дальность и навык — голые числа («24», «3»); на карточке инфолиста — «24″» и «3+». */
 const fmtRange = (r: string) => (/^\d+$/.test(r.trim()) ? `${r.trim()}″` : r);
@@ -111,8 +114,9 @@ export function UnitCard({
             )}
             {c.copy > 1 && <span className="ml-1.5 text-xs font-semibold text-fg-3">#{c.copy}</span>}
           </p>
-          {(meta.length > 0 || (!attachedTo && ds.support)) && (
-            <p className="mt-1 line-clamp-2 text-[12.5px] leading-snug text-fg-3">
+          {(meta.length > 0 || tags.length > 0 || (!attachedTo && ds.support)) && (
+            // 01.11.2026: метки (Epic Hero, Legends, союзник…) — в той же строке, что и состав, а не отдельной строкой
+            <p className="mt-1 line-clamp-2 text-[12.5px] leading-[1.6] text-fg-3">
               {!attachedTo && ds.support && <span className="text-danger">Нужно присоединить · </span>}
               {meta.map((m, i) => (
                 <span key={i} className={cx(c.enhancement && m === c.enhancement.name && 'text-accent/80')}>
@@ -120,16 +124,12 @@ export function UnitCard({
                   {m}
                 </span>
               ))}
-            </p>
-          )}
-          {tags.length > 0 && (
-            <div className="mt-1.5 flex flex-wrap gap-1">
-              {tags.map((t) => (
-                <Tag key={t.label} tone={t.tone}>
-                  {t.label}
-                </Tag>
+              {tags.map((t, i) => (
+                <span key={t.label} className={cx('align-[1px]', (i > 0 || meta.length > 0) && 'ml-1.5')}>
+                  <Tag tone={t.tone}>{t.label}</Tag>
+                </span>
               ))}
-            </div>
+            </p>
           )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
@@ -161,10 +161,21 @@ export function UnitCard({
             </ul>
           )}
 
+          <Profile c={c} cr={cr} L={L} detachmentIds={roster.detachmentIds} />
+
           {readOnly ? (
             <ReadOnlyChoices c={c} cr={cr} isWarlord={isWarlord} attachedTo={attachedTo?.ds?.name ?? null} />
           ) : (
-            <>
+            // настройка свёрнута (профиль — главное при открытии); при ошибках и предупреждениях открыта сразу
+            <details className="group rounded-xl border border-white/10 bg-white/[0.02]" open={issues.length > 0}>
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5 text-sm font-semibold text-fg-2">
+                <span className="min-w-0">
+                  Настройка отряда
+                  <span className="block truncate text-[12px] font-normal text-fg-3">{meta.length ? meta.join(' · ') : 'состав, снаряжение, улучшение'}</span>
+                </span>
+                <Icon name="down" className="size-4 shrink-0 text-fg-3 transition group-open:rotate-180" />
+              </summary>
+              <div className="space-y-5 border-t border-white/[0.06] px-3 pb-3 pt-3">
           {c.band && c.band.options.length > 1 && (
             <Field label="Состав" hint={c.band.from > 1 || c.band.to ? `цены для копии №${c.copy}` : undefined}>
               <Segmented value={c.unit.size} onChange={(size) => onPatch({ size })} options={c.band.options.map((o) => ({ value: o.label, label: o.label, hint: `${o.cost} очк.` }))} />
@@ -287,12 +298,11 @@ export function UnitCard({
             </Field>
           )}
 
-            </>
+              </div>
+            </details>
           )}
 
           <CombinedUnit c={c} cr={cr} L={L} detachmentIds={roster.detachmentIds} />
-
-          <Profile c={c} cr={cr} L={L} detachmentIds={roster.detachmentIds} />
 
           <div className="flex gap-2 pt-1">
             {!readOnly && (
@@ -392,6 +402,8 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
   const [allWeapons, setAllWeapons] = useState(false);
   const tagAbilities = ds.abilities.filter((a) => a.type === 'core' || a.type === 'faction');
   const textAbilities = ds.abilities.filter((a) => a.type !== 'core' && a.type !== 'faction');
+  const g = useGlossary();
+  const moreSummary = [textAbilities.length ? textAbilities.map((a) => a.name).join(', ') : null, ds.composition.length ? 'состав' : null, 'ключевые слова'].filter(Boolean).join(' · ');
   // в обычном виде — только оружие, которое сейчас есть у отряда; полный список — по кнопке
   const count = countIn(c.loadout);
   const equipped = ds.weapons.filter((w) => count(w.name) > 0);
@@ -399,13 +411,11 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
   const hidden = ds.weapons.length - equipped.length;
   const ranged = shown.filter((w) => w.profiles.some((p) => p.type !== 'Melee'));
   const melee = shown.filter((w) => w.profiles.every((p) => p.type === 'Melee'));
+  // 01.11.2026 (по образцу wh-rules.ru): при открытии юнита сразу видны характеристики, оружие и способности-чипы;
+  // тексты способностей, правила детачмента, состав и ключевые слова — в свёрнутом блоке ниже
   return (
-    <details className="group rounded-xl border border-white/10 bg-white/[0.02]">
-      <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2.5 text-sm font-semibold text-fg-2">
-        Профиль
-        <Icon name="down" className="size-4 text-fg-3 transition group-open:rotate-180" />
-      </summary>
-      <div className="space-y-3 border-t border-white/[0.06] px-3 pb-3 pt-3">
+    <>
+      <div className="space-y-3 rounded-xl border border-white/10 bg-white/[0.02] px-3 pb-3 pt-3">
         {ds.stats.length > 0 && (
           <div className="no-scrollbar -mx-1 overflow-x-auto px-1">
             <table className="stat-grid w-full min-w-[320px] text-center text-[13px]">
@@ -451,42 +461,59 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
             <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Способности</p>
             <div className="mt-1 flex flex-wrap gap-1">
               {tagAbilities.map((a, i) => (
-                <RuleChip key={i} name={a.name + (a.param ? ' ' + a.param : '')} text={a.ref ? L.faction.rules[a.ref]?.text ?? '' : a.text} accent={a.type === 'faction'} />
+                <RuleChip key={i} name={a.name + (a.param ? ' ' + a.param : '')} text={a.ref ? L.faction.rules[a.ref]?.text ?? '' : a.text} accent={a.type === 'faction'} core={a.type === 'core'} />
               ))}
             </div>
           </div>
         )}
-        {textAbilities.map((a, i) => (
-          <div key={i}>
-            <p className="text-[13px] font-semibold text-accent/90">
-              {a.name}
-              {a.param ? ` ${a.param}` : ''}
-              {a.type === 'wargear' && <span className="ml-1.5 text-[12px] font-medium uppercase text-fg-3">снаряжение</span>}
-            </p>
-            <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-fg-2">{cleanRuleText(a.ref ? L.faction.rules[a.ref]?.text : a.text)}</p>
-            {a.incomplete && (
-              <p className="mt-1 rounded-lg bg-warn/10 px-2.5 py-1.5 text-[12px] leading-snug text-amber-100">
-                {INCOMPLETE_TEXT[a.incomplete]}{' '}
-                <button type="button" onClick={() => openExternal(ds.link)} className="font-semibold text-accent underline underline-offset-2">
-                  Полный текст — {linkLabel(ds.link)}
-                </button>
+      </div>
+      <details className="group rounded-xl border border-white/10 bg-white/[0.02]">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5 text-sm font-semibold text-fg-2">
+          <span className="min-w-0">
+            Способности и подробности
+            <span className="block truncate text-[12px] font-normal text-fg-3">{moreSummary}</span>
+          </span>
+          <Icon name="down" className="size-4 shrink-0 text-fg-3 transition group-open:rotate-180" />
+        </summary>
+        <div className="space-y-3 border-t border-white/[0.06] px-3 pb-3 pt-3">
+          {textAbilities.map((a, i) => (
+            <div key={i}>
+              <p className="text-[13px] font-semibold text-accent/90">
+                {a.name}
+                {a.param ? ` ${a.param}` : ''}
+                {a.type === 'wargear' && <span className="ml-1.5 text-[12px] font-medium uppercase text-fg-3">снаряжение</span>}
               </p>
+              <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-fg-2">{cleanRuleText(a.ref ? L.faction.rules[a.ref]?.text : a.text)}</p>
+              {a.incomplete && (
+                <p className="mt-1 rounded-lg bg-warn/10 px-2.5 py-1.5 text-[12px] leading-snug text-amber-100">
+                  {INCOMPLETE_TEXT[a.incomplete]}{' '}
+                  <button type="button" onClick={() => openExternal(ds.link)} className="font-semibold text-accent underline underline-offset-2">
+                    Полный текст — {linkLabel(ds.link)}
+                  </button>
+                </p>
+              )}
+            </div>
+          ))}
+          <UnitRules c={c} cr={cr} L={L} detachmentIds={detachmentIds} />
+          {ds.damaged && <Txt title={`Повреждён: ${ds.damaged.w} ран`} text={ds.damaged.text} />}
+          {ds.composition.length > 0 && <Txt title="Состав отряда" text={ds.composition.join('\n')} />}
+          {ds.loadout && <Txt title="Снаряжение" text={ds.loadout} />}
+          {ds.transport && <Txt title="Транспорт" text={ds.transport} />}
+          <div className="flex flex-wrap gap-1">
+            {ds.keywords.map((k) =>
+              g && findKeyword(g, k) ? (
+                <RuleTrigger key={k} source={{ lookup: 'keyword', label: k }} className="rounded-md bg-white/[0.07] px-1.5 py-0.5 text-[12px] font-semibold uppercase leading-none tracking-wide text-fg-2 underline decoration-accent/50 decoration-dotted underline-offset-2">
+                  {k}
+                </RuleTrigger>
+              ) : (
+                <Tag key={k}>{k}</Tag>
+              ),
             )}
           </div>
-        ))}
-        <UnitRules c={c} cr={cr} L={L} detachmentIds={detachmentIds} />
-        {ds.damaged && <Txt title={`Повреждён: ${ds.damaged.w} ран`} text={ds.damaged.text} />}
-        {ds.composition.length > 0 && <Txt title="Состав отряда" text={ds.composition.join('\n')} />}
-        {ds.loadout && <Txt title="Снаряжение" text={ds.loadout} />}
-        {ds.transport && <Txt title="Транспорт" text={ds.transport} />}
-        <div className="flex flex-wrap gap-1">
-          {ds.keywords.map((k) => (
-            <Tag key={k}>{k}</Tag>
-          ))}
+          <p className="text-[12px] text-fg-3">{ds.source}</p>
         </div>
-        <p className="text-[12px] text-fg-3">{ds.source}</p>
-      </div>
-    </details>
+      </details>
+    </>
   );
 }
 
@@ -531,7 +558,13 @@ function WeaponTable({ title, skill, weapons, count }: { title: string; skill: s
                       {w.profiles.length > 1 ? p.name : w.name}
                       {i === 0 && count(w.name) ? <span className="ml-1 text-accent">×{count(w.name)}</span> : null}
                     </span>
-                    {p.keywords && <span className="block text-[12px] uppercase leading-tight text-accent/70">{p.keywords}</span>}
+                    {p.keywords && (
+                      <span className="mt-1 flex flex-wrap gap-1">
+                        {splitWeaponKeywords(p.keywords).map((k) => (
+                          <WeaponAbilityTag key={k} label={k} />
+                        ))}
+                      </span>
+                    )}
                   </td>
                   <td className="px-1 py-1.5">{p.type === 'Melee' ? '—' : fmtRange(p.range)}</td>
                   <td className="px-1 py-1.5">{p.A}</td>
@@ -549,19 +582,15 @@ function WeaponTable({ title, skill, weapons, count }: { title: string; skill: s
   );
 }
 
-function RuleChip({ name, text, accent }: { name: string; text: string; accent?: boolean }) {
-  const [open, setOpen] = useState(false);
+/** Способность-чип: нажатие открывает подсказку. Основные способности (core) — текст из глоссария (wh-rules.ru, раздел 24), остальные — свой текст. */
+function RuleChip({ name, text, accent, core }: { name: string; text: string; accent?: boolean; core?: boolean }) {
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => text && setOpen((o) => !o)}
-        className={cx('rounded-md px-2 py-1 text-[12px] font-semibold uppercase tracking-wide', accent ? 'bg-accent/15 text-accent' : 'bg-white/[0.07] text-fg-2', open && 'ring-1 ring-white/30')}
-      >
-        {name}
-      </button>
-      {open && <p className="w-full whitespace-pre-line rounded-lg bg-white/[0.04] px-2.5 py-2 text-[12px] leading-relaxed text-fg-2">{cleanRuleText(text)}</p>}
-    </>
+    <RuleTrigger
+      source={core ? { lookup: 'ability', label: name } : { title: name, text }}
+      className={cx('rounded-md px-2 py-1 text-[12px] font-semibold uppercase tracking-wide', accent ? 'bg-accent/15 text-accent' : 'bg-white/[0.07] text-fg-2')}
+    >
+      {name}
+    </RuleTrigger>
   );
 }
 
@@ -691,7 +720,7 @@ function CombinedUnit({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: Comput
             </p>
             <div className="mt-1 flex flex-wrap gap-1">
               {m.ds!.abilities.map((a, i) => (
-                <RuleChip key={i} name={a.name + (a.param ? ' ' + a.param : '')} text={text(a)} accent={a.type === 'faction'} />
+                <RuleChip key={i} name={a.name + (a.param ? ' ' + a.param : '')} text={text(a)} accent={a.type === 'faction'} core={a.type === 'core'} />
               ))}
             </div>
           </div>

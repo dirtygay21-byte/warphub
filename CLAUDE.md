@@ -32,6 +32,10 @@ Mini App WarpHub (Telegram) и скрытый раздел Roster Builder (Warha
 > (https://wahapedia.ru/wh40k11ed/the-rules/dominatus/), сверка — каталог сайта Dominatus владельца (`dirtygay21-byte/dominatus`).
 > Данные — `backend/roster-data/dominatus.json` (кураторский файл, тесты `tests/dominatus.test.ts`); карты с полем `review` сверить с колодой.
 >
+> **Подсказки правил 40K, решение владельца 01.11.2026:** глоссарий (раздел 24 основных правил, термины, способности оружия
+> фракций) — с wh-rules.ru: снимок `tools/roster-data/40k/whrules-<версия>-glossary.json` → `backend/roster-data/glossary.json`
+> (`scripts/whrules-glossary.mjs`). Карточки юнитов дорабатываются по образцу wh-rules.ru, без переписывания.
+>
 > **Warcry, решение владельца 30.10.2026:** источник — krisling049/warcry_data (`data/`, лицензии нет),
 > импорт `scripts/import-warcry.mjs` → `backend/roster-data/warcry/`; правила построения варбанды — warcrier.net.
 
