@@ -38,6 +38,7 @@ const offsetOf = (dateKey: string, iso: string | null | undefined) => {
 /**
  * Бронь стола администратором (30.10.2026): стол, дата, время с–по (в пределах смены), цель, название, описание.
  * Сервер откажет, если за столом в это время есть записи, ивент или другая бронь, — сообщение показывается здесь.
+ * Цель «Игра D&D» закрывает весь клуб до конца + 1 ч (31.10.2026); сервер проверяет весь клуб.
  */
 export default function TableHoldSheet({ prefill, onClose }: { prefill?: TableHoldPrefill; onClose: () => void }) {
   const queryClient = useQueryClient();
@@ -176,6 +177,13 @@ export default function TableHoldSheet({ prefill, onClose }: { prefill?: TableHo
           <Field label="Цель">
             <ChoiceChips columns={2} options={PURPOSES.map((p) => ({ value: p, label: HOLD_PURPOSE_LABELS[p] }))} value={purpose} onChange={setPurpose} />
           </Field>
+
+          {purpose === "dnd" && to > from && (
+            <p className="rounded-[14px] border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-fg">
+              Игра D&D закрывает весь клуб: оба острова, покраску и посещение. Игра {formatClubTime(iso(from))}–{formatClubTime(iso(to))} · клуб
+              закрыт до <b>{formatClubTime(new Date(new Date(iso(to)).getTime() + 60 * MINUTE))}</b> (+1 ч).
+            </p>
+          )}
 
           <Field label="Название">
             <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={120} placeholder="Например: Турнир Kill Team, финал" className={inputClassName} />
