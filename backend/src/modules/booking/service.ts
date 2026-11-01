@@ -107,6 +107,8 @@ export type BookingMode = 'table' | 'pool' | 'none';
 
 export type SessionPlayerView = {
   firstName: string;
+  /** ник в Telegram — для связи насчёт игры (31.10.2026); только для вошедших пользователей, иначе null */
+  username: string | null;
   /** игра (40k / aos / kt); null — не игрок Warhammer */
   game: string | null;
   gameLabel: string | null;
@@ -474,10 +476,12 @@ function getBookingWindow(dateParts: DateParts, now = new Date()) {
 function toPlayerView(
   firstName: string,
   details: ReservationDetails | null,
+  username: string | null = null,
 ): SessionPlayerView {
   if (details?.kind === 'wh_player') {
     return {
       firstName,
+      username,
       game: details.game ?? '40k',
       gameLabel: gameLabel(details.game),
       army: details.army,
@@ -489,6 +493,7 @@ function toPlayerView(
 
   return {
     firstName,
+    username,
     game: null,
     gameLabel: null,
     army: null,
@@ -500,10 +505,10 @@ function toPlayerView(
 
 async function loadPlayersByReservation(
   reservationIds: string[],
-): Promise<Map<string, { firstName: string; details: ReservationDetails | null }>> {
+): Promise<Map<string, { firstName: string; username: string | null; details: ReservationDetails | null }>> {
   const map = new Map<
     string,
-    { firstName: string; details: ReservationDetails | null }
+    { firstName: string; username: string | null; details: ReservationDetails | null }
   >();
   if (reservationIds.length === 0) return map;
 
@@ -511,6 +516,7 @@ async function loadPlayersByReservation(
     .select({
       id: reservationsTable.id,
       firstName: usersTable.firstName,
+      username: usersTable.username,
       details: reservationsTable.details,
     })
     .from(reservationsTable)
@@ -520,6 +526,7 @@ async function loadPlayersByReservation(
   for (const row of rows) {
     map.set(row.id, {
       firstName: row.firstName,
+      username: row.username,
       details: (row.details as ReservationDetails | null) ?? null,
     });
   }
@@ -643,7 +650,7 @@ export async function getServiceAvailability(
     freeSeats: Math.max(0, mode.seatsPerTable - session.occupied),
     players: session.bookings.map((booking) => {
       const player = players.get(booking.id!);
-      return toPlayerView(player?.firstName ?? 'Игрок', player?.details ?? null);
+      return toPlayerView(player?.firstName ?? 'Игрок', player?.details ?? null, player?.username ?? null);
     }),
   }));
 
@@ -1272,8 +1279,11 @@ export type UserReservationView = {
   };
 };
 
+/** Другие игроки той же игры (стол + начало + услуга), без отменённых; для «Мои записи» (31.10.2026) */
+export type ReservationWithTablemates = UserReservationView & { tablemates: SessionPlayerView[] };
+
 export type UserMyReservationsView = {
-  reservations: UserReservationView[];
+  reservations: ReservationWithTablemates[];
   event: UserUpcomingEventView | null;
 };
 
@@ -1454,7 +1464,56 @@ export async function getUserReservations(
     getNearestUpcomingEventForUser(userId),
   ]);
 
-  return { reservations, event };
+  return { reservations: await withTablemates(userId, reservations), event };
+}
+
+/** Соперники за тем же столом в той же игре — как сессии в доступности (groupSessions: стол + начало + услуга). */
+async function withTablemates(
+  userId: string,
+  reservations: UserReservationView[],
+): Promise<ReservationWithTablemates[]> {
+  const tableBookings = reservations.filter(
+    (r) => r.tableId !== null && r.startsAt !== null && r.status !== 'cancelled',
+  );
+  if (tableBookings.length === 0) return reservations.map((r) => ({ ...r, tablemates: [] }));
+
+  const rows = await db
+    .select({
+      serviceId: reservationsTable.serviceId,
+      tableId: reservationsTable.tableId,
+      startsAt: reservationsTable.startsAt,
+      createdAt: reservationsTable.createdAt,
+      userId: reservationsTable.userId,
+      details: reservationsTable.details,
+      firstName: usersTable.firstName,
+      username: usersTable.username,
+    })
+    .from(reservationsTable)
+    .innerJoin(usersTable, eq(reservationsTable.userId, usersTable.id))
+    .where(
+      and(
+        inArray(reservationsTable.tableId, [...new Set(tableBookings.map((r) => r.tableId!))]),
+        inArray(reservationsTable.startsAt, [...new Set(tableBookings.map((r) => r.startsAt!))].map((iso) => new Date(iso))),
+        inArray(reservationsTable.status, ['pending', 'confirmed']),
+        ne(reservationsTable.userId, userId),
+      ),
+    )
+    .orderBy(asc(reservationsTable.createdAt));
+
+  const key = (serviceId: number, tableId: number | null, startsAt: Date | string | null) =>
+    `${serviceId}:${tableId}:${startsAt ? new Date(startsAt).getTime() : ''}`;
+  const byGame = new Map<string, SessionPlayerView[]>();
+  for (const row of rows) {
+    const k = key(row.serviceId, row.tableId, row.startsAt);
+    const list = byGame.get(k) ?? [];
+    list.push(toPlayerView(row.firstName, (row.details as ReservationDetails | null) ?? null, row.username));
+    byGame.set(k, list);
+  }
+
+  return reservations.map((r) => ({
+    ...r,
+    tablemates: r.status === 'cancelled' || r.tableId === null ? [] : (byGame.get(key(r.serviceId, r.tableId, r.startsAt)) ?? []),
+  }));
 }
 
 async function getReservationById(

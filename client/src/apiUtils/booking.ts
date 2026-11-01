@@ -166,6 +166,8 @@ export type AvailabilitySegment = {
 
 export type SessionPlayer = {
   firstName: string;
+  /** ник в Telegram без «@»; null — не указан (или запрос без входа) */
+  username?: string | null;
   game?: string | null;
   gameLabel?: string | null;
   army: string | null;

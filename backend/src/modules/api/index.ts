@@ -43,7 +43,7 @@ import { getPlayerProgress } from '../progress/service';
 import { getCardsState, getPointsHistory, openPack } from '../minigames/cards';
 import { getNewsById, listPublishedNews } from '../news/service';
 import { jwtPlugin } from '../../plugins/jwt-plugin';
-import { authMiddleware } from '../../plugins/auth-middleware';
+import { authMiddleware, findUserFromBearer } from '../../plugins/auth-middleware';
 import { db } from '../../db';
 import { disciplinesTable, servicesTable } from '../../db/schema';
 import { asc, eq } from 'drizzle-orm';
@@ -110,7 +110,7 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
   .use(jwtPlugin)
   .get(
     '/services/:serviceId/availability',
-    async ({ params, query }) => {
+    async ({ params, query, headers, jwt }) => {
       try {
         const availability = await getServiceAvailability(
           params.serviceId,
@@ -118,6 +118,14 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
         );
         if (!availability) {
           return status(404, { error: 'Service not found' });
+        }
+
+        // ники Telegram игроков — только вошедшим пользователям Mini App (31.10.2026); без входа — без ников
+        const bearer = headers.authorization?.replace(/^Bearer\s+/i, '');
+        if (!(await findUserFromBearer(bearer, jwt))) {
+          for (const session of availability.sessions) {
+            for (const player of session.players) player.username = null;
+          }
         }
 
         return availability;
