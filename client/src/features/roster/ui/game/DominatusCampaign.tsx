@@ -268,7 +268,8 @@ export function RecordBattle({ game }: { game: GameHook }) {
   const mySeat = useMySeat();
   const result = battleResult(state, game.data!.catalog);
   const active = agendasActive(state);
-  const [seats, setSeats] = useState<Record<Seat, number | null>>({ p1: null, p2: null });
+  // выбор игрока на месте; не выбрано — значение по умолчанию (defaults)
+  const [picked, setPicked] = useState<Partial<Record<Seat, number | null>>>({});
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -289,7 +290,7 @@ export function RecordBattle({ game }: { game: GameHook }) {
     }
     return out;
   }, [campaign, state.players, d.players, mySeat]);
-  useEffect(() => setSeats(defaults), [defaults]);
+  const seats: Record<Seat, number | null> = { p1: 'p1' in picked ? (picked.p1 ?? null) : defaults.p1, p2: 'p2' in picked ? (picked.p2 ?? null) : defaults.p2 };
 
   if (!campaign || !result || !d.phase) return null;
   if (!campaign.me) return <p className="text-[12px] text-fg-3">Кампания «{campaign.campaign.name}»: вы не в кампании — записать битву может только участник.</p>;
@@ -363,7 +364,7 @@ export function RecordBattle({ game }: { game: GameHook }) {
             {state.players[s].name}
             {d.players[s].alliance ? ` · ${ALLIANCE_RU[d.players[s].alliance as AllianceId]}` : ''} — игрок кампании
           </span>
-          <select value={seats[s] ?? ''} onChange={(e) => setSeats({ ...seats, [s]: e.target.value ? Number(e.target.value) : null })} className={SELECT}>
+          <select value={seats[s] ?? ''} onChange={(e) => setPicked({ ...picked, [s]: e.target.value ? Number(e.target.value) : null })} className={SELECT}>
             <option value="">—</option>
             {campaign.players.map((p) => (
               <option key={p.id} value={p.id}>

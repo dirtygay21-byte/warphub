@@ -102,16 +102,20 @@ export function deckFor(view: CampaignView, card: CampaignCard, alliance: Allian
 export function useCampaign() {
   const [view, setView] = useState<CampaignResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const reload = useCallback(async () => {
-    const r: ApiResult<CampaignResponse> = await getCampaign();
+  const apply = useCallback((r: ApiResult<CampaignResponse>) => {
     if (r.ok) {
       setView(r.data);
       setError(null);
     } else setError(r.error);
     return r;
   }, []);
+  const reload = useCallback(async () => apply(await getCampaign()), [apply]);
   useEffect(() => {
-    void reload();
-  }, [reload]);
+    let alive = true;
+    void getCampaign().then((r) => alive && apply(r));
+    return () => {
+      alive = false;
+    };
+  }, [apply]);
   return { view, error, reload, loading: !view && !error };
 }

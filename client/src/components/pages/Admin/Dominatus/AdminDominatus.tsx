@@ -20,6 +20,8 @@ import { useState, type ReactNode } from "react";
 
 const ALLIANCES: AllianceId[] = ["liberators", "oppressors", "raiders"];
 const KEY = ["admin-dominatus"];
+/** Бросок D6 Warmaster для локации фазы (вне компонента: случайность только по нажатию). */
+const rollD6 = () => 1 + Math.floor(Math.random() * 6);
 const card = "rounded-[16px] border border-white/10 bg-app-elevated p-4";
 const chip = (on: boolean) =>
   clsx("ds-press min-h-11 rounded-xl border px-3 text-[14px] font-semibold disabled:opacity-60", on ? "border-accent bg-accent text-accent-foreground" : "border-white/[0.14] bg-field text-fg");
@@ -123,7 +125,7 @@ function StartPhase({ view, phase }: { view: CampaignView; phase: number }) {
   const [loc, setLoc] = useState<string | null>(null);
   const start = useAction(adminStartPhase);
   const doRoll = () => {
-    const value = 1 + Math.floor(Math.random() * 6);
+    const value = rollD6();
     setRoll(value);
     setLoc(locations.find((l) => value >= l.rolls[0] && value <= l.rolls[1])?.id ?? null);
     haptic.ok();
