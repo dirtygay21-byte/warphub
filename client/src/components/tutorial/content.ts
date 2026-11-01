@@ -5,7 +5,9 @@
  * AoS — по Core Rules AoS 4 (Wahapedia, The Core Rules) и Quick Start Guide GW (4 CP, underdog, Rally).
  * Kill Team — по Kill Team Lite Rules GW (файл jul25, © 2024); контроль объекта — Core Rules (Wahapedia).
  *   Значения на схеме датакарты — пример, не профиль реального оперативника.
- * Warcry — пока «скоро».
+ * Warcry — по warcrier.net (сборник правил Warcry; общие способности — по обновлению 05.11.2025:
+ *   Rush/Respite — дубль, Onslaught/Inspiring Presence — тройка, Reckoning — четвёрка; Rampage убран).
+ *   Значения на схеме карточки бойца — пример.
  * Разметка в пунктах: **жирный** — термин.
  */
 
@@ -39,7 +41,14 @@ export type TutorialDiagram =
   | "ktCover"
   | "ktShoot"
   | "ktFight"
-  | "ktObjective";
+  | "ktObjective"
+  | "wcRound"
+  | "wcCard"
+  | "wcInitiative"
+  | "wcAbilities"
+  | "wcCombat"
+  | "wcActions"
+  | "wcAttack";
 
 export type TutorialStep = {
   title: string;
@@ -426,11 +435,99 @@ const KT: TutorialGame = {
   ],
 };
 
-export const TUTORIAL_GAMES: TutorialGame[] = [WH40K, AOS, KT];
+const WARCRY: TutorialGame = {
+  id: "warcry",
+  code: "WC",
+  title: "Warcry",
+  source: "Пересказ правил Warcry по warcrier.net (с обновлением общих способностей от 05.11.2025).",
+  steps: [
+    {
+      title: "Как устроен бой",
+      en: "Battle Round",
+      diagram: "wcRound",
+      points: [
+        "Раунд — три фазы: инициатива, резерв (со 2-го раунда), бой.",
+        "Сколько раундов — задаёт условие победы (часто 4).",
+        "Каждый раунд начинается с броска инициативы.",
+      ],
+    },
+    {
+      title: "Карточка бойца",
+      en: "Fighter Card",
+      diagram: "wcCard",
+      points: [
+        "**Move** — движение, **Toughness** — стойкость, **Wounds** — раны.",
+        "Оружие: **Range**, **Attacks**, **Strength**, **Damage** (обычный / критический).",
+        "Оружие с Range до 3 — ближний бой, дальше — стрельба.",
+      ],
+    },
+    {
+      title: "Инициатива",
+      en: "Initiative Phase",
+      phase: 1,
+      diagram: "wcInitiative",
+      points: [
+        "Каждый бросает 6 кубиков.",
+        "Одиночные (singles) — кубики без пары. У кого их больше — у того инициатива.",
+        "При равенстве — переброс (roll-off).",
+      ],
+      note: "Остальные кубики — кубики способностей на этот раунд.",
+    },
+    {
+      title: "Дубли и тройки",
+      en: "Abilities",
+      diagram: "wcAbilities",
+      points: [
+        "Совпавшие кубики — дубль, тройка или четвёрка: ими платят за способности.",
+        "Общие способности есть у всех, особые — у вашей варбанды. Одна способность за активацию.",
+        "Старшая группа может заменить младшую.",
+      ],
+      note: "Один дикий кубик (wild) можно добавить к группе или сохранить на потом.",
+    },
+    {
+      title: "Фаза боя",
+      en: "Combat Phase",
+      phase: 3,
+      diagram: "wcCombat",
+      points: [
+        "Игроки по очереди активируют по одному бойцу. Кто ходит первым — решает игрок с инициативой.",
+        "Активация — 2 действия и до одной способности.",
+        "Нечем ходить — пас. Фаза кончается, когда оба спасовали подряд.",
+      ],
+    },
+    {
+      title: "Действия",
+      en: "Actions",
+      diagram: "wcActions",
+      points: [
+        "**Move** — до Move дюймов, можно прыгать, лезть, лететь.",
+        "**Disengage** — до 3″, закончить дальше 1″ от врагов.",
+        "**Attack** — атака оружием. **Wait** — ожидание: позже ещё одна активация с 1 действием.",
+      ],
+      note: "Начать Move в 1″ от врага нельзя — сначала Disengage.",
+    },
+    {
+      title: "Атака",
+      en: "Attack",
+      diagram: "wcAttack",
+      points: [
+        "Бросьте столько кубиков, сколько Attacks у оружия.",
+        "Сравните силу S и стойкость цели T: попадание на 3+, 4+ или 5+.",
+        "Попадание — урон по первому числу Damage, шестёрка — по второму.",
+      ],
+    },
+    {
+      title: "Готов к игре",
+      en: "Next Steps",
+      diagram: "ready",
+      points: ["Вы знаете весь раунд — остальное придёт в первой партии.", "Бойцы и способности варбанды — в WarpBuilder."],
+    },
+  ],
+};
+
+export const TUTORIAL_GAMES: TutorialGame[] = [WH40K, AOS, KT, WARCRY];
 
 /** Игры, для которых обучение ещё пишется (показываются как «скоро»). */
-export const TUTORIAL_SOON: { code: string; title: string }[] = [
-  { code: "WC", title: "Warcry" },
-];
+export const TUTORIAL_SOON: { code: string; title: string }[] = [];
 
 export const tutorialOf = (id: string | undefined) => TUTORIAL_GAMES.find((game) => game.id === id) ?? null;
