@@ -1,3 +1,4 @@
+import { assertClubFreeForDnd, ClubClosureError } from '../club-closure/service';
 import { and, asc, desc, eq, gt, inArray, isNull, or, sql, sum } from 'drizzle-orm';
 import {
   bookingOptions,
@@ -37,6 +38,7 @@ export type DndErrorCode =
   | 'BOOKING_NOT_FOUND'
   | 'REQUEST_NOT_FOUND'
   | 'REQUEST_ALREADY_OPEN'
+  | 'CLUB_BUSY'
   | 'INVALID_INPUT';
 
 export class DndError extends Error {
@@ -694,8 +696,20 @@ function parseStatus(value: unknown): DndGameStatus {
   return value as DndGameStatus;
 }
 
+/** Игра D&D с точным временем закрывает клуб (31.10.2026): проверяем, что клуб свободен (с часом после игры). */
+async function assertClubFree(when: DndSchedule, status: DndGameStatus, gameId?: number) {
+  if (!when.startsAt || !when.endsAt || (status !== 'open' && status !== 'closed')) return;
+  try {
+    await assertClubFreeForDnd(when.startsAt, when.endsAt, { gameId: gameId ?? null });
+  } catch (e) {
+    if (e instanceof ClubClosureError) throw new DndError('CLUB_BUSY', e.message);
+    throw e;
+  }
+}
+
 export async function createGame(input: GameInput): Promise<AdminDndGameView> {
   const when = schedule(input);
+  await assertClubFree(when, input.status === undefined ? 'open' : parseStatus(input.status));
 
   const [game] = await db
     .insert(dndGamesTable)
@@ -742,6 +756,7 @@ export async function updateGame(
     input.status === undefined
       ? (existing.status as DndGameStatus)
       : parseStatus(input.status);
+  await assertClubFree(when, status, gameId);
 
   const [game] = await db
     .update(dndGamesTable)

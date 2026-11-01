@@ -10,6 +10,7 @@ import {
   usersEventsTable,
 } from '../../db/schema';
 import { deleteImage } from '../../lib/storage/upload';
+import { getClubClosures } from '../club-closure/service';
 
 export type EventTableBlock = {
   tableId: number;
@@ -163,6 +164,12 @@ async function assertEventTablesAvailable(
     .limit(1);
   if (conflictingHold) {
     throw new EventError('TABLES_UNAVAILABLE', 'One or more tables are reserved by the club at this time');
+  }
+
+  // игра D&D закрывает весь клуб (31.10.2026) — ивент на это время (с часом после игры) не ставим
+  const [closure] = await getClubClosures(startsAt, endsAt);
+  if (closure) {
+    throw new EventError('TABLES_UNAVAILABLE', `The club is closed for the D&D game «${closure.title}» at this time (plus one hour after it)`);
   }
 
   if (conflictingEvents.length > 0) {
