@@ -70,12 +70,15 @@ export const termHit = (g: Glossary, id: string): GlossaryHit | null => {
   return t ? { kind: 'term', id, term: t.term, text: t.text } : null;
 };
 
-/** Кусок текста правила: обычный, **жирный** или ссылка на термин. */
-export type RichPart = { t: 'text'; s: string } | { t: 'bold'; s: string } | { t: 'term'; s: string; id: string };
+/** Кусок текста правила: обычный, **жирный**, __выделение__, ссылка на термин или на основную способность ([core:Deep Strike]). */
+export type RichPart = { t: 'text'; s: string } | { t: 'bold'; s: string } | { t: 'em'; s: string } | { t: 'term'; s: string; id: string } | { t: 'core'; s: string };
 
-const RICH = /\*\*\[gloss:([^:\]]+):([^\]]+)\]\*\*|\[gloss:([^:\]]+):([^\]]+)\]|\*\*([^*]+?)\*\*/g;
+const RICH = /\*\*\[gloss:([^:\]]+):([^\]]+)\]\*\*|\[gloss:([^:\]]+):([^\]]+)\]|\[core:([^\]]+)\]|\*\*([^*]+?)\*\*|__([^_\n]+?)__/g;
 
-/** Разметка wh-rules: «**[gloss:attack-dice:кубики атаки]**», «[gloss:id:текст]», «**[BLAST]**» → куски для показа. */
+/**
+ * Разметка wh-rules: «**[gloss:attack-dice:кубики атаки]**», «[gloss:id:текст]», «[core:Feel No Pain 5+]», «**[BLAST]**»,
+ * «__не__» → куски для показа. Заголовки «### …» и маркеры ◈ ▪ остаются в тексте — их показывает RichText построчно.
+ */
 export function parseRich(text: string): RichPart[] {
   const out: RichPart[] = [];
   let last = 0;
@@ -83,7 +86,9 @@ export function parseRich(text: string): RichPart[] {
     if (m.index! > last) out.push({ t: 'text', s: text.slice(last, m.index) });
     if (m[1]) out.push({ t: 'term', id: m[1], s: m[2]! });
     else if (m[3]) out.push({ t: 'term', id: m[3], s: m[4]! });
-    else out.push({ t: 'bold', s: m[5]! });
+    else if (m[5]) out.push({ t: 'core', s: m[5] });
+    else if (m[6]) out.push({ t: 'bold', s: m[6] });
+    else out.push({ t: 'em', s: m[7]! });
     last = m.index! + m[0].length;
   }
   if (last < text.length) out.push({ t: 'text', s: text.slice(last) });

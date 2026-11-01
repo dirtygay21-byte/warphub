@@ -11,6 +11,10 @@ import { cleanRuleText, INCOMPLETE_TEXT } from '../text';
 import { RuleText } from './DetachmentPanel';
 import { RuleTrigger, WeaponAbilityTag } from './common/RulePopover';
 import { useGlossary } from './common/useGlossary';
+import { useRu } from './common/useRu';
+import { RuleRichText } from './common/RulePopover';
+import { ruAbility, ruDatasheet, ruDetachmentRuleById, ruEnhancement, ruName, ruRule, ruStratagem, type RuOverlay, type RuText } from '../ru';
+import type { Glossary } from '../glossary';
 import { findKeyword, splitWeaponKeywords } from '../glossary';
 
 /** В выгрузке дальность и навык — голые числа («24», «3»); на карточке инфолиста — «24″» и «3+». */
@@ -51,6 +55,7 @@ export function UnitCard({
   const isWarlord = roster.warlordUid === c.unit.uid;
   const hasErr = issues.some((i) => i.level === 'error');
   const hasWarn = !hasErr && issues.length > 0;
+  const ru = useRu(L.faction.id);
 
   if (!ds) {
     return (
@@ -164,7 +169,7 @@ export function UnitCard({
           <Profile c={c} cr={cr} L={L} detachmentIds={roster.detachmentIds} />
 
           {readOnly ? (
-            <ReadOnlyChoices c={c} cr={cr} isWarlord={isWarlord} attachedTo={attachedTo?.ds?.name ?? null} />
+            <ReadOnlyChoices c={c} cr={cr} isWarlord={isWarlord} attachedTo={attachedTo?.ds?.name ?? null} ru={ru} />
           ) : (
             // настройка свёрнута (профиль — главное при открытии); при ошибках и предупреждениях открыта сразу
             <details className="group rounded-xl border border-white/10 bg-white/[0.02]" open={issues.length > 0}>
@@ -328,7 +333,7 @@ export function UnitCard({
 }
 
 /** Итог выбора юнита для режима просмотра: состав, снаряжение, Warlord, улучшение, присоединение. */
-function ReadOnlyChoices({ c, cr, isWarlord, attachedTo }: { c: ComputedUnit; cr: ComputedRoster; isWarlord: boolean; attachedTo: string | null }) {
+function ReadOnlyChoices({ c, cr, isWarlord, attachedTo, ru }: { c: ComputedUnit; cr: ComputedRoster; isWarlord: boolean; attachedTo: string | null; ru: RuOverlay | null }) {
   const lines: [string, string][] = [];
   if (c.unit.size) lines.push(['Состав', c.unit.size]);
   const extras = [...Object.entries(c.unit.addons), ...Object.entries(paidWargear(c))].filter(([, n]) => n > 0).map(([l, n]) => `${n}× ${l}`);
@@ -347,7 +352,7 @@ function ReadOnlyChoices({ c, cr, isWarlord, attachedTo }: { c: ComputedUnit; cr
           ))}
         </div>
       )}
-      {c.enhancement && <RuleText name={c.enhancement.name} sub={`Улучшение · ${c.enhancement.cost} очк. · ${cr.enhancementsUsed}/${cr.enhancementsLimit}`} text={c.enhancement.text} open />}
+      {c.enhancement && <RuleText name={c.enhancement.name} sub={`Улучшение · ${c.enhancement.cost} очк. · ${cr.enhancementsUsed}/${cr.enhancementsLimit}`} text={c.enhancement.text} ru={ruEnhancement(ru, c.enhancement.id)} open />}
     </div>
   );
 }
@@ -403,6 +408,8 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
   const tagAbilities = ds.abilities.filter((a) => a.type === 'core' || a.type === 'faction');
   const textAbilities = ds.abilities.filter((a) => a.type !== 'core' && a.type !== 'faction');
   const g = useGlossary();
+  const ru = useRu(L.faction.id);
+  const rds = ruDatasheet(ru, ds.id);
   const moreSummary = [textAbilities.length ? textAbilities.map((a) => a.name).join(', ') : null, ds.composition.length ? 'состав' : null, 'ключевые слова'].filter(Boolean).join(' · ');
   // в обычном виде — только оружие, которое сейчас есть у отряда; полный список — по кнопке
   const count = countIn(c.loadout);
@@ -461,7 +468,7 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
             <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Способности</p>
             <div className="mt-1 flex flex-wrap gap-1">
               {tagAbilities.map((a, i) => (
-                <RuleChip key={i} name={a.name + (a.param ? ' ' + a.param : '')} text={a.ref ? L.faction.rules[a.ref]?.text ?? '' : a.text} accent={a.type === 'faction'} core={a.type === 'core'} />
+                <RuleChip key={i} name={a.name + (a.param ? ' ' + a.param : '')} text={a.ref ? L.faction.rules[a.ref]?.text ?? '' : a.text} accent={a.type === 'faction'} core={a.type === 'core'} ru={ruOf(ru, ds.id, a)} />
               ))}
             </div>
           </div>
@@ -476,29 +483,38 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
           <Icon name="down" className="size-4 shrink-0 text-fg-3 transition group-open:rotate-180" />
         </summary>
         <div className="space-y-3 border-t border-white/[0.06] px-3 pb-3 pt-3">
-          {textAbilities.map((a, i) => (
-            <div key={i}>
-              <p className="text-[13px] font-semibold text-accent/90">
-                {a.name}
-                {a.param ? ` ${a.param}` : ''}
-                {a.type === 'wargear' && <span className="ml-1.5 text-[12px] font-medium uppercase text-fg-3">снаряжение</span>}
-              </p>
-              <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-fg-2">{cleanRuleText(a.ref ? L.faction.rules[a.ref]?.text : a.text)}</p>
-              {a.incomplete && (
-                <p className="mt-1 rounded-lg bg-warn/10 px-2.5 py-1.5 text-[12px] leading-snug text-amber-100">
-                  {INCOMPLETE_TEXT[a.incomplete]}{' '}
-                  <button type="button" onClick={() => openExternal(ds.link)} className="font-semibold text-accent underline underline-offset-2">
-                    Полный текст — {linkLabel(ds.link)}
-                  </button>
+          {textAbilities.map((a, i) => {
+            // 01.11.2026: русский текст с wh-rules.ru, если есть (название «Русское (English)», термины нажимаются)
+            const r = ruOf(ru, ds.id, a);
+            return (
+              <div key={i}>
+                <p className="text-[13px] font-semibold text-accent/90">
+                  {r ? ruName(r.name, a.name) : a.name}
+                  {a.param ? ` ${a.param}` : ''}
+                  {a.type === 'wargear' && <span className="ml-1.5 text-[12px] font-medium uppercase text-fg-3">снаряжение</span>}
                 </p>
-              )}
-            </div>
-          ))}
-          <UnitRules c={c} cr={cr} L={L} detachmentIds={detachmentIds} />
-          {ds.damaged && <Txt title={`Повреждён: ${ds.damaged.w} ран`} text={ds.damaged.text} />}
+                {r ? (
+                  <RuleRichText text={r.text} g={g} className="mt-0.5 text-[13px] leading-relaxed text-fg-2" />
+                ) : (
+                  <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-fg-2">{cleanRuleText(a.ref ? L.faction.rules[a.ref]?.text : a.text)}</p>
+                )}
+                {!r && a.incomplete && (
+                  <p className="mt-1 rounded-lg bg-warn/10 px-2.5 py-1.5 text-[12px] leading-snug text-amber-100">
+                    {INCOMPLETE_TEXT[a.incomplete]}{' '}
+                    <button type="button" onClick={() => openExternal(ds.link)} className="font-semibold text-accent underline underline-offset-2">
+                      Полный текст — {linkLabel(ds.link)}
+                    </button>
+                  </p>
+                )}
+              </div>
+            );
+          })}
+          <UnitRules c={c} cr={cr} L={L} detachmentIds={detachmentIds} ru={ru} />
+          {ds.damaged && <Txt title={`Повреждён: ${ds.damaged.w} ран`} text={ds.damaged.text} ru={rds?.damaged} g={g} />}
           {ds.composition.length > 0 && <Txt title="Состав отряда" text={ds.composition.join('\n')} />}
-          {ds.loadout && <Txt title="Снаряжение" text={ds.loadout} />}
-          {ds.transport && <Txt title="Транспорт" text={ds.transport} />}
+          {ds.loadout && <Txt title="Снаряжение" text={ds.loadout} ru={rds?.loadout} g={g} />}
+          {rds?.options && <Txt title="Варианты снаряжения" text="" ru={rds.options.map((o) => `▪ ${o}`).join('\n')} g={g} />}
+          {ds.transport && <Txt title="Транспорт" text={ds.transport} ru={rds?.transport} g={g} />}
           <div className="flex flex-wrap gap-1">
             {ds.keywords.map((k) =>
               g && findKeyword(g, k) ? (
@@ -517,14 +533,18 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
   );
 }
 
-function Txt({ title, text }: { title: string; text: string }) {
+function Txt({ title, text, ru, g }: { title: string; text: string; ru?: string | null; g?: Glossary | null }) {
   return (
     <div>
       <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{title}</p>
-      <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-fg-2">{cleanRuleText(text)}</p>
+      {ru ? <RuleRichText text={ru} g={g ?? null} className="mt-0.5 text-[13px] leading-relaxed text-fg-2" /> : <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-fg-2">{cleanRuleText(text)}</p>}
     </div>
   );
 }
+
+/** Русский текст способности инфолиста (wh-rules.ru): армейское правило по ссылке или способность самого инфолиста. */
+const ruOf = (ru: RuOverlay | null, dsId: string, a: Datasheet['abilities'][number]): RuText | null =>
+  a.type === 'core' ? null : a.type === 'faction' ? ruRule(ru, a.ref) : ruAbility(ru, dsId, a.name);
 
 /** Сколько штук оружия в снаряжении (без учёта регистра и апострофов). */
 function countIn(loadout: Record<string, number>) {
@@ -583,10 +603,10 @@ function WeaponTable({ title, skill, weapons, count }: { title: string; skill: s
 }
 
 /** Способность-чип: нажатие открывает подсказку. Основные способности (core) — текст из глоссария (wh-rules.ru, раздел 24), остальные — свой текст. */
-function RuleChip({ name, text, accent, core }: { name: string; text: string; accent?: boolean; core?: boolean }) {
+function RuleChip({ name, text, accent, core, ru }: { name: string; text: string; accent?: boolean; core?: boolean; ru?: RuText | null }) {
   return (
     <RuleTrigger
-      source={core ? { lookup: 'ability', label: name } : { title: name, text }}
+      source={core ? { lookup: 'ability', label: name } : ru ? { title: ruName(ru.name, name), text: ru.text, rich: true } : { title: name, text }}
       className={cx('rounded-md px-2 py-1 text-[12px] font-semibold uppercase tracking-wide', accent ? 'bg-accent/15 text-accent' : 'bg-white/[0.07] text-fg-2')}
     >
       {name}
@@ -697,6 +717,7 @@ function OptionCard({ o, c, picks, paid, onPick }: { o: ParsedOption; c: Compute
 }
 
 function CombinedUnit({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRoster; L: DataLookup; detachmentIds: string[] }) {
+  const ru = useRu(L.faction.id);
   const members = groupOf(c, cr);
   if (members.length < 2) return null;
   const rules = groupDetRules(members, L, detachmentIds);
@@ -720,7 +741,7 @@ function CombinedUnit({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: Comput
             </p>
             <div className="mt-1 flex flex-wrap gap-1">
               {m.ds!.abilities.map((a, i) => (
-                <RuleChip key={i} name={a.name + (a.param ? ' ' + a.param : '')} text={text(a)} accent={a.type === 'faction'} core={a.type === 'core'} />
+                <RuleChip key={i} name={a.name + (a.param ? ' ' + a.param : '')} text={text(a)} accent={a.type === 'faction'} core={a.type === 'core'} ru={ruOf(ru, m.ds!.id, a)} />
               ))}
             </div>
           </div>
@@ -735,6 +756,7 @@ function CombinedUnit({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: Comput
                   name={r.name + (r.via.length < members.length ? ` · через ${r.via.join(', ')}` : '')}
                   text={`${r.det}\n\n${r.text}`}
                   accent
+                  ru={ruDetachmentRuleById(ru, r.id)}
                 />
               ))}
             </div>
@@ -746,7 +768,7 @@ function CombinedUnit({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: Comput
 }
 
 /** Правила выбранных детачментов, действующие на юнит, и доступные ему стратагемы. */
-function UnitRules({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRoster; L: DataLookup; detachmentIds: string[] }) {
+function UnitRules({ c, cr, L, detachmentIds, ru }: { c: ComputedUnit; cr: ComputedRoster; L: DataLookup; detachmentIds: string[]; ru: RuOverlay | null }) {
   const ds = c.ds!;
   const detIds = new Set(detachmentIds);
   // правило, которое действует на любую часть совместного отряда, действует и на присоединённых персонажей
@@ -765,7 +787,7 @@ function UnitRules({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedR
           <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Правила детачмента для юнита</p>
           <div className="mt-1 flex flex-wrap gap-1">
             {detRules.map((r) => (
-              <RuleChip key={r.id} name={r.name + (r.own ? '' : ` · через ${r.via.join(', ')}`)} text={`${r.det}\n\n${r.text}`} accent />
+              <RuleChip key={r.id} name={r.name + (r.own ? '' : ` · через ${r.via.join(', ')}`)} text={`${r.det}\n\n${r.text}`} accent ru={ruDetachmentRuleById(ru, r.id)} />
             ))}
           </div>
         </div>
@@ -775,7 +797,7 @@ function UnitRules({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedR
           <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Стратагемы ({strats.length})</p>
           <div className="mt-1 flex flex-wrap gap-1">
             {strats.map((st) => (
-              <RuleChip key={st.id} name={`${st.name} · ${st.cp}`} text={`${st.type}${st.phase ? ' · ' + st.phase : ''}\n\n${st.text}`} accent={!!st.detachment} />
+              <RuleChip key={st.id} name={`${st.name} · ${st.cp}`} text={`${st.type}${st.phase ? ' · ' + st.phase : ''}\n\n${st.text}`} accent={!!st.detachment} ru={ruStratagem(ru, st.id)} />
             ))}
           </div>
         </div>

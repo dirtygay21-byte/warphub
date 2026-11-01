@@ -24,7 +24,8 @@ const gzCache = new Map<string, { mtime: number; body: Uint8Array }>();
 
 /**
  * Файл данных (сжатый gzip, с кешем в памяти).
- * Warhammer 40K: name — 'index', 'battlefield', 'missions', 'dominatus', 'glossary' или код фракции (папка roster-data).
+ * Warhammer 40K: name — 'index', 'battlefield', 'missions', 'dominatus', 'glossary', код фракции (папка roster-data/f)
+ * или 'ru-<код фракции>' — русские тексты фракции (папка roster-data/ru).
  * Age of Sigmar: name — 'index', 'battlepack' или код фракции (папка roster-data/aos).
  */
 export function readRosterData(name: string, system: '40k' | 'aos' | 'kt' | 'warcry' = '40k'): { body: Uint8Array; gzip: boolean } | null {
@@ -32,12 +33,14 @@ export function readRosterData(name: string, system: '40k' | 'aos' | 'kt' | 'war
   if (system === 'kt' && !/^(index|[A-Z]{2,6}-[A-Z0-9]{2,8})$/.test(name)) return null;
   // Warcry (W4 30.10.2026): 'index' или id фракции из warcry_data (blades-of-khorne-bloodbound, chaos…) — файлы roster-data/warcry/f
   if (system === 'warcry' && !/^(index|[a-z][a-z0-9-]{1,59})$/.test(name)) return null;
-  if (system === '40k' && !/^(index|battlefield|missions|dominatus|glossary|[A-Za-z]{1,6})$/.test(name)) return null;
+  // 'ru-<код фракции>' — русские тексты фракции с wh-rules.ru (оверлей, папка roster-data/ru, 01.11.2026)
+  if (system === '40k' && !/^(index|battlefield|missions|dominatus|glossary|[A-Za-z]{1,6}|ru-[A-Za-z]{1,6})$/.test(name)) return null;
   if (system === 'aos' && !/^(index|battlepack|[A-Za-z]{1,6})$/.test(name)) return null;
   const dir = system === '40k' ? rosterDataDir() : path.join(rosterDataDir(), system);
   // AoS: battlepack — данные General's Handbook (батлпланы, тактики) рядом с index.json
   const top = name === 'index' || (system === '40k' && (name === 'battlefield' || name === 'missions' || name === 'dominatus' || name === 'glossary')) || (system === 'aos' && name === 'battlepack');
-  const file = top ? path.join(dir, `${name}.json`) : path.join(dir, system === 'kt' ? 't' : 'f', `${name}.json`);
+  const ru = system === '40k' && name.startsWith('ru-');
+  const file = top ? path.join(dir, `${name}.json`) : ru ? path.join(dir, 'ru', `${name.slice(3)}.json`) : path.join(dir, system === 'kt' ? 't' : 'f', `${name}.json`);
   let stat: fs.Stats;
   try {
     stat = fs.statSync(file);

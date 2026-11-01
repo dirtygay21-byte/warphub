@@ -1,6 +1,7 @@
 import type { DominatusData } from './dominatus/types';
 import { apiRequest } from '@/apiUtils/general';
 import type { Glossary } from './glossary';
+import type { RuOverlay } from './ru';
 import type { DataIndex, FactionData } from './engine/types';
 import type { AosBattlepack, AosFactionData, AosIndex } from './aos/types';
 import type { KtIndex, KtTeam } from './kt/types';
@@ -175,6 +176,20 @@ export function loadDominatus(): Promise<DominatusData> {
   dominatusPromise ??= apiRequest<DominatusData>('/roster/data/dominatus');
   dominatusPromise.catch(() => (dominatusPromise = null));
   return dominatusPromise;
+}
+
+// ---------- Русские тексты 40K с wh-rules.ru (оверлей фракции, 01.11.2026) ----------
+const ruCache = new Map<string, Promise<RuOverlay | null>>();
+/** Русские тексты фракции; null — файла нет (фракция без русских текстов) или нет связи (тогда запасной — английский). */
+export function loadRu(factionId: string): Promise<RuOverlay | null> {
+  if (!ruCache.has(factionId)) {
+    const p = apiRequest<RuOverlay>(`/roster/data/ru-${encodeURIComponent(factionId)}`).catch(() => {
+      ruCache.delete(factionId);
+      return null;
+    });
+    ruCache.set(factionId, p);
+  }
+  return ruCache.get(factionId)!;
 }
 
 // ---------- Глоссарий правил 40K для подсказок (wh-rules.ru, 01.11.2026) ----------

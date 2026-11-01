@@ -66,6 +66,16 @@ describe('поиск и разбор', () => {
     expect(findKeyword(g, 'Vehicle')?.kind).toBe('term');
   });
 
+  test('разметка wh-rules: основные способности и выделение', () => {
+    expect(parseRich('Имеет [core:Feel No Pain 5+] и __не__ может.')).toEqual([
+      { t: 'text', s: 'Имеет ' },
+      { t: 'core', s: 'Feel No Pain 5+' },
+      { t: 'text', s: ' и ' },
+      { t: 'em', s: 'не' },
+      { t: 'text', s: ' может.' },
+    ]);
+  });
+
   test('разметка wh-rules', () => {
     expect(parseRich('Добавьте **[gloss:attack-dice:кубики атаки]** для **[BLAST]**, см. [gloss:select-targets:Выбор целей].')).toEqual([
       { t: 'text', s: 'Добавьте ' },
