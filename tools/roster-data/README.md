@@ -333,6 +333,19 @@ npm run missions     # 40kdc-data в tools/roster-data/40kdc-data → backend/ro
 - Итог: `dominatus/rewards.ts` — Battle Honour / Battle Skill / Path to Conquest, +1 карта на выбор при Agenda Achieved,
   подсказка 35+ ПО. Тесты: `tests/game-dominatus.test.ts`.
 
+## Глоссарий правил 40K: подсказки в карточках юнитов — 01.11.2026
+
+Решение владельца 01.11.2026: карточки юнитов и подсказки правил — по образцу wh-rules.ru, тексты подсказок — с wh-rules.ru (на русском).
+
+- Снимок: `scripts/whrules-extract-glossary.js` (выполнить в консоли браузера на https://wh-rules.ru/ru/patches) →
+  `node scripts/whrules-glossary.mjs --save <файл>` (проверка fingerprint) → `40k/whrules-<версия>-glossary.json`
+  (раздел 24 основных правил — способности оружия и юнитов с номерами, термины правил, особые способности оружия фракций; EN и RU).
+- Файл приложения: `node scripts/whrules-glossary.mjs --build` → `backend/roster-data/glossary.json` (только RU; без ручных правок).
+- Приложение: `client/src/features/roster/glossary.ts` (поиск: «Anti-Infantry 4+» → [ANTI], разметка `**…**`, `[gloss:id:текст]`),
+  подсказка `ui/common/RulePopover.tsx`. Тест `tests/glossary.test.ts`: каждая способность оружия и основная способность из инфолистов
+  есть в глоссарии.
+- Пробелы источника (версия данных 995): у «C'tan Power» (3 оружия Necrons) и терминов Other / You нет текста — подсказка «нет данных».
+
 ## Доступ по коду
 
 - Код создаёт владелец в админке (вкладка «Ростеры» → «Создать код доступа»). Бот присылает его в Telegram.
