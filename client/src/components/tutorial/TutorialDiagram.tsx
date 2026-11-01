@@ -1024,6 +1024,261 @@ function KtObjective() {
   );
 }
 
+/* ---------- Warcry ---------- */
+function WcRound({ ids }: { ids: Ids }) {
+  const phases = [
+    ["Инициатива", "6 кубиков"],
+    ["Резерв", "со 2-го раунда"],
+    ["Бой", "активации"],
+  ];
+  return (
+    <>
+      {phases.map(([t, s], i) => {
+        const x = 12 + i * 102;
+        return (
+          <g key={t}>
+            <rect x={x} y={34} width={94} height={66} rx={10} fill={PANEL} />
+            <circle cx={x + 16} cy={50} r={10} fill={A} />
+            <text x={x + 16} y={54} textAnchor="middle" fontSize={11} fontWeight={800} fill="#111">
+              {i + 1}
+            </text>
+            <text x={x + 47} y={76} textAnchor="middle" fontSize={12} fontWeight={700} fill={W}>
+              {t}
+            </text>
+            <text x={x + 47} y={92} textAnchor="middle" fontSize={10.5} fill={F2}>
+              {s}
+            </text>
+            {i < 2 && <path d={`M${x + 95} 67h6`} stroke={A} strokeWidth={2} markerEnd={`url(#${ids.accent})`} />}
+          </g>
+        );
+      })}
+      <text x={160} y={128} textAnchor="middle" fontSize={11} fill={F2}>
+        Число раундов задаёт условие победы
+      </text>
+    </>
+  );
+}
+
+function WcCard() {
+  const stats = [
+    ["Move", "4″"],
+    ["Tough.", "4"],
+    ["Wounds", "15"],
+  ];
+  const weapon = [
+    ["Range", "1"],
+    ["Attacks", "3"],
+    ["Strength", "4"],
+    ["Damage", "1/3"],
+  ];
+  return (
+    <>
+      {stats.map(([k, v], i) => {
+        const x = 14 + i * 100;
+        return (
+          <g key={k}>
+            <text x={x + 46} y={34} textAnchor="middle" fontSize={11.5} fontWeight={700} fill={F2}>
+              {k}
+            </text>
+            <rect x={x} y={42} width={92} height={38} rx={9} fill={LIGHT} />
+            <text x={x + 46} y={68} textAnchor="middle" fontSize={18} fontWeight={800} fill="#141413">
+              {v}
+            </text>
+          </g>
+        );
+      })}
+      {weapon.map(([k, v], i) => {
+        const x = 14 + i * 75;
+        return (
+          <g key={k}>
+            <rect x={x} y={96} width={69} height={20} rx={6} fill={HEAD} />
+            <text x={x + 34.5} y={110} textAnchor="middle" fontSize={10.5} fontWeight={700} fill={W}>
+              {k}
+            </text>
+            <rect x={x} y={118} width={69} height={22} rx={6} fill={PANEL} />
+            <text x={x + 34.5} y={134} textAnchor="middle" fontSize={13} fontWeight={800} fill={A}>
+              {v}
+            </text>
+          </g>
+        );
+      })}
+      <text x={160} y={160} textAnchor="middle" fontSize={11} fill={F3}>
+        Пример · Damage 1/3 — обычное / критическое
+      </text>
+    </>
+  );
+}
+
+function WcInitiative() {
+  const roll: [number, boolean][] = [
+    [1, true],
+    [3, true],
+    [5, true],
+    [6, true],
+    [4, false],
+    [4, false],
+  ];
+  return (
+    <>
+      <text x={14} y={28} fontSize={11} fontWeight={700} fill={W}>
+        Бросок 6 кубиков
+      </text>
+      {roll.map(([v, single], i) => (
+        <KtDie key={i} x={14 + i * 34} y={38} v={v} crit={single} size={26} />
+      ))}
+      <text x={14} y={88} fontSize={11} fontWeight={700} fill={A}>
+        4 одиночных (singles)
+      </text>
+      <text x={180} y={88} fontSize={11} fill={F2}>
+        дубль 4–4
+      </text>
+      <rect x={232} y={34} width={72} height={34} rx={8} fill={PANEL} />
+      <text x={268} y={49} textAnchor="middle" fontSize={10} fill={F2}>
+        у соперника
+      </text>
+      <text x={268} y={62} textAnchor="middle" fontSize={11} fontWeight={800} fill={R}>
+        3 одиночных
+      </text>
+      <Tag x={160} y={122} c={A}>
+        Больше одиночных — ваша инициатива
+      </Tag>
+    </>
+  );
+}
+
+function WcAbilities() {
+  const rows: [string, number, string][] = [
+    ["Дубль", 2, "Рывок (+1″ Move), Передышка (лечение)"],
+    ["Тройка", 3, "Натиск (+1 атака), Вдохновение"],
+    ["Четвёрка", 4, "Расплата: ход и атака при потерях"],
+  ];
+  return (
+    <>
+      {rows.map(([t, k, s], i) => {
+        const y = 22 + i * 42;
+        return (
+          <g key={t}>
+            {Array.from({ length: k }, (_, j) => (
+              <rect key={j} x={14 + j * 18} y={y} width={16} height={16} rx={4} fill={LIGHT} />
+            ))}
+            <text x={96} y={y + 8} fontSize={12} fontWeight={700} fill={W}>
+              {t}
+            </text>
+            <text x={96} y={y + 24} fontSize={10.5} fill={F2}>
+              {s}
+            </text>
+          </g>
+        );
+      })}
+      <rect x={14} y={150} width={16} height={16} rx={4} fill="none" stroke={A} strokeWidth={2} />
+      <text x={38} y={162} fontSize={11} fill={A}>
+        дикий кубик (wild) — дополнит любую группу
+      </text>
+    </>
+  );
+}
+
+function WcCombat() {
+  return (
+    <>
+      {[true, false, true, false].map((mine, i) => {
+        const x = 14 + i * 76;
+        const c = mine ? A : R;
+        return (
+          <g key={i}>
+            <rect x={x} y={28} width={68} height={60} rx={10} fill={PANEL} stroke={c} strokeWidth={1.5} />
+            <text x={x + 34} y={52} textAnchor="middle" fontSize={12} fontWeight={800} fill={c}>
+              {mine ? "Вы" : "Враг"}
+            </text>
+            <circle cx={x + 27} cy={70} r={5} fill={c} />
+            <circle cx={x + 41} cy={70} r={5} fill={c} />
+          </g>
+        );
+      })}
+      <text x={160} y={112} textAnchor="middle" fontSize={11} fill={F2}>
+        по 2 действия за активацию
+      </text>
+      <Tag x={160} y={140}>
+        Боец активируется один раз за фазу
+      </Tag>
+    </>
+  );
+}
+
+function WcActions({ ids }: { ids: Ids }) {
+  return (
+    <>
+      <Base x={36} y={40} />
+      <line x1={52} y1={40} x2={176} y2={40} stroke={A} strokeWidth={2} markerEnd={`url(#${ids.accent})`} />
+      <Tag x={112} y={22} c={A}>
+        Move: до Move
+      </Tag>
+      <CombatRange x={60} y={112} r={26} />
+      <Base x={60} y={112} c={R} />
+      <Base x={96} y={112} />
+      <line x1={110} y1={112} x2={190} y2={112} stroke={A} strokeWidth={2} markerEnd={`url(#${ids.accent})`} />
+      <Tag x={150} y={94} c={A}>
+        Disengage: до 3″
+      </Tag>
+      <text x={60} y={156} textAnchor="middle" fontSize={10.5} fill={R}>
+        в 1″ от врага
+      </text>
+      <rect x={212} y={58} width={96} height={70} rx={10} fill={PANEL} />
+      <text x={260} y={80} textAnchor="middle" fontSize={11.5} fontWeight={700} fill={W}>
+        Attack
+      </text>
+      <text x={260} y={98} textAnchor="middle" fontSize={11.5} fontWeight={700} fill={W}>
+        Wait
+      </text>
+      <text x={260} y={116} textAnchor="middle" fontSize={10} fill={F2}>
+        атака · ожидание
+      </text>
+    </>
+  );
+}
+
+function WcAttack() {
+  const rows = [
+    ["S больше T", "3+"],
+    ["S = T", "4+"],
+    ["S меньше T", "5+"],
+  ];
+  return (
+    <>
+      {rows.map(([k, v], i) => {
+        const x = 10 + i * 102;
+        return (
+          <g key={k}>
+            <rect x={x} y={24} width={96} height={22} rx={6} fill={HEAD} />
+            <text x={x + 48} y={39} textAnchor="middle" fontSize={11} fontWeight={700} fill={W}>
+              {k}
+            </text>
+            <rect x={x} y={48} width={96} height={24} rx={6} fill={LIGHT} />
+            <text x={x + 48} y={65} textAnchor="middle" fontSize={13} fontWeight={800} fill="#141413">
+              попадание {v}
+            </text>
+          </g>
+        );
+      })}
+      <text x={14} y={96} fontSize={11} fill={F2}>
+        Пример: Attacks 3, S 4 против T 4, Damage 1/3
+      </text>
+      <KtDie x={14} y={106} v={6} crit />
+      <KtDie x={46} y={106} v={4} />
+      <KtDie x={78} y={106} v={2} ok={false} />
+      <text x={120} y={123} fontSize={11.5} fill={W}>
+        3 + 1 ={" "}
+        <tspan fill={A} fontWeight={800}>
+          4 урона
+        </tspan>
+      </text>
+      <text x={160} y={156} textAnchor="middle" fontSize={11} fill={F3}>
+        6 — критическое: урон по второму числу
+      </text>
+    </>
+  );
+}
+
 const HEIGHT: Record<TutorialDiagram, number> = {
   round: 200,
   profile: 160,
@@ -1055,6 +1310,13 @@ const HEIGHT: Record<TutorialDiagram, number> = {
   ktShoot: 168,
   ktFight: 172,
   ktObjective: 166,
+  wcRound: 144,
+  wcCard: 172,
+  wcInitiative: 140,
+  wcAbilities: 176,
+  wcCombat: 156,
+  wcActions: 168,
+  wcAttack: 168,
 };
 
 const ALT: Record<TutorialDiagram, string> = {
@@ -1088,6 +1350,13 @@ const ALT: Record<TutorialDiagram, string> = {
   ktShoot: "Схема: кубики атаки против трёх кубиков защиты",
   ktFight: "Схема: в ближнем бою игроки по очереди бьют или блокируют",
   ktObjective: "Схема: контроль объекта по сумме APL, 4 против 3",
+  wcRound: "Схема: три фазы раунда — инициатива, резерв, бой",
+  wcCard: "Схема: пример карточки бойца и оружия",
+  wcInitiative: "Схема: шесть кубиков инициативы, одиночные и дубль",
+  wcAbilities: "Схема: дубль, тройка, четвёрка и дикий кубик",
+  wcCombat: "Схема: игроки по очереди активируют бойцов, по 2 действия",
+  wcActions: "Схема: Move, Disengage до 3 дюймов, Attack и Wait",
+  wcAttack: "Схема: попадание по силе и стойкости, пример урона",
 };
 
 export default function TutorialDiagramView({ diagram }: { diagram: TutorialDiagram }) {
@@ -1125,6 +1394,13 @@ export default function TutorialDiagramView({ diagram }: { diagram: TutorialDiag
     ktShoot: <KtShoot />,
     ktFight: <KtFight />,
     ktObjective: <KtObjective />,
+    wcRound: <WcRound ids={ids} />,
+    wcCard: <WcCard />,
+    wcInitiative: <WcInitiative />,
+    wcAbilities: <WcAbilities />,
+    wcCombat: <WcCombat />,
+    wcActions: <WcActions ids={ids} />,
+    wcAttack: <WcAttack />,
   };
   const marker = (id: string, fill: string) => (
     <marker id={id} viewBox="0 0 10 10" refX={9} refY={5} markerWidth={7} markerHeight={7} orient="auto-start-reverse">

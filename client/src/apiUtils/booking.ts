@@ -208,6 +208,8 @@ export type ServiceAvailability = {
     segments: AvailabilitySegment[];
   }>;
   sessions: TableSession[];
+  /** клуб закрыт на игру D&D (с часом после игры), 31.10.2026 */
+  closures: { startsAt: string; endsAt: string; title: string }[];
 };
 
 export const getAvailability = async (
@@ -235,6 +237,7 @@ export const getAvailability = async (
     },
     slots: data.slots ?? [],
     sessions: data.sessions ?? [],
+    closures: data.closures ?? [],
   };
 };
 

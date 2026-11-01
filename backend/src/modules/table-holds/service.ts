@@ -9,6 +9,7 @@ import { db } from '../../db';
 import { dndGamesTable, reservationsTable, tableHoldsTable, tablesTable, usersTable } from '../../db/schema';
 import { formatLocalIso } from '../booking/rules';
 import { getEventTableBlocks, type EventTableBlock } from '../events/service';
+import { assertClubFreeForDnd, ClubClosureError, closuresAsTableBlocks, getClubClosures } from '../club-closure/service';
 import { HoldError, validateHoldInput, type HoldInput, type HoldPurpose } from './rules';
 
 export { HoldError } from './rules';
@@ -32,17 +33,18 @@ export type TableHoldView = {
 
 const creatorColumns = { firstName: usersTable.firstName, lastName: usersTable.lastName, username: usersTable.username };
 
-/** Занятость столов для записи игроков: столы ивентов + брони администратора. */
+/** Занятость столов для записи игроков: столы ивентов + брони администратора + закрытие клуба на D&D (с часом после). */
 export async function getTableBlocks(tableIds: number[], rangeStart: Date, rangeEnd: Date): Promise<EventTableBlock[]> {
   if (tableIds.length === 0) return [];
-  const [events, holds] = await Promise.all([
+  const [events, holds, closures] = await Promise.all([
     getEventTableBlocks(tableIds, rangeStart, rangeEnd),
     db
       .select({ tableId: tableHoldsTable.tableId, startsAt: tableHoldsTable.startsAt, endsAt: tableHoldsTable.endsAt })
       .from(tableHoldsTable)
       .where(and(inArray(tableHoldsTable.tableId, tableIds), lt(tableHoldsTable.startsAt, rangeEnd), gt(tableHoldsTable.endsAt, rangeStart))),
+    getClubClosures(rangeStart, rangeEnd),
   ]);
-  return [...events, ...holds];
+  return [...events, ...holds, ...closuresAsTableBlocks(tableIds, closures)];
 }
 
 type Creator = { firstName: string | null; lastName: string | null; username: string | null } | null;
@@ -121,6 +123,20 @@ export async function createTableHold(input: unknown, createdByTelegramId: numbe
         .map((b) => `${b.firstName ?? ''}${b.username ? ` @${b.username}` : ''} ${formatLocalIso(b.startsAt!).slice(11, 16)}–${formatLocalIso(b.endsAt!).slice(11, 16)}`.trim())
         .join('; ');
       throw new HoldError('BOOKINGS_CONFLICT', `За этим столом в это время есть записи игроков: ${list}. Перенесите или отмените их.`);
+    }
+
+    // D&D закрывает весь клуб (31.10.2026): бронь «Игра D&D» — только если клуб свободен с часом после игры;
+    // любая другая бронь — не поверх закрытия клуба на D&D
+    if (hold.purpose === 'dnd') {
+      try {
+        await assertClubFreeForDnd(hold.startsAt, hold.endsAt, { gameId: hold.dndGameId });
+      } catch (e) {
+        if (e instanceof ClubClosureError) throw new HoldError('CLUB_CLOSED', e.message);
+        throw e;
+      }
+    } else {
+      const [closure] = await getClubClosures(hold.startsAt, hold.endsAt);
+      if (closure) throw new HoldError('CLUB_CLOSED', `Клуб закрыт на игру D&D «${closure.title}» в это время (с часом после игры)`);
     }
 
     const events = await getEventTableBlocks([hold.tableId], hold.startsAt, hold.endsAt);

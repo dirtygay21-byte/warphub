@@ -31,6 +31,7 @@ import {
   usersTable,
 } from '../../db/schema';
 import { getTableBlocks, listHoldsBetween, type TableHoldView } from '../table-holds/service';
+import { closuresAsPoolBookings, getClubClosures } from '../club-closure/service';
 import {
   getNearestUpcomingEventForUser,
   type EventTableBlock,
@@ -155,6 +156,8 @@ export type ServiceAvailability = {
   slots: TableAvailabilityEntry[];
   /** Режим table: уже начатые игры (1/2, 2/2) с данными игроков */
   sessions: SessionView[];
+  /** клуб закрыт на игру D&D в эти интервалы (с часом после игры) — для подписи «Клуб закрыт» (31.10.2026) */
+  closures: { startsAt: string; endsAt: string; title: string }[];
 };
 
 type ServiceRow = {
@@ -435,6 +438,31 @@ async function getPoolReservations(
   );
 }
 
+/**
+ * Записи покраски / посещения + закрытие клуба на D&D (31.10.2026): на время закрытия «заняты все места»,
+ * поэтому свободного времени нет, а запись обрезается до начала игры (poolFitEnd).
+ */
+async function getPoolBusy(
+  executor: Executor,
+  serviceId: number,
+  capacity: number,
+  rangeStart: Date,
+  rangeEnd: Date,
+): Promise<BookingRow[]> {
+  const [bookings, closures] = await Promise.all([
+    getPoolReservations(executor, serviceId, rangeStart, rangeEnd),
+    getClubClosures(rangeStart, rangeEnd),
+  ]);
+  const closed = closuresAsPoolBookings(closures, capacity).map((c, i) => ({
+    ...c,
+    id: `club-closure-${i}`,
+    userId: '',
+    tableId: null,
+    serviceId,
+  }));
+  return [...bookings, ...closed];
+}
+
 /** Окно записи на дату: от открытия (или от «сейчас», если день сегодняшний) до 00:00 */
 function getBookingWindow(dateParts: DateParts, now = new Date()) {
   const { openAt, bookingUntil, closeAt } = getClubSessionBounds(dateParts);
@@ -540,16 +568,23 @@ export async function getServiceAvailability(
     },
     slots: [],
     sessions: [],
+    closures: [],
   };
 
   if (!dateAllowed || mode.mode === 'none') return base;
 
   const window = getBookingWindow(dateParts);
+  base.closures = (await getClubClosures(window.openAt, window.closeAt)).map((c) => ({
+    startsAt: formatLocalIso(c.startsAt),
+    endsAt: formatLocalIso(c.endsAt),
+    title: c.title,
+  }));
 
   if (mode.mode === 'pool') {
-    const bookings = await getPoolReservations(
+    const bookings = await getPoolBusy(
       db,
       service.id,
+      mode.capacity,
       window.openAt,
       window.closeAt,
     );
@@ -866,7 +901,7 @@ export async function createReservation(
 
     const reservation = await db.transaction(async (tx) => {
       await lockKey(tx, LOCK_POOL, service.id);
-      const bookings = await getPoolReservations(tx, service.id, openAt, closeAt);
+      const bookings = await getPoolBusy(tx, service.id, mode.capacity, openAt, closeAt);
       const free = poolFreeSeats({ startsAt, endsAt: new Date(startsAt.getTime() + 1) }, bookings, mode.capacity);
 
       if (free < partySize) {
