@@ -1,4 +1,4 @@
-import type { ReservationDetails } from "@/apiUtils/booking";
+import type { ReservationDetails, SessionPlayer } from "@/apiUtils/booking";
 
 // Типы основных страниц в навигации
 export type PageTypes = "Home" | "Reservations" | "News" | "Profile" | "Admin";
@@ -146,6 +146,12 @@ export type Reservation = {
   partySize: number;
   seatClubArmyOptions: boolean[];
   buyArmyOptions: boolean[];
+  /** название стола (если запись за столом) */
+  tableName?: string | null;
+  /** ваш ник в Telegram (из «Мои записи») */
+  username?: string | null;
+  /** другие игроки той же игры за этим столом (только «Мои записи», 31.10.2026) */
+  tablemates?: SessionPlayer[];
 };
 
 export type ReservationTable = {

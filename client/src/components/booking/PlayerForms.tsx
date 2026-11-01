@@ -205,6 +205,10 @@ export function PlayerInfoForm({
           onChange={(experienceLevel) => set({ experienceLevel })}
         />
       </Field>
+
+      <p className="text-[13px] leading-snug text-fg-3">
+        Ваш ник в Telegram увидят соперники за этим столом — чтобы договориться об игре.
+      </p>
     </div>
   );
 }

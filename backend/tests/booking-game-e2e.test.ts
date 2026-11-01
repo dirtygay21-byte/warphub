@@ -1,7 +1,8 @@
 /**
  * Игра в записи на Warhammer (40K / AoS / Kill Team) — сквозная проверка: настоящий сервер + PostgreSQL (CI job «Backend e2e»).
  * Справочник отдаёт игры, фракции AoS и команды Kill Team; запись Kill Team — без очков; соперник присоединяется
- * только к той же игре, что у первого игрока; в списке сессий видна игра.
+ * только к той же игре, что у первого игрока; в списке сессий видна игра; ники видны только вошедшим;
+ * в «Мои записи» — соперники за тем же столом (31.10.2026).
  */
 import { beforeAll, describe as baseDescribe, expect, test } from 'bun:test';
 import { createHmac } from 'node:crypto';
@@ -11,7 +12,7 @@ const describe = E2E ? baseDescribe : baseDescribe.skip;
 const API = process.env.WARPHUB_E2E_API ?? 'http://127.0.0.1:4100';
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ?? '123456:TEST_TOKEN_FOR_LOCAL_RUN';
 
-function initData(user: { id: number; first_name: string }) {
+function initData(user: { id: number; first_name: string; username?: string }) {
   const params = new URLSearchParams({ auth_date: String(Math.floor(Date.now() / 1000)), query_id: 'AAE' + user.id, user: JSON.stringify(user) });
   const check = [...params.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}=${v}`).join('\n');
   params.set('hash', createHmac('sha256', createHmac('sha256', 'WebAppData').update(BOT_TOKEN).digest()).update(check).digest('hex'));
@@ -63,7 +64,7 @@ beforeAll(async () => {
   }
   tableId = Number(sql(`insert into tables (name) values ('E2E стол игры') returning id`));
   for (const [name, id] of Object.entries({ host: 4301, wrong: 4302, right: 4303 })) {
-    const r = await api('POST', '/auth/telegram', undefined, { initData: initData({ id, first_name: name }) });
+    const r = await api('POST', '/auth/telegram', undefined, { initData: initData({ id, first_name: name, ...(name === 'host' ? { username: 'host_nick' } : {}) }) });
     if (r.status !== 200) console.error(`::error::login ${name} → ${r.status}: ${JSON.stringify(r.json).slice(0, 600)}`);
     T[name] = r.json.token;
   }
@@ -98,5 +99,25 @@ describe('игра в записи на Warhammer', () => {
     const s = JSON.stringify(r.json);
     expect(s).toContain('"game":"kt"');
     expect(s).toContain('Kill Team');
+  });
+
+  test('ник Telegram игрока: виден вошедшим, скрыт без входа', async () => {
+    const withLogin = await api('GET', `/services/${serviceId}/availability?date=${day}`, T.right);
+    expect(JSON.stringify(withLogin.json)).toContain('"username":"host_nick"');
+    const anonymous = await api('GET', `/services/${serviceId}/availability?date=${day}`);
+    expect(anonymous.status).toBe(200);
+    expect(JSON.stringify(anonymous.json)).not.toContain('host_nick');
+  });
+
+  test('«Мои записи»: соперники за тем же столом с ником, армией и опытом', async () => {
+    const mine = await api('GET', '/reservations/my', T.right);
+    expect(mine.status).toBe(200);
+    const game = mine.json.reservations.find((r: { tableId: number | null }) => r.tableId === tableId);
+    expect(game).toBeDefined();
+    expect(game.tablemates).toHaveLength(1);
+    expect(game.tablemates[0]).toMatchObject({ firstName: 'host', username: 'host_nick', game: 'kt', army: 'Pathfinders', experienceLevel: 'player' });
+    const hosts = await api('GET', '/reservations/my', T.host);
+    const hostGame = hosts.json.reservations.find((r: { tableId: number | null }) => r.tableId === tableId);
+    expect(hostGame.tablemates.map((p: { firstName: string }) => p.firstName)).toEqual(['right']);
   });
 });

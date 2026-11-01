@@ -19,6 +19,7 @@ export type HoldErrorCode =
   | 'BOOKINGS_CONFLICT'
   | 'EVENT_CONFLICT'
   | 'HOLD_CONFLICT'
+  | 'CLUB_CLOSED'
   | 'HOLD_NOT_FOUND';
 
 export class HoldError extends Error {

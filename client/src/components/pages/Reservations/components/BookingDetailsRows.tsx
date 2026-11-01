@@ -1,11 +1,13 @@
 import {
   experienceLabelOf,
+  gameLabelOf,
+  killTeamWithFaction,
   isPaintingDetails,
   isWhPlayerDetails,
   type ReservationDetails,
 } from "@/apiUtils/booking";
 import { useBookingOptions } from "@/hooks/useBookingOptions";
-import { Brush, HelpCircle, Medal, Palette, Shield, Swords } from "lucide-react";
+import { Brush, Gamepad2, HelpCircle, Medal, Palette, Shield, Swords } from "lucide-react";
 import { DetailRow } from "./DetailRow";
 
 /** Строки с армией/очками/опытом или данными покраски */
@@ -17,20 +19,29 @@ export function BookingDetailsRows({
   const options = useBookingOptions();
 
   if (isWhPlayerDetails(details)) {
+    const game = details.game ?? "40k";
     return (
       <>
         <DetailRow
-          icon={<Shield className="size-4" />}
-          label="Армия"
-          value={details.army}
+          icon={<Gamepad2 className="size-4" />}
+          label="Игра"
+          value={gameLabelOf(options, game)}
           isLoading={false}
         />
         <DetailRow
-          icon={<Swords className="size-4" />}
-          label="Очки"
-          value={String(details.points)}
+          icon={<Shield className="size-4" />}
+          label={game === "kt" ? "Команда" : game === "warcry" ? "Варбанда" : "Армия"}
+          value={game === "kt" ? killTeamWithFaction(options, details.army) : details.army}
           isLoading={false}
         />
+        {details.points != null && (
+          <DetailRow
+            icon={<Swords className="size-4" />}
+            label="Очки"
+            value={String(details.points)}
+            isLoading={false}
+          />
+        )}
         <DetailRow
           icon={<Medal className="size-4" />}
           label="Опыт"

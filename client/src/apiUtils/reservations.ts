@@ -1,7 +1,7 @@
 import { apiRequest } from "@/apiUtils/general";
 import { mapRegisteredEvent, type EventApi } from "@/apiUtils/events";
 import type { MyReservations, Reservation } from "@/types";
-import type { ReservationDetails } from "@/apiUtils/booking";
+import type { ReservationDetails, SessionPlayer } from "@/apiUtils/booking";
 
 type CreateReservationPayload = {
   serviceId: number;
@@ -26,7 +26,10 @@ export type ReservationApi = {
   user?: {
     telegramId?: number | null;
     telegram_id?: number | null;
+    username?: string | null;
   } | null;
+  tableName?: string | null;
+  tablemates?: SessionPlayer[];
   tableId?: number | null;
   table_id?: number | null;
   startsAt?: string;
@@ -78,6 +81,9 @@ export const mapReservation = (reservation: ReservationApi): Reservation => ({
     reservation.seatClubArmyOptions ?? reservation.seat_club_army_options ?? [],
   buyArmyOptions:
     reservation.buyArmyOptions ?? reservation.buy_army_options ?? [],
+  tableName: reservation.tableName ?? null,
+  username: reservation.user?.username ?? null,
+  tablemates: reservation.tablemates ?? [],
 });
 
 const isCancelled = (reservation: Reservation) =>

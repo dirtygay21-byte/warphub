@@ -4,7 +4,8 @@ import { useBookingOptions } from "@/hooks/useBookingOptions";
 import { useRegistrationStageStore } from "@/stores/useRegistrationStageStore";
 import { useReservationStore } from "@/stores/useReservationStore";
 import { useQuery } from "@tanstack/react-query";
-import { Info, Swords } from "lucide-react";
+import { Dices, Info, Swords } from "lucide-react";
+import { formatClubTimeRange } from "@/utils/clubTime";
 import { useEffect, useMemo, useState } from "react";
 import DateSelector from "./TableSelection/DateSelector";
 import ScheduleUnavailableMessage from "./TableSelection/ScheduleUnavailableMessage";
@@ -18,7 +19,7 @@ import {
 } from "./TableSelection/SessionCards";
 import TableStateMessage from "./TableSelection/TableStateMessage";
 import { getDateKey, getToday, isDateInSchedule } from "./TableSelection/utils";
-import { getWindowLimit, minFreeSeats } from "@/utils/slots";
+import { getWindowLimit, maxFreeSeats } from "@/utils/slots";
 import { DsButton } from "@/components/ui/ds";
 import { pluralizeRu } from "@/utils/plural";
 
@@ -141,7 +142,9 @@ export default function TableSelectionStage() {
       window: { startsAt: first.startsAt, endsAt: last.endsAt },
       segments: poolSlot.segments,
       capacity: service.poolCapacity ?? poolSlot.table.seatCapacity,
-      freeSeats: minFreeSeats(poolSlot.segments),
+      // посещение: свободно хоть когда-то за день (закрытие на D&D — только на время игры + 1 ч, 31.10.2026);
+      // время прихода дальше выбирается только из свободных интервалов
+      freeSeats: maxFreeSeats(poolSlot.segments),
       minMinutes: service.minDuration,
     });
     nextStage();
@@ -171,7 +174,7 @@ export default function TableSelectionStage() {
     }
 
     if (service.mode === "pool" && isClubVisit) {
-      const free = poolSlot ? minFreeSeats(poolSlot.segments) : 0;
+      const free = poolSlot ? maxFreeSeats(poolSlot.segments) : 0;
       const maxVisitors = Math.max(
         1,
         Math.min(service.visitorsCapacity ?? free, free),
@@ -371,7 +374,22 @@ export default function TableSelectionStage() {
           scheduleWeekdays={allowedWeekdays}
         />
       ) : (
-        renderContent()
+        <>
+          {/* игра D&D закрывает весь клуб с часом после игры (31.10.2026) */}
+          {availability?.closures.map((closure) => (
+            <div
+              key={`${closure.startsAt}-${closure.endsAt}`}
+              className="flex gap-3 rounded-[16px] border border-warn/40 bg-warn/10 px-4 py-3 text-sm text-fg"
+            >
+              <Dices className="mt-0.5 size-4 shrink-0 text-warn" />
+              <p>
+                Клуб закрыт {formatClubTimeRange(closure.startsAt, closure.endsAt)}: игра D&D «{closure.title}». В это время
+                записаться нельзя.
+              </p>
+            </div>
+          ))}
+          {renderContent()}
+        </>
       )}
 
       <div className="flex gap-3 rounded-[16px] border border-white/10 bg-app-elevated px-4 py-3 text-[13px] text-fg-2">
