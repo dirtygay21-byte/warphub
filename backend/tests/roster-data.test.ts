@@ -13,6 +13,14 @@ describe('roster data files', () => {
     expect(JSON.parse(new TextDecoder().decode(Bun.gunzipSync(missions!.body))).cards.length).toBe(43);
     expect(readRosterData('SM')).not.toBeNull();
   });
+  test('40K: glossary and Russian texts (ru-<faction>) from wh-rules.ru', () => {
+    expect(readRosterData('glossary')).not.toBeNull();
+    const ru = readRosterData('ru-ORK');
+    expect(ru).not.toBeNull();
+    expect(JSON.parse(new TextDecoder().decode(Bun.gunzipSync(ru!.body))).schema).toBe('warphub-ru/1');
+    expect(readRosterData('ru-../f/SM')).toBeNull();
+    expect(readRosterData('ru-ORK', 'aos')).toBeNull();
+  });
   test('AoS: index and faction files from roster-data/aos', () => {
     const idx = readRosterData('index', 'aos');
     expect(idx).not.toBeNull();

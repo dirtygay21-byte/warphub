@@ -36,6 +36,10 @@ Mini App WarpHub (Telegram) и скрытый раздел Roster Builder (Warha
 > фракций) — с wh-rules.ru: снимок `tools/roster-data/40k/whrules-<версия>-glossary.json` → `backend/roster-data/glossary.json`
 > (`scripts/whrules-glossary.mjs`). Карточки юнитов дорабатываются по образцу wh-rules.ru, без переписывания.
 >
+> **Русские тексты 40K, решение владельца 01.11.2026:** всё, что есть на wh-rules.ru по-русски, показывается по-русски — тексты с сайта
+> как есть (снимок `40k/whrules-<версия>-ru.json` → оверлеи `backend/roster-data/ru/`, `scripts/whrules-ru.mjs`); ничего не переводить вручную.
+> После обновления данных 40K — `node scripts/whrules-ru.mjs --apply`.
+>
 > **Warcry, решение владельца 30.10.2026:** источник — krisling049/warcry_data (`data/`, лицензии нет),
 > импорт `scripts/import-warcry.mjs` → `backend/roster-data/warcry/`; правила построения варбанды — warcrier.net.
 
