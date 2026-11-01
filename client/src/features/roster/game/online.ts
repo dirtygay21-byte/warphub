@@ -5,7 +5,7 @@
 import type { EventBody, GameEvent, Seat } from './types';
 
 /** События, которые движок принимает только общими (seat = null): создание, раскрытия, начало битвы. */
-const SHARED: ReadonlySet<GameEvent['type']> = new Set(['game-created', 'dispositions-revealed', 'secondaries-revealed', 'battle-started']);
+const SHARED: ReadonlySet<GameEvent['type']> = new Set(['game-created', 'dispositions-revealed', 'secondaries-revealed', 'battle-started', 'dom-location-set']);
 
 /**
  * Чьё событие при игре на двух телефонах: общее (раскрытия и т. п.) — null, остальные — место этого телефона.

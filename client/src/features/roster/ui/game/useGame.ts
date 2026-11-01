@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { loadBattlefield, loadMissions, type BattlefieldData, type MissionsData } from '../../data';
+import { loadBattlefield, loadDominatus, loadMissions, type BattlefieldData, type MissionsData } from '../../data';
+import { agendaMissionCards, dominatusCatalog } from '../../dominatus/catalog';
+import type { DominatusData } from '../../dominatus/types';
 import { uid } from '../../engine/roster';
 import {
   GAME_SCHEMA,
@@ -17,6 +19,7 @@ import {
   type EventBody,
   type GameCatalog,
   type GameEvent,
+  type GameMode,
   type GameState,
   type SavedEntry,
   type Seat,
@@ -56,13 +59,15 @@ const store = () => {
 };
 
 /** Каталог движка из данных «Поля боя» и карт миссий (missions.json подходит как есть). */
-export function toCatalog(bf: BattlefieldData, m: MissionsData): GameCatalog {
-  return { cards: m.cards, caps: m.caps, matchups: bf.matchups, layouts: bf.layouts };
+export function toCatalog(bf: BattlefieldData, m: MissionsData, dom?: DominatusData | null): GameCatalog {
+  // Dominatus (DM1): Agenda — дополнительные основные миссии; без данных режим Dominatus недоступен
+  const d = dom ? dominatusCatalog(dom) : null;
+  return { cards: d ? [...m.cards, ...d.cards] : m.cards, caps: m.caps, matchups: bf.matchups, layouts: bf.layouts, ...(d ? { dominatus: d.dominatus } : {}) };
 }
 
 export interface GameHook {
   /** данные загружены (null — ещё грузятся) */
-  data: { battlefield: BattlefieldData; missions: MissionsData; catalog: GameCatalog } | null;
+  data: { battlefield: BattlefieldData; missions: MissionsData; dominatus: DominatusData | null; catalog: GameCatalog } | null;
   loadError: string | null;
   events: GameEvent[];
   state: GameState | null;
@@ -70,7 +75,7 @@ export interface GameHook {
   error: string | null;
   clearError: () => void;
   /** новая игра; initial — первые события подготовки (например, ростер из меню) */
-  newGame: (names?: Partial<Record<Seat, string>>, initial?: EventBody[]) => void;
+  newGame: (names?: Partial<Record<Seat, string>>, initial?: EventBody[], mode?: GameMode) => void;
   /** отправить событие; seat — чьё (null — общее, один телефон). true — принято. */
   dispatch: (body: EventBody) => boolean;
   /** что снимет «Отменить» (null — нечего) */
@@ -89,7 +94,7 @@ export interface GameHook {
   /** соединение с сервером: идёт отправка / последняя ошибка связи */
   sync: { sending: boolean; offline: boolean };
   /** создать игру на двух телефонах: этот телефон — игрок 1; initial — первые события (ростер из меню) */
-  startOnline: (initial?: EventBody[]) => Promise<boolean>;
+  startOnline: (initial?: EventBody[], mode?: GameMode) => Promise<boolean>;
   /** войти по коду вторым игроком */
   joinOnline: (code: string) => Promise<boolean>;
 }
@@ -126,10 +131,13 @@ export function useGame(): GameHook {
   }, []);
 
   useEffect(() => {
-    Promise.all([loadBattlefield(), loadMissions()]).then(
-      ([battlefield, missions]) => {
-        const catalog = toCatalog(battlefield, missions);
-        setData({ battlefield, missions, catalog });
+    // данные Dominatus не обязательны: без них обычная игра работает, а режим Dominatus недоступен
+    Promise.all([loadBattlefield(), loadMissions(), loadDominatus().catch(() => null)]).then(
+      ([battlefield, missions, dominatus]) => {
+        const catalog = toCatalog(battlefield, missions, dominatus);
+        // экраны ищут карты в missions.cards — Agenda Dominatus добавляются туда же (основные миссии, не в колоду вторичных)
+        const shown = dominatus ? { ...missions, cards: [...missions.cards, ...agendaMissionCards(dominatus)] } : missions;
+        setData({ battlefield, missions: shown, dominatus, catalog });
         const s = store();
         if (!s) return setLibrary([]);
         // ссылка на игру на двух телефонах из прежней версии — в список
@@ -272,13 +280,14 @@ export function useGame(): GameHook {
   );
 
   const startOnline = useCallback(
-    async (initial: EventBody[] = []): Promise<boolean> => {
+    async (initial: EventBody[] = [], mode: GameMode = 'standard'): Promise<boolean> => {
       if (!data) return false;
       const r = await createOnlineGame();
       if (!r.ok) return (reject(r.error), false);
       enterOnline(r.data, 'p1');
       const names = { p1: r.data.players.p1?.name || 'Игрок 1', p2: 'Игрок 2' };
-      const list = [stamp({ type: 'game-created', schema: GAME_SCHEMA, seed: newSeed(), names }, 1), ...initial.map((b, i) => stamp(b, i + 2))];
+      const created = { type: 'game-created' as const, schema: GAME_SCHEMA, seed: newSeed(), names, ...(mode === 'dominatus' ? { mode } : {}) };
+      const list = [stamp(created, 1), ...initial.map((b, i) => stamp(b, i + 2))];
       const rp = replay(list, data.catalog);
       if (!rp.ok) return (reject(rp.error), false);
       commit(list, rp.state);
@@ -367,11 +376,15 @@ export function useGame(): GameHook {
   // ---------- общие действия ----------
 
   const newGame = useCallback(
-    (names: Partial<Record<Seat, string>> = {}, initial: EventBody[] = []) => {
+    (names: Partial<Record<Seat, string>> = {}, initial: EventBody[] = [], mode: GameMode = 'standard') => {
       if (!data) return;
       onlineRef.current = null;
       setOnline(null);
-      const ev = stamp({ type: 'game-created', schema: GAME_SCHEMA, seed: newSeed(), names: { p1: names.p1 ?? 'Игрок 1', p2: names.p2 ?? 'Игрок 2' } }, 1);
+      // обычная игра — без поля mode (журнал как до DM1)
+      const ev = stamp(
+        { type: 'game-created', schema: GAME_SCHEMA, seed: newSeed(), names: { p1: names.p1 ?? 'Игрок 1', p2: names.p2 ?? 'Игрок 2' }, ...(mode === 'dominatus' ? { mode } : {}) },
+        1,
+      );
       const list = [ev, ...initial.map((b, i) => stamp(b, i + 2))];
       const r = replay(list, data.catalog);
       if (!r.ok) return reject(r.error);

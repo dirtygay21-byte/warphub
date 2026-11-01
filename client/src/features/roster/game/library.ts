@@ -13,6 +13,10 @@ import type { GameCatalog, GameEvent, GameState, Seat } from './types';
 export const LIBRARY_LIMIT = 20;
 
 export type GameSummary = {
+  /** режим (DM1); нет — обычная игра */
+  mode?: GameState['mode'];
+  /** фаза кампании Dominatus (DM3) */
+  domPhase?: number | null;
   names: Record<Seat, string>;
   /** основные миссии (названия карт); null — ещё не определена */
   primary: Record<Seat, string | null>;
@@ -41,6 +45,7 @@ const localKey = (suffix: string, id: string) => `${gameSaveKey(suffix)}.${id}`;
 export function summarize(state: GameState, catalog: GameCatalog): GameSummary {
   const card = (id: string | null) => (id ? (catalog.cards.find((c) => c.id === id)?.name ?? id) : null);
   return {
+    ...(state.mode === 'dominatus' ? { mode: state.mode, domPhase: state.dominatus?.phase ?? null } : {}),
     names: { p1: state.players.p1.name, p2: state.players.p2.name },
     primary: { p1: card(state.primary.p1), p2: card(state.primary.p2) },
     deploymentId: state.deploymentId,

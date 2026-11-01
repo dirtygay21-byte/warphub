@@ -10,7 +10,10 @@ import {
   ROUNDS,
   SEATS,
   type ApplyResult,
+  type DominatusPlayer,
+  type DominatusState,
   type GameCatalog,
+  type GameMode,
   type GameEvent,
   type GameState,
   type PlayerState,
@@ -22,9 +25,9 @@ import {
   type Seat,
 } from './types';
 import { commandPhasePending, drawCards, initDecks, noteCard, redrawWhenDrawn, swapCard } from './decks';
-import { blockTurnOk, cardVp, primaryAtOk } from './scoring';
+import { blockTurnOk, cardVp, primaryAtOk, primaryContext } from './scoring';
 import { setupMissing } from './setup';
-import { layoutPick, rollOff } from './rng';
+import { layoutPick, rollD6, rollOff } from './rng';
 
 export const other = (s: Seat): Seat => (s === 'p1' ? 'p2' : 'p1');
 
@@ -52,8 +55,20 @@ function newPlayer(seat: Seat, name: string): PlayerState {
   };
 }
 
-/** Основная миссия места по паре типов армий (null — пара не выбрана или не найдена). */
+/** Agenda Dominatus в игре: оба игрока решили играть Agenda (иначе — основные миссии колоды у обоих). */
+export function agendasActive(state: GameState): boolean {
+  const d = state.dominatus;
+  return !!d && d.players.p1.attempt === true && d.players.p2.attempt === true;
+}
+
+const newDomPlayer = (): DominatusPlayer => ({ alliance: null, attempt: null, agenda: null, upgrades: [], achieved: null });
+
+/**
+ * Основная миссия места: по паре типов армий (null — пара не выбрана или не найдена);
+ * в Dominatus, если оба играют Agenda, — выбранная Agenda игрока (правила Dominatus: Agenda заменяет основную миссию).
+ */
 export function primaryFor(state: GameState, seat: Seat, catalog: GameCatalog): string | null {
+  if (agendasActive(state)) return state.dominatus!.players[seat].agenda;
   const a = state.players[seat].disposition;
   const b = state.players[other(seat)].disposition;
   if (!a || !b) return null;
@@ -77,10 +92,18 @@ export function createGame(ev: GameEvent): ApplyResult {
   if (ev.schema !== GAME_SCHEMA) return fail(`Неизвестная версия игры: ${ev.schema} (ожидается ${GAME_SCHEMA})`);
   if (ev.seq !== 1) return fail('Создание игры должно быть событием №1');
   if (!ev.seed) return fail('Нет seed игры');
+  const mode: GameMode = ev.mode ?? 'standard';
+  if (mode !== 'standard' && mode !== 'dominatus') return fail('Неизвестный режим игры');
+  const dominatus: DominatusState | null =
+    mode === 'dominatus'
+      ? { phase: null, locationId: null, locationSource: null, locationRoll: null, locationDraws: 0, players: { p1: newDomPlayer(), p2: newDomPlayer() } }
+      : null;
   return {
     ok: true,
     state: {
       schema: GAME_SCHEMA,
+      mode,
+      dominatus,
       id: ev.id,
       seed: ev.seed,
       createdAt: ev.at,
@@ -116,7 +139,7 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
   if (ev.seq !== state.lastSeq + 1) return fail(`Нарушен порядок журнала: ожидалось событие №${state.lastSeq + 1}, пришло №${ev.seq}`);
   if (ev.seat !== null && !SEATS.includes(ev.seat)) return fail('Неизвестное место игрока');
   // после битвы — только итоги: «Конец битвы» основной миссии, поправки ПО, имя и Battle Ready
-  if (state.stage === 'finished' && !['player-set', 'primary-scored', 'vp-adjusted'].includes(ev.type)) return fail('Битва уже закончена');
+  if (state.stage === 'finished' && !['player-set', 'primary-scored', 'vp-adjusted', 'dom-achieved'].includes(ev.type)) return fail('Битва уже закончена');
 
   const s = structuredClone(state) as GameState;
   s.lastSeq = ev.seq;
@@ -187,6 +210,92 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
         p.fixed = null;
       } else return fail('Неизвестный режим вторичных миссий');
       p.secondaryMode = ev.mode;
+      break;
+    }
+    case 'dom-location-set': {
+      const d = s.dominatus;
+      if (!d || !catalog.dominatus) return fail('Это не битва Dominatus');
+      if (!inSetup) return fail('Локация выбирается до начала битвы');
+      if (ev.seat !== null) return fail('Фазу и локацию задаёт Warmaster — общее событие');
+      if (![1, 2, 3].includes(ev.phase)) return fail('Фаза кампании — 1, 2 или 3');
+      const loc = catalog.dominatus.locations.find((l) => l.id === ev.locationId);
+      if (!loc) return fail('Неизвестная локация');
+      if (loc.phase !== ev.phase) return fail('Эта локация из другой фазы кампании');
+      let roll: number | null = null;
+      if (ev.source === 'random') {
+        if (!ev.roll || ev.roll.attempt !== d.locationDraws) return fail(`Ожидался бросок №${d.locationDraws + 1}`);
+        roll = rollD6(s.seed, `location-${ev.phase}`, ev.roll.attempt);
+        if (roll < loc.rolls[0] || roll > loc.rolls[1]) return fail('Локация не совпадает с броском D6');
+        d.locationDraws += 1;
+      } else if (ev.roll) return fail('Бросок указан, а выбор отмечен как ручной');
+      // другая фаза — выбранные Agenda больше не подходят
+      if (d.phase !== ev.phase) for (const seat of SEATS) d.players[seat].agenda = null;
+      d.phase = ev.phase;
+      d.locationId = loc.id;
+      d.locationSource = ev.source;
+      d.locationRoll = roll;
+      refreshPrimary();
+      break;
+    }
+    case 'dom-player-set': {
+      const d = s.dominatus;
+      if (!d || !catalog.dominatus) return fail('Это не битва Dominatus');
+      if (!inSetup) return fail('Альянс, Agenda и улучшения выбираются до начала битвы');
+      if (!SEATS.includes(ev.target)) return fail('Неизвестное место игрока');
+      if (!own(ev.target)) return fail('Менять можно только свои данные');
+      const p = d.players[ev.target];
+      const patch = ev.patch;
+      if ('achieved' in patch) return fail('Agenda Achieved отмечается после битвы');
+      if (patch.alliance !== undefined) {
+        if (patch.alliance !== null && !catalog.dominatus.alliances.includes(patch.alliance)) return fail('Неизвестный альянс');
+        if (patch.alliance !== p.alliance) p.agenda = null;
+        p.alliance = patch.alliance;
+      }
+      if (patch.attempt !== undefined) {
+        if (patch.attempt !== null && typeof patch.attempt !== 'boolean') return fail('Решение по Agenda — да или нет');
+        p.attempt = patch.attempt;
+        if (patch.attempt === false) p.agenda = null;
+      }
+      if (patch.agenda !== undefined) {
+        if (patch.agenda !== null) {
+          if (!s.dispositionsRevealed) return fail('Agenda выбирается после раскрытия типов армий (Briefing)');
+          if (p.attempt !== true) return fail('Сначала решите играть Agenda');
+          const card = catalog.cards.find((c) => c.id === patch.agenda);
+          if (!card?.agenda) return fail('Неизвестная Agenda');
+          if (card.alliance !== p.alliance) return fail('Agenda другого альянса');
+          if (card.phase !== d.phase) return fail('Agenda другой фазы кампании');
+        }
+        p.agenda = patch.agenda;
+      }
+      if (patch.upgrades !== undefined) {
+        const list = patch.upgrades;
+        if (!Array.isArray(list)) return fail('Неверный список улучшений');
+        const limit = d.locationId === 'titangrave' ? catalog.dominatus.limits.upgradesTitangrave : catalog.dominatus.limits.upgradesPerBattle;
+        if (list.length > limit) return fail(`Не больше ${limit} улучшений в битве`);
+        const cards = new Set<string>();
+        const units = new Set<string>();
+        for (const u of list) {
+          if (!u || typeof u.card !== 'string' || typeof u.unit !== 'string' || !u.unit.trim()) return fail('У улучшения нужны карта и отряд');
+          if (!catalog.dominatus.upgrades.includes(u.card)) return fail(`Неизвестная карта улучшения: ${u.card}`);
+          if (cards.has(u.card)) return fail('Одну карту нельзя назначить дважды');
+          if (units.has(u.unit.trim())) return fail('У отряда может быть только одно улучшение');
+          cards.add(u.card);
+          units.add(u.unit.trim());
+        }
+        p.upgrades = list.map((u) => ({ card: u.card, unit: u.unit.trim() }));
+      }
+      refreshPrimary();
+      break;
+    }
+    case 'dom-achieved': {
+      const d = s.dominatus;
+      if (!d) return fail('Это не битва Dominatus');
+      if (s.stage !== 'finished') return fail('Agenda Achieved отмечается после битвы');
+      if (!SEATS.includes(ev.target)) return fail('Неизвестное место игрока');
+      if (!own(ev.target)) return fail('Отмечать можно только свою Agenda');
+      if (!agendasActive(s)) return fail('В этой битве Agenda не играли');
+      if (![0, 1, 2].includes(ev.cards)) return fail('Карт Agenda Achieved — 0, 1 или 2');
+      d.players[ev.target].achieved = ev.cards;
       break;
     }
     case 'dispositions-revealed': {
@@ -405,8 +514,8 @@ export function applyEvent(state: GameState, ev: GameEvent, catalog: GameCatalog
       const round: Round = end ? (ROUNDS as Round) : s.round;
       const r = cardVp({ card, picks: ev.picks, round, endOfBattle: end });
       if ('error' in r) return fail(r.error);
-      // когда: конец вашего хода, вашей фазы командования (в 5-м раунде — конец хода), любого хода, конец битвы
-      const ctx = { end, step: s.step, ownTurn: s.activeSeat === ev.target, round };
+      // когда: конец вашего хода, фазы командования, любого хода, конца раунда (Agenda Dominatus), конец битвы
+      const ctx = primaryContext(s, ev.target, end);
       for (const pk of ev.picks) {
         const at = card.blocks[pk.block]!.at;
         if (!primaryAtOk(at, ctx)) return fail(`Этот блок засчитывается: ${AT_RU[at!]}`);
@@ -458,6 +567,7 @@ const AT_RU: Record<PrimaryAt, string> = {
   'own-command': 'в конце вашей фазы командования',
   'own-command-r5-turn': 'в конце вашей фазы командования (в 5-м раунде — в конце вашего хода)',
   'any-turn': 'в конце любого хода',
+  'round-end': 'в конце раунда (после хода второго игрока)',
   'battle-end': 'в конце битвы',
 };
 

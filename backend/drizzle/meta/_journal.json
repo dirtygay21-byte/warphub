@@ -141,6 +141,13 @@
       "when": 1783999200000,
       "tag": "0019_club_supporters",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1784002800000,
+      "tag": "0020_dominatus_campaign",
+      "breakpoints": true
     }
   ]
 }
