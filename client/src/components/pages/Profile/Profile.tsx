@@ -6,6 +6,7 @@ import PlayerProgressCard from "./PlayerProgressCard";
 import { pickFrame, saveFrame } from "./progressChoice";
 import { getRosterAccess } from "@/apiUtils/roster";
 import { AccessCodeDialog } from "./AccessCodeDialog";
+import SupportSection from "./SupportSection";
 import TelegramOnly from "@/components/ui/TelegramOnly/TelegramOnly";
 import { isOutsideTelegram } from "@/utils/telegramEnv";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -240,6 +241,8 @@ export default function Profile() {
           }}
         />
       )}
+
+      <SupportSection />
     </div>
   );
 }
