@@ -37,3 +37,24 @@ Inputs: `mode` (`dry-run`, `apply`, `rollback`, `list`), `parts` (`data`, `clien
 6. keeps the last 5 deploy backups.
 
 `rollback <id>` restores the files saved by that deploy (a database dump is never restored automatically).
+
+## CI и минуты GitHub (с 30.10.2026)
+
+The repository is private, so GitHub Actions has a monthly free minute allowance; when it runs out, GitHub
+refuses every job (CI and Deploy) with a "payments failed / spending limit" message until the monthly reset.
+Each job is billed rounded up to a whole minute. To spend less:
+
+| Workflow | Runs when | Jobs |
+|---|---|---|
+| `ci-client.yml` | PR changes `client/**` | type check, lint, build |
+| `ci-backend.yml` | PR changes `backend/**` | unit tests + e2e (PostgreSQL) in one job |
+| `ci-roster.yml` | PR changes `tools/roster-data/**`, `backend/roster-data/**`, `client/src/features/roster/**`, `client/src/apiUtils/**` | engine and data tests |
+| `deploy.yml` | by hand | tests only for the parts deployed, client build, server deploy |
+
+- CI runs on pull requests only (and by hand via "Run workflow"), not on pushes and merge commits.
+- Sync PRs `main` → `roster-builder` skip CI: that code already passed.
+- A workflow whose paths did not change does not start and costs nothing.
+- Before pushing, run locally what is possible: `ops/check-local.sh` (backend unit tests, roster data tests,
+  client type check and lint when `client/node_modules` exists).
+- Group related small changes into one PR and one deploy.
+- Adding an e2e test: append it to the "E2E tests" step of `ci-backend.yml`.
