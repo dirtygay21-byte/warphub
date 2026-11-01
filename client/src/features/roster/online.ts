@@ -17,7 +17,7 @@ export type OnlineGame = {
 };
 export type ApiResult<T> = { ok: true; data: T } | { ok: false; status: number; error: string; code?: string; lastSeq?: number };
 
-async function call<T>(path: string, init: RequestInit = {}): Promise<ApiResult<T>> {
+export async function call<T>(path: string, init: RequestInit = {}): Promise<ApiResult<T>> {
   const token = import.meta.env.VITE_EXECUTION_CONFIG === 'production' ? getApiAuthToken() : `${import.meta.env.VITE_EXECUTION_DEVELOPMENT_TOKEN}`;
   const headers = new Headers(init.headers);
   headers.set('Content-Type', 'application/json');

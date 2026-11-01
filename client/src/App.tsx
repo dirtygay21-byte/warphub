@@ -5,6 +5,7 @@ import AdminLayout from "@/layouts/AdminLayout";
 import MainLayout from "@/layouts/MainLayout";
 import AdminReservations from "@/components/pages/Admin/Reservations";
 import AdminSupporters from "@/components/pages/Admin/Supporters/AdminSupporters";
+import AdminDominatus from "@/components/pages/Admin/Dominatus/AdminDominatus";
 import ContentManagment from "@/components/pages/Admin/ContentManagment";
 import AdminWarhammer from "@/components/pages/Admin/Warhammer/AdminWarhammer";
 import AdminDnd from "@/components/pages/Admin/Dnd/AdminDnd";
@@ -71,6 +72,7 @@ export default function App() {
             <Route path="rewards" element={<AdminRewards />} />
             <Route path="admins" element={<AdminAdmins />} />
             <Route path="supporters" element={<AdminSupporters />} />
+            <Route path="dominatus" element={<AdminDominatus />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

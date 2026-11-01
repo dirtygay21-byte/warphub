@@ -27,6 +27,9 @@ export type SecondaryMode = 'fixed' | 'tactical';
 /** Откуда взялся результат: случайно в приложении, вручную (выбрано или вытянуто из настоящей колоды) */
 export type Source = 'random' | 'manual';
 
+/** Режим игры (DM1, 31.10.2026): обычная партия 11-й редакции или битва кампании Dominatus. */
+export type GameMode = 'standard' | 'dominatus';
+
 export const ROUNDS = 5;
 export type Round = 1 | 2 | 3 | 4 | 5;
 
@@ -58,8 +61,11 @@ export interface CatalogBlock {
   at?: PrimaryAt;
   rows: CatalogRow[];
 }
-/** конец вашего хода | конец вашей фазы командования | то же, в 5-м раунде — конец вашего хода | конец любого хода | конец битвы */
-export type PrimaryAt = 'own-turn' | 'own-command' | 'own-command-r5-turn' | 'any-turn' | 'battle-end';
+/**
+ * конец вашего хода | конец вашей фазы командования | то же, в 5-м раунде — конец вашего хода | конец любого хода |
+ * конец раунда (ход второго игрока; Agenda Dominatus) | конец битвы
+ */
+export type PrimaryAt = 'own-turn' | 'own-command' | 'own-command-r5-turn' | 'any-turn' | 'round-end' | 'battle-end';
 /** own — ваш ход, opponent — ход противника, any — любой, opponent-or-r5 — ход противника или конец 5-го раунда (что раньше) */
 export type BlockTurn = 'own' | 'opponent' | 'any' | 'opponent-or-r5';
 export interface CatalogCard {
@@ -76,7 +82,21 @@ export interface CatalogCard {
   /** «при взятии» в виде данных — см. redrawWhenDrawn */
   onDraw?: { action: 'reshuffle' | 'discard' | 'note'; round1?: boolean; ifActive?: string; required?: boolean; confirm?: boolean };
   blocks: CatalogBlock[];
+  /** Agenda кампании Dominatus: основная миссия альянса в фазе (только в режиме dominatus) */
+  agenda?: boolean;
+  alliance?: string;
+  phase?: number;
 }
+
+/** Что движку нужно из dominatus.json (DM1). */
+export interface DominatusCatalog {
+  locations: { id: string; phase: number; rolls: [number, number] }[];
+  alliances: string[];
+  /** все карты улучшений (Battle Honour, Battle Skill, Relic) — проверка названий и повторов */
+  upgrades: string[];
+  limits: { upgradesPerBattle: number; upgradesTitangrave: number };
+}
+
 export interface GameCatalog {
   cards: CatalogCard[];
   caps: {
@@ -91,6 +111,8 @@ export interface GameCatalog {
   matchups: { you: string; foe: string; mission: string }[];
   /** раскладки: id → карта деплоя и пара типов армий (battlefield.json) */
   layouts: { id: string; pair: [string, string]; variant: number; deployment: string }[];
+  /** данные Dominatus (нет — режим dominatus недоступен) */
+  dominatus?: DominatusCatalog;
 }
 
 // ---------- подготовка игрока ----------
@@ -126,6 +148,29 @@ export interface PlayerSetup {
   battleReady: boolean;
 }
 
+/** Игрок в битве Dominatus. */
+export interface DominatusPlayer {
+  alliance: string | null;
+  /** решение играть Agenda: null — не решено; Agenda действуют, только если оба true */
+  attempt: boolean | null;
+  /** id карты Agenda (dom-…) */
+  agenda: string | null;
+  /** улучшения: карта → отряд (название из ростера или вручную) */
+  upgrades: { card: string; unit: string }[];
+  /** после битвы: карт Agenda Achieved (null — ещё не отмечено) */
+  achieved: 0 | 1 | 2 | null;
+}
+
+export interface DominatusState {
+  phase: 1 | 2 | 3 | null;
+  locationId: string | null;
+  locationSource: Source | null;
+  /** выпавшее на D6 (при случайном выборе) */
+  locationRoll: number | null;
+  locationDraws: number;
+  players: Record<Seat, DominatusPlayer>;
+}
+
 // ---------- события ----------
 
 interface EventBase {
@@ -141,7 +186,13 @@ interface EventBase {
 
 export type GameEvent = EventBase &
   (
-    | { type: 'game-created'; schema: number; seed: string; names: Record<Seat, string> }
+    | { type: 'game-created'; schema: number; seed: string; names: Record<Seat, string>; /** нет — обычная игра */ mode?: GameMode }
+    /** Dominatus: фаза кампании и локация (бросок D6 по seed или выбор Warmaster) */
+    | { type: 'dom-location-set'; phase: 1 | 2 | 3; locationId: string; source: Source; roll?: RollRef }
+    /** Dominatus: альянс, решение играть Agenda, выбранная Agenda, улучшения отрядов */
+    | { type: 'dom-player-set'; target: Seat; patch: Partial<DominatusPlayer> }
+    /** Dominatus, после битвы: сколько карт Agenda Achieved получил игрок (0–2) */
+    | { type: 'dom-achieved'; target: Seat; cards: 0 | 1 | 2 }
     | { type: 'player-set'; target: Seat; patch: Partial<Pick<PlayerSetup, 'name' | 'roster' | 'disposition' | 'battleReady'>> }
     | { type: 'layout-set'; layoutId: string; source: Source; roll?: RollRef }
     | { type: 'dispositions-revealed' }
@@ -271,6 +322,10 @@ export interface PlayerTotals {
 
 export interface GameState {
   schema: number;
+  /** режим игры (DM1); у игр до DM1 — standard */
+  mode: GameMode;
+  /** состояние кампании Dominatus (только mode = dominatus) */
+  dominatus: DominatusState | null;
   id: string;
   seed: string;
   createdAt: string;

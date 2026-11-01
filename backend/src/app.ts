@@ -3,6 +3,7 @@ import { Elysia } from 'elysia';
 import { apiModels } from './lib/api-schemas';
 import { apiModule } from './modules/api';
 import { onlineGamesModule } from './modules/online-games';
+import { dominatusAdminModule, dominatusModule } from './modules/dominatus';
 import { adminModule } from './modules/admin';
 import { authModule } from './modules/auth';
 import { internalModule } from './modules/internal';
@@ -41,5 +42,7 @@ export function createApp() {
     .use(rosterAdminModule)
     .use(rosterModule)
     .use(onlineGamesModule)
+    .use(dominatusModule)
+    .use(dominatusAdminModule)
     .use(apiModule);
 }
