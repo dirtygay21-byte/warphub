@@ -9,6 +9,7 @@ import { haptic, openExternal } from '../../telegram';
 import { Button, Icon, IconButton, Segmented } from '../kit';
 import { useSkirmishOnline } from '../skirmish/useSkirmishOnline';
 import { SkirmishOnlineControls } from '../skirmish/SkirmishOnlineControls';
+import { SkirmishRuleText, SkirmishStep } from '../skirmish/SkirmishLayout';
 
 const SEATS: Seat[] = ['p1', 'p2'];
 const SAVE_KEY = 'warphub.warcry.game.v2';
@@ -86,11 +87,12 @@ export function WarcryFullGameScreen({ onBack, rosters, index, initialRosterId }
             <p className="mt-1 text-[12px] text-fg-3">Атакующий: {state.attacker === 'p1' ? 'Игрок 1' : 'Игрок 2'} · Инициатива: {state.initiative === 'p1' ? 'Игрок 1' : 'Игрок 2'}</p>
             {state.stage === 'battle' && !state.initiativeDice && <WildPanel state={state} onRoll={(wild) => dispatch({ type: 'initiative', wild })} />}
             {state.initiativeDice && <div className="mt-2 text-[12px] text-fg-3">{SEATS.map((seat) => <p key={seat}>{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'}: {state.initiativeDice![seat].join(', ')} · singles {state.players[seat].singles} · ability {state.players[seat].abilityRank ?? '—'} · wild saved {state.players[seat].wildSaved}</p>)}</div>}
+            {state.phase === 'reserve' && state.initiativeDice && <Button variant="primary" className="mt-2 w-full" onClick={() => dispatch({ type: 'phase-advanced' })}>Перейти к Combat phase</Button>}
           </div>
           <div className="space-y-3">{SEATS.map((seat) => <Player key={seat} state={state} seat={seat} rosterName={rosterName(state.players[seat].rosterId)} deployment={deployment} dispatch={dispatch} />)}</div>
-          {state.stage === 'battle' && <div className="mt-3 grid grid-cols-2 gap-2"><Button onClick={() => dispatch({ type: 'end-round' })}>Завершить раунд</Button><Button variant="primary" onClick={() => dispatch({ type: 'finish' })}>Завершить битву</Button></div>}
+          {state.stage === 'battle' && <div className="mt-3 grid grid-cols-2 gap-2">{state.phase === 'combat' && <Button onClick={() => dispatch({ type: 'end-round' })}>Завершить раунд</Button>}{(state.phase === 'combat' || state.round > (state.endRound ?? 0)) && <Button variant="primary" onClick={() => dispatch({ type: 'finish' })}>Завершить битву</Button>}</div>}
           {state.stage === 'finished' && <Result state={state} />}
-          {victory && <details className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3"><summary className="cursor-pointer text-sm font-semibold">Victory condition и battleplan</summary><p className="mt-2 whitespace-pre-line text-[12px] leading-relaxed text-fg-2">{victory.text}</p>{state.twistId && <p className="mt-2 border-t border-white/10 pt-2 text-[12px] text-fg-2">{data.twists.find((t) => t.id === state.twistId)?.text}</p>}</details>}
+          {victory && <details className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3"><summary className="cursor-pointer text-sm font-semibold">Victory condition и battleplan</summary><div className="mt-2"><SkirmishRuleText text={victory.text} /></div>{state.twistId && <div className="mt-2 border-t border-white/10 pt-2"><SkirmishRuleText text={data.twists.find((t) => t.id === state.twistId)!.text} /></div>}</details>}
         </>
       )}
       {data && <button type="button" onClick={() => openExternal(data.source.url)} className="mt-5 w-full rounded-xl px-2 py-2 text-left text-[12px] text-fg-3">Источник: {data.source.name} · {data.source.checked}</button>}
@@ -110,20 +112,26 @@ function Setup({ rosters, index, initialRosterId, data, onSetup }: { rosters: Wa
   const swap = () => setColors((c) => ({ p1: c.p2, p2: c.p1 }));
   return (
     <section className="space-y-3">
-      <div className="rounded-2xl border border-white/10 bg-app-elevated p-3"><p className="mb-2 text-[12px] font-semibold uppercase text-fg-3">Формат</p><Segmented value={matchedPlay ? 'matched' : 'standard'} onChange={(v) => setMatched(v === 'matched')} options={[{ value: 'matched', label: 'Matched play · Table A' }, { value: 'standard', label: 'Стандартная · A/B + twist' }]} /></div>
-      <label className={labelClass}>Deployment map<select value={deploymentId} onChange={(e) => setDeployment(e.target.value)} className={selectClass}>{(['tableA', ...(matchedPlay ? [] : ['tableB'])] as ('tableA' | 'tableB')[]).flatMap((table) => data.deployments.filter((d) => d.table === table).map((d) => <option key={d.id} value={d.id}>{table === 'tableA' ? 'A' : 'B'} · {d.name}</option>))}</select></label>
-      <label className={labelClass}>Victory condition<select value={victoryId} onChange={(e) => setVictory(e.target.value)} className={selectClass}>{(['tableA', ...(matchedPlay ? [] : ['tableB'])] as ('tableA' | 'tableB')[]).flatMap((table) => data.victories[table].map((v) => <option key={v.id} value={v.id}>{table === 'tableA' ? 'A' : 'B'} · {v.name}</option>))}</select></label>
-      {!matchedPlay && <label className={labelClass}>Twist<select value={twistId} onChange={(e) => setTwist(e.target.value)} className={selectClass}>{data.twists.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}</select></label>}
-      {SEATS.map((seat) => <div key={seat} className="rounded-2xl border border-white/10 bg-app-elevated p-3"><p className="text-[12px] font-semibold uppercase text-fg-3">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · {colors[seat]}</p><select value={ids[seat]} onChange={(e) => setIds((ids) => ({ ...ids, [seat]: e.target.value }))} className={selectClass}><option value="">Выберите варбанду</option>{rosters.map((r) => <option key={r.id} value={r.id}>{r.name} · {index.factions.find((f) => f.id === r.factionId)?.name ?? r.factionId} · {r.fighters.length} бойц.</option>)}</select></div>)}
-      <div className="grid grid-cols-2 gap-2"><Button onClick={swap}>Сменить цвета</Button><Button onClick={() => setAttacker((a) => a === 'p1' ? 'p2' : 'p1')}>Атакующий: {attacker === 'p1' ? 'P1' : 'P2'}</Button></div>
-      <Button variant="primary" className="h-12 w-full" disabled={!ready} onClick={() => {
-        const selected: Record<Seat, { id: string; color: Color; fighters: string[]; groups: Record<string, Group> }> = { p1: null!, p2: null! };
-        for (const seat of SEATS) {
-          const roster = autoGroups(rosters.find((r) => r.id === ids[seat])!);
-          selected[seat] = { id: roster.id, color: colors[seat], fighters: roster.fighters.map((f) => f.uid), groups: Object.fromEntries(roster.fighters.map((f) => [f.uid, f.group ?? 'dagger'])) };
-        }
-        onSetup({ type: 'setup', deploymentId, victoryId, twistId: matchedPlay ? null : twistId, matchedPlay, attacker, rosters: selected });
-      }}>Начать битву</Button>
+      <SkirmishStep n={1} title="Battleplan" done={!!deploymentId && !!victoryId}>
+        <div className="rounded-xl border border-white/10 bg-black/20 p-3"><p className="mb-2 text-[12px] font-semibold uppercase text-fg-3">Формат</p><Segmented value={matchedPlay ? 'matched' : 'standard'} onChange={(v) => setMatched(v === 'matched')} options={[{ value: 'matched', label: 'Matched play · Table A' }, { value: 'standard', label: 'Стандартная · A/B + twist' }]} /></div>
+        <label className={labelClass}>Deployment map<select value={deploymentId} onChange={(e) => setDeployment(e.target.value)} className={selectClass}>{(['tableA', ...(matchedPlay ? [] : ['tableB'])] as ('tableA' | 'tableB')[]).flatMap((table) => data.deployments.filter((d) => d.table === table).map((d) => <option key={d.id} value={d.id}>{table === 'tableA' ? 'A' : 'B'} · {d.name}</option>))}</select></label>
+        <label className={labelClass}>Victory condition<select value={victoryId} onChange={(e) => setVictory(e.target.value)} className={selectClass}>{(['tableA', ...(matchedPlay ? [] : ['tableB'])] as ('tableA' | 'tableB')[]).flatMap((table) => data.victories[table].map((v) => <option key={v.id} value={v.id}>{table === 'tableA' ? 'A' : 'B'} · {v.name}</option>))}</select></label>
+        {!matchedPlay && <label className={labelClass}>Twist<select value={twistId} onChange={(e) => setTwist(e.target.value)} className={selectClass}>{data.twists.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}</select></label>}
+      </SkirmishStep>
+      <SkirmishStep n={2} title="Игроки и стороны" done={!!ready}>
+        {SEATS.map((seat) => <div key={seat} className="rounded-xl border border-white/10 bg-black/20 p-3"><p className="text-[12px] font-semibold uppercase text-fg-3">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · {colors[seat]}</p><select value={ids[seat]} onChange={(e) => setIds((ids) => ({ ...ids, [seat]: e.target.value }))} className={selectClass}><option value="">Выберите варбанду</option>{rosters.map((r) => <option key={r.id} value={r.id}>{r.name} · {index.factions.find((f) => f.id === r.factionId)?.name ?? r.factionId} · {r.fighters.length} бойц.</option>)}</select></div>)}
+        <div className="grid grid-cols-2 gap-2"><Button onClick={swap}>Сменить цвета</Button><Button onClick={() => setAttacker((a) => a === 'p1' ? 'p2' : 'p1')}>Атакующий: {attacker === 'p1' ? 'P1' : 'P2'}</Button></div>
+      </SkirmishStep>
+      <SkirmishStep n={3} title="Начало битвы" done={false}>
+        <Button variant="primary" className="h-12 w-full" disabled={!ready} onClick={() => {
+          const selected: Record<Seat, { id: string; color: Color; fighters: string[]; groups: Record<string, Group> }> = { p1: null!, p2: null! };
+          for (const seat of SEATS) {
+            const roster = autoGroups(rosters.find((r) => r.id === ids[seat])!);
+            selected[seat] = { id: roster.id, color: colors[seat], fighters: roster.fighters.map((f) => f.uid), groups: Object.fromEntries(roster.fighters.map((f) => [f.uid, f.group ?? 'dagger'])) };
+          }
+          onSetup({ type: 'setup', deploymentId, victoryId, twistId: matchedPlay ? null : twistId, matchedPlay, attacker, rosters: selected });
+        }}>Начать битву</Button>
+      </SkirmishStep>
     </section>
   );
 }
@@ -146,10 +154,10 @@ function Player({ state, seat, rosterName, deployment, dispatch }: { state: WcSt
   return (
     <article className="rounded-2xl border border-white/10 bg-app-elevated p-3.5">
       <div className="flex items-start justify-between gap-2"><div className="min-w-0"><p className="truncate text-sm font-semibold">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · {rosterName}</p><p className="text-[12px] capitalize text-fg-3">{p.color} · активаций {p.activations.length}</p></div><b className="font-display text-xl">{p.score}</b></div>
-      <div className="mt-2 flex gap-1.5"><Button className="text-xs" onClick={() => dispatch({ type: 'score', seat, points: 1 })}>+1 победное</Button><Button className="text-xs" onClick={() => dispatch({ type: 'score', seat, points: 3 })}>+3</Button></div>
-      {deployment && state.stage === 'battle' && <div className="mt-2 flex flex-wrap gap-1">{(['dagger', 'shield', 'hammer'] as Group[]).map((group) => { const point = deployment.points.find((x) => x.side === p.color && x.group === group); return point?.reserve === state.round && !arrived(group) ? <Button key={group} className="text-xs" onClick={() => dispatch({ type: 'reserve', seat, group })}>Резерв: {GROUP_LABEL[group]}</Button> : null; })}</div>}
-      <div className="mt-2 grid grid-cols-[1fr_1fr] gap-2"><select value={fighterId} onChange={(e) => setFighter(e.target.value)} className={selectClass}><option value="">Боец</option>{p.fighters.map((id) => <option key={id} value={id}>{id}{p.reserves.includes(id) ? ' · резерв' : ''}</option>)}</select><Button onClick={() => fighterId && dispatch({ type: 'activate', seat, fighterId })}>Активировать</Button></div>
-      {p.abilityRank && <Button className="mt-2 w-full" onClick={() => fighterId && dispatch({ type: 'ability', seat, fighterId, rank: p.abilityRank!, name: `Ability ${p.abilityRank}` })}>Способность · {p.abilityRank}</Button>}
+      {state.phase === 'combat' && <div className="mt-2 flex gap-1.5"><Button className="text-xs" onClick={() => dispatch({ type: 'score', seat, points: 1 })}>+1 победное</Button><Button className="text-xs" onClick={() => dispatch({ type: 'score', seat, points: 3 })}>+3</Button></div>}
+      {deployment && state.phase === 'reserve' && <div className="mt-2 flex flex-wrap gap-1">{(['dagger', 'shield', 'hammer'] as Group[]).map((group) => { const point = deployment.points.find((x) => x.side === p.color && x.group === group); return point?.reserve === state.round && !arrived(group) ? <Button key={group} className="text-xs" onClick={() => dispatch({ type: 'reserve', seat, group })}>Резерв: {GROUP_LABEL[group]}</Button> : null; })}</div>}
+      {state.phase === 'combat' && <div className="mt-2 grid grid-cols-[1fr_1fr] gap-2"><select value={fighterId} onChange={(e) => setFighter(e.target.value)} className={selectClass}><option value="">Боец</option>{p.fighters.map((id) => <option key={id} value={id}>{id}{p.reserves.includes(id) ? ' · резерв' : ''}</option>)}</select><Button onClick={() => fighterId && dispatch({ type: 'activate', seat, fighterId })}>Активировать</Button></div>}
+      {state.phase === 'combat' && p.abilityRank && <Button className="mt-2 w-full" onClick={() => fighterId && dispatch({ type: 'ability', seat, fighterId, rank: p.abilityRank!, name: `Ability ${p.abilityRank}` })}>Способность · {p.abilityRank}</Button>}
     </article>
   );
 }

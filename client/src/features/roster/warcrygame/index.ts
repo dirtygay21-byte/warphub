@@ -27,6 +27,7 @@ export interface WcPlayer {
 export interface WcState {
   system: 'warcry';
   stage: Stage;
+  phase: 'initiative' | 'reserve' | 'combat';
   seed: string;
   players: Record<Seat, WcPlayer>;
   deploymentId: string;
@@ -44,6 +45,7 @@ export type WcEventBody =
   | { type: 'game-created'; schema: number; seed: string; game?: 'warcry'; names: Record<Seat, string> }
   | { type: 'setup'; deploymentId: string; victoryId: string; twistId?: string | null; matchedPlay: boolean; attacker: Seat; rosters: Record<Seat, { id: string; color: Color; fighters: string[]; groups: Record<string, Group> }> }
   | { type: 'initiative'; wild?: Partial<Record<Seat, { singles?: number; improve?: number; save?: number }>> }
+  | { type: 'phase-advanced' }
   | { type: 'activate'; seat: Seat; fighterId: string }
   | { type: 'ability'; seat: Seat; fighterId: string; rank: Rank; name: string }
   | { type: 'reserve'; seat: Seat; group: Group }
@@ -69,7 +71,7 @@ const victoryOf = (data: WarcryGameData, id: string) => [...data.victories.table
 
 export function createWarcryState(ev: Extract<WcEventBody, { type: 'game-created' }>): WcState | null {
   if (ev.schema !== WARCRY_GAME_SCHEMA || (ev.game && ev.game !== 'warcry')) return null;
-  return { system: 'warcry', stage: 'setup', seed: ev.seed, players: { p1: player(ev.names.p1), p2: player(ev.names.p2) }, deploymentId: '', victoryId: '', twistId: null, matchedPlay: true, attacker: 'p1', round: 1, endRound: null, initiative: 'p1', initiativeDice: null, winner: null };
+  return { system: 'warcry', stage: 'setup', phase: 'initiative', seed: ev.seed, players: { p1: player(ev.names.p1), p2: player(ev.names.p2) }, deploymentId: '', victoryId: '', twistId: null, matchedPlay: true, attacker: 'p1', round: 1, endRound: null, initiative: 'p1', initiativeDice: null, winner: null };
 }
 
 export function applyWarcryEvent(current: WcState | null, ev: WcEvent, data: WarcryGameData): ApplyResult {
@@ -121,11 +123,17 @@ export function applyWarcryEvent(current: WcState | null, ev: WcEvent, data: War
         p.wildSaved = save;
       }
       if (s.players.p1.singles !== s.players.p2.singles) winner = s.players.p1.singles > s.players.p2.singles ? 'p1' : 'p2';
-      s.initiative = winner; s.initiativeDice = dice;
+      s.initiative = winner; s.initiativeDice = dice; s.phase = 'reserve';
+      return { ok: true, state: s };
+    }
+    case 'phase-advanced': {
+      if (s.stage !== 'battle' || !s.initiativeDice) return fail(s, 'Сначала определите инициативу');
+      if (s.phase !== 'reserve') return fail(s, 'Combat phase уже началась');
+      s.phase = 'combat';
       return { ok: true, state: s };
     }
     case 'activate': {
-      if (s.stage !== 'battle' || !s.initiativeDice) return fail(s, 'Сначала определите инициативу');
+      if (s.stage !== 'battle' || !s.initiativeDice || s.phase !== 'combat') return fail(s, 'Активации выполняются в Combat phase');
       const p = s.players[ev.seat];
       if (!p.fighters.includes(ev.fighterId)) return fail(s, 'Этого бойца нет в варбанде');
       if (p.activations.includes(ev.fighterId)) return fail(s, 'Боец уже активирован в этом раунде');
@@ -134,7 +142,7 @@ export function applyWarcryEvent(current: WcState | null, ev: WcEvent, data: War
       return { ok: true, state: s };
     }
     case 'ability': {
-      if (s.stage !== 'battle') return fail(s, 'Битва не идёт');
+      if (s.stage !== 'battle' || s.phase !== 'combat') return fail(s, 'Способности используются в Combat phase');
       const p = s.players[ev.seat];
       if (!p.fighters.includes(ev.fighterId)) return fail(s, 'Этого бойца нет в варбанде');
       if (!p.abilityRank || p.abilityRank > ev.rank) return fail(s, `Нужен ability dice ${ev.rank}`);
@@ -143,7 +151,7 @@ export function applyWarcryEvent(current: WcState | null, ev: WcEvent, data: War
       return { ok: true, state: s };
     }
     case 'reserve': {
-      if (s.stage !== 'battle' || s.round < 2) return fail(s, 'Резервы прибывают после первого раунда');
+      if (s.stage !== 'battle' || s.round < 2 || s.phase !== 'reserve') return fail(s, 'Резервы прибывают в Reserve phase после первого раунда');
       const p = s.players[ev.seat];
       const deployment = deploymentOf(data, s.deploymentId)!;
       const point = deployment.points.find((x) => x.side === p.color && x.group === ev.group);
@@ -155,21 +163,22 @@ export function applyWarcryEvent(current: WcState | null, ev: WcEvent, data: War
       return { ok: true, state: s };
     }
     case 'score': {
-      if (s.stage !== 'battle' || !Number.isInteger(ev.points) || ev.points < 0 || ev.points > 100) return fail(s, 'Некорректный счёт');
+      if (s.stage !== 'battle' || s.phase !== 'combat' || !Number.isInteger(ev.points) || ev.points < 0 || ev.points > 100) return fail(s, 'Счёт записывается в Combat phase');
       s.players[ev.seat].score += ev.points;
       return { ok: true, state: s };
     }
     case 'end-round': {
-      if (s.stage !== 'battle') return fail(s, 'Битва не идёт');
+      if (s.stage !== 'battle' || s.phase !== 'combat') return fail(s, 'Сначала завершите Combat phase');
       for (const seat of SEATS) {
         const p = s.players[seat]; p.activations = []; p.abilities = []; p.singles = 0; p.abilityRank = null;
       }
       s.initiativeDice = null;
+      s.phase = 'initiative';
       s.round++;
       return { ok: true, state: s };
     }
     case 'finish': {
-      if (s.stage !== 'battle') return fail(s, 'Битва уже завершена');
+      if (s.stage !== 'battle' || (s.phase !== 'combat' && (!s.endRound || s.round <= s.endRound))) return fail(s, 'Завершение битвы доступно в Combat phase');
       const p1 = s.players.p1.score, p2 = s.players.p2.score;
       s.winner = p1 === p2 ? 'draw' : p1 > p2 ? 'p1' : 'p2'; s.stage = 'finished';
       return { ok: true, state: s };

@@ -10,6 +10,7 @@ import type { WarcryIndex } from '../../warcry/types';
 import { Button, IconButton, Segmented, Sheet } from '../kit';
 import { cx } from '../util';
 import { Board, type BoardField } from '../testarmy/Board';
+import { KtMapPanel, WarcryDeploymentPanel } from './SkirmishMaps';
 import type { SkirmishRoster } from './SkirmishGameScreen';
 
 type FoeSpec = { kind: 'none' } | { kind: 'own'; rosterId: string } | { kind: 'code'; code: string };
@@ -169,6 +170,8 @@ function FieldPicker<R extends SkirmishRoster>({ data, roster, rosters, detail, 
   const deploymentId = data.system === 'warcry' ? (battle?.[1] ?? data.deployments[0]!.id) : '';
   const battleColor = data.system === 'warcry' ? (battle?.[2] ?? 'red') : 'red';
   const chooseBattleplan = (id: string, color: string) => onLayout(`battleplan:${id}:${color}`);
+  const officialMap = data.system === 'kt' ? data.maps.find((item) => item.killzone === killzone && item.map === mapNumber) : null;
+  const battleDeployment = data.system === 'warcry' ? data.deployments.find((item) => item.id === deploymentId) : null;
   return (
     <section className="space-y-3">
       <p className="truncate text-sm">Ростер: <b>{roster.name}</b></p>
@@ -186,6 +189,8 @@ function FieldPicker<R extends SkirmishRoster>({ data, roster, rosters, detail, 
           </div>
         )}
       </div>
+      {officialMap && <KtMapPanel map={officialMap} />}
+      {battleDeployment && <WarcryDeploymentPanel deployment={battleDeployment} color={battleColor} />}
       <div><p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Ваша сторона</p><Segmented<Side> value={side} onChange={onSide} options={[{ value: 'attacker', label: 'Атакующий' }, { value: 'defender', label: 'Защитник' }]} /></div>
       <div>
         <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Соперник</p>
@@ -223,7 +228,7 @@ function makeField(data: SkirmishGameData, layoutId: string): BoardField {
     if (map) {
       return {
         title: layoutName(layoutId),
-        background: <OfficialKtMap map={map} />,
+        background: <KtMapPanel map={map} />,
         objectives: map.objectives.map((o) => ({ x: o.x, y: o.y, role: o.id })),
         snapPoints: map.objectives.map((o) => [o.x, o.y] as Pt),
         zones: { attacker: map.zones.p1, defender: map.zones.p2 },
@@ -241,7 +246,7 @@ function makeField(data: SkirmishGameData, layoutId: string): BoardField {
       const enemy = deployment.points.filter((point) => point.side !== color);
       return {
         title: layoutName(layoutId),
-        background: <WarcryDeploymentMap deployment={deployment} color={color} />,
+        background: <WarcryDeploymentPanel deployment={deployment} color={color} />,
         objectives: deployment.points.map((point) => ({ x: point.x, y: point.y, role: `${point.side}:${point.group}` })),
         snapPoints: deployment.points.map((point) => [point.x, point.y] as Pt),
         zones: { attacker: own.map((point) => circleZone(point.x, point.y, 3)), defender: enemy.map((point) => circleZone(point.x, point.y, 3)) },
@@ -258,44 +263,6 @@ function circleZone(cx: number, cy: number, radius: number): Pt[] {
     const angle = (i / 32) * Math.PI * 2;
     return [cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius] as Pt;
   });
-}
-function WarcryDeploymentMap({ deployment, color }: { deployment: import('../../skirmish/types').WarcryDeployment; color: string }) {
-  const disp = ([x, y]: Pt): Pt => [22 - y, x];
-  const label: Record<string, string> = { dagger: 'D', shield: 'S', hammer: 'H' };
-  return (
-    <svg viewBox="-1.5 -1.5 25 33" className="block h-full w-full" role="img" aria-label={`${deployment.name}, ${color}`}>
-      <rect width={22} height={30} fill="#6f5545" />
-      <line x1={11} y1={0} x2={11} y2={30} stroke="rgba(255,255,255,0.25)" strokeWidth={0.1} strokeDasharray="0.4 0.3" />
-      <line x1={0} y1={15} x2={22} y2={15} stroke="rgba(255,255,255,0.25)" strokeWidth={0.1} strokeDasharray="0.4 0.3" />
-      {deployment.points.map((point, index) => {
-        const [x, y] = disp([point.x, point.y]);
-        const own = point.side === color;
-        const stroke = own ? '#f87171' : '#60a5fa';
-        return <g key={`${point.side}-${point.group}-${index}`}><circle cx={x} cy={y} r={3} fill={stroke} fillOpacity={0.08} stroke={stroke} strokeOpacity={0.65} strokeWidth={0.1} strokeDasharray="0.45 0.3" /><polygon points={`${x},${y - 0.7} ${x + 0.65},${y + 0.55} ${x - 0.65},${y + 0.55}`} fill={stroke} stroke="#222" strokeWidth={0.1} /><text x={x + 0.8} y={y - 0.8} fontSize={0.75} fill="#fff" stroke="#222" strokeWidth={0.08}>{label[point.group]}{point.reserve ? ` R${point.reserve}` : ''}</text></g>;
-      })}
-      <rect width={22} height={30} fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth={0.2} />
-    </svg>
-  );
-}
-function OfficialKtMap({ map }: { map: import('../../skirmish/types').KtMapData }) {
-  const disp = ([x, y]: Pt): Pt => [22 - y, x];
-  const points = (poly: Pt[]) => poly.map((p) => disp(p).join(',')).join(' ');
-  return (
-    <svg viewBox="-1.5 -1.5 25 33" className="block h-full w-full" role="img" aria-label={`${map.killzone}, карта ${map.map}`}>
-      <rect width={22} height={30} fill="#b8b9bf" />
-      {map.zones.p1.map((poly, i) => <polygon key={`p1-${i}`} points={points(poly)} fill="rgba(96,165,250,0.2)" stroke="#60a5fa" strokeWidth={0.12} />)}
-      {map.zones.p2.map((poly, i) => <polygon key={`p2-${i}`} points={points(poly)} fill="rgba(251,146,60,0.22)" stroke="#fb923c" strokeWidth={0.12} />)}
-      {map.terrain.map((poly, i) => <polygon key={`terrain-${i}`} points={points(poly)} fill="rgba(60,82,70,0.9)" stroke="rgba(20,35,28,0.9)" strokeWidth={0.1} />)}
-      <line x1={11} y1={0} x2={11} y2={30} stroke="rgba(255,255,255,0.2)" strokeWidth={0.1} strokeDasharray="0.4 0.3" />
-      <line x1={0} y1={15} x2={22} y2={15} stroke="rgba(255,255,255,0.2)" strokeWidth={0.1} strokeDasharray="0.4 0.3" />
-      {map.objectives.map((o) => {
-        const [x, y] = disp([o.x, o.y]);
-        const color = o.id === 'centre' ? '#facc15' : o.id === 'home' ? '#60a5fa' : '#fb923c';
-        return <g key={o.id}><circle cx={x} cy={y} r={0.63} fill={color} stroke="#111" strokeWidth={0.12} /><text x={x} y={y + 0.25} fontSize={0.65} textAnchor="middle" fill="#111">●</text></g>;
-      })}
-      <rect width={22} height={30} fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth={0.2} />
-    </svg>
-  );
 }
 function SkirmishMap({ data, layoutId }: { data: SkirmishGameData; layoutId: string }) {
   const w = data.board.width, h = data.board.height;

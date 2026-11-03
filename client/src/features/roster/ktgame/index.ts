@@ -28,6 +28,7 @@ export interface KtPlayer {
 export interface KtState {
   system: 'kt';
   stage: Stage;
+  phase: 'strategy' | 'firefight';
   seed: string;
   players: Record<Seat, KtPlayer>;
   missionId: string;
@@ -59,6 +60,7 @@ export type KtEventBody =
   | { type: 'incapacitated'; seat: Seat; wounds: number; within6: boolean; marker?: string }
   | { type: 'tac-score'; seat: Seat; points: 1 | 2 }
   | { type: 'primary-op'; seat: Seat; op: Op }
+  | { type: 'phase-advanced' }
   | { type: 'cp-adjust'; seat: Seat; delta: number }
   | { type: 'end-round'; controls: Record<string, Seat | null>; carrying?: Record<string, Seat>; claims?: Partial<Record<Seat, { marker: string; control: boolean; uncontested: boolean }>> }
   | { type: 'finish' }
@@ -87,7 +89,7 @@ const roll = (seed: string, round: number, attempt: number, seat: Seat) => pickI
 export function createKtState(ev: Extract<KtEventBody, { type: 'game-created' }>): KtState | null {
   if (ev.schema !== KT_GAME_SCHEMA || (ev.game && ev.game !== 'kt')) return null;
   return {
-    system: 'kt', stage: 'setup', seed: ev.seed,
+    system: 'kt', stage: 'setup', phase: 'strategy', seed: ev.seed,
     players: { p1: initPlayer(ev.names.p1), p2: initPlayer(ev.names.p2) },
     missionId: '', killzone: '', map: 1, round: 1, initiative: 'p1', initiativeRolls: null, secured: {}, transmitting: {}, looted: {}, downloaded: [], orbMarker: 'centre', data: {}, compiled: { p1: 0, p2: 0 }, inert: null, claimsUsed: { p1: [], p2: [] }, carrying: {}, routVp: { p1: 0, p2: 0 }, genericTacVp: { p1: 0, p2: 0 }, winner: null,
   };
@@ -143,20 +145,28 @@ export function applyKtEvent(current: KtState | null, ev: KtEvent, data: KtGameD
       s.initiativeRolls = { p1: rolls.p1!, p2: rolls.p2! };
       return { ok: true, state: s };
     }
+    case 'phase-advanced': {
+      if (s.stage !== 'battle' || !s.initiativeRolls) return fail(s, 'Сначала определите инициативу');
+      if (s.phase !== 'strategy') return fail(s, 'Firefight уже начался');
+      if (s.round === 1 && SEATS.some((seat) => !s.players[seat].primaryOp)) return fail(s, 'Сначала каждый игрок выбирает primary op');
+      s.phase = 'firefight';
+      return { ok: true, state: s };
+    }
     case 'primary-op': {
-      if (s.stage !== 'battle' || s.round !== 1) return fail(s, 'Primary op выбирается в первом turning point');
+      if (s.stage !== 'battle' || s.round !== 1 || !s.initiativeRolls || s.phase !== 'strategy') return fail(s, 'Primary op выбирается в Strategy phase первого turning point');
       s.players[ev.seat].primaryOp = ev.op;
       return { ok: true, state: s };
     }
     case 'cp-adjust': {
-      if (s.stage !== 'battle' || !Number.isInteger(ev.delta)) return fail(s, 'CP сейчас изменить нельзя');
+      if (s.stage !== 'battle' || !s.initiativeRolls || !Number.isInteger(ev.delta)) return fail(s, 'Сначала определите инициативу');
       const p = s.players[ev.seat];
       if (p.cp + ev.delta < 0) return fail(s, 'Недостаточно CP');
       p.cp += ev.delta;
       return { ok: true, state: s };
     }
     case 'crit-action': {
-      if (s.stage !== 'battle') return fail(s, 'Действие сейчас недоступно');
+      if (s.stage !== 'battle' || !s.initiativeRolls) return fail(s, 'Сначала определите инициативу');
+      if (ev.action === 'reboot-select' ? s.phase !== 'strategy' : s.phase !== 'firefight') return fail(s, ev.action === 'reboot-select' ? 'Выбор inert выполняется в Strategy phase' : 'Mission actions выполняются в Firefight phase');
       const p = s.players[ev.seat];
       const marker = ev.marker ?? 'centre';
       if (s.round === 1 && ev.action !== 'reboot-select') return fail(s, 'Это mission action нельзя выполнить в первом turning point');
@@ -197,7 +207,7 @@ export function applyKtEvent(current: KtState | null, ev: KtEvent, data: KtGameD
       return { ok: true, state: s };
     }
     case 'incapacitated': {
-      if (s.stage !== 'battle') return fail(s, 'Битва не идёт');
+      if (s.stage !== 'battle' || !s.initiativeRolls || s.phase !== 'firefight') return fail(s, 'Incapacitation фиксируется в Firefight phase');
       const p = s.players[ev.seat];
       p.incapacitated++;
       const nextGrade = grade(data, s.players[other(ev.seat)].startingOperatives, p.incapacitated);
@@ -210,13 +220,13 @@ export function applyKtEvent(current: KtState | null, ev: KtEvent, data: KtGameD
       return { ok: true, state: s };
     }
     case 'tac-score': {
-      if (s.stage !== 'battle' || ev.points < 1 || ev.points > 2) return fail(s, 'Некорректные VP Tac Op');
+      if (s.stage !== 'battle' || !s.initiativeRolls || ev.points < 1 || ev.points > 2) return fail(s, 'Сначала определите инициативу');
       if (s.genericTacVp[ev.seat] + ev.points > 2) return fail(s, 'Не больше 2VP от Tac Op за turning point');
       s.genericTacVp[ev.seat] += ev.points; add(s.players[ev.seat], 'tac', ev.points);
       return { ok: true, state: s };
     }
     case 'end-round': {
-      if (s.stage !== 'battle') return fail(s, 'Битва не идёт');
+      if (s.stage !== 'battle' || !s.initiativeRolls || s.phase !== 'firefight') return fail(s, 'Сначала завершите Firefight phase');
       for (const seat of SEATS) {
         const p = s.players[seat], foe = other(seat);
         p.cp += 1;
@@ -246,7 +256,7 @@ export function applyKtEvent(current: KtState | null, ev: KtEvent, data: KtGameD
         }
         s.compiled[seat] = 0; s.genericTacVp[seat] = 0; s.routVp[seat] = 0;
       }
-      s.transmitting = {}; s.carrying = ev.carrying ?? {}; s.initiativeRolls = null;
+      s.transmitting = {}; s.carrying = ev.carrying ?? {}; s.initiativeRolls = null; s.phase = 'strategy';
       if (s.round < data.game.turningPoints) s.round++;
       else s.round = data.game.turningPoints + 1;
       return { ok: true, state: s };

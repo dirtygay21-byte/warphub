@@ -9,6 +9,21 @@ from bs4 import BeautifulSoup
 ROOT = Path(__file__).resolve().parents[3]
 GAME = ROOT / 'backend/roster-data/warcry/game.json'
 BASE = 'https://warcrier.net'
+CORRECTIONS = {
+    'arc placed': 'are placed',
+    'scorts': 'scores',
+    'battJe': 'battle',
+    ' lf ': ' If ',
+    'or or': 'or',
+}
+
+
+def clean(text):
+    text = re.sub(r'[\u200b\u200c\u200d\ufeff]', '', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    for source, replacement in CORRECTIONS.items():
+        text = text.replace(source, replacement)
+    return re.sub(r'\s+([,.;:])', r'\1', text)
 
 
 def get(path):
@@ -32,7 +47,7 @@ def sections(path, expected):
                 break
             if isinstance(element, str) and element.strip():
                 parts.append(element.strip())
-        text = ' '.join(parts)
+        text = clean(' '.join(parts))
         end = None
         match = re.search(r'(?:after|at the end of) the (first|second|third|fourth|fifth) battle round', text, re.I)
         if match:

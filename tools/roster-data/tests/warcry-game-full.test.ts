@@ -15,7 +15,7 @@ const setup = () => ev({ type: 'setup', deploymentId: 'first-blood', victoryId: 
 } });
 const start = () => {
   let state = createWarcryState({ type: 'game-created', schema: WARCRY_GAME_SCHEMA, seed: 'wc-seed', names: { p1: 'A', p2: 'B' } })!;
-  for (const e of [setup(), ev({ type: 'initiative' })]) {
+  for (const e of [setup(), ev({ type: 'initiative' }), ev({ type: 'phase-advanced' })]) {
     const result = applyWarcryEvent(state, e, data); assert.ok(result.ok, result.ok ? '' : result.error); state = result.state;
   }
   return state;
@@ -30,6 +30,10 @@ test('24 deployment maps: по одной Dagger/Shield/Hammer каждого ц
   }
   assert.equal(data.victories.tableA.length + data.victories.tableB.length, 24);
   assert.equal(data.twists.length, 18);
+  for (const rule of [...data.victories.tableA, ...data.victories.tableB, ...data.twists]) {
+    assert.ok(!/[\u200b\u200c\u200d\ufeff]/.test(rule.text), rule.id);
+    assert.ok(!/scorts|battJe|arc placed|ezstandalone/.test(rule.text), rule.id);
+  }
 });
 
 test('First Blood: резервы Hammer/Shield блокируют бойцов до RND2, затем прибытие и активация', () => {
@@ -39,8 +43,9 @@ test('First Blood: резервы Hammer/Shield блокируют бойцов 
   s = dispatch(s, { type: 'activate', seat: 'p1', fighterId: 'f1' });
   assert.equal(applyWarcryEvent(s, ev({ type: 'activate', seat: 'p1', fighterId: 'f1' }), data).ok, false);
   s = dispatch(s, { type: 'end-round' });
-  s = dispatch(s, { type: 'reserve', seat: 'p1', group: 'hammer' });
   s = dispatch(s, { type: 'initiative' });
+  s = dispatch(s, { type: 'reserve', seat: 'p1', group: 'hammer' });
+  s = dispatch(s, { type: 'phase-advanced' });
   s = dispatch(s, { type: 'activate', seat: 'p1', fighterId: 'f2' });
   assert.ok(s.players.p1.activations.includes('f2'));
 });
@@ -53,6 +58,7 @@ test('wild dice сохраняются и улучшаются детермин�
   assert.deepEqual(first.state?.initiativeDice, second.state?.initiativeDice);
   s = first.state!;
   assert.equal(s.players.p1.wildSaved, 1);
+  s = dispatch(s, { type: 'phase-advanced' });
   if (s.players.p1.abilityRank) {
     const rank = s.players.p1.abilityRank;
     s = dispatch(s, { type: 'ability', seat: 'p1', fighterId: 'f1', rank, name: 'Test' });
@@ -61,7 +67,7 @@ test('wild dice сохраняются и улучшаются детермин�
 });
 
 test('Treasure Hunters: четыре раунда, счёт, завершение и undo', () => {
-  const events = [created(), setup(), ev({ type: 'initiative' }), ev({ type: 'score', seat: 'p1', points: 2 }), ev({ type: 'end-round' }), ev({ type: 'end-round' }), ev({ type: 'end-round' }), ev({ type: 'end-round' }), ev({ type: 'finish' })];
+  const events = [created(), setup(), ev({ type: 'initiative' }), ev({ type: 'phase-advanced' }), ev({ type: 'score', seat: 'p1', points: 2 }), ev({ type: 'end-round' }), ev({ type: 'initiative' }), ev({ type: 'phase-advanced' }), ev({ type: 'end-round' }), ev({ type: 'initiative' }), ev({ type: 'phase-advanced' }), ev({ type: 'end-round' }), ev({ type: 'initiative' }), ev({ type: 'phase-advanced' }), ev({ type: 'end-round' }), ev({ type: 'finish' })];
   const result = replayWarcry(events, data);
   assert.ok(result.ok);
   assert.equal(result.state?.stage, 'finished');
@@ -70,4 +76,17 @@ test('Treasure Hunters: четыре раунда, счёт, завершени�
   assert.ok(undone.ok);
   assert.equal(undone.state?.stage, 'battle');
   assert.equal(undone.state?.round, 4);
+});
+
+
+test('phase gate: активации и конец раунда нельзя выполнить до Combat phase', () => {
+  let state = createWarcryState({ type: 'game-created', schema: WARCRY_GAME_SCHEMA, seed: 'wc-seed', names: { p1: 'A', p2: 'B' } })!;
+  state = dispatch(state, setup());
+  assert.equal(applyWarcryEvent(state, ev({ type: 'activate', seat: 'p1', fighterId: 'f1' }), data).ok, false);
+  assert.equal(applyWarcryEvent(state, ev({ type: 'end-round' }), data).ok, false);
+  state = dispatch(state, { type: 'initiative' });
+  assert.equal(applyWarcryEvent(state, ev({ type: 'activate', seat: 'p1', fighterId: 'f1' }), data).ok, false);
+  state = dispatch(state, { type: 'phase-advanced' });
+  state = dispatch(state, { type: 'activate', seat: 'p1', fighterId: 'f1' });
+  assert.equal(state.phase, 'combat');
 });
