@@ -15,6 +15,8 @@ import { EndEarly, Result } from './Result';
 import { SecondaryCard } from './SecondaryCard';
 import { Summary } from './StepStart';
 import type { GameHook } from './useGame';
+import { RoundDots } from '../common/RoundDots';
+import { ScoreboardGrid } from '../common/ScoreboardGrid';
 
 const STEP_RU = { start: 'Начало хода', command: 'Фаза командования', main: 'Ход идёт' } as const;
 
@@ -55,7 +57,7 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
             <span className="text-fg-3"> · {state.players[active].role === 'attacker' ? 'атакующий' : 'защитник'}</span>
           </p>
         )}
-        <RoundDots round={state.round} finished={finished} />
+        <RoundDots round={state.round} rounds={ROUNDS} finished={finished} />
       </div>
 
       {finished && <Result game={game} />}
@@ -115,16 +117,6 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
 
 const roleText = (role: string | null) => (role === 'attacker' ? 'text-[#f87171]' : role === 'defender' ? 'text-[#60a5fa]' : 'text-accent');
 
-function RoundDots({ round, finished }: { round: number; finished: boolean }) {
-  return (
-    <div className="mt-3 grid grid-cols-5 gap-1">
-      {Array.from({ length: ROUNDS }, (_, i) => (
-        <span key={i} className={cx('h-1.5 rounded-full', finished || i + 1 < round ? 'bg-accent' : i + 1 === round ? 'bg-accent/50' : 'bg-white/10')} />
-      ))}
-    </div>
-  );
-}
-
 /** Счёт обоих игроков: всего ПО (основная, вторичные, Battle Ready), срезано лимитами, CP. */
 function Scoreboard({ game }: { game: GameHook }) {
   const state = game.state!;
@@ -133,7 +125,7 @@ function Scoreboard({ game }: { game: GameHook }) {
   // два телефона: CP и ПО поправляет только сам игрок
   const mine = useMySeat();
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <ScoreboardGrid>
       {open && <AdjustSheet game={game} seat={open} onClose={() => setOpen(null)} />}
       {(['p1', 'p2'] as Seat[]).map((s) => {
         const p = state.players[s];
@@ -164,7 +156,7 @@ function Scoreboard({ game }: { game: GameHook }) {
           </button>
         );
       })}
-    </div>
+    </ScoreboardGrid>
   );
 }
 
