@@ -9,6 +9,8 @@ import DndSection from "../Dnd/DndSection";
 import { CalendarDays, Sparkles } from "lucide-react";
 import { NavRow } from "@/components/ui/ds";
 import { haptic } from "@/utils/haptic";
+import BoostySubscriptionInfo from "@/components/booking/BoostySubscriptionInfo";
+import { boostyKindForService } from "@/components/booking/boosty";
 
 const DND_SLUG = "dnd";
 
@@ -121,15 +123,17 @@ function ServiceItemComponent({
   imgUrl: string;
   onClick: () => void;
 }) {
+  const boostyKind = boostyKindForService(service);
+
   return (
-    <li>
+    <li className="relative">
       <button
         type="button"
         onClick={() => {
           haptic.tap();
           onClick();
         }}
-        className="ds-press flex w-full items-center gap-3.5 rounded-[18px] border border-white/10 bg-app-elevated p-2.5 pr-4 text-left"
+        className={`ds-press flex w-full items-center gap-3.5 rounded-[18px] border border-white/10 bg-app-elevated p-2.5 text-left ${boostyKind ? "pr-14" : "pr-4"}`}
       >
         <img src={imgUrl} alt="" className="h-16 w-24 shrink-0 rounded-xl object-cover" />
         <span className="min-w-0 flex-1">
@@ -137,8 +141,15 @@ function ServiceItemComponent({
           {service.description && <span className="mt-1 block text-sm leading-snug text-fg-2">{service.description}</span>}
           {service.visitorsCapacity && <span className="mt-0.5 block text-[13px] text-fg-3">до {service.visitorsCapacity} чел.</span>}
         </span>
-        <ChevronRightIcon className="size-5 shrink-0 text-fg-3" />
+        {!boostyKind && <ChevronRightIcon className="size-5 shrink-0 text-fg-3" />}
       </button>
+      {boostyKind && (
+        <BoostySubscriptionInfo
+          kind={boostyKind}
+          context="selection"
+          className="absolute right-1.5 top-1/2 -translate-y-1/2"
+        />
+      )}
     </li>
   );
 }

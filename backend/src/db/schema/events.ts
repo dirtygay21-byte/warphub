@@ -3,6 +3,7 @@ import { relations } from 'drizzle-orm';
 import {
   check,
   integer,
+  jsonb,
   pgTable,
   primaryKey,
   serial,
@@ -13,6 +14,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { tablesTable } from './tables';
 import { usersTable } from './users';
+import type { ImageCrop } from '../../lib/image-crop';
 
 export const eventsTable = pgTable(
   'events',
@@ -24,6 +26,7 @@ export const eventsTable = pgTable(
     endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
     seatsPerTable: integer('seats_per_table').notNull(),
     bannerUrl: text('banner_url'),
+    bannerCrop: jsonb('banner_crop').$type<ImageCrop>(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),

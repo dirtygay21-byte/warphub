@@ -28,6 +28,7 @@ import type { ReactNode } from "react";
 import { TrainerBadge } from "./TableSelection/SessionCards";
 import ServiceDetailsHeader from "./ServiceDetails/ServiceDetailsHeader";
 import ServiceDetailsImage from "./ServiceDetails/ServiceDetailsImage";
+import { boostyKindForService } from "@/components/booking/boosty";
 
 const CLUB_VISIT_SLUG = "club_visit";
 const MINUTE = 60 * 1000;
@@ -61,6 +62,7 @@ export default function ServiceDetailsStage() {
   const discipline = disciplinesQuery.data?.find((d) => d.id === disciplineId);
   const detailsKind = detailsKindForSlug(service?.slug);
   const isClubVisit = service?.slug === CLUB_VISIT_SLUG;
+  const boostyKind = boostyKindForService(service);
   const durationMinutes = service?.duration ?? 60;
 
   const maxParty =
@@ -196,6 +198,7 @@ export default function ServiceDetailsStage() {
             activity={service?.title ?? undefined}
             discipline={discipline?.title}
             description={service?.description ?? undefined}
+            boostyKind={boostyKind}
           />
           <div className="space-y-2 border-t border-white/[0.06] pt-3 text-[15px]">
             <InfoLine icon={<CalendarDays className="size-4" />}>{formatSelectedDate(selectedDate)}</InfoLine>

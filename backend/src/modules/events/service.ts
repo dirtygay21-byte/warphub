@@ -10,6 +10,7 @@ import {
   usersEventsTable,
 } from '../../db/schema';
 import { deleteImage } from '../../lib/storage/upload';
+import type { ImageCrop } from '../../lib/image-crop';
 import { getClubClosures } from '../club-closure/service';
 
 export type EventTableBlock = {
@@ -27,6 +28,7 @@ export type EventView = {
   seatsPerTable: number;
   capacity: number;
   bannerUrl: string | null;
+  bannerCrop: ImageCrop | null;
   tableIds: number[];
   createdAt: string;
   updatedAt: string;
@@ -74,6 +76,7 @@ export type CreateEventInput = {
   endsAt?: Date;
   seatsPerTable: number;
   bannerUrl?: string;
+  bannerCrop?: ImageCrop | null;
   tableIds?: number[];
 };
 
@@ -84,6 +87,7 @@ export type UpdateEventInput = {
   endsAt?: Date;
   seatsPerTable?: number;
   bannerUrl?: string | null;
+  bannerCrop?: ImageCrop | null;
   tableIds?: number[];
 };
 
@@ -265,6 +269,7 @@ function toEventView(
     seatsPerTable: event.seatsPerTable,
     capacity: computeEventCapacity(tableIds, event.seatsPerTable),
     bannerUrl: event.bannerUrl,
+    bannerCrop: event.bannerCrop,
     tableIds,
     createdAt: event.createdAt.toISOString(),
     updatedAt: event.updatedAt.toISOString(),
@@ -518,6 +523,7 @@ export async function createEvent(input: CreateEventInput): Promise<EventView> {
       endsAt,
       seatsPerTable: input.seatsPerTable,
       bannerUrl: input.bannerUrl ?? null,
+      bannerCrop: input.bannerCrop ?? null,
     })
     .returning();
 
@@ -573,6 +579,8 @@ export async function updateEvent(
       seatsPerTable,
       bannerUrl:
         input.bannerUrl !== undefined ? input.bannerUrl : existing.bannerUrl,
+      bannerCrop:
+        input.bannerCrop !== undefined ? input.bannerCrop : existing.bannerCrop,
     })
     .where(eq(eventsTable.id, eventId))
     .returning();

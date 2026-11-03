@@ -696,6 +696,7 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       try {
         return await createNews({
           coverUrl: body.coverUrl,
+          coverCrop: body.coverCrop,
           title: body.title,
           text: body.text,
           publishedAt:
@@ -725,6 +726,7 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       try {
         return await updateNews(params.id, {
           coverUrl: body.coverUrl,
+          coverCrop: body.coverCrop,
           title: body.title,
           text: body.text,
           publishedAt:
@@ -870,6 +872,7 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
               : undefined,
           seatsPerTable: body.seatsPerTable,
           bannerUrl: body.bannerUrl,
+          bannerCrop: body.bannerCrop,
           tableIds: body.tableIds,
         });
       } catch (error) {
@@ -905,6 +908,7 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
               : undefined,
           seatsPerTable: body.seatsPerTable,
           bannerUrl: body.bannerUrl,
+          bannerCrop: body.bannerCrop,
           tableIds: body.tableIds,
         });
       } catch (error) {

@@ -1,4 +1,5 @@
 import { getNewsById } from "@/apiUtils/news";
+import ContentImage from "@/components/ui/ContentImage";
 import { formatNewsPublishedAt } from "@/components/pages/News/utils";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarDays, LoaderCircle, RefreshCw, X } from "lucide-react";
@@ -70,10 +71,11 @@ export default function NewsDetailsModal({
           {newsQuery.data && (
             <div className="space-y-4 p-5">
               {newsQuery.data.coverUrl ? (
-                <img
+                <ContentImage
                   src={newsQuery.data.coverUrl}
                   alt={newsQuery.data.title}
-                  className="aspect-video w-full rounded-xl object-cover"
+                  crop={newsQuery.data.coverCrop}
+                  className="aspect-video w-full rounded-xl"
                 />
               ) : (
                 <div className="flex aspect-video w-full items-center justify-center rounded-xl bg-white/5 text-sm text-fg-3">

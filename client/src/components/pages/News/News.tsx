@@ -100,6 +100,7 @@ export default function News() {
               key={news.id}
               title={news.title}
               coverUrl={news.coverUrl}
+              coverCrop={news.coverCrop}
               onClick={() => setSelectedNewsId(news.id)}
             />
           ))}

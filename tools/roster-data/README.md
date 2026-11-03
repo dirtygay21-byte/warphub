@@ -604,3 +604,26 @@ Monsters; Bladeborn; страницы фракций): 3–15 бойцов, ≤1
 Конфликты источников (берётся warcrier, записано в `SINGLETON_OVERRIDES`):
 - Blacktalons — warcrier: каждый боец один раз; warcry_data: `singleton: false`.
 - Gladiatorium (Thunderstrike) — warcrier: каждый боец один раз; warcry_data: `singleton: false`.
+
+### «Начать игру» и Test Army для Kill Team / Warcry (03.11.2026)
+
+- `backend/roster-data/kt/game.json`: Approved Ops 2025 — 9 Crit Ops, 12 общих Tac Ops, Kill Grade, 4 turning points,
+  initiative/primary op, 6 killzones по 6 официальных карт (36). Размер поля 30×22″, objective marker 40 мм, 2CP и до 4
+  опций снаряжения. Источники — Wahapedia Approved Ops / Core Rules / Appendix / Killzones, проверка 03.11.2026.
+  `scripts/import-kt-maps.py` векторизует drop zones, home/centre/enemy и контуры террейна из официальных схем; Approved Ops
+  оговаривает, что карты не являются точными измерениями террейна.
+- `backend/roster-data/warcry/game.json`: 24 deployment maps (Table A/B), 24 victory conditions и 18 актуальных twists,
+  battleplan и резервы RND2/RND3. Источники — Warcrier Battleplan / Fighting the Battle / Matched Play, проверка 03.11.2026.
+  `scripts/import-warcry-battleplans.py` импортирует тексты, `scripts/import-warcry-map-points.py` — группы Dagger/Shield/Hammer
+  и метки резервов из официальных карт; внеполевые резервы проецируются на край доски.
+- `client/src/features/roster/ktgame/` и `warcrygame/`: журналы событий с replay и undo, детерминированный RNG,
+  подготовка, CP/Kill Grade/Crit Op, initiative и wild dice, активации/способности, резервы, завершение и primary op.
+  Очки по уникальным Tac Op / victory conditions подтверждаются игроком по полному тексту правила — универсальная механика
+  не выдумывается. Тесты — `tests/kt-game-full.test.ts` и `tests/warcry-game-full.test.ts`.
+- Экраны `ui/kt/KtFullGameScreen` и `ui/warcry/WarcryFullGameScreen`: ростеры и миссия/battleplan, журнал и продолжение,
+  игра на двух телефонах по общему roster-games API (`ui/skirmish/useSkirmishOnline`), миграция ранней локальной версии
+  как новой подготовки без фабрикации прежнего ручного счёта.
+- Test Army использует общий `Board`: 30×22″ для этих систем, прежние 60×44″ для 40K/AoS. Каждый оперативник/боец —
+  отдельная модель; базы Kill Team — из datacard KTDash. В `warcry_data` размера базы нет, поэтому игрок задаёт её вручную.
+  Kill Team — все 36 официальных карт; Warcry — все 24 deployment maps с точками групп и зонами 3″. Соперник — второй
+  сохранённый ростер или код KT1./WC1.; расстановка сохраняется отдельно для системы, аккаунта и ростера.

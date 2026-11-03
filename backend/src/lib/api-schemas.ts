@@ -1,5 +1,12 @@
 import { t } from 'elysia';
 
+const imageCropSchema = t.Object({
+  x: t.Number({ minimum: 0, maximum: 100 }),
+  y: t.Number({ minimum: 0, maximum: 100 }),
+  width: t.Number({ minimum: 0, maximum: 100 }),
+  height: t.Number({ minimum: 0, maximum: 100 }),
+});
+
 const eventSchema = t.Object({
   id: t.Number(),
   title: t.String(),
@@ -13,6 +20,7 @@ const eventSchema = t.Object({
     description: 'Общее количество мест: seatsPerTable × число столов',
   }),
   bannerUrl: t.Nullable(t.String()),
+  bannerCrop: t.Nullable(imageCropSchema),
   tableIds: t.Array(t.Number()),
   createdAt: t.String({ format: 'date-time' }),
   updatedAt: t.String({ format: 'date-time' }),
@@ -280,6 +288,7 @@ export const apiModels = {
       description: 'Количество мест за одним столом',
     }),
     bannerUrl: t.Optional(t.String()),
+    bannerCrop: t.Optional(t.Nullable(imageCropSchema)),
     tableIds: t.Array(t.Number({ minimum: 1 }), {
       minItems: 1,
       description: 'ID столов для резерва на время ивента',
@@ -297,6 +306,7 @@ export const apiModels = {
       }),
     ),
     bannerUrl: t.Optional(t.Nullable(t.String())),
+    bannerCrop: t.Optional(t.Nullable(imageCropSchema)),
     tableIds: t.Optional(
       t.Array(t.Number({ minimum: 1 }), {
         minItems: 1,
@@ -311,6 +321,7 @@ export const apiModels = {
   News: t.Object({
     id: t.Number(),
     coverUrl: t.String(),
+    coverCrop: t.Nullable(imageCropSchema),
     title: t.String(),
     text: t.String(),
     publishedAt: t.String({ format: 'date-time' }),
@@ -319,6 +330,7 @@ export const apiModels = {
   }),
   CreateNewsBody: t.Object({
     coverUrl: t.String({ minLength: 1, description: 'URL обложки' }),
+    coverCrop: t.Optional(t.Nullable(imageCropSchema)),
     title: t.String({ minLength: 1 }),
     text: t.String({ minLength: 1 }),
     publishedAt: t.Optional(
@@ -330,6 +342,7 @@ export const apiModels = {
   }),
   UpdateNewsBody: t.Object({
     coverUrl: t.Optional(t.String({ minLength: 1 })),
+    coverCrop: t.Optional(t.Nullable(imageCropSchema)),
     title: t.Optional(t.String({ minLength: 1 })),
     text: t.Optional(t.String({ minLength: 1 })),
     publishedAt: t.Optional(

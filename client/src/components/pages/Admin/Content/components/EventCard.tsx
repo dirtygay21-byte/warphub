@@ -1,4 +1,5 @@
 import type { Event } from "@/types";
+import ContentImage from "@/components/ui/ContentImage";
 import { getSeatsLabel } from "@/utils/plural";
 import { CalendarDays, Table2, UsersRound } from "lucide-react";
 import { formatEventPeriod } from "../utils";
@@ -19,10 +20,11 @@ export default function EventCard({ event, onClick }: EventCardProps) {
       className="w-full overflow-hidden rounded-2xl border border-white/10 bg-app-elevated text-left transition-colors hover:cursor-pointer hover:border-accent/40 active:bg-white/5"
     >
       {event.bannerUrl ? (
-        <img
+        <ContentImage
           src={event.bannerUrl}
           alt={event.title}
-          className="aspect-[16/7] w-full object-cover"
+          crop={event.bannerCrop}
+          className="aspect-[16/7] w-full"
         />
       ) : (
         <div className="flex aspect-[16/7] w-full items-center justify-center bg-white/5 text-sm text-fg-3">

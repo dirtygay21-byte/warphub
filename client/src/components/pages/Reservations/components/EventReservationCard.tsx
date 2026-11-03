@@ -1,4 +1,5 @@
 import { DetailRow } from "./DetailRow";
+import ContentImage from "@/components/ui/ContentImage";
 import { formatReservationDate } from "@/utils/date";
 import { formatTimeRange } from "@/utils/reservationDisplay";
 import clsx from "clsx";
@@ -33,10 +34,11 @@ export function EventReservationCard({
       )}
     >
       {event.bannerUrl && (
-        <img
+        <ContentImage
           src={event.bannerUrl}
           alt={event.title}
-          className="aspect-[2/1] w-full object-cover"
+          crop={event.bannerCrop}
+          className="aspect-[2/1] w-full"
         />
       )}
 
