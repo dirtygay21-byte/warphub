@@ -10,6 +10,7 @@ import { Button, Icon, IconButton, Segmented } from '../kit';
 import { cx } from '../util';
 import { useSkirmishOnline } from '../skirmish/useSkirmishOnline';
 import { SkirmishOnlineControls } from '../skirmish/SkirmishOnlineControls';
+import { SkirmishRuleText, SkirmishStep } from '../skirmish/SkirmishLayout';
 
 const SEATS: Seat[] = ['p1', 'p2'];
 const SAVE_KEY = 'warphub.kt.game.v2';
@@ -86,14 +87,14 @@ export function KtFullGameScreen({ onBack, rosters, index, initialRosterId }: { 
       {data && state && !resume && state.stage === 'setup' && <Setup rosters={rosters} teamName={teamName} initialRosterId={initialRosterId} data={data} onSetup={(body) => dispatch(body)} />}
       {data && state && !resume && state.stage !== 'setup' && (
         <>
-          <BattleHeader state={state} data={data} onInitiative={(cards) => dispatch({ type: 'initiative', round: state.round, attempt: 0, cards })} />
+          <BattleHeader state={state} data={data} onInitiative={(cards) => dispatch({ type: 'initiative', round: state.round, attempt: 0, cards })} onPhase={() => dispatch({ type: 'phase-advanced' })} />
           <div className="space-y-3">
             {SEATS.map((seat) => <Player key={seat} state={state} seat={seat} rosterName={rosterName(state.players[seat].rosterId)} tacOpName={data.tacOps.find((t) => t.id === state.players[seat].tacOp)?.name ?? state.players[seat].tacOp} dispatch={dispatch} />)}
           </div>
           {state.stage === 'battle' && (
             <>
-              <InitiativeAndActions state={state} dispatch={dispatch} />
-              <EndRound key={`${state.round}-${state.missionId}`} state={state} dispatch={dispatch} />
+              {state.phase === 'firefight' && <InitiativeAndActions state={state} dispatch={dispatch} />}
+              {state.phase === 'firefight' && <EndRound key={`${state.round}-${state.missionId}`} state={state} dispatch={dispatch} />}
               {state.round > data.game.turningPoints && <Button variant="primary" className="mt-3 w-full" onClick={() => dispatch({ type: 'finish' })}>Завершить битву и раскрыть primary ops</Button>}
             </>
           )}
@@ -119,28 +120,36 @@ function Setup({ rosters, teamName, initialRosterId, data, onSetup }: { rosters:
   const ready = selection.p1.id && selection.p2.id && selection.p1.tacOp && selection.p2.tacOp;
   return (
     <section className="space-y-3">
-      <label className={labelClass}>Crit Op<select value={missionId} onChange={(e) => setMission(e.target.value)} className={selectClass}>{data.critOps.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</select></label>
-      <div className="grid grid-cols-[1fr_5rem] gap-2"><label className={labelClass}>Killzone<select value={killzone} onChange={(e) => setKillzone(e.target.value)} className={selectClass}>{data.missionPack.killzones.map((k) => <option key={k}>{k}</option>)}</select></label><label className={labelClass}>Карта<select value={map} onChange={(e) => setMap(Number(e.target.value))} className={selectClass}>{Array.from({ length: 6 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}</select></label></div>
-      <div className="rounded-2xl border border-white/10 bg-app-elevated p-3"><p className="mb-2 text-[12px] font-semibold uppercase text-fg-3">Кто проиграл roll-off и получил Re-roll initiative</p><Segmented<Seat> value={dropZoneLoser} onChange={setLoser} options={[{ value: 'p1', label: 'Игрок 1' }, { value: 'p2', label: 'Игрок 2' }]} /></div>
-      {SEATS.map((seat) => (
-        <div key={seat} className="space-y-2 rounded-2xl border border-white/10 bg-app-elevated p-3">
-          <p className="text-[12px] font-semibold uppercase text-fg-3">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'}</p>
-          <select value={selection[seat].id} onChange={(e) => chooseRoster(seat, e.target.value)} className={selectClass}><option value="">Выберите kill team</option>{rosters.map((r) => <option key={r.id} value={r.id}>{r.name} · {teamName(r.teamId)} · {r.operatives.length} опер.</option>)}</select>
-          <select value={selection[seat].tacOp} onChange={(e) => setSelection((s) => ({ ...s, [seat]: { ...s[seat], tacOp: e.target.value } }))} className={selectClass}>{data.tacOps.map((t) => <option key={t.id} value={t.id}>{t.archetype} · {t.name}</option>)}</select>
-        </div>
-      ))}
-      <Button variant="primary" className="h-12 w-full" disabled={!ready} onClick={() => onSetup({ type: 'setup', missionId, killzone, map, dropZoneLoser, rosters: selection })}>Начать битву</Button>
+      <SkirmishStep n={1} title="Crit Op и killzone" done={!!missionId && !!killzone}>
+        <label className={labelClass}>Crit Op<select value={missionId} onChange={(e) => setMission(e.target.value)} className={selectClass}>{data.critOps.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</select></label>
+        <div className="grid grid-cols-[1fr_5rem] gap-2"><label className={labelClass}>Killzone<select value={killzone} onChange={(e) => setKillzone(e.target.value)} className={selectClass}>{data.missionPack.killzones.map((k) => <option key={k}>{k}</option>)}</select></label><label className={labelClass}>Карта<select value={map} onChange={(e) => setMap(Number(e.target.value))} className={selectClass}>{Array.from({ length: 6 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}</select></label></div>
+      </SkirmishStep>
+      <SkirmishStep n={2} title="Игроки и Tac Ops" done={!!ready}>
+        {SEATS.map((seat) => (
+          <div key={seat} className="space-y-2 rounded-xl border border-white/10 bg-black/20 p-3">
+            <p className="text-[12px] font-semibold uppercase text-fg-3">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'}</p>
+            <select value={selection[seat].id} onChange={(e) => chooseRoster(seat, e.target.value)} className={selectClass}><option value="">Выберите kill team</option>{rosters.map((r) => <option key={r.id} value={r.id}>{r.name} · {teamName(r.teamId)} · {r.operatives.length} опер.</option>)}</select>
+            <select value={selection[seat].tacOp} onChange={(e) => setSelection((s) => ({ ...s, [seat]: { ...s[seat], tacOp: e.target.value } }))} className={selectClass}>{data.tacOps.map((t) => <option key={t.id} value={t.id}>{t.archetype} · {t.name}</option>)}</select>
+          </div>
+        ))}
+      </SkirmishStep>
+      <SkirmishStep n={3} title="Инициатива и начало" done={false}>
+        <p className="text-[12px] leading-snug text-fg-3">Кто проиграл roll-off и получил Re-roll initiative</p>
+        <Segmented<Seat> value={dropZoneLoser} onChange={setLoser} options={[{ value: 'p1', label: 'Игрок 1' }, { value: 'p2', label: 'Игрок 2' }]} />
+        <Button variant="primary" className="h-12 w-full" disabled={!ready} onClick={() => onSetup({ type: 'setup', missionId, killzone, map, dropZoneLoser, rosters: selection })}>Начать битву</Button>
+      </SkirmishStep>
     </section>
   );
 }
 
-function BattleHeader({ state, data, onInitiative }: { state: KtState; data: import('../../skirmish/types').KtGameData; onInitiative: (cards: Partial<Record<Seat, { reroll?: boolean; modifier?: number }>>) => boolean }) {
+function BattleHeader({ state, data, onInitiative, onPhase }: { state: KtState; data: import('../../skirmish/types').KtGameData; onInitiative: (cards: Partial<Record<Seat, { reroll?: boolean; modifier?: number }>>) => boolean; onPhase: () => boolean }) {
   return (
     <div className="mb-3 rounded-2xl border border-white/10 bg-app-elevated p-3.5">
       <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">{state.stage === 'finished' ? 'Битва окончена' : `Turning point ${Math.min(state.round, 4)} / ${data.game.turningPoints}`}</p>
       <p className="mt-1 text-sm text-fg-2">{data.critOps.find((m) => m.id === state.missionId)?.name} · {state.killzone} · Карта {state.map}</p>
       {state.stage === 'battle' && !state.initiativeRolls && state.round <= 4 && <InitiativePanel state={state} onRoll={onInitiative} />}
       {state.initiativeRolls && <p className="mt-1 text-[12px] text-fg-3">Инициатива: {state.initiative === 'p1' ? 'Игрок 1' : 'Игрок 2'} · броски {state.initiativeRolls.p1} : {state.initiativeRolls.p2}</p>}
+      {state.phase === 'strategy' && state.initiativeRolls && <Button variant="primary" className="mt-2 w-full" onClick={onPhase} disabled={state.round === 1 && (!state.players.p1.primaryOp || !state.players.p2.primaryOp)}>Перейти к Firefight</Button>}
     </div>
   );
 }
@@ -166,7 +175,7 @@ function Player({ state, seat, rosterName, tacOpName, dispatch }: { state: KtSta
     <article className="rounded-2xl border border-white/10 bg-app-elevated p-3.5">
       <div className="flex items-start justify-between gap-2"><div className="min-w-0"><p className="truncate text-sm font-semibold">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · {rosterName}</p><p className="truncate text-[12px] text-fg-3">Tac Op: {tacOpName} · Kill Grade {p.killGrade}</p></div><b className="font-display text-xl">{totalKtVp(state, seat)} VP</b></div>
       <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[12px]"><span className="rounded bg-black/25 px-2 py-1">Crit {p.critVp}</span><span className="rounded bg-black/25 px-2 py-1">Kill {p.killVp}</span><span className="rounded bg-black/25 px-2 py-1">Tac {p.tacVp}</span>{p.bonusVp > 0 && <span className="rounded bg-accent/15 px-2 py-1 text-accent">Primary +{p.bonusVp}</span>}</div>
-      {state.stage === 'battle' && <div className="mt-2 flex items-center gap-2 text-[12px]"><span className="text-fg-3">CP</span><button type="button" aria-label={`CP минус ${seat}`} onClick={() => dispatch({ type: 'cp-adjust', seat, delta: -1 })} className="size-7 rounded border border-white/10">−</button><b>{p.cp}</b><button type="button" aria-label={`CP плюс ${seat}`} onClick={() => dispatch({ type: 'cp-adjust', seat, delta: 1 })} className="size-7 rounded border border-white/10">+</button>{state.round === 1 && <span className="ml-auto flex gap-1">{(['crit', 'kill', 'tac'] as Op[]).map((op) => <button key={op} type="button" onClick={() => dispatch({ type: 'primary-op', seat, op })} className={cx('rounded border px-2 py-1', p.primaryOp === op ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 text-fg-3')}>{op}</button>)}</span>}</div>}
+      {state.stage === 'battle' && state.initiativeRolls && <div className="mt-2 flex items-center gap-2 text-[12px]"><span className="text-fg-3">CP</span><button type="button" aria-label={`CP минус ${seat}`} onClick={() => dispatch({ type: 'cp-adjust', seat, delta: -1 })} className="size-7 rounded border border-white/10">−</button><b>{p.cp}</b><button type="button" aria-label={`CP плюс ${seat}`} onClick={() => dispatch({ type: 'cp-adjust', seat, delta: 1 })} className="size-7 rounded border border-white/10">+</button>{state.round === 1 && state.initiativeRolls && <span className="ml-auto flex gap-1">{(['crit', 'kill', 'tac'] as Op[]).map((op) => <button key={op} type="button" onClick={() => dispatch({ type: 'primary-op', seat, op })} className={cx('rounded border px-2 py-1', p.primaryOp === op ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 text-fg-3')}>{op}</button>)}</span>}</div>}
     </article>
   );
 }
@@ -217,7 +226,7 @@ function Result({ state }: { state: KtState }) {
 }
 function Rules({ state, data }: { state: KtState; data: import('../../skirmish/types').KtGameData }) {
   const mission = data.critOps.find((m) => m.id === state.missionId);
-  return <details className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3"><summary className="cursor-pointer text-sm font-semibold">Правила миссии и Tac Ops</summary>{mission && <p className="mt-2 whitespace-pre-line text-[12px] leading-relaxed text-fg-2">{mission.text}</p>}{SEATS.map((seat) => { const p = state.players[seat], tac = data.tacOps.find((t) => t.id === p.tacOp); return tac ? <p key={seat} className="mt-3 whitespace-pre-line border-t border-white/10 pt-2 text-[12px] leading-relaxed text-fg-2"><b>{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · {tac.name}</b><br />{tac.text}</p> : null; })}<p className="mt-3 border-t border-white/10 pt-2 text-[12px] text-fg-3">{data.killOp.text}<br />{data.game.primaryOpBonus}</p></details>;
+  return <details className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3"><summary className="cursor-pointer text-sm font-semibold">Правила миссии и Tac Ops</summary>{mission && <div className="mt-2"><SkirmishRuleText text={mission.text} /></div>}{SEATS.map((seat) => { const p = state.players[seat], tac = data.tacOps.find((t) => t.id === p.tacOp); return tac ? <p key={seat} className="mt-3 whitespace-pre-line border-t border-white/10 pt-2 text-[12px] leading-relaxed text-fg-2"><b>{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · {tac.name}</b><SkirmishRuleText text={tac.text} /></p> : null; })}<p className="mt-3 border-t border-white/10 pt-2 text-[12px] text-fg-3">{data.killOp.text}<br />{data.game.primaryOpBonus}</p></details>;
 }
 const selectClass = 'mt-1 h-10 w-full rounded-xl border border-white/10 bg-app-surface px-2 text-[13px] text-fg outline-none';
 const labelClass = 'block rounded-2xl border border-white/10 bg-app-elevated p-3 text-[12px] font-semibold uppercase tracking-wider text-fg-3';

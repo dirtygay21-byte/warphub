@@ -13,7 +13,7 @@ const created = () => ev({ type: 'game-created', schema: KT_GAME_SCHEMA, seed: '
 const setup = (missionId = 'secure') => ev({ type: 'setup', missionId, killzone: 'Volkus', map: 1, dropZoneLoser: 'p2', rosters: { p1: { id: 'a', operatives: 10, tacOp: 'rout' }, p2: { id: 'b', operatives: 10, tacOp: 'envoy' } } });
 const start = (missionId = 'secure') => {
   let state = createKtState({ type: 'game-created', schema: KT_GAME_SCHEMA, seed: 'test-seed', names })!;
-  for (const e of [setup(missionId), ev({ type: 'initiative', round: 1, attempt: 0 }), ev({ type: 'primary-op', seat: 'p1', op: 'crit' }), ev({ type: 'primary-op', seat: 'p2', op: 'kill' })]) {
+  for (const e of [setup(missionId), ev({ type: 'initiative', round: 1, attempt: 0 }), ev({ type: 'primary-op', seat: 'p1', op: 'crit' }), ev({ type: 'primary-op', seat: 'p2', op: 'kill' }), ev({ type: 'phase-advanced' })]) {
     const result = applyKtEvent(state, e, data);
     assert.ok(result.ok, result.ok ? '' : result.error);
     state = result.state;
@@ -25,10 +25,18 @@ const dispatch = (state: KtState, body: KtEventBody) => {
   assert.ok(result.ok, result.ok ? '' : result.error);
   return result.state;
 };
-const end = (state: KtState, controls: Record<string, Seat | null> = {}) => dispatch(state, { type: 'end-round', controls });
+const end = (state: KtState, controls: Record<string, Seat | null> = {}) => {
+  let next = dispatch(state, { type: 'end-round', controls });
+  next = dispatch(next, { type: 'initiative', round: next.round, attempt: 0 });
+  return dispatch(next, { type: 'phase-advanced' });
+};
 
 test('Approved Ops data: 9 Crit Ops, 12 Tac Ops и точная таблица Kill Grade', () => {
   assert.equal(data.critOps.length, 9);
+  for (const mission of data.critOps) {
+    assert.ok(mission.text.startsWith('MISSION ACTION') || mission.text.startsWith('ADDITIONAL RULES'), mission.id);
+    assert.ok(!mission.text.includes('Crit Op'), `${mission.id}: смешаны карточки`);
+  }
   assert.equal(data.tacOps.length, 12);
   assert.deepEqual(data.killOp.thresholds['10'], [2, 4, 6, 8, 10]);
   assert.equal(data.game.turningPoints, 4);
@@ -78,7 +86,7 @@ test('Data: Compile запрещает повтор маркера за turning 
 });
 
 test('primary op и окончание: половина с округлением, победитель, отмена восстанавливает состояние', () => {
-  const events = [created(), setup(), ev({ type: 'initiative', round: 1, attempt: 0 }), ev({ type: 'primary-op', seat: 'p1', op: 'crit' }), ev({ type: 'end-round', controls: { home: 'p1' } }), ev({ type: 'crit-action', seat: 'p1', action: 'secure', marker: 'home' }), ev({ type: 'end-round', controls: { home: 'p1' } }), ev({ type: 'end-round', controls: { home: 'p1' } }), ev({ type: 'end-round', controls: { home: 'p1' } }), ev({ type: 'finish' })];
+  const events = [created(), setup(), ev({ type: 'initiative', round: 1, attempt: 0 }), ev({ type: 'primary-op', seat: 'p1', op: 'crit' }), ev({ type: 'primary-op', seat: 'p2', op: 'kill' }), ev({ type: 'phase-advanced' }), ev({ type: 'end-round', controls: { home: 'p1' } }), ev({ type: 'initiative', round: 2, attempt: 0 }), ev({ type: 'phase-advanced' }), ev({ type: 'crit-action', seat: 'p1', action: 'secure', marker: 'home' }), ev({ type: 'end-round', controls: { home: 'p1' } }), ev({ type: 'initiative', round: 3, attempt: 0 }), ev({ type: 'phase-advanced' }), ev({ type: 'end-round', controls: { home: 'p1' } }), ev({ type: 'initiative', round: 4, attempt: 0 }), ev({ type: 'phase-advanced' }), ev({ type: 'end-round', controls: { home: 'p1' } }), ev({ type: 'finish' })];
   const replayed = replayKt(events, data);
   assert.ok(replayed.ok);
   const state = replayed.state!;
@@ -89,6 +97,20 @@ test('primary op и окончание: половина с округление
   assert.equal(totalKtVp(state, 'p1'), 9);
   const undone = replayKt([...events.slice(0, -2), ev({ type: 'event-reverted' })], data);
   assert.ok(undone.ok);
-  assert.equal(undone.state!.round, 3);
+  assert.equal(undone.state!.round, 4);
   assert.equal(undone.state!.stage, 'battle');
+});
+
+
+test('phase gate: действия и конец turning point нельзя выполнить до инициативы и Firefight', () => {
+  let state = createKtState({ type: 'game-created', schema: KT_GAME_SCHEMA, seed: 'test-seed', names })!;
+  state = dispatch(state, setup());
+  assert.equal(applyKtEvent(state, ev({ type: 'crit-action', seat: 'p1', action: 'secure', marker: 'home' }), data).ok, false);
+  assert.equal(applyKtEvent(state, ev({ type: 'end-round', controls: {} }), data).ok, false);
+  state = dispatch(state, { type: 'initiative', round: 1, attempt: 0 });
+  assert.equal(applyKtEvent(state, ev({ type: 'end-round', controls: {} }), data).ok, false);
+  state = dispatch(state, { type: 'primary-op', seat: 'p1', op: 'crit' });
+  state = dispatch(state, { type: 'primary-op', seat: 'p2', op: 'kill' });
+  state = dispatch(state, { type: 'phase-advanced' });
+  assert.equal(state.phase, 'firefight');
 });
