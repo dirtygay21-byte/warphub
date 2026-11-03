@@ -1,4 +1,5 @@
 export { formatEventDateTime, formatEventPeriod } from "@/utils/eventDisplay";
+import type { ImageCrop } from "@/types";
 import { fromClubDatetimeLocal, toClubDatetimeLocal } from "@/utils/clubTime";
 
 export type EventDraft = {
@@ -8,6 +9,7 @@ export type EventDraft = {
   endsAt: string;
   seatsPerTable: number;
   bannerUrl: string;
+  bannerCrop: ImageCrop | null;
   tableIds: number[];
 };
 
@@ -18,6 +20,7 @@ export const createEmptyEventDraft = (): EventDraft => ({
   endsAt: "",
   seatsPerTable: 1,
   bannerUrl: "",
+  bannerCrop: null,
   tableIds: [],
 });
 
@@ -36,6 +39,7 @@ export const eventToDraft = (event: {
   endsAt: string;
   seatsPerTable: number;
   bannerUrl: string;
+  bannerCrop: ImageCrop | null;
   tableIds: number[];
 }): EventDraft => ({
   title: event.title,
@@ -44,6 +48,7 @@ export const eventToDraft = (event: {
   endsAt: toDatetimeLocal(event.endsAt),
   seatsPerTable: event.seatsPerTable,
   bannerUrl: event.bannerUrl,
+  bannerCrop: event.bannerCrop,
   tableIds: [...event.tableIds],
 });
 
@@ -54,6 +59,7 @@ export const draftToPayload = (draft: EventDraft, bannerUrl: string) => ({
   endsAt: fromDatetimeLocal(draft.endsAt),
   seatsPerTable: Math.max(1, draft.seatsPerTable),
   bannerUrl,
+  bannerCrop: draft.bannerCrop,
   tableIds: draft.tableIds,
 });
 
@@ -64,4 +70,5 @@ export const draftsEqual = (left: EventDraft, right: EventDraft) =>
   left.endsAt === right.endsAt &&
   left.seatsPerTable === right.seatsPerTable &&
   left.bannerUrl === right.bannerUrl &&
+  JSON.stringify(left.bannerCrop) === JSON.stringify(right.bannerCrop) &&
   tableIdsEqual(left.tableIds, right.tableIds);

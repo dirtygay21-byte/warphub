@@ -23,7 +23,7 @@ import {
   type WarcryRosterFighter,
 } from '../../warcry/roster';
 import type { WarcryAbility, WarcryFaction, WarcryFighter, WarcryIndex, WarcryWeapon } from '../../warcry/types';
-import { confirmAsk, haptic, shareText } from '../../telegram';
+import { confirmAsk, haptic, openExternal, shareText } from '../../telegram';
 import { Button, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
 import { cx } from '../util';
 import { CostBadge, DataCard, EditorHeader, HeaderStat, RuleCard, SearchField, SectionTitle } from '../common/BuilderKit';
@@ -38,7 +38,7 @@ const COST_ORDER = ['reaction', 'double', 'triple', 'quad', 'passive', 'battletr
  * Редактор варбанды Warcry (W5, вид R2 30.10.2026 — как AoS и Kill Team): шапка с очками и лимитами, блок варбанды,
  * датакарты бойцов (характеристики, оружие, способности по стоимости), группы Dagger / Shield / Hammer, правила.
  */
-export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { roster: WarcryRoster; index: WarcryIndex; onBack: () => void; onChange: (r: WarcryRoster) => void; onDelete: () => void }) {
+export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, onChange, onDelete }: { roster: WarcryRoster; index: WarcryIndex; onBack: () => void; onStartGame: () => void; onTestArmy: () => void; onChange: (r: WarcryRoster) => void; onDelete: () => void }) {
   const [data, setData] = useState<Map<string, WarcryFaction>>(new Map());
   const [error, setError] = useState<string | null>(null);
   const own = data.get(roster.factionId);
@@ -262,7 +262,17 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
       <AddSheet open={adding} onClose={() => setAdding(false)} own={own} index={index} data={data} roster={roster} onLoad={load} onAdd={(r) => (haptic.tap(), onChange(r), setAdding(false))} />
       <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} data={data} points={points} />
       <Sheet open={menu} onClose={() => setMenu(false)} title="Варбанда">
-        <Button
+        <div className="space-y-2 pb-2">
+          <Button className="w-full justify-start" onClick={() => (setMenu(false), onStartGame())}>
+            <Icon name="spark" /> Начать игру с этой варбандой
+          </Button>
+          <Button className="w-full justify-start" onClick={() => (setMenu(false), onTestArmy())}>
+            <Icon name="map" /> Test Army: расставить бойцов
+          </Button>
+          <Button className="w-full justify-start" onClick={() => openExternal('https://warcrier.net/docs/rules/battleplan')}>
+            <Icon name="book" /> Battleplan на Warcrier
+          </Button>
+          <Button
           variant="danger"
           className="w-full justify-start"
           onClick={async () => {
@@ -270,7 +280,8 @@ export function WarcryEditor({ roster, index, onBack, onChange, onDelete }: { ro
           }}
         >
           <Icon name="trash" /> Удалить варбанду
-        </Button>
+          </Button>
+        </div>
       </Sheet>
     </div>
   );

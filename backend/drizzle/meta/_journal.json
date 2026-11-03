@@ -148,6 +148,13 @@
       "when": 1784002800000,
       "tag": "0020_dominatus_campaign",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1793700000000,
+      "tag": "0021_content_image_crops",
+      "breakpoints": true
     }
   ]
 }

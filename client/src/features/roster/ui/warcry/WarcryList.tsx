@@ -5,7 +5,7 @@ import { uid } from '../../engine/roster';
 import { cloudEnabled } from '../../storage';
 import { decodeWarcryRoster, newWarcryRoster, WARCRY_CODE_PREFIX, WARCRY_LIMITS, type WarcryRoster } from '../../warcry/roster';
 import type { WarcryIndex } from '../../warcry/types';
-import { confirmAsk, haptic } from '../../telegram';
+import { confirmAsk, haptic, openExternal } from '../../telegram';
 import { Button, Empty, Field, Icon, Sheet, Tag } from '../kit';
 import { BottomAction, ListHeader, PickTile, RosterCard, SearchField, ToolTile } from '../common/BuilderKit';
 
@@ -17,6 +17,8 @@ export function WarcryList({
   index,
   rosters,
   onOpen,
+  onStartGame,
+  onTestArmy,
   onCreate,
   onDuplicate,
   onDelete,
@@ -25,6 +27,8 @@ export function WarcryList({
   index: WarcryIndex;
   rosters: WarcryRoster[];
   onOpen: (id: string) => void;
+  onStartGame: () => void;
+  onTestArmy: () => void;
   onCreate: (r: WarcryRoster) => void;
   onDuplicate: (r: WarcryRoster) => void;
   onDelete: (id: string) => void;
@@ -37,8 +41,11 @@ export function WarcryList({
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-4xl lg:pt-8">
       <ListHeader kicker="WarpBuilder · Warcry Matched Play" title="Warcry" onBack={onExit} onImport={() => setImporting(true)} />
-      <div className="mb-5">
-        <ToolTile icon="spark" title="Как играть" sub="Обучение для новичков: инициатива, действия, атака" onClick={() => navigate('/learn/warcry')} />
+      <div className="mb-5 grid grid-cols-2 gap-2">
+        <ToolTile icon="spark" title="Начать игру" sub="Battleplan · инициатива · раунды" onClick={onStartGame} />
+        <ToolTile icon="map" title="Test Army" sub="Поле 30×22″ · базы · соперник" onClick={onTestArmy} />
+        <ToolTile icon="book" title="Правила" sub="Battleplan · Warcrier" onClick={() => openExternal('https://warcrier.net/docs/rules/battleplan')} />
+        <ToolTile icon="spark" title="Как играть" sub="Обучение: инициатива, действия, атака" onClick={() => navigate('/learn/warcry')} />
       </div>
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Выберите фракцию и наберите бойцов: союзники, траллы, монстр, группы Dagger / Shield / Hammer и проверка правил построения.</Empty>

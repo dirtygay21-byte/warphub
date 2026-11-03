@@ -1,4 +1,5 @@
 import { getNearestEvent } from "@/apiUtils/events";
+import ContentImage from "@/components/ui/ContentImage";
 import EventRegistrationModal from "@/components/pages/Home/EventRegistrationModal";
 import { formatEventPeriod } from "@/utils/eventDisplay";
 import { useQuery } from "@tanstack/react-query";
@@ -63,7 +64,12 @@ export default function NearestEventBanner() {
         )}
       >
         {event.bannerUrl ? (
-          <img src={event.bannerUrl} alt="" className="absolute inset-0 size-full object-cover" />
+          <ContentImage
+            src={event.bannerUrl}
+            alt=""
+            crop={event.bannerCrop}
+            className="absolute inset-0 size-full"
+          />
         ) : (
           <div className="absolute inset-0 bg-app-surface" />
         )}

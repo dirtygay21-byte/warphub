@@ -1,4 +1,5 @@
 import type { NewsItem } from "@/types";
+import ContentImage from "@/components/ui/ContentImage";
 import { CalendarDays } from "lucide-react";
 import { formatNewsDate } from "../newsUtils";
 
@@ -15,10 +16,11 @@ export default function NewsCard({ news, onClick }: NewsCardProps) {
       className="w-full overflow-hidden rounded-2xl border border-white/10 bg-app-elevated text-left transition-colors hover:cursor-pointer hover:border-accent/40 active:bg-white/5"
     >
       {news.coverUrl ? (
-        <img
+        <ContentImage
           src={news.coverUrl}
           alt={news.title}
-          className="aspect-[16/7] w-full object-cover"
+          crop={news.coverCrop}
+          className="aspect-[16/7] w-full"
         />
       ) : (
         <div className="flex aspect-[16/7] w-full items-center justify-center bg-white/5 text-sm text-fg-3">

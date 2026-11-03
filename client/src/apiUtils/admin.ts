@@ -223,6 +223,8 @@ type EventApi = {
   seats_per_table?: number;
   bannerUrl?: string;
   banner_url?: string;
+  bannerCrop?: Event["bannerCrop"];
+  banner_crop?: Event["bannerCrop"];
   tableIds?: number[];
   table_ids?: number[];
   createdAt?: string;
@@ -240,6 +242,7 @@ const mapEvent = (event: EventApi): Event => ({
   seatsPerTable: event.seatsPerTable ?? event.seats_per_table ?? 0,
   capacity: event.capacity ?? 0,
   bannerUrl: event.bannerUrl ?? event.banner_url ?? "",
+  bannerCrop: event.bannerCrop ?? event.banner_crop ?? null,
   tableIds: event.tableIds ?? event.table_ids ?? [],
   createdAt: event.createdAt ?? event.created_at ?? "",
   updatedAt: event.updatedAt ?? event.updated_at ?? "",
@@ -337,6 +340,8 @@ type NewsApi = {
   id?: number;
   coverUrl?: string;
   cover_url?: string;
+  coverCrop?: NewsItem["coverCrop"];
+  cover_crop?: NewsItem["coverCrop"];
   title?: string;
   text?: string;
   publishedAt?: string;
@@ -350,6 +355,7 @@ type NewsApi = {
 const mapNews = (news: NewsApi): NewsItem => ({
   id: news.id ?? 0,
   coverUrl: news.coverUrl ?? news.cover_url ?? "",
+  coverCrop: news.coverCrop ?? news.cover_crop ?? null,
   title: news.title ?? "",
   text: news.text ?? "",
   publishedAt: news.publishedAt ?? news.published_at ?? "",

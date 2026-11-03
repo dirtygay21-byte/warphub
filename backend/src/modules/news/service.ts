@@ -2,10 +2,12 @@ import { and, desc, eq, lte } from 'drizzle-orm';
 import { db } from '../../db';
 import { newsTable } from '../../db/schema';
 import { deleteImage } from '../../lib/storage/upload';
+import type { ImageCrop } from '../../lib/image-crop';
 
 export type NewsView = {
   id: number;
   coverUrl: string;
+  coverCrop: ImageCrop | null;
   title: string;
   text: string;
   publishedAt: string;
@@ -27,6 +29,7 @@ export class NewsError extends Error {
 
 export type CreateNewsInput = {
   coverUrl: string;
+  coverCrop?: ImageCrop | null;
   title: string;
   text: string;
   publishedAt?: Date;
@@ -34,6 +37,7 @@ export type CreateNewsInput = {
 
 export type UpdateNewsInput = {
   coverUrl?: string;
+  coverCrop?: ImageCrop | null;
   title?: string;
   text?: string;
   publishedAt?: Date;
@@ -43,6 +47,7 @@ function toNewsView(row: typeof newsTable.$inferSelect): NewsView {
   return {
     id: row.id,
     coverUrl: row.coverUrl,
+    coverCrop: row.coverCrop,
     title: row.title,
     text: row.text,
     publishedAt: row.publishedAt.toISOString(),
@@ -106,6 +111,7 @@ export async function createNews(input: CreateNewsInput): Promise<NewsView> {
     .insert(newsTable)
     .values({
       coverUrl: input.coverUrl,
+      coverCrop: input.coverCrop ?? null,
       title: input.title,
       text: input.text,
       publishedAt: input.publishedAt ?? new Date(),
@@ -136,6 +142,8 @@ export async function updateNews(
     .update(newsTable)
     .set({
       coverUrl: nextCoverUrl,
+      coverCrop:
+        input.coverCrop !== undefined ? input.coverCrop : existing.coverCrop,
       title: input.title ?? existing.title,
       text: input.text ?? existing.text,
       publishedAt: input.publishedAt ?? existing.publishedAt,

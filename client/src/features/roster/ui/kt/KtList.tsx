@@ -5,7 +5,7 @@ import { uid } from '../../engine/roster';
 import { decodeKtRoster, KT_CODE_PREFIX, ktTeamGroup, newKtRoster, type KtRoster } from '../../kt/roster';
 import type { KtIndex } from '../../kt/types';
 import { cloudEnabled } from '../../storage';
-import { confirmAsk, haptic } from '../../telegram';
+import { confirmAsk, haptic, openExternal } from '../../telegram';
 import { Button, Empty, Field, Icon, Segmented, Sheet, Tag } from '../kit';
 import { BottomAction, ListHeader, PickTile, RosterCard, SearchField, ToolTile } from '../common/BuilderKit';
 
@@ -17,6 +17,8 @@ export function KtList({
   index,
   rosters,
   onOpen,
+  onStartGame,
+  onTestArmy,
   onCreate,
   onDuplicate,
   onDelete,
@@ -25,6 +27,8 @@ export function KtList({
   index: KtIndex;
   rosters: KtRoster[];
   onOpen: (id: string) => void;
+  onStartGame: () => void;
+  onTestArmy: () => void;
   onCreate: (r: KtRoster) => void;
   onDuplicate: (r: KtRoster) => void;
   onDelete: (id: string) => void;
@@ -37,8 +41,11 @@ export function KtList({
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-4xl lg:pt-8">
       <ListHeader kicker={`WarpBuilder · ${index.edition}`} title="Kill Team" onBack={onExit} onImport={() => setImporting(true)} />
-      <div className="mb-5">
-        <ToolTile icon="spark" title="Как играть" sub="Обучение для новичков: активации, стрельба, бой" onClick={() => navigate('/learn/kt')} />
+      <div className="mb-5 grid grid-cols-2 gap-2">
+        <ToolTile icon="spark" title="Начать игру" sub="Approved Ops · CP · раунды" onClick={onStartGame} />
+        <ToolTile icon="map" title="Test Army" sub="Поле 30×22″ · базы · соперник" onClick={onTestArmy} />
+        <ToolTile icon="book" title="Правила" sub="Core Rules · Wahapedia" onClick={() => openExternal('https://wahapedia.ru/kill-team3/the-rules/core-rules/')} />
+        <ToolTile icon="spark" title="Как играть" sub="Обучение: активации, стрельба, бой" onClick={() => navigate('/learn/kt')} />
       </div>
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Выберите команду и наберите оперативников: датакарты, оружие, снаряжение и уловки — из данных KTDash.</Empty>

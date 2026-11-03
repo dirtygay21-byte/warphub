@@ -5,6 +5,8 @@ type NewsApi = {
   id?: number;
   coverUrl?: string;
   cover_url?: string;
+  coverCrop?: NewsItem["coverCrop"];
+  cover_crop?: NewsItem["coverCrop"];
   title?: string;
   text?: string;
   publishedAt?: string;
@@ -18,6 +20,7 @@ type NewsApi = {
 export const mapNews = (news: NewsApi): NewsItem => ({
   id: news.id ?? 0,
   coverUrl: news.coverUrl ?? news.cover_url ?? "",
+  coverCrop: news.coverCrop ?? news.cover_crop ?? null,
   title: news.title ?? "",
   text: news.text ?? "",
   publishedAt: news.publishedAt ?? news.published_at ?? "",

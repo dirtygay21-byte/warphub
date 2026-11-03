@@ -30,15 +30,15 @@ const gzCache = new Map<string, { mtime: number; body: Uint8Array }>();
  */
 export function readRosterData(name: string, system: '40k' | 'aos' | 'kt' | 'warcry' = '40k'): { body: Uint8Array; gzip: boolean } | null {
   // Kill Team (W2 30.10.2026): 'index' или id команды из ktdash (AEL-BOK, IMP-TEMPAQ…) — файлы roster-data/kt/t
-  if (system === 'kt' && !/^(index|[A-Z]{2,6}-[A-Z0-9]{2,8})$/.test(name)) return null;
-  // Warcry (W4 30.10.2026): 'index' или id фракции из warcry_data (blades-of-khorne-bloodbound, chaos…) — файлы roster-data/warcry/f
-  if (system === 'warcry' && !/^(index|[a-z][a-z0-9-]{1,59})$/.test(name)) return null;
+  if (system === 'kt' && !/^(index|game|[A-Z]{2,6}-[A-Z0-9]{2,8})$/.test(name)) return null;
+  // Warcry (W4 30.10.2026): 'index', 'game' или id фракции из warcry_data (blades-of-khorne-bloodbound, chaos…) — файлы roster-data/warcry/f
+  if (system === 'warcry' && !/^(index|game|[a-z][a-z0-9-]{1,59})$/.test(name)) return null;
   // 'ru-<код фракции>' — русские тексты фракции с wh-rules.ru (оверлей, папка roster-data/ru, 01.11.2026)
   if (system === '40k' && !/^(index|battlefield|missions|dominatus|glossary|[A-Za-z]{1,6}|ru-[A-Za-z]{1,6})$/.test(name)) return null;
   if (system === 'aos' && !/^(index|battlepack|[A-Za-z]{1,6})$/.test(name)) return null;
   const dir = system === '40k' ? rosterDataDir() : path.join(rosterDataDir(), system);
   // AoS: battlepack — данные General's Handbook (батлпланы, тактики) рядом с index.json
-  const top = name === 'index' || (system === '40k' && (name === 'battlefield' || name === 'missions' || name === 'dominatus' || name === 'glossary')) || (system === 'aos' && name === 'battlepack');
+  const top = name === 'index' || ((system === 'kt' || system === 'warcry') && name === 'game') || (system === '40k' && (name === 'battlefield' || name === 'missions' || name === 'dominatus' || name === 'glossary')) || (system === 'aos' && name === 'battlepack');
   const ru = system === '40k' && name.startsWith('ru-');
   const file = top ? path.join(dir, `${name}.json`) : ru ? path.join(dir, 'ru', `${name.slice(3)}.json`) : path.join(dir, system === 'kt' ? 't' : 'f', `${name}.json`);
   let stat: fs.Stats;

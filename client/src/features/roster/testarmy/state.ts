@@ -151,7 +151,7 @@ export function removeUnit(u: TAUnit): TAUnit {
 }
 
 /** Удержать точку на столе (центр базы не уходит за край). */
-export const clampToBoard = ([x, y]: Pt): Pt => [Math.min(60, Math.max(0, x)), Math.min(44, Math.max(0, y))];
+export const clampToBoard = ([x, y]: Pt, width = 60, height = 44): Pt => [Math.min(width, Math.max(0, x)), Math.min(height, Math.max(0, y))];
 
 /** Повернуть выставленный отряд вокруг его центра (сохраняя ручные сдвиги моделей). */
 export function rotateUnit(u: TAUnit, delta: number): TAUnit {

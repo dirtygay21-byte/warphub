@@ -6,6 +6,7 @@ import type { DataIndex, FactionData } from './engine/types';
 import type { AosBattlepack, AosFactionData, AosIndex } from './aos/types';
 import type { KtIndex, KtTeam } from './kt/types';
 import type { WarcryFaction, WarcryIndex } from './warcry/types';
+import type { KtGameData, WarcryGameData } from './skirmish/types';
 
 // Данные Wahapedia отдаёт backend (GET /roster/data/:name) — только пользователям с доступом.
 let indexPromise: Promise<DataIndex> | null = null;
@@ -220,6 +221,13 @@ export function loadKtTeam(id: string): Promise<KtTeam> {
   return ktCache.get(id)!;
 }
 
+let ktGamePromise: Promise<KtGameData> | null = null;
+export function loadKtGame(): Promise<KtGameData> {
+  ktGamePromise ??= apiRequest<KtGameData>('/roster/data/kt/game');
+  ktGamePromise.catch(() => (ktGamePromise = null));
+  return ktGamePromise;
+}
+
 // ---------- Warcry (backend: GET /roster/data/warcry/:name, W4 30.10.2026) ----------
 let warcryIndexPromise: Promise<WarcryIndex> | null = null;
 const warcryCache = new Map<string, Promise<WarcryFaction>>();
@@ -237,4 +245,11 @@ export function loadWarcryFaction(id: string): Promise<WarcryFaction> {
     p.catch(() => warcryCache.delete(id));
   }
   return warcryCache.get(id)!;
+}
+
+let warcryGamePromise: Promise<WarcryGameData> | null = null;
+export function loadWarcryGame(): Promise<WarcryGameData> {
+  warcryGamePromise ??= apiRequest<WarcryGameData>('/roster/data/warcry/game');
+  warcryGamePromise.catch(() => (warcryGamePromise = null));
+  return warcryGamePromise;
 }

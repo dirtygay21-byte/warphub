@@ -14,7 +14,7 @@ type Tab = 'ops' | 'rules' | 'ploys' | 'equip';
  * Редактор команды Kill Team (W3, вид R1 30.10.2026 — как AoS и датакарты Wahapedia): шапка со счётом и проверкой,
  * блок команды, датакарты оперативников, правила фракции (один раз, а не в каждой карточке), уловки, снаряжение.
  */
-export function KtEditor({ roster, index, onBack, onChange, onDelete }: { roster: KtRoster; index: KtIndex; onBack: () => void; onChange: (r: KtRoster) => void; onDelete: () => void }) {
+export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onChange, onDelete }: { roster: KtRoster; index: KtIndex; onBack: () => void; onStartGame: () => void; onTestArmy: () => void; onChange: (r: KtRoster) => void; onDelete: () => void }) {
   const [team, setTeam] = useState<KtTeam | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -227,6 +227,12 @@ export function KtEditor({ roster, index, onBack, onChange, onDelete }: { roster
       <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} team={team} />
       <Sheet open={menu} onClose={() => setMenu(false)} title="Команда">
         <div className="space-y-2 pb-2">
+          <Button className="w-full justify-start" onClick={() => (setMenu(false), onStartGame())}>
+            <Icon name="spark" /> Начать игру с этой командой
+          </Button>
+          <Button className="w-full justify-start" onClick={() => (setMenu(false), onTestArmy())}>
+            <Icon name="map" /> Test Army: расставить оперативников
+          </Button>
           <Button className="w-full justify-start" onClick={() => openExternal('https://wahapedia.ru/kill-team3/')}>
             <Icon name="book" /> Правила Kill Team на Wahapedia
           </Button>

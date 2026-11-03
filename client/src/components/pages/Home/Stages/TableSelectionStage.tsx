@@ -22,6 +22,8 @@ import { getDateKey, getToday, isDateInSchedule } from "./TableSelection/utils";
 import { getWindowLimit, maxFreeSeats } from "@/utils/slots";
 import { DsButton } from "@/components/ui/ds";
 import { pluralizeRu } from "@/utils/plural";
+import BoostySubscriptionInfo from "@/components/booking/BoostySubscriptionInfo";
+import { boostyKindForService } from "@/components/booking/boosty";
 
 const CLUB_VISIT_SLUG = "club_visit";
 
@@ -93,6 +95,7 @@ export default function TableSelectionStage() {
   const service = availability?.service;
   const durationMinutes = service?.duration ?? selectedService?.duration ?? 60;
   const isClubVisit = selectedService?.slug === CLUB_VISIT_SLUG;
+  const boostyKind = boostyKindForService(selectedService);
 
   const [visitorCount, setVisitorCount] = useState(1);
 
@@ -367,6 +370,18 @@ export default function TableSelectionStage() {
           info={dayInfo.charAt(0).toUpperCase() + dayInfo.slice(1)}
         />
       </div>
+
+      {boostyKind && selectedService && (
+        <div className="flex items-center gap-3 rounded-[16px] border border-white/10 bg-app-elevated px-4 py-2">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[15px] font-semibold text-fg">
+              {selectedService.title}
+            </p>
+            <p className="text-[13px] text-fg-3">Доступна подписка Boosty</p>
+          </div>
+          <BoostySubscriptionInfo kind={boostyKind} />
+        </div>
+      )}
 
       {!isSelectedDateAllowed ? (
         <ScheduleUnavailableMessage

@@ -1,0 +1,1703 @@
+{
+  "system": "warcry",
+  "title": "Warcry · Battleplan Generator",
+  "source": {
+    "name": "Warcrier",
+    "url": "https://warcrier.net/docs/battles/battleplan-generator",
+    "battleplanUrl": "https://warcrier.net/docs/rules/battleplan",
+    "fightingUrl": "https://warcrier.net/docs/rules/fighting-the-battle",
+    "matchedPlayUrl": "https://warcrier.net/docs/battles/matched-play",
+    "checked": "2026-11-03"
+  },
+  "board": {
+    "width": 30,
+    "height": 22,
+    "objectiveMm": null
+  },
+  "setup": [
+    "Сгенерируйте terrain map, deployment map, victory condition и twist; в matched play используйте Table A для deployment и victory, без twist.",
+    "Установите террейн по terrain card или alternative terrain rules.",
+    "Сориентируйте deployment map по terrain map, сделайте roll-off; победитель выбирает красную или синюю сторону.",
+    "Атакующий выставляет Dagger, затем защитник; в том же порядке — Shield, затем Hammer. Все бойцы группы должны быть wholly within 3 дюймов по горизонтали от своего deployment point.",
+    "Группы с метками RND2/RND3 начинают в резерве и прибывают в reserve phase соответствующего battle round."
+  ],
+  "game": {
+    "roundLabel": "Battle round",
+    "phases": [
+      "Initiative phase",
+      "Reserve phase",
+      "Combat phase"
+    ],
+    "end": "Раунд окончания битвы и победитель определяются выбранным victory condition."
+  },
+  "deploymentOptions": {
+    "tableA": [
+      "First Blood",
+      "Clash of Blades",
+      "Death Blow",
+      "Battle Lines",
+      "Knife in the Back",
+      "Show of Strength",
+      "Bloodbath",
+      "Death Spiral",
+      "Stand-off",
+      "The Duel",
+      "The Unseen Blade",
+      "Escalation"
+    ],
+    "tableB": [
+      "Relentless Assault",
+      "Defiant Stand",
+      "Stranglehold",
+      "Decimation",
+      "Tentative Position",
+      "Divide and Slaughter",
+      "The Trap",
+      "Encircle",
+      "Hold Out",
+      "Outflank",
+      "Vengeance",
+      "Close the Jaws"
+    ]
+  },
+  "victoryOptions": {
+    "tableA": [
+      "Treasure Hunters",
+      "Reaper",
+      "The Cursed Relic",
+      "Cut of the Head",
+      "Glimmers in the Dark",
+      "Bloodmarked",
+      "No Quarter",
+      "Ley Lines",
+      "Higher Ground",
+      "The Hidden Vault",
+      "Raze",
+      "The Comet"
+    ],
+    "tableB": [
+      "Defend the Find",
+      "The Gauntlet",
+      "The Delivery",
+      "Bring to Ruin",
+      "The True Prize",
+      "Drive Them Back",
+      "Seize Territory",
+      "Assassinate",
+      "The Raid",
+      "Isolated",
+      "The Ritual",
+      "No Mercy"
+    ]
+  },
+  "deployments": [
+    {
+      "id": "first-blood",
+      "name": "First Blood",
+      "table": "tableA",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-19.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 24.08,
+          "y": 10.971,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 6.264,
+          "y": 10.854,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 14.943,
+          "y": 22,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 14.828,
+          "y": 0,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 0,
+          "y": 10.971,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 30,
+          "y": 11.146,
+          "reserve": 2,
+          "offboard": true
+        }
+      ]
+    },
+    {
+      "id": "clash-of-blades",
+      "name": "Clash of Blades",
+      "table": "tableA",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-13.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 5.823,
+          "y": 10.881,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 23.664,
+          "y": 10.881,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 29.537,
+          "y": 21.965,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 0,
+          "y": 0.142,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 14.716,
+          "y": 21.907,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 14.66,
+          "y": 0.028,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "death-blow",
+      "name": "Death Blow",
+      "table": "tableA",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-22.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 5.856,
+          "y": 11.088,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 23.858,
+          "y": 11.088,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 6.846,
+          "y": 16.705,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 22.227,
+          "y": 5.529,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 0,
+          "y": 11.205,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 30,
+          "y": 11.205,
+          "reserve": 2,
+          "offboard": true
+        }
+      ]
+    },
+    {
+      "id": "battle-lines",
+      "name": "Battle Lines",
+      "table": "tableA",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-16.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 6.832,
+          "y": 16.28,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 22.085,
+          "y": 5.253,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 14.09,
+          "y": 21.907,
+          "reserve": 2,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 14.147,
+          "y": 0,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 6.804,
+          "y": 5.253,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 21.83,
+          "y": 16.394,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "knife-in-the-back",
+      "name": "Knife in the Back",
+      "table": "tableA",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-20.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 15.23,
+          "y": 0,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 15.287,
+          "y": 22,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 29.885,
+          "y": 11.202,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 0,
+          "y": 11.081,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 15.144,
+          "y": 5.602,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 15.144,
+          "y": 16.621,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "show-of-strength",
+      "name": "Show of Strength",
+      "table": "tableA",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-14.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 29.647,
+          "y": 11.129,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 0,
+          "y": 11.071,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 23.608,
+          "y": 11.186,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 5.325,
+          "y": 11.129,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 0,
+          "y": 0.057,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 29.62,
+          "y": 22,
+          "reserve": null,
+          "offboard": true
+        }
+      ]
+    },
+    {
+      "id": "bloodbath",
+      "name": "Bloodbath",
+      "table": "tableA",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-23.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 14.537,
+          "y": 16.741,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 14.595,
+          "y": 5.662,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 0,
+          "y": 11.141,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 29.393,
+          "y": 11.322,
+          "reserve": 2,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 6.934,
+          "y": 5.602,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 21.965,
+          "y": 16.862,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "death-spiral",
+      "name": "Death Spiral",
+      "table": "tableA",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-17.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 5.868,
+          "y": 11.129,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 23.786,
+          "y": 11.071,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 14.43,
+          "y": 22,
+          "reserve": 3,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 14.544,
+          "y": 0.115,
+          "reserve": 3,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 0,
+          "y": 11.244,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 30,
+          "y": 11.071,
+          "reserve": 2,
+          "offboard": true
+        }
+      ]
+    },
+    {
+      "id": "stand-off",
+      "name": "Stand-off",
+      "table": "tableA",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-21.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 14.885,
+          "y": 22,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 15.057,
+          "y": 0.043,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 29.598,
+          "y": 10.992,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 0,
+          "y": 11.225,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 29.799,
+          "y": 22,
+          "reserve": 3,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 0,
+          "y": 0.16,
+          "reserve": 2,
+          "offboard": true
+        }
+      ]
+    },
+    {
+      "id": "the-duel",
+      "name": "The Duel",
+      "table": "tableA",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-15.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 15.297,
+          "y": 0,
+          "reserve": 3,
+          "offboard": true
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 15.02,
+          "y": 22,
+          "reserve": 3,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 0,
+          "y": 11.168,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 29.814,
+          "y": 10.939,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 22.694,
+          "y": 5.253,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 7.347,
+          "y": 16.739,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "the-unseen-blade",
+      "name": "The Unseen Blade",
+      "table": "tableA",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-24.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 0,
+          "y": 10.817,
+          "reserve": 3,
+          "offboard": true
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 30,
+          "y": 11.05,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 14.595,
+          "y": 22,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 14.304,
+          "y": 0.16,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 5.594,
+          "y": 10.992,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 23.713,
+          "y": 11.166,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "escalation",
+      "name": "Escalation",
+      "table": "tableA",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-18.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 29.91,
+          "y": 22,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 0,
+          "y": 0,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 14.487,
+          "y": 16.681,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 14.43,
+          "y": 5.196,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 0,
+          "y": 10.824,
+          "reserve": 3,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 29.768,
+          "y": 11.168,
+          "reserve": 3,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "relentless-assault",
+      "name": "Relentless Assault",
+      "table": "tableB",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-7.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 14.967,
+          "y": 22,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 14.967,
+          "y": 0,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 0,
+          "y": 22,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 0,
+          "y": 11.108,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 29.816,
+          "y": 11.05,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 14.771,
+          "y": 11.05,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "defiant-stand",
+      "name": "Defiant Stand",
+      "table": "tableB",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-1.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 14.884,
+          "y": 10.759,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 30,
+          "y": 10.817,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 9.327,
+          "y": 15.01,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 0,
+          "y": 21.824,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 14.799,
+          "y": 0,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 20.015,
+          "y": 15.068,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "stranglehold",
+      "name": "Stranglehold",
+      "table": "tableB",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-10.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 0,
+          "y": 0,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 0,
+          "y": 10.875,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 14.368,
+          "y": 11.05,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 22.011,
+          "y": 5.343,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 14.569,
+          "y": 22,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 29.569,
+          "y": 0.102,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "decimation",
+      "name": "Decimation",
+      "table": "tableB",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-4.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 0,
+          "y": 21.707,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 0,
+          "y": 0,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 29.462,
+          "y": 22,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 29.519,
+          "y": 11.05,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 14.427,
+          "y": 21.94,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 14.541,
+          "y": 10.992,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "tentative-position",
+      "name": "Tentative Position",
+      "table": "tableB",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-8.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 14.967,
+          "y": 11.126,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 0,
+          "y": 11.008,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 0,
+          "y": 0.133,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 29.563,
+          "y": 0.25,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 14.827,
+          "y": 22,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 7.304,
+          "y": 16.77,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "divide-and-slaughter",
+      "name": "Divide and Slaughter",
+      "table": "tableB",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-2.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 14.997,
+          "y": 22,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 30,
+          "y": 11.162,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 14.714,
+          "y": 11.282,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 22.255,
+          "y": 5.769,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 0,
+          "y": 11.222,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 7.371,
+          "y": 5.769,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "the-trap",
+      "name": "The Trap",
+      "table": "tableB",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-11.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 6.954,
+          "y": 5.6,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 14.31,
+          "y": 22,
+          "reserve": 3,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 0,
+          "y": 11.243,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 14.138,
+          "y": 0,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 0,
+          "y": 22,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 14.282,
+          "y": 11.243,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "encircle",
+      "name": "Encircle",
+      "table": "tableB",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-5.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 14.684,
+          "y": 14.818,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 0,
+          "y": 11.162,
+          "reserve": null,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 14.398,
+          "y": 22,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 22.589,
+          "y": 11.222,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 30,
+          "y": 11.222,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 14.598,
+          "y": 0,
+          "reserve": null,
+          "offboard": true
+        }
+      ]
+    },
+    {
+      "id": "hold-out",
+      "name": "Hold Out",
+      "table": "tableB",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-9.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 14.63,
+          "y": 10.902,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 22.265,
+          "y": 5.358,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 21.816,
+          "y": 16.504,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 14.294,
+          "y": 0,
+          "reserve": 3,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 0,
+          "y": 22,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 29.479,
+          "y": 10.96,
+          "reserve": 2,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "outflank",
+      "name": "Outflank",
+      "table": "tableB",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-3.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 14.827,
+          "y": 11.013,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 0,
+          "y": 11.071,
+          "reserve": 3,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 22.425,
+          "y": 11.071,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 30,
+          "y": 11.071,
+          "reserve": 3,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 14.629,
+          "y": 22,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 0,
+          "y": 0.173,
+          "reserve": 2,
+          "offboard": true
+        }
+      ]
+    },
+    {
+      "id": "vengeance",
+      "name": "Vengeance",
+      "table": "tableB",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-12.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 14.598,
+          "y": 22,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 29.77,
+          "y": 0.042,
+          "reserve": 2,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 14.253,
+          "y": 10.96,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 21.897,
+          "y": 16.504,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 14.397,
+          "y": 0,
+          "reserve": 3,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 6.81,
+          "y": 16.504,
+          "reserve": null,
+          "offboard": false
+        }
+      ]
+    },
+    {
+      "id": "close-the-jaws",
+      "name": "Close the Jaws",
+      "table": "tableB",
+      "image": "https://raw.githubusercontent.com/CCFrankUrbainsky/warcryMissionShuffler/refs/heads/main/public/cards/deployment/ghur/ghur-deployment-6.png",
+      "points": [
+        {
+          "group": "dagger",
+          "side": "red",
+          "x": 14.627,
+          "y": 11.071,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "dagger",
+          "side": "blue",
+          "x": 14.57,
+          "y": 0,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "hammer",
+          "side": "blue",
+          "x": 6.837,
+          "y": 16.693,
+          "reserve": null,
+          "offboard": false
+        },
+        {
+          "group": "hammer",
+          "side": "red",
+          "x": 0,
+          "y": 5.448,
+          "reserve": 3,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "red",
+          "x": 29.72,
+          "y": 22,
+          "reserve": 2,
+          "offboard": true
+        },
+        {
+          "group": "shield",
+          "side": "blue",
+          "x": 29.72,
+          "y": 11.186,
+          "reserve": 3,
+          "offboard": false
+        }
+      ]
+    }
+  ],
+  "victories": {
+    "tableA": [
+      {
+        "id": "treasure-hunters",
+        "name": "Treasure Hunters",
+        "text": "Treasure Hunters ​ This place is replete with treasures from ancient times. Claim them before your rivals do the same. Before the battle, 5 treasure tokens arc placed on the battlefield. The first is placed by the defender on the battlefield floor or a platform and within 1\" horizontally of the centre of the battlefield. Then, the players alternate placing 4 more treasure tokens one at a time, starting with the attacker. Each of these treasure tokens must be placed on the battlefield floor or a platform, within 5\" horizontally of the centre of the battlefield and more than 3\" horizontally from all other treasure tokens. The battle ends after 4 battle rounds. When the battle ends, the player who has the most fighters carrying treasure wins.",
+        "endRound": 4
+      },
+      {
+        "id": "the-cursed-relic",
+        "name": "The Cursed Relic",
+        "text": "The Cursed Relic ​ This rune-etched treasure is as perilous as it is valuable. Do not let it fall into enemy hands. Before the battle, 1 treasure token is placed on the battlefield by the defender. It must be placed on the battlefield floor or a platform and within 1\" horizontally of the centre of the battlefield. During the battle, if a fighter is carrying the treasure at the end of their\r\nactivation, allocate D6 damage points to them. The battle ends after 4 battle rounds. When the battle ends, the player\r\nwhose fighter is carrying the treasure wins. If no fighter is carrying\r\nthe treasure, the player who has the most fighters within 3\" of the\r\ntreasure wins.",
+        "endRound": 4
+      },
+      {
+        "id": "glimmers-in-the-dark",
+        "name": "Glimmers in the Dark",
+        "text": "Glimmers in the Dark ​ Hints of treasure can be spied here. Defeat your rivals and uncover it! Before the battle, 1 treasure token is placed on the battlefield by the\r\ndefender. It must be placed on the battlefield floor or a platform and within\r\n1\" horizontally of the centre of the battlefield. At the start of each combat\r\nphase, the player who does not have the initiative rolls a dice. If the score is\r\nequal to or less than the current battle round, they place 1 treasure token on\r\nthe battlefield, or D3 treasure tokens if the score is 6. On any other result,\r\nnothing happens. Each treasure token must be placed on the battlefield floor or a platform, more\r\nthan 3\" horizontally from all other treasure tokens and the battlefield edge, and more than 3\" horizontally from all fighters. If there is no space to place a treasure token, it is not placed.",
+        "endRound": null
+      },
+      {
+        "id": "no-quarter",
+        "name": "No Quarter",
+        "text": "No Quarter ​ Your enemies close in on territory rightfully yours. Give them no quarter and no mercy in the fight to come. The battlefield is divided halfway along its width and length into quarters of equal dimensions. The battle ends after 4 battle rounds. When the battle ends, a player\r\ncaptures a quarter of the battlefield if there are any friendly fighters\r\nwholly within it and no enemy fighters wholly within it. The player who\r\ncaptures the most quarters of the battlefield wins.",
+        "endRound": 4
+      },
+      {
+        "id": "higher-ground",
+        "name": "Higher Ground",
+        "text": "Higher Ground ​ This territory offers several vantage points that provide clear views of the surrounding landscape. Secure these positions for yourself whilst denying them to the enemy. If there are no platforms on the battlefield that are at least 2\" vertically\r\nabove the battlefield floor, draw a new victory condition. At the end of each battle round, each player scores 1 victory point for\r\neach fighter from their warband that is on a platform at least 2\" vertically\r\nabove the battlefield floor. The battle ends after 4 battle rounds. When the battle ends, the player\r\nwith the most victory points wins the battle.",
+        "endRound": 4
+      },
+      {
+        "id": "raze",
+        "name": "Raze",
+        "text": "Raze ​ Drive into their lands like. a spear into a foe's gut, and burn all you see. Before the battle, each player picks a different battlefield edge to be their territory, starting with the defender. During the battle. if a fighter finishes a move action within 1\" of enemy\r\nterritory, they can enter it. Remove that fighter from the battlefield but\r\ndo not count them as being taken down. The battle ends after 4 battle rounds. When the battle ends, each player\r\ncounts the number of friendly fighters that entered enemy territory. The\r\nplayer with the most wins the battle.",
+        "endRound": 4
+      },
+      {
+        "id": "reaper",
+        "name": "Reaper",
+        "text": "Reaper ​ Long have you waited to deliver vengeance upon this foe. Strike fast, and leave none standing. At the end of each battle round, each player totals the points values\r\nof enemy fighters taken down in that battle round. The result is their\r\nblood tally. If one player has a higher blood tally, that player scores 1\r\nvictory point. The battle ends after 4 battle rounds. When the battle ends, the player\r\nwith the most victory points wins the battle.",
+        "endRound": 4
+      },
+      {
+        "id": "cut-off-the-head",
+        "name": "Cut off the Head",
+        "text": "Cut off the Head ​ Slay their champion, and leave the leaderless curs to cower. A player wins the battle as soon as the enemy leader is taken down. During the battle, at the end of each battle round, if either player's leader\r\nis within 4\" horizontally of the battlefield edge, they are taken down (if\r\nyou are playing a campaign battle, do not make an injury roll for fighters\r\ntaken down in this manner).",
+        "endRound": null
+      },
+      {
+        "id": "bloodmarked",
+        "name": "Bloodmarked",
+        "text": "Bloodmarked ​ The gods mark those whose doom draws nigh. At the start of the combat phase of the first battle round, starting with\r\nthe player who has the initiative, each player picks one fighter in their\r\nwarband to be bloodmarked. The fighter must be on the battlefield. A player wins the battle as soon as the enemy bloodmarked fighter is taken down. At the end of the fourth and each subsequent battle round, bloodmarked\r\nfighters within 4\" horizontally of the baltlefield edge are taken down (if\r\nyou are playing a campaign battle, do not make an injury roll for fighters\r\ntaken down in this manner).",
+        "endRound": null
+      },
+      {
+        "id": "ley-lines",
+        "name": "Ley Lines",
+        "text": "Ley Lines ​ Ley lines of power criss-cross this region. Siphon their energies before your rivals can. Before the battle. the defender places 5 objectives, each on the battlefield floor or\r\na platform. The first is placed within 1\" horizontally of the centre of the battlefield,\r\nand the other 4 are each placed within 1\" horizontally of the centre of a different\r\nquarter of the battlefield. During the battle, objectives are either dormant or awakened. At the start of the\r\nbattle, only the central objective is awakened; the rest are dormant. At the start of\r\neach combat phase, the player who does not have the initiative can pick 1 dormant\r\nobjective to become awakened. At the end of each battle round, each player scores 1 victory point for each awakened objective they control. The battle ends after 4 battle rounds, When the battle ends, the player with the most victory points wins the battle.",
+        "endRound": 4
+      },
+      {
+        "id": "the-hidden-vault",
+        "name": "The Hidden Vault",
+        "text": "The Hidden Vault ​ A long-hidden vault lies somewhere in this region. Defeat your rivals and stake your claim! Before the battle, 3 objective markers are placed on the battlefield. The\r\ndefender places 1 objective on the battlefield floor or a platform, within 1\"\r\nhorizontally of the centre of the battlefield. Then, players alternate placing\r\n1 objective each, starting with the attacker. Each must be placed on the\r\nbattlefield floor, within 9\" horizontally of the centre of the battlefield and\r\nmore than 6\" horizontally from all other objectives. At the end of the first battle round, the players roll off. The winner picks 1\r\nobjective and removes it from play. At the end of the second battle round, the\r\nother player does the same. The battle ends after 4 battle rounds. When the battle ends, the player who controls the remianing objective wins the battle.",
+        "endRound": 4
+      },
+      {
+        "id": "the-comet",
+        "name": "The Comet",
+        "text": "The Comet ​ Seize the riches that fall from the stars. At the start of the combat phase of the second battle round, the player\r\nwith the initiative rolls a dice. On a 1-4, they place 1 objective on the\r\nbattlefield floor or a platform, within 1\" horizontally of the centre of the\r\ncorresponding quarter of the battlefield, as shown on the map (the top of\r\nthe map is the northern edge). On a 5-6, they place 1 objective on the battlefield floor or a platform, within l\" horizontally of the centre of the battlefield. The battle ends after 4 battle rounds. When the battle ends, the player who controls the objective wins the battle.",
+        "endRound": 4
+      }
+    ],
+    "tableB": [
+      {
+        "id": "defend-the-find",
+        "name": "Defend the Find",
+        "text": "Defend the Find ​ The more you possess, the more others will try to take from you. Do not let them! Before the battle, 4 treasure tokens are placed on the battlefield by the\r\ndefender. Each must be placed on the battlefield floor or a platform,\r\nwithin 2\" horizontally of all the others, and more than 6\" horizontally\r\nfrom the battlefield edge. During the battle, the defender's fighters cannot carry treasure. Starting\r\nfrom the second battle round, if all treasure is being carried by the\r\nattacker's fighters at the end of a battle round, the attacker wins the\r\nbattle. Otherwise, after the end of the fourth battle round, the defender\r\nwins the battle.",
+        "endRound": 4
+      },
+      {
+        "id": "the-delivery",
+        "name": "The Delivery",
+        "text": "The Delivery ​ You have been told of a valuable shipment in this region. Track it down and take the treasure for yourself. Before the battle, the attacker picks 1 of the battlefield edge to be the escape route,\r\nthen the defender secretly picks 3 fighters in their warband to be carrying treasure\r\n(they can be in reserve). During the battle, the attacker's fighters cannot carry treasure. Starting from the\r\nsecond battle round, at thc end of a battle round, any of the defender's fighters\r\nthat are carrying treasure, within 1\" of the escape route and more than 1\" from all\r\nenemy fighters can escape the battlefield. Remove those fighters from the battlefield\r\nbut do not count them as being taken down. If 2 or more fighters escape, the\r\nbattle ends and the defender is the winner. Otherwise. the battle ends after 4 battle rounds. When the battle ends, if fewer than 2 fighters have escaped, the attacker is the winner.",
+        "endRound": 4
+      },
+      {
+        "id": "the-true-prize",
+        "name": "The True Prize",
+        "text": "The True Prize ​ The enemy have invaded your domain seeking plunder. One of your treasures is worth more than any other - make sure it is not stolen. Before the battle, the defender takes 5 treasure tokens and secretly notes down\r\nwhich is the true prize. Then, the players alternate placing the treasure tokens on\r\nthe battlefield one at a time, starting with the attacker. Each of these treasure tokens\r\nmust be placed on the battlefield floor or a pla1form, within 5\" horizontally of the\r\ncentre of the battlefield and more than 3\" horizontally from all other treasure tokens. During the battle, at the start of each combat phase, the defender picks 1 treasure\r\ntoken on the battlefield or 1 piece of treasure being carried and removes it from play.\r\nThe true prize cannot be picked. The battle ends after 4 battle rounds. When the battle ends, if one of the defender's fighters is carrying the true prize, the defender wins the battle. Otherwise, the attacker wins the battle.",
+        "endRound": 4
+      },
+      {
+        "id": "seize-territory",
+        "name": "Seize Territory",
+        "text": "Seize Territory ​ Your rivals claim this place as their own. Seize it by force and send any survivors fleeing. Before the battle, the defender places 3 objectives on the battlefield floor\r\nor a platform, each within 6\" horizontally of the centre of the battlefield\r\nand more than 6\" horizontally from all other objectives. At the end of the fourth battle round, the player who controls the most\r\nobjectives wins the battle. lf the players control an equal number of\r\nobjectives, the attacker wins the battle.",
+        "endRound": 4
+      },
+      {
+        "id": "the-raid",
+        "name": "The Raid",
+        "text": "The Raid ​ Move swift and let the fires of the gods engulf your foes. Before the battle, the defender places 6 objectives on the battlefield floor\r\nor a platform, each within 9\" horizontally of the centre of the battlefield\r\nand more than 6\" horizontally from all other objectives. The attacker can choose to burn any objective they control at the end of\r\na battle round if there are no enemy models within 3\" of that objective. If\r\nthey do so, remove it from play. If the attacker burns 3 objectives, they win the battle. Otherwise, after\r\nthe end of the fourth battle round, the defender wins the battle.",
+        "endRound": null
+      },
+      {
+        "id": "the-ritual",
+        "name": "The Ritual",
+        "text": "The Ritual ​ With each dark syllable uttered, we draw closer to victory. Before the battle, the defender places 3 objectives on the battlefield or or\r\na platform, each within 6\" horizontally of the centre of the battlefield and\r\nmore than 6\" horizontally from all other objectives. The defender then picks 1\r\nobjective to be the primary ritual site. The other 2 objectives are secondary ritual sites. At the end of each battle round, the defender scorts D6 ritual points if they\r\ncontrol the primary ritual site and D3 ritual points for each secondary ritual\r\nsite they control. Then the defender loses D3 ritual points for each ritual site\r\ncontrolled by the attacker (to a minimum of O). The battle ends after 4 battle rounds. If the defender has 16 or more ritual points, they win the battle. Otherwise, the attacker wins.",
+        "endRound": 4
+      },
+      {
+        "id": "the-gauntlet",
+        "name": "The Gauntlet",
+        "text": "The Gauntlet ​ Escape is the only chance of survival. Before the battle, the attacker picks one battlefield edge to be the escape\r\nroute. If any of the defender's fighters finish a move action within 1\"\r\nof the escape route and are more than 3\" from all enemy fighters, they\r\nescape. Remove those fighters from play but not count them as being\r\ntaken down. The defender wins the battle as soon as half or more of their fighters\r\nhave escaped. Otherwise, the attacker wins the battJe as soon as half or\r\nmore of the defender's fighters have been taken down.",
+        "endRound": null
+      },
+      {
+        "id": "bring-to-ruin",
+        "name": "Bring to Ruin",
+        "text": "Bring to Ruin ​ A rival encampment lies ahead. Seize it for yourself to send a message to any who doubt your dominance. Before the battle, the defender picks 1 terrain feature that is 6\" wide or\r\nmore at its widest point. This terrain feature is the bastion. The battle ends after 4 battle rounds. When the battle ends, count the\r\nnumber of fighters from each warband that are within 3\" of the bastion.\r\nLeaders count as 3 fighters instead of 1. The player with the most fighters\r\nwithin 3\" of the bastion wins the battle.",
+        "endRound": 4
+      },
+      {
+        "id": "drive-them-back",
+        "name": "Drive Them Back",
+        "text": "Drive Them Back ​ Your enemies encroach on your territory. Drive them back and send them fleeing. Before the battle, the defender picks one battlefield edge to be\r\ntheir territory. At the end of each battle round, the defender scores 1 victory point for\r\neach fighter from their warband within 6\" horizontally of their territory.\r\nThe attacker scores 2 victory points for each fighter from their warband\r\nwithin 6\" horizontally of the defender's territory. The battle ends after 4 battle rounds. When the battle ends, the player\r\nwith the most victory points wins.",
+        "endRound": 4
+      },
+      {
+        "id": "assassinate",
+        "name": "Assassinate",
+        "text": "Assassinate ​ This fool's death has been ordained. Let their end be an example to all who would defy you. The attacker wins the battle as soon as the defender's leader is taken\r\ndown. Otherwise, the battle ends after 4 battle rounds and the defender\r\nis the winner. During the battle, at the end of each battle round, if the defender's leader\r\nis within 4\" horizontally of the battlefield edge, they are taken down (if\r\nyou are playing a campaign battle, do not make an injury roll for fighters\r\ntaken down in this manner).",
+        "endRound": 4
+      },
+      {
+        "id": "isolated",
+        "name": "Isolated",
+        "text": "Isolated ​ The foe have strayed far from their comrades. Punish them for their error. Before the battle, the attacker chooses one of the defender's battle groups\r\nthat is on the battlefield. All other fighters in the defender's warband\r\nare removed from play and removed from reserve (if you are playing\r\na campaign battle, they count as having fought in the battle but do not\r\ncount as having been taken down). If all the fighters in the chosen battle group are taken down, the attacker\r\nwins. Otherwise, the battle ends after 4 battle rounds and the defender is\r\nthe winner.",
+        "endRound": 4
+      },
+      {
+        "id": "no-mercy",
+        "name": "No Mercy",
+        "text": "No Mercy ​ Your enemies make a final desperate stand against you. Leave none alive. The attacker wins the battle as soon as half or more of the defender's\r\nfighters have been taken down. Otherwise, the battle ends after 4 battle\r\nrounds and the defender is the winner. During the bottle, at the end of each battle round, if any of the defender's\r\nfighters are within 4\" horizontally of the battlefield edge, they are taken\r\ndown (if you are playing a campaign battle, do not make an injury roll\r\nfor fighter, taken down in this manner).",
+        "endRound": null
+      }
+    ]
+  },
+  "twists": [
+    {
+      "id": "eerie-silence",
+      "name": "Eerie Silence",
+      "text": "Eerie Silence ​ Not a single animal cry or rustle of foliage can be heard in this place. The discomforting silence is broken only by the sudden clash of weapons. This twist has no effect.",
+      "endRound": null
+    },
+    {
+      "id": "late-arrivals",
+      "name": "Late Arrivals",
+      "text": "Late Arrivals ​ You have sent warriors to outflank the enemy, but the hour of battle is nigh and still they have not arrived... In the reserve phase, before a player sets up a reserve battle group on the battlefield, they must roll a dice for each fighter in that battle group. On a 1, the fighter being rolled for will arrive in the reserve phase of the next battle round instead.",
+      "endRound": null
+    },
+    {
+      "id": "warning-cry",
+      "name": "Warning Cry",
+      "text": "Warning Cry ​ With the enemy in sight, you let loose a war cry to call your warriors to your position. In the reserve phase of the first battle round, starting with the player with the initiative, the players roll a dice for each of their fighters in reserve. On a 6, the fighter being rolled for must immediately be set up anywhere on the battlefield within 3\" of the battlefield edge and more than 5\" from all other fighters that were set up in the same phase.",
+      "endRound": null
+    },
+    {
+      "id": "cloying-mists",
+      "name": "Cloying Mists",
+      "text": "Cloying Mists ​ Thick fog obscures the battlefield, masking the movements of the enemy as they stalk the darkness beyond. Fighters 4\" or more from each other are not visible to each other. At the start of each combat phase starting from the second battle round, one player rolls a dice. If the score is less the number of the current battle round, the mists clear and this twist no longer has any effect on the battle.",
+      "endRound": null
+    },
+    {
+      "id": "sweltering-heat",
+      "name": "Sweltering Heat",
+      "text": "Sweltering Heat ​ A sudden heatwave saps the energy from your warriors, rendering them sluggish impairing their reactions in combat. Once a fighter has made any move actions in a battle round, subtract 1 from that fighter's Toughness characteristic until the end of that battle round.",
+      "endRound": null
+    },
+    {
+      "id": "dead-of-night",
+      "name": "Dead of Night",
+      "text": "Dead of Night ​ Your rivals close in under the cover of darkness. This night shall taste blood. Fighters 4\" or more from each other are not visible to each other.",
+      "endRound": null
+    },
+    {
+      "id": "rising-hatred",
+      "name": "Rising Hatred",
+      "text": "Rising Hatred ​ The animosity between these warbands means that every transgression is repaid in double. Keep a tally of how many fighters are taken down each battle round. At the end of each battle round, the player who had the most fighters taken down receives 1 additional wild dice. If the players are tied for having the most fighters taken down, neither player receives an additional wild dice.",
+      "endRound": null
+    },
+    {
+      "id": "at-my-command",
+      "name": "At My Command",
+      "text": "At My Command ​ The fighters of each warband look to their leader to help them overcome their foe. Once during the battle, each player can use the 'Inspiring Presence' ability without needing or using any ability dice.",
+      "endRound": null
+    },
+    {
+      "id": "creature-in-the-dark",
+      "name": "Creature in the Dark",
+      "text": "Creature in the Dark ​ Something lurks in the shadows beyond, stalking your warriors and waiting to strike... At the start of the combat phase, starting with the player with the initiative, each player can pick 1 enemy fighter that is more than 3\" from all other fighters. Each time a fighter is picked, roll a dice and add 1 to the roil if that fighter is more than 6\" from all other fighters. On a 1-5, nothing happens. On a 6+, that fighter is taken down.",
+      "endRound": null
+    },
+    {
+      "id": "murky-swampland",
+      "name": "Murky Swampland",
+      "text": "Murky Swampland ​ Weeks of endless rain have turned these lands into a thick and squelching quagmire. If a fighter begins a move action on the battlefield floor, subtract 1 from the Move characteristic of that fighter until the end of that move action. This has no effect on fighters with the Fly runemark ( Fly ).",
+      "endRound": null
+    },
+    {
+      "id": "azyrite-lightning-storm",
+      "name": "Azyrite Lightning Storm",
+      "text": "Azyrite Lightning Storm ​ The gloom is punctuated with dazzling flashes as bolts of lightning fork down from the lowering sky. This is surely a war of the gods. Each time a fighter finishes an activation and their base is not wholly under a platform, roll 2D6. Add 1 to the roll for each whole inch they are vertically above the battlefield floor. On a 10+, that fighter is hit by a bolt of lightning: allocate 2D6 damage points to them.",
+      "endRound": null
+    },
+    {
+      "id": "gaze-of-the-dark-gods",
+      "name": "Gaze of the Dark Gods",
+      "text": "Gaze of the Dark Gods ​ The skies darken above as the Ruinous Powers take an interest in the battle to come. Players roll 7 initiative dice in each initiative phase instead of 6.",
+      "endRound": null
+    },
+    {
+      "id": "smothering-chokeleaves",
+      "name": "Smothering Chokeleaves",
+      "text": "Smothering Chokeleaves ​ Chokeleaves sense the heat emitted by breathing. Reaching out with iron-hard leaves, these plants wrap themselves around the source and drain the warmth from it, strangling their victim as they do so. At the end of each battle round, allocate 1 damage point to each fighter within 3\" of any terrain features.",
+      "endRound": null
+    },
+    {
+      "id": "acidic-muck",
+      "name": "Acidic Muck",
+      "text": "Acidic Muck ​ The soil beneath the fighter's feet is actually the exposed stomach of a colossal underground beast, and it slowly digests all who walk upon it. At the end of each battle round, allocate 2 damage points to each fighter on the battlefield floor.",
+      "endRound": null
+    },
+    {
+      "id": "fevered-bite",
+      "name": "Fevered Bite",
+      "text": "Fevered Bite ​ A fighter is driven to delirium after being bitten by one of the many disease-carrying insects that plague anyone foolish enough to venture deep into the forest surrounding the Eye of Chotec. The players roll off and the winner picks 1 fighter. Add 1 to the Attacks characteristc of melee attack actions made by that fighter until the end of the battle. In addition, until the end of the battle, each time that fighter makes an attack action, allocate 1 damage point to that fighter for each hit roll that misses.",
+      "endRound": null
+    },
+    {
+      "id": "prowling-predators",
+      "name": "Prowling Predators",
+      "text": "Prowling Predators ​ The forst is filled with predators, from sabre-toothed fangmaws to cunning slylurks. All lie in wait, ready to attack a wounded fighter at a moment's notice and carry them screaming into the undergrowth. At the end of each battle round, roll 2 dice for the fighter with the most damage points allocated to them. On a double, that fighter is taken down. If multiple fighters are tied for the most damage points allocated to them, the players roll off. The winner chooses which fighter is taken down.",
+      "endRound": null
+    },
+    {
+      "id": "oppressive-humidity",
+      "name": "Oppressive Humidity",
+      "text": "Oppressive Humidity ​ Fighters who battle in the depths of the forest are as likely to pass out and die from heatstroke as they are to die at the hands of the foe. For each attack action after the first that a fighter makes in the same activation, allocate 2 damage points to that fighter after that attack action has been resolved.",
+      "endRound": null
+    },
+    {
+      "id": "stellar-alignment",
+      "name": "Stellar Alignment",
+      "text": "Stellar Alignment ​ Whether by pure cosmic chance or as a result of the crashed Eye of Chotec _nearby, the constellations are arranged into symbols of hunting and vigour - for those who know how to interpret them. All fighter can use the following ability: [Quad] Aligned: Pick 1 of the following effects: Add the value of this ability to the Move characteristic of this fighter for the next move action they make this activation; or Count 1 hit roll that missed from the next attack action made by this fighter this activation as a hit instead. Previous Editions ​",
+      "endRound": null
+    }
+  ],
+  "mapImport": {
+    "method": "Official card templates for Dagger/Shield/Hammer and RND labels; off-board reserves projected to battlefield edge.",
+    "problems": []
+  }
+}

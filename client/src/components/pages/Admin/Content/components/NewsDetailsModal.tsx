@@ -7,6 +7,8 @@ import {
   uploadAdminFile,
 } from "@/apiUtils/admin";
 import { formatReservationDateTime } from "@/utils/reservationDisplay";
+import ContentImage from "@/components/ui/ContentImage";
+import ImageCropEditor from "@/components/ui/ImageCropEditor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import {
@@ -65,6 +67,7 @@ export default function NewsDetailsModal({
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isCropEditorOpen, setIsCropEditorOpen] = useState(false);
 
   const newsQuery = useQuery({
     queryKey: ["admin-news-item", newsId],
@@ -231,6 +234,8 @@ export default function NewsDetailsModal({
     if (!file || !isEditing) return;
 
     setPendingImageFile(file);
+    setDraft((current) => (current ? { ...current, coverCrop: null } : current));
+    setIsCropEditorOpen(true);
     setSaveError(null);
   };
 
@@ -320,10 +325,11 @@ export default function NewsDetailsModal({
                 )}
               >
                 {coverPreview ? (
-                  <img
+                  <ContentImage
                     src={coverPreview}
                     alt={draft.title || "Обложка новости"}
-                    className="aspect-video w-full object-cover"
+                    crop={draft.coverCrop}
+                    className="aspect-video w-full"
                   />
                 ) : (
                   <div className="flex aspect-video w-full items-center justify-center bg-white/5 text-sm text-fg-3">
@@ -342,6 +348,17 @@ export default function NewsDetailsModal({
                   </div>
                 )}
               </button>
+
+              {isEditing && coverPreview && (
+                <button
+                  type="button"
+                  onClick={() => setIsCropEditorOpen(true)}
+                  className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/3 px-4 py-2.5 text-sm font-medium text-white/85 transition-colors hover:bg-white/10"
+                >
+                  <ImageIcon className="size-4" />
+                  Настроить отображение
+                </button>
+              )}
 
               <div className={editableFieldClassName(isEditing)}>
                 {isEditing ? (
@@ -499,6 +516,20 @@ export default function NewsDetailsModal({
           </div>
         )}
       </div>
+
+      {isCropEditorOpen && coverPreview && (
+        <ImageCropEditor
+          key={coverPreview}
+          imageSrc={coverPreview}
+          initialCrop={draft?.coverCrop}
+          title="Отображение обложки"
+          onCancel={() => setIsCropEditorOpen(false)}
+          onApply={(coverCrop) => {
+            updateDraft({ coverCrop });
+            setIsCropEditorOpen(false);
+          }}
+        />
+      )}
 
       {isDeleteConfirmOpen && draft && (
         <div

@@ -184,6 +184,13 @@ export type AdminReservationsPage = {
 
 // -------------------------- Ивенты --------------------------
 
+export type ImageCrop = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type Event = {
   id: number;
   title: string;
@@ -193,6 +200,7 @@ export type Event = {
   seatsPerTable: number;
   capacity: number;
   bannerUrl: string;
+  bannerCrop: ImageCrop | null;
   tableIds: number[];
   createdAt: string;
   updatedAt: string;
@@ -217,6 +225,7 @@ export type EventUpdatePayload = {
   endsAt: string;
   seatsPerTable: number;
   bannerUrl: string;
+  bannerCrop: ImageCrop | null;
   tableIds: number[];
 };
 
@@ -230,6 +239,7 @@ export type AdminUploadResponse = {
 export type NewsItem = {
   id: number;
   coverUrl: string;
+  coverCrop: ImageCrop | null;
   title: string;
   text: string;
   publishedAt: string;
@@ -239,6 +249,7 @@ export type NewsItem = {
 
 export type NewsPayload = {
   coverUrl: string;
+  coverCrop: ImageCrop | null;
   title: string;
   text: string;
 };

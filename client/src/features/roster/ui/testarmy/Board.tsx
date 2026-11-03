@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 import { haptic, pushOverlay, tg } from '../../telegram';
 import {
   APPROX_DEFAULT_MM,
@@ -60,8 +60,11 @@ const TOUCH_PX = 14;
 const TAP_SLOP = 8;
 const MIN_SCALE = 1;
 const MAX_SCALE = 6;
-/** viewBox карты (BattleMap): 47 × 63 */
-const MAP_ASPECT = 47 / 63;
+const BoardDimensions = createContext({ width: 60, height: 44 });
+const useDisp = () => {
+  const { height } = useContext(BoardDimensions);
+  return useCallback(([x, y]: Pt): Pt => [height - y, x], [height]);
+};
 
 /**
  * Армия на столе для Board — без привязки к игровой системе (40K / AoS, 30.10.2026): имя ростера, строка характеристик
@@ -80,6 +83,9 @@ export type BoardField = {
   /** части зоны стороны (у 40K — одна, у территорий AoS бывает несколько) */
   zones: Partial<Record<Side, Pt[][]>>;
   objectiveNote: string;
+  /** Размер поля в дюймах; по умолчанию 60×44 (40K/AoS), у Kill Team/Warcry — 30×22. */
+  width?: number;
+  height?: number;
 };
 
 type Tool = 'move' | 'ruler' | 'units';
@@ -100,18 +106,28 @@ type Gesture = {
   pan: { x: number; y: number; v0: View } | null;
 };
 
-/** Поле → экран (как в BattleMap): поворот на 90°, 44″ по ширине. */
-const disp = ([x, y]: Pt): Pt => [44 - y, x];
-/** Экран → поле. */
-const undisp = ([dx, dy]: Pt): Pt => [dy, 44 - dx];
-
 /**
  * Стол Test Army (29.10.2026: поле — главное). Карта на весь экран; жесты обрабатывает приложение, а не браузер:
  * палец на базе — двигается модель или отряд (поле стоит на месте), палец на пустом поле — прокрутка, два пальца — масштаб,
  * короткое нажатие — «поставить сюда» / точка линейки. Инструменты — узкая колонка справа, отряды и настройки — выезжающая
  * панель справа (закрывается, когда нужно нажать на поле).
  */
-export function Board({
+export function Board(props: {
+  armies: BoardArmy[];
+  field: BoardField;
+  onArmy: (key: ArmyKey, units: TAUnit[]) => void;
+  onBack: () => void;
+}) {
+  const width = props.field.width ?? 60;
+  const height = props.field.height ?? 44;
+  return (
+    <BoardDimensions.Provider value={{ width, height }}>
+      <BoardInner {...props} />
+    </BoardDimensions.Provider>
+  );
+}
+
+function BoardInner({
   armies,
   field,
   onArmy,
@@ -123,6 +139,12 @@ export function Board({
   onArmy: (key: ArmyKey, units: TAUnit[]) => void;
   onBack: () => void;
 }) {
+  const { width, height } = useContext(BoardDimensions);
+  const disp = useDisp();
+  const undisp = ([dx, dy]: Pt): Pt => [dy, height - dx];
+  const clamp = (p: Pt) => clampToBoard(p, width, height);
+  const mapAspect = (height + 3) / (width + 3);
+  const viewBox = `-1.5 -1.5 ${height + 3} ${width + 3}`;
   const me = armies.find((a) => a.key === 'me')!;
   const foe = armies.find((a) => a.key === 'foe') ?? null;
   const side = me.side;
@@ -159,9 +181,9 @@ export function Board({
   const gesture = useRef<Gesture>({ pts: new Map(), start: null, moved: false, pinch: null, pan: null });
   // карта при масштабе 1 — вписана в экран
   const base = useMemo(() => {
-    const w = Math.min(size.w, size.h * MAP_ASPECT);
-    return { w, h: w / MAP_ASPECT };
-  }, [size]);
+    const w = Math.min(size.w, size.h * mapAspect);
+    return { w, h: w / mapAspect };
+  }, [size, mapAspect]);
   const apply = useCallback(
     (v: View) => {
       const s = Math.min(MAX_SCALE, Math.max(MIN_SCALE, v.s));
@@ -279,13 +301,13 @@ export function Board({
     const p = toBoard(clientX, clientY);
     if (!p) return;
     if (tool === 'ruler') {
-      const end = snapEnd(clampToBoard(p), allBases, snapPoints, Math.max(0.4, tolerance()));
+      const end = snapEnd(clamp(p), allBases, snapPoints, Math.max(0.4, tolerance()));
       setRuler((r) => (!r.a || r.b ? { a: end, b: null } : { a: r.a, b: end }));
       haptic.select();
       return;
     }
     if (tool === 'units' || !sel) return;
-    update(placeUnit(sel, clampToBoard(p)));
+    update(placeUnit(sel, clamp(p)));
     haptic.select();
   };
 
@@ -354,7 +376,7 @@ export function Board({
     const ed = endDrag.current;
     if (ed && e.pointerId === ed.pointerId) {
       const p = toBoard(e.clientX, e.clientY);
-      if (p) setRuler((r) => ({ ...r, [ed.which]: snapEnd(clampToBoard(p), allBases, snapPoints) }));
+      if (p) setRuler((r) => ({ ...r, [ed.which]: snapEnd(clamp(p), allBases, snapPoints) }));
       return;
     }
     const d = drag.current;
@@ -368,7 +390,7 @@ export function Board({
       d.moved = true;
       if (d.modelId) {
         const m = d.orig.models.find((x) => x.id === d.modelId);
-        if (m?.at) update(moveModel(d.orig, d.modelId, clampToBoard([m.at[0] + dx, m.at[1] + dy])));
+        if (m?.at) update(moveModel(d.orig, d.modelId, clamp([m.at[0] + dx, m.at[1] + dy])));
       } else update(moveUnit(d.orig, dx, dy));
       return;
     }
@@ -492,7 +514,7 @@ export function Board({
       >
         <div ref={content} className="absolute left-0 top-0 origin-top-left" style={{ width: base.w, height: base.h }}>
           {field.background}
-          <svg ref={svg} viewBox="-1.5 -1.5 47 63" className="absolute inset-0 h-full w-full">
+          <svg ref={svg} viewBox={viewBox} className="absolute inset-0 h-full w-full">
             {ranges &&
               field.objectives.map((o, i) => {
                 const [x, y] = disp([o.x, o.y]);
@@ -634,6 +656,7 @@ function UnitShapes({
   single: string | null;
   outside: Set<string>;
 }) {
+  const disp = useDisp();
   const bases = placedBases(unit);
   const c = unitCenter(unit);
   if (!c) return null;
@@ -908,6 +931,7 @@ function Measure({
   handles?: boolean;
   onHandle?: (e: PointerEvent, which: 'a' | 'b') => void;
 }) {
+  const disp = useDisp();
   const [x1, y1] = disp(from);
   const [x2, y2] = disp(to);
   return (

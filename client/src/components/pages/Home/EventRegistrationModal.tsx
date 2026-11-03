@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { getEventById, registerForEvent } from "@/apiUtils/events";
+import ContentImage from "@/components/ui/ContentImage";
 import SeatCountControl from "@/components/pages/Home/Stages/TableSelection/SeatCountControl";
 import { formatEventDateTime, formatEventPeriod } from "@/utils/eventDisplay";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -123,10 +124,11 @@ export default function EventRegistrationModal({
           {eventQuery.data && (
             <div className="space-y-4 p-5">
               {eventQuery.data.bannerUrl ? (
-                <img
+                <ContentImage
                   src={eventQuery.data.bannerUrl}
                   alt={eventQuery.data.title}
-                  className="aspect-video w-full rounded-xl object-cover"
+                  crop={eventQuery.data.bannerCrop}
+                  className="aspect-video w-full rounded-xl"
                 />
               ) : (
                 <div className="flex aspect-video w-full items-center justify-center rounded-xl bg-white/5 text-sm text-fg-3">

@@ -39,6 +39,9 @@ import { GameScreen } from './game/GameScreen';
 import { TestArmyScreen } from './testarmy/TestArmyScreen';
 import { AosGameScreen } from './aosgame/AosGameScreen';
 import { AosTestArmyScreen } from './testarmy/AosTestArmyScreen';
+import { WarcryFullGameScreen } from './warcry/WarcryFullGameScreen';
+import { KtFullGameScreen } from './kt/KtFullGameScreen';
+import { KtTestArmyScreen, WarcryTestArmyScreen } from './skirmish/SkirmishTestArmyScreen';
 import { Rules } from './Rules';
 
 type Route =
@@ -53,7 +56,11 @@ type Route =
   | { screen: 'game'; back: Route; rosterId?: string }
   | { screen: 'test-army'; back: Route; rosterId?: string }
   | { screen: 'aos-game'; back: Route; rosterId?: string }
-  | { screen: 'aos-test-army'; back: Route; rosterId?: string };
+  | { screen: 'aos-test-army'; back: Route; rosterId?: string }
+  | { screen: 'kt-game'; back: Route; rosterId?: string }
+  | { screen: 'kt-test-army'; back: Route; rosterId?: string }
+  | { screen: 'warcry-game'; back: Route; rosterId?: string }
+  | { screen: 'warcry-test-army'; back: Route; rosterId?: string };
 
 const SYSTEM_KEY = 'warphub.roster.system';
 const readSystem = (): GameSystem => {
@@ -253,6 +260,8 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   const switcher = null;
 
   if (system === 'warcry' && wcIndex && wcRosters) {
+    if (route.screen === 'warcry-game') return <WarcryFullGameScreen onBack={goBack} rosters={wcRosters} index={wcIndex} initialRosterId={route.rosterId} />;
+    if (route.screen === 'warcry-test-army') return <WarcryTestArmyScreen onBack={goBack} rosters={wcRosters} index={wcIndex} initialRosterId={route.rosterId} />;
     const wr = route.screen === 'wc-editor' ? wcRosters.find((r) => r.id === route.id) : undefined;
     if (wr)
       return (
@@ -261,6 +270,8 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
           roster={wr}
           index={wcIndex}
           onBack={goList}
+          onStartGame={() => setRoute({ screen: 'warcry-game', back: route, rosterId: wr.id })}
+          onTestArmy={() => setRoute({ screen: 'warcry-test-army', back: route, rosterId: wr.id })}
           onChange={onWcChange}
           onDelete={() => {
             markWarcryDeleted(wr.id);
@@ -275,6 +286,8 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
         index={wcIndex}
         rosters={wcRosters}
         onOpen={(id) => setRoute({ screen: 'wc-editor', id })}
+        onStartGame={() => setRoute({ screen: 'warcry-game', back: route })}
+        onTestArmy={() => setRoute({ screen: 'warcry-test-army', back: route })}
         onCreate={(r) => {
           updateWc((list) => [r, ...list]);
           setRoute({ screen: 'wc-editor', id: r.id });
@@ -289,6 +302,8 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   }
 
   if (system === 'kt' && ktIndex && ktRosters) {
+    if (route.screen === 'kt-game') return <KtFullGameScreen onBack={goBack} rosters={ktRosters} index={ktIndex} initialRosterId={route.rosterId} />;
+    if (route.screen === 'kt-test-army') return <KtTestArmyScreen onBack={goBack} rosters={ktRosters} index={ktIndex} initialRosterId={route.rosterId} />;
     const kr = route.screen === 'kt-editor' ? ktRosters.find((r) => r.id === route.id) : undefined;
     if (kr)
       return (
@@ -297,6 +312,8 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
           roster={kr}
           index={ktIndex}
           onBack={goList}
+          onStartGame={() => setRoute({ screen: 'kt-game', back: route, rosterId: kr.id })}
+          onTestArmy={() => setRoute({ screen: 'kt-test-army', back: route, rosterId: kr.id })}
           onChange={onKtChange}
           onDelete={() => {
             markKtDeleted(kr.id);
@@ -311,6 +328,8 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
         index={ktIndex}
         rosters={ktRosters}
         onOpen={(id) => setRoute({ screen: 'kt-editor', id })}
+        onStartGame={() => setRoute({ screen: 'kt-game', back: route })}
+        onTestArmy={() => setRoute({ screen: 'kt-test-army', back: route })}
         onCreate={(r) => {
           updateKt((list) => [r, ...list]);
           setRoute({ screen: 'kt-editor', id: r.id });

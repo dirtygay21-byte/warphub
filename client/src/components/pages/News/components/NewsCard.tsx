@@ -1,6 +1,10 @@
+import ContentImage from "@/components/ui/ContentImage";
+import type { ImageCrop } from "@/types";
+
 type NewsCardProps = {
   title: string;
   coverUrl: string;
+  coverCrop: ImageCrop | null;
 
   onClick: () => void;
 };
@@ -8,6 +12,7 @@ type NewsCardProps = {
 export default function NewsCard({
   title,
   coverUrl,
+  coverCrop,
 
   onClick,
 }: NewsCardProps) {
@@ -18,10 +23,11 @@ export default function NewsCard({
       className="relative aspect-[5/2] w-full overflow-hidden rounded-2xl border border-white/10 text-left transition-[transform,border-color] hover:cursor-pointer hover:border-accent/40 active:scale-[0.99]"
     >
       {coverUrl ? (
-        <img
+        <ContentImage
           src={coverUrl}
           alt={title}
-          className="absolute inset-0 size-full object-cover"
+          crop={coverCrop}
+          className="absolute inset-0 size-full"
         />
       ) : (
         <div className="absolute inset-0 bg-app-surface" />
