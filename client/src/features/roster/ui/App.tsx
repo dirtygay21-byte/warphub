@@ -315,6 +315,10 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
           onStartGame={() => setRoute({ screen: 'kt-game', back: route, rosterId: kr.id })}
           onTestArmy={() => setRoute({ screen: 'kt-test-army', back: route, rosterId: kr.id })}
           onChange={onKtChange}
+          onDuplicate={(r) => {
+            updateKt((list) => [r, ...list]);
+            setRoute({ screen: 'kt-editor', id: r.id });
+          }}
           onDelete={() => {
             markKtDeleted(kr.id);
             updateKt((list) => list.filter((x) => x.id !== kr.id));
