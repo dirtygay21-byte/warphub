@@ -74,6 +74,7 @@ export interface KtGameData {
   mapImportV2: { method: string; problems: string[] };
 }
 
+export type WarcryPoint = [number, number];
 export interface WarcryDeploymentPoint {
   group: 'dagger' | 'shield' | 'hammer';
   side: 'red' | 'blue';
@@ -81,6 +82,17 @@ export interface WarcryDeploymentPoint {
   y: number;
   reserve: 2 | 3 | null;
   offboard: boolean;
+  /** Исходная позиция на карте до ограничения игрового поля; x/y остаются безопасными для текущего рендера. */
+  sourceX: number;
+  sourceY: number;
+}
+export interface WarcryDeploymentGuide {
+  from: WarcryPoint;
+  to: WarcryPoint;
+  at: WarcryPoint;
+  d: 4 | 6 | 8 | 9;
+  side: 'red' | 'blue';
+  group: 'dagger' | 'shield' | 'hammer';
 }
 export interface WarcryDeployment {
   id: string;
@@ -88,6 +100,8 @@ export interface WarcryDeployment {
   table: 'tableA' | 'tableB';
   image: string;
   points: WarcryDeploymentPoint[];
+  guides: WarcryDeploymentGuide[];
+  orientation: { kind: 'double-arrow'; at: WarcryPoint };
 }
 export interface WarcryVictory {
   id: string;
@@ -109,6 +123,7 @@ export interface WarcryGameData {
   victories: { tableA: WarcryVictory[]; tableB: WarcryVictory[] };
   twists: WarcryVictory[];
   mapImport: { method: string; problems: string[] };
+  mapImportV2: { method: string; problems: string[] };
 }
 
 export type SkirmishGameData = KtGameData | WarcryGameData;
