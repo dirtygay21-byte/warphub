@@ -189,12 +189,30 @@ function ImportSheet({ open, index, onClose, onImport }: { open: boolean; index:
   const [code, setCode] = useState('');
   const [err, setErr] = useState<string | null>(null);
   const go = () => {
+    const c = code.trim();
+    if (c.startsWith('WH1.')) {
+      setErr('Это ростер Warhammer 40,000 — импортируйте его на вкладке 40K.');
+      haptic.error();
+      return;
+    }
+    if (c.startsWith('AOS1.')) {
+      setErr('Это ростер Age of Sigmar — импортируйте его на вкладке AoS.');
+      haptic.error();
+      return;
+    }
+    if (c.startsWith('KT1.')) {
+      setErr('Это команда Kill Team — импортируйте её на вкладке Kill Team.');
+      haptic.error();
+      return;
+    }
     try {
-      onImport(decodeWarcryRoster(code, index.factions.map((f) => f.id)));
+      onImport(decodeWarcryRoster(c, index.factions.map((f) => f.id)));
       setCode('');
       setErr(null);
+      haptic.ok();
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Неверный код');
+      setErr(e instanceof Error ? e.message : 'Не получилось прочитать код. Скопируйте его целиком (начинается с WC1.).');
+      haptic.error();
     }
   };
   return (
@@ -208,6 +226,7 @@ function ImportSheet({ open, index, onClose, onImport }: { open: boolean; index:
         </Button>
       }
     >
+      <p className="mb-3 text-sm text-fg-3">Вставьте код из «Экспорт → Код» на другом устройстве. После импорта варбанда проверяется по правилам.</p>
       <textarea value={code} onChange={(e) => setCode(e.target.value)} rows={6} placeholder={`${WARCRY_CODE_PREFIX}eyJ2Ijox…`} className="w-full rounded-xl border border-white/10 bg-white/[0.04] p-3 font-mono text-xs text-white outline-none focus:border-accent" />
       {err && <p className="mt-2 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{err}</p>}
     </Sheet>

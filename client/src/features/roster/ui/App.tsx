@@ -273,6 +273,10 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
           onStartGame={() => setRoute({ screen: 'warcry-game', back: route, rosterId: wr.id })}
           onTestArmy={() => setRoute({ screen: 'warcry-test-army', back: route, rosterId: wr.id })}
           onChange={onWcChange}
+          onDuplicate={(r) => {
+            updateWc((list) => [r, ...list]);
+            setRoute({ screen: 'wc-editor', id: r.id });
+          }}
           onDelete={() => {
             markWarcryDeleted(wr.id);
             updateWc((list) => list.filter((x) => x.id !== wr.id));

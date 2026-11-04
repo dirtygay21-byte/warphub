@@ -111,14 +111,14 @@ export function autoGroups(r: WarcryRoster): WarcryRoster {
   return touchWarcry({ ...r, fighters });
 }
 
-export type WarcryIssue = { level: 'error' | 'warning'; message: string };
+export type WarcryIssue = { level: 'error' | 'warning'; message: string; uids?: string[] };
 export function checkWarcryRoster(r: WarcryRoster, data: Data): WarcryIssue[] {
   const out: WarcryIssue[] = [];
   const L = WARCRY_LIMITS;
   const own = data.get(r.factionId);
   if (!own) return [{ level: 'error', message: `Фракции ${r.factionId} нет в данных` }];
   const list = r.fighters.map((x) => ({ x, f: fighterOf(data, x), src: data.get(x.factionId) }));
-  for (const { x, f } of list) if (!f) out.push({ level: 'error', message: `Бойца ${x.fighterId} нет в данных — удалите его` });
+  for (const { x, f } of list) if (!f) out.push({ level: 'error', message: `Бойца ${x.fighterId} нет в данных — удалите его`, uids: [x.uid] });
   const known = list.filter((p): p is typeof p & { f: WarcryFighter; src: WarcryFaction } => !!p.f && !!p.src);
   const name = (p: (typeof known)[number]) => p.x.name || p.f.name;
 
@@ -127,13 +127,13 @@ export function checkWarcryRoster(r: WarcryRoster, data: Data): WarcryIssue[] {
   if (pts > L.points) out.push({ level: 'error', message: `Очков ${pts} — больше ${L.points}` });
   for (const p of known) {
     const roles = rolesFor(own, p.src, p.f);
-    if (!roles.includes(p.x.role)) out.push({ level: 'error', message: `${name(p)}: не может быть в варбанде как ${ROLE_LABEL[p.x.role].toLowerCase()}` });
+    if (!roles.includes(p.x.role)) out.push({ level: 'error', message: `${name(p)}: не может быть в варбанде как ${ROLE_LABEL[p.x.role].toLowerCase()}`, uids: [p.x.uid] });
   }
 
   // лидер — первый боец: герой и не союзник
   const lead = known[0];
   if (lead && known.length === r.fighters.length && (!has(lead.f, 'hero') || lead.x.role !== 'warband'))
-    out.push({ level: 'error', message: 'Лидер (первый боец) должен быть героем своей фракции, не союзником' });
+    out.push({ level: 'error', message: 'Лидер (первый боец) должен быть героем своей фракции, не союзником', uids: [lead.x.uid] });
 
   // герои: обычный лимит 3; «Heroes All» фракции — без лимита для своих, ≤2 героев других фракций;
   // «Heroes All» подфракции — без лимита, если все бойцы (кроме союзников) из этой подфракции
@@ -165,16 +165,16 @@ export function checkWarcryRoster(r: WarcryRoster, data: Data): WarcryIssue[] {
   for (const [k, n] of seen)
     if (n > 1) {
       const p = known.find((q) => `${q.src.id}|${q.f.id}` === k)!;
-      out.push({ level: 'error', message: `${p.f.name}: можно взять только один раз` });
+      out.push({ level: 'error', message: `${p.f.name}: можно взять только один раз`, uids: known.filter((q) => `${q.src.id}|${q.f.id}` === k).map((q) => q.x.uid) });
     }
 
   // группы: все распределены; монстр один в группе; остальные — разница не больше 1
   if (known.length) {
-    if (r.fighters.some((x) => !x.group)) out.push({ level: 'warning', message: 'Не все бойцы распределены по группам Dagger / Shield / Hammer' });
+    if (r.fighters.some((x) => !x.group)) out.push({ level: 'warning', message: 'Не все бойцы распределены по группам Dagger / Shield / Hammer', uids: r.fighters.filter((x) => !x.group).map((x) => x.uid) });
     else {
       const m = monsters[0];
       const pool = m ? WARCRY_GROUPS.filter((g) => g !== m.x.group) : WARCRY_GROUPS;
-      if (m && r.fighters.some((x) => x !== m.x && x.group === m.x.group)) out.push({ level: 'warning', message: 'Монстр должен быть один в своей группе' });
+      if (m && r.fighters.some((x) => x !== m.x && x.group === m.x.group)) out.push({ level: 'warning', message: 'Монстр должен быть один в своей группе', uids: r.fighters.filter((x) => x.group === m.x.group).map((x) => x.uid) });
       const sizes = pool.map((g) => r.fighters.filter((x) => x.group === g && x !== m?.x).length);
       if (Math.max(...sizes) - Math.min(...sizes) > 1) out.push({ level: 'warning', message: `Группы неровные (${sizes.join(' / ')}) — распределите как можно ровнее` });
     }

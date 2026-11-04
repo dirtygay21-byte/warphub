@@ -150,6 +150,23 @@ test('способности: по рунмаркам и подфракции; �
   assert.ok(universalFor(universal, champ).some((a: { name: string }) => a.name === 'Inspiring Presence'));
 });
 
+test('ошибки варбанды ведут к конкретным бойцам по uid', () => {
+  let r = newWarcryRoster(KHORNE, 'x');
+  r = add(r, KHORNE, 'Bloodreaver with Meatripper');
+  r = add(r, KHORNE, 'Bloodreaver Chieftain');
+  const leader = checkWarcryRoster(r, data).find((i) => i.message.startsWith('Лидер'));
+  assert.deepEqual(leader?.uids, [r.fighters[0]!.uid]);
+  const ungrouped = checkWarcryRoster(r, data).find((i) => /Не все бойцы распределены/.test(i.message));
+  assert.deepEqual(ungrouped?.uids, r.fighters.map((x) => x.uid));
+  r = add(r, KHORNE, 'Arnulf');
+  r = add(r, KHORNE, 'Arnulf');
+  const duplicate = checkWarcryRoster(r, data).find((i) => i.message.startsWith('Arnulf:'));
+  assert.deepEqual(duplicate?.uids, [r.fighters[2]!.uid, r.fighters[3]!.uid]);
+  const missing = { ...r, fighters: [...r.fighters, { uid: 'missing-uid', factionId: KHORNE.id, fighterId: 'missing-fighter', role: 'warband' as const, name: '', group: null }] };
+  const unknown = checkWarcryRoster(missing, data).find((i) => /missing-fighter/.test(i.message));
+  assert.deepEqual(unknown?.uids, ['missing-uid']);
+});
+
 test('код WC1.: туда и обратно, чужие фракции отклоняются', () => {
   const r = autoGroups(addFighter(khorneBase(), CHAOS.id, CHAOS.fighters[0], 'thrall'));
   const back = decodeWarcryRoster(encodeWarcryRoster(r), [KHORNE.id, CHAOS.id]);
