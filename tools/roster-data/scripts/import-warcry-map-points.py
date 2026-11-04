@@ -22,6 +22,10 @@ REFERENCE = {
     'hammer': {'red': -6, 'blue': -20},
     'shield': {'red': 3, 'blue': -21},
 }
+RESERVE_OVERRIDES = {
+    ('stand-off', 'red', 'shield'): 2,
+    ('the-unseen-blade', 'blue', 'dagger'): 2,
+}
 # Card geometry measured from the official 885x636 deployment cards.
 BX, BY, BW, BH = 185 / 885, 160 / 636, 522 / 885, 376 / 636
 
@@ -38,6 +42,31 @@ def matches(image, template, threshold, suppression=30, limit=12):
             points.append((x, y, score))
         cv2.rectangle(result, (x - 20, y - 20), (x + 20, y + 20), -1, -1)
     return points
+
+
+def make_guides(points):
+    guides = []
+    for point in points:
+        if point['reserve']:
+            continue
+        x, y = point['sourceX'], point['sourceY']
+        dx, dy = abs(x - 15), abs(y - 11)
+        for distance, target in [(dx, 'centre-x'), (dy, 'centre-y')]:
+            for wanted in [4, 6, 8, 9]:
+                if abs(distance - wanted) <= .3:
+                    if target == 'centre-x':
+                        to = [15.0, y]
+                        at = [(x + 15) / 2, y]
+                    else:
+                        to = [x, 11.0]
+                        at = [x, (y + 11) / 2]
+                    guides.append({'from': [x, y], 'to': to, 'at': [round(at[0], 3), round(at[1], 3)], 'd': wanted, 'side': point['side'], 'group': point['group']})
+    return guides
+
+
+def orientation_for(width, height):
+    # Orientation mark in the upper-left of every official card, converted to board coordinates.
+    return {'kind': 'double-arrow', 'at': [round((70 / width - BX) * 30 / BW, 3), round((40 / height - BY) * 22 / BH, 3)]}
 
 
 def main():
@@ -89,10 +118,17 @@ def main():
             used_points.add(point_index)
             points[point_index]['reserve'] = labels[label_index]['reserve']
         for point in points:
+            override = RESERVE_OVERRIDES.get((deployment['id'], point['side'], point['group']))
+            if override is not None:
+                point['reserve'] = override
+            point['sourceX'] = point['x']
+            point['sourceY'] = point['y']
             if point['offboard']:
                 point['x'] = round(min(30, max(0, point['x'])), 3)
                 point['y'] = round(min(22, max(0, point['y'])), 3)
         deployment['points'] = points
+        deployment['guides'] = make_guides(points)
+        deployment['orientation'] = orientation_for(width, height)
     problems = []
     for deployment in game['deployments']:
         points = deployment['points']
@@ -102,6 +138,7 @@ def main():
             if sorted(p['group'] for p in points if p['side'] == side) != ['dagger', 'hammer', 'shield']:
                 problems.append(f"{deployment['id']}: wrong {side} groups")
     game['mapImport'] = {'method': 'Official card templates for Dagger/Shield/Hammer and RND labels; off-board reserves projected to battlefield edge.', 'problems': problems}
+    game['mapImportV2'] = {'method': 'Raw off-board sourceX/sourceY preserved, source-verified reserve overrides, centre-line guides and orientation marks.', 'problems': problems}
     GAME.write_text(json.dumps(game, ensure_ascii=False, indent=2) + '\n')
     print('maps', len(game['deployments']), 'problems', problems)
     for deployment in game['deployments']:
