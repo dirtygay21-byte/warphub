@@ -1,10 +1,13 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useState } from 'react';
 import type { AosIndex, AosRoster } from '../../aos/types';
 import type { AosEventBody, AosSavedEntry } from '../../aosgame';
-import { haptic, pushOverlay } from '../../telegram';
+import { haptic } from '../../telegram';
 import { OnlineBar, OnlineStart } from '../game/Online';
-import { Button, Icon, IconButton } from '../kit';
+import { Button, Icon } from '../kit';
 import { cx } from '../util';
+import { GameErrorBar } from '../common/GameErrorBar';
+import { GameShell } from '../common/GameShell';
+import { SavedGamesFrame } from '../common/SavedGamesFrame';
 import { AosSetup } from './AosSetup';
 import { rosterRefOf } from './refs';
 import { AosTracker } from './AosTracker';
@@ -26,53 +29,31 @@ export function AosGameScreen({ onBack, rosters, index, initialRosterId }: { onB
   const startOnline = async () => {
     await game.startOnline(initial());
   };
-  if (loadError) return <Shell onBack={onBack}><p className="mt-10 text-center text-sm text-fg-3">Нет данных батлпака: {loadError}</p></Shell>;
+  if (loadError) return <GameShell onBack={onBack} kicker="Age of Sigmar · GH 2026-27" title="Игра" className="pb-28"><p className="mt-10 text-center text-sm text-fg-3">Нет данных батлпака: {loadError}</p></GameShell>;
   if (!bp) {
     return (
-      <Shell onBack={onBack}>
+      <GameShell onBack={onBack} kicker="Age of Sigmar · GH 2026-27" title="Игра" className="pb-28">
         <div className="mx-auto mt-16 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
-      </Shell>
+      </GameShell>
     );
   }
   return (
-    <Shell onBack={state || game.online ? game.closeGame : onBack} undo={state && game.canUndo ? game.undo : undefined}>
+    <GameShell
+      onBack={state || game.online ? game.closeGame : onBack}
+      undo={state && game.canUndo ? game.undo : undefined}
+      kicker="Age of Sigmar · GH 2026-27"
+      title="Игра"
+      className="pb-28"
+    >
       <OnlineBar game={game} system="aos" />
       {game.online && !state ? (
         <div className="mx-auto mt-16 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
       ) : !state ? <StartCard game={game} onStart={start} onStartOnline={startOnline} /> : state.stage === 'setup' ? <AosSetup game={game} rosters={rosters} index={index} /> : <AosTracker game={game} />}
-      {game.error && (
-        <div className="sheet-enter fixed inset-x-0 bottom-0 z-40 border-t border-danger/40 bg-app-elevated px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
-          <div className="mx-auto flex max-w-lg items-start gap-2">
-            <Icon name="alert" className="mt-0.5 size-5 shrink-0 text-danger" />
-            <p className="min-w-0 flex-1 text-sm text-white/85">{game.error}</p>
-            <IconButton icon="close" label="Закрыть" onClick={game.clearError} className="size-8" />
-          </div>
-        </div>
-      )}
+      {game.error && <GameErrorBar error={game.error} onClose={game.clearError} />}
       <p className="mt-6 text-[12px] leading-snug text-fg-3">
         Источник: {bp.title}. {bp.source.note}
       </p>
-    </Shell>
-  );
-}
-
-function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => void; children: ReactNode }) {
-  return (
-    <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5">
-      <header className="mb-4 flex items-end gap-3">
-        <IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" />
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Age of Sigmar · GH 2026-27</p>
-          <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Игра</h1>
-        </div>
-        {undo && (
-          <button type="button" onClick={undo} className="mb-0.5 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-fg-2 active:bg-white/10">
-            Отменить
-          </button>
-        )}
-      </header>
-      {children}
-    </div>
+    </GameShell>
   );
 }
 
@@ -113,23 +94,15 @@ const fmtDate = (iso: string) => {
 };
 
 function SavedList({ game, onClose }: { game: AosGameHook; onClose: () => void }) {
-  useEffect(() => pushOverlay(onClose), [onClose]);
   const list = game.library ?? [];
   return (
-    <section className="space-y-2">
-      <div className="flex items-center gap-2">
-        <IconButton icon="back" label="Назад" onClick={onClose} className="size-8" />
-        <p className="font-display min-w-0 flex-1 text-xl font-semibold uppercase">Сохранённые игры</p>
-        <span className="text-xs text-fg-3">{list.length}</span>
-      </div>
-      {!list.length && <p className="py-6 text-center text-sm text-fg-3">Сохранённых игр пока нет.</p>}
+    <SavedGamesFrame count={list.length} note="Игры хранятся на этом телефоне (до 20)." onClose={onClose}>
       <ul className="space-y-2">
         {list.map((e) => (
           <SavedRow key={e.key} entry={e} rounds={game.bp!.rounds} onOpen={() => void game.openSaved(e.key).then((ok) => ok && haptic.ok())} onRemove={() => game.removeSaved(e.key)} />
         ))}
       </ul>
-      <p className="pt-1 text-[12px] text-fg-3">Игры хранятся на этом телефоне (до 20).</p>
-    </section>
+    </SavedGamesFrame>
   );
 }
 
