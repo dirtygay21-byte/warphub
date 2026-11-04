@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { loadWarcryFaction } from '../../data';
+import { uid } from '../../engine/roster';
 import {
   abilitiesFor,
   addFighter,
@@ -38,9 +39,10 @@ const COST_ORDER = ['reaction', 'double', 'triple', 'quad', 'passive', 'battletr
  * Редактор варбанды Warcry (W5, вид R2 30.10.2026 — как AoS и Kill Team): шапка с очками и лимитами, блок варбанды,
  * датакарты бойцов (характеристики, оружие, способности по стоимости), группы Dagger / Shield / Hammer, правила.
  */
-export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, onChange, onDelete }: { roster: WarcryRoster; index: WarcryIndex; onBack: () => void; onStartGame: () => void; onTestArmy: () => void; onChange: (r: WarcryRoster) => void; onDelete: () => void }) {
+export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, onChange, onDuplicate, onDelete }: { roster: WarcryRoster; index: WarcryIndex; onBack: () => void; onStartGame: () => void; onTestArmy: () => void; onChange: (r: WarcryRoster) => void; onDuplicate: (r: WarcryRoster) => void; onDelete: () => void }) {
   const [data, setData] = useState<Map<string, WarcryFaction>>(new Map());
   const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
   const own = data.get(roster.factionId);
   const generic = own ? index.factions.find((f) => f.generic && f.grandAlliance === own.grandAlliance)?.id : undefined;
   // нужные файлы: своя фракция, общий файл альянса, фракции уже взятых бойцов
@@ -55,7 +57,7 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
   );
   useEffect(() => {
     for (const id of need) if (!data.has(id)) void load(id);
-  }, [need, data, load]);
+  }, [need, data, load, attempt]);
   const ready = need.every((id) => data.has(id));
   const issues = useMemo(() => (ready ? checkWarcryRoster(roster, data) : []), [roster, data, ready]);
   const points = useMemo(() => warcryPoints(roster, data), [roster, data]);
@@ -71,14 +73,16 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
   const [menu, setMenu] = useState(false);
   const [armyOpen, setArmyOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [view, setView] = useState(false);
 
   if (error)
     return (
       <div className="mx-auto max-w-lg px-4 pt-10 text-center">
         <p className="text-sm text-fg-3">{error}</p>
-        <Button className="mt-4" onClick={onBack}>
-          Назад
-        </Button>
+        <div className="mt-4 flex justify-center gap-2">
+          <Button onClick={onBack}>Назад</Button>
+          <Button variant="primary" onClick={() => (setError(null), setAttempt((n) => n + 1))}>Повторить</Button>
+        </div>
       </div>
     );
   if (!own || !ready) return <div className="mx-auto mt-24 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />;
@@ -87,6 +91,11 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
   const heroes = roster.fighters.filter((x) => fighterOf(data, x)?.runemarks.includes('hero')).length;
   const n = roster.fighters.length;
   const battletraits = own.abilities.filter((a) => a.cost === 'battletrait');
+  const scrollToFighter = (id: string) => {
+    setTab('fighters');
+    setExpanded(id);
+    window.setTimeout(() => document.getElementById(`u-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60);
+  };
 
   return (
     <div className="mx-auto min-h-dvh max-w-lg pb-32 lg:max-w-3xl">
@@ -96,8 +105,18 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
         onBack={onBack}
         actions={
           <>
-            <IconButton icon="share" label="Экспорт" onClick={() => setExporting(true)} className="size-9" />
-            <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />
+            <IconButton
+              icon={view ? 'edit' : 'eye'}
+              label={view ? 'Редактировать' : 'Режим просмотра'}
+              onClick={() => (setView((v) => !v), setExpanded(null), setAdding(false))}
+              className={cx('size-9', view && 'bg-accent/15 text-accent')}
+            />
+            {!view && (
+              <>
+                <IconButton icon="share" label="Экспорт" onClick={() => setExporting(true)} className="size-9" />
+                <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />
+              </>
+            )}
           </>
         }
         big={points}
@@ -109,6 +128,8 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
           </>
         }
         issues={issues}
+        readOnly={view}
+        onOpenIssue={(issue) => issue.uids?.[0] && scrollToFighter(issue.uids[0])}
       />
 
       <div className="space-y-4 px-4 pt-4">
@@ -171,20 +192,22 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
             {roster.fighters.map((x, i) => {
               const f = fighterOf(data, x);
               return f ? (
-                <FighterCard
-                  key={x.uid}
-                  leader={i === 0}
-                  x={x}
-                  f={f}
-                  src={data.get(x.factionId)}
-                  own={own}
-                  universal={index.universal}
-                  open={expanded === x.uid}
-                  onToggle={() => setExpanded((e) => (e === x.uid ? null : x.uid))}
-                  onChange={(p) => onChange(updateFighter(roster, x.uid, p))}
-                  onLeader={() => (haptic.select(), onChange(makeLeader(roster, x.uid)))}
-                  onRemove={() => onChange(removeFighter(roster, x.uid))}
-                />
+                <div key={x.uid} id={`u-${x.uid}`}>
+                  <FighterCard
+                    leader={i === 0}
+                    x={x}
+                    f={f}
+                    src={data.get(x.factionId)}
+                    own={own}
+                    universal={index.universal}
+                    open={expanded === x.uid}
+                    onToggle={() => setExpanded((e) => (e === x.uid ? null : x.uid))}
+                    onChange={(p) => onChange(updateFighter(roster, x.uid, p))}
+                    onLeader={() => (haptic.select(), onChange(makeLeader(roster, x.uid)))}
+                    onRemove={() => onChange(removeFighter(roster, x.uid))}
+                    readOnly={view}
+                  />
+                </div>
               ) : (
                 <div key={x.uid} className="flex items-center justify-between rounded-2xl border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-danger">
                   Нет в данных: {x.fighterId}
@@ -194,15 +217,13 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
                 </div>
               );
             })}
-            <Button variant="primary" className="h-12 w-full" onClick={() => setAdding(true)}>
-              <Icon name="plus" /> Добавить бойца
-            </Button>
+
           </section>
         )}
 
         {tab === 'groups' && (
           <section className="space-y-3">
-            <Button className="w-full" onClick={() => (haptic.select(), onChange(autoGroups(roster)))}>
+            <Button className="w-full" disabled={view} onClick={() => (haptic.select(), onChange(autoGroups(roster)))}>
               Распределить автоматически
             </Button>
             <div className="grid gap-2.5 sm:grid-cols-3">
@@ -216,7 +237,7 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
                     </p>
                     {!list.length && <p className="text-[12px] text-fg-3">Пусто</p>}
                     {list.map((x) => (
-                      <GroupRow key={x.uid} x={x} f={fighterOf(data, x)} onGroup={(group) => onChange(updateFighter(roster, x.uid, { group }))} />
+                      <GroupRow key={x.uid} x={x} f={fighterOf(data, x)} onGroup={(group) => onChange(updateFighter(roster, x.uid, { group }))} readOnly={view} />
                     ))}
                   </div>
                 );
@@ -228,7 +249,7 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
                 {roster.fighters
                   .filter((x) => !x.group)
                   .map((x) => (
-                    <GroupRow key={x.uid} x={x} f={fighterOf(data, x)} onGroup={(group) => onChange(updateFighter(roster, x.uid, { group }))} />
+                    <GroupRow key={x.uid} x={x} f={fighterOf(data, x)} onGroup={(group) => onChange(updateFighter(roster, x.uid, { group }))} readOnly={view} />
                   ))}
               </div>
             )}
@@ -259,6 +280,23 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
         )}
       </div>
 
+      <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
+        <div className="mx-auto flex max-w-lg gap-2 lg:max-w-3xl lg:px-4">
+          {view ? (
+            <Button variant="outline" className="h-12 flex-1 text-base" onClick={() => setView(false)}>
+              <Icon name="edit" /> <span className="whitespace-nowrap">Редактировать</span>
+            </Button>
+          ) : (
+            <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => (setTab('fighters'), setAdding(true))}>
+              <Icon name="plus" /> <span className="whitespace-nowrap">Добавить бойца</span>
+            </Button>
+          )}
+          <Button variant="ghost" className="h-12 px-4" onClick={() => setExporting(true)}>
+            <Icon name="share" /> <span className="max-[359px]:sr-only">Экспорт</span>
+          </Button>
+        </div>
+      </div>
+
       <AddSheet open={adding} onClose={() => setAdding(false)} own={own} index={index} data={data} roster={roster} onLoad={load} onAdd={(r) => (haptic.tap(), onChange(r), setAdding(false))} />
       <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} data={data} points={points} />
       <Sheet open={menu} onClose={() => setMenu(false)} title="Варбанда">
@@ -268,6 +306,12 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
           </Button>
           <Button className="w-full justify-start" onClick={() => (setMenu(false), onTestArmy())}>
             <Icon name="map" /> Test Army: расставить бойцов
+          </Button>
+          <Button
+            className="w-full justify-start"
+            onClick={() => (setMenu(false), onDuplicate({ ...roster, id: uid(), name: `${roster.name} (копия)`, createdAt: Date.now(), updatedAt: Date.now() }))}
+          >
+            <Icon name="copy" /> Дублировать варбанду
           </Button>
           <Button className="w-full justify-start" onClick={() => openExternal('https://warcrier.net/docs/rules/battleplan')}>
             <Icon name="book" /> Battleplan на Warcrier
@@ -287,7 +331,7 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
   );
 }
 
-function GroupRow({ x, f, onGroup }: { x: WarcryRosterFighter; f?: WarcryFighter; onGroup: (g: WarcryRosterFighter['group']) => void }) {
+function GroupRow({ x, f, onGroup, readOnly }: { x: WarcryRosterFighter; f?: WarcryFighter; onGroup: (g: WarcryRosterFighter['group']) => void; readOnly: boolean }) {
   return (
     <div className="flex items-center gap-2 border-t border-white/[0.05] py-1.5 first-of-type:border-t-0">
       <span className="min-w-0 flex-1">
@@ -303,8 +347,9 @@ function GroupRow({ x, f, onGroup }: { x: WarcryRosterFighter; f?: WarcryFighter
             key={g}
             type="button"
             aria-label={GROUP_LABEL[g]}
+            disabled={readOnly}
             onClick={() => (haptic.select(), onGroup(g))}
-            className={cx('ds-hit size-7 rounded-lg border text-[12px] font-bold', x.group === g ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 text-fg-3')}
+            className={cx('ds-hit size-7 rounded-lg border text-[12px] font-bold disabled:cursor-default disabled:opacity-70', x.group === g ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 text-fg-3')}
           >
             {GROUP_LABEL[g][0]}
           </button>
@@ -334,6 +379,7 @@ function FighterCard({
   onChange,
   onLeader,
   onRemove,
+  readOnly,
 }: {
   leader: boolean;
   x: WarcryRosterFighter;
@@ -346,6 +392,7 @@ function FighterCard({
   onChange: (p: Partial<Pick<WarcryRosterFighter, 'name' | 'group'>>) => void;
   onLeader: () => void;
   onRemove: () => void;
+  readOnly: boolean;
 }) {
   const abilities = useMemo(() => (open ? sortByCost(abilitiesFor(src, f)) : []), [open, src, f]);
   const univ = useMemo(() => (open ? sortByCost(universalFor(universal, f)) : []), [open, universal, f]);
@@ -372,22 +419,26 @@ function FighterCard({
     >
       <AbilityList title="Способности" list={abilities} empty="Нет способностей фракции для рунмарок этого бойца." />
       <AbilityList title="Универсальные способности" list={univ} collapsed />
-      <input
-        value={x.name}
-        onChange={(e) => onChange({ name: e.target.value.slice(0, 40) })}
-        placeholder="Своё имя бойца"
-        className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none placeholder:text-fg-3 focus:border-accent"
-      />
-      <div className="grid grid-cols-2 gap-2">
-        {!leader && (
-          <Button className="text-xs" onClick={onLeader}>
-            <Icon name="crown" /> Сделать лидером
-          </Button>
-        )}
-        <Button variant="danger" className={cx('text-xs', leader && 'col-span-2')} onClick={onRemove}>
-          <Icon name="trash" /> Убрать
-        </Button>
-      </div>
+      {!readOnly && (
+        <>
+          <input
+            value={x.name}
+            onChange={(e) => onChange({ name: e.target.value.slice(0, 40) })}
+            placeholder="Своё имя бойца"
+            className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none placeholder:text-fg-3 focus:border-accent"
+          />
+          <div className="grid grid-cols-2 gap-2">
+            {!leader && (
+              <Button className="text-xs" onClick={onLeader}>
+                <Icon name="crown" /> Сделать лидером
+              </Button>
+            )}
+            <Button variant="danger" className={cx('text-xs', leader && 'col-span-2')} onClick={onRemove}>
+              <Icon name="trash" /> Убрать
+            </Button>
+          </div>
+        </>
+      )}
     </DataCard>
   );
 }
