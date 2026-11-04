@@ -12,14 +12,34 @@ interface BoardData {
   objectiveMm: number | null;
 }
 
+export type KtPoint = [number, number];
+export interface KtMapFeature {
+  label: string;
+  x: number;
+  y: number;
+  poly: KtPoint[];
+}
+export interface KtMapGuide {
+  edge: 'left' | 'right' | 'top' | 'bottom';
+  at: KtPoint;
+  d: number;
+  side: 'p1' | 'p2';
+}
+
 export interface KtMapData {
   id: string;
   killzone: string;
   map: number;
   sourceImage: string;
-  zones: { p1: [number, number][][]; p2: [number, number][][] };
+  zones: { p1: KtPoint[][]; p2: KtPoint[][] };
+  territories: { p1: KtPoint[][]; p2: KtPoint[][] };
+  dropZones: { p1: KtPoint[][]; p2: KtPoint[][] };
   objectives: { id: string; x: number; y: number }[];
-  terrain: [number, number][][];
+  terrain: KtPoint[][];
+  features: KtMapFeature[];
+  walls: KtPoint[][];
+  doors: KtPoint[][];
+  guides: KtMapGuide[];
 }
 
 export interface KtGameData {
@@ -51,6 +71,7 @@ export interface KtGameData {
   };
   maps: KtMapData[];
   mapImport: { method: string; problems: string[] };
+  mapImportV2: { method: string; problems: string[] };
 }
 
 export interface WarcryDeploymentPoint {
