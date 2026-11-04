@@ -103,7 +103,9 @@
           "x": 24.08,
           "y": 10.971,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 24.08,
+          "sourceY": 10.971
         },
         {
           "group": "dagger",
@@ -111,7 +113,9 @@
           "x": 6.264,
           "y": 10.854,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 6.264,
+          "sourceY": 10.854
         },
         {
           "group": "hammer",
@@ -119,7 +123,9 @@
           "x": 14.943,
           "y": 22,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.943,
+          "sourceY": 22.088
         },
         {
           "group": "hammer",
@@ -127,7 +133,9 @@
           "x": 14.828,
           "y": 0,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.828,
+          "sourceY": -0.088
         },
         {
           "group": "shield",
@@ -135,7 +143,9 @@
           "x": 0,
           "y": 10.971,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -2.845,
+          "sourceY": 10.971
         },
         {
           "group": "shield",
@@ -143,9 +153,54 @@
           "x": 30,
           "y": 11.146,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 32.73,
+          "sourceY": 11.146
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            24.08,
+            10.971
+          ],
+          "to": [
+            15.0,
+            10.971
+          ],
+          "at": [
+            19.54,
+            10.971
+          ],
+          "d": 9,
+          "side": "blue",
+          "group": "dagger"
+        },
+        {
+          "from": [
+            6.264,
+            10.854
+          ],
+          "to": [
+            15.0,
+            10.854
+          ],
+          "at": [
+            10.632,
+            10.854
+          ],
+          "d": 9,
+          "side": "red",
+          "group": "dagger"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.609,
+          -7.021
+        ]
+      }
     },
     {
       "id": "clash-of-blades",
@@ -159,7 +214,9 @@
           "x": 5.823,
           "y": 10.881,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 5.823,
+          "sourceY": 10.881
         },
         {
           "group": "dagger",
@@ -167,7 +224,9 @@
           "x": 23.664,
           "y": 10.881,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 23.664,
+          "sourceY": 10.881
         },
         {
           "group": "hammer",
@@ -175,7 +234,9 @@
           "x": 29.537,
           "y": 21.965,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.537,
+          "sourceY": 21.965
         },
         {
           "group": "hammer",
@@ -183,7 +244,9 @@
           "x": 0,
           "y": 0.142,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.604,
+          "sourceY": 0.142
         },
         {
           "group": "shield",
@@ -191,7 +254,9 @@
           "x": 14.716,
           "y": 21.907,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.716,
+          "sourceY": 21.907
         },
         {
           "group": "shield",
@@ -199,9 +264,37 @@
           "x": 14.66,
           "y": 0.028,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.66,
+          "sourceY": 0.028
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            5.823,
+            10.881
+          ],
+          "to": [
+            15.0,
+            10.881
+          ],
+          "at": [
+            10.412,
+            10.881
+          ],
+          "d": 9,
+          "side": "blue",
+          "group": "dagger"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.754,
+          -7.065
+        ]
+      }
     },
     {
       "id": "death-blow",
@@ -215,7 +308,9 @@
           "x": 5.856,
           "y": 11.088,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 5.856,
+          "sourceY": 11.088
         },
         {
           "group": "dagger",
@@ -223,7 +318,9 @@
           "x": 23.858,
           "y": 11.088,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 23.858,
+          "sourceY": 11.088
         },
         {
           "group": "hammer",
@@ -231,7 +328,9 @@
           "x": 6.846,
           "y": 16.705,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 6.846,
+          "sourceY": 16.705
         },
         {
           "group": "hammer",
@@ -239,7 +338,9 @@
           "x": 22.227,
           "y": 5.529,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 22.227,
+          "sourceY": 5.529
         },
         {
           "group": "shield",
@@ -247,7 +348,9 @@
           "x": 0,
           "y": 11.205,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -3.087,
+          "sourceY": 11.205
         },
         {
           "group": "shield",
@@ -255,9 +358,88 @@
           "x": 30,
           "y": 11.205,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 32.569,
+          "sourceY": 11.205
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            5.856,
+            11.088
+          ],
+          "to": [
+            15.0,
+            11.088
+          ],
+          "at": [
+            10.428,
+            11.088
+          ],
+          "d": 9,
+          "side": "blue",
+          "group": "dagger"
+        },
+        {
+          "from": [
+            23.858,
+            11.088
+          ],
+          "to": [
+            15.0,
+            11.088
+          ],
+          "at": [
+            19.429,
+            11.088
+          ],
+          "d": 9,
+          "side": "red",
+          "group": "dagger"
+        },
+        {
+          "from": [
+            6.846,
+            16.705
+          ],
+          "to": [
+            15.0,
+            16.705
+          ],
+          "at": [
+            10.923,
+            16.705
+          ],
+          "d": 8,
+          "side": "blue",
+          "group": "hammer"
+        },
+        {
+          "from": [
+            6.846,
+            16.705
+          ],
+          "to": [
+            6.846,
+            11.0
+          ],
+          "at": [
+            6.846,
+            13.852
+          ],
+          "d": 6,
+          "side": "blue",
+          "group": "hammer"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.554,
+          -7.021
+        ]
+      }
     },
     {
       "id": "battle-lines",
@@ -271,7 +453,9 @@
           "x": 6.832,
           "y": 16.28,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 6.832,
+          "sourceY": 16.28
         },
         {
           "group": "dagger",
@@ -279,7 +463,9 @@
           "x": 22.085,
           "y": 5.253,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 22.085,
+          "sourceY": 5.253
         },
         {
           "group": "hammer",
@@ -287,7 +473,9 @@
           "x": 14.09,
           "y": 21.907,
           "reserve": 2,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.09,
+          "sourceY": 21.907
         },
         {
           "group": "hammer",
@@ -295,7 +483,9 @@
           "x": 14.147,
           "y": 0,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.147,
+          "sourceY": -0.202
         },
         {
           "group": "shield",
@@ -303,7 +493,9 @@
           "x": 6.804,
           "y": 5.253,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 6.804,
+          "sourceY": 5.253
         },
         {
           "group": "shield",
@@ -311,9 +503,88 @@
           "x": 21.83,
           "y": 16.394,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 21.83,
+          "sourceY": 16.394
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            6.832,
+            16.28
+          ],
+          "to": [
+            15.0,
+            16.28
+          ],
+          "at": [
+            10.916,
+            16.28
+          ],
+          "d": 8,
+          "side": "blue",
+          "group": "dagger"
+        },
+        {
+          "from": [
+            22.085,
+            5.253
+          ],
+          "to": [
+            22.085,
+            11.0
+          ],
+          "at": [
+            22.085,
+            8.127
+          ],
+          "d": 6,
+          "side": "red",
+          "group": "dagger"
+        },
+        {
+          "from": [
+            6.804,
+            5.253
+          ],
+          "to": [
+            15.0,
+            5.253
+          ],
+          "at": [
+            10.902,
+            5.253
+          ],
+          "d": 8,
+          "side": "red",
+          "group": "shield"
+        },
+        {
+          "from": [
+            6.804,
+            5.253
+          ],
+          "to": [
+            6.804,
+            11.0
+          ],
+          "at": [
+            6.804,
+            8.127
+          ],
+          "d": 6,
+          "side": "red",
+          "group": "shield"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.663,
+          -7.065
+        ]
+      }
     },
     {
       "id": "knife-in-the-back",
@@ -327,7 +598,9 @@
           "x": 15.23,
           "y": 0,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 15.23,
+          "sourceY": -2.286
         },
         {
           "group": "dagger",
@@ -335,7 +608,9 @@
           "x": 15.287,
           "y": 22,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 15.287,
+          "sourceY": 24.63
         },
         {
           "group": "hammer",
@@ -343,7 +618,9 @@
           "x": 29.885,
           "y": 11.202,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.885,
+          "sourceY": 11.202
         },
         {
           "group": "hammer",
@@ -351,7 +628,9 @@
           "x": 0,
           "y": 11.081,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.115,
+          "sourceY": 11.081
         },
         {
           "group": "shield",
@@ -359,7 +638,9 @@
           "x": 15.144,
           "y": 5.602,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 15.144,
+          "sourceY": 5.602
         },
         {
           "group": "shield",
@@ -367,9 +648,19 @@
           "x": 15.144,
           "y": 16.621,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 15.144,
+          "sourceY": 16.621
         }
-      ]
+      ],
+      "guides": [],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.609,
+          -6.953
+        ]
+      }
     },
     {
       "id": "show-of-strength",
@@ -383,7 +674,9 @@
           "x": 29.647,
           "y": 11.129,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.647,
+          "sourceY": 11.129
         },
         {
           "group": "dagger",
@@ -391,7 +684,9 @@
           "x": 0,
           "y": 11.071,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.438,
+          "sourceY": 11.071
         },
         {
           "group": "hammer",
@@ -399,7 +694,9 @@
           "x": 23.608,
           "y": 11.186,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 23.608,
+          "sourceY": 11.186
         },
         {
           "group": "hammer",
@@ -407,7 +704,9 @@
           "x": 5.325,
           "y": 11.129,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 5.325,
+          "sourceY": 11.129
         },
         {
           "group": "shield",
@@ -415,7 +714,9 @@
           "x": 0,
           "y": 0.057,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.465,
+          "sourceY": 0.057
         },
         {
           "group": "shield",
@@ -423,9 +724,19 @@
           "x": 29.62,
           "y": 22,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 29.62,
+          "sourceY": 22.084
         }
-      ]
+      ],
+      "guides": [],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.754,
+          -7.043
+        ]
+      }
     },
     {
       "id": "bloodbath",
@@ -439,7 +750,9 @@
           "x": 14.537,
           "y": 16.741,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.537,
+          "sourceY": 16.741
         },
         {
           "group": "dagger",
@@ -447,7 +760,9 @@
           "x": 14.595,
           "y": 5.662,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.595,
+          "sourceY": 5.662
         },
         {
           "group": "hammer",
@@ -455,7 +770,9 @@
           "x": 0,
           "y": 11.141,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.728,
+          "sourceY": 11.141
         },
         {
           "group": "hammer",
@@ -463,7 +780,9 @@
           "x": 29.393,
           "y": 11.322,
           "reserve": 2,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.393,
+          "sourceY": 11.322
         },
         {
           "group": "shield",
@@ -471,7 +790,9 @@
           "x": 6.934,
           "y": 5.602,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 6.934,
+          "sourceY": 5.602
         },
         {
           "group": "shield",
@@ -479,9 +800,71 @@
           "x": 21.965,
           "y": 16.862,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 21.965,
+          "sourceY": 16.862
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            14.537,
+            16.741
+          ],
+          "to": [
+            14.537,
+            11.0
+          ],
+          "at": [
+            14.537,
+            13.87
+          ],
+          "d": 6,
+          "side": "blue",
+          "group": "dagger"
+        },
+        {
+          "from": [
+            6.934,
+            5.602
+          ],
+          "to": [
+            15.0,
+            5.602
+          ],
+          "at": [
+            10.967,
+            5.602
+          ],
+          "d": 8,
+          "side": "red",
+          "group": "shield"
+        },
+        {
+          "from": [
+            21.965,
+            16.862
+          ],
+          "to": [
+            21.965,
+            11.0
+          ],
+          "at": [
+            21.965,
+            13.931
+          ],
+          "d": 6,
+          "side": "blue",
+          "group": "shield"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.554,
+          -6.953
+        ]
+      }
     },
     {
       "id": "death-spiral",
@@ -495,7 +878,9 @@
           "x": 5.868,
           "y": 11.129,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 5.868,
+          "sourceY": 11.129
         },
         {
           "group": "dagger",
@@ -503,7 +888,9 @@
           "x": 23.786,
           "y": 11.071,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 23.786,
+          "sourceY": 11.071
         },
         {
           "group": "hammer",
@@ -511,7 +898,9 @@
           "x": 14.43,
           "y": 22,
           "reserve": 3,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.43,
+          "sourceY": 22.142
         },
         {
           "group": "hammer",
@@ -519,7 +908,9 @@
           "x": 14.544,
           "y": 0.115,
           "reserve": 3,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.544,
+          "sourceY": 0.115
         },
         {
           "group": "shield",
@@ -527,7 +918,9 @@
           "x": 0,
           "y": 11.244,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -3.062,
+          "sourceY": 11.244
         },
         {
           "group": "shield",
@@ -535,9 +928,54 @@
           "x": 30,
           "y": 11.071,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 32.547,
+          "sourceY": 11.071
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            5.868,
+            11.129
+          ],
+          "to": [
+            15.0,
+            11.129
+          ],
+          "at": [
+            10.434,
+            11.129
+          ],
+          "d": 9,
+          "side": "blue",
+          "group": "dagger"
+        },
+        {
+          "from": [
+            23.786,
+            11.071
+          ],
+          "to": [
+            15.0,
+            11.071
+          ],
+          "at": [
+            19.393,
+            11.071
+          ],
+          "d": 9,
+          "side": "red",
+          "group": "dagger"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.663,
+          -7.043
+        ]
+      }
     },
     {
       "id": "stand-off",
@@ -551,7 +989,9 @@
           "x": 14.885,
           "y": 22,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.885,
+          "sourceY": 22.057
         },
         {
           "group": "dagger",
@@ -559,7 +999,9 @@
           "x": 15.057,
           "y": 0.043,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 15.057,
+          "sourceY": 0.043
         },
         {
           "group": "hammer",
@@ -567,7 +1009,9 @@
           "x": 29.598,
           "y": 10.992,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.598,
+          "sourceY": 10.992
         },
         {
           "group": "hammer",
@@ -575,15 +1019,19 @@
           "x": 0,
           "y": 11.225,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.46,
+          "sourceY": 11.225
         },
         {
           "group": "shield",
           "side": "red",
           "x": 29.799,
           "y": 22,
-          "reserve": 3,
-          "offboard": true
+          "reserve": 2,
+          "offboard": true,
+          "sourceX": 29.799,
+          "sourceY": 22.115
         },
         {
           "group": "shield",
@@ -591,9 +1039,19 @@
           "x": 0,
           "y": 0.16,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.201,
+          "sourceY": 0.16
         }
-      ]
+      ],
+      "guides": [],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.609,
+          -7.032
+        ]
+      }
     },
     {
       "id": "the-duel",
@@ -607,7 +1065,9 @@
           "x": 15.297,
           "y": 0,
           "reserve": 3,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 15.297,
+          "sourceY": -2.384
         },
         {
           "group": "dagger",
@@ -615,7 +1075,9 @@
           "x": 15.02,
           "y": 22,
           "reserve": 3,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 15.02,
+          "sourceY": 24.606
         },
         {
           "group": "hammer",
@@ -623,7 +1085,9 @@
           "x": 0,
           "y": 11.168,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.271,
+          "sourceY": 11.168
         },
         {
           "group": "hammer",
@@ -631,7 +1095,9 @@
           "x": 29.814,
           "y": 10.939,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.814,
+          "sourceY": 10.939
         },
         {
           "group": "shield",
@@ -639,7 +1105,9 @@
           "x": 22.694,
           "y": 5.253,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 22.694,
+          "sourceY": 5.253
         },
         {
           "group": "shield",
@@ -647,9 +1115,54 @@
           "x": 7.347,
           "y": 16.739,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 7.347,
+          "sourceY": 16.739
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            22.694,
+            5.253
+          ],
+          "to": [
+            22.694,
+            11.0
+          ],
+          "at": [
+            22.694,
+            8.127
+          ],
+          "d": 6,
+          "side": "red",
+          "group": "shield"
+        },
+        {
+          "from": [
+            7.347,
+            16.739
+          ],
+          "to": [
+            7.347,
+            11.0
+          ],
+          "at": [
+            7.347,
+            13.87
+          ],
+          "d": 6,
+          "side": "blue",
+          "group": "shield"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.754,
+          -7.065
+        ]
+      }
     },
     {
       "id": "the-unseen-blade",
@@ -662,8 +1175,10 @@
           "side": "blue",
           "x": 0,
           "y": 10.817,
-          "reserve": 3,
-          "offboard": true
+          "reserve": 2,
+          "offboard": true,
+          "sourceX": -2.942,
+          "sourceY": 10.817
         },
         {
           "group": "dagger",
@@ -671,7 +1186,9 @@
           "x": 30,
           "y": 11.05,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 32.714,
+          "sourceY": 11.05
         },
         {
           "group": "hammer",
@@ -679,7 +1196,9 @@
           "x": 14.595,
           "y": 22,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.595,
+          "sourceY": 22.173
         },
         {
           "group": "hammer",
@@ -687,7 +1206,9 @@
           "x": 14.304,
           "y": 0.16,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.304,
+          "sourceY": 0.16
         },
         {
           "group": "shield",
@@ -695,7 +1216,9 @@
           "x": 5.594,
           "y": 10.992,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 5.594,
+          "sourceY": 10.992
         },
         {
           "group": "shield",
@@ -703,9 +1226,37 @@
           "x": 23.713,
           "y": 11.166,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 23.713,
+          "sourceY": 11.166
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            23.713,
+            11.166
+          ],
+          "to": [
+            15.0,
+            11.166
+          ],
+          "at": [
+            19.357,
+            11.166
+          ],
+          "d": 9,
+          "side": "blue",
+          "group": "shield"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.554,
+          -7.032
+        ]
+      }
     },
     {
       "id": "escalation",
@@ -719,7 +1270,9 @@
           "x": 29.91,
           "y": 22,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 29.91,
+          "sourceY": 22.137
         },
         {
           "group": "dagger",
@@ -727,7 +1280,9 @@
           "x": 0,
           "y": 0,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.256,
+          "sourceY": -0.145
         },
         {
           "group": "hammer",
@@ -735,7 +1290,9 @@
           "x": 14.487,
           "y": 16.681,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.487,
+          "sourceY": 16.681
         },
         {
           "group": "hammer",
@@ -743,7 +1300,9 @@
           "x": 14.43,
           "y": 5.196,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.43,
+          "sourceY": 5.196
         },
         {
           "group": "shield",
@@ -751,7 +1310,9 @@
           "x": 0,
           "y": 10.824,
           "reserve": 3,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.284,
+          "sourceY": 10.824
         },
         {
           "group": "shield",
@@ -759,9 +1320,37 @@
           "x": 29.768,
           "y": 11.168,
           "reserve": 3,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.768,
+          "sourceY": 11.168
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            14.43,
+            5.196
+          ],
+          "to": [
+            14.43,
+            11.0
+          ],
+          "at": [
+            14.43,
+            8.098
+          ],
+          "d": 6,
+          "side": "red",
+          "group": "hammer"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.663,
+          -7.065
+        ]
+      }
     },
     {
       "id": "relentless-assault",
@@ -775,7 +1364,9 @@
           "x": 14.967,
           "y": 22,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.967,
+          "sourceY": 22.115
         },
         {
           "group": "dagger",
@@ -783,7 +1374,9 @@
           "x": 14.967,
           "y": 0,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.967,
+          "sourceY": -0.015
         },
         {
           "group": "hammer",
@@ -791,7 +1384,9 @@
           "x": 0,
           "y": 22,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.471,
+          "sourceY": 22.115
         },
         {
           "group": "hammer",
@@ -799,7 +1394,9 @@
           "x": 0,
           "y": 11.108,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.471,
+          "sourceY": 11.108
         },
         {
           "group": "shield",
@@ -807,7 +1404,9 @@
           "x": 29.816,
           "y": 11.05,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.816,
+          "sourceY": 11.05
         },
         {
           "group": "shield",
@@ -815,9 +1414,19 @@
           "x": 14.771,
           "y": 11.05,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.771,
+          "sourceY": 11.05
         }
-      ]
+      ],
+      "guides": [],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.702,
+          -7.032
+        ]
+      }
     },
     {
       "id": "defiant-stand",
@@ -831,7 +1440,9 @@
           "x": 14.884,
           "y": 10.759,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.884,
+          "sourceY": 10.759
         },
         {
           "group": "dagger",
@@ -839,7 +1450,9 @@
           "x": 30,
           "y": 10.817,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 30.023,
+          "sourceY": 10.817
         },
         {
           "group": "hammer",
@@ -847,7 +1460,9 @@
           "x": 9.327,
           "y": 15.01,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 9.327,
+          "sourceY": 15.01
         },
         {
           "group": "hammer",
@@ -855,7 +1470,9 @@
           "x": 0,
           "y": 21.824,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.539,
+          "sourceY": 21.824
         },
         {
           "group": "shield",
@@ -863,7 +1480,9 @@
           "x": 14.799,
           "y": 0,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.799,
+          "sourceY": -0.131
         },
         {
           "group": "shield",
@@ -871,9 +1490,54 @@
           "x": 20.015,
           "y": 15.068,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 20.015,
+          "sourceY": 15.068
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            9.327,
+            15.01
+          ],
+          "to": [
+            9.327,
+            11.0
+          ],
+          "at": [
+            9.327,
+            13.005
+          ],
+          "d": 4,
+          "side": "blue",
+          "group": "hammer"
+        },
+        {
+          "from": [
+            20.015,
+            15.068
+          ],
+          "to": [
+            20.015,
+            11.0
+          ],
+          "at": [
+            20.015,
+            13.034
+          ],
+          "d": 4,
+          "side": "blue",
+          "group": "shield"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.663,
+          -7.032
+        ]
+      }
     },
     {
       "id": "stranglehold",
@@ -887,7 +1551,9 @@
           "x": 0,
           "y": 0,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.23,
+          "sourceY": -0.015
         },
         {
           "group": "dagger",
@@ -895,7 +1561,9 @@
           "x": 0,
           "y": 10.875,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.345,
+          "sourceY": 10.875
         },
         {
           "group": "hammer",
@@ -903,7 +1571,9 @@
           "x": 14.368,
           "y": 11.05,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.368,
+          "sourceY": 11.05
         },
         {
           "group": "hammer",
@@ -911,7 +1581,9 @@
           "x": 22.011,
           "y": 5.343,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 22.011,
+          "sourceY": 5.343
         },
         {
           "group": "shield",
@@ -919,7 +1591,9 @@
           "x": 14.569,
           "y": 22,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.569,
+          "sourceY": 22.173
         },
         {
           "group": "shield",
@@ -927,9 +1601,19 @@
           "x": 29.569,
           "y": 0.102,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.569,
+          "sourceY": 0.102
         }
-      ]
+      ],
+      "guides": [],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.609,
+          -7.032
+        ]
+      }
     },
     {
       "id": "decimation",
@@ -943,7 +1627,9 @@
           "x": 0,
           "y": 21.707,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.322,
+          "sourceY": 21.707
         },
         {
           "group": "dagger",
@@ -951,7 +1637,9 @@
           "x": 0,
           "y": 0,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.208,
+          "sourceY": -0.073
         },
         {
           "group": "hammer",
@@ -959,7 +1647,9 @@
           "x": 29.462,
           "y": 22,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 29.462,
+          "sourceY": 22.057
         },
         {
           "group": "hammer",
@@ -967,7 +1657,9 @@
           "x": 29.519,
           "y": 11.05,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.519,
+          "sourceY": 11.05
         },
         {
           "group": "shield",
@@ -975,7 +1667,9 @@
           "x": 14.427,
           "y": 21.94,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.427,
+          "sourceY": 21.94
         },
         {
           "group": "shield",
@@ -983,9 +1677,19 @@
           "x": 14.541,
           "y": 10.992,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.541,
+          "sourceY": 10.992
         }
-      ]
+      ],
+      "guides": [],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.623,
+          -7.032
+        ]
+      }
     },
     {
       "id": "tentative-position",
@@ -999,7 +1703,9 @@
           "x": 14.967,
           "y": 11.126,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.967,
+          "sourceY": 11.126
         },
         {
           "group": "dagger",
@@ -1007,7 +1713,9 @@
           "x": 0,
           "y": 11.008,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.246,
+          "sourceY": 11.008
         },
         {
           "group": "hammer",
@@ -1015,7 +1723,9 @@
           "x": 0,
           "y": 0.133,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.471,
+          "sourceY": 0.133
         },
         {
           "group": "hammer",
@@ -1023,7 +1733,9 @@
           "x": 29.563,
           "y": 0.25,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.563,
+          "sourceY": 0.25
         },
         {
           "group": "shield",
@@ -1031,7 +1743,9 @@
           "x": 14.827,
           "y": 22,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.827,
+          "sourceY": 24.588
         },
         {
           "group": "shield",
@@ -1039,9 +1753,37 @@
           "x": 7.304,
           "y": 16.77,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 7.304,
+          "sourceY": 16.77
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            7.304,
+            16.77
+          ],
+          "to": [
+            7.304,
+            11.0
+          ],
+          "at": [
+            7.304,
+            13.885
+          ],
+          "d": 6,
+          "side": "red",
+          "group": "shield"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.702,
+          -7.01
+        ]
+      }
     },
     {
       "id": "divide-and-slaughter",
@@ -1055,7 +1797,9 @@
           "x": 14.997,
           "y": 22,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.997,
+          "sourceY": 22.128
         },
         {
           "group": "dagger",
@@ -1063,7 +1807,9 @@
           "x": 30,
           "y": 11.162,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 32.575,
+          "sourceY": 11.162
         },
         {
           "group": "hammer",
@@ -1071,7 +1817,9 @@
           "x": 14.714,
           "y": 11.282,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.714,
+          "sourceY": 11.282
         },
         {
           "group": "hammer",
@@ -1079,7 +1827,9 @@
           "x": 22.255,
           "y": 5.769,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 22.255,
+          "sourceY": 5.769
         },
         {
           "group": "shield",
@@ -1087,7 +1837,9 @@
           "x": 0,
           "y": 11.222,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -2.892,
+          "sourceY": 11.222
         },
         {
           "group": "shield",
@@ -1095,9 +1847,19 @@
           "x": 7.371,
           "y": 5.769,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 7.371,
+          "sourceY": 5.769
         }
-      ]
+      ],
+      "guides": [],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.663,
+          -6.965
+        ]
+      }
     },
     {
       "id": "the-trap",
@@ -1111,7 +1873,9 @@
           "x": 6.954,
           "y": 5.6,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 6.954,
+          "sourceY": 5.6
         },
         {
           "group": "dagger",
@@ -1119,7 +1883,9 @@
           "x": 14.31,
           "y": 22,
           "reserve": 3,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.31,
+          "sourceY": 22.178
         },
         {
           "group": "hammer",
@@ -1127,7 +1893,9 @@
           "x": 0,
           "y": 11.243,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.805,
+          "sourceY": 11.243
         },
         {
           "group": "hammer",
@@ -1135,7 +1903,9 @@
           "x": 14.138,
           "y": 0,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.138,
+          "sourceY": -2.395
         },
         {
           "group": "shield",
@@ -1143,7 +1913,9 @@
           "x": 0,
           "y": 22,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.718,
+          "sourceY": 22.178
         },
         {
           "group": "shield",
@@ -1151,9 +1923,37 @@
           "x": 14.282,
           "y": 11.243,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.282,
+          "sourceY": 11.243
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            6.954,
+            5.6
+          ],
+          "to": [
+            15.0,
+            5.6
+          ],
+          "at": [
+            10.977,
+            5.6
+          ],
+          "d": 8,
+          "side": "blue",
+          "group": "dagger"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.609,
+          -7.01
+        ]
+      }
     },
     {
       "id": "encircle",
@@ -1167,7 +1967,9 @@
           "x": 14.684,
           "y": 14.818,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.684,
+          "sourceY": 14.818
         },
         {
           "group": "dagger",
@@ -1175,7 +1977,9 @@
           "x": 0,
           "y": 11.162,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.723,
+          "sourceY": 11.162
         },
         {
           "group": "hammer",
@@ -1183,7 +1987,9 @@
           "x": 14.398,
           "y": 22,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.398,
+          "sourceY": 24.885
         },
         {
           "group": "hammer",
@@ -1191,7 +1997,9 @@
           "x": 22.589,
           "y": 11.222,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 22.589,
+          "sourceY": 11.222
         },
         {
           "group": "shield",
@@ -1199,7 +2007,9 @@
           "x": 30,
           "y": 11.222,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 32.927,
+          "sourceY": 11.222
         },
         {
           "group": "shield",
@@ -1207,9 +2017,37 @@
           "x": 14.598,
           "y": 0,
           "reserve": null,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.598,
+          "sourceY": -0.163
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            14.684,
+            14.818
+          ],
+          "to": [
+            14.684,
+            11.0
+          ],
+          "at": [
+            14.684,
+            12.909
+          ],
+          "d": 4,
+          "side": "red",
+          "group": "dagger"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.623,
+          -6.965
+        ]
+      }
     },
     {
       "id": "hold-out",
@@ -1223,7 +2061,9 @@
           "x": 14.63,
           "y": 10.902,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.63,
+          "sourceY": 10.902
         },
         {
           "group": "dagger",
@@ -1231,7 +2071,9 @@
           "x": 22.265,
           "y": 5.358,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 22.265,
+          "sourceY": 5.358
         },
         {
           "group": "hammer",
@@ -1239,7 +2081,9 @@
           "x": 21.816,
           "y": 16.504,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 21.816,
+          "sourceY": 16.504
         },
         {
           "group": "hammer",
@@ -1247,7 +2091,9 @@
           "x": 14.294,
           "y": 0,
           "reserve": 3,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.294,
+          "sourceY": -2.531
         },
         {
           "group": "shield",
@@ -1255,7 +2101,9 @@
           "x": 0,
           "y": 22,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.611,
+          "sourceY": 22.163
         },
         {
           "group": "shield",
@@ -1263,9 +2111,19 @@
           "x": 29.479,
           "y": 10.96,
           "reserve": 2,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.479,
+          "sourceY": 10.96
         }
-      ]
+      ],
+      "guides": [],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.702,
+          -7.075
+        ]
+      }
     },
     {
       "id": "outflank",
@@ -1279,7 +2137,9 @@
           "x": 14.827,
           "y": 11.013,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.827,
+          "sourceY": 11.013
         },
         {
           "group": "dagger",
@@ -1287,7 +2147,9 @@
           "x": 0,
           "y": 11.071,
           "reserve": 3,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.256,
+          "sourceY": 11.071
         },
         {
           "group": "hammer",
@@ -1295,7 +2157,9 @@
           "x": 22.425,
           "y": 11.071,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 22.425,
+          "sourceY": 11.071
         },
         {
           "group": "hammer",
@@ -1303,7 +2167,9 @@
           "x": 30,
           "y": 11.071,
           "reserve": 3,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 32.178,
+          "sourceY": 11.071
         },
         {
           "group": "shield",
@@ -1311,7 +2177,9 @@
           "x": 14.629,
           "y": 22,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.629,
+          "sourceY": 24.46
         },
         {
           "group": "shield",
@@ -1319,9 +2187,19 @@
           "x": 0,
           "y": 0.173,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -0.341,
+          "sourceY": 0.173
         }
-      ]
+      ],
+      "guides": [],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.663,
+          -7.043
+        ]
+      }
     },
     {
       "id": "vengeance",
@@ -1335,7 +2213,9 @@
           "x": 14.598,
           "y": 22,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.598,
+          "sourceY": 24.45
         },
         {
           "group": "dagger",
@@ -1343,7 +2223,9 @@
           "x": 29.77,
           "y": 0.042,
           "reserve": 2,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.77,
+          "sourceY": 0.042
         },
         {
           "group": "hammer",
@@ -1351,7 +2233,9 @@
           "x": 14.253,
           "y": 10.96,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.253,
+          "sourceY": 10.96
         },
         {
           "group": "hammer",
@@ -1359,7 +2243,9 @@
           "x": 21.897,
           "y": 16.504,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 21.897,
+          "sourceY": 16.504
         },
         {
           "group": "shield",
@@ -1367,7 +2253,9 @@
           "x": 14.397,
           "y": 0,
           "reserve": 3,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.397,
+          "sourceY": -0.016
         },
         {
           "group": "shield",
@@ -1375,9 +2263,37 @@
           "x": 6.81,
           "y": 16.504,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 6.81,
+          "sourceY": 16.504
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            6.81,
+            16.504
+          ],
+          "to": [
+            15.0,
+            16.504
+          ],
+          "at": [
+            10.905,
+            16.504
+          ],
+          "d": 8,
+          "side": "blue",
+          "group": "shield"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.609,
+          -7.075
+        ]
+      }
     },
     {
       "id": "close-the-jaws",
@@ -1391,7 +2307,9 @@
           "x": 14.627,
           "y": 11.071,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 14.627,
+          "sourceY": 11.071
         },
         {
           "group": "dagger",
@@ -1399,7 +2317,9 @@
           "x": 14.57,
           "y": 0,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 14.57,
+          "sourceY": -2.435
         },
         {
           "group": "hammer",
@@ -1407,7 +2327,9 @@
           "x": 6.837,
           "y": 16.693,
           "reserve": null,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 6.837,
+          "sourceY": 16.693
         },
         {
           "group": "hammer",
@@ -1415,7 +2337,9 @@
           "x": 0,
           "y": 5.448,
           "reserve": 3,
-          "offboard": true
+          "offboard": true,
+          "sourceX": -3.072,
+          "sourceY": 5.448
         },
         {
           "group": "shield",
@@ -1423,7 +2347,9 @@
           "x": 29.72,
           "y": 22,
           "reserve": 2,
-          "offboard": true
+          "offboard": true,
+          "sourceX": 29.72,
+          "sourceY": 22.258
         },
         {
           "group": "shield",
@@ -1431,9 +2357,37 @@
           "x": 29.72,
           "y": 11.186,
           "reserve": 3,
-          "offboard": false
+          "offboard": false,
+          "sourceX": 29.72,
+          "sourceY": 11.186
         }
-      ]
+      ],
+      "guides": [
+        {
+          "from": [
+            6.837,
+            16.693
+          ],
+          "to": [
+            15.0,
+            16.693
+          ],
+          "at": [
+            10.918,
+            16.693
+          ],
+          "d": 8,
+          "side": "blue",
+          "group": "hammer"
+        }
+      ],
+      "orientation": {
+        "kind": "double-arrow",
+        "at": [
+          -6.623,
+          -7.043
+        ]
+      }
     }
   ],
   "victories": {
@@ -1698,6 +2652,10 @@
   ],
   "mapImport": {
     "method": "Official card templates for Dagger/Shield/Hammer and RND labels; off-board reserves projected to battlefield edge.",
+    "problems": []
+  },
+  "mapImportV2": {
+    "method": "Raw off-board sourceX/sourceY preserved, source-verified reserve overrides, centre-line guides and orientation marks.",
     "problems": []
   }
 }
