@@ -14,6 +14,15 @@ export type OnlineLike = {
   closeGame: () => void;
 };
 
+export type OnlineSystem = '40k' | 'aos' | 'kt' | 'warcry';
+
+const SYSTEM_LABEL: Record<OnlineSystem, { title: string; route: string }> = {
+  '40k': { title: 'Warhammer 40,000', route: '' },
+  aos: { title: 'Age of Sigmar', route: ' → Age of Sigmar' },
+  kt: { title: 'Kill Team', route: ' → Kill Team' },
+  warcry: { title: 'Warcry', route: ' → Warcry' },
+};
+
 /**
  * Игра на двух телефонах (T3): создать игру (этот телефон — игрок 1, сопернику — код) или войти по коду (игрок 2);
  * вернуться к незаконченной. Журнал хранит сервер; каждый телефон действует только за своего игрока.
@@ -55,14 +64,14 @@ export function OnlineStart({ game, onCreate, busy }: { game: OnlineLike; onCrea
 }
 
 /** Полоса игры на двух телефонах: код, кто я, есть ли соперник, связь; «Позвать» и «К списку» (игра остаётся в сохранённых). */
-export function OnlineBar({ game, system = '40k' }: { game: OnlineLike; system?: '40k' | 'aos' }) {
+export function OnlineBar({ game, system = '40k' }: { game: OnlineLike; system?: OnlineSystem }) {
   const o = game.online;
   if (!o) return null;
   const opp = o.seat === 'p1' ? 'p2' : 'p1';
   const me = game.state?.players[o.seat].name ?? (o.seat === 'p1' ? 'Игрок 1' : 'Игрок 2');
   const joined = !!o.players[opp];
   const invite = () => {
-    shareText(`Игра ${system === 'aos' ? 'Age of Sigmar' : 'Warhammer 40,000'} в WarpHub: откройте WarpBuilder${system === 'aos' ? ' → Age of Sigmar' : ''} → «Начать игру» → «На двух телефонах» и введите код ${o.code}`);
+    shareText(`Игра ${SYSTEM_LABEL[system].title} в WarpHub: откройте WarpBuilder${SYSTEM_LABEL[system].route} → «Начать игру» → «На двух телефонах» и введите код ${o.code}`);
     haptic.tap();
   };
   const status = game.sync.offline ? 'нет связи' : game.sync.sending ? 'отправка…' : 'на связи';

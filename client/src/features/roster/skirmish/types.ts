@@ -12,14 +12,34 @@ interface BoardData {
   objectiveMm: number | null;
 }
 
+export type KtPoint = [number, number];
+export interface KtMapFeature {
+  label: string;
+  x: number;
+  y: number;
+  poly: KtPoint[];
+}
+export interface KtMapGuide {
+  edge: 'left' | 'right' | 'top' | 'bottom';
+  at: KtPoint;
+  d: number;
+  side: 'p1' | 'p2';
+}
+
 export interface KtMapData {
   id: string;
   killzone: string;
   map: number;
   sourceImage: string;
-  zones: { p1: [number, number][][]; p2: [number, number][][] };
+  zones: { p1: KtPoint[][]; p2: KtPoint[][] };
+  territories: { p1: KtPoint[][]; p2: KtPoint[][] };
+  dropZones: { p1: KtPoint[][]; p2: KtPoint[][] };
   objectives: { id: string; x: number; y: number }[];
-  terrain: [number, number][][];
+  terrain: KtPoint[][];
+  features: KtMapFeature[];
+  walls: KtPoint[][];
+  doors: KtPoint[][];
+  guides: KtMapGuide[];
 }
 
 export interface KtGameData {
@@ -51,8 +71,10 @@ export interface KtGameData {
   };
   maps: KtMapData[];
   mapImport: { method: string; problems: string[] };
+  mapImportV2: { method: string; problems: string[] };
 }
 
+export type WarcryPoint = [number, number];
 export interface WarcryDeploymentPoint {
   group: 'dagger' | 'shield' | 'hammer';
   side: 'red' | 'blue';
@@ -60,6 +82,17 @@ export interface WarcryDeploymentPoint {
   y: number;
   reserve: 2 | 3 | null;
   offboard: boolean;
+  /** Исходная позиция на карте до ограничения игрового поля; x/y остаются безопасными для текущего рендера. */
+  sourceX: number;
+  sourceY: number;
+}
+export interface WarcryDeploymentGuide {
+  from: WarcryPoint;
+  to: WarcryPoint;
+  at: WarcryPoint;
+  d: 4 | 6 | 8 | 9;
+  side: 'red' | 'blue';
+  group: 'dagger' | 'shield' | 'hammer';
 }
 export interface WarcryDeployment {
   id: string;
@@ -67,6 +100,8 @@ export interface WarcryDeployment {
   table: 'tableA' | 'tableB';
   image: string;
   points: WarcryDeploymentPoint[];
+  guides: WarcryDeploymentGuide[];
+  orientation: { kind: 'double-arrow'; at: WarcryPoint };
 }
 export interface WarcryVictory {
   id: string;
@@ -88,6 +123,7 @@ export interface WarcryGameData {
   victories: { tableA: WarcryVictory[]; tableB: WarcryVictory[] };
   twists: WarcryVictory[];
   mapImport: { method: string; problems: string[] };
+  mapImportV2: { method: string; problems: string[] };
 }
 
 export type SkirmishGameData = KtGameData | WarcryGameData;

@@ -178,13 +178,13 @@ function FieldPicker<R extends SkirmishRoster>({ data, roster, rosters, detail, 
       <div>
         <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Вариант расстановки · поле {data.board.width}×{data.board.height}″</p>
         {data.system === 'kt' ? (
-          <div className="grid grid-cols-[1fr_5rem] gap-2">
-            <select value={killzone} onChange={(e) => chooseOfficial(e.target.value, 1)} className="h-11 rounded-xl border border-white/10 bg-app-elevated px-3 text-sm">{data.missionPack.killzones.map((zone) => <option key={zone}>{zone}</option>)}</select>
+          <div className="grid grid-cols-[minmax(0,1fr)_5rem] gap-2">
+            <select value={killzone} onChange={(e) => chooseOfficial(e.target.value, 1)} className="h-11 min-w-0 rounded-xl border border-white/10 bg-app-elevated px-3 text-sm">{data.missionPack.killzones.map((zone) => <option key={zone}>{zone}</option>)}</select>
             <select value={mapNumber} onChange={(e) => chooseOfficial(killzone, Number(e.target.value))} className="h-11 rounded-xl border border-white/10 bg-app-elevated px-3 text-sm">{Array.from({ length: data.missionPack.mapsPerKillzone }, (_, i) => <option key={i + 1} value={i + 1}>Карта {i + 1}</option>)}</select>
           </div>
         ) : (
-          <div className="grid grid-cols-[1fr_7rem] gap-2">
-            <select value={deploymentId} onChange={(e) => chooseBattleplan(e.target.value, battleColor)} className="h-11 rounded-xl border border-white/10 bg-app-elevated px-3 text-sm">{data.deployments.map((deployment) => <option key={deployment.id} value={deployment.id}>{deployment.table === 'tableA' ? 'A' : 'B'} · {deployment.name}</option>)}</select>
+          <div className="grid grid-cols-[minmax(0,1fr)_7rem] gap-2">
+            <select value={deploymentId} onChange={(e) => chooseBattleplan(e.target.value, battleColor)} className="h-11 min-w-0 rounded-xl border border-white/10 bg-app-elevated px-3 text-sm">{data.deployments.map((deployment) => <option key={deployment.id} value={deployment.id}>{deployment.table === 'tableA' ? 'A' : 'B'} · {deployment.name}</option>)}</select>
             <select value={battleColor} onChange={(e) => chooseBattleplan(deploymentId, e.target.value)} className="h-11 rounded-xl border border-white/10 bg-app-elevated px-3 text-sm"><option value="red">Красные</option><option value="blue">Синие</option></select>
           </div>
         )}
@@ -228,7 +228,7 @@ function makeField(data: SkirmishGameData, layoutId: string): BoardField {
     if (map) {
       return {
         title: layoutName(layoutId),
-        background: <KtMapPanel map={map} />,
+        background: <KtMapPanel map={map} interactive={false} />,
         objectives: map.objectives.map((o) => ({ x: o.x, y: o.y, role: o.id })),
         snapPoints: map.objectives.map((o) => [o.x, o.y] as Pt),
         zones: { attacker: map.zones.p1, defender: map.zones.p2 },
@@ -246,7 +246,7 @@ function makeField(data: SkirmishGameData, layoutId: string): BoardField {
       const enemy = deployment.points.filter((point) => point.side !== color);
       return {
         title: layoutName(layoutId),
-        background: <WarcryDeploymentPanel deployment={deployment} color={color} />,
+        background: <WarcryDeploymentPanel deployment={deployment} color={color} interactive={false} />,
         objectives: deployment.points.map((point) => ({ x: point.x, y: point.y, role: `${point.side}:${point.group}` })),
         snapPoints: deployment.points.map((point) => [point.x, point.y] as Pt),
         zones: { attacker: own.map((point) => circleZone(point.x, point.y, 3)), defender: enemy.map((point) => circleZone(point.x, point.y, 3)) },

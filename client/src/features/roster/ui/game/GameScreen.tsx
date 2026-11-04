@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { DataIndex, Roster } from '../../engine/types';
 import { currentSetupStep, setupSteps, type EventBody, type GameMode, type Seat, type SetupStepId } from '../../game';
 import { pushOverlay } from '../../telegram';
 import { Battlefield } from '../Battlefield';
-import { Button, Icon, IconButton, Sheet } from '../kit';
+import { Button, Icon, Sheet } from '../kit';
 import { cx } from '../util';
+import { GameErrorBar } from '../common/GameErrorBar';
+import { GameShell } from '../common/GameShell';
 import { CardSheet } from './CardSheet';
 import { CardViewerContext, MySeatContext, RosterViewerContext } from './cardViewer';
 import { OnlineBar, OnlineStart } from './Online';
@@ -71,16 +73,16 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
 
   if (loadError) {
     return (
-      <Shell onBack={onBack}>
+      <GameShell onBack={onBack} kicker="Chapter Approved 2026–27" title="Начать игру" className="pb-24 lg:max-w-4xl lg:pt-8">
         <p className="mt-10 text-center text-sm text-fg-3">{loadError}</p>
-      </Shell>
+      </GameShell>
     );
   }
   if (!data) {
     return (
-      <Shell onBack={onBack}>
+      <GameShell onBack={onBack} kicker="Chapter Approved 2026–27" title="Начать игру" className="pb-24 lg:max-w-4xl lg:pt-8">
         <div className="mx-auto mt-16 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
-      </Shell>
+      </GameShell>
     );
   }
 
@@ -88,12 +90,15 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
     <CardViewerContext.Provider value={openCard}>
       <RosterViewerContext.Provider value={master ? openRoster : null}>
        <MySeatContext.Provider value={game.online?.seat ?? null}>
-        <Shell
+        <GameShell
           onBack={state || game.online ? game.closeGame : onBack}
           undo={state && game.canUndo ? game.undo : undefined}
           master={master}
           onMaster={toggleMaster}
-          kicker={state?.mode === 'dominatus' ? dominatusKicker(game) : undefined}
+          kicker={state?.mode === 'dominatus' ? dominatusKicker(game) : 'Chapter Approved 2026–27'}
+          title="Начать игру"
+          className="pb-24 lg:max-w-4xl lg:pt-8"
+          undoClassName="mb-0.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-fg-2 active:bg-white/10"
         >
           <OnlineBar game={game} />
           {game.online && !state ? (
@@ -104,15 +109,7 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
             state.stage === 'setup' ? <Setup game={game} rosters={rosters} index={index} /> : <Tracker game={game} index={index} />
           )}
 
-          {game.error && (
-            <div className="sheet-enter fixed inset-x-0 bottom-0 z-40 border-t border-danger/40 bg-app-elevated px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
-              <div className="mx-auto flex max-w-lg items-start gap-2">
-                <Icon name="alert" className="mt-0.5 size-5 shrink-0 text-danger" />
-                <p className="min-w-0 flex-1 text-sm text-white/85">{game.error}</p>
-                <IconButton icon="close" label="Закрыть" onClick={game.clearError} className="size-8" />
-              </div>
-            </div>
-          )}
+          {game.error && <GameErrorBar error={game.error} onClose={game.clearError} />}
 
           <button
             type="button"
@@ -127,7 +124,7 @@ export function GameScreen({ onBack, rosters, index, initialRosterId }: { onBack
             <Icon name="chevron" className="size-4 text-fg-3" />
           </button>
           {card && <CardSheet game={game} id={card.id} seat={card.seat} onClose={closeCard} />}
-        </Shell>
+        </GameShell>
        </MySeatContext.Provider>
       </RosterViewerContext.Provider>
     </CardViewerContext.Provider>
@@ -332,38 +329,4 @@ function StepBody({ id, game, rosters, index, onNext }: { id: SetupStepId; game:
   if (id === 'roles') return <StepRoles game={game} onNext={onNext} />;
   if (id === 'secondaries') return <StepSecondaries game={game} onNext={onNext} />;
   return <StepStart game={game} index={index} />;
-}
-
-function Shell({ onBack, undo, master, onMaster, kicker, children }: { onBack: () => void; undo?: () => void; master?: boolean; onMaster?: () => void; kicker?: string; children: ReactNode }) {
-  return (
-    <div className="mx-auto min-h-dvh max-w-lg px-4 pb-24 pt-5 lg:max-w-4xl lg:pt-8">
-      <header className="mb-4 flex items-end gap-3">
-        <IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" />
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{kicker ?? 'Chapter Approved 2026–27'}</p>
-          <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Начать игру</h1>
-        </div>
-        {onMaster && (
-          <button
-            type="button"
-            onClick={onMaster}
-            aria-pressed={master}
-            title="Режим мастера: открывать ростеры игроков"
-            className={cx(
-              'mb-0.5 rounded-full border px-3 py-1.5 text-xs font-semibold',
-              master ? 'border-accent bg-accent/15 text-accent' : 'border-white/15 text-fg-2 active:bg-white/10',
-            )}
-          >
-            Мастер
-          </button>
-        )}
-        {undo && (
-          <button type="button" onClick={undo} className="mb-0.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-fg-2 active:bg-white/10">
-            Отменить
-          </button>
-        )}
-      </header>
-      {children}
-    </div>
-  );
 }
