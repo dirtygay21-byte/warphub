@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ROUNDS, type SavedEntry } from '../../game';
-import { haptic, pushOverlay } from '../../telegram';
-import { Button, Icon, IconButton } from '../kit';
+import { haptic } from '../../telegram';
+import { Button, Icon } from '../kit';
 import { cx } from '../util';
+import { SavedGamesFrame } from '../common/SavedGamesFrame';
 import type { GameHook } from './useGame';
 
 const fmtDate = (iso: string) => {
@@ -15,7 +16,6 @@ const fmtDate = (iso: string) => {
  * нажатие открывает игру. Одиночную можно удалить (с подтверждением), игру на двух телефонах — убрать из списка.
  */
 export function SavedGames({ game, onClose }: { game: GameHook; onClose: () => void }) {
-  useEffect(() => pushOverlay(onClose), [onClose]);
   const list = game.library ?? [];
   const [busy, setBusy] = useState<string | null>(null);
   const open = async (e: SavedEntry) => {
@@ -25,20 +25,13 @@ export function SavedGames({ game, onClose }: { game: GameHook; onClose: () => v
     if (ok) haptic.ok();
   };
   return (
-    <section className="space-y-2">
-      <div className="flex items-center gap-2">
-        <IconButton icon="back" label="Назад" onClick={onClose} className="size-8" />
-        <p className="font-display min-w-0 flex-1 text-xl font-semibold uppercase">Сохранённые игры</p>
-        <span className="text-xs text-fg-3">{list.length}</span>
-      </div>
-      {!list.length && <p className="py-6 text-center text-sm text-fg-3">Сохранённых игр пока нет.</p>}
+    <SavedGamesFrame count={list.length} note="Игры хранятся на этом телефоне (до 20); игры на двух телефонах — на сервере, здесь — ссылка." onClose={onClose}>
       <ul className="space-y-2">
         {list.map((e) => (
           <Row key={e.key} game={game} entry={e} busy={busy === e.key} disabled={!!busy} onOpen={() => void open(e)} />
         ))}
       </ul>
-      <p className="pt-1 text-[12px] text-fg-3">Игры хранятся на этом телефоне (до 20); игры на двух телефонах — на сервере, здесь — ссылка.</p>
-    </section>
+    </SavedGamesFrame>
   );
 }
 

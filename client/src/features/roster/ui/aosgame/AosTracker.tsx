@@ -6,6 +6,7 @@ import { cx } from '../util';
 import { BattleplanInfo, TacticCards } from './AosSetup';
 import { territoryLabel, TIER_LABEL } from './refs';
 import type { AosGameHook } from './useAosGame';
+import { ScoreboardGrid } from '../common/ScoreboardGrid';
 
 /** Трекер битвы AoS: счёт, priority в начале раунда, ресурсы игроков, конец хода (батлплан и тактики), итог. */
 export function AosTracker({ game }: { game: AosGameHook }) {
@@ -14,7 +15,7 @@ export function AosTracker({ game }: { game: AosGameHook }) {
   const names = { p1: s.players.p1.name, p2: s.players.p2.name };
   return (
     <section className="space-y-3">
-      <div className="grid grid-cols-2 gap-2 text-center">
+      <ScoreboardGrid className="text-center">
         {SEATS.map((seat) => {
           const t = aosTotals(s, seat, bp);
           return (
@@ -30,7 +31,7 @@ export function AosTracker({ game }: { game: AosGameHook }) {
             </div>
           );
         })}
-      </div>
+      </ScoreboardGrid>
       {s.stage === 'finished' ? (
         <Result game={game} />
       ) : (
