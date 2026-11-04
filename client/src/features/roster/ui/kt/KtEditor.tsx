@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { loadKtTeam } from '../../data';
+import { uid } from '../../engine/roster';
 import { addOperative, checkKtRoster, compositionTotal, encodeKtRoster, ktTeamGroup, removeOperative, toggleEquipment, touchKt, updateOperative, type KtRoster, type KtRosterOp } from '../../kt/roster';
 import type { KtIndex, KtOperative, KtTeam, KtWeapon } from '../../kt/types';
 import { confirmAsk, haptic, openExternal, shareText } from '../../telegram';
@@ -14,12 +15,13 @@ type Tab = 'ops' | 'rules' | 'ploys' | 'equip';
  * Редактор команды Kill Team (W3, вид R1 30.10.2026 — как AoS и датакарты Wahapedia): шапка со счётом и проверкой,
  * блок команды, датакарты оперативников, правила фракции (один раз, а не в каждой карточке), уловки, снаряжение.
  */
-export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onChange, onDelete }: { roster: KtRoster; index: KtIndex; onBack: () => void; onStartGame: () => void; onTestArmy: () => void; onChange: (r: KtRoster) => void; onDelete: () => void }) {
+export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onChange, onDuplicate, onDelete }: { roster: KtRoster; index: KtIndex; onBack: () => void; onStartGame: () => void; onTestArmy: () => void; onChange: (r: KtRoster) => void; onDuplicate: (r: KtRoster) => void; onDelete: () => void }) {
   const [team, setTeam] = useState<KtTeam | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     loadKtTeam(roster.teamId).then(setTeam, (e) => setError(String(e?.message ?? e)));
-  }, [roster.teamId]);
+  }, [roster.teamId, attempt]);
   const issues = useMemo(() => (team ? checkKtRoster(roster, team) : []), [roster, team]);
   useEffect(() => {
     if (!team) return;
@@ -33,6 +35,7 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
   const [menu, setMenu] = useState(false);
   const [teamOpen, setTeamOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [view, setView] = useState(false);
 
   // правила фракции повторяются в каждом оперативнике источника — показываются один раз во вкладке «Правила»
   const factionRules = useMemo(() => {
@@ -46,9 +49,10 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
     return (
       <div className="mx-auto max-w-lg px-4 pt-10 text-center">
         <p className="text-sm text-fg-3">{error}</p>
-        <Button className="mt-4" onClick={onBack}>
-          Назад
-        </Button>
+        <div className="mt-4 flex justify-center gap-2">
+          <Button onClick={onBack}>Назад</Button>
+          <Button variant="primary" onClick={() => (setError(null), setAttempt((n) => n + 1))}>Повторить</Button>
+        </div>
       </div>
     );
   if (!team) return <div className="mx-auto mt-24 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />;
@@ -58,6 +62,11 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
   const leader = roster.operatives.some((x) => opOf(x)?.keywords.includes('LEADER'));
   const ploys = team.ploys.filter((p) => p.type !== 'rule');
   const teamRules = team.ploys.filter((p) => p.type === 'rule');
+  const scrollToOperative = (id: string) => {
+    setTab('ops');
+    setExpanded(id);
+    window.setTimeout(() => document.getElementById(`u-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60);
+  };
 
   return (
     <div className="mx-auto min-h-dvh max-w-lg pb-32 lg:max-w-3xl">
@@ -67,8 +76,18 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
         onBack={onBack}
         actions={
           <>
-            <IconButton icon="share" label="Экспорт" onClick={() => setExporting(true)} className="size-9" />
-            <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />
+            <IconButton
+              icon={view ? 'edit' : 'eye'}
+              label={view ? 'Редактировать' : 'Режим просмотра'}
+              onClick={() => (setView((v) => !v), setExpanded(null), setAdding(false))}
+              className={cx('size-9', view && 'bg-accent/15 text-accent')}
+            />
+            {!view && (
+              <>
+                <IconButton icon="share" label="Экспорт" onClick={() => setExporting(true)} className="size-9" />
+                <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />
+              </>
+            )}
           </>
         }
         big={roster.operatives.length}
@@ -81,6 +100,8 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
           </>
         }
         issues={issues}
+        readOnly={view}
+        onOpenIssue={(issue) => issue.uids?.[0] && scrollToOperative(issue.uids[0])}
       />
 
       <div className="space-y-4 px-4 pt-4">
@@ -131,16 +152,18 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
             {roster.operatives.map((x, n) => {
               const o = opOf(x);
               return o ? (
-                <OpCard
-                  key={x.uid}
-                  n={n + 1}
-                  x={x}
-                  o={o}
-                  open={expanded === x.uid}
-                  onToggle={() => setExpanded((e) => (e === x.uid ? null : x.uid))}
-                  onChange={(p) => onChange(updateOperative(roster, x.uid, p))}
-                  onRemove={() => onChange(removeOperative(roster, x.uid))}
-                />
+                <div key={x.uid} id={`u-${x.uid}`}>
+                  <OpCard
+                    n={n + 1}
+                    x={x}
+                    o={o}
+                    open={expanded === x.uid}
+                    onToggle={() => setExpanded((e) => (e === x.uid ? null : x.uid))}
+                    onChange={(p) => onChange(updateOperative(roster, x.uid, p))}
+                    onRemove={() => onChange(removeOperative(roster, x.uid))}
+                    readOnly={view}
+                  />
+                </div>
               ) : (
                 <div key={x.uid} className="flex items-center justify-between rounded-2xl border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-danger">
                   Нет в данных: {x.opTypeId}
@@ -150,9 +173,7 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
                 </div>
               );
             })}
-            <Button variant="primary" className="h-12 w-full" onClick={() => setAdding(true)}>
-              <Icon name="plus" /> Добавить оперативника
-            </Button>
+
           </section>
         )}
 
@@ -207,7 +228,7 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
               const on = roster.equipment.includes(e.id);
               return (
                 <div key={e.id} className={cx('overflow-hidden rounded-2xl border', on ? 'border-accent/50 bg-accent/[0.06]' : 'border-white/10 bg-app-elevated')}>
-                  <button type="button" onClick={() => (haptic.select(), onChange(toggleEquipment(roster, e.id)))} className="flex w-full items-center gap-3 px-3.5 py-3 text-left">
+                  <button type="button" disabled={view} onClick={() => (haptic.select(), onChange(toggleEquipment(roster, e.id)))} className="flex w-full items-center gap-3 px-3.5 py-3 text-left disabled:cursor-default disabled:opacity-70">
                     <span className={cx('flex size-5 shrink-0 items-center justify-center rounded-md border', on ? 'border-accent bg-accent text-black' : 'border-white/30')}>{on && <Icon name="check" className="size-3.5" />}</span>
                     <span className="min-w-0 flex-1 text-[14px] font-semibold">{e.name}</span>
                     {on && <Tag tone="accent">Взято</Tag>}
@@ -223,6 +244,23 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
         )}
       </div>
 
+      <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
+        <div className="mx-auto flex max-w-lg gap-2 lg:max-w-3xl lg:px-4">
+          {view ? (
+            <Button variant="outline" className="h-12 flex-1 text-base" onClick={() => setView(false)}>
+              <Icon name="edit" /> <span className="whitespace-nowrap">Редактировать</span>
+            </Button>
+          ) : (
+            <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => (setTab('ops'), setAdding(true))}>
+              <Icon name="plus" /> <span className="whitespace-nowrap">Добавить оперативника</span>
+            </Button>
+          )}
+          <Button variant="ghost" className="h-12 px-4" onClick={() => setExporting(true)}>
+            <Icon name="share" /> <span className="max-[359px]:sr-only">Экспорт</span>
+          </Button>
+        </div>
+      </div>
+
       <AddSheet open={adding} team={team} roster={roster} onClose={() => setAdding(false)} onAdd={(o) => (haptic.tap(), onChange(addOperative(roster, o)), setAdding(false))} />
       <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} team={team} />
       <Sheet open={menu} onClose={() => setMenu(false)} title="Команда">
@@ -232,6 +270,12 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
           </Button>
           <Button className="w-full justify-start" onClick={() => (setMenu(false), onTestArmy())}>
             <Icon name="map" /> Test Army: расставить оперативников
+          </Button>
+          <Button
+            className="w-full justify-start"
+            onClick={() => (setMenu(false), onDuplicate({ ...roster, id: uid(), name: `${roster.name} (копия)`, createdAt: Date.now(), updatedAt: Date.now() }))}
+          >
+            <Icon name="copy" /> Дублировать команду
           </Button>
           <Button className="w-full justify-start" onClick={() => openExternal('https://wahapedia.ru/kill-team3/')}>
             <Icon name="book" /> Правила Kill Team на Wahapedia
@@ -267,6 +311,7 @@ function OpCard({
   onToggle,
   onChange,
   onRemove,
+  readOnly,
 }: {
   n: number;
   x: KtRosterOp;
@@ -275,6 +320,7 @@ function OpCard({
   onToggle: () => void;
   onChange: (p: Partial<KtRosterOp>) => void;
   onRemove: () => void;
+  readOnly: boolean;
 }) {
   const chosen = o.weapons.filter((w) => x.weapons.includes(w.id));
   const toggle = (w: KtWeapon) => (haptic.select(), onChange({ weapons: x.weapons.includes(w.id) ? x.weapons.filter((id) => id !== w.id) : [...x.weapons, w.id] }));
@@ -298,8 +344,8 @@ function OpCard({
       summary={!open && <WeaponTable list={chosen} empty="Оружие не выбрано — раскройте карточку" />}
     >
       <div>
-        <SectionTitle>Оружие · отметьте выбранное</SectionTitle>
-        <WeaponTable list={o.weapons} chosen={x.weapons} onToggle={toggle} />
+        <SectionTitle>{readOnly ? 'Оружие' : 'Оружие · отметьте выбранное'}</SectionTitle>
+        <WeaponTable list={o.weapons} chosen={x.weapons} onToggle={readOnly ? undefined : toggle} />
       </div>
       {own.length > 0 && (
         <div>
@@ -330,17 +376,21 @@ function OpCard({
           <Tag key={k}>{k}</Tag>
         ))}
       </div>
-      <input
-        value={x.name}
-        onChange={(e) => onChange({ name: e.target.value.slice(0, 40) })}
-        placeholder="Своё имя оперативника"
-        className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none placeholder:text-fg-3 focus:border-accent"
-      />
+      {!readOnly && (
+        <input
+          value={x.name}
+          onChange={(e) => onChange({ name: e.target.value.slice(0, 40) })}
+          placeholder="Своё имя оперативника"
+          className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none placeholder:text-fg-3 focus:border-accent"
+        />
+      )}
       <div className="flex items-center justify-between gap-2">
         <span className="text-[12px] text-fg-3">Подставка: {o.baseMm ? `${o.baseMm} мм` : 'нет данных'}</span>
-        <Button variant="danger" className="text-xs" onClick={onRemove}>
-          <Icon name="trash" /> Убрать
-        </Button>
+        {!readOnly && (
+          <Button variant="danger" className="text-xs" onClick={onRemove}>
+            <Icon name="trash" /> Убрать
+          </Button>
+        )}
       </div>
     </DataCard>
   );

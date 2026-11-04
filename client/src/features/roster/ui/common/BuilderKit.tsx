@@ -139,7 +139,7 @@ export function NameInput({ value, onChange, label = 'Название рост�
   );
 }
 
-export type BuilderIssue = { level: 'error' | 'warning'; message: string };
+export type BuilderIssue = { level: 'error' | 'warning'; message: string; uids?: string[] };
 
 /**
  * Липкая шапка редактора: назад, название, действия; крупный счёт (очки или численность) с лимитом, показатели,
@@ -155,6 +155,8 @@ export function EditorHeader({
   bigUnit,
   stats,
   issues,
+  readOnly = false,
+  onOpenIssue,
 }: {
   name: string;
   onName: (v: string) => void;
@@ -165,6 +167,8 @@ export function EditorHeader({
   bigUnit?: string;
   stats?: ReactNode;
   issues: BuilderIssue[];
+  readOnly?: boolean;
+  onOpenIssue?: (issue: BuilderIssue) => void;
 }) {
   const [open, setOpen] = useState(false);
   const errors = issues.filter((i) => i.level === 'error').length;
@@ -175,7 +179,7 @@ export function EditorHeader({
     <div className="sticky top-0 z-30 border-b border-white/[0.06] bg-app/95 px-4 pb-3 pt-3 backdrop-blur">
       <div className="flex items-center gap-2">
         <IconButton icon="back" label="К списку" onClick={onBack} />
-        <NameInput value={name} onChange={onName} />
+        {readOnly ? <p className="font-display min-w-0 flex-1 truncate px-1.5 py-1 text-lg font-semibold uppercase">{name}</p> : <NameInput value={name} onChange={onName} />}
         {actions}
       </div>
       <div className="mt-3 flex items-end justify-between gap-3">
@@ -188,6 +192,7 @@ export function EditorHeader({
           {stats}
           <button
             type="button"
+            aria-label="Проверка состава"
             onClick={() => (haptic.tap(), setOpen(true))}
             className={cx(
               'flex min-w-12 flex-col items-center justify-center rounded-lg px-2 py-1 transition active:scale-95',
@@ -212,9 +217,20 @@ export function EditorHeader({
         ) : (
           <ul className="space-y-2 pb-2">
             {issues.map((i, k) => (
-              <li key={k} className={cx('flex gap-2 rounded-xl border px-3 py-2 text-[13px] leading-snug', i.level === 'error' ? 'border-danger/30 bg-danger/10 text-danger' : 'border-warn/30 bg-warn/10 text-amber-100')}>
-                <Icon name="alert" className="mt-0.5 size-4 shrink-0" />
-                {i.message}
+              <li key={k}>
+                <button
+                  type="button"
+                  disabled={!onOpenIssue || !i.uids?.length}
+                  onClick={() => (setOpen(false), onOpenIssue?.(i))}
+                  className={cx(
+                    'flex w-full gap-2 rounded-xl border px-3 py-2 text-left text-[13px] leading-snug disabled:cursor-default',
+                    i.level === 'error' ? 'border-danger/30 bg-danger/10 text-danger' : 'border-warn/30 bg-warn/10 text-amber-100',
+                  )}
+                >
+                  <Icon name="alert" className="mt-0.5 size-4 shrink-0" />
+                  <span className="min-w-0 flex-1">{i.message}</span>
+                  {!!i.uids?.length && <Icon name="chevron" className="mt-0.5 size-4 shrink-0 opacity-50" />}
+                </button>
               </li>
             ))}
           </ul>

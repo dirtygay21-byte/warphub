@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { addOperative, checkKtRoster, compositionTotal, decodeKtRoster, encodeKtRoster, newKtRoster, sanitizeKtRoster, toggleEquipment } from '../../../client/src/features/roster/kt/roster';
+import { addOperative, checkKtRoster, compositionTotal, decodeKtRoster, encodeKtRoster, newKtRoster, sanitizeKtRoster, toggleEquipment, updateOperative } from '../../../client/src/features/roster/kt/roster';
 import type { KtTeam } from '../../../client/src/features/roster/kt/types';
 
 const team = (id: string): KtTeam => JSON.parse(readFileSync(join(import.meta.dirname, '../../../backend/roster-data/kt/t', id + '.json'), 'utf8'));
@@ -33,6 +33,23 @@ test('пустая команда — не «OK»: замечание «нет �
   const t = team('IMP-AOD');
   const issues = checkKtRoster(newKtRoster(t, 'x'), t);
   assert.ok(issues.some((i) => i.level === 'warning' && /нет оперативников/.test(i.message)));
+});
+
+test('ошибки состава ведут к конкретным оперативникам по uid', () => {
+  const t = team('CHAOS-LEG');
+  const leader = t.operatives.find((o) => o.keywords.includes('LEADER'))!;
+  const warrior = t.operatives.find((o) => !o.keywords.includes('LEADER'))!;
+  let r = addOperative(newKtRoster(t, 'x'), leader);
+  r = addOperative(r, warrior);
+  r = addOperative(r, leader);
+  const severalLeaders = checkKtRoster(r, t).find((i) => /Лидеров 2/.test(i.message));
+  assert.deepEqual(severalLeaders?.uids, [r.operatives[0]!.uid, r.operatives[2]!.uid]);
+  r = updateOperative(r, r.operatives[1]!.uid, { weapons: [] });
+  const noWeapon = checkKtRoster(r, t).find((i) => /не выбрано оружие/.test(i.message) && i.uids?.includes(r.operatives[1]!.uid));
+  assert.deepEqual(noWeapon?.uids, [r.operatives[1]!.uid]);
+  const missing = { ...r, operatives: [...r.operatives, { uid: 'missing-uid', opTypeId: 'missing-op', name: '', weapons: [] }] };
+  const unknown = checkKtRoster(missing, t).find((i) => /missing-op/.test(i.message));
+  assert.deepEqual(unknown?.uids, ['missing-uid']);
 });
 
 test('код KT1.: туда и обратно, чужая команда — ошибка, мусор отбрасывается', () => {

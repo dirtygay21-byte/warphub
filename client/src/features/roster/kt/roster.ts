@@ -54,25 +54,25 @@ export function compositionTotal(text: string): number | null {
   return top.length ? top.reduce((a, b) => a + b, 0) : null;
 }
 
-export type KtIssue = { level: 'error' | 'warning'; message: string };
+export type KtIssue = { level: 'error' | 'warning'; message: string; uids?: string[] };
 export function checkKtRoster(r: KtRoster, team: KtTeam): KtIssue[] {
   const out: KtIssue[] = [];
   const byId = new Map(team.operatives.map((o) => [o.id, o]));
   const ops = r.operatives.map((x) => ({ x, o: byId.get(x.opTypeId) }));
-  for (const { x, o } of ops) if (!o) out.push({ level: 'error', message: `Оперативника ${x.opTypeId} нет в данных команды — удалите его` });
+  for (const { x, o } of ops) if (!o) out.push({ level: 'error', message: `Оперативника ${x.opTypeId} нет в данных команды — удалите его`, uids: [x.uid] });
   const known = ops.filter((p) => p.o);
   // пустая команда — не «OK» (UI-аудит B1)
   if (!r.operatives.length) out.push({ level: 'warning', message: 'В команде нет оперативников — добавьте лидера и остальных' });
   if (team.operatives.some((o) => o.keywords.includes('LEADER'))) {
     const leaders = known.filter((p) => p.o!.keywords.includes('LEADER')).length;
     if (leaders === 0 && known.length) out.push({ level: 'error', message: 'Нет лидера (оперативник с ключевым словом LEADER)' });
-    if (leaders > 1) out.push({ level: 'error', message: `Лидеров ${leaders} — нужен один` });
+    if (leaders > 1) out.push({ level: 'error', message: `Лидеров ${leaders} — нужен один`, uids: known.filter((p) => p.o!.keywords.includes('LEADER')).map((p) => p.x.uid) });
   }
   const total = compositionTotal(team.composition);
   if (total != null && known.length !== total) out.push({ level: 'warning', message: `По составу команды — ${total} оперативников, выбрано ${known.length}` });
   for (const { x, o } of known) {
     const ws = x.weapons.filter((id) => o!.weapons.some((w) => w.id === id));
-    if (!ws.length && o!.weapons.length) out.push({ level: 'warning', message: `${x.name || o!.name}: не выбрано оружие` });
+    if (!ws.length && o!.weapons.length) out.push({ level: 'warning', message: `${x.name || o!.name}: не выбрано оружие`, uids: [x.uid] });
   }
   for (const id of r.equipment) if (!team.equipment.some((e) => e.id === id)) out.push({ level: 'error', message: `Снаряжения ${id} нет в данных команды — снимите его` });
   return out;
