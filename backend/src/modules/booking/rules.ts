@@ -117,9 +117,12 @@ export function getClubSessionBounds(dateParts: DateParts): {
   closeAt: Date;
 } {
   const nextDay = addCalendarDays(dateParts, 1);
+  const openHour =
+    bookingConfig.openHourByWeekday[isoWeekday(dateParts)] ??
+    bookingConfig.openHour;
 
   return {
-    openAt: localDateTimeToUtc(dateParts, bookingConfig.openHour, 0),
+    openAt: localDateTimeToUtc(dateParts, openHour, 0),
     bookingUntil: localDateTimeToUtc(
       nextDay,
       bookingConfig.bookingUntilHourNextDay,

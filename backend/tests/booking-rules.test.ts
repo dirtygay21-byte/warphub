@@ -4,6 +4,7 @@ import {
   checkTableSession,
   dndAvailableSeats,
   getAllowedWeekdays,
+  getClubSessionBounds,
   groupSessions,
   isDateAllowed,
   isOnSlotGrid,
@@ -51,6 +52,28 @@ describe('club time (UTC+5)', () => {
     expect(isOnSlotGrid(late, new Date(late.getTime() + hours(2)), 120)).toBe(
       true,
     );
+  });
+
+  // 2026-11-06 — пятница (ISO 5): запись только с 20:00
+  test('Friday: slots start at 20:00, earlier starts are off the grid', () => {
+    const fri = (h: number, m = 0) => at('2026-11-06', h, m);
+    const ok = (start: Date, minutes: number) =>
+      isOnSlotGrid(start, new Date(start.getTime() + minutes * 60_000), minutes);
+    expect(ok(fri(12), 60)).toBe(false);
+    expect(ok(fri(18), 60)).toBe(false);
+    expect(ok(fri(19, 30), 60)).toBe(false);
+    expect(ok(fri(20), 60)).toBe(true);
+    expect(ok(fri(20, 30), 60)).toBe(true);
+    expect(ok(fri(20), 120)).toBe(true);
+  });
+
+  test('Friday: session window opens at 20:00, other days still open at 12:00', () => {
+    const friday = getClubSessionBounds(parseDateParam('2026-11-06'));
+    expect(friday.openAt.getTime()).toBe(at('2026-11-06', 20).getTime());
+    const saturday = getClubSessionBounds(parseDateParam('2026-11-07'));
+    expect(saturday.openAt.getTime()).toBe(at('2026-11-07', 12).getTime());
+    const thursday = getClubSessionBounds(parseDateParam('2026-11-05'));
+    expect(thursday.openAt.getTime()).toBe(at('2026-11-05', 12).getTime());
   });
 });
 
