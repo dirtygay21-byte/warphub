@@ -126,14 +126,14 @@ function ServiceItemComponent({
   const boostyKind = boostyKindForService(service);
 
   return (
-    <li className="relative">
+    <li className="flex items-center rounded-[18px] border border-white/10 bg-app-elevated">
       <button
         type="button"
         onClick={() => {
           haptic.tap();
           onClick();
         }}
-        className={`ds-press flex w-full items-center gap-3.5 rounded-[18px] border border-white/10 bg-app-elevated p-2.5 text-left ${boostyKind ? "pr-14" : "pr-4"}`}
+        className="ds-press flex min-w-0 flex-1 items-center gap-3.5 rounded-[18px] p-2.5 pr-4 text-left"
       >
         <img src={imgUrl} alt="" className="h-16 w-24 shrink-0 rounded-xl object-cover" />
         <span className="min-w-0 flex-1">
@@ -147,7 +147,7 @@ function ServiceItemComponent({
         <BoostySubscriptionInfo
           kind={boostyKind}
           context="selection"
-          className="absolute right-1.5 top-1/2 -translate-y-1/2"
+          className="mr-1.5 shrink-0"
         />
       )}
     </li>

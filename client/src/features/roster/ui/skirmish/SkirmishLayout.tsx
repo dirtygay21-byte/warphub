@@ -10,7 +10,7 @@ export function SkirmishRuleText({ text }: { text: string }) {
   return (
     <div className="space-y-1.5">
       {parts.map((part, i) => LABELS.includes(part as (typeof LABELS)[number]) ? (
-        <p key={i} className="pt-1 text-[11px] font-bold uppercase tracking-[0.08em] text-accent/90">{part}</p>
+        <p key={i} className="pt-1 text-xs font-bold uppercase tracking-[0.08em] text-accent/90">{part}</p>
       ) : (
         <p key={i} className="text-[12.5px] leading-relaxed text-fg-2">{part}</p>
       ))}

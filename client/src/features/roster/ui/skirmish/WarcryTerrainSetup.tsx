@@ -16,7 +16,7 @@ function FeatureShape({ feature, selected = false }: { feature: WarcryTerrainFea
   const style = TYPES[feature.type];
   return (
     <g transform={`rotate(${feature.angle} ${feature.x} ${feature.y})`}>
-      <rect x={feature.x - feature.w / 2} y={feature.y - feature.h / 2} width={feature.w} height={feature.h} rx={0.2} fill={style.fill} stroke={selected ? '#eaff44' : 'rgba(255,255,255,0.55)'} strokeWidth={selected ? 0.22 : 0.1} />
+      <rect x={feature.x - feature.w / 2} y={feature.y - feature.h / 2} width={feature.w} height={feature.h} rx={0.2} fill={style.fill} stroke={selected ? '#ECFE46' : 'rgba(255,255,255,0.55)'} strokeWidth={selected ? 0.22 : 0.1} />
       <text x={feature.x} y={feature.y + 0.3} textAnchor="middle" fontSize={0.8} fontWeight={700} fill="#f4f4f0" pointerEvents="none">{style.short}</text>
     </g>
   );
@@ -154,7 +154,7 @@ export function WarcryTerrainSetup({ setup, onChange, onContinue }: { setup: War
       ) : (
         <>
           <AlternativeEditor key={setup.seed ?? 'manual'} features={setup.features} onChange={(features) => onChange({ ...setup, features })} onRandomize={() => void randomize()} />
-          {setup.seed && <p className="text-center text-[11px] text-fg-3">Seed: {setup.seed}</p>}
+          {setup.seed && <p className="text-center text-xs text-fg-3">Seed: {setup.seed}</p>}
           {issues.length > 0 ? (
             <ul className="space-y-1 rounded-xl border border-danger/30 bg-danger/5 p-3 text-[12px] text-danger">
               {issues.map((issue) => <li key={issue}>{issue}</li>)}
