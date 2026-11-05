@@ -60,10 +60,10 @@ const TOUCH_PX = 14;
 const TAP_SLOP = 8;
 const MIN_SCALE = 1;
 const MAX_SCALE = 6;
-const BoardDimensions = createContext({ width: 60, height: 44 });
+const BoardDimensions = createContext<{ width: number; height: number; orientation: 'portrait' | 'landscape' }>({ width: 60, height: 44, orientation: 'portrait' });
 const useDisp = () => {
-  const { height } = useContext(BoardDimensions);
-  return useCallback(([x, y]: Pt): Pt => [height - y, x], [height]);
+  const { height, orientation } = useContext(BoardDimensions);
+  return useCallback(([x, y]: Pt): Pt => (orientation === 'landscape' ? [x, y] : [height - y, x]), [height, orientation]);
 };
 
 /**
@@ -86,6 +86,10 @@ export type BoardField = {
   /** Размер поля в дюймах; по умолчанию 60×44 (40K/AoS), у Kill Team/Warcry — 30×22. */
   width?: number;
   height?: number;
+  /** По умолчанию 3″ (40K/AoS); у Kill Team — 1″. */
+  objectiveRange?: number;
+  /** Официальные skirmish-карты показываются в landscape без поворота подписей. */
+  orientation?: 'portrait' | 'landscape';
 };
 
 type Tool = 'move' | 'ruler' | 'units';
@@ -120,8 +124,9 @@ export function Board(props: {
 }) {
   const width = props.field.width ?? 60;
   const height = props.field.height ?? 44;
+  const orientation = props.field.orientation ?? 'portrait';
   return (
-    <BoardDimensions.Provider value={{ width, height }}>
+    <BoardDimensions.Provider value={{ width, height, orientation }}>
       <BoardInner {...props} />
     </BoardDimensions.Provider>
   );
@@ -139,12 +144,12 @@ function BoardInner({
   onArmy: (key: ArmyKey, units: TAUnit[]) => void;
   onBack: () => void;
 }) {
-  const { width, height } = useContext(BoardDimensions);
+  const { width, height, orientation } = useContext(BoardDimensions);
   const disp = useDisp();
-  const undisp = ([dx, dy]: Pt): Pt => [dy, height - dx];
+  const undisp = ([dx, dy]: Pt): Pt => (orientation === 'landscape' ? [dx, dy] : [dy, height - dx]);
   const clamp = (p: Pt) => clampToBoard(p, width, height);
   const mapAspect = (height + 3) / (width + 3);
-  const viewBox = `-1.5 -1.5 ${height + 3} ${width + 3}`;
+  const viewBox = orientation === 'landscape' ? `-1.5 -1.5 ${width + 3} ${height + 3}` : `-1.5 -1.5 ${height + 3} ${width + 3}`;
   const me = armies.find((a) => a.key === 'me')!;
   const foe = armies.find((a) => a.key === 'foe') ?? null;
   const side = me.side;
@@ -289,7 +294,7 @@ function BoardInner({
   const enemyArmy = armies.find((a) => a.key !== selArmy.key);
   const info = selBases.length
     ? {
-        objective: nearestObjective(selBases, field.objectives),
+        objective: nearestObjective(selBases, field.objectives, field.objectiveRange ?? OBJECTIVE_RANGE),
         own: ownZone ? unitToZones(selBases, ownZone) : null,
         enemy: enemyZone ? unitToZones(selBases, enemyZone) : null,
         foe: enemyArmy ? nearestEnemy(selBases, allBases.filter((x) => enemyArmy.units.some((u) => u.uid === x.uid))) : null,
@@ -518,7 +523,7 @@ function BoardInner({
             {ranges &&
               field.objectives.map((o, i) => {
                 const [x, y] = disp([o.x, o.y]);
-                return <circle key={i} cx={x} cy={y} r={objectiveRadius + OBJECTIVE_RANGE} fill="#eaff44" fillOpacity={0.06} stroke="#eaff44" strokeOpacity={0.7} strokeWidth={0.1} strokeDasharray="0.5 0.35" pointerEvents="none" />;
+                return <circle key={i} cx={x} cy={y} r={objectiveRadius + (field.objectiveRange ?? OBJECTIVE_RANGE)} fill="#eaff44" fillOpacity={0.06} stroke="#eaff44" strokeOpacity={0.7} strokeWidth={0.1} strokeDasharray="0.5 0.35" pointerEvents="none" />;
               })}
             {units.map((u) => (
               <UnitShapes
@@ -552,7 +557,7 @@ function BoardInner({
         {TOOLS.map((t) => (
           <RailButton key={t.id} icon={t.icon} label={t.label} active={tool === t.id} onClick={() => chooseTool(t.id)} />
         ))}
-        <RailButton icon="◎" label="Цели 3″" active={ranges} onClick={() => setRanges((v) => !v)} />
+        <RailButton icon="◎" label={field.objectives.length ? `Цели ${field.objectiveRange ?? OBJECTIVE_RANGE}″` : 'Зоны 3″'} active={ranges} onClick={() => setRanges((v) => !v)} />
         {tool === 'ruler' && ruler.a && <RailButton icon="✕" label="Сброс" onClick={() => setRuler({ a: null, b: null })} />}
         <span className="flex-1" />
         <RailButton icon="+" label="Крупнее" onClick={() => zoomBy(1.4)} />

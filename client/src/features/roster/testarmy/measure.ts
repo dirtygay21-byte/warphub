@@ -46,7 +46,7 @@ export function snapEnd(p: Pt, bases: readonly { modelId: string; base: Placed }
 }
 
 /** До ближайшей цели от отряда: расстояние (край базы — край маркера), какие точки, в пределах ли дальности. */
-export function nearestObjective(bases: readonly Placed[], objectives: readonly { x: number; y: number; role: string | null }[]) {
+export function nearestObjective(bases: readonly Placed[], objectives: readonly { x: number; y: number; role: string | null }[], range = OBJECTIVE_RANGE) {
   let best: { d: number; from: Pt; to: Pt; index: number } | null = null;
   objectives.forEach((o, index) => {
     const ob = objectiveBase(o);
@@ -59,7 +59,7 @@ export function nearestObjective(bases: readonly Placed[], objectives: readonly 
     }
   });
   const r = best as { d: number; from: Pt; to: Pt; index: number } | null;
-  return r ? { ...r, inRange: r.d <= OBJECTIVE_RANGE } : null;
+  return r ? { ...r, inRange: r.d <= range } : null;
 }
 
 /** До зоны деплоя от отряда: 0 — хотя бы одна база касается зоны или в ней; точки для линии. */
