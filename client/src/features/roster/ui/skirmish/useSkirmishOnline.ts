@@ -81,6 +81,7 @@ export function useSkirmishOnline<E extends { id: string; seq: number; type: str
       const result = await getOnlineEvents(online.id, last);
       if (!result.ok) { setSync((s) => ({ ...s, offline: result.status === 0 })); return; }
       setSync((s) => ({ ...s, offline: false }));
+      setOnline({ ...result.data.game, seat: online.seat });
       if (!result.data.events.length) return;
       const merged = appendRemote(eventsRef.current as unknown as GameEvent[], result.data.events) as unknown as E[] | null;
       if (!merged) { await resync(); return; }
@@ -91,5 +92,10 @@ export function useSkirmishOnline<E extends { id: string; seq: number; type: str
     return () => window.clearInterval(timer);
   }, [online, resync, setEvents]);
 
-  return { online, error, setError, sync, start, join, send, resync };
+  const leave = useCallback(() => {
+    onlineRef.current = null;
+    setOnline(null);
+  }, []);
+
+  return { online, error, setError, sync, start, join, send, resync, leave };
 }

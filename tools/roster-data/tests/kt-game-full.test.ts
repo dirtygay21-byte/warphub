@@ -72,6 +72,34 @@ test('Kill Grade и Rout: thresholds, Kill VP, лимит Rout 2VP за turning 
   assert.equal(s.players.p1.tacVp, 4);
 });
 
+test('новый ручной Tac Op не зависит от секрета, не дублирует Rout и имеет лимит 2VP за turning point', () => {
+  let own = start();
+  let publicState = structuredClone(own);
+  publicState.players.p1.tacOp = data.tacOps[0]!.id;
+  const actions: KtEventBody[] = [
+    { type: 'incapacitated', seat: 'p1', wounds: 12, within6: true, manualTacOp: true },
+    { type: 'tac-score', seat: 'p1', points: 2 },
+    { type: 'incapacitated', seat: 'p1', wounds: 8, within6: true, manualTacOp: true },
+  ];
+  for (const action of actions) {
+    own = dispatch(own, action);
+    publicState = dispatch(publicState, action);
+  }
+  assert.equal(own.players.p1.tacVp, 2);
+  assert.equal(publicState.players.p1.tacVp, own.players.p1.tacVp);
+  assert.equal(publicState.players.p1.killVp, own.players.p1.killVp);
+  assert.equal(applyKtEvent(own, ev({ type: 'tac-score', seat: 'p1', points: 1 }), data).ok, false);
+  assert.equal(applyKtEvent(publicState, ev({ type: 'tac-score', seat: 'p1', points: 1 }), data).ok, false);
+  own = end(own);
+  publicState = end(publicState);
+  own = dispatch(own, { type: 'incapacitated', seat: 'p1', wounds: 8, within6: true, manualTacOp: true });
+  publicState = dispatch(publicState, { type: 'incapacitated', seat: 'p1', wounds: 8, within6: true, manualTacOp: true });
+  own = dispatch(own, { type: 'tac-score', seat: 'p1', points: 1 });
+  publicState = dispatch(publicState, { type: 'tac-score', seat: 'p1', points: 1 });
+  assert.equal(own.players.p1.tacVp, 3);
+  assert.equal(publicState.players.p1.tacVp, 3);
+});
+
 test('Data: Compile запрещает повтор маркера за turning point, Send Data даёт VP за снятые points', () => {
   let s = start('data');
   s = end(s);

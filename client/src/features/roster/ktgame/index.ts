@@ -57,9 +57,12 @@ export type KtEventBody =
   | { type: 'setup'; missionId: string; killzone: string; map: number; dropZoneLoser: Seat; rosters: Record<Seat, { id: string; operatives: number; tacOp: string }> }
   | { type: 'initiative'; round: number; attempt: number; cards?: Partial<Record<Seat, { reroll?: boolean; modifier?: number }>> }
   | { type: 'crit-action'; seat: Seat; action: string; marker?: string; target?: string }
-  | { type: 'incapacitated'; seat: Seat; wounds: number; within6: boolean; marker?: string }
+  | { type: 'incapacitated'; seat: Seat; wounds: number; within6: boolean; marker?: string; manualTacOp?: boolean }
   | { type: 'tac-score'; seat: Seat; points: 1 | 2 }
   | { type: 'primary-op'; seat: Seat; op: Op }
+  | { type: 'player-set'; seat: Seat; rosterId: string; operatives: number }
+  | { type: 'tac-set'; seat: Seat; tacOp: string }
+  | { type: 'secret-revealed'; seat: Seat; tacOp: string; op: Op }
   | { type: 'phase-advanced' }
   | { type: 'cp-adjust'; seat: Seat; delta: number }
   | { type: 'end-round'; controls: Record<string, Seat | null>; carrying?: Record<string, Seat>; claims?: Partial<Record<Seat, { marker: string; control: boolean; uncontested: boolean }>> }
@@ -152,9 +155,31 @@ export function applyKtEvent(current: KtState | null, ev: KtEvent, data: KtGameD
       s.phase = 'firefight';
       return { ok: true, state: s };
     }
+    case 'player-set': {
+      if (s.stage !== 'battle' || s.round !== 1 || s.initiativeRolls) return fail(s, 'Ростер меняется только до первой инициативы');
+      const p = s.players[ev.seat];
+      if (!ev.rosterId || ev.operatives < 1) return fail(s, 'Ростер не выбран');
+      p.rosterId = ev.rosterId;
+      p.startingOperatives = ev.operatives;
+      return { ok: true, state: s };
+    }
+    case 'tac-set': {
+      if (s.stage !== 'battle' || s.round !== 1 || s.initiativeRolls) return fail(s, 'Tac Op меняется только до первой инициативы');
+      if (!data.tacOps.some((t) => t.id === ev.tacOp)) return fail(s, 'Неизвестный Tac Op');
+      s.players[ev.seat].tacOp = ev.tacOp;
+      return { ok: true, state: s };
+    }
     case 'primary-op': {
       if (s.stage !== 'battle' || s.round !== 1 || !s.initiativeRolls || s.phase !== 'strategy') return fail(s, 'Primary op выбирается в Strategy phase первого turning point');
       s.players[ev.seat].primaryOp = ev.op;
+      return { ok: true, state: s };
+    }
+    case 'secret-revealed': {
+      if (s.stage !== 'battle' || s.round <= data.game.turningPoints) return fail(s, 'Секреты раскрываются после четвёртого turning point');
+      if (!data.tacOps.some((t) => t.id === ev.tacOp)) return fail(s, 'Неизвестный Tac Op');
+      const p = s.players[ev.seat];
+      p.tacOp = ev.tacOp;
+      p.primaryOp = ev.op;
       return { ok: true, state: s };
     }
     case 'cp-adjust': {
@@ -212,7 +237,9 @@ export function applyKtEvent(current: KtState | null, ev: KtEvent, data: KtGameD
       p.incapacitated++;
       const nextGrade = grade(data, s.players[other(ev.seat)].startingOperatives, p.incapacitated);
       if (nextGrade > p.killGrade) { add(p, 'kill', nextGrade - p.killGrade); p.killGrade = nextGrade; }
-      if (p.tacOp === 'rout' && ev.within6 && s.routVp[ev.seat] < 2) {
+      // Старые журналы сохраняют автоматический Rout. В новых событиях Tac Op начисляется отдельным
+      // публичным tac-score, чтобы скрытый выбор не менял replay на телефоне соперника.
+      if (!ev.manualTacOp && p.tacOp === 'rout' && ev.within6 && s.routVp[ev.seat] < 2) {
         const vp = ev.wounds >= 12 ? 2 : 1;
         const actual = Math.min(vp, 2 - s.routVp[ev.seat]);
         s.routVp[ev.seat] += actual; add(p, 'tac', actual);
