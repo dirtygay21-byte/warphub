@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test';
+import { readdirSync, readFileSync } from 'node:fs';
 
 process.env.POSTGRES_URI ??= 'postgres://postgres:postgres@127.0.0.1:5432/wh_e2e';
 process.env.TELEGRAM_BOT_TOKEN ??= '123456:TEST_TOKEN_FOR_LOCAL_RUN';
@@ -48,5 +49,23 @@ describe('Open Graph metadata', () => {
   });
   test('blocks local metadata targets before any network request', async () => {
     await expect(fetchPartnerMetadata('http://127.0.0.1:4100')).rejects.toThrow('Local and private metadata URLs are not allowed');
+  });
+});
+
+describe('Drizzle migration journal', () => {
+  test('registers every SQL migration once with strictly increasing timestamps', () => {
+    const journal = JSON.parse(readFileSync(new URL('../drizzle/meta/_journal.json', import.meta.url), 'utf8')) as {
+      entries: Array<{ idx: number; when: number; tag: string }>;
+    };
+    const sqlTags = readdirSync(new URL('../drizzle', import.meta.url))
+      .filter((name) => /^\d{4}_.+\.sql$/.test(name))
+      .map((name) => name.slice(0, -4))
+      .sort();
+
+    expect(journal.entries.map((entry) => entry.tag)).toEqual(sqlTags);
+    journal.entries.forEach((entry, index) => {
+      expect(entry.idx).toBe(index);
+      if (index > 0) expect(entry.when).toBeGreaterThan(journal.entries[index - 1].when);
+    });
   });
 });
