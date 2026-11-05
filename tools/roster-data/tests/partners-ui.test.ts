@@ -5,10 +5,10 @@ import { join } from 'node:path';
 
 const root = join(import.meta.dirname, '../../..');
 
-test('Profile renders two independent swipe lanes with unlimited lazy cards and external links', () => {
+test('Profile renders two independent swipe lanes with compact unlimited lazy cards and external links', () => {
   const source = readFileSync(join(root, 'client/src/components/pages/Profile/PartnerSection.tsx'), 'utf8');
   assert.equal((source.match(/<PartnerLane /g) ?? []).length, 2);
-  for (const token of ['snap-x', 'snap-mandatory', 'overflow-x-auto', 'loading="lazy"', 'openLink', 'getPartners']) assert.ok(source.includes(token), token);
+  for (const token of ['snap-x', 'snap-mandatory', 'overflow-x-auto', 'loading="lazy"', 'openLink', 'getPartners', 'w-[39%]', 'min-w-[105px]', 'max-w-[135px]', 'sm:w-[120px]']) assert.ok(source.includes(token), token);
 });
 
 test('Admin → Content exposes settings, CRUD, reordering, hide/show and Open Graph review', () => {
