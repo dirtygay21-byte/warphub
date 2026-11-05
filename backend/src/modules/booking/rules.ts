@@ -174,6 +174,25 @@ export function isOnSlotGrid(
 }
 
 // ----------------------------------------------------------------------------
+// Категории столов
+// ----------------------------------------------------------------------------
+
+export const TABLE_CATEGORY_LABEL = {
+  wh: 'Full-scale Wargaming',
+  small: 'Tactical Games',
+} as const;
+
+/** Категория стола, нужная для игры (40k/aos → wh, kt/warcry → small); неизвестная игра → null */
+export function tableCategoryForGame(game: string | null | undefined): 'wh' | 'small' | null {
+  return bookingConfig.tableCategoryByGame[game ?? '40k'] ?? null;
+}
+
+/** Можно ли играть эту игру за столом данной категории */
+export function gameFitsTable(game: string | null | undefined, tableCategory: string): boolean {
+  return tableCategoryForGame(game) === tableCategory;
+}
+
+// ----------------------------------------------------------------------------
 // Дни недели
 // ----------------------------------------------------------------------------
 

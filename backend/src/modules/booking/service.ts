@@ -51,6 +51,8 @@ import {
   formatLocalIso,
   getAllowedWeekdays,
   getClubSessionBounds,
+  gameFitsTable,
+  TABLE_CATEGORY_LABEL,
   groupSessions,
   isDateAllowed,
   isOnSlotGrid,
@@ -86,6 +88,7 @@ type Executor = typeof db | Tx;
 type ClubTable = {
   id: number;
   name: string;
+  category: 'wh' | 'small';
 };
 
 export type TableAvailabilitySegment = {
@@ -99,6 +102,8 @@ export type TableAvailabilityEntry = {
     id: number;
     name: string;
     seatCapacity: number;
+    /** категория стола; у пула мест (клуб, покраска) не задаётся */
+    category?: 'wh' | 'small';
   };
   segments: TableAvailabilitySegment[];
 };
@@ -359,6 +364,7 @@ async function getActiveTables(executor: Executor = db): Promise<ClubTable[]> {
     .select({
       id: tablesTable.id,
       name: tablesTable.name,
+      category: tablesTable.category,
     })
     .from(tablesTable)
     .where(eq(tablesTable.isActive, true))
@@ -619,7 +625,7 @@ export async function getServiceAvailability(
   );
 
   base.slots = tables.map((table) => ({
-    table: { id: table.id, name: table.name, seatCapacity: mode.seatsPerTable },
+    table: { id: table.id, name: table.name, seatCapacity: mode.seatsPerTable, category: table.category },
     segments: getNewSessionSegments(
       table.id,
       window,
@@ -955,13 +961,16 @@ export async function createReservation(
     await lockKey(tx, LOCK_TABLE, tableId);
 
     const [table] = await tx
-      .select({ id: tablesTable.id })
+      .select({ id: tablesTable.id, category: tablesTable.category })
       .from(tablesTable)
       .where(and(eq(tablesTable.id, tableId), eq(tablesTable.isActive, true)))
       .limit(1);
 
     if (!table) {
       throw new BookingError('TABLE_NOT_FOUND', 'Table not found');
+    }
+    if (details?.kind === 'wh_player' && !gameFitsTable(details.game, table.category)) {
+      throw new BookingError('INVALID_DETAILS', `This table is for ${TABLE_CATEGORY_LABEL[table.category]}`);
     }
 
     const bookings = await getTableReservations(tx, [tableId], openAt, closeAt);
@@ -1978,7 +1987,7 @@ export async function moveReservationToTable(
     }
 
     const [table] = await tx
-      .select({ id: tablesTable.id })
+      .select({ id: tablesTable.id, category: tablesTable.category })
       .from(tablesTable)
       .where(
         and(eq(tablesTable.id, targetTableId), eq(tablesTable.isActive, true)),
@@ -1986,6 +1995,9 @@ export async function moveReservationToTable(
       .limit(1);
     if (!table) {
       throw new BookingError('TABLE_NOT_FOUND', 'Table not found');
+    }
+    if (reservation.details?.kind === 'wh_player' && !gameFitsTable(reservation.details.game, table.category)) {
+      throw new BookingError('INVALID_DETAILS', `This table is for ${TABLE_CATEGORY_LABEL[table.category]}`);
     }
 
     const bookings = (
