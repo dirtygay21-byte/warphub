@@ -39,10 +39,10 @@ function sql(query: string): string {
   return r.stdout.toString().trim();
 }
 
-// ближайшая пятница не раньше чем через 2 дня; время клуба UTC+5
+// ближайшая суббота не раньше чем через 2 дня; время клуба UTC+5 (пятница открыта с 20:00 — тесту нужны дневные часы)
 const day = (() => {
   const d = new Date(Date.now() + 2 * 86400_000);
-  while (new Date(d.getTime() + 5 * 3600_000).getUTCDay() !== 5) d.setTime(d.getTime() + 86400_000);
+  while (new Date(d.getTime() + 5 * 3600_000).getUTCDay() !== 6) d.setTime(d.getTime() + 86400_000);
   return new Date(d.getTime() + 5 * 3600_000).toISOString().slice(0, 10);
 })();
 const local = (hh: string) => new Date(`${day}T${hh}:00+05:00`).toISOString();
