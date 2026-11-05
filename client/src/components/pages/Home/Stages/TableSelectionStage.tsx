@@ -24,6 +24,7 @@ import { DsButton } from "@/components/ui/ds";
 import { pluralizeRu } from "@/utils/plural";
 import BoostySubscriptionInfo from "@/components/booking/BoostySubscriptionInfo";
 import { boostyKindForService } from "@/components/booking/boosty";
+import { TABLE_CATEGORY_LABEL } from "@/components/booking/tableCategory";
 
 const CLUB_VISIT_SLUG = "club_visit";
 
@@ -109,7 +110,10 @@ export default function TableSelectionStage() {
           .filter((segment) => segment.freeSeats > 0)
           .map((segment) => ({
             tableId: slot.table.id,
-            label: `Свободный слот ${tableIndex + 1}`,
+            category: slot.table.category,
+            label: slot.table.category
+              ? `Свободный слот ${tableIndex + 1} · ${TABLE_CATEGORY_LABEL[slot.table.category]}`
+              : `Свободный слот ${tableIndex + 1}`,
             segment,
             segments: slot.segments,
             capacity: slot.table.seatCapacity,
@@ -274,6 +278,7 @@ export default function TableSelectionStage() {
                       setSelectedSlot({
                         kind: "join",
                         tableId: session.tableId,
+                        category: session.tableCategory,
                         startsAt: session.startsAt,
                         endsAt: session.endsAt,
                         occupied: session.occupied,
@@ -317,6 +322,7 @@ export default function TableSelectionStage() {
                     setSelectedSlot({
                       kind: "new",
                       tableId: slot.tableId,
+                      category: slot.category,
                       label: slot.label,
                       window: {
                         startsAt: slot.segment.startsAt,

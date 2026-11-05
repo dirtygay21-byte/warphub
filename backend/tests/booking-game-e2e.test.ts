@@ -62,7 +62,7 @@ beforeAll(async () => {
     const disc = sql(`select id from disciplines where slug = 'wh' limit 1`) || sql(`insert into disciplines (slug, title) values ('wh', 'E2E WH') returning id`);
     serviceId = Number(sql(`insert into services (discipline_id, slug, title, duration, seats_per_table) values (${disc}, 'wh_game', 'E2E игра', 240, 2) returning id`));
   }
-  tableId = Number(sql(`insert into tables (name) values ('E2E стол игры') returning id`));
+  tableId = Number(sql(`insert into tables (name, category) values ('E2E стол игры', 'small') returning id`));
   for (const [name, id] of Object.entries({ host: 4301, wrong: 4302, right: 4303 })) {
     const r = await api('POST', '/auth/telegram', undefined, { initData: initData({ id, first_name: name, ...(name === 'host' ? { username: 'host_nick' } : {}) }) });
     if (r.status !== 200) console.error(`::error::login ${name} → ${r.status}: ${JSON.stringify(r.json).slice(0, 600)}`);
@@ -86,7 +86,8 @@ describe('игра в записи на Warhammer', () => {
     expect(host.json.details.points).toBeNull();
     const wrong = await book('wrong', { game: '40k', army: 'Orks', points: 1000, experienceLevel: 'player' });
     expect(wrong.status).toBe(400);
-    expect(String(wrong.json.error)).toContain('Kill Team');
+    // стол категории Tactical Games: 40K здесь не принимается (решение 05.11.2026)
+    expect(String(wrong.json.error)).toContain('Tactical Games');
     const right = await book('right', { game: 'kt', army: 'Kasrkin', experienceLevel: 'beginner' });
     if (right.status !== 200) console.error(`::error::join → ${right.status}: ${JSON.stringify(right.json).slice(0, 600)}`);
     expect(right.status).toBe(200);

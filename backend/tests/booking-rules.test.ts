@@ -4,8 +4,10 @@ import {
   checkTableSession,
   dndAvailableSeats,
   getAllowedWeekdays,
+  gameFitsTable,
   getClubSessionBounds,
   groupSessions,
+  tableCategoryForGame,
   isDateAllowed,
   isOnSlotGrid,
   isoWeekday,
@@ -392,5 +394,28 @@ describe('Kill Team: список команд по фракциям (Wahapedia)
     expect(armyLine('kt', 'Своя команда')).toBe('Команда: Своя команда');
     expect(armyLine('40k', 'Orks')).toBe('Армия: Orks');
     expect(armyLine('warcry', 'Skaven')).toBe('Варбанда: Skaven');
+  });
+});
+
+describe('категории столов (Full-scale Wargaming / Tactical Games)', () => {
+  test('40K и AoS — категория wh, Kill Team и Warcry — категория small', () => {
+    expect(tableCategoryForGame('40k')).toBe('wh');
+    expect(tableCategoryForGame('aos')).toBe('wh');
+    expect(tableCategoryForGame('kt')).toBe('small');
+    expect(tableCategoryForGame('warcry')).toBe('small');
+  });
+
+  test('неизвестная игра — без категории; пустая игра = 40K (старые записи)', () => {
+    expect(tableCategoryForGame('necromunda')).toBeNull();
+    expect(tableCategoryForGame(null)).toBe('wh');
+    expect(tableCategoryForGame(undefined)).toBe('wh');
+  });
+
+  test('игра подходит только столу своей категории', () => {
+    expect(gameFitsTable('40k', 'wh')).toBe(true);
+    expect(gameFitsTable('40k', 'small')).toBe(false);
+    expect(gameFitsTable('kt', 'wh')).toBe(false);
+    expect(gameFitsTable('warcry', 'small')).toBe(true);
+    expect(gameFitsTable('warcry', 'wh')).toBe(false);
   });
 });

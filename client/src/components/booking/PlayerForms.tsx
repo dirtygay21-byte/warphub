@@ -91,12 +91,15 @@ export function PlayerInfoForm({
   options,
   playerName,
   lockedGame,
+  games,
 }: {
   value: PlayerFormValue;
   onChange: (value: PlayerFormValue) => void;
   options: BookingOptions;
   playerName?: string;
   lockedGame?: string | null;
+  /** игры, доступные за выбранным столом (категория стола); по умолчанию — все */
+  games?: BookingOptions["games"];
 }) {
   const set = (patch: Partial<PlayerFormValue>) =>
     onChange({ ...value, ...patch });
@@ -130,7 +133,7 @@ export function PlayerInfoForm({
         ) : (
           <ChoiceChips
             columns={2}
-            options={options.games}
+            options={games ?? options.games}
             value={value.game}
             onChange={(game) =>
               // другая игра — другой список армий; очки у Kill Team не нужны

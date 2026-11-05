@@ -179,6 +179,8 @@ export type SessionPlayer = {
 export type TableSession = {
   tableId: number;
   tableName: string;
+  /** категория стола: wh — Full-scale Wargaming, small — Tactical Games */
+  tableCategory?: "wh" | "small";
   startsAt: string;
   endsAt: string;
   occupied: number;
@@ -204,7 +206,7 @@ export type ServiceAvailability = {
     minDuration: number;
   };
   slots: Array<{
-    table: { id: number; name: string; seatCapacity: number };
+    table: { id: number; name: string; seatCapacity: number; category?: "wh" | "small" };
     segments: AvailabilitySegment[];
   }>;
   sessions: TableSession[];
