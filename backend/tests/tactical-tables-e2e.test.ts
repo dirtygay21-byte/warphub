@@ -3,7 +3,7 @@
  *  - столы wh (Full-scale Wargaming): 40K и AoS; столы small (Tactical Games): Kill Team и Warcry — только свои игры;
  *  - занятый стол small блокирует покраску на это время; запись на стол small не принимается поверх покраски;
  *  - бронь администратора на стол small тоже не ставится поверх покраски.
- * Свой день (суббота через 2 недели), чтобы не пересекаться с другими тестами.
+ * Свой день (воскресенье через 30 дней), чтобы не пересекаться с другими тестами.
  */
 import { beforeAll, describe as baseDescribe, expect, test } from 'bun:test';
 import { createHmac } from 'node:crypto';
@@ -41,10 +41,10 @@ function sql(query: string): string {
   return r.stdout.toString().trim();
 }
 
-// суббота через 14 дней (время клуба UTC+5)
+// воскресенье через 30 дней (время клуба UTC+5); у других тестов свои дни
 const day = (() => {
-  const d = new Date(Date.now() + 14 * 86400_000);
-  while (new Date(d.getTime() + 5 * 3600_000).getUTCDay() !== 6) d.setTime(d.getTime() + 86400_000);
+  const d = new Date(Date.now() + 30 * 86400_000);
+  while (new Date(d.getTime() + 5 * 3600_000).getUTCDay() !== 0) d.setTime(d.getTime() + 86400_000);
   return new Date(d.getTime() + 5 * 3600_000).toISOString().slice(0, 10);
 })();
 const local = (hh: string) => new Date(`${day}T${hh}:00+05:00`).toISOString();
@@ -120,7 +120,7 @@ describe('Tactical Games блокирует покраску', () => {
 
   test('на стол Tactical нельзя поставить бронь поверх покраски 18:00–20:00', async () => {
     const r = await bookGame('p3', smallTable, '17:00', KT);
-    expect(r.status).toBe(400);
+    expect(r.status).toBe(409);
     expect(String(r.json.error)).toContain('Painting');
   });
 
