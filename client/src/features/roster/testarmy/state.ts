@@ -4,6 +4,7 @@
  * Координаты — поле боя 60×44″ (x вдоль 60″), как в battlefield.json.
  */
 import type { ComputedRoster } from '../engine/compute';
+import type { WarcryTerrainSetup } from '../skirmish/terrain';
 import { APPROX_DEFAULT_MM, baseRadii, type BaseShape } from './bases';
 import { formation, type Formation } from './formations';
 import type { Placed, Pt } from './geometry';
@@ -195,7 +196,7 @@ export function unitProfiles(u: TAUnit): { profile: string; count: number; optio
  * Сохранённая расстановка (на телефоне, по своему ростеру). v2 — армии (своя и соперника); v1 (до 30.10.2026) — только свои
  * отряды в units: читается как армия «me».
  */
-export type TASave = { v: 2; rosterId: string; layoutId: string; side: Side; savedAt: string; armies: TAArmy[] };
+export type TASave = { v: 2; rosterId: string; layoutId: string; side: Side; savedAt: string; armies: TAArmy[]; terrain?: WarcryTerrainSetup };
 
 /**
  * Вернуть сохранённую расстановку на отряды из текущего ростера: позиции, построение, поворот, зазор и базы — там, где
@@ -225,7 +226,7 @@ export function parseSave(text: string | null): TASave | null {
     if (v.v === 1 && Array.isArray(v.units))
       return { v: 2, rosterId: v.rosterId, layoutId: v.layoutId, side: v.side, savedAt: v.savedAt ?? '', armies: [{ key: 'me', side: v.side, rosterId: v.rosterId, units: v.units }] };
     if (v.v === 2 && Array.isArray(v.armies) && v.armies.every((a) => a && (a.key === 'me' || a.key === 'foe') && Array.isArray(a.units)))
-      return { v: 2, rosterId: v.rosterId, layoutId: v.layoutId, side: v.side, savedAt: v.savedAt ?? '', armies: v.armies };
+      return { v: 2, rosterId: v.rosterId, layoutId: v.layoutId, side: v.side, savedAt: v.savedAt ?? '', armies: v.armies, ...(v.terrain ? { terrain: v.terrain } : {}) };
     return null;
   } catch {
     return null;

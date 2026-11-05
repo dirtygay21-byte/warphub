@@ -3,6 +3,8 @@ import { loadKtGame, loadKtTeam, loadWarcryFaction, loadWarcryGame } from '../..
 import { decodeKtRoster, type KtRoster } from '../../kt/roster';
 import type { KtIndex } from '../../kt/types';
 import type { SkirmishGameData, SkirmishSystem } from '../../skirmish/types';
+import { initialWarcryDeploymentPoints } from '../../skirmish/deployment';
+import type { WarcryTerrainSetup as TerrainSetupState } from '../../skirmish/terrain';
 import { buildKtUnits, buildWarcryUnits, FOE_PREFIX, otherSide, parseSave, restoreUnits, skirmishUid, type ArmyKey, type Pt, type Side, type TAArmy, type TASave, type TAUnit } from '../../testarmy';
 import { pushOverlay, tg, openExternal } from '../../telegram';
 import { decodeWarcryRoster, neededFactions, type WarcryRoster } from '../../warcry/roster';
@@ -11,6 +13,7 @@ import { Button, IconButton, Segmented, Sheet } from '../kit';
 import { cx } from '../util';
 import { Board, type BoardField } from '../testarmy/Board';
 import { KtMapPanel, WarcryDeploymentPanel } from './SkirmishMaps';
+import { WarcryTerrainBackground, WarcryTerrainSetup as TerrainSetupView } from './WarcryTerrainSetup';
 import type { SkirmishRoster } from './SkirmishGameScreen';
 
 type FoeSpec = { kind: 'none' } | { kind: 'own'; rosterId: string } | { kind: 'code'; code: string };
@@ -77,7 +80,9 @@ function SkirmishTestArmyScreen<R extends SkirmishRoster>({ system, onBack, rost
   const [layoutId, setLayoutId] = useState(system === 'kt' ? 'official:Non-Specific Killzone Maps:1' : 'battleplan:first-blood:red');
   const [side, setSide] = useState<Side>('attacker');
   const [armies, setArmies] = useState<Army<R>[] | null>(null);
-  const [step, setStep] = useState<'roster' | 'field' | 'board'>(initialRosterId ? 'field' : 'roster');
+  const [step, setStep] = useState<'roster' | 'field' | 'terrain' | 'board'>(initialRosterId ? 'field' : 'roster');
+  const [pendingFoe, setPendingFoe] = useState<FoeSpec>({ kind: 'none' });
+  const [terrain, setTerrain] = useState<TerrainSetupState>({ mode: 'card', cardId: 'hog-1', features: [] });
   const roster = rosters.find((r) => r.id === rosterId) ?? null;
   const storageKey = useCallback((id: string) => `warphub.testarmy.${system}.v1${tg?.initDataUnsafe.user?.id ? `.${tg.initDataUnsafe.user.id}` : ''}.${id}`, [system]);
   const readSaved = (id: string) => {
@@ -89,17 +94,18 @@ function SkirmishTestArmyScreen<R extends SkirmishRoster>({ system, onBack, rost
     (system === 'kt' ? loadKtGame() : loadWarcryGame()).then(setData, (e) => setError(String(e?.message ?? e)));
   }, [system]);
   useEffect(() => {
-    if (step === 'board') return pushOverlay(() => setStep('field'));
+    if (step === 'board') return pushOverlay(() => setStep(data?.system === 'warcry' ? 'terrain' : 'field'));
+    if (step === 'terrain') return pushOverlay(() => setStep('field'));
     if (step === 'field' && !initialRosterId) return pushOverlay(() => setStep('roster'));
     return undefined;
-  }, [step, initialRosterId]);
+  }, [step, initialRosterId, data?.system]);
   useEffect(() => {
     if (step !== 'board' || !roster || !armies) return;
     try {
-      const value: TASave = { v: 2, rosterId: roster.id, layoutId, side, savedAt: new Date().toISOString(), armies: armies.map(({ key, side: sd, rosterId: rid, code, units }) => ({ key, side: sd, ...(rid ? { rosterId: rid } : {}), ...(code ? { code } : {}), units })) };
+      const value: TASave = { v: 2, rosterId: roster.id, layoutId, side, savedAt: new Date().toISOString(), armies: armies.map(({ key, side: sd, rosterId: rid, code, units }) => ({ key, side: sd, ...(rid ? { rosterId: rid } : {}), ...(code ? { code } : {}), units })), ...(system === 'warcry' ? { terrain } : {}) };
       localStorage.setItem(storageKey(roster.id), JSON.stringify(value));
     } catch { /* сохранение недоступно */ }
-  }, [step, roster, layoutId, side, armies, storageKey]);
+  }, [step, roster, layoutId, side, armies, storageKey, system, terrain]);
 
   const detail = (r: R) => {
     if (r.system === 'kt' && 'teams' in index) return `${index.teams.find((t) => t.id === r.teamId)?.name ?? r.teamId} · ${r.operatives.length} опер.`;
@@ -115,6 +121,7 @@ function SkirmishTestArmyScreen<R extends SkirmishRoster>({ system, onBack, rost
   };
   const deploy = async (foe: FoeSpec, restored?: TASave) => {
     if (!roster) return;
+    if (restored?.terrain) setTerrain(restored.terrain);
     setStep('board');
     setArmies(null);
     const foeRoster = foe.kind === 'own' ? rosters.find((r) => r.id === foe.rosterId) : foe.kind === 'code' ? decode(foe.code) : null;
@@ -137,13 +144,27 @@ function SkirmishTestArmyScreen<R extends SkirmishRoster>({ system, onBack, rost
   if (!data) return <Shell onBack={onBack} system={system}><Spinner /></Shell>;
   if (step === 'board' && roster) {
     if (!armies) return <Spinner full />;
-    return <Board armies={armies.map((a) => ({ ...a, name: a.roster.name }))} field={makeField(data, layoutId)} onArmy={setArmyUnits} onBack={() => setStep('field')} />;
+    return <Board armies={armies.map((a) => ({ ...a, name: a.roster.name }))} field={makeField(data, layoutId, terrain)} onArmy={setArmyUnits} onBack={() => setStep(data.system === 'warcry' ? 'terrain' : 'field')} />;
+  }
+  if (step === 'terrain' && roster) {
+    return (
+      <Shell onBack={() => setStep('field')} system={system}>
+        <TerrainSetupView setup={terrain} onChange={setTerrain} onContinue={() => void deploy(pendingFoe)} />
+      </Shell>
+    );
   }
   if (step === 'field' && roster) {
     return (
       <Shell onBack={initialRosterId ? onBack : () => setStep('roster')} system={system}>
         {saved && <div className="mb-3 rounded-2xl border border-accent/40 bg-accent/10 p-3"><p className="text-sm font-semibold">Сохранённая расстановка</p><p className="mt-0.5 text-[12px] text-fg-3">{layoutName(saved.layoutId)} · {saved.side === 'attacker' ? 'атакующий' : 'защитник'}</p><Button variant="primary" className="mt-2 w-full" onClick={() => { setLayoutId(saved.layoutId); setSide(saved.side); const f = saved.armies.find((a) => a.key === 'foe'); void deploy(f?.code ? { kind: 'code', code: f.code } : f?.rosterId ? { kind: 'own', rosterId: f.rosterId } : { kind: 'none' }, saved); }}>Продолжить</Button></div>}
-        <FieldPicker data={data} roster={roster} rosters={rosters} detail={detail} decode={decode} layoutId={layoutId} onLayout={setLayoutId} side={side} onSide={setSide} onDeploy={(foe) => void deploy(foe)} />
+        <FieldPicker data={data} roster={roster} rosters={rosters} detail={detail} decode={decode} layoutId={layoutId} onLayout={setLayoutId} side={side} onSide={setSide} onDeploy={(foe) => {
+          if (data.system === 'warcry') {
+            setPendingFoe(foe);
+            setStep('terrain');
+          } else {
+            void deploy(foe);
+          }
+        }} />
       </Shell>
     );
   }
@@ -221,7 +242,7 @@ function zones(layoutId: string): Partial<Record<Side, Pt[][]>> {
   if (layoutId === 'edges-y') return { attacker: [[[0, 0], [30, 0], [30, 6], [0, 6]]], defender: [[[0, 16], [30, 16], [30, 22], [0, 22]]] };
   return {};
 }
-function makeField(data: SkirmishGameData, layoutId: string): BoardField {
+function makeField(data: SkirmishGameData, layoutId: string, terrain?: TerrainSetupState): BoardField {
   if (data.system === 'kt' && layoutId.startsWith('official:')) {
     const [, zone, number] = layoutId.split(':');
     const map = data.maps.find((item) => item.killzone === zone && item.map === Number(number));
@@ -233,6 +254,8 @@ function makeField(data: SkirmishGameData, layoutId: string): BoardField {
         snapPoints: map.objectives.map((o) => [o.x, o.y] as Pt),
         zones: { attacker: map.zones.p1, defender: map.zones.p2 },
         objectiveNote: 'Objective marker — 40 мм; control range — 1″. Drop zones и маркеры из Approved Ops. Контуры террейна приблизительные: официальные карты не являются точными размерами.',
+        objectiveRange: 1,
+        orientation: 'landscape',
         width: data.board.width,
         height: data.board.height,
       };
@@ -242,15 +265,17 @@ function makeField(data: SkirmishGameData, layoutId: string): BoardField {
     const [, deploymentId, color] = layoutId.split(':');
     const deployment = data.deployments.find((item) => item.id === deploymentId);
     if (deployment) {
-      const own = deployment.points.filter((point) => point.side === color);
-      const enemy = deployment.points.filter((point) => point.side !== color);
+      const initialPoints = initialWarcryDeploymentPoints(deployment);
+      const own = initialPoints.filter((point) => point.side === color);
+      const enemy = initialPoints.filter((point) => point.side !== color);
       return {
         title: layoutName(layoutId),
-        background: <WarcryDeploymentPanel deployment={deployment} color={color} interactive={false} />,
-        objectives: deployment.points.map((point) => ({ x: point.x, y: point.y, role: `${point.side}:${point.group}` })),
-        snapPoints: deployment.points.map((point) => [point.x, point.y] as Pt),
+        background: terrain ? <WarcryTerrainBackground setup={terrain} /> : <WarcryDeploymentPanel deployment={deployment} color={color} interactive={false} />,
+        objectives: [],
+        snapPoints: initialPoints.map((point) => [point.x, point.y] as Pt),
         zones: { attacker: own.map((point) => circleZone(point.x, point.y, 3)), defender: enemy.map((point) => circleZone(point.x, point.y, 3)) },
         objectiveNote: 'Deployment groups — wholly within 3″ horizontally от соответствующей точки. RND2/RND3 — резерв, а не начальная расстановка. Пунктирные круги — зоны 3″, не objective markers.',
+        orientation: 'landscape',
         width: data.board.width,
         height: data.board.height,
       };

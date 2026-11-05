@@ -4,7 +4,7 @@ import { openExternal, pushOverlay } from '../../telegram';
 import { IconButton } from '../kit';
 import { cx } from '../util';
 
-function OfficialImage({ src, alt, large }: { src: string; alt: string; large: boolean }) {
+export function OfficialImage({ src, alt, large }: { src: string; alt: string; large: boolean }) {
   return (
     <img
       src={src}
@@ -15,7 +15,7 @@ function OfficialImage({ src, alt, large }: { src: string; alt: string; large: b
   );
 }
 
-function SkirmishMapPanel({
+export function SkirmishMapPanel({
   title,
   subtitle,
   sourceName,
