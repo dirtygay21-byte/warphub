@@ -45,7 +45,7 @@ function PartnerLane({ title, lane, cards }: { title: string; lane: PartnerLane;
   const items = cards.filter((card) => card.lane === lane);
   const scroll = (direction: -1 | 1) => {
     haptic.tap();
-    scroller.current?.scrollBy({ left: direction * Math.max(220, scroller.current.clientWidth * 0.82), behavior: "smooth" });
+    scroller.current?.scrollBy({ left: direction * Math.max(112, scroller.current.clientWidth * 0.82), behavior: "smooth" });
   };
   return (
     <div>
@@ -61,7 +61,7 @@ function PartnerLane({ title, lane, cards }: { title: string; lane: PartnerLane;
       {items.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-white/15 px-4 py-5 text-center text-sm text-fg-3">Скоро появятся новые миниатюры</div>
       ) : (
-        <div ref={scroller} className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div ref={scroller} className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {items.map((card) => <PartnerCardView key={card.id} card={card} />)}
         </div>
       )}
@@ -80,19 +80,19 @@ function PartnerCardView({ card }: { card: PartnerCard }) {
         openPartnerUrl(card.url);
       }}
       aria-label={`${card.title} — открыть сайт партнёра`}
-      className="ds-press group block w-[78%] min-w-[210px] max-w-[270px] shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-app-elevated text-left sm:w-[240px]"
+      className="ds-press group block w-[39%] min-w-[105px] max-w-[135px] shrink-0 snap-start overflow-hidden rounded-xl border border-white/10 bg-app-elevated text-left sm:w-[120px]"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-white/[0.04]">
         {card.imageUrl && !failed ? (
           <img src={card.imageUrl} alt={card.title} loading="lazy" onError={() => setFailed(true)} className="size-full object-cover transition-transform duration-300 group-active:scale-[1.03]" />
         ) : (
-          <div className="flex size-full items-center justify-center text-fg-3"><ImageOff className="size-8" /></div>
+          <div className="flex size-full items-center justify-center text-fg-3"><ImageOff className="size-5" /></div>
         )}
-        <span className="absolute right-2 top-2 flex size-8 items-center justify-center rounded-full bg-black/60 text-white"><ArrowUpRight className="size-4" /></span>
+        <span className="absolute right-1 top-1 flex size-6 items-center justify-center rounded-full bg-black/60 text-white"><ArrowUpRight className="size-3" /></span>
       </div>
-      <div className="p-3">
-        <p className="line-clamp-2 text-sm font-semibold leading-snug">{card.title}</p>
-        {card.text.trim() && <p className="mt-1 line-clamp-2 text-[13px] leading-snug text-fg-2">{card.text}</p>}
+      <div className="p-2">
+        <p className="line-clamp-2 text-xs font-semibold leading-snug">{card.title}</p>
+        {card.text.trim() && <p className="mt-0.5 line-clamp-2 text-xs leading-snug text-fg-2">{card.text}</p>}
       </div>
     </a>
   );
