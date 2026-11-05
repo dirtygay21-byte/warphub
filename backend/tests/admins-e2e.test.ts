@@ -85,6 +85,35 @@ describe('admins by Telegram ID', () => {
   });
 });
 
+describe('partner showcase', () => {
+  test('admin CRUD, public active filtering and metadata validation', async () => {
+    expect((await api('GET', '/admin/partners')).status).toBe(401);
+    const me = await api('GET', '/me', T.newbie);
+    const forbidden = await api('GET', '/admin/partners', T.newbie);
+    console.error(`::notice::partner fan /me → ${me.status}: ${JSON.stringify(me.json).slice(0, 600)}`);
+    console.error(`::notice::partner fan /admin/partners → ${forbidden.status}: ${JSON.stringify(forbidden.json).slice(0, 600)}`);
+    expect(me.status).toBe(200);
+    expect(forbidden.status).toBe(403);
+    const settings = await api('PUT', '/admin/partners/settings', T.owner, { partner1Title: 'First shop', partner2Title: 'Second shop', footerText: 'Miniatures on sale' });
+    expect(settings.status).toBe(200);
+    expect(settings.json).toMatchObject({ partner1Title: 'First shop', partner2Title: 'Second shop', footerText: 'Miniatures on sale' });
+    const first = await api('POST', '/admin/partners/cards', T.owner, { lane: 1, title: 'First mini', text: 'Discount', url: 'https://example.com/first', imageUrl: 'https://example.com/first.png', sortOrder: 0 });
+    expect(first.status).toBe(200);
+    const second = await api('POST', '/admin/partners/cards', T.owner, { lane: 2, title: 'Second mini', url: 'https://example.com/second', sortOrder: 4 });
+    expect(second.status).toBe(200);
+    expect((await api('GET', '/partners')).json.cards.some((card: { id: number }) => card.id === first.json.id)).toBe(true);
+    expect((await api('PATCH', `/admin/partners/cards/${first.json.id}`, T.owner, { isActive: false })).json.isActive).toBe(false);
+    expect((await api('GET', '/partners')).json.cards.some((card: { id: number }) => card.id === first.json.id)).toBe(false);
+    const adminCards = await api('GET', '/admin/partners', T.owner);
+    expect(adminCards.json.cards.some((card: { id: number; isActive: boolean }) => card.id === first.json.id && !card.isActive)).toBe(true);
+    expect((await api('PATCH', `/admin/partners/cards/${second.json.id}`, T.owner, { sortOrder: 9 })).json.sortOrder).toBe(9);
+    expect((await api('POST', '/admin/partners/metadata', T.owner, { url: 'http://127.0.0.1:4100' })).status).toBe(400);
+    expect((await api('DELETE', `/admin/partners/cards/${first.json.id}`, T.owner)).status).toBe(200);
+    expect((await api('DELETE', `/admin/partners/cards/${second.json.id}`, T.owner)).status).toBe(200);
+    expect((await api('DELETE', `/admin/partners/cards/${first.json.id}`, T.owner)).status).toBe(404);
+  });
+});
+
 describe('notification check (N1)', () => {
   test('admins only; with notifications off the reason says so', async () => {
     expect((await api('POST', '/admin/notifications/test', T.newbie)).status).toBe(403);

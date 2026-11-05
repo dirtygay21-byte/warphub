@@ -60,6 +60,8 @@ import {
 import { mapDndError } from '../dnd/http';
 import { findPlayers, listSupporters, setSupporter, SupporterError } from '../supporters/service';
 import { createTableHold, deleteTableHold, HoldError, listTableHolds } from '../table-holds/service';
+import { createPartnerCard, deletePartnerCard, getPartnerShowcase, PartnerError, updatePartnerCard, updatePartnerSettings } from '../partners/service';
+import { fetchPartnerMetadata } from '../partners/metadata';
 
 const dndGameBody = t.Object({
   title: t.Optional(t.String({ description: 'Название' })),
@@ -158,6 +160,10 @@ function mapBookingError(error: BookingError) {
 function mapHoldError(error: HoldError) {
   const code = error.code === 'TABLE_NOT_FOUND' || error.code === 'DND_GAME_NOT_FOUND' || error.code === 'HOLD_NOT_FOUND' ? 404 : error.code === 'INVALID_INPUT' ? 400 : 409;
   return status(code, { error: error.message, code: error.code });
+}
+
+function mapPartnerError(error: PartnerError) {
+  return status(error.code === 'NOT_FOUND' ? 404 : 400, { error: error.message, code: error.code });
 }
 
 function mapEventError(error: EventError) {
@@ -648,6 +654,72 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       },
     },
   )
+  .get('/partners', async () => getPartnerShowcase(true), { detail: { tags: ['Partners'], summary: 'Partner settings and all cards, including hidden' } })
+  .put('/partners/settings', async ({ body }) => updatePartnerSettings(body), {
+    body: t.Object({ partner1Title: t.String(), partner2Title: t.String(), footerText: t.String() }),
+    detail: { tags: ['Partners'], summary: 'Update lane titles and editable footer' },
+  })
+  .post('/partners/cards', async ({ body }) => {
+    try {
+      return await createPartnerCard(body);
+    } catch (error) {
+      if (error instanceof PartnerError) return mapPartnerError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    body: t.Object({
+      lane: t.Union([t.Literal(1), t.Literal(2)]),
+      title: t.String(),
+      text: t.Optional(t.String()),
+      url: t.String(),
+      imageUrl: t.Optional(t.String()),
+      sortOrder: t.Optional(t.Number({ minimum: 0 })),
+      isActive: t.Optional(t.Boolean()),
+    }),
+    detail: { tags: ['Partners'], summary: 'Create an unlimited partner card' },
+  })
+  .patch('/partners/cards/:id', async ({ params, body }) => {
+    try {
+      return await updatePartnerCard(params.id, body);
+    } catch (error) {
+      if (error instanceof PartnerError) return mapPartnerError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    params: t.Object({ id: t.Number() }),
+    body: t.Partial(t.Object({
+      lane: t.Union([t.Literal(1), t.Literal(2)]),
+      title: t.String(),
+      text: t.String(),
+      url: t.String(),
+      imageUrl: t.String(),
+      sortOrder: t.Number({ minimum: 0 }),
+      isActive: t.Boolean(),
+    })),
+    detail: { tags: ['Partners'], summary: 'Edit, move, reorder, hide or show a partner card' },
+  })
+  .delete('/partners/cards/:id', async ({ params }) => {
+    try {
+      return await deletePartnerCard(params.id);
+    } catch (error) {
+      if (error instanceof PartnerError) return mapPartnerError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    params: t.Object({ id: t.Number() }),
+    detail: { tags: ['Partners'], summary: 'Delete a partner card' },
+  })
+  .post('/partners/metadata', async ({ body }) => {
+    try {
+      return await fetchPartnerMetadata(body.url);
+    } catch (error) {
+      if (error instanceof PartnerError) return mapPartnerError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    body: t.Object({ url: t.String() }),
+    detail: { tags: ['Partners'], summary: 'Safely fetch Open Graph title, description and image for manual review' },
+  })
   .get(
     '/news',
     async () => {
