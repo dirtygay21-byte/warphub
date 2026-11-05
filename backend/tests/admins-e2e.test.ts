@@ -88,7 +88,12 @@ describe('admins by Telegram ID', () => {
 describe('partner showcase', () => {
   test('admin CRUD, public active filtering and metadata validation', async () => {
     expect((await api('GET', '/admin/partners')).status).toBe(401);
-    expect((await api('GET', '/admin/partners', T.fan)).status).toBe(403);
+    const me = await api('GET', '/me', T.fan);
+    const forbidden = await api('GET', '/admin/partners', T.fan);
+    console.error(`::notice::partner fan /me → ${me.status}: ${JSON.stringify(me.json).slice(0, 600)}`);
+    console.error(`::notice::partner fan /admin/partners → ${forbidden.status}: ${JSON.stringify(forbidden.json).slice(0, 600)}`);
+    expect(me.status).toBe(200);
+    expect(forbidden.status).toBe(403);
     const settings = await api('PUT', '/admin/partners/settings', T.admin, { partner1Title: 'First shop', partner2Title: 'Second shop', footerText: 'Miniatures on sale' });
     expect(settings.status).toBe(200);
     expect(settings.json).toMatchObject({ partner1Title: 'First shop', partner2Title: 'Second shop', footerText: 'Miniatures on sale' });
