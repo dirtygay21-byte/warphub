@@ -19,7 +19,7 @@ test('Admin → Content exposes settings, CRUD, reordering, hide/show and Open G
 });
 
 test('migration creates settings and unlimited cards without a row cap', () => {
-  const migration = readFileSync(join(root, 'backend/drizzle/0022_partner_showcase.sql'), 'utf8');
+  const migration = readFileSync(join(root, 'backend/drizzle/0023_partner_showcase.sql'), 'utf8');
   assert.ok(migration.includes('CREATE TABLE IF NOT EXISTS "partner_settings"'));
   assert.ok(migration.includes('CREATE TABLE IF NOT EXISTS "partner_cards"'));
   assert.ok(!/limit\s+\d+/i.test(migration));
