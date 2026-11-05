@@ -13,6 +13,8 @@ export type SelectedSlot =
   | {
       kind: "new";
       tableId: number;
+      /** категория стола: задаёт список игр в анкете */
+      category?: "wh" | "small";
       label: string;
       window: { startsAt: string; endsAt: string };
       segments: AvailabilitySegment[];
@@ -23,6 +25,7 @@ export type SelectedSlot =
   | {
       kind: "join";
       tableId: number;
+      category?: "wh" | "small";
       startsAt: string;
       endsAt: string;
       occupied: number;

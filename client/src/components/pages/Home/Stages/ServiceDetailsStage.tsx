@@ -29,6 +29,7 @@ import { TrainerBadge } from "./TableSelection/SessionCards";
 import ServiceDetailsHeader from "./ServiceDetails/ServiceDetailsHeader";
 import ServiceDetailsImage from "./ServiceDetails/ServiceDetailsImage";
 import { boostyKindForService } from "@/components/booking/boosty";
+import { GAMES_BY_CATEGORY } from "@/components/booking/tableCategory";
 
 const CLUB_VISIT_SLUG = "club_visit";
 const MINUTE = 60 * 1000;
@@ -124,6 +125,9 @@ export default function ServiceDetailsStage() {
   const lockedGame =
     selectedSlot?.kind === "join" ? ((selectedSlot.players.find((p) => p.game)?.game as PlayerFormValue["game"] | undefined) ?? "40k") : null;
   const player = lockedGame && playerDraft.game !== lockedGame ? { ...playerDraft, game: lockedGame } : playerDraft;
+  // категория стола (Full-scale Wargaming: 40K, AoS; Tactical Games: Kill Team, Warcry) — только свои игры
+  const slotCategory = selectedSlot && (selectedSlot.kind === "new" || selectedSlot.kind === "join") ? selectedSlot.category : undefined;
+  const gamesForSlot = slotCategory ? options.games.filter((g) => GAMES_BY_CATEGORY[slotCategory].includes(g.value)) : undefined;
   const [clubArmy, setClubArmy] = useState(false);
   const [painting, setPainting] = useState(emptyPaintingForm);
   const [showErrors, setShowErrors] = useState(false);
@@ -288,6 +292,7 @@ export default function ServiceDetailsStage() {
             onChange={setPlayer}
             lockedGame={lockedGame}
             options={options}
+            games={gamesForSlot}
             playerName={user ? [user.firstName, user.lastName].filter(Boolean).join(" ") : undefined}
           />
           <ToggleRow title="Нужна армия клуба" checked={clubArmy} onChange={setClubArmy} />

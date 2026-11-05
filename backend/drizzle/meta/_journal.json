@@ -157,10 +157,10 @@
       "breakpoints": true
     },
     {
-      "idx": 23,
+      "idx": 22,
       "version": "7",
       "when": 1793800000000,
-      "tag": "0023_partner_showcase",
+      "tag": "0022_table_categories",
       "breakpoints": true
     }
   ]

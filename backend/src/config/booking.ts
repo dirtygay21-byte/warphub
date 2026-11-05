@@ -49,6 +49,11 @@ export const bookingConfig = {
    * кроме D&D. Проверяется на сервере при каждой записи.
    */
   allowedWeekdays: [5, 6, 7] as number[],
+  /**
+   * Категория стола для игры (решение владельца 05.11.2026): 40K и AoS — на столах wh (Full-scale Wargaming),
+   * Kill Team и Warcry — на столах small (Tactical Games). Запись с другой игрой на стол категории не принимается.
+   */
+  tableCategoryByGame: { '40k': 'wh', aos: 'wh', kt: 'small', warcry: 'small' } as Record<string, 'wh' | 'small'>,
 } as const;
 
 export type TableCapacityProfile =
