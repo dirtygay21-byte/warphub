@@ -20,8 +20,6 @@ import {
   experienceLabel,
   armyLine,
   gameLabel,
-  gameFitsTable,
-  TABLE_CATEGORY_LABEL,
   type TableCapacityProfile,
 } from '../../config/booking';
 import { db } from '../../db';
@@ -54,6 +52,8 @@ import {
   formatLocalIso,
   getAllowedWeekdays,
   getClubSessionBounds,
+  gameFitsTable,
+  TABLE_CATEGORY_LABEL,
   groupSessions,
   isDateAllowed,
   isOnSlotGrid,

@@ -206,7 +206,7 @@ export type ServiceAvailability = {
     minDuration: number;
   };
   slots: Array<{
-    table: { id: number; name: string; seatCapacity: number };
+    table: { id: number; name: string; seatCapacity: number; category?: "wh" | "small" };
     segments: AvailabilitySegment[];
   }>;
   sessions: TableSession[];
