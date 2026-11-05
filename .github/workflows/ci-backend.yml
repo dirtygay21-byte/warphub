@@ -58,6 +58,14 @@ jobs:
       - name: Unit tests (without the e2e environment, as before)
         working-directory: backend
         run: env -i PATH="$PATH" HOME="$HOME" bun test tests
+      - name: Partner migration applies to empty PostgreSQL
+        run: |
+          MIGRATION_URI=postgres://postgres:postgres@127.0.0.1:5432/wh_partner_migration
+          PGPASSWORD=postgres createdb -h 127.0.0.1 -U postgres wh_partner_migration
+          psql "$MIGRATION_URI" -v ON_ERROR_STOP=1 -q -f backend/drizzle/0023_partner_showcase.sql
+          TABLES=$(psql "$MIGRATION_URI" -Atc "select string_agg(table_name, ' ' order by table_name) from information_schema.tables where table_schema='public' and table_name in ('partner_cards', 'partner_settings')")
+          [ "$TABLES" = "partner_cards partner_settings" ] || { echo "::error::partner migration tables: $TABLES"; exit 1; }
+          [ "$(psql "$MIGRATION_URI" -Atc 'select count(*) from partner_settings where id = 1')" = "1" ] || { echo "::error::partner settings default row is missing"; exit 1; }
       - name: Database schema (from src/db/schema)
         working-directory: backend
         # drizzle-kit push создавал схему не полностью — генерируем полный SQL из схемы и применяем psql (ошибки видны)
