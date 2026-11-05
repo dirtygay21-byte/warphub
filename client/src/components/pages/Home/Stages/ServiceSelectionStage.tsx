@@ -35,7 +35,7 @@ export default function ServiceSelectionStage() {
     : disciplines.map((discipline) => discipline.id);
 
   return (
-    <div className="ds-enter h-full w-full space-y-7 px-5 py-3 text-fg">
+    <div className="ds-enter h-full w-full space-y-5 px-5 py-3 text-fg">
       {disciplineIds.map((id) => (
         <ServiceBlock key={id} disciplineId={id} />
       ))}
@@ -73,7 +73,7 @@ function ServiceBlock({ disciplineId }: { disciplineId: number }) {
     return (
       <div>
         <h2 className="mb-3 font-display text-xl font-semibold uppercase leading-none">{title}</h2>
-        <ul className="flex flex-col gap-2.5">
+        <ul className="flex flex-col gap-2">
           <DndEntryItem
             icon={<Sparkles className="size-5" />}
             title="Хочу попробовать"
@@ -100,7 +100,7 @@ function ServiceBlock({ disciplineId }: { disciplineId: number }) {
   return (
     <div>
       <h2 className="mb-3 font-display text-xl font-semibold uppercase leading-none">{title}</h2>
-      <ul className="flex flex-col gap-2.5">
+      <ul className="flex flex-col gap-2">
         {services.map((service) => (
           <ServiceItemComponent
             key={service.id}
@@ -133,9 +133,9 @@ function ServiceItemComponent({
           haptic.tap();
           onClick();
         }}
-        className={`ds-press flex w-full items-center gap-3.5 rounded-[18px] border border-white/10 bg-app-elevated p-2.5 text-left ${boostyKind ? "pr-14" : "pr-4"}`}
+        className={`ds-press flex w-full items-center gap-3 rounded-[18px] border border-white/10 bg-app-elevated p-2 text-left ${boostyKind ? "pr-12" : "pr-4"}`}
       >
-        <img src={imgUrl} alt="" className="h-16 w-24 shrink-0 rounded-xl object-cover" />
+        <img src={imgUrl} alt="" className="h-14 w-20 shrink-0 rounded-xl object-cover" />
         <span className="min-w-0 flex-1">
           <span className="block text-base font-bold leading-tight">{service.title}</span>
           {service.description && <span className="mt-1 block text-sm leading-snug text-fg-2">{service.description}</span>}
@@ -144,11 +144,9 @@ function ServiceItemComponent({
         {!boostyKind && <ChevronRightIcon className="size-5 shrink-0 text-fg-3" />}
       </button>
       {boostyKind && (
-        <BoostySubscriptionInfo
-          kind={boostyKind}
-          context="selection"
-          className="absolute right-1.5 top-1/2 -translate-y-1/2"
-        />
+        <div className="absolute right-1.5 top-1/2 -translate-y-1/2">
+          <BoostySubscriptionInfo kind={boostyKind} context="selection" />
+        </div>
       )}
     </li>
   );
