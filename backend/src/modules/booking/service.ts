@@ -20,6 +20,8 @@ import {
   experienceLabel,
   armyLine,
   gameLabel,
+  gameFitsTable,
+  TABLE_CATEGORY_LABEL,
   type TableCapacityProfile,
 } from '../../config/booking';
 import { db } from '../../db';
@@ -31,6 +33,7 @@ import {
   usersTable,
 } from '../../db/schema';
 import { getTableBlocks, listHoldsBetween, type TableHoldView } from '../table-holds/service';
+import { paintingBookedDuring, tacticalBusyForPainting } from './tactical';
 import { closuresAsPoolBookings, getClubClosures } from '../club-closure/service';
 import {
   getNearestUpcomingEventForUser,
@@ -86,6 +89,7 @@ type Executor = typeof db | Tx;
 type ClubTable = {
   id: number;
   name: string;
+  category: 'wh' | 'small';
 };
 
 export type TableAvailabilitySegment = {
@@ -99,6 +103,8 @@ export type TableAvailabilityEntry = {
     id: number;
     name: string;
     seatCapacity: number;
+    /** категория стола; у пула мест (покраска, клуб) не задаётся */
+    category?: 'wh' | 'small';
   };
   segments: TableAvailabilitySegment[];
 };
@@ -359,6 +365,7 @@ async function getActiveTables(executor: Executor = db): Promise<ClubTable[]> {
     .select({
       id: tablesTable.id,
       name: tablesTable.name,
+      category: tablesTable.category,
     })
     .from(tablesTable)
     .where(eq(tablesTable.isActive, true))
@@ -448,10 +455,13 @@ async function getPoolBusy(
   capacity: number,
   rangeStart: Date,
   rangeEnd: Date,
+  blockedByTactical = false,
 ): Promise<BookingRow[]> {
-  const [bookings, closures] = await Promise.all([
+  const [bookings, closures, tactical] = await Promise.all([
     getPoolReservations(executor, serviceId, rangeStart, rangeEnd),
     getClubClosures(rangeStart, rangeEnd),
+    // Tactical Games (столы 3–4) закрывают покраску на время занятия стола (решение 05.11.2026)
+    blockedByTactical ? tacticalBusyForPainting(executor, rangeStart, rangeEnd) : Promise.resolve([]),
   ]);
   const closed = closuresAsPoolBookings(closures, capacity).map((c, i) => ({
     ...c,
@@ -460,7 +470,16 @@ async function getPoolBusy(
     tableId: null,
     serviceId,
   }));
-  return [...bookings, ...closed];
+  const blocked = tactical.map((t, i) => ({
+    partySize: capacity,
+    startsAt: t.startsAt,
+    endsAt: t.endsAt,
+    id: `tactical-${i}`,
+    userId: '',
+    tableId: null,
+    serviceId,
+  }));
+  return [...bookings, ...closed, ...blocked];
 }
 
 /** Окно записи на дату: от открытия (или от «сейчас», если день сегодняшний) до 00:00 */
@@ -587,6 +606,7 @@ export async function getServiceAvailability(
       mode.capacity,
       window.openAt,
       window.closeAt,
+      service.slug === PAINTING_SLUG,
     );
 
     base.slots = [
@@ -619,7 +639,7 @@ export async function getServiceAvailability(
   );
 
   base.slots = tables.map((table) => ({
-    table: { id: table.id, name: table.name, seatCapacity: mode.seatsPerTable },
+    table: { id: table.id, name: table.name, seatCapacity: mode.seatsPerTable, category: table.category },
     segments: getNewSessionSegments(
       table.id,
       window,
@@ -639,10 +659,12 @@ export async function getServiceAvailability(
     ),
   );
   const tableNames = new Map(tables.map((table) => [table.id, table.name]));
+  const tableCategories = new Map(tables.map((table) => [table.id, table.category]));
 
   base.sessions = sessions.map((session) => ({
     tableId: session.tableId,
     tableName: tableNames.get(session.tableId) ?? '',
+    tableCategory: tableCategories.get(session.tableId) ?? 'wh',
     startsAt: formatLocalIso(session.startsAt),
     endsAt: formatLocalIso(session.endsAt),
     occupied: session.occupied,
@@ -901,7 +923,7 @@ export async function createReservation(
 
     const reservation = await db.transaction(async (tx) => {
       await lockKey(tx, LOCK_POOL, service.id);
-      const bookings = await getPoolBusy(tx, service.id, mode.capacity, openAt, closeAt);
+      const bookings = await getPoolBusy(tx, service.id, mode.capacity, openAt, closeAt, service.slug === PAINTING_SLUG);
       const free = poolFreeSeats({ startsAt, endsAt: new Date(startsAt.getTime() + 1) }, bookings, mode.capacity);
 
       if (free < partySize) {
@@ -955,13 +977,16 @@ export async function createReservation(
     await lockKey(tx, LOCK_TABLE, tableId);
 
     const [table] = await tx
-      .select({ id: tablesTable.id })
+      .select({ id: tablesTable.id, category: tablesTable.category })
       .from(tablesTable)
       .where(and(eq(tablesTable.id, tableId), eq(tablesTable.isActive, true)))
       .limit(1);
 
     if (!table) {
       throw new BookingError('TABLE_NOT_FOUND', 'Table not found');
+    }
+    if (details?.kind === 'wh_player' && !gameFitsTable(details.game, table.category)) {
+      throw new BookingError('INVALID_DETAILS', `This table is for ${TABLE_CATEGORY_LABEL[table.category]}`);
     }
 
     const bookings = await getTableReservations(tx, [tableId], openAt, closeAt);
@@ -975,6 +1000,9 @@ export async function createReservation(
       tableFitEnd({ tableId, startsAt, fullEnd: fullEndsAt, bookings, blocks: eventBlocks, minMinutes: bookingConfig.minShortenedMinutes });
     if (!endsAt) {
       throw new BookingError('SLOT_UNAVAILABLE', `Less than ${bookingConfig.minShortenedMinutes / 60} hours are free at this table from this time`);
+    }
+    if (table.category === 'small' && (await paintingBookedDuring(tx, startsAt, endsAt))) {
+      throw new BookingError('SLOT_UNAVAILABLE', 'Painting is booked at this time');
     }
     const check = checkTableSession({
       tableId,
@@ -1619,6 +1647,13 @@ export async function updateReservationDetails(
   const details = parseDetails(slug, rawDetails);
   const previous = (reservation.details as ReservationDetails | null) ?? null;
 
+  if (details.kind === 'wh_player' && reservation.tableId !== null) {
+    const [table] = await db.select({ category: tablesTable.category }).from(tablesTable).where(eq(tablesTable.id, reservation.tableId)).limit(1);
+    if (table && !gameFitsTable(details.game, table.category)) {
+      throw new BookingError('INVALID_DETAILS', `This table is for ${TABLE_CATEGORY_LABEL[table.category]}`);
+    }
+  }
+
   const [updated] = await db
     .update(reservationsTable)
     .set({ details })
@@ -1978,7 +2013,7 @@ export async function moveReservationToTable(
     }
 
     const [table] = await tx
-      .select({ id: tablesTable.id })
+      .select({ id: tablesTable.id, category: tablesTable.category })
       .from(tablesTable)
       .where(
         and(eq(tablesTable.id, targetTableId), eq(tablesTable.isActive, true)),
@@ -1986,6 +2021,12 @@ export async function moveReservationToTable(
       .limit(1);
     if (!table) {
       throw new BookingError('TABLE_NOT_FOUND', 'Table not found');
+    }
+    if (reservation.details?.kind === 'wh_player' && !gameFitsTable(reservation.details.game, table.category)) {
+      throw new BookingError('INVALID_DETAILS', `This table is for ${TABLE_CATEGORY_LABEL[table.category]}`);
+    }
+    if (table.category === 'small' && (await paintingBookedDuring(tx, startsAt, endsAt))) {
+      throw new BookingError('SLOT_UNAVAILABLE', 'Painting is booked at this time');
     }
 
     const bookings = (

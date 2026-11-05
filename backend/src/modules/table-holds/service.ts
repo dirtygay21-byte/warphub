@@ -8,6 +8,7 @@ import { and, asc, eq, gt, inArray, lt, ne, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import { dndGamesTable, reservationsTable, tableHoldsTable, tablesTable, usersTable } from '../../db/schema';
 import { formatLocalIso } from '../booking/rules';
+import { paintingBookedDuring } from '../booking/tactical';
 import { getEventTableBlocks, type EventTableBlock } from '../events/service';
 import { assertClubFreeForDnd, ClubClosureError, closuresAsTableBlocks, getClubClosures } from '../club-closure/service';
 import { HoldError, validateHoldInput, type HoldInput, type HoldPurpose } from './rules';
@@ -90,7 +91,7 @@ export async function createTableHold(input: unknown, createdByTelegramId: numbe
     // та же блокировка стола, что у записи игрока (booking/service.ts, LOCK_TABLE = 1): запись и бронь идут по очереди
     await tx.execute(sql`select pg_advisory_xact_lock(1::int, ${hold.tableId}::int)`);
     const [table] = await tx
-      .select({ id: tablesTable.id, name: tablesTable.name, isActive: tablesTable.isActive })
+      .select({ id: tablesTable.id, name: tablesTable.name, isActive: tablesTable.isActive, category: tablesTable.category })
       .from(tablesTable)
       .where(eq(tablesTable.id, hold.tableId));
     if (!table || !table.isActive) throw new HoldError('TABLE_NOT_FOUND', 'Стол не найден или выключен');
@@ -123,6 +124,11 @@ export async function createTableHold(input: unknown, createdByTelegramId: numbe
         .map((b) => `${b.firstName ?? ''}${b.username ? ` @${b.username}` : ''} ${formatLocalIso(b.startsAt!).slice(11, 16)}–${formatLocalIso(b.endsAt!).slice(11, 16)}`.trim())
         .join('; ');
       throw new HoldError('BOOKINGS_CONFLICT', `За этим столом в это время есть записи игроков: ${list}. Перенесите или отмените их.`);
+    }
+
+    // стол Tactical Games (категория small): покраска на это время занята записью — бронь не ставим (решение 05.11.2026)
+    if (table.category === 'small' && (await paintingBookedDuring(tx, hold.startsAt, hold.endsAt))) {
+      throw new HoldError('BOOKINGS_CONFLICT', 'На покраску в это время есть запись. Перенесите или отмените её.');
     }
 
     // D&D закрывает весь клуб (31.10.2026): бронь «Игра D&D» — только если клуб свободен с часом после игры;

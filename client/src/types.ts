@@ -98,6 +98,8 @@ export type Table = {
   name: string;
   is_active?: boolean;
   seatCapacity?: number;
+  /** категория стола (Full-scale Wargaming / Tactical Games); у пула мест не задаётся */
+  category?: "wh" | "small";
   segments?: TableAvailabilitySegment[];
   description?: string;
   discipline?: ServiceType;
