@@ -2,10 +2,12 @@ import clsx from "clsx";
 import { useState } from "react";
 import EventsList from "./Content/EventsList";
 import NewsList from "./Content/NewsList";
+import AdminPartners from "./Content/AdminPartners";
 
 const CONTENT_TABS = [
   { id: "events", label: "Список ивентов" },
   { id: "news", label: "Список новостей" },
+  { id: "partners", label: "Партнёры" },
 ] as const;
 
 type ContentTabId = (typeof CONTENT_TABS)[number]["id"];
@@ -13,6 +15,7 @@ type ContentTabId = (typeof CONTENT_TABS)[number]["id"];
 const TAB_CONTENT: Record<ContentTabId, () => React.ReactNode> = {
   events: EventsList,
   news: NewsList,
+  partners: AdminPartners,
 };
 
 export default function ContentManagment() {

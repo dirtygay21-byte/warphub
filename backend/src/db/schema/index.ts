@@ -13,3 +13,4 @@ export * from './online-games';
 export * from './table-holds';
 export * from './supporters';
 export * from './dominatus';
+export * from './partners';

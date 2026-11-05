@@ -42,6 +42,7 @@ import { handleMinigame } from '../minigames/http';
 import { getPlayerProgress } from '../progress/service';
 import { getCardsState, getPointsHistory, openPack } from '../minigames/cards';
 import { getNewsById, listPublishedNews } from '../news/service';
+import { getPartnerShowcase } from '../partners/service';
 import { jwtPlugin } from '../../plugins/jwt-plugin';
 import { authMiddleware, findUserFromBearer } from '../../plugins/auth-middleware';
 import { db } from '../../db';
@@ -108,6 +109,9 @@ function mapEventError(error: EventError) {
 export const apiModule = new Elysia({ tags: ['Booking'] })
   .model(apiModels)
   .use(jwtPlugin)
+  .get('/partners', async () => getPartnerShowcase(), {
+    detail: { tags: ['Partners'], summary: 'Public partner showcase for Profile' },
+  })
   .get(
     '/services/:serviceId/availability',
     async ({ params, query, headers, jwt }) => {
