@@ -110,3 +110,21 @@ Adding a game: add a `TutorialGame` in `content.ts`, add diagram keys + componen
 Verified fine: every rank frame stays round; reduce-motion covers all `af-`/`sp-` classes and the banner's SMIL; frames ignore taps and reserve their own space; tutorial arrow markers use unique ids per drawing (`useId`).
 
 Not verified: real-device look and performance (no phone access from the design session).
+
+## 7. Motion levels and the «Яркие эффекты» toggle
+
+Recorded 06.11.2026 (owner's decision): subtle base animations for everyone, strong effects on by default and switchable in Profile → Настройки → «Яркие эффекты».
+
+| Level (`<html data-fx>`) | When | What runs |
+|---|---|---|
+| `full` | default | base animations + strong effects |
+| `base` | toggle off | base animations only |
+| `reduced` | system «Reduce motion» on (overrides the toggle) | no strong effects; base animations stopped by the existing reduce-motion rules |
+
+- Code: `client/src/stores/useEffectsStore.ts` (setting, `useFx()`), `client/src/components/EffectsRoot.tsx` (sets `data-fx`, wraps the app in `MotionConfig`).
+- The setting is per device (`localStorage` key `warphub:fx-strong`), not per account: a weak phone and a strong laptop can differ.
+- CSS: a strong effect's animation or transition uses the class `.fx-strong`; a purely decorative layer (burst, particles) uses `.fx-strong-only`. Both are off unless `data-fx="full"`.
+- JS / `motion`: check `useFx().strong` before rendering a strong effect; `MotionConfig` already disables `motion` animations at `reduced`.
+- Base vs strong: base = feedback the user needs (press, enter, sheet, loading skeleton, step change); strong = celebration and depth (bursts, glow, tilt, page depth, reward moments). A screen must work and read the same with strong effects off.
+- Tokens: `--motion-fast` 150 ms (press, hover), `--motion-base` 220 ms (enter, step), `--motion-slow` 320 ms (sheet, page), `--motion-emphasis` 600 ms (success, reward); easing `--ease-out-soft` for movement, `--ease-spring` for small overshoot (pop, badge).
+- Performance: animate only `transform` and `opacity`; no new blur or SVG filters on animated layers (see §6 findings 2–3).

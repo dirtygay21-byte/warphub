@@ -48,6 +48,12 @@
 
   /* Движение: мягкое торможение, короткие длительности (120–300 мс) */
   --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* движение (docs/design-code.md → «Motion levels»): длительности и упругое замедление */
+  --motion-fast: 150ms;
+  --motion-base: 220ms;
+  --motion-slow: 320ms;
+  --motion-emphasis: 600ms;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* Статусы (Roster Builder) */
   --color-danger: 248 113 113;
@@ -205,6 +211,19 @@ body {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/*
+ * Яркие эффекты (уровень data-fx на <html>, см. EffectsRoot): работают только при data-fx="full".
+ * .fx-strong      — анимация/переход яркого эффекта: при base и reduced выключается;
+ * .fx-strong-only — декоративный слой (вспышка, частицы): при base и reduced не показывается.
+ */
+:root:not([data-fx="full"]) .fx-strong {
+  animation: none !important;
+  transition: none !important;
+}
+:root:not([data-fx="full"]) .fx-strong-only {
+  display: none !important;
 }
 
 /* ---------- Roster Builder ---------- */
