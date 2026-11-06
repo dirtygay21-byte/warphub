@@ -1,4 +1,4 @@
-import type { BoostyKind } from "./boosty";
+import { BOOSTY_GENERAL_URL, BOOSTY_SUBSCRIPTION_URL, type BoostyKind } from "./boosty";
 import clsx from "clsx";
 import { CircleAlert, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -6,12 +6,28 @@ import { createPortal } from "react-dom";
 
 type BoostyContext = "selection" | "booking";
 
+const CLOSE_LABELS = ["угу", "ок", "ладно", "понял", "понятно", "спасибо", "принял", "добро", "ясно", "круто", "кайф", "окей", "связь"] as const;
+
+function nextCloseLabel(previous: string) {
+  const options = CLOSE_LABELS.filter((label) => label !== previous);
+  return options[Math.floor(Math.random() * options.length)] ?? "Понятно";
+}
+
+function openBoostySubscription(url: string) {
+  const webApp = typeof window !== "undefined" ? window.Telegram?.WebApp : undefined;
+  if (webApp && typeof webApp.openLink === "function") {
+    webApp.openLink(url);
+    return;
+  }
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
 const COPY: Record<BoostyKind, Record<BoostyContext, string>> = {
   warhammer: {
     selection:
       "Планируете регулярно играть в Warhammer? На Boosty можно оформить подписку в поддержку клуба — она включает безлимитное посещение клуба.",
     booking:
-      "Для игр в Warhammer на Boosty доступна подписка в поддержку клуба. Она включает безлимитное посещение клуба.",
+      "Подписка Boosty включает только доступ к WarpBuilder — конструктору ростеров и игровым инструментам клуба. Мы очень благодарны за вашу поддержку!",
   },
   painting: {
     selection:
@@ -31,10 +47,12 @@ export default function BoostySubscriptionInfo({
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [closeLabel, setCloseLabel] = useState("Понятно");
   const label =
     kind === "warhammer"
       ? "О подписке Boosty для Warhammer"
       : "О подписке Boosty для покраски";
+  const linkUrl = kind === "warhammer" && context === "booking" ? BOOSTY_SUBSCRIPTION_URL : BOOSTY_GENERAL_URL;
 
   useEffect(() => {
     if (!open) return;
@@ -61,10 +79,11 @@ export default function BoostySubscriptionInfo({
         onClick={(event) => {
           event.preventDefault();
           event.stopPropagation();
+          setCloseLabel((previous) => nextCloseLabel(previous));
           setOpen(true);
         }}
         className={clsx(
-          "ds-hit flex size-11 shrink-0 items-center justify-center rounded-xl text-fg-3 transition-colors hover:bg-white/[0.06] hover:text-accent active:bg-white/10",
+          "ds-hit flex size-9 shrink-0 items-center justify-center rounded-lg text-fg-3 transition-colors hover:bg-white/[0.04] hover:text-fg active:bg-white/[0.06]",
           className,
         )}
       >
@@ -102,15 +121,24 @@ export default function BoostySubscriptionInfo({
                 </button>
               </div>
               <p className="px-5 py-5 text-[15px] leading-relaxed text-fg-2">
-                {COPY[kind][context]}
-              </p>
-              <div className="border-t border-white/[0.07] px-5 py-4">
+                {COPY[kind][context]}{" "}
                 <button
                   type="button"
-                  onClick={() => setOpen(false)}
-                  className="min-h-11 w-full rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground active:scale-[0.99]"
+                  aria-label={kind === "warhammer" && context === "booking" ? "Поддержать WarpBuilder на Boosty" : "Поддержать клуб на Boosty"}
+                  onClick={() => openBoostySubscription(linkUrl)}
+                  className="inline font-medium text-accent underline underline-offset-4 transition-opacity hover:opacity-80"
                 >
-                  Понятно
+                  Поддержать
+                </button>
+              </p>
+              <div className="border-t border-white/[0.07] px-5 py-3">
+                <button
+                  type="button"
+                  aria-label="Закрыть диалог"
+                  onClick={() => setOpen(false)}
+                  className="min-h-10 w-full rounded-xl px-4 py-2 text-sm font-medium text-fg-3 transition-colors hover:bg-white/[0.04] hover:text-fg active:bg-white/[0.06]"
+                >
+                  {closeLabel}
                 </button>
               </div>
             </div>

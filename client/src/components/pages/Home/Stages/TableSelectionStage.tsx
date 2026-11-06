@@ -383,7 +383,7 @@ export default function TableSelectionStage() {
             <p className="truncate text-[15px] font-semibold text-fg">
               {selectedService.title}
             </p>
-            <p className="text-[13px] text-fg-3">Доступна подписка Boosty</p>
+            <p className="text-[13px] text-fg-3">Поддержи нас и получи доступ к WarpBuilder</p>
           </div>
           <BoostySubscriptionInfo kind={boostyKind} />
         </div>
