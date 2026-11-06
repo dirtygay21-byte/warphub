@@ -1,4 +1,5 @@
 import { LoaderCircle, XCircle } from "lucide-react";
+import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 
 type EventCancelConfirmDialogProps = {
   eventTitle: string;
@@ -19,16 +20,18 @@ export function EventCancelConfirmDialog({
   onClose,
   onConfirm,
 }: EventCancelConfirmDialogProps) {
+  const leaving = useDialogExit();
+
   return (
     <div
-      className="fixed w-full h-full top-0 left-1/2 -translate-x-1/2  z-50 flex items-center justify-center bg-overlay/70 px-4 pb-24 pt-6 sm:items-center sm:pb-6"
+      className={`ds-fade fixed w-full h-full top-0 left-1/2 -translate-x-1/2  z-50 flex items-center justify-center bg-overlay/70 px-4 pb-24 pt-6 sm:items-center sm:pb-6${leaving ? " ds-leaving" : ""}`}
       onClick={onClose}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="event-cancel-dialog-title"
-        className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
+        className="ds-sheet w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="border-b border-white/10 px-5 py-5 flex justify-around">

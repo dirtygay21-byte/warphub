@@ -18,6 +18,7 @@ import type { Reservation } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoaderCircle, PencilLine } from "lucide-react";
 import { useState } from "react";
+import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 
 /** Изменение армии/очков/опыта или формы покраски до начала записи */
 export function EditDetailsDialog({
@@ -64,9 +65,11 @@ export function EditDetailsDialog({
     },
   });
 
+  const leaving = useDialogExit();
+
   return (
     <div
-      className="ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-6 pt-10 sm:items-center"
+      className={`ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-6 pt-10 sm:items-center${leaving ? " ds-leaving" : ""}`}
       onClick={() => !mutation.isPending && onClose()}
     >
       <div

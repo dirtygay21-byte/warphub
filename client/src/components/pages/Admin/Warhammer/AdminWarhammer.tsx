@@ -21,7 +21,6 @@ import {
   ChevronRight,
   GraduationCap,
   HelpCircle,
-  LoaderCircle,
   RefreshCw,
   Repeat,
   Lock,
@@ -30,7 +29,7 @@ import {
 import HoldCard from "@/components/pages/Admin/TableHolds/HoldCard";
 import UpcomingHolds from "@/components/pages/Admin/TableHolds/UpcomingHolds";
 import TableHoldSheet from "@/components/pages/Admin/TableHolds/TableHoldSheet";
-import { DsButton } from "@/components/ui/ds";
+import { DsButton, Skeleton } from "@/components/ui/ds";
 import { useMemo, useState } from "react";
 
 const shiftDate = (dateKey: string, days: number) => {
@@ -119,8 +118,10 @@ export default function AdminWarhammer() {
       {holdOpen && <TableHoldSheet prefill={{ dateKey }} onClose={() => setHoldOpen(false)} />}
 
       {dayQuery.isLoading ? (
-        <div className="flex justify-center py-16">
-          <LoaderCircle className="size-8 animate-spin text-accent" />
+        <div className="flex flex-col gap-3" aria-busy="true" aria-label="Загружаем день">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-[96px] rounded-2xl" />
+          ))}
         </div>
       ) : dayQuery.isError || !day ? (
         <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-fg-2">

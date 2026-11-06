@@ -188,6 +188,14 @@ body {
   .ds-stagger > :nth-child(6) { animation-delay: 200ms; }
   .ds-stagger > :nth-child(7) { animation-delay: 240ms; }
   .ds-stagger > :nth-child(n + 8) { animation-delay: 280ms; }
+  /* закрытие окна (useDialogExit): фон гаснет, панель уходит вниз; клики во время закрытия не проходят */
+  .ds-leaving {
+    pointer-events: none;
+    animation: ds-leave 180ms var(--ease-out-soft) forwards;
+  }
+  .ds-leaving .ds-sheet {
+    animation: ds-sheet-out 180ms var(--ease-out-soft) forwards;
+  }
   /* успех: круг пружинит */
   .ds-pop {
     animation: ds-pop 600ms var(--ease-out-soft) both;
@@ -201,6 +209,12 @@ body {
 @keyframes ds-sheet {
   from { transform: translateY(40px); opacity: 0; }
   to { transform: none; opacity: 1; }
+}
+@keyframes ds-leave {
+  to { opacity: 0; }
+}
+@keyframes ds-sheet-out {
+  to { transform: translateY(24px); opacity: 0; }
 }
 @keyframes ds-fade {
   from { opacity: 0; }
@@ -218,7 +232,7 @@ body {
 
 /* «Уменьшить движение» в системе — без анимаций */
 @media (prefers-reduced-motion: reduce) {
-  .ds-press, .ds-enter, .ds-sheet, .ds-fade, .ds-shimmer, .ds-pop, .ds-stagger > * {
+  .ds-press, .ds-enter, .ds-sheet, .ds-fade, .ds-shimmer, .ds-pop, .ds-stagger > *, .ds-leaving, .ds-leaving .ds-sheet {
     animation: none !important;
     transition: none !important;
   }

@@ -9,13 +9,14 @@ import {
 import { s3Url } from "@/utils/s3utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
-import { Clock, Layers, LoaderCircle, Sparkles, X } from "lucide-react";
+import { Clock, Layers, Sparkles, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CardBack, CardFace } from "./cards/CardFace";
 import { RARITY_ORDER, RARITY_STYLE } from "./cards/rarity";
 import { ErrorNote, GameTopBar, PixelButton } from "./common";
 import { errorText, oswald } from "./helpers";
+import { Skeleton } from "@/components/ui/ds";
 
 const useCards = () => useQuery({ queryKey: ["minigames", "cards"], queryFn: getCardsState });
 
@@ -240,8 +241,9 @@ export default function CardsGame() {
 
       <div className="px-4">
         {cards.isLoading && (
-          <div className="flex justify-center py-20">
-            <LoaderCircle className="size-8 animate-spin text-accent" />
+          <div className="space-y-3 py-4" aria-busy="true" aria-label="Загружаем карты">
+            <Skeleton className="h-28 rounded-2xl" />
+            <Skeleton className="h-48 rounded-2xl" />
           </div>
         )}
         {cards.isError && <ErrorNote message={errorText(cards.error)} onRetry={() => cards.refetch()} />}
@@ -416,7 +418,13 @@ export function CardCollection() {
     <div className="min-h-full pb-10 text-white">
       <GameTopBar title="Коллекция" back="/games/cards" right={state ? <div className="pr-2"><PointsChip value={state.balance} /></div> : undefined} />
       <div className="px-4">
-        {cards.isLoading && <LoaderCircle className="mx-auto mt-16 size-8 animate-spin text-accent" />}
+        {cards.isLoading && (
+          <div className="grid grid-cols-3 gap-3 pt-4" aria-busy="true" aria-label="Загружаем коллекцию">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="aspect-[3/4] rounded-xl" />
+            ))}
+          </div>
+        )}
         {state && (
           <>
             <div className="rounded-2xl border border-white/10 bg-app-elevated p-4">

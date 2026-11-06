@@ -50,7 +50,7 @@ export function WarcryList({
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Выберите фракцию и наберите бойцов: союзники, траллы, монстр, группы Dagger / Shield / Hammer и проверка правил построения.</Empty>
       ) : (
-        <ul className="space-y-2.5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-2.5 lg:space-y-0">
+        <ul className="ds-stagger space-y-2.5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-2.5 lg:space-y-0">
           {rosters.map((r) => {
             const f = factionOf.get(r.factionId);
             return (

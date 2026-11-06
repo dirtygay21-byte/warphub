@@ -2,10 +2,10 @@ import { getMyPoints, getMyRewards, type MinigameKey } from "@/apiUtils/minigame
 import { RARITY_STYLE } from "./cards/rarity";
 import { cardArt } from "./pixel/fantasy";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronRight, Gift, LoaderCircle, Sparkles, Trophy } from "lucide-react";
+import { ChevronRight, Gift, Sparkles, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ErrorNote, GameTopBar, RewardCodeCard, TierStrip } from "./common";
-import { DsButton } from "@/components/ui/ds";
+import { DsButton, Skeleton } from "@/components/ui/ds";
 import { errorText, useMinigames, oswald } from "./helpers";
 import { PixelSprite } from "./pixel/PixelSprite";
 import { eggSprite } from "./eggScene";
@@ -83,8 +83,10 @@ export default function GamesHub() {
         </button>
 
         {games.isLoading && (
-          <div className="flex justify-center py-16">
-            <LoaderCircle className="size-8 animate-spin text-accent" />
+          <div className="mt-5 space-y-4" aria-busy="true" aria-label="Загружаем игры">
+            {[0, 1, 2].map((i) => (
+              <Skeleton key={i} className="h-[150px] rounded-[18px]" />
+            ))}
           </div>
         )}
         {games.isError && (
@@ -93,7 +95,7 @@ export default function GamesHub() {
           </div>
         )}
 
-        <div className="mt-5 space-y-4">
+        <div className="ds-stagger mt-5 space-y-4">
           {games.data?.map((game) => (
             <section
               key={game.key}
@@ -193,8 +195,10 @@ export function MyRewards() {
           Код также приходит сообщением от бота.
         </p>
         {rewards.isLoading && (
-          <div className="flex justify-center py-16">
-            <LoaderCircle className="size-8 animate-spin text-accent" />
+          <div className="space-y-3" aria-busy="true" aria-label="Загружаем награды">
+            {[0, 1, 2].map((i) => (
+              <Skeleton key={i} className="h-[92px] rounded-2xl" />
+            ))}
           </div>
         )}
         {rewards.isError && (
@@ -205,7 +209,7 @@ export function MyRewards() {
             Наград пока нет. Сыграйте в мини-игру — награда появится здесь.
           </p>
         )}
-        <div className="space-y-3">
+        <div className="ds-stagger space-y-3">
           {sorted.map((reward) => (
             <RewardCodeCard key={reward.id} reward={reward} />
           ))}
