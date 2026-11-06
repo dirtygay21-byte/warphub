@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { LoaderCircle, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 
 const MINUTE = 60_000;
 /** смена клуба: 12:00 — 10:00 следующего дня (как на сервере, config/booking.ts) */
@@ -82,6 +83,7 @@ export default function TableHoldSheet({ prefill, onClose }: { prefill?: TableHo
     tableId === null ? "Выберите стол" : to <= from ? "Конец должен быть позже начала" : !title.trim() ? "Укажите название" : null;
 
   const mutation = useMutation({
+    meta: { success: "Бронь стола сохранена" },
     mutationFn: () =>
       createTableHold({
         tableId: tableId!,
@@ -103,8 +105,10 @@ export default function TableHoldSheet({ prefill, onClose }: { prefill?: TableHo
     onError: () => haptic.error(),
   });
 
+  const leaving = useDialogExit();
+
   return (
-    <div className="fixed inset-0 z-[70]">
+    <div className={`fixed inset-0 z-[70]${leaving ? " ds-leaving" : ""}`}>
       <div className="ds-fade absolute inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
       <div
         role="dialog"

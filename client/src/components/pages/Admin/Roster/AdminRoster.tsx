@@ -41,14 +41,15 @@ export default function AdminRoster() {
   };
 
   const create = useMutation({
+    meta: { success: "Код доступа создан", error: true },
     mutationFn: createRosterCode,
     onSuccess: (data) => {
       setCreated(data);
       refresh();
     },
   });
-  const revokeCode = useMutation({ mutationFn: revokeRosterCode, onSuccess: refresh });
-  const revokeAccess = useMutation({ mutationFn: revokeRosterAccess, onSuccess: refresh });
+  const revokeCode = useMutation({ meta: { success: "Код отозван", error: true }, mutationFn: revokeRosterCode, onSuccess: refresh });
+  const revokeAccess = useMutation({ meta: { success: "Доступ отозван", error: true }, mutationFn: revokeRosterAccess, onSuccess: refresh });
 
   const activeCount = codes.data?.filter((c) => c.status === "active").length ?? 0;
 

@@ -46,6 +46,7 @@ import type {
 import { addHoursToEndsAt, formToQuery, hasActiveFilters } from "./utils";
 import { isPaintingDetails, summarizeDetails } from "@/apiUtils/booking";
 import { useBookingOptions } from "@/hooks/useBookingOptions";
+import { AnimatePresence } from "motion/react";
 
 export default function AdminReservations() {
   // Пагинация
@@ -224,6 +225,7 @@ export default function AdminReservations() {
   );
 
   const statusMutation = useMutation({
+    meta: { success: "Статус записи обновлён" },
     mutationFn: async ({
       action,
       id,
@@ -384,46 +386,18 @@ export default function AdminReservations() {
         }}
       />
 
-      {pendingStatusAction?.action === "extend" && (
-        <ExtendReservationDialog
-          userLabel={pendingStatusAction.reservation.userLabel}
-          serviceTitle={pendingStatusAction.reservation.serviceTitle}
-          timeLabel={pendingStatusAction.reservation.timeRange}
-          dateLabel={formatReservationDateTime(
-            pendingStatusAction.reservation.startsAt
-          )}
-          currentEndsAt={pendingStatusAction.reservation.endsAt}
-          hours={extendHours}
-          onHoursChange={setExtendHours}
-          isPending={statusMutation.isPending}
-          errorMessage={
-            statusMutation.isError ? statusMutation.error.message : null
-          }
-          onClose={closePendingAction}
-          onConfirm={() =>
-            statusMutation.mutate({
-              action: "extend",
-              id: pendingStatusAction.reservation.id,
-              endsAt: addHoursToEndsAt(
-                pendingStatusAction.reservation.endsAt,
-                extendHours
-              ),
-            })
-          }
-        />
-      )}
-
-      {pendingStatusAction &&
-        (pendingStatusAction.action === "confirm" ||
-          pendingStatusAction.action === "reject") && (
-          <StatusConfirmDialog
-            action={pendingStatusAction.action}
+      <AnimatePresence>
+        {pendingStatusAction?.action === "extend" && (
+          <ExtendReservationDialog
             userLabel={pendingStatusAction.reservation.userLabel}
             serviceTitle={pendingStatusAction.reservation.serviceTitle}
             timeLabel={pendingStatusAction.reservation.timeRange}
             dateLabel={formatReservationDateTime(
               pendingStatusAction.reservation.startsAt
             )}
+            currentEndsAt={pendingStatusAction.reservation.endsAt}
+            hours={extendHours}
+            onHoursChange={setExtendHours}
             isPending={statusMutation.isPending}
             errorMessage={
               statusMutation.isError ? statusMutation.error.message : null
@@ -431,12 +405,44 @@ export default function AdminReservations() {
             onClose={closePendingAction}
             onConfirm={() =>
               statusMutation.mutate({
-                action: pendingStatusAction.action,
+                action: "extend",
                 id: pendingStatusAction.reservation.id,
+                endsAt: addHoursToEndsAt(
+                  pendingStatusAction.reservation.endsAt,
+                  extendHours
+                ),
               })
             }
           />
         )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {pendingStatusAction &&
+          (pendingStatusAction.action === "confirm" ||
+            pendingStatusAction.action === "reject") && (
+            <StatusConfirmDialog
+              action={pendingStatusAction.action}
+              userLabel={pendingStatusAction.reservation.userLabel}
+              serviceTitle={pendingStatusAction.reservation.serviceTitle}
+              timeLabel={pendingStatusAction.reservation.timeRange}
+              dateLabel={formatReservationDateTime(
+                pendingStatusAction.reservation.startsAt
+              )}
+              isPending={statusMutation.isPending}
+              errorMessage={
+                statusMutation.isError ? statusMutation.error.message : null
+              }
+              onClose={closePendingAction}
+              onConfirm={() =>
+                statusMutation.mutate({
+                  action: pendingStatusAction.action,
+                  id: pendingStatusAction.reservation.id,
+                })
+              }
+            />
+          )}
+      </AnimatePresence>
     </div>
   );
 }

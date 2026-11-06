@@ -2,6 +2,7 @@ import { formatReservationDateTime } from "@/utils/reservationDisplay";
 import { Clock } from "lucide-react";
 import { EXTEND_HOUR_OPTIONS } from "../constants";
 import { addHoursToEndsAt } from "../utils";
+import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 
 type ExtendReservationDialogProps = {
   userLabel: string;
@@ -32,9 +33,11 @@ export function ExtendReservationDialog({
 }: ExtendReservationDialogProps) {
   const newEndsAt = addHoursToEndsAt(currentEndsAt, hours);
 
+  const leaving = useDialogExit();
+
   return (
     <div
-      className="ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
+      className={`ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center${leaving ? " ds-leaving" : ""}`}
       onClick={onClose}
     >
       <div

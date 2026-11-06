@@ -30,6 +30,7 @@ const chip = (on: boolean) =>
 function useAction<A extends unknown[]>(fn: (...args: A) => Promise<unknown>) {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { success: "Готово" },
     mutationFn: (args: A) => fn(...args),
     onSuccess: () => {
       haptic.ok();

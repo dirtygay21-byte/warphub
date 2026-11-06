@@ -28,6 +28,7 @@ import {
   gameToDraft,
   type GameDraft,
 } from "./gameDraft";
+import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 
 const validateDraft = (draft: GameDraft): string | null => {
   if (!draft.title.trim()) return "Введите название";
@@ -104,6 +105,7 @@ export function GameEditorModal({
   const validationError = validateDraft(draft);
 
   const mutation = useMutation({
+    meta: { success: "Игра сохранена" },
     mutationFn: () =>
       game
         ? updateAdminDndGame(game.id, draftToPayload(draft))
@@ -130,9 +132,11 @@ export function GameEditorModal({
     }
   };
 
+  const leaving = useDialogExit();
+
   return (
     <div
-      className="ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-3 pb-4 pt-8 sm:items-center"
+      className={`ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-3 pb-4 pt-8 sm:items-center${leaving ? " ds-leaving" : ""}`}
       onClick={() => !mutation.isPending && onClose()}
     >
       <div

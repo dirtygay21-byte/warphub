@@ -21,6 +21,7 @@ export default function AdminAdmins() {
   const refresh = () => void queryClient.invalidateQueries({ queryKey: ["admin-admins"] });
 
   const add = useMutation({
+    meta: { success: "Администратор добавлен", error: true },
     mutationFn: () => addAdmin(telegramId.trim(), note.trim()),
     onSuccess: () => {
       setTelegramId("");
@@ -28,7 +29,7 @@ export default function AdminAdmins() {
       refresh();
     },
   });
-  const remove = useMutation({ mutationFn: removeAdmin, onSuccess: refresh });
+  const remove = useMutation({ meta: { success: "Администратор удалён", error: true }, mutationFn: removeAdmin, onSuccess: refresh });
   const idOk = /^\d{1,15}$/.test(telegramId.trim()) && Number(telegramId) > 0;
   const canManage = list.data?.canManage ?? false;
 

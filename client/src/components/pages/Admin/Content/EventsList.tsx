@@ -6,6 +6,7 @@ import { useState } from "react";
 import EventCard from "./components/EventCard";
 import EventDetailsModal from "./components/EventDetailsModal";
 import { Skeleton } from "@/components/ui/ds";
+import { AnimatePresence } from "motion/react";
 
 export default function EventsList() {
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
@@ -69,9 +70,11 @@ export default function EventsList() {
           </button>
         </div>
 
-        {isCreateOpen && (
-          <EventDetailsModal mode="create" onClose={closeModal} />
-        )}
+        <AnimatePresence>
+          {isCreateOpen && (
+            <EventDetailsModal mode="create" onClose={closeModal} />
+          )}
+        </AnimatePresence>
       </>
     );
   }
@@ -136,15 +139,19 @@ export default function EventsList() {
         </button>
       </div>
 
-      {isCreateOpen && <EventDetailsModal mode="create" onClose={closeModal} />}
+      <AnimatePresence>
+        {isCreateOpen && <EventDetailsModal mode="create" onClose={closeModal} />}
+      </AnimatePresence>
 
-      {selectedEventId !== null && (
-        <EventDetailsModal
-          mode="edit"
-          eventId={selectedEventId}
-          onClose={closeModal}
-        />
-      )}
+      <AnimatePresence>
+        {selectedEventId !== null && (
+          <EventDetailsModal
+            mode="edit"
+            eventId={selectedEventId}
+            onClose={closeModal}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }

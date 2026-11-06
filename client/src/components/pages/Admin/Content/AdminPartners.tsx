@@ -12,6 +12,7 @@ export default function AdminPartners() {
   const [editor, setEditor] = useState<{ mode: "create" | "edit"; lane: PartnerLane; card?: PartnerCard } | null>(null);
   const settings = query.data?.settings ?? { partner1Title: "Партнёр 1", partner2Title: "Партнёр 2", footerText: "Мини-ки по скидке", updatedAt: null };
   const remove = useMutation({
+    meta: { success: "Карточка удалена" },
     mutationFn: (id: number) => deletePartnerCard(id),
     onSuccess: () => {
       haptic.ok();
@@ -20,6 +21,7 @@ export default function AdminPartners() {
     },
   });
   const toggle = useMutation({
+    meta: { success: "Карточка обновлена" },
     mutationFn: (card: PartnerCard) => updatePartnerCard(card.id, { isActive: !card.isActive }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-partners"] });
@@ -98,6 +100,7 @@ function PartnerSettingsForm({ settings }: { settings: PartnerSettings }) {
   const queryClient = useQueryClient();
   const [value, setValue] = useState(settings);
   const save = useMutation({
+    meta: { success: "Настройки партнёров сохранены" },
     mutationFn: () => updatePartnerSettings(value),
     onSuccess: () => {
       haptic.ok();
@@ -129,6 +132,7 @@ function CardEditor({ mode, lane, card, onClose, onSaved }: { mode: "create" | "
   const [metadataError, setMetadataError] = useState<string | null>(null);
   const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => setForm((current) => ({ ...current, [key]: value }));
   const save = useMutation({
+    meta: { success: "Карточка сохранена" },
     mutationFn: (input: PartnerCardInput) => mode === "edit" && card ? updatePartnerCard(card.id, input) : createPartnerCard(input),
     onSuccess: () => { haptic.ok(); onSaved(); },
   });

@@ -74,6 +74,7 @@ export default function AdminSupporters() {
 function PlayerCard({ row }: { row: SupporterRow }) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
+    meta: { success: "Статус поддержки обновлён" },
     mutationFn: (title: SupporterTitle | null) => setSupporterTitle(row.user.id, title),
     onSuccess: () => {
       haptic.ok();
