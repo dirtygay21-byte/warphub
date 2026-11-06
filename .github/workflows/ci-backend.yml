@@ -49,6 +49,10 @@ jobs:
       ADMIN_TELEGRAM_IDS: "777"
       DOMINATUS_API_URL: "http://127.0.0.1:41999"
       DOMINATUS_INTEGRATION_TOKEN: "test-integration-secret"
+      DOMINATUS_GIT_API_URL: "http://127.0.0.1:41999"
+      DOMINATUS_GITHUB_TOKEN: "test-integration-secret"
+      DOMINATUS_GITHUB_REPOSITORY: "dirtygay21-byte/warphub"
+      DOMINATUS_GIT_BRANCH: "dominatus-battles"
     steps:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
@@ -92,7 +96,7 @@ jobs:
           cat api.log; exit 1
       - name: E2E tests
         working-directory: backend
-        run: WARPHUB_E2E=1 bun test tests/admins-e2e.test.ts tests/booking-short-e2e.test.ts tests/online-games-e2e.test.ts tests/dnd-flexible-e2e.test.ts tests/booking-game-e2e.test.ts tests/table-holds-e2e.test.ts tests/progress-e2e.test.ts tests/supporters-e2e.test.ts tests/club-closure-e2e.test.ts tests/dominatus-e2e.test.ts tests/tactical-tables-e2e.test.ts tests/dominatus-export-e2e.test.ts
+        run: WARPHUB_E2E=1 bun test tests/admins-e2e.test.ts tests/booking-short-e2e.test.ts tests/online-games-e2e.test.ts tests/dnd-flexible-e2e.test.ts tests/booking-game-e2e.test.ts tests/table-holds-e2e.test.ts tests/progress-e2e.test.ts tests/supporters-e2e.test.ts tests/club-closure-e2e.test.ts tests/dominatus-e2e.test.ts tests/tactical-tables-e2e.test.ts tests/dominatus-export-e2e.test.ts tests/dominatus-export-e2e.test.ts
       - name: API log on failure
         if: failure()
         working-directory: backend

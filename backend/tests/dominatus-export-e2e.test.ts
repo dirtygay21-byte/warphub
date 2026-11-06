@@ -17,6 +17,10 @@ const U: Record<string, string> = {};
 const P: Record<string, number> = {};
 const requests: Array<{ gameKey: string; token: string | undefined; body: any }> = [];
 const applied = new Map<string, string>();
+const gitFiles = new Map<string, { sha: string; html_url: string; content: string }>();
+const gitCommits: Array<{ path: string; message: string; content: string }> = [];
+let branchCreated = false;
+let gitSequence = 0;
 let mock: http.Server | undefined;
 let sequence = 0;
 
@@ -54,6 +58,52 @@ beforeAll(async () => {
   if (!E2E) return;
   sql(`delete from dominatus_campaigns`);
   mock = http.createServer((req, res) => {
+    const url = new URL(req.url ?? '/', 'http://localhost');
+    const path = url.pathname;
+    if (path.startsWith('/repos/dirtygay21-byte/warphub/')) {
+      if (req.headers.authorization !== 'Bearer test-integration-secret') {
+        res.writeHead(401).end();
+        return;
+      }
+      if (path === '/repos/dirtygay21-byte/warphub/git/ref/heads/main') {
+        res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify({ object: { sha: 'main-sha' } }));
+        return;
+      }
+      if (path === '/repos/dirtygay21-byte/warphub/git/ref/heads/dominatus-battles') {
+        if (!branchCreated) res.writeHead(404).end();
+        else res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify({ object: { sha: 'main-sha' } }));
+        return;
+      }
+      if (path === '/repos/dirtygay21-byte/warphub/git/refs' && req.method === 'POST') {
+        branchCreated = true;
+        res.writeHead(201, { 'Content-Type': 'application/json' }).end(JSON.stringify({ ref: 'refs/heads/dominatus-battles', object: { sha: 'main-sha' } }));
+        return;
+      }
+      if (path.startsWith('/repos/dirtygay21-byte/warphub/contents/')) {
+        const filePath = decodeURIComponent(path.slice('/repos/dirtygay21-byte/warphub/contents/'.length));
+        if (req.method === 'GET') {
+          const file = gitFiles.get(filePath);
+          if (!file) res.writeHead(404, { 'Content-Type': 'application/json' }).end(JSON.stringify({ message: 'Not Found' }));
+          else res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify({ path: filePath, sha: file.sha, html_url: file.html_url }));
+          return;
+        }
+        if (req.method === 'PUT') {
+          void (async () => {
+            const chunks: Buffer[] = [];
+            for await (const chunk of req) chunks.push(Buffer.from(chunk));
+            const body = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+            const sha = `file-${++gitSequence}`;
+            const htmlUrl = `https://github.test/${filePath}`;
+            gitFiles.set(filePath, { sha, html_url: htmlUrl, content: body.content });
+            gitCommits.push({ path: filePath, message: body.message, content: body.content });
+            res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify({ content: { path: filePath, sha, html_url: htmlUrl } }));
+          })().catch((error) => res.writeHead(500).end(String(error)));
+          return;
+        }
+      }
+      res.writeHead(404).end();
+      return;
+    }
     if (req.method !== 'POST' || req.url !== '/api/integrations/warphub/battles') {
       res.writeHead(404).end();
       return;
@@ -81,6 +131,10 @@ beforeAll(async () => {
   await new Promise<void>((resolve) => mock!.listen(MOCK_PORT, '127.0.0.1', resolve));
   process.env.DOMINATUS_API_URL = `http://127.0.0.1:${MOCK_PORT}`;
   process.env.DOMINATUS_INTEGRATION_TOKEN = 'test-integration-secret';
+  process.env.DOMINATUS_GIT_API_URL = `http://127.0.0.1:${MOCK_PORT}`;
+  process.env.DOMINATUS_GITHUB_TOKEN = 'test-integration-secret';
+  process.env.DOMINATUS_GITHUB_REPOSITORY = 'dirtygay21-byte/warphub';
+  process.env.DOMINATUS_GIT_BRANCH = 'dominatus-battles';
 
   for (const [name, id] of Object.entries(ID)) {
     const r = await api('POST', '/auth/telegram', undefined, { initData: initData({ id, first_name: name }) });
@@ -141,5 +195,29 @@ describe('dominatus export', () => {
     expect(retried.json.updated).toBe(true);
     expect(requests.filter((r) => r.gameKey === 'retry-once').length).toBe(2);
     expect(applied.get('retry-once')).toBe('site-2');
+  });
+});
+
+describe('dominatus git export', () => {
+  test('full JSON is created once in a dedicated branch and updated on the next save', async () => {
+    expect((await api('POST', '/roster/dominatus/battles', T.anna, battle())).status).toBe(200);
+    expect((await api('GET', '/roster/dominatus/git-export/dom-export-game-1', T.anna)).json.htmlUrl).toBeNull();
+    const created = await api('POST', '/roster/dominatus/git-export', T.anna, { gameKey: 'dom-export-game-1' });
+    expect(created.status).toBe(200);
+    const campaignId = (await view('anna')).campaign.id;
+    expect(created.json.path).toBe(`dominatus/${campaignId}/dom-export-game-1.json`);
+    expect(created.json.htmlUrl).toContain(`https://github.test/dominatus/${campaignId}/dom-export-game-1.json`);
+    const updated = await api('POST', '/roster/dominatus/git-export', T.boris, { gameKey: 'dom-export-game-1' });
+    expect(updated.status).toBe(200);
+    expect(updated.json.path).toBe(created.json.path);
+    expect(updated.json.sha).not.toBe(created.json.sha);
+    expect(gitFiles.size).toBe(1);
+    expect(gitCommits.length).toBe(2);
+    const payload = JSON.parse(Buffer.from(gitCommits[1]!.content, 'base64').toString('utf8'));
+    expect(payload.battle.gameKey).toBe('dom-export-game-1');
+    expect(payload.battle.details.events[0].text).toBe('full export payload');
+    expect(branchCreated).toBe(true);
+    const read = await api('GET', '/roster/dominatus/git-export/dom-export-game-1', T.boris);
+    expect(read.json.htmlUrl).toBe(created.json.htmlUrl);
   });
 });

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { agendasActive, battleResult, type Seat } from '../../game';
-import { ALLIANCE_RU, claimCampaignCard, deckFor, hasCampaign, KIND_RU, recordCampaignBattle, retryDominatusBattle, uploadDominatusBattle, useCampaign, type CampaignCard, type CampaignView } from '../../dominatus/api';
+import { ALLIANCE_RU, claimCampaignCard, deckFor, getDominatusGitExport, hasCampaign, KIND_RU, recordCampaignBattle, retryDominatusBattle, saveDominatusBattleToGit, uploadDominatusBattle, useCampaign, type CampaignCard, type CampaignView, type DominatusGitFile } from '../../dominatus/api';
 import type { AllianceId, CampaignPhase } from '../../dominatus/types';
 import { haptic, pushOverlay } from '../../telegram';
 import { Button, IconButton, Tag } from '../kit';
@@ -271,6 +271,50 @@ function ExportBattle({ battle, reload }: { battle: CampaignView['battles'][numb
   );
 }
 
+/** Сохранение полного JSON битвы в отдельную ветку GitHub с историей изменений файла. */
+function GitExportBattle({ battle, reload }: { battle: CampaignView['battles'][number]; reload: () => Promise<unknown> }) {
+  const [file, setFile] = useState<DominatusGitFile | { path: null; sha: null; htmlUrl: null } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    void getDominatusGitExport(battle.gameKey).then((result) => {
+      if (alive && result.ok && result.data) setFile(result.data);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [battle.gameKey]);
+
+  const submit = async () => {
+    setBusy(true);
+    setError(null);
+    const result = await saveDominatusBattleToGit(battle.gameKey);
+    setBusy(false);
+    if (!result.ok) return setError(result.error);
+    setFile(result.data);
+    haptic.ok();
+    await reload();
+  };
+
+  return (
+    <div className="space-y-2 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm">
+      {file?.path ? (
+        <p className="text-accent">
+          Сохранено в GitHub · <a className="underline underline-offset-2" href={file.htmlUrl} target="_blank" rel="noreferrer">открыть JSON</a>
+        </p>
+      ) : (
+        <p className="text-fg-3">Можно сохранить полный JSON битвы в отдельную ветку GitHub.</p>
+      )}
+      {error && <p className="text-xs text-warn">{error}</p>}
+      <Button className="w-full" disabled={busy} onClick={() => void submit()}>
+        {file?.path ? 'Обновить в GitHub' : 'Сохранить в GitHub'}
+      </Button>
+    </div>
+  );
+}
+
 // ---------- «Начать игру»: подстановка из кампании и запись битвы ----------
 
 /** Шаг «Кампания»: фаза и локация открытой фазы кампании (одной кнопкой). */
@@ -433,6 +477,7 @@ export function RecordBattle({ game }: { game: GameHook }) {
         {done || recorded ? 'Обновить запись' : 'Записать битву в кампанию'}
       </Button>
       {recorded && <ExportBattle battle={recorded} reload={reload} />}
+      {recorded && <GitExportBattle battle={recorded} reload={reload} />}
     </div>
   );
 }

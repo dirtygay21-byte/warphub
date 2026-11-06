@@ -18,3 +18,12 @@ test('Dominatus export is an explicit participant action with cross-device statu
   assert.ok(screen.includes('Загружено на Dominatus'));
   assert.ok(screen.includes('exportBattleId'));
 });
+
+test('GitHub export saves full JSON in a dedicated branch with an update link', () => {
+  assert.ok(api.includes('getDominatusGitExport'));
+  assert.ok(api.includes('saveDominatusBattleToGit'));
+  assert.ok(screen.includes('Сохранить в GitHub'));
+  assert.ok(screen.includes('Обновить в GitHub'));
+  assert.ok(screen.includes('открыть JSON'));
+  assert.ok(screen.includes('<GitExportBattle battle={recorded} reload={reload} />'));
+});
