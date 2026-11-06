@@ -113,7 +113,7 @@ Not verified: real-device look and performance (no phone access from the design 
 
 ## 7. Motion levels and the «Яркие эффекты» toggle
 
-Recorded 06.11.2026 (owner's decision): subtle base animations for everyone, strong effects on by default and switchable in Profile → Настройки → «Яркие эффекты».
+Recorded 06.11.2026 (owner's decision): subtle base animations for everyone, strong effects on by default and switchable with the small «Яркие эффекты» switch (sparkle icon) in the top-right corner of the Profile card; a toast confirms the change.
 
 | Level (`<html data-fx>`) | When | What runs |
 |---|---|---|

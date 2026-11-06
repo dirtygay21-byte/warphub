@@ -13,8 +13,9 @@ import { isOutsideTelegram } from "@/utils/telegramEnv";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getFullName, getInitials } from "@/utils/user";
 import { useQuery } from "@tanstack/react-query";
-import { AtSign, BookOpen, Check, Copy, Gamepad2, Hash, RefreshCw, ShieldCheck, Swords, UserRound } from "lucide-react";
-import { DsButton, GroupCard, NavRow, SectionLabel, Skeleton, ToggleRow } from "@/components/ui/ds";
+import { AtSign, BookOpen, Check, Copy, Gamepad2, Hash, RefreshCw, ShieldCheck, Sparkles, Swords, UserRound } from "lucide-react";
+import { DsButton, GroupCard, NavRow, SectionLabel, Skeleton } from "@/components/ui/ds";
+import clsx from "clsx";
 import { useEffectsStore } from "@/stores/useEffectsStore";
 import { haptic } from "@/utils/haptic";
 import { useEffect, useState } from "react";
@@ -110,6 +111,7 @@ export default function Profile() {
     <div className="ds-enter px-5 py-3 text-fg lg:grid lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start lg:gap-x-6 lg:pt-8">
       <section className="overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.35)] lg:sticky lg:top-8 lg:row-span-6">
         <div className="relative px-6 pb-6 pt-8 text-center">
+          <EffectsToggle />
           <div className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-accent/15 to-transparent" />
 
           {supporter ? (
@@ -200,8 +202,6 @@ export default function Profile() {
           />
         </GroupCard>
       </section>
-
-      <EffectsSetting />
 
       <DsButton
         className="mt-4 w-full"
@@ -312,25 +312,46 @@ function InfoRow({
   );
 }
 
-/** Переключатель «Яркие эффекты» (на этом устройстве). При «Уменьшить движение» в системе эффекты выключены всегда. */
-function EffectsSetting() {
+/**
+ * Переключатель «Яркие эффекты» (на этом устройстве) — маленький, в правом верхнем углу карточки профиля
+ * (решение владельца 06.11.2026). Подписи нет, поэтому смена состояния подтверждается всплывающим сообщением.
+ * При «Уменьшить движение» в системе эффекты выключены всегда — нажатие объясняет почему.
+ */
+function EffectsToggle() {
   const strongEnabled = useEffectsStore((s) => s.strongEnabled);
   const systemReduced = useEffectsStore((s) => s.systemReduced);
   const setStrongEnabled = useEffectsStore((s) => s.setStrongEnabled);
+  const on = strongEnabled && !systemReduced;
 
   return (
-    <section className="mt-6">
-      <SectionLabel>Настройки</SectionLabel>
-      <ToggleRow
-        title="Яркие эффекты"
-        subtitle={
-          systemReduced
-            ? "В системе включено «Уменьшить движение» — эффекты выключены"
-            : "Анимации и эффекты в приложении. Выключите, если телефон тормозит"
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-label="Яркие эффекты"
+      title={systemReduced ? "Яркие эффекты выключены: в системе включено «Уменьшить движение»" : "Яркие эффекты"}
+      onClick={() => {
+        haptic.select();
+        if (systemReduced) {
+          toast.info("В системе включено «Уменьшить движение» — яркие эффекты выключены");
+          return;
         }
-        checked={strongEnabled && !systemReduced}
-        onChange={setStrongEnabled}
-      />
-    </section>
+        setStrongEnabled(!strongEnabled);
+        toast.info(strongEnabled ? "Яркие эффекты выключены" : "Яркие эффекты включены");
+      }}
+      className="ds-press absolute right-1.5 top-1.5 z-[2] flex min-h-11 items-center gap-1.5 rounded-full px-2.5"
+    >
+      <Sparkles aria-hidden="true" className={clsx("size-4 transition-colors duration-200", on ? "text-accent" : "text-fg-3")} />
+      <span
+        aria-hidden="true"
+        className={clsx(
+          "flex h-[18px] w-[30px] items-center rounded-full p-[2px] transition-colors duration-200",
+          on ? "justify-end bg-accent" : "justify-start bg-white/[0.16]",
+          systemReduced && "opacity-50",
+        )}
+      >
+        <span className={clsx("size-[14px] rounded-full", on ? "bg-accent-foreground" : "bg-fg")} />
+      </span>
+    </button>
   );
 }
