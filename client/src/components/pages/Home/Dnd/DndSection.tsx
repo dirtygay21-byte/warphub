@@ -22,6 +22,7 @@ import { s3Url } from "@/utils/s3utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import {
+  BookOpenText,
   CalendarDays,
   CheckCircle2,
   ChevronLeft,
@@ -31,7 +32,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AnimatePresence } from "motion/react";
+import { createPortal } from "react-dom";
 import { Skeleton } from "@/components/ui/ds";
+import { DndGameDetailsModal } from "./DndGameDetailsModal";
 
 type View =
   | { name: "home" }
@@ -179,7 +183,14 @@ export function DndGameCard({
   game: DndGame;
   onJoin?: () => void;
 }) {
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const imageUrl = gameImage(game);
+  const dateLabel = formatGameDate(game);
+  const timeLabel = formatGameTime(game);
+  const seatsLabel = availabilityLabel(game);
+
   return (
+    <>
     <article
       className={clsx(
         "overflow-hidden rounded-2xl border bg-app-elevated",
@@ -187,7 +198,7 @@ export function DndGameCard({
       )}
     >
       <img
-        src={gameImage(game)}
+        src={imageUrl}
         alt=""
         className="aspect-[16/7] w-full object-cover"
       />
@@ -197,9 +208,26 @@ export function DndGameCard({
         </span>
         <h3 className="mt-2 text-lg font-semibold leading-tight">{game.title}</h3>
         {game.description && (
-          <p className="mt-1.5 line-clamp-3 text-sm text-fg-2">
-            {game.description}
-          </p>
+          <div className="mt-1.5">
+            <p>
+              <button
+                type="button"
+                aria-label={`Открыть полное описание игры «${game.title}»`}
+                onClick={() => setDetailsOpen(true)}
+                className="line-clamp-3 w-full text-left text-sm leading-relaxed text-fg-2 transition-colors hover:text-fg"
+              >
+                {game.description}
+              </button>
+            </p>
+            <button
+              type="button"
+              onClick={() => setDetailsOpen(true)}
+              className="ds-press mt-1 inline-flex min-h-11 items-center gap-1.5 rounded-lg text-sm font-semibold text-accent underline decoration-accent/40 underline-offset-4 transition-colors hover:text-white"
+            >
+              <BookOpenText className="size-4 shrink-0" aria-hidden="true" />
+              Читать полностью
+            </button>
+          </div>
         )}
 
         <div className="mt-3 space-y-1.5 text-sm text-white/85">
@@ -231,6 +259,22 @@ export function DndGameCard({
         )}
       </div>
     </article>
+    {createPortal(
+      <AnimatePresence>
+        {detailsOpen && game.description && (
+          <DndGameDetailsModal
+            game={game}
+            imageUrl={imageUrl}
+            dateLabel={dateLabel}
+            timeLabel={timeLabel}
+            availabilityLabel={seatsLabel}
+            onClose={() => setDetailsOpen(false)}
+          />
+        )}
+      </AnimatePresence>,
+      document.body,
+    )}
+    </>
   );
 }
 
