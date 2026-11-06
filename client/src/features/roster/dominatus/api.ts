@@ -102,6 +102,9 @@ export const claimCampaignCard = (id: number, name: string) => call<unknown>(`/r
 export const getDominatusExport = (gameKey: string) => call<DominatusExportInfo>(`/roster/dominatus/exports/${encodeURIComponent(gameKey)}`);
 export const uploadDominatusBattle = (gameKey: string) => call<DominatusExportInfo>('/roster/dominatus/exports', { method: 'POST', body: JSON.stringify({ gameKey }) });
 export const retryDominatusBattle = (gameKey: string) => call<DominatusExportInfo>(`/roster/dominatus/exports/${encodeURIComponent(gameKey)}/retry`, { method: 'POST' });
+export interface DominatusGitFile { path: string; sha: string; htmlUrl: string }
+export const getDominatusGitExport = (gameKey: string) => call<DominatusGitFile | { path: null; sha: null; htmlUrl: null }>(`/roster/dominatus/git-export/${encodeURIComponent(gameKey)}`);
+export const saveDominatusBattleToGit = (gameKey: string) => call<DominatusGitFile>('/roster/dominatus/git-export', { method: 'POST', body: JSON.stringify({ gameKey }) });
 
 /** Колода, из которой выбирается ожидающая карта. */
 export function deckFor(view: CampaignView, card: CampaignCard, alliance: AllianceId): string[] {

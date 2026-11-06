@@ -4,6 +4,7 @@ import { adminMiddleware } from '../../plugins/admin-middleware';
 import { hasRosterAccess } from '../roster/service';
 import { findPlayers } from '../supporters/service';
 import { enqueueDominatusExport, getDominatusExport } from './export';
+import { getDominatusGitExport, saveDominatusBattleToGit } from './git-export';
 import {
   claimCard,
   createCampaign,
@@ -40,6 +41,14 @@ export const dominatusModule = new Elysia({ prefix: '/roster/dominatus', tags: [
   .use(authMiddleware)
   .guard({ detail: { security: [{ bearerAuth: [] }] } })
   .get('/campaign', ({ user }) => guard(user, () => getCampaignView(user.id)), { detail: { summary: 'Dominatus: активная кампания' } })
+  .get('/git-export/:gameKey', ({ user, params }) => guard(user, () => getDominatusGitExport(user.id, params.gameKey)), {
+    params: t.Object({ gameKey: t.String({ minLength: 4, maxLength: 80 }) }),
+    detail: { summary: 'Dominatus: файл битвы в GitHub, если он уже сохранён' },
+  })
+  .post('/git-export', ({ user, body }) => guard(user, () => saveDominatusBattleToGit(user.id, body.gameKey)), {
+    body: t.Object({ gameKey: t.String({ minLength: 4, maxLength: 80 }) }),
+    detail: { summary: 'Dominatus: сохранить полный JSON битвы в отдельную GitHub-ветку' },
+  })
   .get('/exports/:gameKey', ({ user, params }) => guard(user, () => getDominatusExport(user.id, params.gameKey)), {
     params: t.Object({ gameKey: t.String({ minLength: 4, maxLength: 80 }) }),
     detail: { summary: 'Dominatus: статус загрузки битвы на сайт' },
