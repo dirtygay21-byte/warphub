@@ -1,5 +1,6 @@
 import { BOOSTY_GENERAL_URL, BOOSTY_SUBSCRIPTION_URL, type BoostyKind } from "./boosty";
 import clsx from "clsx";
+import { DsButton } from "@/components/ui/ds";
 import { CircleAlert, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { AnimatePresence } from "motion/react";
@@ -29,7 +30,7 @@ const COPY: Record<BoostyKind, Record<BoostyContext, string>> = {
     selection:
       "Планируете регулярно играть в Warhammer? На Boosty можно оформить подписку в поддержку клуба — она включает безлимитное посещение клуба.",
     booking:
-      "Подписка Boosty включает только доступ к WarpBuilder — конструктору ростеров и игровым инструментам клуба. Мы очень благодарны за вашу поддержку!",
+      "У нас есть WarpBuilder — конструктор ростеров и игровые инструменты клуба. Доступ к нему можно получить по подписке на Boosty. Будем рады вашей поддержке!",
   },
   painting: {
     selection:
@@ -132,14 +133,9 @@ export default function BoostySubscriptionInfo({
                 </button>
               </p>
               <div className="border-t border-white/[0.07] px-5 py-3">
-                <button
-                  type="button"
-                  aria-label="Закрыть диалог"
-                  onClick={() => setOpen(false)}
-                  className="min-h-10 w-full rounded-xl px-4 py-2 text-sm font-medium text-fg-3 transition-colors hover:bg-white/[0.04] hover:text-fg active:bg-white/[0.06]"
-                >
+                <DsButton variant="primary" className="w-full" aria-label="Закрыть диалог" onClick={() => setOpen(false)}>
                   {closeLabel}
-                </button>
+                </DsButton>
               </div>
             </div>
           </BoostySheet>
