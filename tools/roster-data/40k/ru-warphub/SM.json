@@ -1,0 +1,705 @@
+{
+ "schema": "warphub-ru-translation/1",
+ "faction": "SM",
+ "name": "Space Marines",
+ "rules": {},
+ "datasheets": {
+  "000003837": {
+   "name": "Death Company Marines with Boltguns and Jump Packs",
+   "abilities": {
+    "An Honourable Death in Combat": {
+     "en": "aa5afff4e4",
+     "name": "Достойная смерть в бою",
+     "text": "Каждый раз, когда модель этого юнита совершает атаку, эта атака имеет способность [SUSTAINED HITS 1], если этот юнит ниже своей начальной численности, или способность [SUSTAINED HITS 2], если этот юнит ниже половинной численности.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000000061": {
+   "name": "Assault Squad",
+   "abilities": {
+    "Astartes Shield": {
+     "en": "01c0762d0c",
+     "name": "Щит астартес",
+     "text": "Носитель имеет инвулевый спас-бросок 4+.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000000063": {
+   "name": "Apothecary on Bike",
+   "abilities": {}
+  },
+  "000000064": {
+   "name": "Assault Squad with Jump Packs",
+   "abilities": {
+    "Astartes Shield": {
+     "en": "01c0762d0c",
+     "name": "Щит астартес",
+     "text": "Носитель имеет инвулевый спас-бросок 4+.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000000068": {
+   "name": "Suppressor Squad",
+   "abilities": {}
+  },
+  "000000070": {
+   "name": "Tactical Squad",
+   "abilities": {}
+  },
+  "000000072": {
+   "name": "Caestus Assault Ram",
+   "abilities": {
+    "Into the Foe": {
+     "en": "fe8f15a178",
+     "name": "На врага",
+     "text": "Если юнит высаживается из этого TRANSPORT до того, как тот двигался, до конца хода этот юнит имеет право нападать в ход, в который он продвигался.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000000096": {
+   "name": "Carab Culln The Risen",
+   "abilities": {}
+  },
+  "000000104": {
+   "name": "Relic Terminator Squad",
+   "abilities": {}
+  },
+  "000000107": {
+   "name": "Javelin Attack Speeder",
+   "abilities": {}
+  },
+  "000000111": {
+   "name": "Mortis Dreadnought",
+   "abilities": {}
+  },
+  "000000113": {
+   "name": "Storm Eagle Gunship",
+   "abilities": {
+    "Armoured Resilience": {
+     "en": "3fc85c8289",
+     "name": "Бронированная стойкость",
+     "text": "Каждый раз, когда атака распределяется по этой модели, вычтите 1 из характеристики Урона (Damage) этой атаки.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000000116": {
+   "name": "Bike Squad",
+   "abilities": {
+    "Turbo-boost": {
+     "en": "e2a86089c2",
+     "name": "Турбоускорение",
+     "text": "Каждый раз, когда этот юнит продвигается, не делайте для него бросок продвижения. Вместо этого до конца фазы прибавьте 6\" к характеристике Движения (Move) моделей этого юнита.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000000121": {
+   "name": "Uriel Ventris",
+   "abilities": {}
+  },
+  "000000122": {
+   "name": "Dreadnought Drop Pod",
+   "abilities": {}
+  },
+  "000000131": {
+   "name": "Leviathan Dreadnought",
+   "abilities": {}
+  },
+  "000000132": {
+   "name": "Land Speeder Storm",
+   "abilities": {}
+  },
+  "000000134": {
+   "name": "Astartes Servitors",
+   "abilities": {}
+  },
+  "000000146": {
+   "name": "Hunter",
+   "abilities": {}
+  },
+  "000000148": {
+   "name": "Imperial Space Marine",
+   "abilities": {
+    "Swift Assault": {
+     "en": "7aa0a3d41b",
+     "name": "Стремительный штурм",
+     "text": "Пока эта модель возглавляет юнит, оружие дальнего боя моделей этого юнита имеет способность [ASSAULT].",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000001162": {
+   "name": "Sergeant Telion",
+   "abilities": {}
+  },
+  "000001164": {
+   "name": "Thunderfire Cannon",
+   "abilities": {}
+  },
+  "000001166": {
+   "name": "Company Veterans On Bikes",
+   "abilities": {
+    "Storm Shield": {
+     "en": "c2fadf0a61",
+     "name": "Штормовой щит",
+     "text": "Носитель имеет инвулевый спас-бросок 4+.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000001168": {
+   "name": "Land Speeder Tempest",
+   "abilities": {}
+  },
+  "000001169": {
+   "name": "Land Speeder Tornado",
+   "abilities": {}
+  },
+  "000001178": {
+   "name": "Vindicator Laser Destroyer",
+   "abilities": {}
+  },
+  "000001179": {
+   "name": "Sokar-pattern Stormbird",
+   "abilities": {
+    "Aerial Assault": {
+     "en": "672575df69",
+     "name": "Воздушный штурм",
+     "text": "Каждый раз, когда юнит со способностью Deep Strike высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000001182": {
+   "name": "Ancient on Bike",
+   "abilities": {}
+  },
+  "000001184": {
+   "name": "Terminus Ultra",
+   "abilities": {
+    "Assault Ramp": {
+     "en": "de8e6c75c8",
+     "name": "Штурмовая аппарель",
+     "text": "Каждый раз, когда юнит высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000001192": {
+   "name": "Chaplain Venerable Dreadnought",
+   "abilities": {}
+  },
+  "000001344": {
+   "name": "Librarian with Jump Pack",
+   "abilities": {}
+  },
+  "000001345": {
+   "name": "Lieutenant In Reiver Armour",
+   "abilities": {
+    "Tactical Precision": {
+     "en": "310b117fca",
+     "name": "Тактическая точность",
+     "text": "Пока эта модель возглавляет юнит, оружие моделей этого юнита имеет способность [LETHAL HITS].",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000001347": {
+   "name": "Land Raider Prometheus",
+   "abilities": {
+    "Assault Ramp": {
+     "en": "de8e6c75c8",
+     "name": "Штурмовая аппарель",
+     "text": "Каждый раз, когда юнит высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000001348": {
+   "name": "Librarian on Bike",
+   "abilities": {}
+  },
+  "000001523": {
+   "name": "Scout Sniper Squad",
+   "abilities": {}
+  },
+  "000001524": {
+   "name": "Sergeant Chronus",
+   "abilities": {}
+  },
+  "000001527": {
+   "name": "Techmarine on Bike",
+   "abilities": {
+    "Conversion": {
+     "en": "eed641bd9f",
+     "text": "Каждый раз, когда атака этим оружием нацеливается на вражеский юнит, который не находится в пределах 12\", немодифицированный бросок попадания 4+ считается критическим попаданием.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000001607": {
+   "name": "Land Raider Achilles",
+   "abilities": {
+    "Assault Ramp": {
+     "en": "de8e6c75c8",
+     "name": "Штурмовая аппарель",
+     "text": "Каждый раз, когда юнит высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000001608": {
+   "name": "Land Raider Proteus",
+   "abilities": {
+    "Assault Ramp": {
+     "en": "de8e6c75c8",
+     "name": "Штурмовая аппарель",
+     "text": "Каждый раз, когда юнит высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000001609": {
+   "name": "Fire Raptor Gunship",
+   "abilities": {}
+  },
+  "000002076": {
+   "name": "Attack Bike Squad",
+   "abilities": {}
+  },
+  "000002102": {
+   "name": "Land Speeder Typhoon",
+   "abilities": {}
+  },
+  "000002103": {
+   "name": "Command Squad",
+   "abilities": {
+    "Astartes Shield": {
+     "en": "01c0762d0c",
+     "name": "Щит астартес",
+     "text": "Носитель имеет инвулевый спас-бросок 4+.",
+     "by": "wh-rules"
+    },
+    "Honour or Death": {
+     "en": "4ec65d7f60",
+     "name": "Честь или смерть",
+     "text": "Пока этот юнит содержит Company Champion, прибавьте 1 к броскам продвижения и нападения для этого юнита. Когда вы нацеливаете стратагему Heroic Intervention на этот юнит, это применение стоит на 1 CP меньше.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000002202": {
+   "name": "Devastator Squad",
+   "abilities": {}
+  },
+  "000002234": {
+   "name": "Primaris Company Champion",
+   "abilities": {}
+  },
+  "000002252": {
+   "name": "Spartan",
+   "abilities": {
+    "Assault Ramp": {
+     "en": "de8e6c75c8",
+     "name": "Штурмовая аппарель",
+     "text": "Каждый раз, когда юнит высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000002258": {
+   "name": "Stalker",
+   "abilities": {}
+  },
+  "000002267": {
+   "name": "Deathstorm Drop Pod",
+   "abilities": {}
+  },
+  "000002268": {
+   "name": "Deimos Predator",
+   "abilities": {
+    "Armoured Spearhead": {
+     "en": "43a663914a",
+     "name": "Бронированный наконечник",
+     "text": "Каждый раз, когда эта модель совершает атаку по вражескому юниту, перебросьте бросок попадания, равный 1, и, если этот юнит находится в радиусе маркера цели, который вы не контролируете, вы можете вместо этого перебросить бросок попадания.",
+     "by": "wh-rules"
+    },
+    "Conversion": {
+     "en": "eed641bd9f",
+     "text": "Каждый раз, когда атака этим оружием нацеливается на вражеский юнит, который не находится в пределах 12\", немодифицированный бросок попадания 4+ считается критическим попаданием.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000002269": {
+   "name": "Deredeo Dreadnought",
+   "abilities": {}
+  },
+  "000002285": {
+   "name": "Death Company Marines with Bolt Rifles",
+   "abilities": {}
+  },
+  "000002678": {
+   "name": "Chaplain Cassius",
+   "abilities": {}
+  },
+  "000002704": {
+   "name": "Fellblade",
+   "abilities": {}
+  },
+  "000002706": {
+   "name": "Ironclad Dreadnought",
+   "abilities": {}
+  },
+  "000002710": {
+   "name": "Land Raider Helios",
+   "abilities": {
+    "Assault Ramp": {
+     "en": "de8e6c75c8",
+     "name": "Штурмовая аппарель",
+     "text": "Каждый раз, когда юнит высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000002713": {
+   "name": "Pedro Kantor",
+   "abilities": {}
+  },
+  "000002719": {
+   "name": "Relic Contemptor Dreadnought",
+   "abilities": {
+    "Conversion": {
+     "en": "eed641bd9f",
+     "text": "Каждый раз, когда атака этим оружием нацеливается на вражеский юнит, который не находится в пределах 12\", немодифицированный бросок попадания 4+ считается критическим попаданием.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000002724": {
+   "name": "Thunderhawk Transporter",
+   "abilities": {
+    "Aerial Deployment": {
+     "en": "2e572e496d",
+     "name": "Воздушное развёртывание",
+     "text": "Если эта модель начинает игру в режиме Hover и в стратегических резервах, её можно выставить в шаге Reinforcements вашей первой, второй или третьей фазы движения, независимо от любых правил миссии.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000002725": {
+   "name": "Tyrannic War Veterans",
+   "abilities": {}
+  },
+  "000002728": {
+   "name": "Whirlwind Scorpius",
+   "abilities": {}
+  },
+  "000002729": {
+   "name": "Xiphon Interceptor",
+   "abilities": {}
+  },
+  "000004204": {
+   "name": "Ferren Areios",
+   "abilities": {}
+  },
+  "000004234": {
+   "name": "Company Champion on Bike",
+   "abilities": {}
+  },
+  "000000871": {
+   "name": "Callidus Assassin",
+   "abilities": {}
+  },
+  "000000873": {
+   "name": "Culexus Assassin",
+   "abilities": {}
+  },
+  "000003822": {
+   "name": "Deathwatch Terminator Squad",
+   "abilities": {
+    "ATTACHED UNIT": {
+     "en": "7c8eabbf70",
+     "name": "Присоединяемый юнит",
+     "text": "Если CHARACTER из вашей армии со способностью Leader может быть присоединён к DEATHWATCH KILL TEAM, он может быть присоединён к этому юниту вместо этого.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000000872": {
+   "name": "Eversor Assassin",
+   "abilities": {}
+  },
+  "000003825": {
+   "name": "Fortis Kill Team",
+   "abilities": {
+    "Kill Team": {
+     "en": "7efec07421",
+     "name": "Истребительная команда",
+     "text": "Каждый раз, когда атака нацелена на этот юнит, если он содержит модели с разными характеристиками Стойкости (Toughness), до тех пор пока атакующий юнит не завершит свои атаки, для определения броска, необходимого для ранения, используйте характеристику Стойкости большинства моделей этого юнита. Если две или более характеристики Стойкости делят большинство, используйте наибольшее значение.\n\nДля определения того, какие модели этого юнита могут погрузиться в TRANSPORT, модели Kill Team Terminator, Kill Team Outrider, Kill Team Biker и модели с прыжковым ранцем занимают место 2 моделей каждая, но в остальном могут погружаться в любой TRANSPORT, в который может погрузиться их юнит, даже если похожие модели в других юнитах имеют ключевые слова TERMINATOR, MOUNTED или JUMP PACK.\n\nДля взаимодействия с элементами ландшафта все модели юнитов с этой способностью считаются моделями INFANTRY, даже если похожие модели в других юнитах могут иметь ключевые слова MOUNTED или JUMP PACK.\n\n**Примечание разработчика:** хотя абстракции этого правила заставляют некоторые модели вести себя иначе, чем похожие модели в других юнитах, они созданы, чтобы свести к минимуму сложные правила движения, транспорта и преимущества укрытия.",
+     "by": "wh-rules"
+    },
+    "ATTACHED UNIT": {
+     "en": "7c8eabbf70",
+     "name": "Присоединяемый юнит",
+     "text": "Если CHARACTER из вашей армии со способностью Leader может быть присоединён к DEATHWATCH KILL TEAM, он может быть присоединён к этому юниту вместо этого.",
+     "by": "wh-rules"
+    },
+    "TRANSPORT": {
+     "en": "15cafba99e",
+     "text": "Этот юнит не может погружаться в IMPERIAL RHINO.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003813": {
+   "name": "Grey Knights Terminator Squad",
+   "abilities": {}
+  },
+  "000003826": {
+   "name": "Indomitor Kill Team",
+   "abilities": {
+    "Kill Team": {
+     "en": "7efec07421",
+     "name": "Истребительная команда",
+     "text": "Каждый раз, когда атака нацелена на этот юнит, если он содержит модели с разными характеристиками Стойкости (Toughness), до тех пор пока атакующий юнит не завершит свои атаки, для определения броска, необходимого для ранения, используйте характеристику Стойкости большинства моделей этого юнита. Если две или более характеристики Стойкости делят большинство, используйте наибольшее значение.\n\nДля определения того, какие модели этого юнита могут погрузиться в TRANSPORT, модели Kill Team Terminator, Kill Team Outrider, Kill Team Biker и модели с прыжковым ранцем занимают место 2 моделей каждая, но в остальном могут погружаться в любой TRANSPORT, в который может погрузиться их юнит, даже если похожие модели в других юнитах имеют ключевые слова TERMINATOR, MOUNTED или JUMP PACK.\n\nДля взаимодействия с элементами ландшафта все модели юнитов с этой способностью считаются моделями INFANTRY, даже если похожие модели в других юнитах могут иметь ключевые слова MOUNTED или JUMP PACK.\n\n**Примечание разработчика:** хотя абстракции этого правила заставляют некоторые модели вести себя иначе, чем похожие модели в других юнитах, они созданы, чтобы свести к минимуму сложные правила движения, транспорта и преимущества укрытия.",
+     "by": "wh-rules"
+    },
+    "ATTACHED UNIT": {
+     "en": "f7838df53a",
+     "name": "Присоединяемый юнит",
+     "text": "Если юнит CHARACTER из вашей армии может быть присоединён к DEATHWATCH KILL TEAM, он может быть присоединён к этому юниту вместо этого.",
+     "by": "wh-rules"
+    },
+    "TRANSPORT": {
+     "en": "15cafba99e",
+     "text": "Этот юнит не может погружаться в IMPERIAL RHINO.",
+     "by": "wh-rules"
+    },
+    "Jump Pack": {
+     "en": "6cb734c6b3",
+     "name": "Прыжковый ранец",
+     "text": "Носитель имеет характеристику Движения (Move) 10\" и может двигаться сквозь модели и элементы ландшафта, как если бы их не было.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000002767": {
+   "name": "Inquisitorial Agents",
+   "abilities": {}
+  },
+  "000003812": {
+   "name": "Ministorum Priest",
+   "abilities": {
+    "Holy Hatred": {
+     "en": "d4542e28bb",
+     "name": "Святая ненависть",
+     "text": "Пока эта модель возглавляет юнит, оружие ближнего боя моделей этого юнита имеет способность [SUSTAINED HITS 1].",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003818": {
+   "name": "Sisters of Battle Squad",
+   "abilities": {}
+  },
+  "000003827": {
+   "name": "Spectrus Kill Team",
+   "abilities": {
+    "Kill Team": {
+     "en": "7efec07421",
+     "name": "Истребительная команда",
+     "text": "Каждый раз, когда атака нацелена на этот юнит, если он содержит модели с разными характеристиками Стойкости (Toughness), до тех пор пока атакующий юнит не завершит свои атаки, для определения броска, необходимого для ранения, используйте характеристику Стойкости большинства моделей этого юнита. Если две или более характеристики Стойкости делят большинство, используйте наибольшее значение.\n\nДля определения того, какие модели этого юнита могут погрузиться в TRANSPORT, модели Kill Team Terminator, Kill Team Outrider, Kill Team Biker и модели с прыжковым ранцем занимают место 2 моделей каждая, но в остальном могут погружаться в любой TRANSPORT, в который может погрузиться их юнит, даже если похожие модели в других юнитах имеют ключевые слова TERMINATOR, MOUNTED или JUMP PACK.\n\nДля взаимодействия с элементами ландшафта все модели юнитов с этой способностью считаются моделями INFANTRY, даже если похожие модели в других юнитах могут иметь ключевые слова MOUNTED или JUMP PACK.\n\n**Примечание разработчика:** хотя абстракции этого правила заставляют некоторые модели вести себя иначе, чем похожие модели в других юнитах, они созданы, чтобы свести к минимуму сложные правила движения, транспорта и преимущества укрытия.",
+     "by": "wh-rules"
+    },
+    "ATTACHED UNIT": {
+     "en": "7c8eabbf70",
+     "name": "Присоединяемый юнит",
+     "text": "Если CHARACTER из вашей армии со способностью Leader может быть присоединён к DEATHWATCH KILL TEAM, он может быть присоединён к этому юниту вместо этого.",
+     "by": "wh-rules"
+    },
+    "TRANSPORT": {
+     "en": "15cafba99e",
+     "text": "Этот юнит не может погружаться в IMPERIAL RHINO.",
+     "by": "wh-rules"
+    },
+    "Infiltrator Comms Array": {
+     "en": "47e00973e2",
+     "name": "Антенна связи инфильтратора",
+     "text": "Каждый раз, когда вы нацеливаете стратагему на юнит носителя, бросьте один D6: на 5+ вы получаете 1 CP.",
+     "by": "wh-rules"
+    },
+    "Jump Pack": {
+     "en": "e08a723b3f",
+     "name": "Прыжковый ранец",
+     "text": "Носитель имеет характеристику Движения (Move) 12\" и может двигаться сквозь модели и элементы ландшафта, как если бы их не было.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000000870": {
+   "name": "Vindicare Assassin",
+   "abilities": {}
+  },
+  "000002509": {
+   "name": "Voidsmen-at-Arms",
+   "abilities": {}
+  },
+  "000003815": {
+   "name": "Watch Master",
+   "abilities": {
+    "Strategic Acumen": {
+     "en": "a296b6fa24",
+     "name": "Стратегическая проницательность",
+     "text": "В вашей фазе командования вы можете использовать эту способность. Если вы это делаете, выберите одну **[gloss:sm-combat-doctrine:боевую доктрину]**, которая будет активна для этого юнита до начала вашей следующей фазы командования.",
+     "by": "wh-rules"
+    }
+   }
+  }
+ },
+ "detachments": {
+  "000000758": {
+   "detachment": "Liberator Assault Group",
+   "rules": {}
+  },
+  "000000793": {
+   "detachment": "Anvil Siege Force",
+   "rules": {}
+  },
+  "000000795": {
+   "detachment": "Firestorm Assault Force",
+   "rules": {}
+  },
+  "000000797": {
+   "detachment": "Vanguard Spearhead",
+   "rules": {}
+  },
+  "000000798": {
+   "detachment": "1st Company Task Force",
+   "rules": {}
+  },
+  "000000834": {
+   "detachment": "Unforgiven Task Force",
+   "rules": {}
+  },
+  "000000836": {
+   "detachment": "Company of Hunters",
+   "rules": {}
+  },
+  "000000900": {
+   "detachment": "The Lost Brethren",
+   "rules": {}
+  },
+  "000000901": {
+   "detachment": "The Angelic Host",
+   "rules": {}
+  },
+  "000000981": {
+   "detachment": "Lion’s Blade Task Force",
+   "rules": {}
+  },
+  "000000994": {
+   "detachment": "Librarius Conclave",
+   "rules": {}
+  },
+  "000001006": {
+   "detachment": "Wrathful Procession",
+   "rules": {}
+  },
+  "000001068": {
+   "detachment": "Saga of the Hunter",
+   "rules": {}
+  },
+  "000001069": {
+   "detachment": "Saga of the Bold",
+   "rules": {}
+  },
+  "000001091": {
+   "detachment": "Companions of Vehemence",
+   "rules": {}
+  },
+  "000001092": {
+   "detachment": "Vindication Task Force",
+   "rules": {}
+  },
+  "000001093": {
+   "detachment": "Godhammer Assault Force",
+   "rules": {}
+  },
+  "000001103": {
+   "detachment": "Emperor’s Shield",
+   "rules": {}
+  },
+  "000001118": {
+   "detachment": "Hammer of Avernii",
+   "rules": {}
+  },
+  "000001123": {
+   "detachment": "Rage-cursed Onslaught",
+   "rules": {}
+  },
+  "000001130": {
+   "detachment": "Bastion Task Force",
+   "rules": {}
+  },
+  "000001131": {
+   "detachment": "Orbital Assault Force",
+   "rules": {}
+  },
+  "000001132": {
+   "detachment": "Reclamation Force",
+   "rules": {}
+  },
+  "000001147": {
+   "detachment": "Armoured Speartip",
+   "rules": {}
+  },
+  "000001148": {
+   "detachment": "Headhunter Task Force",
+   "rules": {}
+  },
+  "000001210": {
+   "detachment": "The Living Miracle",
+   "rules": {}
+  },
+  "000001213": {
+   "detachment": "Legacy of Grace",
+   "rules": {}
+  },
+  "000001204": {
+   "detachment": "Dark Age Arsenal",
+   "rules": {}
+  },
+  "000001206": {
+   "detachment": "Interrogation Conclave",
+   "rules": {}
+  },
+  "000001207": {
+   "detachment": "Legends of Saga and Song",
+   "rules": {}
+  },
+  "000001208": {
+   "detachment": "Veterans of the Fang",
+   "rules": {}
+  },
+  "000001221": {
+   "detachment": "Vengeful Hosts",
+   "rules": {}
+  },
+  "000001211": {
+   "detachment": "Fulguris Task Force",
+   "rules": {}
+  },
+  "000001212": {
+   "detachment": "Subversion Assets",
+   "rules": {}
+  }
+ },
+ "stratagems": {},
+ "enhancements": {}
+}

@@ -1,0 +1,418 @@
+{
+ "schema": "warphub-ru-translation/1",
+ "faction": "AM",
+ "name": "Astra Militarum",
+ "datasheets": {
+  "000000680": {
+   "name": "Leman Russ Commander",
+   "abilities": {}
+  },
+  "000000686": {
+   "name": "Cadian Heavy Weapons Squad",
+   "abilities": {}
+  },
+  "000000690": {
+   "name": "Scout Sentinels",
+   "abilities": {}
+  },
+  "000000691": {
+   "name": "Armoured Sentinels",
+   "abilities": {}
+  },
+  "000000692": {
+   "name": "Chimera",
+   "abilities": {}
+  },
+  "000000694": {
+   "name": "Hellhound",
+   "abilities": {}
+  },
+  "000000695": {
+   "name": "Basilisk",
+   "abilities": {}
+  },
+  "000000696": {
+   "name": "Hydra",
+   "abilities": {}
+  },
+  "000000697": {
+   "name": "Wyvern",
+   "abilities": {}
+  },
+  "000000698": {
+   "name": "Manticore",
+   "abilities": {}
+  },
+  "000000699": {
+   "name": "Deathstrike",
+   "abilities": {}
+  },
+  "000000700": {
+   "name": "Leman Russ Battle Tank",
+   "abilities": {}
+  },
+  "000000701": {
+   "name": "Leman Russ Demolisher",
+   "abilities": {}
+  },
+  "000000719": {
+   "name": "Militarum Tempestus Command Squad",
+   "abilities": {}
+  },
+  "000000728": {
+   "name": "Atlas Recovery Vehicle",
+   "abilities": {}
+  },
+  "000000729": {
+   "name": "Salamander Command Vehicle",
+   "abilities": {}
+  },
+  "000000731": {
+   "name": "Centaur Light Carrier",
+   "abilities": {}
+  },
+  "000000733": {
+   "name": "Trojan Support Vehicle",
+   "abilities": {}
+  },
+  "000000735": {
+   "name": "Salamander Scout Vehicle",
+   "abilities": {}
+  },
+  "000000736": {
+   "name": "Tauros Assault Vehicle",
+   "abilities": {}
+  },
+  "000000737": {
+   "name": "Tauros Venator",
+   "abilities": {}
+  },
+  "000000739": {
+   "name": "Armageddon-pattern Medusa",
+   "abilities": {}
+  },
+  "000000740": {
+   "name": "Colossus",
+   "abilities": {}
+  },
+  "000000741": {
+   "name": "Cyclops Demolition Vehicle",
+   "abilities": {}
+  },
+  "000000751": {
+   "name": "Malcador Annihilator",
+   "abilities": {}
+  },
+  "000000752": {
+   "name": "Malcador Defender",
+   "abilities": {}
+  },
+  "000000753": {
+   "name": "Malcador",
+   "abilities": {}
+  },
+  "000000754": {
+   "name": "Malcador Infernus",
+   "abilities": {}
+  },
+  "000000760": {
+   "name": "Stygies Destroyer Tank Hunter",
+   "abilities": {}
+  },
+  "000000763": {
+   "name": "Stormblade",
+   "abilities": {}
+  },
+  "000000764": {
+   "name": "Arkurian Stormhammer",
+   "abilities": {}
+  },
+  "000000767": {
+   "name": "Dominus Armoured Siege Bombard",
+   "abilities": {}
+  },
+  "000000768": {
+   "name": "Gorgon Heavy Transport",
+   "abilities": {}
+  },
+  "000000769": {
+   "name": "Macharius",
+   "abilities": {}
+  },
+  "000000770": {
+   "name": "Macharius Omega",
+   "abilities": {}
+  },
+  "000000771": {
+   "name": "Macharius Vanquisher",
+   "abilities": {}
+  },
+  "000000772": {
+   "name": "Macharius Vulcan",
+   "abilities": {}
+  },
+  "000000777": {
+   "name": "Valdor",
+   "abilities": {}
+  },
+  "000001406": {
+   "name": "Sly Marbo",
+   "abilities": {}
+  },
+  "000001596": {
+   "name": "Rein And Raus",
+   "abilities": {}
+  },
+  "000001994": {
+   "name": "Carnodon",
+   "abilities": {}
+  },
+  "000002379": {
+   "name": "Storm Chimera",
+   "abilities": {}
+  },
+  "000002485": {
+   "name": "Gaunt’s Ghosts",
+   "abilities": {}
+  },
+  "000002605": {
+   "name": "Lord Solar Leontus",
+   "abilities": {
+    "SUPREME COMMANDER": {
+     "en": "7bea4eed23",
+     "text": "Если эта модель в вашей армии, она обязана быть вашим WARLORD.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000002606": {
+   "name": "Ursula Creed",
+   "abilities": {}
+  },
+  "000002607": {
+   "name": "Cadian Castellan",
+   "abilities": {}
+  },
+  "000002609": {
+   "name": "Cadian Command Squad",
+   "abilities": {}
+  },
+  "000002610": {
+   "name": "Regimental Attachés",
+   "abilities": {}
+  },
+  "000002619": {
+   "name": "Aegis Defence Line",
+   "abilities": {}
+  },
+  "000002740": {
+   "name": "Elysian Drop Sentinel",
+   "abilities": {}
+  },
+  "000002741": {
+   "name": "Leman Russ Eradicator",
+   "abilities": {}
+  },
+  "000002742": {
+   "name": "Leman Russ Executioner",
+   "abilities": {}
+  },
+  "000002743": {
+   "name": "Leman Russ Exterminator",
+   "abilities": {}
+  },
+  "000002744": {
+   "name": "Leman Russ Punisher",
+   "abilities": {}
+  },
+  "000002745": {
+   "name": "Leman Russ Vanquisher",
+   "abilities": {}
+  },
+  "000003889": {
+   "name": "Krieg Command Squad",
+   "abilities": {}
+  },
+  "000003890": {
+   "name": "Lord Marshal Dreir",
+   "abilities": {}
+  },
+  "000003891": {
+   "name": "Catachan Command Squad",
+   "abilities": {}
+  },
+  "000003892": {
+   "name": "Rogal Dorn Commander",
+   "abilities": {}
+  },
+  "000003894": {
+   "name": "Catachan Heavy Weapons Squad",
+   "abilities": {}
+  },
+  "000003895": {
+   "name": "Krieg Heavy Weapons Squad",
+   "abilities": {}
+  },
+  "000003922": {
+   "name": "Hell’s Last",
+   "abilities": {}
+  },
+  "000000870": {
+   "name": "Vindicare Assassin",
+   "abilities": {}
+  },
+  "000000871": {
+   "name": "Callidus Assassin",
+   "abilities": {}
+  },
+  "000000872": {
+   "name": "Eversor Assassin",
+   "abilities": {}
+  },
+  "000000873": {
+   "name": "Culexus Assassin",
+   "abilities": {}
+  },
+  "000002509": {
+   "name": "Voidsmen-at-Arms",
+   "abilities": {}
+  },
+  "000002767": {
+   "name": "Inquisitorial Agents",
+   "abilities": {}
+  },
+  "000003812": {
+   "name": "Ministorum Priest",
+   "abilities": {
+    "Holy Hatred": {
+     "en": "d4542e28bb",
+     "name": "Святая ненависть",
+     "text": "Пока эта модель возглавляет юнит, оружие ближнего боя моделей этого юнита имеет способность [SUSTAINED HITS 1].",
+     "by": "wh-rules"
+    },
+    "Zealot": {
+     "en": "ae37427f70",
+     "name": "Фанатик",
+     "text": "Один раз за битву, в фазе ближнего боя, эта модель может задействовать эту способность. Если она это делает, до конца фазы улучшите характеристики Силы (Strength) и Атак (Attacks) оружия ближнего боя этой модели на 3.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003813": {
+   "name": "Grey Knights Terminator Squad",
+   "abilities": {}
+  },
+  "000003815": {
+   "name": "Watch Master",
+   "abilities": {
+    "Strategic Acumen": {
+     "en": "a296b6fa24",
+     "name": "Стратегическая проницательность",
+     "text": "В вашей фазе командования вы можете использовать эту способность. Если вы это делаете, выберите одну **[gloss:sm-combat-doctrine:боевую доктрину]**, которая будет активна для этого юнита до начала вашей следующей фазы командования.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003818": {
+   "name": "Sisters of Battle Squad",
+   "abilities": {}
+  },
+  "000003822": {
+   "name": "Deathwatch Terminator Squad",
+   "abilities": {
+    "ATTACHED UNIT": {
+     "en": "7c8eabbf70",
+     "name": "Присоединяемый юнит",
+     "text": "Если CHARACTER из вашей армии со способностью Leader может быть присоединён к DEATHWATCH KILL TEAM, он может быть присоединён к этому юниту вместо этого.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003825": {
+   "name": "Fortis Kill Team",
+   "abilities": {
+    "Kill Team": {
+     "en": "7efec07421",
+     "name": "Истребительная команда",
+     "text": "Каждый раз, когда атака нацелена на этот юнит, если он содержит модели с разными характеристиками Стойкости (Toughness), до тех пор пока атакующий юнит не завершит свои атаки, для определения броска, необходимого для ранения, используйте характеристику Стойкости большинства моделей этого юнита. Если две или более характеристики Стойкости делят большинство, используйте наибольшее значение.\n\nДля определения того, какие модели этого юнита могут погрузиться в TRANSPORT, модели Kill Team Terminator, Kill Team Outrider, Kill Team Biker и модели с прыжковым ранцем занимают место 2 моделей каждая, но в остальном могут погружаться в любой TRANSPORT, в который может погрузиться их юнит, даже если похожие модели в других юнитах имеют ключевые слова TERMINATOR, MOUNTED или JUMP PACK.\n\nДля взаимодействия с элементами ландшафта все модели юнитов с этой способностью считаются моделями INFANTRY, даже если похожие модели в других юнитах могут иметь ключевые слова MOUNTED или JUMP PACK.\n\n**Примечание разработчика:** хотя абстракции этого правила заставляют некоторые модели вести себя иначе, чем похожие модели в других юнитах, они созданы, чтобы свести к минимуму сложные правила движения, транспорта и преимущества укрытия.",
+     "by": "wh-rules"
+    },
+    "ATTACHED UNIT": {
+     "en": "7c8eabbf70",
+     "name": "Присоединяемый юнит",
+     "text": "Если CHARACTER из вашей армии со способностью Leader может быть присоединён к DEATHWATCH KILL TEAM, он может быть присоединён к этому юниту вместо этого.",
+     "by": "wh-rules"
+    },
+    "TRANSPORT": {
+     "en": "15cafba99e",
+     "text": "Этот юнит не может погружаться в IMPERIAL RHINO.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003826": {
+   "name": "Indomitor Kill Team",
+   "abilities": {
+    "Kill Team": {
+     "en": "7efec07421",
+     "name": "Истребительная команда",
+     "text": "Каждый раз, когда атака нацелена на этот юнит, если он содержит модели с разными характеристиками Стойкости (Toughness), до тех пор пока атакующий юнит не завершит свои атаки, для определения броска, необходимого для ранения, используйте характеристику Стойкости большинства моделей этого юнита. Если две или более характеристики Стойкости делят большинство, используйте наибольшее значение.\n\nДля определения того, какие модели этого юнита могут погрузиться в TRANSPORT, модели Kill Team Terminator, Kill Team Outrider, Kill Team Biker и модели с прыжковым ранцем занимают место 2 моделей каждая, но в остальном могут погружаться в любой TRANSPORT, в который может погрузиться их юнит, даже если похожие модели в других юнитах имеют ключевые слова TERMINATOR, MOUNTED или JUMP PACK.\n\nДля взаимодействия с элементами ландшафта все модели юнитов с этой способностью считаются моделями INFANTRY, даже если похожие модели в других юнитах могут иметь ключевые слова MOUNTED или JUMP PACK.\n\n**Примечание разработчика:** хотя абстракции этого правила заставляют некоторые модели вести себя иначе, чем похожие модели в других юнитах, они созданы, чтобы свести к минимуму сложные правила движения, транспорта и преимущества укрытия.",
+     "by": "wh-rules"
+    },
+    "ATTACHED UNIT": {
+     "en": "f7838df53a",
+     "name": "Присоединяемый юнит",
+     "text": "Если юнит CHARACTER из вашей армии может быть присоединён к DEATHWATCH KILL TEAM, он может быть присоединён к этому юниту вместо этого.",
+     "by": "wh-rules"
+    },
+    "TRANSPORT": {
+     "en": "15cafba99e",
+     "text": "Этот юнит не может погружаться в IMPERIAL RHINO.",
+     "by": "wh-rules"
+    },
+    "Jump Pack": {
+     "en": "6cb734c6b3",
+     "name": "Прыжковый ранец",
+     "text": "Носитель имеет характеристику Движения (Move) 10\" и может двигаться сквозь модели и элементы ландшафта, как если бы их не было.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003827": {
+   "name": "Spectrus Kill Team",
+   "abilities": {
+    "Kill Team": {
+     "en": "7efec07421",
+     "name": "Истребительная команда",
+     "text": "Каждый раз, когда атака нацелена на этот юнит, если он содержит модели с разными характеристиками Стойкости (Toughness), до тех пор пока атакующий юнит не завершит свои атаки, для определения броска, необходимого для ранения, используйте характеристику Стойкости большинства моделей этого юнита. Если две или более характеристики Стойкости делят большинство, используйте наибольшее значение.\n\nДля определения того, какие модели этого юнита могут погрузиться в TRANSPORT, модели Kill Team Terminator, Kill Team Outrider, Kill Team Biker и модели с прыжковым ранцем занимают место 2 моделей каждая, но в остальном могут погружаться в любой TRANSPORT, в который может погрузиться их юнит, даже если похожие модели в других юнитах имеют ключевые слова TERMINATOR, MOUNTED или JUMP PACK.\n\nДля взаимодействия с элементами ландшафта все модели юнитов с этой способностью считаются моделями INFANTRY, даже если похожие модели в других юнитах могут иметь ключевые слова MOUNTED или JUMP PACK.\n\n**Примечание разработчика:** хотя абстракции этого правила заставляют некоторые модели вести себя иначе, чем похожие модели в других юнитах, они созданы, чтобы свести к минимуму сложные правила движения, транспорта и преимущества укрытия.",
+     "by": "wh-rules"
+    },
+    "ATTACHED UNIT": {
+     "en": "7c8eabbf70",
+     "name": "Присоединяемый юнит",
+     "text": "Если CHARACTER из вашей армии со способностью Leader может быть присоединён к DEATHWATCH KILL TEAM, он может быть присоединён к этому юниту вместо этого.",
+     "by": "wh-rules"
+    },
+    "TRANSPORT": {
+     "en": "15cafba99e",
+     "text": "Этот юнит не может погружаться в IMPERIAL RHINO.",
+     "by": "wh-rules"
+    },
+    "Infiltrator Comms Array": {
+     "en": "47e00973e2",
+     "name": "Антенна связи инфильтратора",
+     "text": "Каждый раз, когда вы нацеливаете стратагему на юнит носителя, бросьте один D6: на 5+ вы получаете 1 CP.",
+     "by": "wh-rules"
+    },
+    "Jump Pack": {
+     "en": "e08a723b3f",
+     "name": "Прыжковый ранец",
+     "text": "Носитель имеет характеристику Движения (Move) 12\" и может двигаться сквозь модели и элементы ландшафта, как если бы их не было.",
+     "by": "wh-rules"
+    }
+   }
+  }
+ },
+ "stratagems": {},
+ "enhancements": {}
+}

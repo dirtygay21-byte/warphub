@@ -1,0 +1,186 @@
+{
+ "schema": "warphub-ru-translation/1",
+ "faction": "DG",
+ "name": "Death Guard",
+ "rules": {},
+ "datasheets": {
+  "000001053": {
+   "name": "Typhus",
+   "abilities": {}
+  },
+  "000003608": {
+   "name": "Land Raider Achilles",
+   "abilities": {
+    "Assault Ramp": {
+     "en": "de8e6c75c8",
+     "name": "Штурмовая аппарель",
+     "text": "Каждый раз, когда юнит высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003612": {
+   "name": "Land Raider Proteus",
+   "abilities": {
+    "Assault Ramp": {
+     "en": "de8e6c75c8",
+     "name": "Штурмовая аппарель",
+     "text": "Каждый раз, когда юнит высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003616": {
+   "name": "Fire Raptor Gunship",
+   "abilities": {}
+  },
+  "000003620": {
+   "name": "Spartan",
+   "abilities": {
+    "Assault Ramp": {
+     "en": "de8e6c75c8",
+     "name": "Штурмовая аппарель",
+     "text": "Каждый раз, когда юнит высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003624": {
+   "name": "Deredeo Dreadnought",
+   "abilities": {}
+  },
+  "000003632": {
+   "name": "Kratos",
+   "abilities": {}
+  },
+  "000003636": {
+   "name": "Sokar-pattern Stormbird",
+   "abilities": {
+    "Aerial Assault": {
+     "en": "672575df69",
+     "name": "Воздушный штурм",
+     "text": "Каждый раз, когда юнит со способностью Deep Strike высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003640": {
+   "name": "Sicaran Battle Tank",
+   "abilities": {
+    "Armoured Spearhead": {
+     "en": "43a663914a",
+     "name": "Бронированный наконечник",
+     "text": "Каждый раз, когда эта модель совершает атаку по вражескому юниту, перебросьте бросок попадания, равный 1, и, если этот юнит находится в радиусе маркера цели, который вы не контролируете, вы можете вместо этого перебросить бросок попадания.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003648": {
+   "name": "Leviathan Dreadnought",
+   "abilities": {}
+  },
+  "000003652": {
+   "name": "Fellblade",
+   "abilities": {}
+  },
+  "000003656": {
+   "name": "Relic Contemptor Dreadnought",
+   "abilities": {
+    "Conversion": {
+     "en": "eed641bd9f",
+     "text": "Каждый раз, когда атака этим оружием нацеливается на вражеский юнит, который не находится в пределах 12\", немодифицированный бросок попадания 4+ считается критическим попаданием.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003660": {
+   "name": "Whirlwind Scorpius",
+   "abilities": {}
+  },
+  "000003664": {
+   "name": "Xiphon Interceptor",
+   "abilities": {}
+  },
+  "000003672": {
+   "name": "Storm Eagle Gunship",
+   "abilities": {
+    "Armoured Resilience": {
+     "en": "3fc85c8289",
+     "name": "Бронированная стойкость",
+     "text": "Каждый раз, когда атака распределяется по этой модели, вычтите 1 из характеристики Урона (Damage) этой атаки.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003676": {
+   "name": "Sicaran Venator",
+   "abilities": {}
+  },
+  "000003684": {
+   "name": "Sicaran Punisher",
+   "abilities": {}
+  },
+  "000001126": {
+   "name": "Exalted Flamer",
+   "abilities": {}
+  },
+  "000001130": {
+   "name": "Great Unclean One",
+   "abilities": {
+    "Greater Daemon of Nurgle (Aura)": {
+     "en": "6d6d6d59e4",
+     "name": "Великий демон Нургла (Аура)",
+     "text": "Пока дружественный юнит NURGLE LEGIONES DAEMONICA находится в пределах 6\" от этой модели, этот юнит находится в Shadow of Chaos вашей армии.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000001148": {
+   "name": "Be’lakor",
+   "abilities": {}
+  },
+  "000001149": {
+   "name": "Daemon Prince of Chaos",
+   "abilities": {}
+  },
+  "000001329": {
+   "name": "An’ggrath the Unbound",
+   "abilities": {
+    "Relentless Carnage": {
+     "en": "39ff43d2a2",
+     "name": "Неустанная бойня",
+     "text": "В конце фазы ближнего боя вы можете выбрать один вражеский юнит в дистанции ввязывания от этой модели и бросить восемь D6: за каждый 4+ этот вражеский юнит получает 1 смертельную рану.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000001333": {
+   "name": "Aetaos’rau’keres",
+   "abilities": {}
+  },
+  "000001465": {
+   "name": "Rotigus",
+   "abilities": {
+    "Greater Daemon of Nurgle (Aura)": {
+     "en": "6d6d6d59e4",
+     "name": "Великий демон Нургла (Аура)",
+     "text": "Пока дружественный юнит NURGLE LEGIONES DAEMONICA находится в пределах 6\" от этой модели, этот юнит находится в Shadow of Chaos вашей армии.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000002584": {
+   "name": "Pink Horrors",
+   "abilities": {}
+  },
+  "000002758": {
+   "name": "Daemon Prince Of Chaos With Wings",
+   "abilities": {}
+  },
+  "000004052": {
+   "name": "Accursed Cultists",
+   "abilities": {}
+  }
+ },
+ "enhancements": {}
+}
