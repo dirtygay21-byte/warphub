@@ -8,7 +8,7 @@ import { Icon, IconButton, Tag } from './kit';
 import { RuleRichText } from './common/RulePopover';
 import { useGlossary } from './common/useGlossary';
 import { useRu } from './common/useRu';
-import { ruDetachmentName, ruDetachmentRule, ruEnhancement, ruName, ruStratagem, type RuText } from '../ru';
+import { isWarphub, ruDetachmentName, ruDetachmentRule, ruEnhancement, ruName, ruStratagem, WARPHUB_LABEL, type RuText } from '../ru';
 import { cx } from './util';
 
 const TURN_RU: Record<string, string> = { 'Your turn': 'ваш ход', 'Opponent’s turn': 'ход противника', 'Either player’s turn': 'любой ход' };
@@ -44,7 +44,7 @@ export function RuleText({
   /** где прочитать полный текст */
   link?: string | null;
 }) {
-  const subText = cleanRuleText(sub);
+  const subText = [cleanRuleText(sub), isWarphub(ru) ? WARPHUB_LABEL : ''].filter(Boolean).join(' · ');
   const missing = ru ? null : (incomplete ?? rawIncomplete(text));
   return (
     <details open={open} className="group rounded-xl border border-white/10 bg-white/[0.03]">
@@ -155,7 +155,12 @@ export function DetachmentPanel({
         <div className="min-w-0 flex-1">
           <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent/80">Детачмент</p>
           <h2 className="font-display mt-0.5 text-xl font-semibold uppercase leading-tight">{ruleLabel(d)}</h2>
-          {ruDetachmentName(ru, d.id) && <p className="text-[13px] text-fg-3">{ruDetachmentName(ru, d.id)}</p>}
+          {ruDetachmentName(ru, d.id) && (
+            <p className="text-[13px] text-fg-3">
+              {ruDetachmentName(ru, d.id)}
+              {ru?.detachments?.[d.id]?.nameSrc === 'warphub' && <span className="text-[12px]"> · {WARPHUB_LABEL}</span>}
+            </p>
+          )}
           {d.outdated && <p className="mt-1 text-xs text-amber-200">{OUTDATED_RULE_NOTE}</p>}
         </div>
         <IconButton icon="close" label="Закрыть" onClick={onClose} className="size-9" />

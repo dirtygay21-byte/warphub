@@ -6,3 +6,6 @@ dist/
 *.log
 .DS_Store
 !.env.demo
+
+# Перевод WarpHub: английские исходники для переводчика (собираются scripts/ru-warphub.mjs --gaps)
+tools/roster-data/40k/ru-warphub/_source/

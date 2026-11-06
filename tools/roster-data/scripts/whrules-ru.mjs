@@ -9,6 +9,8 @@
  *                                               → 40k/ru-coverage.{json,md};
  *   node scripts/whrules-ru.mjs --apply        — русские тексты для приложения → backend/roster-data/ru/<id фракции>.json
  *                                               (оверлей поверх f/<id>.json: показ по-русски, английский — запасной).
+ *                                               Чего нет на сайте — перевод WarpHub (40k/ru-warphub/, scripts/ru-warphub.mjs, ru-warphub-lib.mjs;
+ *                                               решение владельца 06.11.2026), с пометкой src: "warphub"; сайт важнее.
  *
  * Сопоставление (только по названиям, как на сайте):
  *  - фракция: slug названия (Orks → orks); Space Marines: ордена по ключевому слову ордена, остальное — space-marines;
@@ -21,6 +23,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import { CHAPTER_FACTIONS, slugify } from './whrules-map.mjs';
+import { mergeWarphub, readTranslation } from './ru-warphub-lib.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DIR = path.join(ROOT, '40k');
@@ -238,7 +241,13 @@ function report() {
   for (const f of index.factions) {
     const data = JSON.parse(fs.readFileSync(path.join(DATA, 'f', `${f.id}.json`), 'utf8'));
     const m = matchFaction(snap, data);
-    factions[f.id] = { name: f.name, counts: m.counts, missing: Object.fromEntries(Object.entries(m.missing).filter(([, v]) => v.length)) };
+    const w = mergeWarphub(data, m.ru, readTranslation(f.id));
+    factions[f.id] = {
+      name: f.name,
+      counts: m.counts,
+      missing: Object.fromEntries(Object.entries(m.missing).filter(([, v]) => v.length)),
+      ...(w.applied || w.stale.length || w.unknown.length ? { warphub: { applied: w.applied, stale: w.stale, unknown: w.unknown } } : {}),
+    };
     for (const [k, c] of Object.entries(m.counts)) {
       total[k] ??= { total: 0, ru: 0 };
       total[k].total += c.total;
@@ -263,7 +272,15 @@ function report() {
     `|---|${Object.keys(LABELS).map(() => '---').join('|')}|`,
     ...Object.values(factions).map((f) => `| ${f.name} | ${Object.keys(LABELS).map((k) => (f.counts[k] ? `${pct(f.counts[k])} (${f.counts[k].total - f.counts[k].ru} нет)` : '—')).join(' | ')} |`),
     ``,
-    `Списки того, чего нет, — в \`ru-coverage.json\` (поле missing у каждой фракции).`,
+    `Списки того, чего нет на сайте, — в \`ru-coverage.json\` (поле missing у каждой фракции).`,
+    ``,
+    `## Перевод WarpHub (тексты, которых нет на wh-rules.ru)`,
+    ``,
+    `| Фракция | Переводов применено | Устарели (английский изменился) | Неизвестные id |`,
+    `|---|---|---|---|`,
+    ...Object.values(factions)
+      .filter((f) => f.warphub)
+      .map((f) => `| ${f.name} | ${f.warphub.applied} | ${f.warphub.stale.length} | ${f.warphub.unknown.length} |`),
     ``,
   ];
   fs.writeFileSync(path.join(DIR, 'ru-coverage.md'), lines.join('\n'));
@@ -278,6 +295,7 @@ export function buildOverlays(snap, file) {
   for (const f of index.factions) {
     const data = JSON.parse(fs.readFileSync(path.join(DATA, 'f', `${f.id}.json`), 'utf8'));
     const { ru } = matchFaction(snap, data);
+    mergeWarphub(data, ru, readTranslation(f.id));
     out[f.id] = { schema: 'warphub-ru/1', faction: f.id, source, ...Object.fromEntries(Object.entries(ru).filter(([, v]) => Object.keys(v).length)) };
   }
   return out;
