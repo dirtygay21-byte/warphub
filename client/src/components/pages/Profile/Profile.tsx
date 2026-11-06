@@ -20,6 +20,7 @@ import { haptic } from "@/utils/haptic";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import { AnimatePresence } from "motion/react";
 
 export default function Profile() {
   const { setUser } = useAuthStore();
@@ -244,15 +245,17 @@ export default function Profile() {
         </button>
       )}
 
-      {codeOpen && (
-        <AccessCodeDialog
-          onClose={() => setCodeOpen(false)}
-          onSuccess={() => {
-            setCodeOpen(false);
-            navigate("/roster");
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {codeOpen && (
+          <AccessCodeDialog
+            onClose={() => setCodeOpen(false)}
+            onSuccess={() => {
+              setCodeOpen(false);
+              navigate("/roster");
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       <PartnerSection />
       <SupportSection />

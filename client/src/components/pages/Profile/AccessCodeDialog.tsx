@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { KeyRound, LoaderCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 
 const LENGTH = 4;
 
@@ -40,9 +41,11 @@ export function AccessCodeDialog({
     if (value.length === LENGTH && !redeem.isPending) redeem.mutate(value);
   };
 
+  const leaving = useDialogExit();
+
   return (
     <div
-      className="ds-fade fixed inset-0 z-50 flex items-center justify-center bg-overlay/70 px-4 pb-24 pt-6"
+      className={`ds-fade fixed inset-0 z-50 flex items-center justify-center bg-overlay/70 px-4 pb-24 pt-6${leaving ? " ds-leaving" : ""}`}
       onClick={onClose}
     >
       <div

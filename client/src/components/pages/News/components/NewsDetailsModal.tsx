@@ -3,6 +3,7 @@ import ContentImage from "@/components/ui/ContentImage";
 import { formatNewsPublishedAt } from "@/components/pages/News/utils";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarDays, LoaderCircle, RefreshCw, X } from "lucide-react";
+import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 
 type NewsDetailsModalProps = {
   newsId: number;
@@ -22,9 +23,11 @@ export default function NewsDetailsModal({
     onClose();
   };
 
+  const leaving = useDialogExit();
+
   return (
     <div
-      className="ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
+      className={`ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center${leaving ? " ds-leaving" : ""}`}
       onClick={handleClose}
     >
       <div

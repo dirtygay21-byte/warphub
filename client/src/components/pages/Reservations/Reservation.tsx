@@ -37,6 +37,7 @@ import {
 import TelegramOnly from "@/components/ui/TelegramOnly/TelegramOnly";
 import { isOutsideTelegram } from "@/utils/telegramEnv";
 import { useMemo, useState } from "react";
+import { AnimatePresence } from "motion/react";
 
 const RESERVATION_SKELETON_COUNT = 5;
 
@@ -364,58 +365,64 @@ export default function Reservation() {
         </div>
       )}
 
-      {registeredEvent && showEventCancelDialog && (
-        <EventCancelConfirmDialog
-          eventTitle={registeredEvent.title}
-          dateLabel={formatReservationDate(registeredEvent.startsAt)}
-          timeLabel={formatTimeRange(
-            registeredEvent.startsAt,
-            registeredEvent.endsAt
-          )}
-          isPending={cancelEventMutation.isPending}
-          errorMessage={
-            cancelEventMutation.isError
-              ? cancelEventMutation.error.message
-              : null
-          }
-          onClose={() => {
-            if (!cancelEventMutation.isPending) {
-              setShowEventCancelDialog(false);
-              cancelEventMutation.reset();
+      <AnimatePresence>
+        {registeredEvent && showEventCancelDialog && (
+          <EventCancelConfirmDialog
+            eventTitle={registeredEvent.title}
+            dateLabel={formatReservationDate(registeredEvent.startsAt)}
+            timeLabel={formatTimeRange(
+              registeredEvent.startsAt,
+              registeredEvent.endsAt
+            )}
+            isPending={cancelEventMutation.isPending}
+            errorMessage={
+              cancelEventMutation.isError
+                ? cancelEventMutation.error.message
+                : null
             }
-          }}
-          onConfirm={() => cancelEventMutation.mutate(registeredEvent.id)}
-        />
-      )}
+            onClose={() => {
+              if (!cancelEventMutation.isPending) {
+                setShowEventCancelDialog(false);
+                cancelEventMutation.reset();
+              }
+            }}
+            onConfirm={() => cancelEventMutation.mutate(registeredEvent.id)}
+          />
+        )}
+      </AnimatePresence>
 
-      {reservationBeingEdited && (
-        <EditDetailsDialog
-          reservation={reservationBeingEdited}
-          onClose={() => setReservationToEdit(null)}
-        />
-      )}
+      <AnimatePresence>
+        {reservationBeingEdited && (
+          <EditDetailsDialog
+            reservation={reservationBeingEdited}
+            onClose={() => setReservationToEdit(null)}
+          />
+        )}
+      </AnimatePresence>
 
-      {reservationPendingCancel && (
-        <CancelConfirmDialog
-          serviceTitle={pendingCancelServiceTitle}
-          dateLabel={formatReservationDate(reservationPendingCancel.startsAt)}
-          timeLabel={formatTimeRange(
-            reservationPendingCancel.startsAt,
-            reservationPendingCancel.endsAt
-          )}
-          isPending={cancelMutation.isPending}
-          errorMessage={
-            cancelMutation.isError ? cancelMutation.error.message : null
-          }
-          onClose={() => {
-            if (!cancelMutation.isPending) {
-              setReservationToCancel(null);
-              cancelMutation.reset();
+      <AnimatePresence>
+        {reservationPendingCancel && (
+          <CancelConfirmDialog
+            serviceTitle={pendingCancelServiceTitle}
+            dateLabel={formatReservationDate(reservationPendingCancel.startsAt)}
+            timeLabel={formatTimeRange(
+              reservationPendingCancel.startsAt,
+              reservationPendingCancel.endsAt
+            )}
+            isPending={cancelMutation.isPending}
+            errorMessage={
+              cancelMutation.isError ? cancelMutation.error.message : null
             }
-          }}
-          onConfirm={() => cancelMutation.mutate(reservationPendingCancel.id)}
-        />
-      )}
+            onClose={() => {
+              if (!cancelMutation.isPending) {
+                setReservationToCancel(null);
+                cancelMutation.reset();
+              }
+            }}
+            onConfirm={() => cancelMutation.mutate(reservationPendingCancel.id)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

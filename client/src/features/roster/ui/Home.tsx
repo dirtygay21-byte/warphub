@@ -90,7 +90,7 @@ export function Home({
       {!recent.length ? (
         <p className="text-sm text-fg-2">Ростеров пока нет — выберите игру и соберите первую армию.</p>
       ) : (
-        <ul className="space-y-2.5">
+        <ul className="ds-stagger space-y-2.5">
           {recent.map((r) => {
             const over = r.pts != null && r.limit != null && r.pts > r.limit;
             return (

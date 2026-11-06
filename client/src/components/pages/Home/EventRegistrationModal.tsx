@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 
 type EventRegistrationModalProps = {
   eventId: number;
@@ -74,9 +75,11 @@ export default function EventRegistrationModal({
     registerMutation.mutate();
   };
 
+  const leaving = useDialogExit();
+
   return createPortal(
     <div
-      className="ds-fade fixed inset-0 z-[60] flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
+      className={`ds-fade fixed inset-0 z-[60] flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center${leaving ? " ds-leaving" : ""}`}
       onClick={handleClose}
     >
       <div

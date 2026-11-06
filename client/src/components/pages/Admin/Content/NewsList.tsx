@@ -1,10 +1,11 @@
 import { getAdminNews } from "@/apiUtils/admin";
 import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
-import { LoaderCircle, Newspaper, Plus, RefreshCw } from "lucide-react";
+import { Newspaper, Plus, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import NewsCard from "./components/NewsCard";
 import NewsDetailsModal from "./components/NewsDetailsModal";
+import { Skeleton } from "@/components/ui/ds";
 
 export default function NewsList() {
   const [selectedNewsId, setSelectedNewsId] = useState<number | null>(null);
@@ -32,8 +33,10 @@ export default function NewsList() {
 
   if (newsQuery.isLoading) {
     return (
-      <div className="flex min-h-48 items-center justify-center text-fg-2">
-        <LoaderCircle className="size-8 animate-spin text-accent" />
+      <div className="flex flex-col gap-3" aria-busy="true" aria-label="Загружаем новости">
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-[88px] rounded-2xl" />
+        ))}
       </div>
     );
   }

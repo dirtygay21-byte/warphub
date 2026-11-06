@@ -9,6 +9,7 @@ import { useState } from "react";
 import { Badge, Skeleton } from "@/components/ui/ds";
 import { haptic } from "@/utils/haptic";
 import { getSeatsLabel } from "@/utils/plural";
+import { AnimatePresence } from "motion/react";
 
 export default function NearestEventBanner() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,13 +91,15 @@ export default function NearestEventBanner() {
         </div>
       </button>
 
-      {isModalOpen && (
-        <EventRegistrationModal
-          eventId={event.id}
-          initialFreeSeats={freeSeats}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {isModalOpen && (
+          <EventRegistrationModal
+            eventId={event.id}
+            initialFreeSeats={freeSeats}
+            onClose={() => setIsModalOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -59,7 +59,7 @@ export function AosList({
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Соберите первую армию: полки с героями, вспомогательные юниты, лоры и улучшения проверяются сразу.</Empty>
       ) : (
-        <ul className="space-y-2.5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-2.5 lg:space-y-0">
+        <ul className="ds-stagger space-y-2.5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-2.5 lg:space-y-0">
           {rosters.map((r) => (
             <Card key={r.id} roster={r} faction={factionName[r.factionId] ?? r.factionId} onOpen={() => onOpen(r.id)} onMenu={() => setMenu(r)} />
           ))}

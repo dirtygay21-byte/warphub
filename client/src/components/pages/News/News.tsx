@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
 import { Newspaper, RefreshCw } from "lucide-react";
 import { useState } from "react";
+import { AnimatePresence } from "motion/react";
 
 const NEWS_SKELETON_COUNT = 5;
 
@@ -107,12 +108,14 @@ export default function News() {
         </div>
       )}
 
-      {selectedNewsId !== null && (
-        <NewsDetailsModal
-          newsId={selectedNewsId}
-          onClose={() => setSelectedNewsId(null)}
-        />
-      )}
+      <AnimatePresence>
+        {selectedNewsId !== null && (
+          <NewsDetailsModal
+            newsId={selectedNewsId}
+            onClose={() => setSelectedNewsId(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

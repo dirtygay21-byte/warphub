@@ -1,7 +1,7 @@
 import { listTableHolds, type HoldPurpose } from "@/apiUtils/tableHolds";
-import { Segmented } from "@/components/ui/ds";
+import { Segmented, Skeleton } from "@/components/ui/ds";
 import { useQuery } from "@tanstack/react-query";
-import { LoaderCircle } from "lucide-react";
+
 import { useState } from "react";
 import HoldCard from "./HoldCard";
 
@@ -27,7 +27,11 @@ export default function UpcomingHolds({ focus, focusLabel }: { focus?: HoldPurpo
         />
       )}
       {query.isLoading ? (
-        <LoaderCircle className="mx-auto size-6 animate-spin text-accent" />
+        <div className="flex flex-col gap-2" aria-busy="true" aria-label="Загружаем брони">
+          {[0, 1].map((i) => (
+            <Skeleton key={i} className="h-[64px] rounded-xl" />
+          ))}
+        </div>
       ) : query.isError ? (
         <p className="text-sm text-danger">Не удалось загрузить брони: {query.error.message}</p>
       ) : holds.length === 0 ? (

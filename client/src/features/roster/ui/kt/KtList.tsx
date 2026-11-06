@@ -50,7 +50,7 @@ export function KtList({
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Выберите команду и наберите оперативников: датакарты, оружие, снаряжение и уловки — из данных KTDash.</Empty>
       ) : (
-        <ul className="space-y-2.5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-2.5 lg:space-y-0">
+        <ul className="ds-stagger space-y-2.5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-2.5 lg:space-y-0">
           {rosters.map((r) => {
             const t = teamOf.get(r.teamId);
             return (

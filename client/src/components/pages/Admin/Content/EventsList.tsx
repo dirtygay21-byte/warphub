@@ -1,10 +1,11 @@
 import { getAdminEvents } from "@/apiUtils/admin";
 import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
-import { CalendarX2, LoaderCircle, Plus, RefreshCw } from "lucide-react";
+import { CalendarX2, Plus, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import EventCard from "./components/EventCard";
 import EventDetailsModal from "./components/EventDetailsModal";
+import { Skeleton } from "@/components/ui/ds";
 
 export default function EventsList() {
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
@@ -32,8 +33,10 @@ export default function EventsList() {
 
   if (eventsQuery.isLoading) {
     return (
-      <div className="flex min-h-48 items-center justify-center text-fg-2">
-        <LoaderCircle className="size-8 animate-spin text-accent" />
+      <div className="flex flex-col gap-3" aria-busy="true" aria-label="Загружаем события">
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-[88px] rounded-2xl" />
+        ))}
       </div>
     );
   }
