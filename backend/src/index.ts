@@ -1,6 +1,7 @@
 import { createApp } from './app';
 import { env } from './config/env';
 import { refreshAddedAdmins } from './modules/admins/service';
+import { startDominatusExportWorker } from './modules/dominatus/export';
 
 const app = createApp();
 
@@ -9,6 +10,7 @@ void refreshAddedAdmins();
 setInterval(() => void refreshAddedAdmins(), 5 * 60_000);
 
 app.listen(env.port);
+startDominatusExportWorker();
 
 console.log(`Warphub API is running at http://127.0.0.1:${env.port}`);
 

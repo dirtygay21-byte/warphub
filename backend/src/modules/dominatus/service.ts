@@ -12,6 +12,7 @@ import {
   dominatusBattlesTable,
   dominatusCampaignsTable,
   dominatusCardsTable,
+  dominatusExportsTable,
   dominatusPhasesTable,
   dominatusPlayersTable,
   usersTable,
@@ -75,7 +76,7 @@ function cardAllowed(kind: string, phase: number, name: string, alliance: Allian
 
 // ---------- чтение ----------
 
-async function activeCampaign() {
+export async function activeCampaign() {
   const [c] = await db.select().from(dominatusCampaignsTable).where(eq(dominatusCampaignsTable.status, 'active')).orderBy(desc(dominatusCampaignsTable.id)).limit(1);
   return c ?? null;
 }
@@ -85,7 +86,7 @@ async function requireCampaign() {
   return c;
 }
 
-async function campaignPlayers(campaignId: number) {
+export async function campaignPlayers(campaignId: number) {
   return db
     .select({
       id: dominatusPlayersTable.id,
@@ -102,7 +103,7 @@ async function campaignPlayers(campaignId: number) {
     .orderBy(asc(dominatusPlayersTable.id));
 }
 
-async function openPhase(campaignId: number) {
+export async function openPhase(campaignId: number) {
   const [p] = await db
     .select()
     .from(dominatusPhasesTable)
@@ -158,11 +159,15 @@ export async function getCampaignView(userId: string | null) {
     db.select().from(dominatusBattlesTable).where(eq(dominatusBattlesTable.campaignId, c.id)).orderBy(desc(dominatusBattlesTable.playedAt)),
     db.select().from(dominatusCardsTable).where(eq(dominatusCardsTable.campaignId, c.id)).orderBy(asc(dominatusCardsTable.id)),
   ]);
+  const exportRows = battles.length
+    ? await db.select().from(dominatusExportsTable).where(inArray(dominatusExportsTable.gameKey, battles.map((battle) => battle.gameKey)))
+    : [];
   const open = phases.find((p) => p.status === 'open') ?? null;
   const me = userId ? players.find((p) => p.userId === userId) ?? null : null;
   const playerName = new Map(players.map((p) => [p.id, nameOf(p)]));
   const loc = (id: string | null) => (id ? domData().locations.find((l) => l.id === id) ?? null : null);
   const dom = domData();
+  const exportByKey = new Map(exportRows.map((row) => [row.gameKey, row]));
   return {
     /** для выбора карт и локаций: колоды улучшений и локации (названия из dominatus.json) */
     catalog: {
@@ -199,6 +204,9 @@ export async function getCampaignView(userId: string | null) {
       achieved1: b.achieved1,
       achieved2: b.achieved2,
       playedAt: b.playedAt.toISOString(),
+      exportStatus: exportByKey.get(b.gameKey)?.status ?? null,
+      exportError: exportByKey.get(b.gameKey)?.lastError ?? null,
+      exportBattleId: exportByKey.get(b.gameKey)?.battleIdOnSite ?? null,
     })),
     me: me
       ? {

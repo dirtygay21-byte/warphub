@@ -3,6 +3,7 @@ import { authMiddleware } from '../../plugins/auth-middleware';
 import { adminMiddleware } from '../../plugins/admin-middleware';
 import { hasRosterAccess } from '../roster/service';
 import { findPlayers } from '../supporters/service';
+import { enqueueDominatusExport, getDominatusExport } from './export';
 import {
   claimCard,
   createCampaign,
@@ -39,6 +40,18 @@ export const dominatusModule = new Elysia({ prefix: '/roster/dominatus', tags: [
   .use(authMiddleware)
   .guard({ detail: { security: [{ bearerAuth: [] }] } })
   .get('/campaign', ({ user }) => guard(user, () => getCampaignView(user.id)), { detail: { summary: 'Dominatus: активная кампания' } })
+  .get('/exports/:gameKey', ({ user, params }) => guard(user, () => getDominatusExport(user.id, params.gameKey)), {
+    params: t.Object({ gameKey: t.String({ minLength: 4, maxLength: 80 }) }),
+    detail: { summary: 'Dominatus: статус загрузки битвы на сайт' },
+  })
+  .post('/exports', ({ user, body }) => guard(user, () => enqueueDominatusExport(user.id, body.gameKey)), {
+    body: t.Object({ gameKey: t.String({ minLength: 4, maxLength: 80 }) }),
+    detail: { summary: 'Dominatus: загрузить битву на сайт' },
+  })
+  .post('/exports/:gameKey/retry', ({ user, params }) => guard(user, () => enqueueDominatusExport(user.id, params.gameKey)), {
+    params: t.Object({ gameKey: t.String({ minLength: 4, maxLength: 80 }) }),
+    detail: { summary: 'Dominatus: повторить загрузку битвы на сайт' },
+  })
   .post('/battles', ({ user, body }) => guard(user, () => recordBattle(user.id, body as BattleInput)), {
     body: t.Unknown(),
     detail: { summary: 'Dominatus: записать битву открытой фазы (участник битвы)' },

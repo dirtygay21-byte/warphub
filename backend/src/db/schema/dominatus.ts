@@ -122,3 +122,29 @@ export const dominatusCardsTable = pgTable(
   },
   (t) => [index('dominatus_cards_player').on(t.playerId)],
 );
+
+/** Outbox загрузки битвы на внешний сайт Dominatus. Полный payload хранится до успешной доставки. */
+export const dominatusExportsTable = pgTable(
+  'dominatus_exports',
+  {
+    id: serial('id').primaryKey(),
+    gameKey: varchar('game_key', { length: 80 }).notNull().unique(),
+    campaignId: integer('campaign_id')
+      .notNull()
+      .references(() => dominatusCampaignsTable.id, { onDelete: 'cascade' }),
+    battleId: integer('battle_id')
+      .notNull()
+      .references(() => dominatusBattlesTable.id, { onDelete: 'cascade' }),
+    payload: jsonb('payload').$type<Record<string, unknown>>().notNull(),
+    /** pending | sending | applied | retry | dead */
+    status: varchar('status', { length: 16 }).notNull().default('pending'),
+    attempts: integer('attempts').notNull().default(0),
+    lastError: text('last_error'),
+    battleIdOnSite: text('battle_id_on_site'),
+    nextAttemptAt: timestamp('next_attempt_at', { withTimezone: true }).defaultNow().notNull(),
+    appliedAt: timestamp('applied_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().$onUpdateFn(() => new Date()).notNull(),
+  },
+  (t) => [index('dominatus_exports_status_next_attempt').on(t.status, t.nextAttemptAt)],
+);
