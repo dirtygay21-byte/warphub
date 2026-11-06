@@ -159,7 +159,16 @@ export const numbersOf = (s) =>
     .map((x) => x.toUpperCase().replace(/[”″]/g, '"'))
     .sort();
 /** Ключевые слова ЗАГЛАВНЫМИ (латиница, от 3 букв), как пишутся в правилах: INFANTRY, ADEPTUS ASTARTES. */
-export const keywordsOf = (s) => [...new Set(String(s ?? '').match(/\b[A-Z][A-Z'’-]*[A-Z](?:\s+[A-Z][A-Z'’-]*[A-Z])*\b/g)?.filter((k) => k.replace(/[^A-Z]/g, '').length >= 3) ?? [])].sort();
+/** Подписи разделов стратагем (на сайте — КОГДА / ЦЕЛЬ / ЭФФЕКТ / ОГРАНИЧЕНИЯ) — не ключевые слова. */
+const SECTION_LABELS = new Set(['WHEN', 'TARGET', 'EFFECT', 'RESTRICTIONS', 'RESTRICTION']);
+export const keywordsOf = (s) =>
+  [
+    ...new Set(
+      (String(s ?? '').match(/\b[A-Z][A-Z'’-]*[A-Z](?:\s+[A-Z][A-Z'’-]*[A-Z])*\b/g) ?? [])
+        .map((k) => k.split(/\s+/).filter((w) => !SECTION_LABELS.has(w)).join(' '))
+        .filter((k) => k.replace(/[^A-Z]/g, '').length >= 3),
+    ),
+  ].sort();
 
 /** Проблемы одного перевода (пустой список — порядок). */
 export function checkEntry(source, tr) {
