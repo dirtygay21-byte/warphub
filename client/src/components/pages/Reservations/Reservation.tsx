@@ -291,7 +291,7 @@ export default function Reservation() {
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start">
+        <div className="ds-stagger flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start">
           {visibleEvent && (
             <EventReservationCard
               event={visibleEvent}

@@ -7,7 +7,7 @@ import { useReservationStore } from "@/stores/useReservationStore";
 import { s3Url } from "@/utils/s3utils";
 import DndSection from "../Dnd/DndSection";
 import { CalendarDays, Sparkles } from "lucide-react";
-import { NavRow } from "@/components/ui/ds";
+import { NavRow, Skeleton } from "@/components/ui/ds";
 import { haptic } from "@/utils/haptic";
 import BoostySubscriptionInfo from "@/components/booking/BoostySubscriptionInfo";
 import { boostyKindForService } from "@/components/booking/boosty";
@@ -64,6 +64,19 @@ function ServiceBlock({ disciplineId }: { disciplineId: number }) {
   const title = discipline?.title ?? "";
   const services = servicesQuery.data ?? [];
 
+  if (disciplinesQuery.isLoading || servicesQuery.isLoading) {
+    return (
+      <div aria-busy="true" aria-label="Загружаем услуги">
+        <Skeleton className="mb-3 h-5 w-36" />
+        <div className="flex flex-col gap-2">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-[84px] rounded-[18px]" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (discipline?.slug === DND_SLUG) {
     const openDnd = (view: "home" | "trial") => {
       setDisciplineId(disciplineId);
@@ -73,7 +86,7 @@ function ServiceBlock({ disciplineId }: { disciplineId: number }) {
     return (
       <div>
         <h2 className="mb-3 font-display text-xl font-semibold uppercase leading-none">{title}</h2>
-        <ul className="flex flex-col gap-2">
+        <ul className="ds-stagger flex flex-col gap-2">
           <DndEntryItem
             icon={<Sparkles className="size-5" />}
             title="Хочу попробовать"
@@ -100,7 +113,7 @@ function ServiceBlock({ disciplineId }: { disciplineId: number }) {
   return (
     <div>
       <h2 className="mb-3 font-display text-xl font-semibold uppercase leading-none">{title}</h2>
-      <ul className="flex flex-col gap-2">
+      <ul className="ds-stagger flex flex-col gap-2">
         {services.map((service) => (
           <ServiceItemComponent
             key={service.id}

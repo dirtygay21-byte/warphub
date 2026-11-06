@@ -91,7 +91,7 @@ export default function News() {
       ) : (
         <div
           className={clsx(
-            "flex flex-col gap-4 lg:grid lg:grid-cols-2",
+            "ds-stagger flex flex-col gap-4 lg:grid lg:grid-cols-2",
             newsQuery.isFetching && "opacity-70"
           )}
         >

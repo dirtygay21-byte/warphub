@@ -34,13 +34,13 @@ export function ExtendReservationDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
+      className="ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
       onClick={onClose}
     >
       <div
         role="dialog"
         aria-modal="true"
-        className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated"
+        className="ds-sheet w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="border-b border-white/10 px-5 py-5">

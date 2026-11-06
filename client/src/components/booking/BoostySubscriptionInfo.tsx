@@ -93,14 +93,14 @@ export default function BoostySubscriptionInfo({
       {open &&
         createPortal(
           <div
-            className="fixed inset-0 z-[80] flex items-end justify-center bg-overlay/75 px-4 pb-6 pt-6 sm:items-center"
+            className="ds-fade fixed inset-0 z-[80] flex items-end justify-center bg-overlay/75 px-4 pb-6 pt-6 sm:items-center"
             onClick={() => setOpen(false)}
           >
             <div
               role="dialog"
               aria-modal="true"
               aria-labelledby="boosty-subscription-title"
-              className="w-full max-w-sm overflow-hidden rounded-[20px] border border-white/10 bg-app-elevated text-fg shadow-2xl"
+              className="ds-sheet w-full max-w-sm overflow-hidden rounded-[20px] border border-white/10 bg-app-elevated text-fg shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex items-center gap-3 border-b border-white/[0.07] px-5 py-4">

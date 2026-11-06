@@ -3,6 +3,8 @@ import type { RegistrationStageTypes } from "@/types";
 
 type RegistrationStageStore = {
   currentStage: RegistrationStageTypes;
+  /** направление последнего перехода: 1 — вперёд, -1 — назад (для анимации шагов) */
+  direction: 1 | -1;
   nextStage: () => void;
   previousStage: () => void;
   resetStages: () => void;
@@ -21,13 +23,14 @@ let currentPath: RegistrationStageTypes[] = ["Home"];
 export const useRegistrationStageStore = create<RegistrationStageStore>(
   (set) => ({
     currentStage: currentPath[currentPath.length - 1],
+    direction: 1,
 
     nextStage: () =>
       set((state) => {
         const nextStage = stages.pop();
         if (!nextStage) return { currentStage: state.currentStage };
         currentPath.push(nextStage);
-        return { currentStage: currentPath[currentPath.length - 1] };
+        return { currentStage: currentPath[currentPath.length - 1], direction: 1 };
       }),
 
     previousStage: () =>
@@ -39,14 +42,14 @@ export const useRegistrationStageStore = create<RegistrationStageStore>(
         const previousStage = currentPath.pop();
         if (!previousStage) return { currentStage: state.currentStage };
         stages.push(previousStage);
-        return { currentStage: currentPath[currentPath.length - 1] };
+        return { currentStage: currentPath[currentPath.length - 1], direction: -1 };
       }),
 
     resetStages: () =>
       set(() => {
         stages = [...initialStages];
         currentPath = ["Home"];
-        return { currentStage: "Home" };
+        return { currentStage: "Home", direction: -1 };
       }),
   })
 );

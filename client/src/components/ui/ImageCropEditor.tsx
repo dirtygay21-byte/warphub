@@ -45,7 +45,7 @@ export default function ImageCropEditor({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[70] flex items-end justify-center bg-overlay/80 p-4 sm:items-center"
+      className="ds-fade fixed inset-0 z-[70] flex items-end justify-center bg-overlay/80 p-4 sm:items-center"
       onClick={(event) => {
         event.stopPropagation();
         onCancel();
@@ -55,7 +55,7 @@ export default function ImageCropEditor({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="flex max-h-[calc(100dvh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-white/10 bg-app-elevated text-white"
+        className="ds-sheet flex max-h-[calc(100dvh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-white/10 bg-app-elevated text-white"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4">

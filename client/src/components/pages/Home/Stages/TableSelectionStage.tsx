@@ -20,7 +20,7 @@ import {
 import TableStateMessage from "./TableSelection/TableStateMessage";
 import { getDateKey, getToday, isDateInSchedule } from "./TableSelection/utils";
 import { getWindowLimit, maxFreeSeats } from "@/utils/slots";
-import { DsButton } from "@/components/ui/ds";
+import { DsButton, Skeleton } from "@/components/ui/ds";
 import { pluralizeRu } from "@/utils/plural";
 import BoostySubscriptionInfo from "@/components/booking/BoostySubscriptionInfo";
 import { boostyKindForService } from "@/components/booking/boosty";
@@ -162,7 +162,13 @@ export default function TableSelectionStage() {
       return <TableStateMessage>Сначала выберите услугу.</TableStateMessage>;
     }
     if (availabilityQuery.isLoading) {
-      return <TableStateMessage>Загружаем свободное время…</TableStateMessage>;
+      return (
+        <div className="flex flex-col gap-3" aria-busy="true" aria-label="Загружаем свободное время">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-[72px] rounded-[14px]" />
+          ))}
+        </div>
+      );
     }
     if (availabilityQuery.isError || !availability || !service) {
       return (
@@ -304,7 +310,7 @@ export default function TableSelectionStage() {
           >
             {isMultiplayer ? "Начать новую игру" : "Свободное время"}
           </SectionTitle>
-          <div className="flex flex-col gap-3">
+          <div className="ds-stagger flex flex-col gap-3">
             {freeSlots.length === 0 ? (
               <TableStateMessage>На выбранную дату свободных мест нет.</TableStateMessage>
             ) : (
