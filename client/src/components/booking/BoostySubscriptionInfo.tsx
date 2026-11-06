@@ -122,25 +122,20 @@ export default function BoostySubscriptionInfo({
                 </button>
               </div>
               <p className="px-5 py-5 text-[15px] leading-relaxed text-fg-2">
-                {COPY[kind][context]}
-              </p>
-              <div className="flex flex-col gap-1 border-t border-white/[0.07] px-5 py-3">
-                <DsButton
-                  variant="primary"
-                  className="w-full"
-                  aria-label={kind === "warhammer" && context === "booking" ? "Поддержать WarpBuilder на Boosty" : "Поддержать клуб на Boosty"}
-                  onClick={() => openBoostySubscription(linkUrl)}
-                >
-                  Поддержать на Boosty
-                </DsButton>
+                {COPY[kind][context]}{" "}
                 <button
                   type="button"
-                  aria-label="Закрыть диалог"
-                  onClick={() => setOpen(false)}
-                  className="min-h-10 w-full rounded-xl px-4 py-2 text-sm font-medium text-fg-3 transition-colors hover:bg-white/[0.04] hover:text-fg active:bg-white/[0.06]"
+                  aria-label={kind === "warhammer" && context === "booking" ? "Поддержать WarpBuilder на Boosty" : "Поддержать клуб на Boosty"}
+                  onClick={() => openBoostySubscription(linkUrl)}
+                  className="inline font-medium text-accent underline underline-offset-4 transition-opacity hover:opacity-80"
                 >
-                  {closeLabel}
+                  Поддержать
                 </button>
+              </p>
+              <div className="border-t border-white/[0.07] px-5 py-3">
+                <DsButton variant="primary" className="w-full" aria-label="Закрыть диалог" onClick={() => setOpen(false)}>
+                  {closeLabel}
+                </DsButton>
               </div>
             </div>
           </BoostySheet>
