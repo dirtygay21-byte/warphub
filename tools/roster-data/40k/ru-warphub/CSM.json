@@ -96,7 +96,7 @@
    "options": {
     "en": "b1ae3165e2",
     "items": [
-     "2 twin volkite culverins этой модели можно заменить на 2 twin multi-melta.",
+     "2 twin volkite culverins этой модели можно заменить на 2 twin multi-melta",
      "Эту модель можно снабдить 1 hunter-killer missile.",
      "Эту модель можно снабдить 1 storm bolter."
     ]
@@ -113,8 +113,8 @@
     },
     "Explorator Augury Web": {
      "en": "bb743c2e8e",
-     "name": "Авгурная сеть эксплораторов",
-     "text": "Вражеские юниты, выставляемые на поле боя как Подкрепления, не могут быть выставлены в пределах 12\" от носителя, но носитель должен уменьшить вдвое свою транспортную вместимость."
+     "name": "Разведывательная сеть эксплораторов",
+     "text": "Вражеские юниты, выставляемые на поле боя как Подкрепления, не могут быть выставлены в пределах 12\" от носителя, но транспортная вместимость носителя уменьшается вдвое."
     },
     "One Shot": {
      "en": "4bd2d5f2b1",
@@ -146,17 +146,17 @@
     "Strafing Run": {
      "en": "cbd7962ec3",
      "name": "Штурмовой заход",
-     "text": "Каждый раз, когда эта модель совершает дальнобойную атаку по юниту, который не может FLY, прибавьте 1 к броску на попадание."
+     "text": "Каждый раз, когда эта модель совершает дальнобойную атаку по юниту, что не может FLY, прибавьте 1 к броску попадания."
     }
    },
    "loadout": {
     "en": "f89c8bc2a1",
-    "text": "**Эта модель вооружена:** twin avenger bolt cannon; 2 twin autocannons; 2 twin hellstrike launchers; armoured hull."
+    "text": "**Эта модель вооружена:** twin avenger bolt cannon; 2 twin autocannons; 2 twin hellstrike launchers; armoured hull"
    },
    "options": {
     "en": "066946b831",
     "items": [
-     "2 twin hellstrike missile launchers этой модели можно заменить на 2 twin lascannons.",
+     "2 twin hellstrike missile launchers этой модели можно заменить на 2 twin lascannons",
      "2 twin autocannons этой модели можно заменить на 2 quad heavy bolters."
     ]
    }
@@ -183,7 +183,7 @@
     "en": "7e51bace1d",
     "items": [
      "2 quad lascannons этой модели можно заменить на 2 laser destroyers.",
-     "twin heavy bolter этой модели можно заменить на 1 twin heavy flamer.",
+     "twin heavy bolter этой модели можно заменить на 1 twin heavy flamer",
      "Эту модель можно снабдить одним из следующего:\n▪ 1 heavy bolter\n▪ 1 heavy flamer\n▪ 1 multi-melta\n▪ 1 storm bolter"
     ]
    }
@@ -193,8 +193,8 @@
    "abilities": {
     "Deredeo Strike": {
      "en": "b02cd8e93d",
-     "name": "Удар «Дередео»",
-     "text": "Каждый раз, когда эта модель совершает дальнобойную атаку по юниту, который не ниже половинной численности, вы можете перебросить бросок на попадание."
+     "name": "Удар Deredeo",
+     "text": "Каждый раз, когда эта модель совершает дальнобойную атаку по юниту, что не ниже половинной численности, вы можете перебросить бросок попадания."
     }
    },
    "loadout": {
@@ -288,7 +288,7 @@
    "options": {
     "en": "f4be65fc36",
     "items": [
-     "Каждый grav-flux bombard этой модели можно заменить на одно из следующего:\n▪ 1 cyclonic melta lance\n▪ 1 storm cannon\n▪ 1 meltagun и 1 Leviathan siege claw\n▪ 1 meltagun и 1 Leviathan siege drill",
+     "Каждую grav-flux bombard этой модели можно заменить на одно из следующего:\n▪ 1 cyclonic melta lance\n▪ 1 storm cannon\n▪ 1 meltagun и 1 Leviathan siege claw\n▪ 1 meltagun и 1 Leviathan siege drill",
      "2 heavy flamers этой модели можно заменить на 2 twin volkite calivers.",
      "Эту модель можно снабдить 3 hunter-killer missiles."
     ]
@@ -300,7 +300,7 @@
     "Rolling Fortress": {
      "en": "56713e0a6a",
      "name": "Катящаяся крепость",
-     "text": "Каждый раз, когда дальнобойная атака распределяется по модели из вашей армии, если эта модель не полностью видима каждой модели атакующего юнита из-за этой модели FELLBLADE, эта модель имеет преимущество укрытия против этой атаки."
+     "text": "Каждый раз, когда дальнобойная атака распределяется по модели из вашей армии, если эта модель не полностью видима каждой модели атакующего юнита из-за этой модели Fellblade, эта модель имеет Benefit of Cover против этой атаки."
     }
    },
    "loadout": {
@@ -327,8 +327,8 @@
     },
     "Even In Death I Serve": {
      "en": "82712b8a9e",
-     "name": "И в смерти я служу",
-     "text": "В первый раз, когда эта модель уничтожается, уберите её из игры, не отыгрывая её способность Deadly Demise. Затем в конце фазы бросьте один D6: на 2+ выставьте эту модель обратно на поле боя как можно ближе к месту, где она была уничтожена, и не в дистанции ввязывания любых вражеских юнитов, с D6 оставшимися ранами."
+     "name": "Даже в смерти я служу",
+     "text": "Когда эта модель уничтожается в первый раз, уберите её из игры, не применяя её способность Deadly Demise. Затем, в конце фазы, бросьте один D6: на 2+ снова выставьте эту модель на поле боя как можно ближе к месту, где она была уничтожена, не в дистанции ввязывания вражеских юнитов, с D6 оставшимися ранами."
     }
    },
    "loadout": {
@@ -338,7 +338,7 @@
    "options": {
     "en": "61047f1da1",
     "items": [
-     "Каждый heavy plasma cannon этой модели можно заменить на одно из следующего:\n▪ 1 conversion beam cannon\n▪ 1 kheres-pattern assault cannon\n▪ 1 multi-melta\n▪ 1 twin autocannon\n▪ 1 twin heavy bolter\n▪ 1 twin lascannon\n▪ 1 twin volkite culverin\n▪ 1 Dreadnought chainfist и 1 combi-bolter\n▪ 1 Dreadnought combat weapon и 1 combi-bolter",
+     "Каждую heavy plasma cannon этой модели можно заменить на одно из следующего:\n▪ 1 conversion beam cannon\n▪ 1 kheres-pattern assault cannon\n▪ 1 multi-melta\n▪ 1 twin autocannon\n▪ 1 twin heavy bolter\n▪ 1 twin lascannon\n▪ 1 twin volkite culverin\n▪ 1 Dreadnought chainfist и 1 combi-bolter\n▪ 1 Dreadnought combat weapon и 1 combi-bolter",
      "Каждый combi-bolter этой модели можно заменить на одно из следующего:\n▪ 1 graviton blaster\n▪ 1 heavy flamer\n▪ 1 plasma blaster",
      "Эту модель можно снабдить 1 cyclone missile launcher."
     ]
@@ -376,7 +376,7 @@
     "Interceptor": {
      "en": "a322cdd8ff",
      "name": "Перехватчик",
-     "text": "Каждый раз, когда эта модель совершает дальнобойную атаку по юниту, который может FLY, прибавьте 1 к броску на попадание."
+     "text": "Каждый раз, когда эта модель совершает дальнобойную атаку по юниту, что может FLY, прибавьте 1 к броску попадания."
     }
    },
    "loadout": {
@@ -406,7 +406,7 @@
     "en": "9caf80eedc",
     "items": [
      "twin heavy bolter этой модели можно заменить на одно из следующего:\n▪ 1 twin multi-melta\n▪ 1 typhoon missile launcher",
-     "2 twin hellstrike missile launchers этой модели можно заменить на 2 twin lascannons."
+     "2 twin hellstrike missile launchers этой модели можно заменить на 2 twin lascannons"
     ]
    }
   },
@@ -415,8 +415,8 @@
    "abilities": {
     "Ferocious Assault": {
      "en": "464cc93f91",
-     "name": "Яростный натиск",
-     "text": "Каждый раз, когда эта модель совершает дальнобойную атаку по ближайшему допустимому юниту MONSTER или VEHICLE, прибавьте 1 к броску на попадание."
+     "name": "Яростный штурм",
+     "text": "Каждый раз, когда эта модель совершает дальнобойную атаку по ближайшему подходящему юниту MONSTER или VEHICLE, прибавьте 1 к броску попадания."
     },
     "One Shot": {
      "en": "4bd2d5f2b1",
