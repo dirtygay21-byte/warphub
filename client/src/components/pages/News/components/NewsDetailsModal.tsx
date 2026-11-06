@@ -24,7 +24,7 @@ export default function NewsDetailsModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
+      className="ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
       onClick={handleClose}
     >
       <div

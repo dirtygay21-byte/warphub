@@ -4,9 +4,9 @@ import EventRegistrationModal from "@/components/pages/Home/EventRegistrationMod
 import { formatEventPeriod } from "@/utils/eventDisplay";
 import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
-import { LoaderCircle } from "lucide-react";
+
 import { useState } from "react";
-import { Badge } from "@/components/ui/ds";
+import { Badge, Skeleton } from "@/components/ui/ds";
 import { haptic } from "@/utils/haptic";
 import { getSeatsLabel } from "@/utils/plural";
 
@@ -20,9 +20,7 @@ export default function NearestEventBanner() {
 
   if (nearestEventQuery.isLoading) {
     return (
-      <div className="flex h-full w-full items-center justify-center rounded-[18px] bg-app-surface">
-        <LoaderCircle className="size-8 animate-spin text-accent" />
-      </div>
+      <Skeleton className="h-full w-full rounded-[18px]" />
     );
   }
 

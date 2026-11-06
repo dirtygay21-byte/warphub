@@ -464,13 +464,13 @@ function TrialsTab() {
 
       {grouping && !creatingGame && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-3 pb-4 pt-8 sm:items-center"
+          className="ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-3 pb-4 pt-8 sm:items-center"
           onClick={() => !groupMutation.isPending && setGrouping(false)}
         >
           <div
             role="dialog"
             aria-modal="true"
-            className="max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/10 bg-app-elevated p-5 text-white"
+            className="ds-sheet max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/10 bg-app-elevated p-5 text-white"
             onClick={(event) => event.stopPropagation()}
           >
             <h2 className="text-lg font-semibold">Объединить в игру</h2>

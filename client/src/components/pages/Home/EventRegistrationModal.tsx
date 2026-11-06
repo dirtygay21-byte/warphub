@@ -76,7 +76,7 @@ export default function EventRegistrationModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
+      className="ds-fade fixed inset-0 z-[60] flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
       onClick={handleClose}
     >
       <div

@@ -1,8 +1,9 @@
 import { getPartners, type PartnerCard, type PartnerLane } from "@/apiUtils/partners";
 import { haptic } from "@/utils/haptic";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowUpRight, ChevronLeft, ChevronRight, ImageOff, LoaderCircle, RefreshCw } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, ImageOff, RefreshCw } from "lucide-react";
 import { useRef, useState } from "react";
+import { Skeleton } from "@/components/ui/ds";
 
 function openPartnerUrl(url: string) {
   const webApp = typeof window !== "undefined" ? window.Telegram?.WebApp : undefined;
@@ -23,7 +24,11 @@ export default function PartnerSection() {
         <p className="mt-1 text-sm text-fg-2">Можете заказать миниатюры у наших партнёров</p>
       </div>
       {query.isLoading ? (
-        <div className="mt-4 flex justify-center"><LoaderCircle className="size-6 animate-spin text-accent" /></div>
+        <div className="mt-4 flex gap-3 overflow-hidden" aria-busy="true" aria-label="Загружаем миниатюры">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-36 w-28 shrink-0 rounded-2xl" />
+          ))}
+        </div>
       ) : query.isError ? (
         <div className="mt-4 rounded-2xl border border-white/10 bg-app-elevated p-4 text-center">
           <p className="text-sm text-fg-2">Не удалось загрузить миниатюры партнёров.</p>

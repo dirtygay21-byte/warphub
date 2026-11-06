@@ -42,14 +42,14 @@ export function AccessCodeDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/70 px-4 pb-24 pt-6"
+      className="ds-fade fixed inset-0 z-50 flex items-center justify-center bg-overlay/70 px-4 pb-24 pt-6"
       onClick={onClose}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="access-code-title"
-        className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated px-5 pb-5 pt-6 text-center shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
+        className="ds-sheet w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated px-5 pb-5 pt-6 text-center shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-accent/15 text-accent">

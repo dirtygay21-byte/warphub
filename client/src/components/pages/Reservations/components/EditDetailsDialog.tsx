@@ -66,14 +66,14 @@ export function EditDetailsDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-6 pt-10 sm:items-center"
+      className="ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-6 pt-10 sm:items-center"
       onClick={() => !mutation.isPending && onClose()}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="edit-details-title"
-        className="max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/10 bg-app-elevated p-5 text-white shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
+        className="ds-sheet max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/10 bg-app-elevated p-5 text-white shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
         onClick={(event) => event.stopPropagation()}
       >
         <h2

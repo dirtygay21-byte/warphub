@@ -13,8 +13,8 @@ import { isOutsideTelegram } from "@/utils/telegramEnv";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getFullName, getInitials } from "@/utils/user";
 import { useQuery } from "@tanstack/react-query";
-import { AtSign, BookOpen, Check, Copy, Gamepad2, Hash, LoaderCircle, RefreshCw, ShieldCheck, Swords, UserRound } from "lucide-react";
-import { DsButton, GroupCard, NavRow, SectionLabel, ToggleRow } from "@/components/ui/ds";
+import { AtSign, BookOpen, Check, Copy, Gamepad2, Hash, RefreshCw, ShieldCheck, Swords, UserRound } from "lucide-react";
+import { DsButton, GroupCard, NavRow, SectionLabel, Skeleton, ToggleRow } from "@/components/ui/ds";
 import { useEffectsStore } from "@/stores/useEffectsStore";
 import { haptic } from "@/utils/haptic";
 import { useEffect, useState } from "react";
@@ -58,8 +58,17 @@ export default function Profile() {
 
   if (profileQuery.isLoading) {
     return (
-      <div className="flex min-h-[calc(100dvh-140px)] items-center justify-center px-6 text-fg-2">
-        <LoaderCircle className="size-8 animate-spin text-accent" />
+      <div className="px-5 pb-3 pt-6" aria-busy="true" aria-label="Загружаем профиль">
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-white/10 bg-app-elevated p-6">
+          <Skeleton className="size-[104px] rounded-full" />
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-4 w-24" />
+        </div>
+        <div className="mt-4 flex flex-col gap-3">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-[68px] rounded-[18px]" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -115,7 +124,6 @@ export default function Profile() {
               {avatar}
             </AvatarFrame>
           )}
-
 
           <h1 className="text-2xl font-semibold leading-tight">
             {fullName || "Пользователь"}

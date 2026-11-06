@@ -289,13 +289,13 @@ export default function EventDetailsModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
+      className="ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
       onClick={handleClose}
     >
       <div
         role="dialog"
         aria-modal="true"
-        className="flex max-h-[calc(100dvh-3rem)] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-white/10 bg-app-elevated"
+        className="ds-sheet flex max-h-[calc(100dvh-3rem)] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-white/10 bg-app-elevated"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4">
@@ -668,7 +668,7 @@ export default function EventDetailsModal({
 
       {isDeleteConfirmOpen && draft && (
         <div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
+          className="ds-fade fixed inset-0 z-[60] flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
           onClick={() => {
             if (!deleteMutation.isPending) {
               setIsDeleteConfirmOpen(false);
@@ -678,7 +678,7 @@ export default function EventDetailsModal({
           <div
             role="dialog"
             aria-modal="true"
-            className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated"
+            className="ds-sheet w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="border-b border-white/10 px-5 py-5">

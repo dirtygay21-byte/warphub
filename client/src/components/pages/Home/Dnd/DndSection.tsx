@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Skeleton } from "@/components/ui/ds";
 
 type View =
   | { name: "home" }
@@ -145,9 +146,11 @@ function DndHome({
         </p>
 
         {gamesQuery.isLoading ? (
-          <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-fg-2">
-            Загружаем игры...
-          </p>
+          <div className="flex flex-col gap-3" aria-busy="true" aria-label="Загружаем игры">
+            {[0, 1].map((i) => (
+              <Skeleton key={i} className="h-[88px] rounded-xl" />
+            ))}
+          </div>
         ) : gamesQuery.isError ? (
           <p className="rounded-xl border border-white/10 bg-app-elevated px-4 py-5 text-sm text-fg-2">
             Не удалось загрузить игры. Попробуйте позже.
