@@ -65,7 +65,7 @@ export function NavRow({
     <button
       type="button"
       onClick={() => (haptic.tap(), onClick())}
-      className={clsx("ds-press flex min-h-[64px] w-full items-center gap-3.5 rounded-[18px] px-4 py-3 text-left text-fg", TONE[tone], className)}
+      className={clsx("ds-press fx-press flex min-h-[64px] w-full items-center gap-3.5 rounded-[18px] px-4 py-3 text-left text-fg", TONE[tone], className)}
     >
       {icon &&
         (bareIcon ? (

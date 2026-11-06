@@ -94,7 +94,7 @@ export default function ConfirmationStage({
   return (
     <div className="ds-enter relative min-h-[calc(100dvh-160px)] overflow-hidden px-5 py-8 text-center text-fg">
       {isSuccess && (
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-52">
+        <div className="fx-strong-only pointer-events-none absolute inset-x-0 top-0 h-52">
           {confetti.map((className) => (
             <span
               key={className}
@@ -106,12 +106,18 @@ export default function ConfirmationStage({
 
       <div className="relative mx-auto flex max-w-sm flex-col items-center">
         <div
-          className={`ds-pop mb-5 flex size-24 items-center justify-center rounded-full border shadow-[0_0_36px_currentColor] ${
+          className={`ds-pop relative mb-5 flex size-24 items-center justify-center rounded-full border shadow-[0_0_36px_currentColor] ${
             isSuccess
               ? "border-accent/70 bg-accent/15 text-accent"
               : "border-danger/70 bg-danger/15 text-danger"
           }`}
         >
+          {isSuccess && (
+            <>
+              <span aria-hidden="true" className="fx-strong-only fx-burst" />
+              <span aria-hidden="true" className="fx-strong-only fx-burst fx-burst-late" />
+            </>
+          )}
           {isSuccess ? (
             <CheckCircle2 className="size-14" />
           ) : (

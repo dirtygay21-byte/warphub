@@ -40,7 +40,11 @@ export default function MainLayout() {
           <Home />
         </div>
 
-        {!isHomeRoute && <Outlet />}
+        {!isHomeRoute && (
+          <div key={pathname} className="fx-strong fx-page">
+            <Outlet />
+          </div>
+        )}
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 z-[2] lg:hidden">

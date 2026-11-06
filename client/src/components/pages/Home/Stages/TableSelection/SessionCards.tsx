@@ -122,7 +122,7 @@ function PickCard({
       }}
       className={clsx(
         "flex min-h-[64px] w-full items-center gap-3.5 rounded-[16px] border bg-app-elevated px-4 py-3.5 text-left",
-        disabled ? "cursor-not-allowed border-white/[0.08] opacity-60" : "ds-press active:border-accent",
+        disabled ? "cursor-not-allowed border-white/[0.08] opacity-60" : "ds-press fx-press active:border-accent",
         !disabled && (tone === "limited" ? "border-danger/50" : "border-white/[0.14]"),
       )}
     >
