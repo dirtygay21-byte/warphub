@@ -48,8 +48,8 @@ export function Tracker({ game, index }: { game: GameHook; index: DataIndex }) {
     <section className="space-y-3">
       <div className="rounded-2xl border border-accent/40 bg-accent/10 p-4">
         <div className="flex items-baseline justify-between gap-2">
-          <p className="font-display text-2xl font-semibold uppercase leading-none">{finished ? 'Битва окончена' : `Раунд ${state.round} из ${ROUNDS}`}</p>
-          {!finished && <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">{STEP_RU[state.step]}</p>}
+          <p key={finished ? 'end' : state.round} className="fx-strong fx-phase font-display text-2xl font-semibold uppercase leading-none">{finished ? 'Битва окончена' : `Раунд ${state.round} из ${ROUNDS}`}</p>
+          {!finished && <p key={state.step} className="fx-strong fx-phase text-[12px] font-semibold uppercase tracking-wider text-accent">{STEP_RU[state.step]}</p>}
         </div>
         {!finished && active && (
           <p className="mt-1.5 text-sm">
@@ -141,7 +141,7 @@ function Scoreboard({ game }: { game: GameHook }) {
           >
             <span className={cx('block truncate text-[12px] font-semibold', roleText(p.role))}>{p.name}</span>
             <span className="block font-display mt-0.5 text-3xl font-semibold leading-none">
-              {t.total}
+              <span key={t.total} className="fx-strong fx-bump">{t.total}</span>
               <span className="ml-1 text-sm text-fg-3">ПО</span>
             </span>
             <span className="block mt-1 text-[12px] leading-snug text-fg-3">

@@ -237,6 +237,69 @@ body {
   display: none !important;
 }
 
+/* ---------- Яркие эффекты (stage 3): только transform и opacity; классы — вместе с .fx-strong ---------- */
+/* число изменилось (ПО, счёт): короткий упругий «подскок» */
+.fx-bump {
+  display: inline-block;
+  animation: fx-bump var(--motion-emphasis) var(--ease-spring) both;
+}
+@keyframes fx-bump {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.28); }
+  100% { transform: scale(1); }
+}
+/* кубик: выкатывается с поворотом */
+.fx-dice {
+  animation: fx-dice 520ms var(--ease-spring) both;
+}
+@keyframes fx-dice {
+  0% { opacity: 0; transform: rotate(-200deg) scale(0.4); }
+  70% { opacity: 1; transform: rotate(12deg) scale(1.08); }
+  100% { transform: none; }
+}
+/* смена раунда и фазы */
+.fx-phase {
+  animation: fx-phase var(--motion-slow) var(--ease-out-soft) both;
+}
+@keyframes fx-phase {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: none; }
+}
+/* переход между разделами: появление с глубиной */
+/* fill-mode backwards: после анимации на обёртке не остаётся transform — фиксированные окна страницы
+   (диалоги) не попадают в её контекст наложения */
+.fx-page {
+  animation: fx-page var(--motion-slow) var(--ease-out-soft) backwards;
+}
+@keyframes fx-page {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+/* вспышка-кольцо вокруг значка (успех, новый ранг); слой — .fx-strong-only */
+.fx-burst {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid rgb(var(--color-accent));
+  animation: fx-burst 900ms var(--ease-out-soft) both;
+}
+.fx-burst-late {
+  animation-delay: 180ms;
+}
+@keyframes fx-burst {
+  from { opacity: 0.9; transform: scale(0.6); }
+  to { opacity: 0; transform: scale(2.4); }
+}
+/* нажатие карточки: наклон с глубиной и лаймовое свечение (без яркого уровня — обычный ds-press) */
+:root[data-fx="full"] .fx-press {
+  transition: transform var(--motion-fast) var(--ease-out-soft), box-shadow var(--motion-fast) var(--ease-out-soft);
+}
+:root[data-fx="full"] .fx-press:active:not(:disabled) {
+  transform: perspective(600px) rotateX(3deg) scale(0.97);
+  box-shadow: 0 0 0 1px rgb(var(--color-accent) / 0.35), 0 8px 28px rgb(var(--color-accent) / 0.12);
+}
+
 /* ---------- Roster Builder ---------- */
 .font-display {
   letter-spacing: 0.02em;

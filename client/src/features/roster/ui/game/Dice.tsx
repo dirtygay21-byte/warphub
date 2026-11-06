@@ -31,7 +31,7 @@ function Die({ value, win }: { value: number; win: boolean }) {
   return (
     <span
       className={cx(
-        'font-display mx-auto flex size-11 items-center justify-center rounded-xl border-2 text-2xl font-semibold',
+        'fx-strong fx-dice font-display mx-auto flex size-11 items-center justify-center rounded-xl border-2 text-2xl font-semibold',
         win ? 'border-accent bg-accent/15 text-accent' : 'border-white/20 text-white/80',
       )}
     >

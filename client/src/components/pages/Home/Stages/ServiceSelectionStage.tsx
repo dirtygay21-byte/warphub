@@ -146,7 +146,7 @@ function ServiceItemComponent({
           haptic.tap();
           onClick();
         }}
-        className={`ds-press flex w-full items-center gap-3 rounded-[18px] border border-white/10 bg-app-elevated p-2 text-left ${boostyKind ? "pr-12" : "pr-4"}`}
+        className={`ds-press fx-press flex w-full items-center gap-3 rounded-[18px] border border-white/10 bg-app-elevated p-2 text-left ${boostyKind ? "pr-12" : "pr-4"}`}
       >
         <img src={imgUrl} alt="" className="h-14 w-20 shrink-0 rounded-xl object-cover" />
         <span className="min-w-0 flex-1">
