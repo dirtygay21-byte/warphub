@@ -6,7 +6,8 @@
  *                                                     gzip+base64) по fingerprint и сохранить 40k/whrules-<версия>-glossary.json;
  *   node scripts/whrules-glossary.mjs --build        — из последнего снимка собрать backend/roster-data/glossary.json.
  *
- * Файл приложения (схема warphub-glossary/1) — только русский текст (как показывает wh-rules.ru), английский остаётся в снимке:
+ * Файл приложения (схема warphub-glossary/1) — русский текст (как показывает wh-rules.ru) и английский текст того же снимка
+ * для переключателя RU/EN в WarpBuilder 40K (решение владельца 06.11.2026):
  *   abilities — раздел 24 основных правил по ключу (имя без скобок, ВЕРХНИЙ РЕГИСТР): num, name, type (weapon | unit), text, example;
  *   weapon    — особые способности оружия фракций по ключу: варианты текста (у некоторых их несколько);
  *   terms     — термины правил по id: term (англ. название), text; в текстах ссылки вида [gloss:id:текст] и **жирный**.
@@ -47,21 +48,35 @@ export function buildGlossary(snap, file) {
   for (const a of snap.coreAbilities) {
     const key = abilityKey(a.name);
     if (abilities[key]) throw new Error(`глоссарий: способность ${key} дважды`);
-    abilities[key] = { num: a.num || null, name: a.name, type: a.type, text: a.ru.fullText, ...(a.ru.example ? { example: a.ru.example } : {}) };
+    abilities[key] = {
+      num: a.num || null,
+      name: a.name,
+      type: a.type,
+      text: a.ru.fullText,
+      ...(a.ru.example ? { example: a.ru.example } : {}),
+      ...(a.en?.fullText ? { en: { text: a.en.fullText, ...(a.en.example ? { example: a.en.example } : {}) } } : {}),
+    };
   }
   const weapon = {};
+  const weaponEn = {};
   for (const [name, variants] of Object.entries(snap.weaponAbilities)) {
     const key = abilityKey(name);
     if (abilities[key]) continue; // уже есть в разделе 24
     weapon[key] = variants.map((v) => v.ru);
+    if (variants.every((v) => v.en)) weaponEn[key] = variants.map((v) => v.en);
   }
   // термины без текста на wh-rules (Other, You) не берутся: ссылки на них показываются обычным текстом
-  const terms = Object.fromEntries(Object.entries(snap.glossary).filter(([, g]) => g.ru).map(([id, g]) => [id, { term: g.term, text: g.ru }]));
+  const terms = Object.fromEntries(
+    Object.entries(snap.glossary)
+      .filter(([, g]) => g.ru)
+      .map(([id, g]) => [id, { term: g.term, text: g.ru, ...(g.en ? { textEn: g.en } : {}) }]),
+  );
   return {
     schema: 'warphub-glossary/1',
     source: { ...snap.source, snapshot: `tools/roster-data/40k/${file}`, fingerprint: snap.fingerprint, language: 'ru' },
     abilities,
     weapon,
+    weaponEn,
     terms,
   };
 }

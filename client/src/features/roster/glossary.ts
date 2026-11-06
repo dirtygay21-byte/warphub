@@ -13,6 +13,8 @@ export interface GlossaryAbility {
   type: 'weapon' | 'unit';
   text: string;
   example?: string;
+  /** английский текст того же снимка wh-rules (переключатель RU/EN) */
+  en?: { text: string; example?: string };
 }
 export interface Glossary {
   schema: 'warphub-glossary/1';
@@ -20,7 +22,25 @@ export interface Glossary {
   abilities: Record<string, GlossaryAbility>;
   /** особые способности оружия фракций: варианты текста */
   weapon: Record<string, string[]>;
-  terms: Record<string, { term: string; text: string }>;
+  /** английские варианты особых способностей оружия */
+  weaponEn?: Record<string, string[]>;
+  terms: Record<string, { term: string; text: string; textEn?: string }>;
+}
+
+/**
+ * Глоссарий на выбранном языке WarpBuilder 40K (решение владельца 06.11.2026): en — английский текст того же снимка
+ * wh-rules.ru; чего нет по-английски — остаётся русский. ru — без изменений.
+ */
+export function localizeGlossary(g: Glossary, lang: 'ru' | 'en'): Glossary {
+  if (lang === 'ru') return g;
+  return {
+    ...g,
+    abilities: Object.fromEntries(
+      Object.entries(g.abilities).map(([k, a]) => [k, a.en ? { ...a, text: a.en.text, example: a.en.example } : a]),
+    ),
+    weapon: Object.fromEntries(Object.entries(g.weapon).map(([k, v]) => [k, g.weaponEn?.[k] ?? v])),
+    terms: Object.fromEntries(Object.entries(g.terms).map(([id, t]) => [id, t.textEn ? { ...t, text: t.textEn } : t])),
+  };
 }
 
 /** Строка способностей оружия из инфолиста («rapid fire 1, anti-infantry 4+») → отдельные способности. */
