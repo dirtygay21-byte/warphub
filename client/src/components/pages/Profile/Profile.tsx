@@ -14,7 +14,8 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { getFullName, getInitials } from "@/utils/user";
 import { useQuery } from "@tanstack/react-query";
 import { AtSign, BookOpen, Check, Copy, Gamepad2, Hash, LoaderCircle, RefreshCw, ShieldCheck, Swords, UserRound } from "lucide-react";
-import { DsButton, GroupCard, NavRow, SectionLabel } from "@/components/ui/ds";
+import { DsButton, GroupCard, NavRow, SectionLabel, ToggleRow } from "@/components/ui/ds";
+import { useEffectsStore } from "@/stores/useEffectsStore";
 import { haptic } from "@/utils/haptic";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
@@ -190,6 +191,8 @@ export default function Profile() {
         </GroupCard>
       </section>
 
+      <EffectsSetting />
+
       <DsButton
         className="mt-4 w-full"
         size="lg"
@@ -289,5 +292,28 @@ function InfoRow({
         </button>
       )}
     </div>
+  );
+}
+
+/** Переключатель «Яркие эффекты» (на этом устройстве). При «Уменьшить движение» в системе эффекты выключены всегда. */
+function EffectsSetting() {
+  const strongEnabled = useEffectsStore((s) => s.strongEnabled);
+  const systemReduced = useEffectsStore((s) => s.systemReduced);
+  const setStrongEnabled = useEffectsStore((s) => s.setStrongEnabled);
+
+  return (
+    <section className="mt-6">
+      <SectionLabel>Настройки</SectionLabel>
+      <ToggleRow
+        title="Яркие эффекты"
+        subtitle={
+          systemReduced
+            ? "В системе включено «Уменьшить движение» — эффекты выключены"
+            : "Анимации и эффекты в приложении. Выключите, если телефон тормозит"
+        }
+        checked={strongEnabled && !systemReduced}
+        onChange={setStrongEnabled}
+      />
+    </section>
   );
 }
