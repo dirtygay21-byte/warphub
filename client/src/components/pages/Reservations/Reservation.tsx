@@ -38,6 +38,7 @@ import TelegramOnly from "@/components/ui/TelegramOnly/TelegramOnly";
 import { isOutsideTelegram } from "@/utils/telegramEnv";
 import { useMemo, useState } from "react";
 import { AnimatePresence } from "motion/react";
+import { toast } from "@/stores/useToastStore";
 
 const RESERVATION_SKELETON_COUNT = 5;
 
@@ -64,6 +65,7 @@ export default function Reservation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-dnd"] });
       queryClient.invalidateQueries({ queryKey: ["dnd-games"] });
+      toast.success("Запись на D&D отменена");
     },
   });
 
@@ -71,6 +73,7 @@ export default function Reservation() {
     mutationFn: cancelTrialRequest,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-dnd"] });
+      toast.success("Заявка отменена");
     },
   });
 
@@ -105,6 +108,7 @@ export default function Reservation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reservations"] });
       setReservationToCancel(null);
+      toast.success("Запись отменена");
     },
   });
 
@@ -115,6 +119,7 @@ export default function Reservation() {
       queryClient.invalidateQueries({ queryKey: ["nearest-event"] });
       queryClient.invalidateQueries({ queryKey: ["event", eventId] });
       setShowEventCancelDialog(false);
+      toast.success("Вы отказались от участия");
     },
   });
 

@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence } from "motion/react";
+import { toast } from "@/stores/useToastStore";
 
 export default function Profile() {
   const { setUser } = useAuthStore();
@@ -205,7 +206,11 @@ export default function Profile() {
       <DsButton
         className="mt-4 w-full"
         size="lg"
-        onClick={() => profileQuery.refetch()}
+        onClick={async () => {
+          const result = await profileQuery.refetch();
+          if (result.isError) toast.error("Не удалось обновить профиль. Попробуйте позже");
+          else toast.success("Профиль обновлён");
+        }}
         disabled={profileQuery.isFetching}
       >
         <RefreshCw className={`size-[18px] ${profileQuery.isFetching ? "animate-spin" : ""}`} />
@@ -251,6 +256,7 @@ export default function Profile() {
             onClose={() => setCodeOpen(false)}
             onSuccess={() => {
               setCodeOpen(false);
+              toast.success("Доступ к WarpBuilder открыт");
               navigate("/roster");
             }}
           />
