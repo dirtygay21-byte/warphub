@@ -201,9 +201,38 @@ function forEachEntry(t, fn) {
 }
 const at = (o, p) => p.reduce((v, k) => v?.[k], o);
 
+/**
+ * Названия правил, способностей, стратагем, улучшений, детачментов фракции и основных способностей (раздел 24) —
+ * в тексте перевода они остаются по-английски (решение владельца 07.11.2026; перевод — в скобках после названия).
+ */
+export function gameNamesOf(faction) {
+  const names = new Set();
+  try {
+    const g = JSON.parse(fs.readFileSync(path.join(DATA, 'glossary.json'), 'utf8'));
+    for (const a of Object.values(g.abilities)) if (!a.name.startsWith('[')) names.add(a.name);
+  } catch {
+    // без глоссария — только названия фракции
+  }
+  for (const r of Object.values(faction.rules ?? {})) names.add(r.name);
+  for (const ds of faction.datasheets ?? []) for (const a of ds.abilities ?? []) names.add(a.name);
+  for (const x of [...(faction.stratagems ?? []), ...(faction.enhancements ?? [])]) names.add(x.name);
+  for (const d of faction.detachments ?? []) {
+    names.add(d.name);
+    for (const a of d.abilities ?? []) names.add(a.name);
+  }
+  return [...names].filter((n) => n && n.length >= 4 && n !== n.toUpperCase());
+}
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+/** Названия из английского текста, которых нет по-английски в переводе (регистр не важен: ANATHEMA PSYKANA = Anathema Psykana). */
+export function lostNames(names, enText, ruText, ownName) {
+  const ru = String(ruText ?? '').toLowerCase();
+  return names.filter((n) => n !== ownName && new RegExp(`(?<![A-Za-z])${escapeRe(n)}(?![A-Za-z])`).test(enText ?? '') && !ru.includes(n.toLowerCase()));
+}
+
 /** Проверка файла перевода против текущих английских исходников. */
 export function checkTranslation(faction, ru, t) {
   const gaps = collectGaps(faction, ru);
+  const names = gameNamesOf(faction);
   const out = [];
   forEachEntry(t, (where, tr, p) => {
     const gap = at(gaps, p);
@@ -211,6 +240,10 @@ export function checkTranslation(faction, ru, t) {
     if (gap.en !== tr.en) return out.push({ where, problems: ['английский текст изменился — перевод устарел'] });
     // текст сайта (память переводов wh-rules.ru) — как на сайте; проверяется только наличие текста
     const problems = tr.by === 'wh-rules' ? (tr.text?.trim() || tr.items?.length ? [] : ['пустой перевод']) : checkEntry(gap.source, tr);
+    if (tr.by !== 'wh-rules' && tr.text) {
+      const lost = lostNames(names, gap.source.text, tr.text, gap.source.name ?? gap.source.text);
+      if (lost.length) problems.push(`названия не по-английски: ${lost.join(', ')}`);
+    }
     if (problems.length) out.push({ where, problems });
   });
   return out;
