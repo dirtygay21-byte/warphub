@@ -25,6 +25,7 @@ import RosterPage from "@/components/pages/Roster/RosterPage";
 import AdminRoster from "@/components/pages/Admin/Roster/AdminRoster";
 import AdminAdmins from "@/components/pages/Admin/Admins/AdminAdmins";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import Toaster from "@/components/ui/ds/Toaster";
 
 export default function App() {
   return (
@@ -80,6 +81,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
+        <Toaster />
       </EffectsRoot>
     </TanstackProvider>
   );

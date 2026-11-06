@@ -19,6 +19,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoaderCircle, PencilLine } from "lucide-react";
 import { useState } from "react";
 import { useDialogExit } from "@/components/ui/ds/useDialogExit";
+import { toast } from "@/stores/useToastStore";
 
 /** Изменение армии/очков/опыта или формы покраски до начала записи */
 export function EditDetailsDialog({
@@ -61,6 +62,7 @@ export function EditDetailsDialog({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reservations"] });
       queryClient.invalidateQueries({ queryKey: ["service-availability"] });
+      toast.success("Данные записи обновлены");
       onClose();
     },
   });

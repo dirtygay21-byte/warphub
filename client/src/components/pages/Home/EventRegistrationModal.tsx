@@ -15,6 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useDialogExit } from "@/components/ui/ds/useDialogExit";
+import { toast } from "@/stores/useToastStore";
 
 type EventRegistrationModalProps = {
   eventId: number;
@@ -51,6 +52,7 @@ export default function EventRegistrationModal({
       queryClient.invalidateQueries({ queryKey: ["nearest-event"] });
       queryClient.invalidateQueries({ queryKey: ["event", eventId] });
       queryClient.invalidateQueries({ queryKey: ["reservations"] });
+      toast.success("Вы записаны на ивент");
       onClose();
     },
     onError: (error) => {
