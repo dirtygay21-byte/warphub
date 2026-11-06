@@ -10,6 +10,13 @@ export const ALLIANCE_RU: Record<AllianceId, string> = { liberators: 'Liberators
 export const KIND_RU = { honour: 'Battle Honour', skill: 'Battle Skill', relic: 'Relic', agenda: 'Agenda Achieved' } as const;
 
 export type CardKind = keyof typeof KIND_RU;
+export type DominatusExportStatus = 'pending' | 'sending' | 'applied' | 'retry' | 'dead';
+export interface DominatusExportInfo {
+  status: DominatusExportStatus | null;
+  error: string | null;
+  battleIdOnSite: string | null;
+  updated: boolean;
+}
 export interface CampaignCard {
   id: number;
   kind: CardKind;
@@ -65,6 +72,9 @@ export interface CampaignView {
     achieved1: number;
     achieved2: number;
     playedAt: string;
+    exportStatus: DominatusExportStatus | null;
+    exportError: string | null;
+    exportBattleId: string | null;
   }[];
   me: { playerId: number; alliance: AllianceId; cards: CampaignCard[] } | null;
 }
@@ -89,6 +99,9 @@ export const getCampaign = () => call<CampaignResponse>('/roster/dominatus/campa
 export const recordCampaignBattle = (body: BattleBody) =>
   call<{ updated: boolean; agendaLimitReached: string[] }>('/roster/dominatus/battles', { method: 'POST', body: JSON.stringify(body) });
 export const claimCampaignCard = (id: number, name: string) => call<unknown>(`/roster/dominatus/cards/${id}/claim`, { method: 'POST', body: JSON.stringify({ name }) });
+export const getDominatusExport = (gameKey: string) => call<DominatusExportInfo>(`/roster/dominatus/exports/${encodeURIComponent(gameKey)}`);
+export const uploadDominatusBattle = (gameKey: string) => call<DominatusExportInfo>('/roster/dominatus/exports', { method: 'POST', body: JSON.stringify({ gameKey }) });
+export const retryDominatusBattle = (gameKey: string) => call<DominatusExportInfo>(`/roster/dominatus/exports/${encodeURIComponent(gameKey)}/retry`, { method: 'POST' });
 
 /** Колода, из которой выбирается ожидающая карта. */
 export function deckFor(view: CampaignView, card: CampaignCard, alliance: AllianceId): string[] {

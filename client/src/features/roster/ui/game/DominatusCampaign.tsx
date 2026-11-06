@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { agendasActive, battleResult, type Seat } from '../../game';
-import { ALLIANCE_RU, claimCampaignCard, deckFor, hasCampaign, KIND_RU, recordCampaignBattle, useCampaign, type CampaignCard, type CampaignView } from '../../dominatus/api';
+import { ALLIANCE_RU, claimCampaignCard, deckFor, hasCampaign, KIND_RU, recordCampaignBattle, retryDominatusBattle, uploadDominatusBattle, useCampaign, type CampaignCard, type CampaignView } from '../../dominatus/api';
 import type { AllianceId, CampaignPhase } from '../../dominatus/types';
 import { haptic, pushOverlay } from '../../telegram';
 import { Button, IconButton, Tag } from '../kit';
@@ -226,6 +226,51 @@ function Battles({ view }: { view: CampaignView }) {
   );
 }
 
+/** Явная загрузка уже записанной битвы на публичный сайт Dominatus; статус синхронизируется по gameKey. */
+function ExportBattle({ battle, reload }: { battle: CampaignView['battles'][number]; reload: () => Promise<unknown> }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const status = battle.exportStatus;
+  const pending = status === 'pending' || status === 'sending';
+  const applied = status === 'applied';
+  const failed = status === 'retry' || status === 'dead';
+
+  const submit = async () => {
+    setBusy(true);
+    setError(null);
+    const response = failed ? await retryDominatusBattle(battle.gameKey) : await uploadDominatusBattle(battle.gameKey);
+    setBusy(false);
+    if (!response.ok) return setError(response.error);
+    haptic.ok();
+    await reload();
+  };
+
+  return (
+    <div className="space-y-2 rounded-xl border border-accent/25 bg-accent/[0.04] p-3 text-sm">
+      {applied ? (
+        <p className="text-accent">
+          Загружено на Dominatus{battle.exportBattleId ? (
+            <>
+              {' '}
+              · <a className="underline underline-offset-2" href={`https://warp-dominatus.ru/battles/${battle.exportBattleId}`} target="_blank" rel="noreferrer">открыть битву</a>
+            </>
+          ) : null}
+        </p>
+      ) : pending ? (
+        <p className="text-fg-3">Загружаем битву на Dominatus…</p>
+      ) : failed ? (
+        <p className="text-warn">Не удалось загрузить на Dominatus{battle.exportError ? `: ${battle.exportError}` : '.'}</p>
+      ) : (
+        <p className="text-fg-3">Битва записана в кампанию. Можно отправить её на публичный сайт.</p>
+      )}
+      {error && <p className="text-xs text-warn">{error}</p>}
+      <Button variant="primary" className="w-full" disabled={busy || pending} onClick={() => void submit()}>
+        {applied ? 'Обновить на Dominatus' : failed ? 'Повторить загрузку' : 'Загрузить на Dominatus'}
+      </Button>
+    </div>
+  );
+}
+
 // ---------- «Начать игру»: подстановка из кампании и запись битвы ----------
 
 /** Шаг «Кампания»: фаза и локация открытой фазы кампании (одной кнопкой). */
@@ -387,6 +432,7 @@ export function RecordBattle({ game }: { game: GameHook }) {
       <Button variant="primary" className="w-full" disabled={!!problem || busy} onClick={() => void submit()}>
         {done || recorded ? 'Обновить запись' : 'Записать битву в кампанию'}
       </Button>
+      {recorded && <ExportBattle battle={recorded} reload={reload} />}
     </div>
   );
 }
