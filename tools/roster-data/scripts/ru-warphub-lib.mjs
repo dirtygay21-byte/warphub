@@ -220,7 +220,9 @@ export function gameNamesOf(faction) {
     names.add(d.name);
     for (const a of d.abilities ?? []) names.add(a.name);
   }
-  return [...names].filter((n) => n && n.length >= 4 && n !== n.toUpperCase());
+  // заголовки, а не названия правил
+  const GENERIC = new Set(['restrictions', 'designer’s note', "designer's note", 'designers note']);
+  return [...names].filter((n) => n && n.length >= 4 && n !== n.toUpperCase() && !GENERIC.has(n.toLowerCase()));
 }
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 /** Названия из английского текста, которых нет по-английски в переводе (регистр не важен: ANATHEMA PSYKANA = Anathema Psykana). */
@@ -240,7 +242,8 @@ export function checkTranslation(faction, ru, t) {
     if (gap.en !== tr.en) return out.push({ where, problems: ['английский текст изменился — перевод устарел'] });
     // текст сайта (память переводов wh-rules.ru) — как на сайте; проверяется только наличие текста
     const problems = tr.by === 'wh-rules' ? (tr.text?.trim() || tr.items?.length ? [] : ['пустой перевод']) : checkEntry(gap.source, tr);
-    if (tr.by !== 'wh-rules' && tr.text) {
+    // название детачмента — само переводимое название (показывается «English (Русское)»)
+    if (tr.by !== 'wh-rules' && tr.text && !where.startsWith('detachment name')) {
       const lost = lostNames(names, gap.source.text, tr.text, gap.source.name ?? gap.source.text);
       if (lost.length) problems.push(`названия не по-английски: ${lost.join(', ')}`);
     }

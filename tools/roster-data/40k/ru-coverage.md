@@ -65,7 +65,7 @@
 | Leagues of Votann | 3 | 0 | 0 |
 | Necrons | 11 | 0 | 0 |
 | Orks | 24 | 0 | 0 |
-| Space Marines | 38 | 0 | 0 |
+| Space Marines | 697 | 0 | 0 |
 | T’au Empire | 21 | 0 | 0 |
 | Thousand Sons | 85 | 0 | 0 |
 | Tyranids | 4 | 0 | 0 |
