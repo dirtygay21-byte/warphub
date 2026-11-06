@@ -1,5 +1,6 @@
 import { BOOSTY_GENERAL_URL, BOOSTY_SUBSCRIPTION_URL, type BoostyKind } from "./boosty";
 import clsx from "clsx";
+import { DsButton } from "@/components/ui/ds";
 import { CircleAlert, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { AnimatePresence } from "motion/react";
@@ -29,7 +30,7 @@ const COPY: Record<BoostyKind, Record<BoostyContext, string>> = {
     selection:
       "Планируете регулярно играть в Warhammer? На Boosty можно оформить подписку в поддержку клуба — она включает безлимитное посещение клуба.",
     booking:
-      "Подписка Boosty включает только доступ к WarpBuilder — конструктору ростеров и игровым инструментам клуба. Мы очень благодарны за вашу поддержку!",
+      "У нас есть WarpBuilder — конструктор ростеров и игровые инструменты клуба. Доступ к нему можно получить по подписке на Boosty. Будем рады вашей поддержке!",
   },
   painting: {
     selection:
@@ -121,17 +122,17 @@ export default function BoostySubscriptionInfo({
                 </button>
               </div>
               <p className="px-5 py-5 text-[15px] leading-relaxed text-fg-2">
-                {COPY[kind][context]}{" "}
-                <button
-                  type="button"
+                {COPY[kind][context]}
+              </p>
+              <div className="flex flex-col gap-1 border-t border-white/[0.07] px-5 py-3">
+                <DsButton
+                  variant="primary"
+                  className="w-full"
                   aria-label={kind === "warhammer" && context === "booking" ? "Поддержать WarpBuilder на Boosty" : "Поддержать клуб на Boosty"}
                   onClick={() => openBoostySubscription(linkUrl)}
-                  className="inline font-medium text-accent underline underline-offset-4 transition-opacity hover:opacity-80"
                 >
-                  Поддержать
-                </button>
-              </p>
-              <div className="border-t border-white/[0.07] px-5 py-3">
+                  Поддержать на Boosty
+                </DsButton>
                 <button
                   type="button"
                   aria-label="Закрыть диалог"
