@@ -29,6 +29,7 @@ import {
   newsToDraft,
   type NewsDraft,
 } from "../newsUtils";
+import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 
 type NewsDetailsModalProps = {
   mode: "create" | "edit";
@@ -76,6 +77,7 @@ export default function NewsDetailsModal({
   });
 
   const deleteMutation = useMutation({
+    meta: { success: "Новость удалена" },
     mutationFn: async () => {
       if (newsId == null) throw new Error("ID новости не указан");
 
@@ -126,6 +128,7 @@ export default function NewsDetailsModal({
   }, [draft, baselineDraft, pendingImageFile]);
 
   const saveMutation = useMutation({
+    meta: { success: "Новость сохранена" },
     mutationFn: async () => {
       if (!draft) throw new Error("Данные новости не загружены");
 
@@ -249,9 +252,11 @@ export default function NewsDetailsModal({
   const canPublish =
     isCreate && Boolean(draft?.title.trim()) && Boolean(draft?.text.trim());
 
+  const leaving = useDialogExit();
+
   return (
     <div
-      className="ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
+      className={`ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center${leaving ? " ds-leaving" : ""}`}
       onClick={handleClose}
     >
       <div

@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 
 export function StatusConfirmDialog({
   action,
@@ -23,9 +24,11 @@ export function StatusConfirmDialog({
 }) {
   const isConfirm = action === "confirm";
 
+  const leaving = useDialogExit();
+
   return (
     <div
-      className="ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
+      className={`ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center${leaving ? " ds-leaving" : ""}`}
       onClick={onClose}
     >
       <div

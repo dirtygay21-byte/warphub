@@ -81,6 +81,7 @@ function RewardRow({ reward }: { reward: AdminReward }) {
   const queryClient = useQueryClient();
   const [confirm, setConfirm] = useState(false);
   const redeem = useMutation({
+    meta: { success: "Награда отмечена как использованная" },
     mutationFn: () => redeemAdminReward(reward.id),
     onSuccess: () => {
       setConfirm(false);
@@ -562,6 +563,7 @@ function PlayerPoints({ player }: { player: AdminPlayerPoints }) {
   const [note, setNote] = useState("");
   const history = useQuery({ queryKey: ["admin", "points", "history", player.id], queryFn: () => getPlayerPoints(player.id) });
   const adjust = useMutation({
+    meta: { success: "Баланс игрока изменён" },
     mutationFn: (delta: number) => adjustPlayerPoints(player.id, delta, note),
     onSuccess: () => {
       setAmount("");

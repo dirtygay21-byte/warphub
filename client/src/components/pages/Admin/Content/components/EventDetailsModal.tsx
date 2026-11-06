@@ -34,6 +34,7 @@ import {
   fromDatetimeLocal,
   type EventDraft,
 } from "../utils";
+import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 
 type EventDetailsModalProps = {
   mode: "create" | "edit";
@@ -81,6 +82,7 @@ export default function EventDetailsModal({
   });
 
   const deleteMutation = useMutation({
+    meta: { success: "Ивент удалён" },
     mutationFn: async () => {
       if (eventId == null) throw new Error("ID ивента не указан");
 
@@ -132,6 +134,7 @@ export default function EventDetailsModal({
   }, [draft, baselineDraft, pendingImageFile]);
 
   const saveMutation = useMutation({
+    meta: { success: "Ивент сохранён" },
     mutationFn: async () => {
       if (!draft) throw new Error("Данные ивента не загружены");
 
@@ -287,9 +290,11 @@ export default function EventDetailsModal({
   const tablesLabel = tableIds.length > 0 ? tableIds.join(", ") : "—";
   const canShowForm = draft && (isCreate || eventQuery.data);
 
+  const leaving = useDialogExit();
+
   return (
     <div
-      className="ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center"
+      className={`ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-4 pb-8 pt-6 sm:items-center${leaving ? " ds-leaving" : ""}`}
       onClick={handleClose}
     >
       <div

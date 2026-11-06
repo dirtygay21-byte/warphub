@@ -1,7 +1,9 @@
 import { BOOSTY_GENERAL_URL, BOOSTY_SUBSCRIPTION_URL, type BoostyKind } from "./boosty";
 import clsx from "clsx";
 import { CircleAlert, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { AnimatePresence } from "motion/react";
+import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 import { createPortal } from "react-dom";
 
 type BoostyContext = "selection" | "booking";
@@ -90,12 +92,10 @@ export default function BoostySubscriptionInfo({
         <CircleAlert className="size-4" />
       </button>
 
-      {open &&
-        createPortal(
-          <div
-            className="ds-fade fixed inset-0 z-[80] flex items-end justify-center bg-overlay/75 px-4 pb-6 pt-6 sm:items-center"
-            onClick={() => setOpen(false)}
-          >
+      {createPortal(
+        <AnimatePresence>
+          {open && (
+          <BoostySheet onClose={() => setOpen(false)}>
             <div
               role="dialog"
               aria-modal="true"
@@ -142,9 +142,24 @@ export default function BoostySubscriptionInfo({
                 </button>
               </div>
             </div>
-          </div>,
-          document.body,
-        )}
+          </BoostySheet>
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
     </>
+  );
+}
+
+/** Фон окна Boosty: закрытие с анимацией (useDialogExit) — содержимое передаёт BoostySubscriptionInfo. */
+function BoostySheet({ onClose, children }: { onClose: () => void; children: ReactNode }) {
+  const leaving = useDialogExit();
+  return (
+    <div
+      className={`ds-fade fixed inset-0 z-[80] flex items-end justify-center bg-overlay/75 px-4 pb-6 pt-6 sm:items-center${leaving ? " ds-leaving" : ""}`}
+      onClick={onClose}
+    >
+      {children}
+    </div>
   );
 }

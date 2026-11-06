@@ -34,6 +34,7 @@ import UpcomingHolds from "@/components/pages/Admin/TableHolds/UpcomingHolds";
 import { DsButton } from "@/components/ui/ds";
 import { GameEditorModal } from "./GameEditorModal";
 import { emptyGameDraft } from "./gameDraft";
+import { AnimatePresence } from "motion/react";
 
 const TABS = [
   { id: "games", label: "Игры" },
@@ -105,7 +106,9 @@ function HoldsTab() {
         <Lock className="size-4" />
         Забронировать стол
       </DsButton>
-      {open && <TableHoldSheet prefill={{ purpose: "dnd" }} onClose={() => setOpen(false)} />}
+      <AnimatePresence>
+        {open && <TableHoldSheet prefill={{ purpose: "dnd" }} onClose={() => setOpen(false)} />}
+      </AnimatePresence>
       <UpcomingHolds focus="dnd" focusLabel="Только D&D" />
     </div>
   );
@@ -181,12 +184,14 @@ function GamesTab() {
         </div>
       )}
 
-      {editing && (
-        <GameEditorModal
-          game={editing === "new" ? undefined : editing}
-          onClose={() => setEditing(null)}
-        />
-      )}
+      <AnimatePresence>
+        {editing && (
+          <GameEditorModal
+            game={editing === "new" ? undefined : editing}
+            onClose={() => setEditing(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -209,6 +214,7 @@ function AdminGameCard({
   });
 
   const deleteMutation = useMutation({
+    meta: { success: "Игра удалена" },
     mutationFn: () => deleteAdminDndGame(game.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-dnd-games"] });
@@ -284,12 +290,14 @@ function AdminGameCard({
           </button>
         )}
       </div>
-      {holdOpen && (
-        <TableHoldSheet
-          prefill={{ startsAt: game.startsAt, endsAt: game.endsAt, purpose: "dnd", title: game.title, dndGameId: game.id }}
-          onClose={() => setHoldOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {holdOpen && (
+          <TableHoldSheet
+            prefill={{ startsAt: game.startsAt, endsAt: game.endsAt, purpose: "dnd", title: game.title, dndGameId: game.id }}
+            onClose={() => setHoldOpen(false)}
+          />
+        )}
+      </AnimatePresence>
       {deleteMutation.isError && (
         <p className="px-4 pb-3 text-xs text-red-300">{deleteMutation.error.message}</p>
       )}
@@ -358,6 +366,7 @@ function TrialsTab() {
   const selectedPlayers = selectedTrials.reduce((sum, t) => sum + t.playersCount, 0);
 
   const updateMutation = useMutation({
+    meta: { success: "Статус заявки обновлён", error: true },
     mutationFn: ({ id, status, gameId }: { id: string; status: DndTrialStatus; gameId?: number }) =>
       updateAdminTrialRequest(id, { status, gameId }),
     onSuccess: () => {
@@ -367,6 +376,7 @@ function TrialsTab() {
   });
 
   const groupMutation = useMutation({
+    meta: { success: "Заявки добавлены в игру" },
     mutationFn: async (gameId: number) => {
       for (const id of selected) {
         await updateAdminTrialRequest(id, { status: "grouped", gameId });
@@ -526,18 +536,20 @@ function TrialsTab() {
         </div>
       )}
 
-      {creatingGame && (
-        <GameEditorModal
-          title="Новая игра для заявок"
-          initialDraft={emptyGameDraft({
-            title: "Пробная игра D&D",
-            gameType: "Пробная игра",
-            capacity: String(Math.max(selectedPlayers, 1)),
-          })}
-          onClose={() => setCreatingGame(false)}
-          onSaved={(game) => groupMutation.mutate(game.id)}
-        />
-      )}
+      <AnimatePresence>
+        {creatingGame && (
+          <GameEditorModal
+            title="Новая игра для заявок"
+            initialDraft={emptyGameDraft({
+              title: "Пробная игра D&D",
+              gameType: "Пробная игра",
+              capacity: String(Math.max(selectedPlayers, 1)),
+            })}
+            onClose={() => setCreatingGame(false)}
+            onSaved={(game) => groupMutation.mutate(game.id)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { useState } from "react";
 import NewsCard from "./components/NewsCard";
 import NewsDetailsModal from "./components/NewsDetailsModal";
 import { Skeleton } from "@/components/ui/ds";
+import { AnimatePresence } from "motion/react";
 
 export default function NewsList() {
   const [selectedNewsId, setSelectedNewsId] = useState<number | null>(null);
@@ -69,9 +70,11 @@ export default function NewsList() {
           </button>
         </div>
 
-        {isCreateOpen && (
-          <NewsDetailsModal mode="create" onClose={closeModal} />
-        )}
+        <AnimatePresence>
+          {isCreateOpen && (
+            <NewsDetailsModal mode="create" onClose={closeModal} />
+          )}
+        </AnimatePresence>
       </>
     );
   }
@@ -138,15 +141,19 @@ export default function NewsList() {
         </button>
       </div>
 
-      {isCreateOpen && <NewsDetailsModal mode="create" onClose={closeModal} />}
+      <AnimatePresence>
+        {isCreateOpen && <NewsDetailsModal mode="create" onClose={closeModal} />}
+      </AnimatePresence>
 
-      {selectedNewsId !== null && (
-        <NewsDetailsModal
-          mode="edit"
-          newsId={selectedNewsId}
-          onClose={closeModal}
-        />
-      )}
+      <AnimatePresence>
+        {selectedNewsId !== null && (
+          <NewsDetailsModal
+            mode="edit"
+            newsId={selectedNewsId}
+            onClose={closeModal}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -31,6 +31,7 @@ import UpcomingHolds from "@/components/pages/Admin/TableHolds/UpcomingHolds";
 import TableHoldSheet from "@/components/pages/Admin/TableHolds/TableHoldSheet";
 import { DsButton, Skeleton } from "@/components/ui/ds";
 import { useMemo, useState } from "react";
+import { AnimatePresence } from "motion/react";
 
 const shiftDate = (dateKey: string, days: number) => {
   const [y, m, d] = dateKey.split("-").map(Number);
@@ -115,7 +116,9 @@ export default function AdminWarhammer() {
         <Lock className="size-4" />
         Забронировать стол
       </DsButton>
-      {holdOpen && <TableHoldSheet prefill={{ dateKey }} onClose={() => setHoldOpen(false)} />}
+      <AnimatePresence>
+        {holdOpen && <TableHoldSheet prefill={{ dateKey }} onClose={() => setHoldOpen(false)} />}
+      </AnimatePresence>
 
       {dayQuery.isLoading ? (
         <div className="flex flex-col gap-3" aria-busy="true" aria-label="Загружаем день">
@@ -365,6 +368,7 @@ function PlayerRow({
   const isFuture = new Date(session.startsAt).getTime() > now;
 
   const moveMutation = useMutation({
+    meta: { success: "Запись перенесена на другой стол" },
     mutationFn: (tableId: number) =>
       moveAdminReservation(player.reservationId, tableId),
     onSuccess: () => {

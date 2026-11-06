@@ -12,6 +12,7 @@ export default function HoldCard({ hold, showDate = false }: { hold: TableHold; 
   const queryClient = useQueryClient();
   const [armed, setArmed] = useState(false);
   const remove = useMutation({
+    meta: { success: "Бронь стола удалена" },
     mutationFn: () => deleteTableHold(hold.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-warhammer-day"] });
