@@ -18,6 +18,7 @@ import { useRu } from './common/useRu';
 import { ruDetachmentRule, ruName, ruRule, ruStratagem } from '../ru';
 import { RuleRichText } from './common/RulePopover';
 import { useGlossary } from './common/useGlossary';
+import { LangSwitch } from './common/LangSwitch';
 import { cleanRuleText } from '../text';
 import { w40kPointSystems } from '../points';
 import { PointsSheet } from './PointsSheet';
@@ -192,6 +193,7 @@ function Editor({
           ) : (
             <NameInput value={roster.name} onChange={(name) => set({ name })} />
           )}
+          <LangSwitch />
           {!viewOnly && (
             <IconButton
               icon={view ? 'edit' : 'eye'}

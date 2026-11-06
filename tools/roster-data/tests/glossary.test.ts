@@ -3,7 +3,7 @@
 import { describe, expect, test } from 'bun:test';
 import fs from 'node:fs';
 import path from 'node:path';
-import { findAbility, findKeyword, parseRich, splitWeaponKeywords, type Glossary } from '../../../client/src/features/roster/glossary';
+import { findAbility, findKeyword, localizeGlossary, parseRich, splitWeaponKeywords, type Glossary } from '../../../client/src/features/roster/glossary';
 import { buildGlossary } from '../scripts/whrules-glossary.mjs';
 
 const DATA = path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster-data');
@@ -86,5 +86,35 @@ describe('поиск и разбор', () => {
       { t: 'term', id: 'select-targets', s: 'Выбор целей' },
       { t: 'text', s: '.' },
     ]);
+  });
+});
+
+describe('переключатель RU/EN (06.11.2026): английский текст того же снимка wh-rules', () => {
+  const en = localizeGlossary(g, 'en');
+
+  test('у всех способностей, способностей оружия и терминов есть английский текст', () => {
+    expect(Object.values(g.abilities).filter((a) => !a.en)).toEqual([]);
+    expect(Object.keys(g.weapon).filter((k) => !g.weaponEn?.[k])).toEqual([]);
+    expect(Object.entries(g.terms).filter(([, t]) => !t.textEn).map(([id]) => id)).toEqual([]);
+  });
+
+  test('en подменяет тексты на английские, ru — без изменений', () => {
+    expect(localizeGlossary(g, 'ru')).toBe(g);
+    const [key, a] = Object.entries(g.abilities)[0]!;
+    expect(en.abilities[key]!.text).toBe(a.en!.text);
+    expect(en.abilities[key]!.name).toBe(a.name);
+    const [termId, t] = Object.entries(g.terms)[0]!;
+    expect(en.terms[termId]!.text).toBe(t.textEn!);
+    const [wKey] = Object.keys(g.weapon);
+    expect(en.weapon[wKey!]).toEqual(g.weaponEn![wKey!]!);
+    // поиск по названиям одинаков на обоих языках
+    expect(findAbility(en, 'Deep Strike')?.kind).toBe(findAbility(g, 'Deep Strike')?.kind);
+  });
+
+  test('ссылки [gloss:id] в английских текстах ведут на существующие термины', () => {
+    const texts = [...Object.values(en.abilities).flatMap((a) => [a.text, a.example ?? '']), ...Object.values(en.weapon).flat(), ...Object.values(en.terms).map((t) => t.text)];
+    const broken = new Set<string>();
+    for (const t of texts) for (const p of parseRich(t)) if (p.t === 'term' && !g.terms[p.id]) broken.add(p.id);
+    expect([...broken].every((id) => KNOWN_GAPS.terms.includes(id))).toBe(true);
   });
 });
