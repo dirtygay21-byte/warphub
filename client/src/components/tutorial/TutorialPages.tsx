@@ -89,7 +89,7 @@ export function TutorialHub() {
         </section>
         {TUTORIAL_GAMES.some((g) => TUTORIAL_WALKS[g.id]) && (
           <section>
-            <SectionLabel>Учебный раунд</SectionLabel>
+            <SectionLabel>Обучающая игра</SectionLabel>
             <div className="overflow-hidden rounded-[18px] border border-accent/30 bg-app-elevated">
               {TUTORIAL_GAMES.filter((g) => TUTORIAL_WALKS[g.id]).map((game, i) => (
                 <button
@@ -260,7 +260,7 @@ export function TutorialViewer() {
           <div className="mt-5 flex flex-col gap-2.5">
             {TUTORIAL_WALKS[game.id] && (
               <DsButton variant="primary" size="lg" className="w-full" onClick={() => (haptic.tap(), navigate(`/learn/${game.id}/round`))}>
-                Учебный раунд: сыграть по шагам
+                Обучающая игра: раунд по шагам
               </DsButton>
             )}
             <DsButton variant={TUTORIAL_WALKS[game.id] ? "secondary" : "primary"} size="lg" className="w-full" onClick={bookTraining}>
@@ -446,7 +446,7 @@ export function TutorialRound() {
 
   return (
     <div className="pb-[calc(96px+env(safe-area-inset-bottom))] text-fg" data-tutorial-top>
-      <TopBar onBack={back} kicker={`Учебный раунд · ${game.code}`} title={page === 0 ? game.title : last ? "Следующий раунд" : `Шаг ${page} из ${walk.steps.length}`} />
+      <TopBar onBack={back} kicker={`Обучающая игра · ${game.code}`} title={page === 0 ? game.title : last ? "Следующий раунд" : `Шаг ${page} из ${walk.steps.length}`} />
       <div className="flex gap-1 px-4 pb-3" role="progressbar" aria-valuemin={0} aria-valuemax={walk.steps.length} aria-valuenow={done.length}>
         {walk.steps.map((s, i) => (
           <span key={s.title} className={clsx("h-1 flex-1 rounded-full transition-colors", done.includes(i) ? "bg-accent" : i === stepIndex ? "bg-accent/50" : "bg-white/[0.14]")} />

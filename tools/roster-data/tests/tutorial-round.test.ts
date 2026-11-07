@@ -27,5 +27,8 @@ describe('учебный раунд', () => {
     const pages = fs.readFileSync(path.join(ROOT, 'components', 'tutorial', 'TutorialPages.tsx'), 'utf8');
     expect(pages).toContain('navigate(`/learn/${game.id}/round`)');
     expect(pages).toContain('Повторить раунд');
+    const ktList = fs.readFileSync(path.join(ROOT, 'features', 'roster', 'ui', 'kt', 'KtList.tsx'), 'utf8');
+    expect(ktList).toContain("title=\"Обучающая игра\"");
+    expect(ktList).toContain("navigate('/learn/kt/round')");
   });
 });

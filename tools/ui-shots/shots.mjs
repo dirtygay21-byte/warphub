@@ -185,6 +185,12 @@ for (const [label, name] of [
 }
 
 // «Учебный раунд» Kill Team: вступление, шаги с примерами, следующий раунд
+await step('kt-list-learn', async () => {
+  await page.goto(BASE + '/roster', { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: /Kill Team/ }).first().click({ timeout: 5000 });
+  await page.waitForTimeout(800);
+  await shot('kt-list-tiles');
+});
 await step('learn-kt-round', async () => {
   await page.goto(BASE + '/learn', { waitUntil: 'networkidle' });
   await shot('learn-hub', true);
