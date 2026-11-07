@@ -43,11 +43,17 @@ describe('пробелы: что есть по-английски и нет на
     expect(Object.keys(g.enhancements)).toEqual(['e1']);
   });
 
+  test('инфолист есть на сайте, но без пояснения «Лидер» или снаряжения — эти поля пробел (07.11.2026)', () => {
+    const f2 = { ...faction, datasheets: [{ ...faction.datasheets[0], leaderNote: 'You can attach this model even if…' }] };
+    const g = collectGaps(f2, { ...empty(), datasheets: { ds1: { abilities: { Hold: { text: 'с сайта' } } } } });
+    expect(Object.keys(g.datasheets.ds1).sort()).toEqual(['leaderNote', 'loadout', 'name']);
+  });
+
   test('что есть на сайте — не пробел', () => {
-    const ru = { ...empty(), stratagems: { s1: { text: 'с сайта' } }, datasheets: { ds1: { abilities: { Hold: { text: 'с сайта' } } } } };
+    const ru = { ...empty(), stratagems: { s1: { text: 'с сайта' } }, datasheets: { ds1: { abilities: { Hold: { text: 'с сайта' } }, loadout: 'с сайта' } } };
     const g = collectGaps(faction, ru);
     expect(g.stratagems.s1).toBeUndefined();
-    expect(g.datasheets.ds1).toBeUndefined(); // инфолист есть на сайте — снаряжение не переводится
+    expect(g.datasheets.ds1).toBeUndefined(); // инфолист есть на сайте со снаряжением — не пробел
   });
 });
 

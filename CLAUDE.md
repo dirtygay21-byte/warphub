@@ -52,6 +52,9 @@ Mini App WarpHub (Telegram) и скрытый раздел Roster Builder (Warha
 > **Названия — по-английски (решение владельца 07.11.2026):** названия ключевых слов, правил, способностей, стратагем, улучшений,
 > детачментов в тексте перевода остаются английскими, перевод — в скобках после: «Oath of Moment (Клятва момента)»
 > (`--check` проверяет). Заголовки в приложении — «English (Русское)» (`ruName` в `client/src/features/roster/ru.ts`).
+> **Основные стратагемы (07.11.2026):** раздел 15 с wh-rules.ru/ru/stratagems — снимок `40k/whrules-995-core-stratagems.json`
+> (снят в браузере, `contentSha256`); манёвры Battle Focus — из армейского правила сайта. Пояснение «Лидер» — заголовок сайта
+> + названия юнитов или footer сайта (`leaderNoteRu`). Все тексты правил 40K по-русски — `tests/roster-lang.test.ts`.
 >
 > **Warcry, решение владельца 30.10.2026:** источник — krisling049/warcry_data (`data/`, лицензии нет),
 > импорт `scripts/import-warcry.mjs` → `backend/roster-data/warcry/`; правила построения варбанды — warcrier.net.

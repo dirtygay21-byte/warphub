@@ -32,6 +32,10 @@
    "total": 310,
    "ru": 246
   },
+  "coreStratagems": {
+   "total": 236,
+   "ru": 236
+  },
   "stratagems": {
    "total": 1445,
    "ru": 1180
@@ -68,6 +72,10 @@
     "detRules": {
      "total": 8,
      "ru": 8
+    },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
     },
     "stratagems": {
      "total": 36,
@@ -120,7 +128,7 @@
     ]
    },
    "warphub": {
-    "applied": 33,
+    "applied": 37,
     "stale": [],
     "unknown": []
    }
@@ -147,6 +155,10 @@
     "detRules": {
      "total": 18,
      "ru": 12
+    },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
     },
     "stratagems": {
      "total": 82,
@@ -318,6 +330,10 @@
      "total": 10,
      "ru": 10
     },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
+    },
     "stratagems": {
      "total": 51,
      "ru": 49
@@ -396,6 +412,10 @@
      "total": 17,
      "ru": 15
     },
+    "coreStratagems": {
+     "total": 16,
+     "ru": 16
+    },
     "stratagems": {
      "total": 78,
      "ru": 76
@@ -426,7 +446,7 @@
     ]
    },
    "warphub": {
-    "applied": 6,
+    "applied": 8,
     "stale": [],
     "unknown": []
    }
@@ -453,6 +473,10 @@
     "detRules": {
      "total": 11,
      "ru": 11
+    },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
     },
     "stratagems": {
      "total": 57,
@@ -597,6 +621,10 @@
      "total": 12,
      "ru": 6
     },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
+    },
     "stratagems": {
      "total": 46,
      "ru": 44
@@ -675,6 +703,10 @@
      "total": 8,
      "ru": 8
     },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
+    },
     "stratagems": {
      "total": 39,
      "ru": 39
@@ -738,6 +770,10 @@
     "detRules": {
      "total": 20,
      "ru": 16
+    },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
     },
     "stratagems": {
      "total": 93,
@@ -830,6 +866,10 @@
      "total": 9,
      "ru": 9
     },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
+    },
     "stratagems": {
      "total": 45,
      "ru": 45
@@ -912,6 +952,10 @@
      "total": 9,
      "ru": 9
     },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
+    },
     "stratagems": {
      "total": 45,
      "ru": 45
@@ -966,6 +1010,10 @@
     "detRules": {
      "total": 11,
      "ru": 9
+    },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
     },
     "stratagems": {
      "total": 51,
@@ -1034,6 +1082,10 @@
     "detRules": {
      "total": 10,
      "ru": 8
+    },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
     },
     "stratagems": {
      "total": 45,
@@ -1168,6 +1220,10 @@
      "total": 9,
      "ru": 9
     },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
+    },
     "stratagems": {
      "total": 45,
      "ru": 45
@@ -1249,6 +1305,10 @@
      "total": 5,
      "ru": 5
     },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
+    },
     "stratagems": {
      "total": 30,
      "ru": 30
@@ -1302,6 +1362,10 @@
     "detRules": {
      "total": 9,
      "ru": 7
+    },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
     },
     "stratagems": {
      "total": 39,
@@ -1384,6 +1448,10 @@
      "total": 10,
      "ru": 10
     },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
+    },
     "stratagems": {
      "total": 51,
      "ru": 51
@@ -1434,6 +1502,10 @@
     "detRules": {
      "total": 12,
      "ru": 11
+    },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
     },
     "stratagems": {
      "total": 63,
@@ -1495,6 +1567,10 @@
     "detRules": {
      "total": 15,
      "ru": 15
+    },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
     },
     "stratagems": {
      "total": 40,
@@ -1567,6 +1643,10 @@
     "detRules": {
      "total": 71,
      "ru": 35
+    },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
     },
     "stratagems": {
      "total": 343,
@@ -2099,7 +2179,7 @@
     ]
    },
    "warphub": {
-    "applied": 697,
+    "applied": 698,
     "stale": [],
     "unknown": []
    }
@@ -2126,6 +2206,10 @@
     "detRules": {
      "total": 9,
      "ru": 6
+    },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
     },
     "stratagems": {
      "total": 31,
@@ -2170,7 +2254,7 @@
     ]
    },
    "warphub": {
-    "applied": 21,
+    "applied": 22,
     "stale": [],
     "unknown": []
    }
@@ -2197,6 +2281,10 @@
     "detRules": {
      "total": 9,
      "ru": 9
+    },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
     },
     "stratagems": {
      "total": 45,
@@ -2287,6 +2375,10 @@
      "total": 10,
      "ru": 10
     },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
+    },
     "stratagems": {
      "total": 51,
      "ru": 51
@@ -2340,6 +2432,10 @@
     "detRules": {
      "total": 8,
      "ru": 8
+    },
+    "coreStratagems": {
+     "total": 10,
+     "ru": 10
     },
     "stratagems": {
      "total": 39,

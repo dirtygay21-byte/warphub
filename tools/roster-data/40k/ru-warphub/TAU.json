@@ -173,6 +173,13 @@
      "text": "Этот юнит может стрелять в ход, в который он отступал."
     }
    }
+  },
+  "000000436": {
+   "name": "Tidewall Shieldline",
+   "loadout": {
+    "en": "8dec5af1af",
+    "text": "Эта модель может быть вооружена 1 Tidewall defence platform."
+   }
   }
  },
  "detachments": {
