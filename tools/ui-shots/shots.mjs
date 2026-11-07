@@ -148,6 +148,10 @@ for (const [label, name] of [
     await page.getByRole('button', { name: 'Начать битву' }).first().click({ timeout: 5000 });
     await page.waitForTimeout(1500);
     await shot(`${label}-battle`, true);
+    // переключатель кубиков: «Вручную» — ввод итога, затем обратно «В приложении»
+    await page.getByRole('radio', { name: 'Вручную' }).first().click({ timeout: 5000 });
+    await shot(`${label}-battle-dice-manual`, true);
+    await page.getByRole('radio', { name: 'В приложении' }).first().click({ timeout: 5000 });
     await page.getByRole('button', { name: /Бросить/ }).first().click({ timeout: 5000 });
     await page.waitForTimeout(800);
     await shot(`${label}-battle-initiative`, true);

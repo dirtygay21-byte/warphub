@@ -18,6 +18,7 @@ import { RoundDots } from '../common/RoundDots';
 import { ScoreboardGrid } from '../common/ScoreboardGrid';
 import { GameShell } from '../common/GameShell';
 import { ChoiceField, GameCounter, GameLabel, ToggleChip, type Choice } from '../common/GameControls';
+import { DiceHead, useDiceMode } from '../common/DiceMode';
 import { readKtLibrary, readKtLocal, rememberKtOnline, removeKtSaved, saveKtLocal, type KtSavedEntry } from '../../ktgame/library';
 import { injectKtSecret, readKtSecret, redactKtSetup, writeKtSecret } from '../../ktgame/secrets';
 import { KtMapPanel } from '../skirmish/SkirmishMaps';
@@ -177,7 +178,7 @@ export function KtFullGameScreen({ onBack, rosters, index, initialRosterId }: { 
         <>
           <RoundDots round={state.round} rounds={data.game.turningPoints} finished={state.stage === 'finished'} />
           {onlineGame.online && state.stage === 'battle' && state.round === 1 && !state.initiativeRolls && <OnlinePlayerSetup rosters={rosters} index={index} data={data} onlineSeat={onlineGame.online.seat} onRoster={(rosterId, operatives) => dispatch({ type: 'player-set', seat: onlineGame.online!.seat, rosterId, operatives })} onTac={(tacOp) => dispatch({ type: 'tac-set', seat: onlineGame.online!.seat, tacOp })} />}
-          <BattleHeader state={state} data={data} onInitiative={(cards) => dispatch({ type: 'initiative', round: state.round, attempt: 0, cards })} onPhase={() => dispatch({ type: 'phase-advanced' })} />
+          <BattleHeader state={state} data={data} onInitiative={(cards, manual) => dispatch({ type: 'initiative', round: state.round, attempt: 0, cards, ...(manual ? { manual } : {}) })} onPhase={() => dispatch({ type: 'phase-advanced' })} />
           <ScoreboardGrid className="mb-3 text-center">
             {SEATS.map((seat) => {
               const p = state.players[seat];
@@ -401,8 +402,9 @@ function RosterChoice({ seat, rosters, index, selected, onSelect, onCode }: { se
 }
 
 type Cards = Partial<Record<Seat, { reroll?: boolean; modifier?: number }>>;
+type ManualInitiative = { winner: Seat; rolls?: Partial<Record<Seat, number>> };
 
-function BattleHeader({ state, data, onInitiative, onPhase }: { state: KtState; data: KtData; onInitiative: (cards: Cards) => boolean; onPhase: () => boolean }) {
+function BattleHeader({ state, data, onInitiative, onPhase }: { state: KtState; data: KtData; onInitiative: (cards: Cards, manual?: ManualInitiative) => boolean; onPhase: () => boolean }) {
   return (
     <div className="mb-3 rounded-2xl border border-white/10 bg-app-elevated p-3.5">
       <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">
@@ -414,7 +416,12 @@ function BattleHeader({ state, data, onInitiative, onPhase }: { state: KtState; 
       {state.stage === 'battle' && !state.initiativeRolls && state.round <= 4 && <InitiativePanel state={state} onRoll={onInitiative} />}
       {state.initiativeRolls && (
         <p className="mt-1 text-[12px] text-fg-3">
-          Инициатива: {seatName(state.initiative)} · броски {state.initiativeRolls.p1} : {state.initiativeRolls.p2}
+          Инициатива: {seatName(state.initiative)}
+          {state.initiativeManual
+            ? state.initiativeRolls.p1 || state.initiativeRolls.p2
+              ? ` · вручную, броски ${state.initiativeRolls.p1} : ${state.initiativeRolls.p2}`
+              : ' · вручную'
+            : ` · броски ${state.initiativeRolls.p1} : ${state.initiativeRolls.p2}`}
         </p>
       )}
       {state.phase === 'strategy' && state.initiativeRolls && (
@@ -426,10 +433,15 @@ function BattleHeader({ state, data, onInitiative, onPhase }: { state: KtState; 
   );
 }
 
-function InitiativePanel({ state, onRoll }: { state: KtState; onRoll: (cards: Cards) => boolean }) {
+function InitiativePanel({ state, onRoll }: { state: KtState; onRoll: (cards: Cards, manual?: ManualInitiative) => boolean }) {
   const [cards, setCards] = useState<Cards>({});
+  const dice = useDiceMode((s) => s.mode);
+  const [winner, setWinner] = useState<Seat | ''>('');
+  const [rolls, setRolls] = useState<Partial<Record<Seat, number>>>({});
+  const D6: Choice<number>[] = [1, 2, 3, 4, 5, 6].map((n) => ({ value: n, label: String(n) }));
   return (
     <div className="mt-3 space-y-2 rounded-xl bg-black/25 p-3">
+      <DiceHead title="Инициатива" hint="кто выиграл (значения — по желанию)" />
       {SEATS.map(
         (seat) =>
           state.players[seat].initiativeCards.length > 0 && (
@@ -451,9 +463,28 @@ function InitiativePanel({ state, onRoll }: { state: KtState; onRoll: (cards: Ca
             </ToggleChip>
           ),
       )}
-      <Button variant="primary" className="w-full" onClick={() => onRoll(cards)}>
-        <Icon name="spark" /> Бросить инициативу
-      </Button>
+      {dice === 'manual' ? (
+        <>
+          {SEATS.map((seat) => (
+            <ChoiceField
+              key={`roll${seat}`}
+              label={`${seatName(seat)}: выпало (по желанию)`}
+              value={rolls[seat] ?? ''}
+              onChange={(v) => setRolls((r) => ({ ...r, [seat]: v }))}
+              inlineMax={6}
+              options={D6}
+            />
+          ))}
+          <ChoiceField label="Инициативу выиграл" value={winner} onChange={setWinner} options={SEAT_CHOICES} />
+          <Button variant="primary" className="w-full" disabled={!winner} onClick={() => winner && onRoll(cards, { winner, rolls })}>
+            Записать инициативу
+          </Button>
+        </>
+      ) : (
+        <Button variant="primary" className="w-full" onClick={() => onRoll(cards)}>
+          <Icon name="spark" /> Бросить инициативу
+        </Button>
+      )}
     </div>
   );
 }

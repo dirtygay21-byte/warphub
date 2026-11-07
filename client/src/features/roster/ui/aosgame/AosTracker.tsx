@@ -6,6 +6,7 @@ import { cx } from '../util';
 import { BattleplanInfo, TacticCards } from './AosSetup';
 import { territoryLabel, TIER_LABEL } from './refs';
 import type { AosGameHook } from './useAosGame';
+import { DiceModeSwitch, useDiceMode } from '../common/DiceMode';
 import { ScoreboardGrid } from '../common/ScoreboardGrid';
 
 /** Трекер битвы AoS: счёт, priority в начале раунда, ресурсы игроков, конец хода (батлплан и тактики), итог. */
@@ -70,6 +71,7 @@ function Priority({ game }: { game: AosGameHook }) {
   const bp = game.bp!;
   const names = { p1: s.players.p1.name, p2: s.players.p2.name };
   const [rolled, setRolled] = useState(false);
+  const dice = useDiceMode((m) => m.mode);
   const r = priorityRoll(s.seed, s.round, s.rollCount.priority, s.prevFirst);
   const second = s.prevFirst ? otherSeat(s.prevFirst) : null;
   // перехват: ходивший вторым решает ходить первым; запрещён, если соперник впереди на seizeBlockedLead+ ПО
@@ -88,10 +90,18 @@ function Priority({ game }: { game: AosGameHook }) {
   };
   return (
     <div className="rounded-2xl border border-accent/30 bg-white/[0.03] p-4">
-      <p className="font-display text-lg font-semibold uppercase">Priority · раунд {s.round}</p>
+      <div className="flex items-center gap-2">
+        <p className="font-display min-w-0 flex-1 text-lg font-semibold uppercase">Priority · раунд {s.round}</p>
+        <DiceModeSwitch />
+      </div>
       <p className="mt-1 text-[12.5px] leading-snug text-fg-2">{bp.priority.roll}</p>
       {s.underdog === null && s.round > 1 && <p className="mt-1 text-[12px] text-fg-3">Очки равны — underdog нет.</p>}
-      {!rolled ? (
+      {dice === 'manual' ? (
+        <div className="mt-3 space-y-2">
+          <p className="text-[12.5px] text-fg-2">Бросьте priority сами. Кто ходит первым?</p>
+          <div className="grid grid-cols-2 gap-2">{SEATS.map((x) => firstBtn(x, 'manual', `Первым — ${names[x]}`))}</div>
+        </div>
+      ) : !rolled ? (
         <Button variant="primary" className="mt-3 w-full" onClick={() => setRolled(true)}>
           Бросить priority
         </Button>
@@ -117,10 +127,6 @@ function Priority({ game }: { game: AosGameHook }) {
         </p>
       )}
       {second && !seizeBlocked && <p className="mt-2 text-[12px] text-fg-3">Если первым пойдёт {names[second]} — это перехват инициативы: {bp.priority.seize}</p>}
-      <details className="mt-2">
-        <summary className="cursor-pointer text-[12px] text-fg-3">Без броска, по договорённости</summary>
-        <div className="mt-2 grid grid-cols-2 gap-2">{SEATS.map((x) => firstBtn(x, 'manual', `Первым — ${names[x]}`))}</div>
-      </details>
     </div>
   );
 }

@@ -142,3 +142,29 @@ test('phase gate: действия и конец turning point нельзя вы
   state = dispatch(state, { type: 'phase-advanced' });
   assert.equal(state.phase, 'firefight');
 });
+
+test('инициатива вручную (кубики бросали сами): победитель, карта проигравшему, карты списываются, следующий TP — снова выбор', () => {
+  let state = createKtState({ type: 'game-created', schema: KT_GAME_SCHEMA, seed: 'test-seed', names })!;
+  state = dispatch(state, setup());
+  assert.equal(applyKtEvent(state, ev({ type: 'initiative', round: 1, attempt: 0, manual: { winner: 'x' as Seat } }), data).ok, false);
+  state = dispatch(state, { type: 'initiative', round: 1, attempt: 0, manual: { winner: 'p2', rolls: { p1: 3, p2: 5 } } });
+  assert.equal(state.initiative, 'p2');
+  assert.deepEqual(state.initiativeRolls, { p1: 3, p2: 5 });
+  assert.equal(state.initiativeManual, true);
+  assert.deepEqual(state.players.p1.initiativeCards, [1], 'проигравший получает initiative card этого turning point');
+  state = dispatch(state, { type: 'primary-op', seat: 'p1', op: 'crit' });
+  state = dispatch(state, { type: 'primary-op', seat: 'p2', op: 'kill' });
+  state = dispatch(state, { type: 'phase-advanced' });
+  state = dispatch(state, { type: 'end-round', controls: {} });
+  assert.equal(state.initiativeManual, false);
+  // карта +1 игрока 1 списывается и при ручном броске; итог без значений
+  state = dispatch(state, { type: 'initiative', round: 2, attempt: 0, cards: { p1: { modifier: 1 } }, manual: { winner: 'p1' } });
+  assert.deepEqual(state.players.p1.initiativeCards, []);
+  assert.deepEqual(state.initiativeRolls, { p1: 0, p2: 0 });
+  assert.equal(state.initiative, 'p1');
+  // журнал с ручной инициативой воспроизводится так же
+  const log = [created(), setup(), ev({ type: 'initiative', round: 1, attempt: 0, manual: { winner: 'p2' } })];
+  const replay = replayKt(log, data);
+  assert.ok(replay.ok);
+  assert.equal(replay.ok && replay.state?.initiative, 'p2');
+});

@@ -7,6 +7,7 @@ import { CardLink } from './CardSheet';
 import { Dice } from './Dice';
 import { RosterButton } from './RosterViewer';
 import type { GameHook } from './useGame';
+import { DiceHead, useDiceMode } from '../common/DiceMode';
 
 const LETTERS = ['A', 'B', 'C'];
 
@@ -18,6 +19,7 @@ export function StepStart({ game, index }: { game: GameHook; index: DataIndex })
   const state = game.state!;
   const names = { p1: state.players.p1.name, p2: state.players.p2.name };
   const attempt = state.rollCount['first-turn'];
+  const dice = useDiceMode((s) => s.mode);
   const missing = setupMissing(state).filter((m) => m !== 'кто ходит первым');
 
   const rollFirst = () => {
@@ -33,6 +35,7 @@ export function StepStart({ game, index }: { game: GameHook; index: DataIndex })
 
   return (
     <div className="mt-3 space-y-2.5">
+      <DiceHead title="Первый ход: бросок «кто выше»" hint="победителя — он ходит первым" />
       {state.firstTurn ? (
         <div className="rounded-xl border border-white/10 bg-black/20 p-3">
           {state.firstTurnSource === 'random' && state.rolls['first-turn'] && (
@@ -42,8 +45,8 @@ export function StepStart({ game, index }: { game: GameHook; index: DataIndex })
             Первым ходит <span className="font-semibold text-accent">{names[state.firstTurn]}</span>
             <span className="text-fg-3"> · {state.firstTurnSource === 'random' ? 'по броску' : 'по договорённости'}</span>
           </p>
-          <div className="mt-2 grid grid-cols-3 gap-1.5">
-            <Button onClick={rollFirst}>Перебросить</Button>
+          <div className={`mt-2 grid gap-1.5 ${dice === 'app' ? 'grid-cols-3' : 'grid-cols-2'}`}>
+            {dice === 'app' && <Button onClick={rollFirst}>Перебросить</Button>}
             {(['p1', 'p2'] as const).map((s) => (
               <Button key={s} disabled={state.firstTurn === s} onClick={() => setFirst(s)}>
                 {names[s]}
@@ -53,16 +56,19 @@ export function StepStart({ game, index }: { game: GameHook; index: DataIndex })
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-2">
-          <Button variant="primary" onClick={rollFirst}>
-            Бросить кубики — победитель ходит первым
-          </Button>
-          <div className="grid grid-cols-2 gap-2">
-            {(['p1', 'p2'] as const).map((s) => (
-              <Button key={s} onClick={() => setFirst(s)}>
-                Первым — {names[s]}
-              </Button>
-            ))}
-          </div>
+          {dice === 'app' ? (
+            <Button variant="primary" onClick={rollFirst}>
+              Бросить кубики — победитель ходит первым
+            </Button>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              {(['p1', 'p2'] as const).map((s) => (
+                <Button key={s} variant="primary" onClick={() => setFirst(s)}>
+                  Первым — {names[s]}
+                </Button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

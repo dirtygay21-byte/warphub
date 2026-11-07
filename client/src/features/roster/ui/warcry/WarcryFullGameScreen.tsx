@@ -20,6 +20,7 @@ import { RoundDots } from '../common/RoundDots';
 import { ScoreboardGrid } from '../common/ScoreboardGrid';
 import { GameShell } from '../common/GameShell';
 import { ChoiceField, GameLabel, type Choice } from '../common/GameControls';
+import { DiceHead, useDiceMode } from '../common/DiceMode';
 import { WarcryDeploymentPanel } from '../skirmish/SkirmishMaps';
 
 const SEATS: Seat[] = ['p1', 'p2'];
@@ -477,11 +478,8 @@ function BattleHeader({ state, deploymentName, victoryName, dispatch, onlineSeat
       <p className="mt-1 text-[12px] text-fg-3">
         Атакующий: {seatName(state.attacker)} · Инициатива: {seatName(state.initiative)}
       </p>
-      {state.stage === 'battle' && !state.initiativeDice && (
-        <Button variant="primary" className="mt-3 w-full" onClick={() => dispatch({ type: 'initiative-roll' })}>
-          <Icon name="spark" /> Бросить 6D6 на инициативу
-        </Button>
-      )}
+      {state.stage === 'battle' && !state.initiativeDice && <InitiativeRoll dispatch={dispatch} />}
+      {state.abilityDiceManual && state.stage === 'battle' && <p className="mt-1 text-[12px] text-fg-3">Инициатива записана итогом — ability dice отслеживаете сами.</p>}
       {state.initiativeDice && (
         <div className="mt-2 space-y-1">
           {SEATS.map((seat) => (
@@ -511,6 +509,72 @@ function BattleHeader({ state, deploymentName, victoryName, dispatch, onlineSeat
         <p className="mt-2 text-[12px] text-fg-3">
           Очередь: {state.turn === 'p1' || state.turn === 'p2' ? seatName(state.turn) : 'по свободному журналу'} · пасы {state.passes} / 2
         </p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Бросок инициативы 6D6: в приложении или вручную (07.11.2026). Вручную — ввести по 6 значений каждого игрока (дальше всё
+ * как при броске: singles, ability dice, wild dice) или записать только итог (ability dice не отслеживаются).
+ */
+function InitiativeRoll({ dispatch }: { dispatch: (body: WcEventBody) => boolean }) {
+  const dice = useDiceMode((s) => s.mode);
+  const [kind, setKind] = useState<'dice' | 'winner'>('dice');
+  const [text, setText] = useState<Record<Seat, string>>({ p1: '', p2: '' });
+  const [winner, setWinner] = useState<Seat | ''>('');
+  const parse = (v: string) => v.replace(/[^1-6]/g, '').split('').map(Number);
+  const values = { p1: parse(text.p1), p2: parse(text.p2) };
+  const singles = (list: number[]) => list.filter((v) => list.filter((x) => x === v).length === 1).length;
+  const tie = values.p1.length === 6 && values.p2.length === 6 && singles(values.p1) === singles(values.p2);
+  const okDice = values.p1.length === 6 && values.p2.length === 6 && (!tie || !!winner);
+  return (
+    <div className="mt-3 space-y-2 rounded-xl bg-black/25 p-3">
+      <DiceHead title="Инициатива · 6D6" hint="результат" />
+      {dice === 'app' ? (
+        <Button variant="primary" className="w-full" onClick={() => dispatch({ type: 'initiative-roll' })}>
+          <Icon name="spark" /> Бросить 6D6 на инициативу
+        </Button>
+      ) : (
+        <>
+          <ChoiceField
+            value={kind}
+            onChange={setKind}
+            options={[
+              { value: 'dice', label: 'Ввести кубики', sub: 'ability и wild dice считаются' },
+              { value: 'winner', label: 'Только итог', sub: 'кто получил инициативу' },
+            ]}
+          />
+          {kind === 'dice' ? (
+            <>
+              {SEATS.map((seat) => (
+                <label key={seat} className="block">
+                  <span className="mb-1 block text-[12px] font-semibold uppercase tracking-wider text-fg-3">
+                    {seatName(seat)}: 6 кубиков · {values[seat].length}/6
+                  </span>
+                  <input
+                    inputMode="numeric"
+                    value={values[seat].join(' ')}
+                    onChange={(e) => setText((t) => ({ ...t, [seat]: e.target.value.slice(0, 20) }))}
+                    placeholder="например 3 3 5 1 6 2"
+                    className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 font-mono text-[15px] tracking-widest outline-none placeholder:font-sans placeholder:tracking-normal placeholder:text-fg-3 focus:border-accent"
+                  />
+                </label>
+              ))}
+              {tie && <ChoiceField label="Singles поровну — roll-off выиграл" value={winner} onChange={setWinner} options={SEAT_CHOICES} />}
+              <Button variant="primary" className="w-full" disabled={!okDice} onClick={() => dispatch({ type: 'initiative-roll', manual: { dice: { p1: values.p1.slice(0, 6), p2: values.p2.slice(0, 6) }, ...(tie && winner ? { winner } : {}) } })}>
+                Записать кубики
+              </Button>
+            </>
+          ) : (
+            <>
+              <ChoiceField label="Инициативу получил" value={winner} onChange={setWinner} options={SEAT_CHOICES} />
+              <Button variant="primary" className="w-full" disabled={!winner} onClick={() => winner && dispatch({ type: 'initiative-roll', manual: { winner } })}>
+                Записать итог
+              </Button>
+            </>
+          )}
+        </>
       )}
     </div>
   );
@@ -646,10 +710,12 @@ function ActivationPanel({ state, seat, catalog, dispatch }: { state: WcState; s
   const abilities = info?.abilities.filter((ability) => abilityRank(ability.cost) !== null) ?? [];
   const selectedAbility = abilities.find((ability) => ability.id === abilityId);
   const required = selectedAbility ? abilityRank(selectedAbility.cost)! : null;
+  // инициатива записана итогом: кубик для способности не выбирается
+  const manualDice = !!state.abilityDiceManual;
   const dice = required ? p.dice.map((die, index) => ({ die, index })).filter(({ die }) => !die.used && die.rank >= required) : [];
   const activate = () => {
     if (!fighterId) return;
-    if (dispatch({ type: 'activate', seat, fighterId, actions, abilityId: abilityId || undefined, diceIndex: abilityId ? (diceIndex ?? undefined) : undefined, abilityAfter: abilityId ? after : undefined })) {
+    if (dispatch({ type: 'activate', seat, fighterId, actions, abilityId: abilityId || undefined, diceIndex: abilityId && !manualDice ? (diceIndex ?? undefined) : undefined, abilityAfter: abilityId ? after : undefined })) {
       setFighter('');
       setAbility('');
       setDice(null);
@@ -689,6 +755,7 @@ function ActivationPanel({ state, seat, catalog, dispatch }: { state: WcState; s
       )}
       {abilityId && (
         <>
+          {!manualDice && (
           <ChoiceField
             label="Ability dice"
             placeholder="Выберите кубик"
@@ -697,6 +764,7 @@ function ActivationPanel({ state, seat, catalog, dispatch }: { state: WcState; s
             inlineMax={4}
             options={dice.map(({ die, index }) => ({ value: index, label: `${COST_LABEL[({ 2: 'double', 3: 'triple', 4: 'quad' } as const)[die.rank as 2 | 3 | 4]]} ${die.value}` }))}
           />
+          )}
           <ChoiceField
             label="Когда"
             value={after}
@@ -710,7 +778,7 @@ function ActivationPanel({ state, seat, catalog, dispatch }: { state: WcState; s
         </>
       )}
       {selectedAbility && catalog.get(selectedAbility.id)?.text && <p className="max-h-28 overflow-y-auto whitespace-pre-line text-[12px] leading-relaxed text-fg-3">{catalog.get(selectedAbility.id)!.text}</p>}
-      <Button variant="primary" className="w-full" disabled={!fighterId || (!!abilityId && diceIndex === null)} onClick={activate}>
+      <Button variant="primary" className="w-full" disabled={!fighterId || (!!abilityId && !manualDice && diceIndex === null)} onClick={activate}>
         Активировать
       </Button>
     </div>
