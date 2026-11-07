@@ -116,10 +116,34 @@ const log = [];
 page.on('console', (m) => m.type() === 'error' && log.push(`console: ${m.text()}`));
 page.on('pageerror', (e) => log.push(`pageerror: ${e.message}`));
 let n = 0;
+// проверки (07.11.2026): ошибка — задача screenshots завершается с ошибкой
+const failures = [];
+const fail = (m) => (failures.push(m), log.push(`ПРОВЕРКА: ${m}`));
+/**
+ * Подсказка правила не меняет то, что под ней: открыть, закрыть крестиком, открыть, закрыть нажатием мимо (на строку
+ * под карточкой) — состояние (state) до и после совпадает, карточка закрыта.
+ */
+async function popoverHasNoSideEffect(label, trigger, state, outside) {
+  const before = await state();
+  await trigger.scrollIntoViewIfNeeded();
+  await trigger.click({ timeout: 5000 });
+  await page.getByRole('dialog').getByRole('button', { name: 'Закрыть' }).click({ timeout: 5000 });
+  await page.waitForTimeout(300);
+  if ((await state()) !== before) fail(`${label}: закрытие подсказки крестиком изменило выбор`);
+  await trigger.click({ timeout: 5000 });
+  await page.waitForTimeout(200);
+  await outside.click({ timeout: 5000, position: { x: 4, y: 4 } });
+  await page.waitForTimeout(300);
+  if ((await state()) !== before) fail(`${label}: нажатие мимо подсказки изменило выбор`);
+  if (await page.getByRole('dialog').count()) fail(`${label}: подсказка не закрылась`);
+}
 const shot = async (name, full = false) => {
   // JPEG: снимки читаются и из лога задачи (workflow печатает их base64, если артефакты недоступны)
   const file = path.join(OUT, `${String(++n).padStart(2, '0')}-${name}.jpg`);
   await page.waitForTimeout(500);
+  // проверка вёрстки (07.11.2026): страница не шире экрана (нет прокрутки вбок)
+  const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth).catch(() => 0);
+  if (over > 1) fail(`вёрстка: «${name}» шире экрана на ${over} px`);
   await page.screenshot({ path: file, fullPage: full, type: 'jpeg', quality: 70 });
   console.log('📸', path.basename(file));
 };
@@ -167,6 +191,16 @@ for (const [label, name] of [
     if (label === 'kt') {
       // правило оружия (Lethal, Piercing…) — нажатие открывает текст
       const rule = page.locator('[id^="u-"] button.underline').first();
+      const row = rule.locator('xpath=ancestor::div[@role="checkbox"][1]');
+      if (await row.count()) {
+        const checked = () => row.getAttribute('aria-checked');
+        await popoverHasNoSideEffect('KT: правило оружия в редакторе', rule, checked, row);
+        // выбор строки сам по себе работает
+        const was = await checked();
+        await row.click({ timeout: 5000, position: { x: 4, y: 4 } });
+        if ((await checked()) === was) fail('KT: нажатие на строку оружия не меняет выбор');
+        await row.click({ timeout: 5000, position: { x: 4, y: 4 } });
+      } else fail('KT: строка оружия с правилом не найдена');
       await rule.scrollIntoViewIfNeeded();
       await rule.click({ timeout: 5000 });
       await page.waitForTimeout(400);
@@ -303,11 +337,20 @@ for (const width of [390, 360]) {
         await page.waitForTimeout(400);
         await shot('warcry-runemark');
         await page.keyboard.press('Escape');
+        const card = page.locator('[id^="u-"] > button[aria-expanded]').first();
+        await popoverHasNoSideEffect('Warcry: рунмарка', rm, () => card.getAttribute('aria-expanded'), card);
       }
       if (unit) {
         await page.getByText(unit, { exact: false }).first().click({ timeout: 5000 });
         await page.waitForTimeout(1000);
         await shot(`layout-${width}-${label}-unit`, true);
+        if (label === '40k' && width === 390) {
+          // способность оружия 40K в карточке юнита: подсказка не меняет карточку
+          const tag = page.locator('[id^="u-"] [data-rule-trigger]').first();
+          const card = page.locator('[id^="u-"] [aria-expanded]').first();
+          if (await tag.count()) await popoverHasNoSideEffect('40K: способность оружия', tag, () => card.getAttribute('aria-expanded'), card);
+          else fail('40K: в карточке юнита нет подсказок правил');
+        }
         if (label === 'aos' && width === 390) {
           // варскролл: способность оружия и ключевое слово нажимаются и открывают текст
           await page.getByRole('button', { name: 'Варскролл' }).first().click({ timeout: 5000 });
@@ -318,6 +361,8 @@ for (const width of [390, 360]) {
           await page.waitForTimeout(400);
           await shot('aos-weapon-ability');
           await page.keyboard.press('Escape');
+          const card = page.locator('[id^="u-"] [aria-expanded]').first();
+          await popoverHasNoSideEffect('AoS: способность оружия', chip, () => card.getAttribute('aria-expanded'), card);
         }
       }
     });
@@ -327,3 +372,7 @@ for (const width of [390, 360]) {
 fs.writeFileSync(path.join(OUT, 'log.txt'), log.join('\n') + '\n');
 console.log(log.length ? `замечания:\n${log.join('\n')}` : 'без замечаний');
 await browser.close();
+if (failures.length) {
+  console.log(`ПРОВЕРКИ НЕ ПРОЙДЕНЫ: ${failures.length}`);
+  process.exitCode = 1;
+}
