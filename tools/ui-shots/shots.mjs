@@ -297,6 +297,17 @@ for (const width of [390, 360]) {
         await page.getByText(unit, { exact: false }).first().click({ timeout: 5000 });
         await page.waitForTimeout(1000);
         await shot(`layout-${width}-${label}-unit`, true);
+        if (label === 'aos' && width === 390) {
+          // варскролл: способность оружия и ключевое слово нажимаются и открывают текст
+          await page.getByRole('button', { name: 'Варскролл' }).first().click({ timeout: 5000 });
+          await page.waitForTimeout(500);
+          const chip = page.locator('td button').first();
+          await chip.scrollIntoViewIfNeeded();
+          await chip.click({ timeout: 5000 });
+          await page.waitForTimeout(400);
+          await shot('aos-weapon-ability');
+          await page.keyboard.press('Escape');
+        }
       }
     });
   }
