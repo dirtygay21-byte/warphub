@@ -10,6 +10,7 @@ import { Button, IconButton, Segmented } from '../kit';
 import { cx, fmtPts } from '../util';
 import { Board, type BoardArmy as BoardArmyView, type BoardField } from './Board';
 import { UnitInfo } from './UnitInfo';
+import { CombatSheet } from './CombatSheet';
 
 const LETTERS = ['A', 'B', 'C'];
 
@@ -171,7 +172,21 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
       zones: Object.fromEntries(dep.zones.map((z) => [z.player, [z.poly as Pt[]]])),
       objectiveNote: `${OBJECTIVE_RULE_SOURCE}. Для целей в участке террейна правило другое; высота на карте не учитывается.`,
     };
-    return <Board armies={armies.map(view40k)} field={field} onArmy={setArmyUnits} onBack={() => setStep('field')} />;
+    // симулятор боя (S2): отряды ростеров по ключу армии; uid соперника — с префиксом FOE_PREFIX
+    const crUid = (u: TAUnit) => (u.uid.startsWith(FOE_PREFIX) ? u.uid.slice(FOE_PREFIX.length) : u.uid);
+    const side = (key: ArmyKey, u: TAUnit) => {
+      const a = armies.find((x) => x.key === key)!;
+      return { name: u.name, cr: a.cr, uid: crUid(u) };
+    };
+    return (
+      <Board
+        armies={armies.map(view40k)}
+        field={field}
+        onArmy={setArmyUnits}
+        onBack={() => setStep('field')}
+        combat={(c, onClose) => <CombatSheet attacker={side(c.attackerArmy.key, c.attacker)} target={side(c.targetArmy.key, c.target)} distance={c.distance} onClose={onClose} />}
+      />
+    );
   }
 
   if (step === 'field' && roster)

@@ -116,11 +116,15 @@ type Gesture = {
  * короткое нажатие — «поставить сюда» / точка линейки. Инструменты — узкая колонка справа, отряды и настройки — выезжающая
  * панель справа (закрывается, когда нужно нажать на поле).
  */
+/** Симулятор боя (S2, 08.11.2026): лист атаки отряда по цели; только 40K (передаёт TestArmyScreen). */
+export type CombatRender = (a: { attacker: TAUnit; attackerArmy: BoardArmy; target: TAUnit; targetArmy: BoardArmy; distance: number | null }, onClose: () => void) => ReactNode;
+
 export function Board(props: {
   armies: BoardArmy[];
   field: BoardField;
   onArmy: (key: ArmyKey, units: TAUnit[]) => void;
   onBack: () => void;
+  combat?: CombatRender;
 }) {
   const width = props.field.width ?? 60;
   const height = props.field.height ?? 44;
@@ -137,12 +141,14 @@ function BoardInner({
   field,
   onArmy,
   onBack,
+  combat,
 }: {
   /** своя армия (me) и, если выбрана, армия соперника (foe) — за другую сторону */
   armies: BoardArmy[];
   field: BoardField;
   onArmy: (key: ArmyKey, units: TAUnit[]) => void;
   onBack: () => void;
+  combat?: CombatRender;
 }) {
   const { width, height, orientation } = useContext(BoardDimensions);
   const disp = useDisp();
@@ -174,6 +180,9 @@ function BoardInner({
   const [ruler, setRuler] = useState<{ a: RulerEnd | null; b: RulerEnd | null }>({ a: null, b: null });
   const [pair, setPair] = useState<string[]>([]);
   const [infoFor, setInfoFor] = useState<string | null>(null);
+  // атака: выбран атакующий отряд — следующее нажатие на отряд другой армии выбирает цель
+  const [attackFrom, setAttackFrom] = useState<string | null>(null);
+  const [attack, setAttack] = useState<{ from: string; to: string } | null>(null);
   const infoUnit = units.find((u) => u.uid === infoFor) ?? null;
   const endDrag = useRef<{ which: 'a' | 'b'; pointerId: number } | null>(null);
   const sel = units.find((u) => u.uid === selected) ?? null;
@@ -321,6 +330,14 @@ function BoardInner({
 
   // палец на базе (или рядом, до TOUCH_PX): весь отряд; удержание без движения — одна модель. Поле в это время не двигается.
   const startModel = (e: PointerEvent, unit: TAUnit, modelId: string) => {
+    if (attackFrom) {
+      if (armyOf(unit.uid).key !== armyOf(attackFrom).key) {
+        setAttack({ from: attackFrom, to: unit.uid });
+        setAttackFrom(null);
+        haptic.select();
+      }
+      return;
+    }
     if (tool === 'units') {
       setPair((p) => (p.length >= 2 || p[0] === unit.uid ? [unit.uid] : [...p, unit.uid]));
       haptic.select();
@@ -459,6 +476,7 @@ function BoardInner({
   };
   const chooseTool = (t: Tool) => {
     haptic.select();
+    setAttackFrom(null);
     setTool(t);
     setRuler({ a: null, b: null });
     setPair([]);
@@ -466,7 +484,15 @@ function BoardInner({
   };
 
   // строка состояния поверх карты: что сейчас делать и результат измерения
-  const status: ReactNode =
+  const attacker = attackFrom ? units.find((u) => u.uid === attackFrom) : null;
+  const status: ReactNode = attacker ? (
+    <>
+      <b className="text-white">⚔ {label(attacker)}. {attacker.name}</b> · нажмите на отряд соперника ·{' '}
+      <button type="button" className="pointer-events-auto font-semibold text-accent underline" onClick={() => setAttackFrom(null)}>
+        отмена
+      </button>
+    </>
+  ) :
     tool === 'ruler' ? (
       rulerLine ? (
         <>
@@ -507,6 +533,15 @@ function BoardInner({
   return (
     <div className="fixed inset-0 z-40 flex bg-app">
       {infoUnit && armyOf(infoUnit.uid).info(infoUnit, () => setInfoFor(null))}
+      {attack && combat && (() => {
+        const a = units.find((u) => u.uid === attack.from);
+        const t = units.find((u) => u.uid === attack.to);
+        if (!a || !t) return null;
+        const ab = unitsOf(a.uid);
+        const tb = unitsOf(t.uid);
+        const distance = ab.length && tb.length ? unitToUnit(ab, tb).d : null;
+        return combat({ attacker: a, attackerArmy: armyOf(a.uid), target: t, targetArmy: armyOf(t.uid), distance }, () => setAttack(null));
+      })()}
 
       {/* поле: жесты — свои (touch-action: none), браузер ничего не прокручивает */}
       <div
@@ -597,6 +632,16 @@ function BoardInner({
                 stats={selArmy.stats(sel)}
                 onInfo={() => setInfoFor(sel.uid)}
                 onPlace={() => (setTool('move'), setPanel(false))}
+                onAttack={
+                  combat && enemyArmy?.units.length
+                    ? () => {
+                        haptic.select();
+                        setTool('move');
+                        setAttackFrom(sel.uid);
+                        setPanel(false);
+                      }
+                    : undefined
+                }
               />
             ) : (
               <>
@@ -774,6 +819,7 @@ function UnitPanel({
   stats,
   onInfo,
   onPlace,
+  onAttack,
 }: {
   unit: TAUnit;
   n: string;
@@ -795,6 +841,8 @@ function UnitPanel({
   onInfo: () => void;
   /** закрыть панель и нажать на поле, чтобы поставить отряд */
   onPlace: () => void;
+  /** «Атаковать» (симулятор боя, только 40K; нет армии соперника — кнопки нет) */
+  onAttack?: () => void;
 }) {
   const [bases, setBases] = useState(false);
   const profiles = useMemo(() => unitProfiles(unit), [unit]);
@@ -825,6 +873,11 @@ function UnitPanel({
         <span className="min-w-0 flex-1 truncate tabular-nums text-white/80">{stats ?? 'Характеристики'}</span>
         <span className="shrink-0 font-semibold text-accent">Характеристики ›</span>
       </button>
+      {onAttack && (
+        <button type="button" onClick={onAttack} className="w-full rounded-lg bg-accent px-2.5 py-2 text-xs font-semibold text-accent-foreground active:opacity-80">
+          ⚔ Атаковать — выбрать цель на столе
+        </button>
+      )}
       {info && (
         <div className="grid grid-cols-3 gap-1.5 text-center text-[12px]">
           <div className={cx('rounded-lg border px-1.5 py-1', info.objective?.inRange ? 'border-[#4ade80]/50 text-[#4ade80]' : 'border-white/10')}>
