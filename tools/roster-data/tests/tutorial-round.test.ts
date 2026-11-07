@@ -9,6 +9,15 @@ import { TUTORIAL_WALKS } from '../../../client/src/components/tutorial/walkthro
 const ROOT = path.join(import.meta.dirname, '..', '..', '..', 'client', 'src');
 
 describe('учебный раунд', () => {
+  test('Warcry: battleplan, инициатива и wild dice, боевая фаза, конец раунда', () => {
+    const wc = TUTORIAL_WALKS.warcry!;
+    expect(wc.steps.length).toBeGreaterThanOrEqual(10);
+    expect(wc.steps.some((s) => s.phase === 1) && wc.steps.some((s) => s.phase === 2)).toBe(true);
+    for (const s of wc.steps) if (s.example) expect(s.example.title.startsWith('Пример')).toBe(true);
+    expect(wc.source).toContain('warcrier');
+    const list = fs.readFileSync(path.join(ROOT, 'features', 'roster', 'ui', 'warcry', 'WarcryList.tsx'), 'utf8');
+    expect(list).toContain("navigate('/learn/warcry/round')");
+  });
   test('Kill Team: подготовка, обе фазы, конец turning point и следующий раунд', () => {
     const kt = TUTORIAL_WALKS.kt!;
     expect(kt.steps.length).toBeGreaterThanOrEqual(10);
