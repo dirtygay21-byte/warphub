@@ -164,6 +164,15 @@ for (const [label, name] of [
     await page.getByRole('button', { name: 'Датакарта' }).first().click({ timeout: 5000 });
     await page.locator('[id^="u-"] [aria-expanded="true"]').first().scrollIntoViewIfNeeded();
     await shot(`${label}-card-datasheet`, true);
+    if (label === 'kt') {
+      // правило оружия (Lethal, Piercing…) — нажатие открывает текст
+      const rule = page.locator('[id^="u-"] button.underline').first();
+      await rule.scrollIntoViewIfNeeded();
+      await rule.click({ timeout: 5000 });
+      await page.waitForTimeout(400);
+      await shot('kt-weapon-rule');
+      await page.keyboard.press('Escape');
+    }
   });
   await step(`${label}-view-mode`, async () => {
     await page.getByRole('button', { name: 'Режим просмотра' }).first().click({ timeout: 5000 });

@@ -8,6 +8,8 @@ import { Button, Empty, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
 import { cx } from '../util';
 import { AddRow, ArmyBlock, ControlRow, CostBadge, DatasheetBlock, EditorHeader, GroupHeading, HeaderStat, PickRow, RuleCard, RulesPanel, SectionTitle, StatTiles, UnitRowCard, type BuilderIssue } from '../common/BuilderKit';
 import { Md } from './Md';
+import { RuleTrigger } from '../common/RulePopover';
+import { ktRuleIndex, ktWeaponRuleTokens } from '../../kt/weaponRules';
 
 
 /**
@@ -43,6 +45,7 @@ export function KtEditor({
     loadKtTeam(roster.teamId).then(setTeam, (e) => setError(String(e?.message ?? e)));
   }, [roster.teamId, attempt]);
   const issues = useMemo(() => (team ? checkKtRoster(roster, team) : []), [roster, team]);
+  const findRule = useMemo(() => ktRuleIndex(index.weaponRules), [index]);
   useEffect(() => {
     if (!team || viewOnly) return;
     const s = { operatives: roster.operatives.length, errors: issues.filter((i) => i.level === 'error').length, warnings: issues.filter((i) => i.level === 'warning').length };
@@ -218,6 +221,7 @@ export function KtEditor({
                   onChange={(p) => onChange(updateOperative(roster, x.uid, p))}
                   onRemove={() => onChange(removeOperative(roster, x.uid))}
                   readOnly={view}
+                  findRule={findRule}
                 />
               ) : (
                 <div key={x.uid} className="flex items-center justify-between rounded-2xl border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-danger">
@@ -324,6 +328,7 @@ function OpCard({
   onChange,
   onRemove,
   readOnly,
+  findRule,
 }: {
   n: number;
   x: KtRosterOp;
@@ -334,6 +339,7 @@ function OpCard({
   onChange: (p: Partial<KtRosterOp>) => void;
   onRemove: () => void;
   readOnly: boolean;
+  findRule: FindRule;
 }) {
   const chosen = o.weapons.filter((w) => x.weapons.includes(w.id));
   const toggle = (w: KtWeapon) => (haptic.select(), onChange({ weapons: x.weapons.includes(w.id) ? x.weapons.filter((id) => id !== w.id) : [...x.weapons, w.id] }));
@@ -355,7 +361,7 @@ function OpCard({
       {!readOnly && (
         <div className="space-y-2">
           <ControlRow label="Оружие · отметьте выбранное" value={`${chosen.length} из ${o.weapons.length}`}>
-            <WeaponTable list={o.weapons} chosen={x.weapons} onToggle={readOnly ? undefined : toggle} />
+            <WeaponTable list={o.weapons} chosen={x.weapons} onToggle={readOnly ? undefined : toggle} op={o} findRule={findRule} />
           </ControlRow>
           <ControlRow label="Своё имя">
             <input
@@ -376,7 +382,7 @@ function OpCard({
         <StatTiles stats={OP_STATS(o)} />
         <div>
           <SectionTitle>Оружие</SectionTitle>
-          <WeaponTable list={readOnly ? chosen : o.weapons} chosen={readOnly ? undefined : x.weapons} empty="Оружие не выбрано" />
+          <WeaponTable list={readOnly ? chosen : o.weapons} chosen={readOnly ? undefined : x.weapons} empty="Оружие не выбрано" op={o} findRule={findRule} />
         </div>
         {own.length > 0 && (
           <div>
@@ -433,7 +439,29 @@ function WeaponIcon({ type }: { type: KtWeapon['type'] }) {
  * Оружие таблицей, как на датакарте Wahapedia: строка названия со значком, под ней ATK · HIT · DMG и правила (WR).
  * onToggle — режим выбора (отметки слева).
  */
-function WeaponTable({ list, chosen, onToggle, empty }: { list: KtWeapon[]; chosen?: string[]; onToggle?: (w: KtWeapon) => void; empty?: string }) {
+type FindRule = ReturnType<typeof ktRuleIndex>;
+
+/** Правила оружия профиля: каждое — нажимается и открывает текст (как способности оружия 40K); без текста — просто подпись. */
+function KtRuleList({ rules, op, findRule }: { rules: string; op: KtOperative; findRule: FindRule }) {
+  return (
+    <>
+      {ktWeaponRuleTokens(rules, findRule, op.abilities).map((t, i) => (
+        <span key={i}>
+          {i > 0 && ', '}
+          {t.rule ? (
+            <RuleTrigger source={{ title: t.rule.name, text: t.rule.text, sub: t.rule.sub }} className="inline text-accent/90 underline decoration-accent/40 decoration-dotted underline-offset-2 active:text-accent">
+              {t.label}
+            </RuleTrigger>
+          ) : (
+            t.label
+          )}
+        </span>
+      ))}
+    </>
+  );
+}
+
+function WeaponTable({ list, chosen, onToggle, empty, op, findRule }: { list: KtWeapon[]; chosen?: string[]; onToggle?: (w: KtWeapon) => void; empty?: string; op: KtOperative; findRule: FindRule }) {
   if (!list.length) return <p className="text-[12px] text-fg-3">{empty ?? 'Нет оружия'}</p>;
   return (
     <div className="overflow-hidden rounded-xl border border-white/[0.07]">
@@ -446,12 +474,19 @@ function WeaponTable({ list, chosen, onToggle, empty }: { list: KtWeapon[]; chos
       {list.map((w) => {
         const on = chosen?.includes(w.id);
         return (
-          <button
+          // строка — не <button>: внутри нажимаемые правила оружия (кнопки); выбор — нажатием на строку или Enter/пробел
+          <div
             key={w.id}
-            type="button"
-            disabled={!onToggle}
+            role={onToggle ? 'checkbox' : undefined}
+            aria-checked={onToggle ? !!on : undefined}
+            tabIndex={onToggle ? 0 : undefined}
             onClick={() => onToggle?.(w)}
-            className={cx('block w-full border-t border-white/[0.06] px-2.5 py-1.5 text-left', onToggle && !on && 'opacity-55', onToggle && 'active:bg-white/5')}
+            onKeyDown={(e) => {
+              if (!onToggle || (e.key !== 'Enter' && e.key !== ' ')) return;
+              e.preventDefault();
+              onToggle(w);
+            }}
+            className={cx('block w-full cursor-default border-t border-white/[0.06] px-2.5 py-1.5 text-left', onToggle && !on && 'opacity-55', onToggle && 'active:bg-white/5')}
           >
             <span className="flex items-center gap-1.5">
               {onToggle && <span className={cx('flex size-4 shrink-0 items-center justify-center rounded border', on ? 'border-accent bg-accent text-black' : 'border-white/30')}>{on && <Icon name="check" className="size-3" />}</span>}
@@ -463,14 +498,14 @@ function WeaponTable({ list, chosen, onToggle, empty }: { list: KtWeapon[]; chos
                 <span className="min-w-0 pl-[1.375rem] text-[12px] leading-snug text-fg-3">
                   {p.name && <b className="text-fg-2">{p.name}</b>}
                   {p.name && p.rules ? ' · ' : ''}
-                  {p.rules}
+                  {p.rules && <KtRuleList rules={p.rules} op={op} findRule={findRule} />}
                 </span>
                 <span className="text-center text-white/85">{p.atk}</span>
                 <span className="text-center text-white/85">{p.hit}</span>
                 <span className="text-center text-white/85">{p.dmg}</span>
               </span>
             ))}
-          </button>
+          </div>
         );
       })}
     </div>
