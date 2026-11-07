@@ -123,19 +123,39 @@ const fail = (m) => (failures.push(m), log.push(`ПРОВЕРКА: ${m}`));
  * Подсказка правила не меняет то, что под ней: открыть, закрыть крестиком, открыть, закрыть нажатием мимо (на строку
  * под карточкой) — состояние (state) до и после совпадает, карточка закрыта.
  */
-async function popoverHasNoSideEffect(label, trigger, state, outside) {
-  const before = await state();
-  await trigger.scrollIntoViewIfNeeded();
-  await trigger.click({ timeout: 5000 });
-  await page.getByRole('dialog').getByRole('button', { name: 'Закрыть' }).click({ timeout: 5000 });
-  await page.waitForTimeout(300);
-  if ((await state()) !== before) fail(`${label}: закрытие подсказки крестиком изменило выбор`);
-  await trigger.click({ timeout: 5000 });
-  await page.waitForTimeout(200);
-  await outside.click({ timeout: 5000, position: { x: 4, y: 4 } });
-  await page.waitForTimeout(300);
-  if ((await state()) !== before) fail(`${label}: нажатие мимо подсказки изменило выбор`);
-  if (await page.getByRole('dialog').count()) fail(`${label}: подсказка не закрылась`);
+async function popoverHasNoSideEffect(label, trigger, _state, outside) {
+  // состояние страницы: все переключатели (aria-expanded / aria-checked / aria-pressed) и очки в шапке
+  const state = () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('[aria-expanded],[aria-checked],[aria-pressed]')]
+        .filter((e) => !e.closest('[role="dialog"]'))
+        .map((e) => `${e.getAttribute('aria-expanded')}${e.getAttribute('aria-checked')}${e.getAttribute('aria-pressed')}`)
+        .join(),
+    );
+  let at = 'начало';
+  try {
+    const before = await state();
+    at = 'открыть подсказку';
+    await trigger.scrollIntoViewIfNeeded();
+    await trigger.click({ timeout: 5000 });
+    at = 'закрыть крестиком';
+    await page.getByRole('dialog').getByRole('button', { name: 'Закрыть' }).click({ timeout: 5000 });
+    await page.waitForTimeout(300);
+    if ((await state()) !== before) fail(`${label}: закрытие подсказки крестиком изменило выбор`);
+    at = 'открыть снова';
+    await trigger.click({ timeout: 5000 });
+    await page.waitForTimeout(200);
+    at = 'нажать мимо';
+    // мимо карточки, в той же строке, что и подсказка (на экране, без прокрутки — прокрутка сама закрывает карточку)
+    const tb = await trigger.boundingBox();
+    const ob = outside ? await outside.boundingBox() : null;
+    await page.mouse.click(ob ? ob.x + 6 : page.viewportSize().width - 10, tb.y + tb.height / 2);
+    await page.waitForTimeout(300);
+    if ((await state()) !== before) fail(`${label}: нажатие мимо подсказки изменило выбор`);
+    if (await page.getByRole('dialog').count()) fail(`${label}: подсказка не закрылась`);
+  } catch (e) {
+    fail(`${label}: проверка не выполнена (${at}): ${String(e.message ?? e).split('\n')[0]}`);
+  }
 }
 const shot = async (name, full = false) => {
   // JPEG: снимки читаются и из лога задачи (workflow печатает их base64, если артефакты недоступны)
@@ -194,7 +214,7 @@ for (const [label, name] of [
       const row = rule.locator('xpath=ancestor::div[@role="checkbox"][1]');
       if (await row.count()) {
         const checked = () => row.getAttribute('aria-checked');
-        await popoverHasNoSideEffect('KT: правило оружия в редакторе', rule, checked, row);
+        await popoverHasNoSideEffect('KT: правило оружия в редакторе', rule, null, row);
         // выбор строки сам по себе работает
         const was = await checked();
         await row.click({ timeout: 5000, position: { x: 4, y: 4 } });
@@ -337,8 +357,7 @@ for (const width of [390, 360]) {
         await page.waitForTimeout(400);
         await shot('warcry-runemark');
         await page.keyboard.press('Escape');
-        const card = page.locator('[id^="u-"] > button[aria-expanded]').first();
-        await popoverHasNoSideEffect('Warcry: рунмарка', rm, () => card.getAttribute('aria-expanded'), card);
+        await popoverHasNoSideEffect('Warcry: рунмарка', page.locator('[id^="u-"] [data-rule-trigger]').last(), null, null);
       }
       if (unit) {
         await page.getByText(unit, { exact: false }).first().click({ timeout: 5000 });
@@ -347,8 +366,7 @@ for (const width of [390, 360]) {
         if (label === '40k' && width === 390) {
           // способность оружия 40K в карточке юнита: подсказка не меняет карточку
           const tag = page.locator('[id^="u-"] [data-rule-trigger]').first();
-          const card = page.locator('[id^="u-"] [aria-expanded]').first();
-          if (await tag.count()) await popoverHasNoSideEffect('40K: способность оружия', tag, () => card.getAttribute('aria-expanded'), card);
+          if (await tag.count()) await popoverHasNoSideEffect('40K: способность оружия', tag, null, null);
           else fail('40K: в карточке юнита нет подсказок правил');
         }
         if (label === 'aos' && width === 390) {
@@ -361,8 +379,7 @@ for (const width of [390, 360]) {
           await page.waitForTimeout(400);
           await shot('aos-weapon-ability');
           await page.keyboard.press('Escape');
-          const card = page.locator('[id^="u-"] [aria-expanded]').first();
-          await popoverHasNoSideEffect('AoS: способность оружия', chip, () => card.getAttribute('aria-expanded'), card);
+          await popoverHasNoSideEffect('AoS: способность оружия', chip, null, null);
         }
       }
     });
