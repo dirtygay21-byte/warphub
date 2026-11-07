@@ -46,6 +46,9 @@ export function KtList({
         <ToolTile icon="map" title="Test Army" sub="Поле 30×22″ · базы · соперник" onClick={onTestArmy} />
         <ToolTile icon="book" title="Правила" sub="Core Rules · Wahapedia" onClick={() => openExternal('https://wahapedia.ru/kill-team3/the-rules/core-rules/')} />
         <ToolTile icon="spark" title="Как играть" sub="Обучение: активации, стрельба, бой" onClick={() => navigate('/learn/kt')} />
+        <div className="col-span-2 min-w-0">
+          <ToolTile icon="shield" title="Обучающая игра" sub="Раунд по шагам за столом" onClick={() => navigate('/learn/kt/round')} />
+        </div>
       </div>
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Выберите команду и наберите оперативников: датакарты, оружие, снаряжение и уловки — из данных KTDash.</Empty>

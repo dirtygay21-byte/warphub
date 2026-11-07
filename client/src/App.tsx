@@ -17,7 +17,7 @@ import DiceGame from "@/components/games/DiceGame";
 import EggGame from "@/components/games/EggGame";
 import CardsGame, { CardCollection } from "@/components/games/CardsGame";
 import GamesLayout from "@/layouts/GamesLayout";
-import { TutorialHub, TutorialViewer } from "@/components/tutorial/TutorialPages";
+import { TutorialHub, TutorialRound, TutorialViewer } from "@/components/tutorial/TutorialPages";
 import Reservation from "@/components/pages/Reservations/Reservation";
 import News from "@/components/pages/News/News";
 import Profile from "@/components/pages/Profile/Profile";
@@ -57,6 +57,7 @@ export default function App() {
             <Route path="/learn" element={<GamesLayout />}>
               <Route index element={<TutorialHub />} />
               <Route path=":game" element={<TutorialViewer />} />
+              <Route path=":game/round" element={<TutorialRound />} />
             </Route>
 
             <Route

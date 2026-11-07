@@ -184,6 +184,24 @@ for (const [label, name] of [
   });
 }
 
+// «Учебный раунд» Kill Team: вступление, шаги с примерами, следующий раунд
+await step('kt-list-learn', async () => {
+  await page.goto(BASE + '/roster', { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: /Kill Team/ }).first().click({ timeout: 5000 });
+  await page.waitForTimeout(800);
+  await shot('kt-list-tiles');
+});
+await step('learn-kt-round', async () => {
+  await page.goto(BASE + '/learn', { waitUntil: 'networkidle' });
+  await shot('learn-hub', true);
+  for (const p of [0, 4, 9, 11]) {
+    await page.goto(`${BASE}/learn/kt/round?p=${p}`, { waitUntil: 'networkidle' });
+    await shot(`learn-kt-round-${p}`, true);
+  }
+  await page.goto(`${BASE}/learn/kt/round?p=15`, { waitUntil: 'networkidle' });
+  await shot('learn-kt-round-next', true);
+});
+
 fs.writeFileSync(path.join(OUT, 'log.txt'), log.join('\n') + '\n');
 console.log(log.length ? `замечания:\n${log.join('\n')}` : 'без замечаний');
 await browser.close();
