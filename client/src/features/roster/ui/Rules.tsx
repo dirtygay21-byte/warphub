@@ -99,7 +99,7 @@ export function Rules({
   const [det, setDet] = useState<string>(detachmentIds?.length ? 'mine' : 'all');
   const [phase, setPhase] = useState<Phase>('all');
   // переключатель RU/EN (07.11.2026): русские тексты — те же оверлеи, что в редакторе
-  const g = useGlossary();
+  const gloss = useGlossary();
 
   // основные стратагемы есть в файле любой фракции — без выбранной армии грузим первую
   const loadId = fid || index.factions[0]?.id || '';
@@ -247,7 +247,7 @@ export function Rules({
                   </div>
                   <ul className="space-y-1.5">
                     {g.items.map((s) => (
-                      <StratCard key={s.id} s={s} ru={ruStratagem(ru, s.id)} g={g} />
+                      <StratCard key={s.id} s={s} ru={ruStratagem(ru, s.id)} g={gloss} />
                     ))}
                   </ul>
                 </section>
