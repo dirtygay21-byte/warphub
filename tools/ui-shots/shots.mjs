@@ -73,9 +73,10 @@ page.on('console', (m) => m.type() === 'error' && log.push(`console: ${m.text()}
 page.on('pageerror', (e) => log.push(`pageerror: ${e.message}`));
 let n = 0;
 const shot = async (name, full = false) => {
-  const file = path.join(OUT, `${String(++n).padStart(2, '0')}-${name}.png`);
+  // JPEG: снимки читаются и из лога задачи (workflow печатает их base64, если артефакты недоступны)
+  const file = path.join(OUT, `${String(++n).padStart(2, '0')}-${name}.jpg`);
   await page.waitForTimeout(500);
-  await page.screenshot({ path: file, fullPage: full });
+  await page.screenshot({ path: file, fullPage: full, type: 'jpeg', quality: 70 });
   console.log('📸', path.basename(file));
 };
 const step = async (name, fn) => {

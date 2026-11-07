@@ -42,7 +42,12 @@ jobs:
           for i in $(seq 1 30); do curl -sf http://localhost:5050/ >/dev/null && break; sleep 1; done
           node tools/ui-shots/shots.mjs ui-shots
           cp /tmp/server.log ui-shots/server.log || true
-      - uses: actions/upload-artifact@v4
+      - name: Print screenshots (base64, for readers without artifact access)
+        if: ${{ always() }}
+        run: |
+          cat ui-shots/log.txt || true
+          for f in ui-shots/*.jpg; do echo "SHOT-BEGIN $(basename "$f")"; base64 -w 0 "$f"; echo; echo "SHOT-END"; done
+      - uses: actions/upload-artifact@v7
         if: ${{ always() }}
         with:
           name: ui-shots
