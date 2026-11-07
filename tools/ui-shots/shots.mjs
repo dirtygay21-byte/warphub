@@ -173,6 +173,14 @@ for (const [label, name] of [
     await page.getByRole('button', { name: /Бросить/ }).first().click({ timeout: 5000 });
     await page.waitForTimeout(800);
     await shot(`${label}-battle-initiative`, true);
+    if (label === 'kt') {
+      await page.getByRole('button', { name: 'Mobile Engagement' }).first().click({ timeout: 5000 });
+      await page.getByRole('button', { name: '1 CP' }).first().click({ timeout: 5000 });
+      await shot('kt-ploy-open', true);
+      await page.getByRole('button', { name: /Использовать за 1 CP/ }).first().click({ timeout: 5000 });
+      await page.waitForTimeout(500);
+      await shot('kt-ploy-used', true);
+    }
   });
 }
 

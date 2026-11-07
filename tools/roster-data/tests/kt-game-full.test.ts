@@ -168,3 +168,28 @@ test('инициатива вручную (кубики бросали сами)
   assert.ok(replay.ok);
   assert.equal(replay.ok && replay.state?.initiative, 'p2');
 });
+
+test('уловки: стратегическая — в Strategy phase, боевая — в Firefight; CP списываются, повтор за turning point запрещён', () => {
+  let state = createKtState({ type: 'game-created', schema: KT_GAME_SCHEMA, seed: 'test-seed', names })!;
+  state = dispatch(state, setup());
+  const ploy = { type: 'ploy-used' as const, seat: 'p1' as Seat, ployId: 'AEL-COR-S-ME', name: 'Mobile Engagement', ployType: 'strategy' as const, cp: 1 };
+  assert.equal(applyKtEvent(state, ev(ploy), data).ok, false, 'до инициативы нельзя');
+  state = dispatch(state, { type: 'initiative', round: 1, attempt: 0 });
+  const cp = state.players.p1.cp;
+  state = dispatch(state, ploy);
+  assert.equal(state.players.p1.cp, cp - 1);
+  assert.deepEqual(state.players.p1.ploys?.map((x) => x.ployId), ['AEL-COR-S-ME']);
+  assert.equal(applyKtEvent(state, ev(ploy), data).ok, false, 'одна уловка — раз за turning point');
+  assert.equal(applyKtEvent(state, ev({ ...ploy, ployId: 'x', cp: 9 }), data).ok, false, 'стоимость 0–3');
+  assert.equal(applyKtEvent(state, ev({ ...ploy, ployId: 'y', cp: 3 }), data).ok, false, 'не больше, чем есть CP');
+  assert.equal(applyKtEvent(state, ev({ ...ploy, ployId: 'f', ployType: 'firefight' }), data).ok, false, 'боевая — только в Firefight');
+  state = dispatch(state, { type: 'primary-op', seat: 'p1', op: 'crit' });
+  state = dispatch(state, { type: 'primary-op', seat: 'p2', op: 'kill' });
+  state = dispatch(state, { type: 'phase-advanced' });
+  state = dispatch(state, { ...ploy, ployId: 'AEL-COR-F-CA', name: 'Capricious Flight', ployType: 'firefight', cp: 0 });
+  assert.equal(state.players.p1.ploys?.length, 2);
+  state = dispatch(state, { type: 'end-round', controls: {} });
+  state = dispatch(state, { type: 'initiative', round: 2, attempt: 0 });
+  state = dispatch(state, { ...ploy, cp: 0 });
+  assert.equal(state.players.p1.ploys?.filter((x) => x.ployId === 'AEL-COR-S-ME').length, 2, 'в новом turning point — снова можно');
+});
