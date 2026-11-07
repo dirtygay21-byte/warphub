@@ -133,6 +133,21 @@ for (const [label, name] of [
     await page.waitForTimeout(1200);
     await shot(`${label}-game-start`, true);
   });
+  await step(`${label}-game-setup`, async () => {
+    await page.getByRole('button', { name: 'Начать подготовку' }).first().click({ timeout: 5000 });
+    await page.waitForTimeout(800);
+    await shot(`${label}-game-setup`, true);
+    // оба игрока — демо-ростер (выбор из листа), затем начало битвы
+    for (let i = 0; i < 2; i++) {
+      await page.getByRole('button', { name: label === 'kt' ? /Выберите kill team/ : /Выберите варбанду/ }).first().click({ timeout: 5000 });
+      await page.getByRole('button', { name: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }).last().click({ timeout: 5000 });
+      await page.waitForTimeout(300);
+    }
+    await shot(`${label}-game-setup-filled`, true);
+    await page.getByRole('button', { name: 'Начать битву' }).first().click({ timeout: 5000 });
+    await page.waitForTimeout(1500);
+    await shot(`${label}-battle`, true);
+  });
 }
 
 fs.writeFileSync(path.join(OUT, 'log.txt'), log.join('\n') + '\n');
