@@ -3,7 +3,7 @@ import { optionalWargear, paidWargear, type ComputedRoster, type ComputedUnit, t
 import type { Datasheet, Roster, RosterUnit, Weapon } from '../engine/types';
 import { optionsOf, whoText, type ParsedOption } from '../engine/wargear';
 import { linkLabel, OUTDATED_MARK, outdatedNote, ruleLabel, selectableEnhancement, visibleStratagem } from '../engine/source';
-import { groupDetRules, groupOf, roleOf } from '../engine/group';
+import { groupDetRules, groupOf, roleOf, unitAppliedRules } from '../engine/group';
 import { openExternal } from '../telegram';
 import { Button, Counter, Field, Icon, Segmented, Tag } from './kit';
 import { cx, fmtPts } from './util';
@@ -415,7 +415,9 @@ function Choice({ active, onClick, title, right, sub, dim, detail }: { active: b
 function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRoster; L: DataLookup; detachmentIds: string[] }) {
   const ds = c.ds!;
   const [allWeapons, setAllWeapons] = useState(false);
-  const tagAbilities = ds.abilities.filter((a) => a.type === 'core' || a.type === 'faction');
+  // армейское правило (faction) — в строке «Действует на юнит» с пометкой АРМИЯ; здесь — основные способности
+  const tagAbilities = ds.abilities.filter((a) => a.type === 'core');
+  const applied = unitAppliedRules(c, cr, L, detachmentIds);
   const textAbilities = ds.abilities.filter((a) => a.type !== 'core' && a.type !== 'faction');
   const g = useGlossary();
   const ru = useRu(L.faction.id);
@@ -487,6 +489,20 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
             </div>
           </div>
         )}
+        {(applied.army.length > 0 || applied.det.length > 0) && (
+          // 07.11.2026: какие правила армии и детачмента действуют на юнит — сразу видно при открытии (по образцу Warmind)
+          <div>
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Действует на юнит</p>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {applied.army.map((r, i) => (
+                <RuleChip key={'a' + i} tag="Армия" name={r.name} text={r.text} accent ru={ruOf(ru, ds.id, r.ability)} />
+              ))}
+              {applied.det.map((r) => (
+                <RuleChip key={r.id} tag="Детачмент" name={r.name + (r.own ? '' : ` · через ${r.via.join(', ')}`)} text={`${r.det}\n\n${r.text}`} accent ru={ruDetachmentRuleById(ru, r.id)} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       <details className="group rounded-xl border border-white/10 bg-white/[0.02]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5 text-sm font-semibold text-fg-2">
@@ -523,7 +539,7 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
               </div>
             );
           })}
-          <UnitRules c={c} cr={cr} L={L} detachmentIds={detachmentIds} ru={ru} />
+          <UnitRules c={c} L={L} detachmentIds={detachmentIds} ru={ru} />
           {ds.damaged && <Txt title={`Повреждён: ${ds.damaged.w} ран`} text={ds.damaged.text} ru={rds?.damaged} g={g} warphub={rds?.warphub?.includes('damaged')} />}
           {ds.composition.length > 0 && <Txt title="Состав отряда" text={ds.composition.join('\n')} />}
           {ds.loadout && <Txt title="Снаряжение" text={ds.loadout} ru={rds?.loadout} g={g} warphub={rds?.warphub?.includes('loadout')} />}
@@ -633,12 +649,13 @@ function WeaponTable({ title, skill, weapons, count }: { title: string; skill: s
 }
 
 /** Способность-чип: нажатие открывает подсказку. Основные способности (core) — текст из глоссария (wh-rules.ru, раздел 24), остальные — свой текст. */
-function RuleChip({ name, text, accent, core, ru }: { name: string; text: string; accent?: boolean; core?: boolean; ru?: RuText | null }) {
+function RuleChip({ name, text, accent, core, ru, tag }: { name: string; text: string; accent?: boolean; core?: boolean; ru?: RuText | null; tag?: string }) {
   return (
     <RuleTrigger
       source={core ? { lookup: 'ability', label: name } : ru ? { title: ruName(ru.name, name), text: ru.text, rich: true, ...(isWarphub(ru) ? { sub: WARPHUB_LABEL } : {}) } : { title: name, text }}
       className={cx('rounded-md px-2 py-1 text-[12px] font-semibold uppercase tracking-wide', accent ? 'bg-accent/15 text-accent' : 'bg-white/[0.07] text-fg-2')}
     >
+      {tag && <span className="mr-1.5 rounded bg-black/25 px-1 py-px text-[10px] font-bold tracking-wider opacity-80">{tag}</span>}
       {name}
     </RuleTrigger>
   );
@@ -798,41 +815,22 @@ function CombinedUnit({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: Comput
   );
 }
 
-/** Правила выбранных детачментов, действующие на юнит, и доступные ему стратагемы. */
-function UnitRules({ c, cr, L, detachmentIds, ru }: { c: ComputedUnit; cr: ComputedRoster; L: DataLookup; detachmentIds: string[]; ru: RuOverlay | null }) {
+/** Стратагемы, доступные юниту (правила армии и детачмента — в строке «Действует на юнит» выше). */
+function UnitRules({ c, L, detachmentIds, ru }: { c: ComputedUnit; L: DataLookup; detachmentIds: string[]; ru: RuOverlay | null }) {
   const ds = c.ds!;
   const detIds = new Set(detachmentIds);
-  // правило, которое действует на любую часть совместного отряда, действует и на присоединённых персонажей
-  const members = groupOf(c, cr);
-  const detRules = groupDetRules(members.length ? members : [c], L, detachmentIds).map((r) => ({
-    ...r,
-    det: r.det,
-    own: r.via.includes(ds.name),
-  }));
   const strats = L.faction.stratagems.filter((st) => ds.stratagems.includes(st.id) && (!st.detachment || detIds.has(st.detachment)) && visibleStratagem(st, L.det));
-  if (!detRules.length && !strats.length) return null;
+  if (!strats.length) return null;
   return (
     <div className="space-y-2">
-      {detRules.length > 0 && (
-        <div>
-          <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Правила детачмента для юнита</p>
-          <div className="mt-1 flex flex-wrap gap-1">
-            {detRules.map((r) => (
-              <RuleChip key={r.id} name={r.name + (r.own ? '' : ` · через ${r.via.join(', ')}`)} text={`${r.det}\n\n${r.text}`} accent ru={ruDetachmentRuleById(ru, r.id)} />
-            ))}
-          </div>
+      <div>
+        <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Стратагемы ({strats.length})</p>
+        <div className="mt-1 flex flex-wrap gap-1">
+          {strats.map((st) => (
+            <RuleChip key={st.id} name={`${st.name} · ${st.cp}`} text={`${st.type}${st.phase ? ' · ' + st.phase : ''}\n\n${st.text}`} accent={!!st.detachment} ru={ruStratagem(ru, st.id)} />
+          ))}
         </div>
-      )}
-      {strats.length > 0 && (
-        <div>
-          <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Стратагемы ({strats.length})</p>
-          <div className="mt-1 flex flex-wrap gap-1">
-            {strats.map((st) => (
-              <RuleChip key={st.id} name={`${st.name} · ${st.cp}`} text={`${st.type}${st.phase ? ' · ' + st.phase : ''}\n\n${st.text}`} accent={!!st.detachment} ru={ruStratagem(ru, st.id)} />
-            ))}
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
