@@ -72,7 +72,12 @@ export function primaryFor(state: GameState, seat: Seat, catalog: GameCatalog): 
   const a = state.players[seat].disposition;
   const b = state.players[other(seat)].disposition;
   if (!a || !b) return null;
-  return catalog.matchups.find((m) => m.you === a && m.foe === b)?.mission ?? null;
+  return matchupMission(catalog.matchups, a, b);
+}
+
+/** Основная миссия игрока с типом армии you против foe (таблица пар battlefield.json; «Поле боя» и игра — одна функция). */
+export function matchupMission(matchups: GameCatalog['matchups'], you: string, foe: string): string | null {
+  return matchups.find((m) => m.you === you && m.foe === foe)?.mission ?? null;
 }
 
 /** Раскладки пары типов армий (в battlefield.json пара хранится отсортированной). */
