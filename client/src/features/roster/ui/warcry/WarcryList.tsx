@@ -46,6 +46,9 @@ export function WarcryList({
         <ToolTile icon="map" title="Test Army" sub="Поле 30×22″ · базы · соперник" onClick={onTestArmy} />
         <ToolTile icon="book" title="Правила" sub="Battleplan · Warcrier" onClick={() => openExternal('https://warcrier.net/docs/rules/battleplan')} />
         <ToolTile icon="spark" title="Как играть" sub="Обучение: инициатива, действия, атака" onClick={() => navigate('/learn/warcry')} />
+        <div className="col-span-2 min-w-0">
+          <ToolTile icon="shield" title="Обучающая игра" sub="Раунд по шагам за столом" onClick={() => navigate('/learn/warcry/round')} />
+        </div>
       </div>
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Выберите фракцию и наберите бойцов: союзники, траллы, монстр, группы Dagger / Shield / Hammer и проверка правил построения.</Empty>
