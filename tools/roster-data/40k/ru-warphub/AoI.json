@@ -54,16 +54,6 @@
     }
    }
   },
-  "000003818": {
-   "name": "Sisters of Battle Squad",
-   "abilities": {
-    "Simulacrum Imperials": {
-     "en": "047aee50ae",
-     "name": "Симулякрум Империалис",
-     "text": "Улучшите характеристику Лидерства (Leadership) моделей юнита носителя на 1."
-    }
-   }
-  },
   "000000870": {
    "name": "Vindicare Assassin",
    "abilities": {

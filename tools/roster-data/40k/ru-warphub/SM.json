@@ -15,17 +15,6 @@
   }
  },
  "datasheets": {
-  "000003837": {
-   "name": "Death Company Marines with Boltguns and Jump Packs",
-   "abilities": {
-    "An Honourable Death in Combat": {
-     "en": "aa5afff4e4",
-     "name": "Достойная смерть в бою",
-     "text": "Каждый раз, когда модель этого юнита совершает атаку, эта атака имеет способность [SUSTAINED HITS 1], если этот юнит ниже своей начальной численности, или способность [SUSTAINED HITS 2], если этот юнит ниже половинной численности.",
-     "by": "wh-rules"
-    }
-   }
-  },
   "000000061": {
    "name": "Assault Squad",
    "abilities": {
@@ -1765,16 +1754,6 @@
      "name": "Святая ненависть",
      "text": "Пока эта модель возглавляет юнит, оружие ближнего боя моделей этого юнита имеет способность [SUSTAINED HITS 1].",
      "by": "wh-rules"
-    }
-   }
-  },
-  "000003818": {
-   "name": "Sisters of Battle Squad",
-   "abilities": {
-    "Simulacrum Imperials": {
-     "en": "047aee50ae",
-     "name": "Симулякрум Империалис",
-     "text": "Улучшите характеристику Лидерства (Leadership) моделей юнита носителя на 1."
     }
    }
   },

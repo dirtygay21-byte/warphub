@@ -38,7 +38,8 @@ function wmPrice(u) {
 }
 const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
-const sk = (v) => num(v).replace(/\+$/, '');
+// навык: «N/A» и «7+» (TORRENT у wh-rules) — одно и то же: атака попадает автоматически
+const sk = (v) => { const x = num(v).replace(/\+$/, ''); return x === '7' || x === '-' ? 'n/a' : x; };
 function weaponKey(w) {
   return [num(w.range ?? ''), num(w.a), sk(w.skill), num(w.s), num(w.ap), num(w.d)].join('/');
 }
@@ -51,7 +52,7 @@ function compareArmy(army, slugs, wm) {
   for (const s of slugs) for (const u of wm.factions.find((f) => f.id === s)?.units ?? []) if (!units.has(`${s}|${norm(u.name)}`)) units.set(`${s}|${norm(u.name)}`, u);
   const siteOf = (d) => (army === 'SM' ? CHAPTERS[Object.keys(CHAPTERS).find((c) => d.factionKeywords?.includes(c))] ?? 'space-marines' : slugs[0]);
   const own = F.datasheets.filter((d) => d.group === 'own' && d.faction === F.id && !d.outdated);
-  const r = { army, matched: 0, onlyOurs: [], points: [], copies: [], stats: [], weapons: [], leads: [], detachments: [], enhancements: [] };
+  const r = { army, matched: 0, onlyOurs: [], points: [], copies: [], stats: [], weapons: [], leads: [], leadsExtra: [], detachments: [], enhancements: [] };
   for (const d of own) {
     const u = units.get(`${siteOf(d)}|${norm(d.name)}`) ?? slugs.map((s) => units.get(`${s}|${norm(d.name)}`)).find(Boolean);
     if (!u) {
@@ -61,14 +62,22 @@ function compareArmy(army, slugs, wm) {
     r.matched++;
     const a = ourPrice(d);
     const b = wmPrice(u);
-    if (!eq(a.base, b.base)) r.points.push({ unit: d.name, ours: a.base, warmind: b.base });
-    if (b.copies && !eq(a.copies, b.copies)) r.copies.push({ unit: d.name, ours: a.copies, warmind: b.copies });
+    // размеры без числа моделей у нас (подписи сайта «1 Sword Brother, 4 Neophytes, 5 Initiates») — сверяются очки:
+    // каждая цена Warmind есть среди наших цен этой ступени
+    const noModels = (band) => band?.options.length && band.options.every((o) => o.models == null);
+    const costsIn = (band, sizes) => Object.values(sizes).every((p) => band.options.some((o) => o.cost === p));
+    const later = d.costs?.find((x) => x.from > 1);
+    const baseOk = noModels(d.costs?.[0]) ? costsIn(d.costs[0], b.base) : eq(a.base, b.base);
+    const copiesOk = !b.copies || (noModels(later) ? later.from === b.copies.from && costsIn(later, b.copies.sizes) : eq(a.copies, b.copies));
+    if (!baseOk) r.points.push({ unit: d.name, ours: a.base, warmind: b.base });
+    if (!copiesOk) r.copies.push({ unit: d.name, ours: a.copies, warmind: b.copies });
     // характеристики: по подписи профиля, иначе по порядку
     const ws = u.statlines ?? [];
     (d.stats ?? []).forEach((s, i) => {
       // подписи профиля — без учёта множественного числа («Gellerpox Mutants» у нас, «Gellerpox Mutant» у Warmind)
       const one = (t) => norm(t).replace(/s$/, '');
-      const w = ws.find((x) => one(x.label) === one(s.name)) ?? (ws.length === (d.stats ?? []).length ? ws[i] : null);
+      // подпись короче («Grimaldus» у Warmind, «Chaplain Grimaldus» у нас) — по вхождению
+      const w = ws.find((x) => one(x.label) === one(s.name)) ?? ws.find((x) => one(s.name).endsWith(one(x.label)) || one(x.label).endsWith(one(s.name))) ?? (ws.length === (d.stats ?? []).length ? ws[i] : null);
       if (!w) return;
       const k1 = statKey({ M: s.M, T: s.T, Sv: s.Sv, W: s.W, Ld: s.Ld, OC: s.OC });
       const k2 = statKey(w);
@@ -77,17 +86,26 @@ function compareArmy(army, slugs, wm) {
     // оружие: каждый наш профиль, у которого есть оружие с тем же названием у Warmind
     // название + вид (у одного оружия бывают дальний и ближний профили с тем же названием)
     const kindOf = (p) => (p.type === 'Melee' ? 'melee' : 'ranged');
-    const wmw = new Map((u.weapons ?? []).map((w) => [`${norm(w.name)}|${w.kind}`, w]));
+    // у Warmind бывает несколько профилей с одним названием (разные модели отряда) — расхождение, если не совпал ни один
+    const wmw = new Map();
+    for (const w of u.weapons ?? []) wmw.set(`${norm(w.name)}|${w.kind}`, [...(wmw.get(`${norm(w.name)}|${w.kind}`) ?? []), w]);
     for (const w of d.weapons ?? [])
       for (const p of w.profiles ?? []) {
-        const x = wmw.get(`${norm(w.profiles.length > 1 ? p.name : w.name)}|${kindOf(p)}`) ?? wmw.get(`${norm(p.name ?? w.name)}|${kindOf(p)}`);
-        if (x && ourWeaponKey(p) !== weaponKey(x)) r.weapons.push({ unit: d.name, weapon: p.name ?? w.name, ours: ourWeaponKey(p), warmind: weaponKey(x) });
+        const xs = wmw.get(`${norm(w.profiles.length > 1 ? p.name : w.name)}|${kindOf(p)}`) ?? wmw.get(`${norm(p.name ?? w.name)}|${kindOf(p)}`);
+        if (xs && !xs.some((x) => ourWeaponKey(p) === weaponKey(x))) r.weapons.push({ unit: d.name, weapon: p.name ?? w.name, ours: ourWeaponKey(p), warmind: xs.map(weaponKey).join(' | ') });
       }
     // Leader: названия юнитов
     if (u.attachTo) {
-      const ours = (d.leads ?? []).map((id) => byId.get(id)?.name).filter(Boolean).map(norm).sort();
-      const theirs = u.attachTo.map(norm).sort();
-      if (!eq([...new Set(ours)], [...new Set(theirs)])) r.leads.push({ unit: d.name, onlyOurs: ours.filter((x) => !theirs.includes(x)), onlyWarmind: theirs.filter((x) => !ours.includes(x)) });
+      // сравниваются только действующие инфолисты: цели Legends «*» или которых нет в данных — связь некуда добавить
+      const live = new Set(F.datasheets.filter((x) => !x.outdated).map((x) => norm(x.name)));
+      const ours = (d.leads ?? []).map((id) => byId.get(id)).filter((x) => x && !x.outdated).map((x) => norm(x.name)).sort();
+      const theirs = u.attachTo.map(norm).filter((x) => live.has(x)).sort();
+      // наши связи не убираются (решение владельца 07.11.2026: у Warmind список бывает уже) — расхождение, только если
+      // у Warmind есть цель, которой нет у нас; лишние наши — в leadsExtra (для сведения)
+      const onlyWarmind = theirs.filter((x) => !ours.includes(x));
+      const onlyOurs = [...new Set(ours.filter((x) => !theirs.includes(x)))];
+      if (onlyWarmind.length) r.leads.push({ unit: d.name, onlyOurs, onlyWarmind });
+      else if (onlyOurs.length) r.leadsExtra.push({ unit: d.name, onlyOurs });
     }
   }
   const dets = slugs.flatMap((s) => wm.factions.find((f) => f.id === s)?.detachments ?? []);

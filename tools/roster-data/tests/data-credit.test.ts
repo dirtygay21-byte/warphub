@@ -24,7 +24,10 @@ test('армия, сконвертированная целиком той же 
 });
 
 test('правила из другой версии сайта: Space Marines — правила wh-rules.ru 981, очки 995', () => {
-  assert.equal(factionCredit(fac('SM'), index), 'Очки: MFM 1.6 · wh-rules.ru 995 · 16.10.2026 · правила: wh-rules.ru 981 · 14.10.2026');
+  // с 07.11.2026 (Task C, партия 4) Space Marines тоже на 995 — армия с правилами 981 синтетическая
+  const sm = fac('SM');
+  assert.equal(factionCredit({ ...sm, source: { ...sm.source!, dataVersion: 981, date: '2026-10-14' } }, index), 'Очки: MFM 1.6 · wh-rules.ru 995 · 16.10.2026 · правила: wh-rules.ru 981 · 14.10.2026');
+  assert.equal(factionCredit(sm, index), 'Очки и правила: MFM 1.6 · wh-rules.ru 995 · 16.10.2026');
 });
 
 test('армии без обновлений — по-прежнему выгрузка Wahapedia; ни одна армия с обновлением очков не подписана «powered by Wahapedia»', () => {

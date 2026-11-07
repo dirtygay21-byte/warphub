@@ -167,6 +167,14 @@
     "dataVersion": 995
    },
    {
+    "id": "whrules-995-space-marines",
+    "scope": [
+     "SM",
+     "AoI"
+    ],
+    "dataVersion": 995
+   },
+   {
     "id": "whrules-995-points",
     "scope": [
      "AS",
@@ -237,7 +245,9 @@
      "TAU",
      "CSM",
      "QI",
-     "ORK"
+     "ORK",
+     "SM",
+     "AoI"
     ],
     "dataVersion": "1.6"
    }

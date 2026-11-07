@@ -361,6 +361,18 @@
         "note": "Полная конвертация ORK из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 4)."
       },
       {
+        "id": "whrules-995-space-marines",
+        "kind": "whrules-faction",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "enabled": true,
+        "scope": [
+          "SM",
+          "AoI"
+        ],
+        "note": "Space Marines (с орденами) и Imperial Agents из wh-rules.ru 995; копии Imperial Agents в AC, AM, AS, AdM, GK, QI, TL"
+      },
+      {
         "id": "whrules-995-points",
         "kind": "whrules-points",
         "snapshot": "whrules-995.json",
@@ -554,7 +566,9 @@
           "TAU",
           "CSM",
           "QI",
-          "ORK"
+          "ORK",
+          "SM",
+          "AoI"
         ],
         "note": "Leader по Warmind (решение владельца 2026-11-07): к своим связям добавлены юниты из списка Warmind («attachTo»), если такой инфолист есть в файле армии; наши связи не убираются. Армии — полностью сконвертированные из wh-rules 995; остальные добавятся после своих партий."
       }

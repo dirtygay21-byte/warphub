@@ -21,6 +21,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -32,53 +33,8 @@
    "copies": [],
    "stats": [],
    "weapons": [],
-   "leads": [
-    {
-     "unit": "Blade Champion",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "custodian guard"
-     ]
-    },
-    {
-     "unit": "Knight-Centura",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "prosecutors",
-      "vigilators",
-      "witchseekers"
-     ]
-    },
-    {
-     "unit": "Shield-Captain",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "custodian guard"
-     ]
-    },
-    {
-     "unit": "Shield-Captain in Allarus Terminator Armour",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "aquilon custodians"
-     ]
-    },
-    {
-     "unit": "Shield-Captain on Dawneagle Jetbike",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "agamatus custodians"
-     ]
-    },
-    {
-     "unit": "Trajann Valoris",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "aquilon custodians",
-      "custodian guard"
-     ]
-    }
-   ],
+   "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -91,6 +47,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -114,15 +71,9 @@
    ],
    "copies": [],
    "stats": [],
-   "weapons": [
-    {
-     "unit": "Stonesinger",
-     "weapon": "Venomcrest Spit",
-     "ours": "12/3/n/a/3/-2/2",
-     "warmind": "12/3/-/3/-2/2"
-    }
-   ],
+   "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -135,6 +86,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -147,6 +99,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -159,6 +112,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -171,6 +125,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -183,6 +138,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -195,6 +151,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -207,6 +164,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -219,6 +177,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -231,6 +190,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -280,49 +240,32 @@
      "warmind": "melee/4/3/5/-2/2"
     }
    ],
-   "leads": [
+   "leads": [],
+   "leadsExtra": [
     {
      "unit": "Inquisitor",
      "onlyOurs": [
       "deathwatch kill team"
-     ],
-     "onlyWarmind": []
+     ]
     },
     {
      "unit": "Inquisitor Coteaz",
      "onlyOurs": [
       "aquila kill team",
       "deathwatch kill team"
-     ],
-     "onlyWarmind": []
+     ]
     },
     {
      "unit": "Inquisitor Draxus",
      "onlyOurs": [
       "deathwatch kill team"
-     ],
-     "onlyWarmind": []
+     ]
     },
     {
      "unit": "Inquisitor Greyfax",
      "onlyOurs": [
       "aquila kill team",
       "deathwatch kill team"
-     ],
-     "onlyWarmind": []
-    },
-    {
-     "unit": "Inquisitor Karamazov",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "sanctifiers"
-     ]
-    },
-    {
-     "unit": "Inquisitor Kroyle",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "sanctifiers"
      ]
     }
    ],
@@ -340,6 +283,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -352,6 +296,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -366,6 +311,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -377,16 +323,8 @@
    "copies": [],
    "stats": [],
    "weapons": [],
-   "leads": [
-    {
-     "unit": "Warboss on Warbike",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "nobz on warbikes",
-      "skorchas"
-     ]
-    }
-   ],
+   "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -394,54 +332,14 @@
    "army": "SM",
    "matched": 222,
    "onlyOurs": [],
-   "points": [
-    {
-     "unit": "Crusader Squad",
-     "ours": {},
-     "warmind": {
-      "10": 160,
-      "20": 305
-     }
-    },
-    {
-     "unit": "Wolf Guard Headtakers",
-     "ours": {},
-     "warmind": {
-      "3": 85,
-      "6": 170,
-      "12": 230
-     }
-    }
-   ],
-   "copies": [
-    {
-     "unit": "Wolf Guard Headtakers",
-     "ours": {
-      "from": 3,
-      "sizes": {}
-     },
-     "warmind": {
-      "from": 3,
-      "sizes": {
-       "3": 95,
-       "6": 180,
-       "12": 240
-      }
-     }
-    }
-   ],
+   "points": [],
+   "copies": [],
    "stats": [
     {
      "unit": "Thunderhawk Gunship",
      "profile": "Thunderhawk Gunship",
      "ours": "M14 T12 Sv2+ W30 Ld6+ OC0",
      "warmind": "M20 T12 Sv2+ W30 Ld6+ OC0"
-    },
-    {
-     "unit": "Chaplain Grimaldus",
-     "profile": "Chaplain Grimaldus",
-     "ours": "M6 T5 Sv3+ W5 Ld5+ OC1",
-     "warmind": "M6 T4 Sv3+ W1 Ld8+ OC1"
     }
    ],
    "weapons": [
@@ -458,431 +356,60 @@
      "warmind": "24/8/2/5/-1/1"
     },
     {
-     "unit": "Death Company Captain",
-     "weapon": "Power Fist",
-     "ours": "melee/3/3/8/-2/2",
-     "warmind": "melee/6/2/8/-2/2"
-    },
-    {
-     "unit": "Talonstrike Kill Team",
-     "weapon": "Hand Flamer",
-     "ours": "9/3/7/4/0/1",
-     "warmind": "9/3/n/a/4/0/1"
-    },
-    {
      "unit": "Bjorn the Fell-handed",
      "weapon": "Assault Cannon",
      "ours": "24/6/2/6/-2/1",
      "warmind": "24/6/3/6/-2/1"
-    },
-    {
-     "unit": "Iron Priest",
-     "weapon": "Helfrost Pistol – dispersed",
-     "ours": "12/3/7/4/-1/1",
-     "warmind": "12/3/n/a/4/-1/1"
-    },
-    {
-     "unit": "Murderfang",
-     "weapon": "Heavy Flamer",
-     "ours": "12/3/7/5/-1/1",
-     "warmind": "12/3/n/a/5/-1/1"
-    },
-    {
-     "unit": "Wulfen Dreadnought",
-     "weapon": "Heavy Flamer",
-     "ours": "12/3/7/5/-1/1",
-     "warmind": "12/3/n/a/5/-1/1"
     }
    ],
-   "leads": [
-    {
-     "unit": "Adrax Agatone",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "command squad"
-     ]
-    },
-    {
-     "unit": "Ancient",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "devastator squad",
-      "tactical squad"
-     ]
-    },
+   "leads": [],
+   "leadsExtra": [
     {
      "unit": "Ancient in Terminator Armour",
      "onlyOurs": [
       "wolf guard terminators"
-     ],
-     "onlyWarmind": [
-      "relic terminator squad"
-     ]
-    },
-    {
-     "unit": "Apothecary",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "devastator squad",
-      "tactical squad",
-      "vanguard veteran squad"
-     ]
-    },
-    {
-     "unit": "Apothecary Biologis",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "eradicator squad"
-     ]
-    },
-    {
-     "unit": "Caanok Var",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "relic terminator squad"
-     ]
-    },
-    {
-     "unit": "Captain",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "command squad"
-     ]
-    },
-    {
-     "unit": "Captain in Gravis Armour",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "eradicator squad"
      ]
     },
     {
      "unit": "Captain in Phobos Armour",
      "onlyOurs": [
       "wolf scouts"
-     ],
-     "onlyWarmind": []
+     ]
     },
     {
      "unit": "Captain in Terminator Armour",
      "onlyOurs": [
       "wolf guard terminators"
-     ],
-     "onlyWarmind": [
-      "relic terminator squad"
      ]
     },
     {
      "unit": "Captain on Bike",
      "onlyOurs": [
       "ravenwing black knights"
-     ],
-     "onlyWarmind": []
-    },
-    {
-     "unit": "Captain Titus",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "command squad"
-     ]
-    },
-    {
-     "unit": "Captain with Jump Pack",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad with jump packs"
-     ]
-    },
-    {
-     "unit": "Chaplain",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "death company marines with bolt rifles"
      ]
     },
     {
      "unit": "Chaplain in Terminator Armour",
      "onlyOurs": [
       "wolf guard terminators"
-     ],
-     "onlyWarmind": [
-      "relic terminator squad"
-     ]
-    },
-    {
-     "unit": "Chaplain on Bike",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "bike squad",
-      "company veterans on bikes"
-     ]
-    },
-    {
-     "unit": "Chaplain with Jump Pack",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad with jump packs"
-     ]
-    },
-    {
-     "unit": "Chief Librarian Tigurius",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad"
-     ]
-    },
-    {
-     "unit": "Darnath Lysander",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "relic terminator squad"
-     ]
-    },
-    {
-     "unit": "Iron Father Feirros",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "eradicator squad"
-     ]
-    },
-    {
-     "unit": "Judiciar",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "tactical squad"
-     ]
-    },
-    {
-     "unit": "Kayvaan Shrike",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad with jump packs"
-     ]
-    },
-    {
-     "unit": "Kor’sarro Khan",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "command squad"
-     ]
-    },
-    {
-     "unit": "Librarian",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad"
      ]
     },
     {
      "unit": "Librarian in Phobos Armour",
      "onlyOurs": [
       "wolf scouts"
-     ],
-     "onlyWarmind": []
+     ]
     },
     {
      "unit": "Librarian in Terminator Armour",
      "onlyOurs": [
       "wolf guard terminators"
-     ],
-     "onlyWarmind": [
-      "relic terminator squad"
-     ]
-    },
-    {
-     "unit": "Lieutenant",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "command squad",
-      "tactical squad"
      ]
     },
     {
      "unit": "Lieutenant in Phobos Armour",
      "onlyOurs": [
       "wolf scouts"
-     ],
-     "onlyWarmind": []
-    },
-    {
-     "unit": "Marneus Calgar",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "command squad",
-      "eradicator squad",
-      "relic terminator squad"
-     ]
-    },
-    {
-     "unit": "Suboden Khan",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "bike squad",
-      "company veterans on bikes"
-     ]
-    },
-    {
-     "unit": "Techmarine",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "vanguard veteran squad"
-     ]
-    },
-    {
-     "unit": "Tor Garadon",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "eradicator squad"
-     ]
-    },
-    {
-     "unit": "Vulkan He’stan",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "command squad"
-     ]
-    },
-    {
-     "unit": "Wardens of Ultramar",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad"
-     ]
-    },
-    {
-     "unit": "Castellan",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "vanguard veteran squad"
-     ]
-    },
-    {
-     "unit": "Chaplain Grimaldus",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "vanguard veteran squad"
-     ]
-    },
-    {
-     "unit": "Emperor's Champion",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "vanguard veteran squad"
-     ]
-    },
-    {
-     "unit": "Marshal",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault intercessor squad codex",
-      "bladeguard veteran squad codex",
-      "infernus squad codex",
-      "intercessor squad codex",
-      "sternguard veteran squad codex"
-     ]
-    },
-    {
-     "unit": "Astorath",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "death company marines with boltguns and jump packs"
-     ]
-    },
-    {
-     "unit": "Blood Angels Captain",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "command squad",
-      "tactical squad",
-      "vanguard veteran squad"
-     ]
-    },
-    {
-     "unit": "Death Company Captain",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "death company marines with boltguns"
-     ]
-    },
-    {
-     "unit": "Death Company Captain with Jump Pack",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "death company marines with boltguns and jump packs"
-     ]
-    },
-    {
-     "unit": "Lemartes",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "death company marines with boltguns and jump packs"
-     ]
-    },
-    {
-     "unit": "Sanguinary Priest",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "devastator squad",
-      "tactical squad",
-      "vanguard veteran squad"
-     ]
-    },
-    {
-     "unit": "Asmodai",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "tactical squad",
-      "vanguard veteran squad"
-     ]
-    },
-    {
-     "unit": "Belial",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "relic terminator squad"
-     ]
-    },
-    {
-     "unit": "Ezekiel",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "tactical squad",
-      "vanguard veteran squad"
-     ]
-    },
-    {
-     "unit": "Lazarus",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "assault squad",
-      "tactical squad",
-      "vanguard veteran squad"
-     ]
-    },
-    {
-     "unit": "Ravenwing Command Squad",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "outrider squad codex"
      ]
     }
    ],
@@ -898,6 +425,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -910,6 +438,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -929,6 +458,7 @@
     }
    ],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   },
@@ -941,6 +471,7 @@
    "stats": [],
    "weapons": [],
    "leads": [],
+   "leadsExtra": [],
    "detachments": [],
    "enhancements": []
   }

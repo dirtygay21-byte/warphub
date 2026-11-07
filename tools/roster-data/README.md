@@ -167,6 +167,13 @@ Warmind, у каждого — `why`): `weaponFixes` (профиль оружи�
 остальных Aircraft 11-й редакции), `loadoutFixes` (текст снаряжения: Valkyrie «Militarum multi-laser» → «multi-laser»). Новый
 инфолист без очков на сайте (Legends T'au Tactical Drones) не добавляется — пробел в unavailable; запись очков без числа моделей и
 подписи (Tidewall Shieldline «20» — это добавка Tidewall Defence Platform) размером отряда не считается.
+Партия 4 — CSM, QI (копии freeblades в 8 файлах — `syncCopies`), ORK; Space Marines (с орденами) и Imperial Agents — второй
+прогон конвейера SM (kind `whrules-faction`, `whrules-995-space-marines`, снимок `whrules-995-full-25-factions.json`, сопоставление
+по `whrules-995.json`): записи `migrations` дописываются к прежним (981), обновление 981 считается применённым по записи
+«wh-rules 981 (MFM …)». Цены копий с другим id (инфолисты детачментов и союзников из выгрузки: Brood Brothers у GC, Harlequins у
+DRU, Legiones Daemonica у CD) — как у инфолиста армии с тем же названием и её ключевыми словами фракции. Подпись размера сайта без
+пояснения («10 models») заменяется прежней («10 Gretchin»), если размер тот же. Исправления ошибок сайта — `applySourceFixes`.
+Расхождения с Warmind, оставленные по сайту, — `tests/warmind-compare.test.ts → KNOWN` (с объяснением).
 
 **Обновление значений по wh-rules.ru** (`40k/curated.json → updates`, kind `whrules-points`, `scripts/whrules-points.mjs`;
 сейчас `whrules-995-points`, задача P1-T3). У сопоставленных записей (та же функция сопоставления, что и отчёт свежести)

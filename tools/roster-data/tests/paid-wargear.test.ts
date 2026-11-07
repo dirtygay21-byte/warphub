@@ -129,7 +129,8 @@ test('разбор вариантов: составные замены — Knigh
 
 test('варианты из конструктора сайта у инфолистов без вариантов в тексте: Impulsor (Orbital Comms Array — автоматически), Repulsor Executioner (замена Heavy Laser Destroyer)', () => {
   const imp = sheet('SM', 'Impulsor', 'Space Marines');
-  assert.ok(imp.options.length && imp.options.every((o) => o.source === 'whrules-roster'));
+  // в 981 вариантов в тексте инфолиста не было (взяты из конструктора сайта, source «whrules-roster»); в 995 они в тексте сайта
+  assert.ok(imp.options.some((o) => o.text.includes('Orbital Comms Array')));
   assert.equal(paidIsAuto(imp, 'Orbital Comms Array'), true);
   assert.equal(extra(build('SM', imp).last), 0);
   assert.equal(extra(build('SM', imp, { picks: pick(opt(imp, 'Orbital Comms Array'), 'Orbital Comms Array', 1) }).last), 10);

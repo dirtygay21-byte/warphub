@@ -521,6 +521,23 @@
    }
   },
   {
+   "id": "whrules-995-space-marines",
+   "kind": "whrules-faction",
+   "scope": [
+    "SM",
+    "AoI"
+   ],
+   "note": "Space Marines (с орденами) и Imperial Agents из wh-rules.ru 995; копии Imperial Agents в AC, AM, AS, AdM, GK, QI, TL",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
    "id": "whrules-995-points",
    "kind": "whrules-points",
    "scope": [
@@ -610,7 +627,9 @@
     "TAU",
     "CSM",
     "QI",
-    "ORK"
+    "ORK",
+    "SM",
+    "AoI"
    ],
    "note": "Leader по Warmind (решение владельца 2026-11-07): к своим связям добавлены юниты из списка Warmind («attachTo»), если такой инфолист есть в файле армии; наши связи не убираются. Армии — полностью сконвертированные из wh-rules 995; остальные добавятся после своих партий.",
    "source": {
