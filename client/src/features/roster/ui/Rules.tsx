@@ -7,7 +7,7 @@ import { cx } from './util';
 import { cleanRuleText } from '../text';
 import { factionCredit, ruleLabel, visibleStratagem } from '../engine/source';
 import { isWarphub, ruDetachmentName, ruName, ruStratagem, WARPHUB_LABEL, type RuText } from '../ru';
-import type { Glossary } from '../glossary';
+import { glossaryEntries, GLOSSARY_GROUPS, matchGlossary, type Glossary, type GlossaryGroup } from '../glossary';
 import { RuleRichText } from './common/RulePopover';
 import { useGlossary } from './common/useGlossary';
 import { useRu } from './common/useRu';
@@ -93,7 +93,7 @@ export function Rules({
   factionId?: string;
   detachmentIds?: string[];
 }) {
-  const [tab, setTab] = useState<'strats' | 'core'>('strats');
+  const [tab, setTab] = useState<'strats' | 'terms' | 'core'>('strats');
   const [fid, setFid] = useState(factionId ?? '');
   const [loaded, setLoaded] = useState<{ id: string; faction?: FactionData; error?: string } | null>(null);
   const [det, setDet] = useState<string>(detachmentIds?.length ? 'mine' : 'all');
@@ -152,11 +152,14 @@ export function Rules({
         onChange={setTab}
         options={[
           { value: 'strats', label: 'Стратагемы' },
+          { value: 'terms', label: 'Термины' },
           { value: 'core', label: 'Core Rules' },
         ]}
       />
 
-      {tab === 'core' ? (
+      {tab === 'terms' ? (
+        <GlossaryTab g={gloss} />
+      ) : tab === 'core' ? (
         <div className="mt-4 space-y-5">
           <p className="text-sm leading-relaxed text-fg-3">
             Полный текст основных правил — на Wahapedia. Глава откроется сразу на нужном месте и всегда в актуальной версии.
@@ -257,6 +260,64 @@ export function Rules({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+/** Термины (07.11.2026): основные способности, способности оружия (в т. ч. фракций) и термины правил — поиск и группы. */
+function GlossaryTab({ g }: { g: Glossary | null }) {
+  const [q, setQ] = useState('');
+  const [group, setGroup] = useState<GlossaryGroup | 'all'>('all');
+  const all = useMemo(() => (g ? glossaryEntries(g) : []), [g]);
+  if (!g) return <div className="mx-auto mt-10 size-6 animate-spin rounded-full border-2 border-white/15 border-t-accent" />;
+  const hits = all
+    .map((e) => ({ e, hit: matchGlossary(e, q) }))
+    .filter((x) => x.hit && (group === 'all' || x.e.group === group))
+    .sort((a, b) => b.hit - a.hit);
+  return (
+    <div className="mt-4 space-y-3">
+      <input
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Поиск: Deep Strike, Lethal Hits, укрытие…"
+        className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-white outline-none placeholder:text-fg-3 focus:border-accent"
+      />
+      <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4">
+        {[{ key: 'all' as const, label: 'Все' }, ...GLOSSARY_GROUPS].map((x) => (
+          <button
+            key={x.key}
+            type="button"
+            aria-pressed={group === x.key}
+            onClick={() => setGroup(x.key)}
+            className={cx('shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition', group === x.key ? 'bg-accent text-accent-foreground' : 'bg-white/[0.06] text-fg-2')}
+          >
+            {x.label} <span className="tabular-nums opacity-60">{x.key === 'all' ? all.length : all.filter((e) => e.group === x.key).length}</span>
+          </button>
+        ))}
+      </div>
+      {hits.length ? (
+        <div className="space-y-1.5">
+          {hits.map(({ e }) => (
+            <details key={e.id} className="group rounded-xl border border-white/10 bg-white/[0.03]">
+              <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2.5">
+                <span className="min-w-0 flex-1 text-sm font-semibold">{e.name}</span>
+                <span className="shrink-0 text-[11px] text-fg-3">{[e.num, GLOSSARY_GROUPS.find((x) => x.key === e.group)!.label].filter(Boolean).join(' · ')}</span>
+              </summary>
+              <div className="space-y-2 border-t border-white/[0.06] px-3 py-2.5">
+                {e.texts.map((t, i) => (
+                  <RuleRichText key={i} text={t} g={g} className="text-[13px] leading-relaxed text-fg-2" />
+                ))}
+              </div>
+            </details>
+          ))}
+        </div>
+      ) : (
+        <p className="py-10 text-center text-sm text-fg-3">Ничего не найдено</p>
+      )}
+      <p className="text-[11px] leading-snug text-fg-3">
+        Тексты — wh-rules.ru, данные {g.source.dataVersion}
+        {g.source.mfm ? ` (MFM ${g.source.mfm})` : ''}.
+      </p>
     </div>
   );
 }
