@@ -449,7 +449,7 @@ function Editor({
       )}
 
       <PointsSheet open={pointsInfo} onClose={() => setPointsInfo(false)} systems={w40kPointSystems(roster, L, cr)} />
-      <UnitPicker open={picker} onClose={() => setPicker(false)} roster={roster} L={L} cr={cr} onAdd={add} onToggleLegends={() => set({ showLegends: !roster.showLegends })} />
+      <UnitPicker open={picker} onClose={() => setPicker(false)} roster={roster} L={L} cr={cr} onAdd={add} onToggleLegends={() => set({ showLegends: !roster.showLegends })} ru={ru} />
 
       <DetachmentSheet open={detSheet} onClose={() => setDetSheet(false)} roster={roster} L={L} cr={cr} onPick={(d) => {
         const ids = [...roster.detachmentIds, d.id];
