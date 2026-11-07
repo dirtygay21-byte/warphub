@@ -132,6 +132,12 @@ for (const [label, name] of [
     await page.getByText('Начать игру', { exact: false }).first().click({ timeout: 5000 });
     await page.waitForTimeout(1200);
     await shot(`${label}-game-start`, true);
+    if (label === 'kt') {
+      await page.getByRole('button', { name: /Поле боя/ }).first().click({ timeout: 5000 });
+      await page.waitForTimeout(800);
+      await shot('kt-field-view', true);
+      await page.getByRole('button', { name: 'Назад' }).first().click({ timeout: 5000 });
+    }
   });
   await step(`${label}-game-setup`, async () => {
     await page.getByRole('button', { name: 'Начать подготовку' }).first().click({ timeout: 5000 });
@@ -148,6 +154,18 @@ for (const [label, name] of [
     await page.getByRole('button', { name: 'Начать битву' }).first().click({ timeout: 5000 });
     await page.waitForTimeout(1500);
     await shot(`${label}-battle`, true);
+    if (label === 'kt') {
+      await page.getByText(/^Карта ·/).first().click({ timeout: 5000 });
+      await shot('kt-battle-map', true);
+      await page.getByRole('button', { name: 'Мастер' }).first().click({ timeout: 5000 });
+      await shot('kt-battle-master');
+      await page.getByRole('button', { name: 'Ростер' }).first().click({ timeout: 5000 });
+      await page.waitForTimeout(1200);
+      await shot('kt-master-roster', true);
+      await page.getByRole('button', { name: /К списку|Назад/ }).first().click({ timeout: 5000 });
+      await page.waitForTimeout(500);
+      await page.getByRole('button', { name: 'Мастер' }).first().click({ timeout: 5000 });
+    }
     // переключатель кубиков: «Вручную» — ввод итога, затем обратно «В приложении»
     await page.getByRole('radio', { name: 'Вручную' }).first().click({ timeout: 5000 });
     await shot(`${label}-battle-dice-manual`, true);
