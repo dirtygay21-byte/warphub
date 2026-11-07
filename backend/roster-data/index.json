@@ -409,6 +409,31 @@
     "snapshot": "whrules-995-roster.json",
     "fingerprint": "e736162b51a3ab6fa2cd9ed5274925f9b94f527944770d5a867a4568327aadbf"
    }
+  },
+  {
+   "id": "warmind-leaders",
+   "kind": "warmind-leaders",
+   "scope": [
+    "AS",
+    "AC",
+    "AdM",
+    "AE",
+    "QT",
+    "EC",
+    "GC",
+    "GK",
+    "LoV",
+    "TYR"
+   ],
+   "note": "Leader по Warmind (решение владельца 2026-11-07): к своим связям добавлены юниты из списка Warmind («attachTo»), если такой инфолист есть в файле армии; наши связи не убираются. Армии — полностью сконвертированные из wh-rules 995; остальные добавятся после своих партий.",
+   "source": {
+    "site": "https://warmind.online/app/",
+    "dataVersion": "1.6",
+    "mfm": "1.6",
+    "date": "2026-11-07",
+    "snapshot": "warmind-11e.json",
+    "fingerprint": "adfa402cb0b52a72155ee8508b8dce91bc9b9fb424c72a5bdbbc81d493ef649f"
+   }
   }
  ]
 }

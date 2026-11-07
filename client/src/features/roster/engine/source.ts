@@ -63,9 +63,13 @@ const sameSource = (a: DataSource, b: DataSource) => site(a) === site(b) && Stri
 export const pointsLabel = (s: DataSource): string => `${s.mfm ? `MFM ${s.mfm} · ` : ''}${site(s)} ${s.dataVersion} · ${ruDate(s.date)}`;
 const wahapedia = (index: Pick<DataIndex, 'lastUpdate'>) => `Wahapedia${index.lastUpdate ? ` · ${ruDate(index.lastUpdate.slice(0, 10))}` : ''}`;
 
+/** Обновления, которые не меняют очки и правила (сверка связей Leader с Warmind, 07.11.2026) — в подпись источника не идут. */
+const NOT_POINTS = new Set(['warmind-leaders']);
+const pointsUpdates = (index: Pick<DataIndex, 'updates'>) => (index.updates ?? []).filter((u) => !NOT_POINTS.has(u.kind));
+
 /** Последнее применённое обновление, которое меняло фракцию (порядок index.updates — порядок применения). */
 export const pointsUpdateFor = (index: Pick<DataIndex, 'updates'>, factionId: string): Update | null =>
-  [...(index.updates ?? [])].reverse().find((u) => (u.scope ?? []).includes(factionId)) ?? null;
+  [...pointsUpdates(index)].reverse().find((u) => (u.scope ?? []).includes(factionId)) ?? null;
 
 /**
  * Подпись данных фракции: откуда очки (последнее обновление, которое её меняло) и откуда правила (своя конвертация или
@@ -87,7 +91,7 @@ export const factionCredit = (faction: Pick<FactionData, 'id' | 'source'> | null
 
 /** Короткая подпись для списка ростеров: самая новая версия очков (или выгрузка Wahapedia, если обновлений нет). */
 export const indexCredit = (index: IndexInfo): string => {
-  const latest = [...(index.updates ?? [])].sort((a, b) => a.source.date.localeCompare(b.source.date)).at(-1);
+  const latest = [...pointsUpdates(index)].sort((a, b) => a.source.date.localeCompare(b.source.date)).at(-1);
   return latest ? `Очки: ${pointsLabel(latest.source)}` : `powered by ${wahapedia(index)}`;
 };
 
@@ -97,6 +101,7 @@ const UPDATE_KIND: Record<string, string> = {
   'whrules-faction-convert': 'Инфолисты, детачменты и правила армии целиком (новый кодекс)',
   'whrules-points': 'Очки отрядов, ступени цены за копии, DP детачментов, очки улучшений, платное снаряжение',
   'whrules-wargear': 'Платное снаряжение и варианты снаряжения — как в конструкторе ростеров сайта',
+  'warmind-leaders': 'К каким юнитам присоединяются персонажи (Leader) — дополнено по сверке с Warmind',
 };
 
 /** Подробности для списка ростеров: выгрузка и каждое обновление — версия, дата, что меняет и какие армии. */

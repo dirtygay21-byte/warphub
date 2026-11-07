@@ -31,6 +31,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadSnapshot } from './updates-40k.mjs';
 import { WHRULES_APPLIERS as CONVERT_APPLIERS } from './whrules-convert.mjs';
+import { applyWarmindLeaders } from './warmind-leaders.mjs';
 import { ARMIES, compareArmy, compareDetachments, siteCosts, wargearKey } from './whrules-compare.mjs';
 import { applyWhrulesWargear } from './whrules-wargear.mjs';
 import { data40kAt } from './baseline-40k.mjs';
@@ -217,7 +218,7 @@ export function applyWhrulesPoints(files, snap, u) {
 }
 
 /** Все обработчики обновлений 40K: полная конвертация (whrules-faction), значения (whrules-points), платное стандартное снаряжение (whrules-wargear). */
-export const WHRULES_APPLIERS = { ...CONVERT_APPLIERS, 'whrules-points': applyWhrulesPoints, 'whrules-wargear': applyWhrulesWargear };
+export const WHRULES_APPLIERS = { ...CONVERT_APPLIERS, 'whrules-points': applyWhrulesPoints, 'whrules-wargear': applyWhrulesWargear, 'warmind-leaders': applyWarmindLeaders };
 
 function main() {
   const arg = (k, d) => {

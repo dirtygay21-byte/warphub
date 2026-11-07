@@ -20,10 +20,10 @@ const DATA = path.join(HERE, '..', '..', '..', 'backend', 'roster-data');
 const SNAP = path.join(HERE, '..', '40k', 'warmind-11e.json');
 const OUT = path.join(HERE, '..', '40k', 'warmind-compare');
 
-const norm = (s) => String(s ?? '').toLowerCase().normalize('NFKD').replace(/[’'`‘]/g, '').replace(/[‐-―-]/g, ' ').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+export const norm = (s) => String(s ?? '').toLowerCase().normalize('NFKD').replace(/[’'`‘]/g, '').replace(/[‐-―-]/g, ' ').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
 const num = (s) => String(s ?? '').replace(/["”″]/g, '').replace(/\s+/g, '').replace(/^\+/, '').toLowerCase();
 const statKey = (s) => ['M', 'T', 'Sv', 'W', 'Ld', 'OC'].map((k) => `${k}${num(s[k])}`).join(' ');
-const CHAPTERS = { 'Black Templars': 'black-templars', 'Blood Angels': 'blood-angels', 'Dark Angels': 'dark-angels', Deathwatch: 'deathwatch', 'Space Wolves': 'space-wolves' };
+export const CHAPTERS = { 'Black Templars': 'black-templars', 'Blood Angels': 'blood-angels', 'Dark Angels': 'dark-angels', Deathwatch: 'deathwatch', 'Space Wolves': 'space-wolves' };
 
 /** Наши цены: размер → очки первой ступени; за копии — первая ступень с from > 1. */
 function ourPrice(d) {
