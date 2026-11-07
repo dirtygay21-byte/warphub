@@ -64,7 +64,8 @@ test('включённые обновления whrules-981, whrules-995-custode
     const res = repair40kData(dir, curated, { appliers: WHRULES_APPLIERS });
     assert.deepEqual(res.changedFiles, []);
     assert.deepEqual(snapshotOf(dir), before);
-    assert.deepEqual(JSON.parse(before['index.json']).updates.map((u: { id: string }) => u.id), ['whrules-981-space-marines', 'whrules-995-custodes', 'whrules-995-points', 'whrules-995-wargear']);
+    // все включённые обновления curated, по порядку (07.11.2026: + полные конвертации фракций из wh-rules 995)
+    assert.deepEqual(JSON.parse(before['index.json']).updates.map((u: { id: string }) => u.id), curated.updates.items.filter((u: { enabled: boolean }) => u.enabled).map((u: { id: string }) => u.id));
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

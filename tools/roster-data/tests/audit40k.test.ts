@@ -24,7 +24,9 @@ const own = (F: FactionData, name: string, source?: string) => {
   return d!;
 };
 const withDet = (F: FactionData, det: string): Roster => {
-  const d = F.detachments.find((x) => x.name === det)!;
+  // апостроф: у сайта (wh-rules 995) — прямой «'», в прежних данных — «’»
+  const ap = (n: string) => n.replace(/[’']/g, "'");
+  const d = F.detachments.find((x) => ap(x.name) === ap(det))!;
   assert.ok(d, `${F.id}: нет детачмента ${det}`);
   return { ...newRoster(F.id), detachmentIds: [d.id], forceDisposition: d.forceDisposition };
 };

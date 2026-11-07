@@ -201,6 +201,150 @@
    }
   },
   {
+   "id": "whrules-995-adepta-sororitas",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "AS"
+   ],
+   "note": "Полная конвертация AS из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-adeptus-mechanicus",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "AdM"
+   ],
+   "note": "Полная конвертация AdM из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-aeldari",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "AE"
+   ],
+   "note": "Полная конвертация AE из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-chaos-knights",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "QT"
+   ],
+   "note": "Полная конвертация QT из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-emperors-children",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "EC"
+   ],
+   "note": "Полная конвертация EC из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-genestealer-cults",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "GC"
+   ],
+   "note": "Полная конвертация GC из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-grey-knights",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "GK"
+   ],
+   "note": "Полная конвертация GK из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-leagues-of-votann",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "LoV"
+   ],
+   "note": "Полная конвертация LoV из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-tyranids",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "TYR"
+   ],
+   "note": "Полная конвертация TYR из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
    "id": "whrules-995-points",
    "kind": "whrules-points",
    "scope": [

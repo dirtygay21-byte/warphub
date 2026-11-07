@@ -37,9 +37,9 @@ TB('изменённые файлы совпадают с одобренным �
 TB('index.json: добавлены только записи updates — 981 из одобренного отчёта, 995-custodes, 995-points и 995-wargear', () => {
   const { updates, ...rest } = disk('index.json');
   assert.deepEqual(rest, BASE.index);
-  assert.deepEqual(updates.map((u: { id: string }) => u.id), ['whrules-981-space-marines', 'whrules-995-custodes', 'whrules-995-points', 'whrules-995-wargear']);
+  assert.deepEqual(updates.map((u: { id: string }) => u.id), curated.updates.items.filter((u: { enabled: boolean }) => u.enabled).map((u: { id: string }) => u.id));
   assert.deepEqual(updates[0], R.scope.indexUpdate);
   assert.deepEqual(updates, EXPECT_INDEX!.updates);
   const snap = loadSnapshot(POINTS.snapshot);
-  assert.deepEqual(updates[2], { id: POINTS.id, kind: POINTS.kind, scope: POINTS.scope, note: POINTS.note, source: { site: snap.source.site, dataVersion: 995, mfm: '1.6', date: '2026-10-16', snapshot: POINTS.snapshot, fingerprint: snap.fingerprint } });
+  assert.deepEqual(updates.find((u: { id: string }) => u.id === POINTS.id), { id: POINTS.id, kind: POINTS.kind, scope: POINTS.scope, note: POINTS.note, source: { site: snap.source.site, dataVersion: 995, mfm: '1.6', date: '2026-10-16', snapshot: POINTS.snapshot, fingerprint: snap.fingerprint } });
 });

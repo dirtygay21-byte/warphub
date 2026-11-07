@@ -289,7 +289,7 @@ const whrLink = (f) => `https://wh-rules.ru/ru/factions/${f}/datasheets`;
  *  ourIdOf — Map «<фракция сайта>|<slug>» → наш id (сопоставление); armyFactions — фракции сайта для правил армии;
  *  factionOf(f) — id нашей фракции для записей фракции сайта f; sourceOf(f) — подпись источника («Space Marines»).
  */
-export function makeConverter({ full, olds, ourIdOf, armyFactions, factionOf, sourceOf }) {
+export function makeConverter({ full, olds, ourIdOf, armyFactions, factionOf, sourceOf, keepOldLimits = false }) {
   const prov = {}; // id → { поле: 'whrules' | 'derived' | 'legacy' | 'unavailable' }
   const legacy = []; // { id, name, field, value, why }
   const unavailable = []; // { id, name, field, why }
@@ -449,6 +449,20 @@ export function makeConverter({ full, olds, ourIdOf, armyFactions, factionOf, so
         const id = old?.id ?? `whr:${f}:det:${s.id}`;
         const rule = { id: `${id}:rule`, name: s.rule.name, text: mdToText(s.rule.body) };
         const parsed = parseDetachmentRules([rule.text], vocab, names);
+        // ограничения построения (Battleline, обязательные юниты, лимиты): в снимке сайта у правила детачмента раздела
+        // «KEYWORDS / Restrictions» нет. Если текст сайта ничего не задаёт, а у прежнего детачмента ограничения были —
+        // они остаются (не выдумываем и не теряем), запись в legacy (07.11.2026, Task C; включается keepOldLimits у обновления).
+        const LIMITS = ['battleline', 'grants', 'forbid', 'requires', 'limitOverride', 'disablesArmyRule'];
+        const empty = (v) => v == null || (Array.isArray(v) && !v.length);
+        if (keepOldLimits && old && LIMITS.every((k) => empty(parsed[k])) && LIMITS.some((k) => !empty(old[k]))) {
+          for (const k of LIMITS) parsed[k] = old[k];
+          legacy.push({ id, name: s.name, field: 'detachment.limits', value: LIMITS.filter((k) => !empty(old[k])).join(', '), why: 'ограничений построения нет в тексте сайта — оставлены прежние (Wahapedia)' });
+        }
+        // общий тег детачментов («только один ACROBATIC»): у сайта — поле unique; если его и в тексте нет — прежний
+        if (keepOldLimits && old?.tag && !s.unique && !parsed.tag) {
+          parsed.tag = old.tag;
+          legacy.push({ id, name: s.name, field: 'detachment.tag', value: old.tag, why: 'тега детачмента нет на сайте — оставлен прежний (Wahapedia)' });
+        }
         const fds = s.forceDispositions ?? [];
         dets.push({
           id, faction: fid, name: s.name, type: '', dp: s.dp,
@@ -655,14 +669,14 @@ export function convertSpaceMarines({ full, map, plan, current }) {
  * данные Space Marines (981) уже записаны с ним и не меняются. */
 export const plainHyphens = (x) => JSON.parse(JSON.stringify(x).replace(/\u2011/g, '-'));
 
-export function convertFaction({ full: fullIn, slug, army, map, plan }) {
+export function convertFaction({ full: fullIn, slug, army, map, plan, keepOldLimits = false }) {
   if (!fullIn.factions[slug]) throw new Error(`convertFaction: в снимке нет ${slug}`);
   const full = { ...fullIn, factions: { ...fullIn.factions, [slug]: plainHyphens(fullIn.factions[slug]) } };
   const site = full.factions[slug];
   const src = { site: full.source.site, dataVersion: full.source.dataVersion, mfm: full.source.mfm, date: full.source.date };
   const ourIdOf = new Map([...map.matched, ...map.renamed].map((x) => [`${slug}|${x.site.id}`, x.ours.id]));
   const ownOld = army.datasheets.filter((d) => d.group === 'own' && d.faction === army.id);
-  const K = makeConverter({ full, olds: [army], ourIdOf, armyFactions: [slug], factionOf: () => army.id, sourceOf: () => site.name ?? army.name });
+  const K = makeConverter({ full, olds: [army], ourIdOf, armyFactions: [slug], factionOf: () => army.id, sourceOf: () => site.name ?? army.name, keepOldLimits });
   const ds = site.datasheets.map((s) => K.convertDs(slug, s, 'own'));
   const outdatedIds = new Set(plan.outdated.map((o) => o.id));
   const retained = ownOld.filter((d) => outdatedIds.has(d.id)).map((d) => {
@@ -1001,18 +1015,41 @@ export function applyWhrulesFactionConvert(files, full, u) {
   const src = `wh-rules ${full.source.dataVersion} (MFM ${full.source.mfm}, ${full.source.date})`;
   const list = !A.migrations ? [] : Array.isArray(A.migrations) ? A.migrations : [A.migrations];
   if (String(A.source?.dataVersion) === String(full.source.dataVersion) && list.some((m) => m.source === src)) return { changed: 0, lines: [`${A.name} уже на wh-rules ${full.source.dataVersion}`] };
-  const r = dryRunFaction({ slug: u.faction, armyId: u.army, snapshot: u.points, fullFile: u.snapshot, army: A, full });
+  const r = dryRunFaction({ slug: u.faction, armyId: u.army, snapshot: u.points, fullFile: u.snapshot, army: A, full, keepOldLimits: !!u.keepOldLimits });
   const failed = r.checks.filter((c) => !c.ok);
   if (failed.length) throw new Error(`whrules-faction-convert: проверки не пройдены — ${failed.map((c) => c.check).join('; ')}`);
   const next = plain(r._file);
   next.migrations = [...list, { source: src, datasheets: {}, detachments: {}, enhancements: {}, options: r._optionsNew }];
   files[fname] = next;
+  // копии инфолистов армии у союзников в других файлах (Chaos Knights — dreadblades у армий Хаоса, Aeldari — corsairs
+  // у Drukhari; 07.11.2026, Task C): та же запись, что у армии, со своей группой; улучшения — как были (пусто — пусто);
+  // правила, на которые ссылаются способности, добавляются в словарь файла
+  const own = new Map(next.datasheets.filter((d) => d.group === 'own' && d.faction === next.id).map((d) => [d.id, d]));
+  let copies = 0;
+  const copyFiles = [];
+  if (u.syncCopies) {
+    for (const [f, F] of Object.entries(files)) {
+      if (f === fname || !Array.isArray(F?.datasheets)) continue;
+      let n = 0;
+      F.datasheets = F.datasheets.map((d) => {
+        const o = own.get(d.id);
+        if (!o || !String(d.group ?? '').startsWith('ally:')) return d;
+        n++;
+        const c = plain({ ...o, group: d.group, enhancements: d.enhancements?.length ? o.enhancements : [] });
+        for (const a of c.abilities) if (a.ref && !F.rules?.[a.ref] && next.rules?.[a.ref]) (F.rules ??= {})[a.ref] = next.rules[a.ref];
+        return c;
+      });
+      if (n) copyFiles.push(`${f.replace(/\.json$/, '')} ${n}`);
+      copies += n;
+    }
+  }
   const s = r.summary;
   return {
     changed: 1,
     lines: [
       `${A.name}: инфолистов ${s.datasheets.after} (сохранены id ${s.datasheets.kept + s.datasheets.renamed}, новых ${s.datasheets.added}), детачментов ${s.detachments.current} (+${s.detachments.outdated} устаревших), улучшений ${s.enhancements.current}, стратагем ${s.stratagems.current}; переводов снаряжения ${Object.keys(r._optionsNew).length}`,
       `проверки: ${r.checks.length} — все пройдены`,
+      ...(copies ? [`копии у союзников обновлены: ${copies} (${copyFiles.join(', ')})`] : []),
     ],
   };
 }
@@ -1079,12 +1116,12 @@ export function dryRun({ dir = DATA, files = null } = {}) {
  * Сухой прогон полной конвертации одной фракции (P1-T4c): отчёт для утверждения, данные не меняются.
  * snapshot — снимок очков /3 (сопоставление и переименования), fullFile — полный снимок фракции.
  */
-export function dryRunFaction({ slug, armyId, snapshot = 'whrules-995.json', fullFile, dir = DATA, army = null, full: fullIn = null }) {
+export function dryRunFaction({ slug, armyId, snapshot = 'whrules-995.json', fullFile, dir = DATA, army = null, full: fullIn = null, keepOldLimits = false }) {
   const A = army ?? JSON.parse(fs.readFileSync(path.join(dir, 'f', `${armyId}.json`), 'utf8'));
   const full = fullIn ?? loadFull(fullFile, undefined, [slug]);
   const map = mapFaction(loadSnapshot(snapshot), slug, A);
   const plan = planFaction(map, full, A);
-  const r = convertFaction({ full, slug, army: A, map, plan });
+  const r = convertFaction({ full, slug, army: A, map, plan, keepOldLimits });
   const F = r.file;
   const ownOf = (X) => X.datasheets.filter((d) => d.group === 'own' && d.faction === A.id);
   const before = ownOf(A);

@@ -1,6 +1,6 @@
 # Свежесть данных 40K — wh-rules.ru 995 (MFM 1.6, 2026-10-16)
 
-Снимок `whrules-995.json`, fingerprint `79a26d70ca87852a…`. Наши данные: Wahapedia 2026-09-28 02:38:04 + whrules-981-space-marines (SM, AoI) + whrules-995-custodes (AC) + whrules-995-points (AS, AC, AdM, AE, AM, CD, QT, CSM, DG, DRU, EC, GC, GK, AoI, QI, LoV, NEC, ORK, SM, TAU, TS, TYR, WE) + whrules-995-wargear (AC, AE, AM, AdM, CSM, DRU, GC, LoV, ORK, QI, QT, SM, TAU).
+Снимок `whrules-995.json`, fingerprint `79a26d70ca87852a…`. Наши данные: Wahapedia 2026-09-28 02:38:04 + whrules-981-space-marines (SM, AoI) + whrules-995-custodes (AC) + whrules-995-adepta-sororitas (AS) + whrules-995-adeptus-mechanicus (AdM) + whrules-995-aeldari (AE) + whrules-995-chaos-knights (QT) + whrules-995-emperors-children (EC) + whrules-995-genestealer-cults (GC) + whrules-995-grey-knights (GK) + whrules-995-leagues-of-votann (LoV) + whrules-995-tyranids (TYR) + whrules-995-points (AS, AC, AdM, AE, AM, CD, QT, CSM, DG, DRU, EC, GC, GK, AoI, QI, LoV, NEC, ORK, SM, TAU, TS, TYR, WE) + whrules-995-wargear (AC, AE, AM, AdM, CSM, DRU, GC, LoV, ORK, QI, QT, SM, TAU).
 Сравниваются размеры отряда и цены, платные добавки и платное снаряжение. Отчёт строит scripts/whrules-compare.mjs; данные приложения он не меняет.
 
 | Армия | Изм. на сайте | Инфолисты наши/сайт | Совпало | Очки | Размеры | Ступени | Legends | Переим. | Новые | Убраны | В др. фракции | Legends/FW нет | Не сопост. | Детачм. новые/нет/DP | Улучш. очки/новые/нет/переим.? | Снаряж. совп./цена/только у нас/только на сайте/не по выбору |
@@ -11,16 +11,16 @@
 | Aeldari | 0 | 99/99 | 99 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0/0 | 0/0/0/0 | 1/0/0/0/0 |
 | Astra Militarum | 0 | 135/135 | 135 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0/0 | 0/0/0/1 | 27/0/0/0/0 |
 | Chaos Daemons | 0 | 70/63 | 63 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 7 | 0 | 0 | 0/0/0 | 0/0/0/0 | 0/0/0/0/0 |
-| Chaos Knights | 0 | 20/20 | 20 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0/0 | 0/0/0/1 | 2/0/0/0/0 |
+| Chaos Knights | 0 | 20/20 | 20 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0/0 | 0/0/0/0 | 2/0/0/0/0 |
 | Chaos Space Marines | 0 | 111/85 | 85 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 11 | 15 | 0 | 0/0/0 | 0/0/0/0 | 3/0/0/0/0 |
 | Death Guard | 0 | 71/41 | 41 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 15 | 15 | 0 | 0/0/0 | 0/0/0/0 | 2/0/0/0/0 |
 | Drukhari | 0 | 38/30 | 30 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 8 | 0 | 0 | 0/0/0 | 0/0/0/0 | 4/0/0/0/0 |
 | Emperor’s Children | 0 | 23/23 | 23 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0/0 | 0/0/0/0 | 2/0/0/0/0 |
-| Genestealer Cults | 0 | 25/25 | 25 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1/1/0 | 0/0/0/0 | 1/0/0/0/0 |
+| Genestealer Cults | 0 | 25/25 | 25 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0/0 | 0/0/0/0 | 1/0/0/0/0 |
 | Grey Knights | 0 | 31/31 | 31 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0/0 | 0/0/0/0 | 7/0/0/0/0 |
 | Imperial Agents | 0 | 46/46 | 46 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0/0 | 0/0/0/0 | 2/0/0/0/0 |
 | Imperial Knights | 0 | 25/23 | 22 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0/0/0 | 0/0/0/0 | 1/0/0/0/0 |
-| Leagues of Votann | 0 | 22/22 | 22 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0/0 | 0/0/0/1 | 0/0/0/0/0 |
+| Leagues of Votann | 0 | 22/22 | 22 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0/0 | 0/0/0/0 | 0/0/0/0/0 |
 | Necrons | 0 | 64/64 | 64 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0/0 | 0/0/0/1 | 0/0/0/0/0 |
 | Orks | 0 | 67/67 | 67 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0/0 | 0/0/0/0 | 4/0/0/0/0 |
 | Space Marines | 0 | 285/215 | 222 | 0 | 0 | 0 | 0 | 0 | 0 | 63 | 0 | 0 | 0 | 0/0/0 | 0/0/0/0 | 20/0/0/0/1 |

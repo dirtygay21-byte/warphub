@@ -141,6 +141,8 @@ export function planWargear(files, roster, points, u = {}) {
           continue;
         }
         if (d.options.some((o) => o.text === text)) continue; // уже применено
+        // инфолист уже взят с сайта (полная конвертация, 07.11.2026): вариант в формулировке сайта — исправлять нечего
+        if (f.replace && !d.options.some((o) => o.text.includes(f.replace)) && d.options.some((o) => o.text.toLowerCase().includes(f.site.toLowerCase()))) continue;
         if (f.replace && !d.options.some((o) => o.text.includes(f.replace))) {
           plan.fixErrors.push(`${army}/${d.name}: нет нашего варианта с «${f.replace}»`);
           continue;

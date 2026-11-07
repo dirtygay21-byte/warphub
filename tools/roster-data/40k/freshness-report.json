@@ -27,6 +27,69 @@
     "dataVersion": 995
    },
    {
+    "id": "whrules-995-adepta-sororitas",
+    "scope": [
+     "AS"
+    ],
+    "dataVersion": 995
+   },
+   {
+    "id": "whrules-995-adeptus-mechanicus",
+    "scope": [
+     "AdM"
+    ],
+    "dataVersion": 995
+   },
+   {
+    "id": "whrules-995-aeldari",
+    "scope": [
+     "AE"
+    ],
+    "dataVersion": 995
+   },
+   {
+    "id": "whrules-995-chaos-knights",
+    "scope": [
+     "QT"
+    ],
+    "dataVersion": 995
+   },
+   {
+    "id": "whrules-995-emperors-children",
+    "scope": [
+     "EC"
+    ],
+    "dataVersion": 995
+   },
+   {
+    "id": "whrules-995-genestealer-cults",
+    "scope": [
+     "GC"
+    ],
+    "dataVersion": 995
+   },
+   {
+    "id": "whrules-995-grey-knights",
+    "scope": [
+     "GK"
+    ],
+    "dataVersion": 995
+   },
+   {
+    "id": "whrules-995-leagues-of-votann",
+    "scope": [
+     "LoV"
+    ],
+    "dataVersion": 995
+   },
+   {
+    "id": "whrules-995-tyranids",
+    "scope": [
+     "TYR"
+    ],
+    "dataVersion": 995
+   },
+   {
     "id": "whrules-995-points",
     "scope": [
      "AS",
@@ -161,14 +224,9 @@
     "same": 38,
     "pairs": [
      {
-      "id": "000000894",
+      "id": "000002480",
       "siteFaction": "adepta-sororitas",
-      "siteId": "crusaders"
-     },
-     {
-      "id": "000000895",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "death-cult-assassins"
+      "siteId": "aestred-thurga-and-agathae-dolan"
      },
      {
       "id": "000000896",
@@ -176,34 +234,9 @@
       "siteId": "arco-flagellants"
      },
      {
-      "id": "000000897",
+      "id": "000002068",
       "siteFaction": "adepta-sororitas",
-      "siteId": "penitent-engines"
-     },
-     {
-      "id": "000000898",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "saint-celestine"
-     },
-     {
-      "id": "000000899",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "canoness"
-     },
-     {
-      "id": "000000900",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "imagifier"
-     },
-     {
-      "id": "000000901",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "hospitaller"
-     },
-     {
-      "id": "000000902",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "dialogus"
+      "siteId": "battle-sanctum"
      },
      {
       "id": "000000903",
@@ -211,119 +244,9 @@
       "siteId": "battle-sisters-squad"
      },
      {
-      "id": "000000904",
+      "id": "000000899",
       "siteFaction": "adepta-sororitas",
-      "siteId": "seraphim-squad"
-     },
-     {
-      "id": "000000907",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "repentia-squad"
-     },
-     {
-      "id": "000000908",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "retributor-squad"
-     },
-     {
-      "id": "000000909",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "dominion-squad"
-     },
-     {
-      "id": "000000910",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "sororitas-rhino"
-     },
-     {
-      "id": "000000911",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "immolator"
-     },
-     {
-      "id": "000000912",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "exorcist"
-     },
-     {
-      "id": "000001199",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "repressor"
-     },
-     {
-      "id": "000001553",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "ministorum-priest"
-     },
-     {
-      "id": "000002063",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "triumph-of-saint-katherine"
-     },
-     {
-      "id": "000002064",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "junith-eruita"
-     },
-     {
-      "id": "000002066",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "zephyrim-squad"
-     },
-     {
-      "id": "000002067",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "mortifiers"
-     },
-     {
-      "id": "000002068",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "battle-sanctum"
-     },
-     {
-      "id": "000002472",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "palatine"
-     },
-     {
-      "id": "000002479",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "morvenn-vahl"
-     },
-     {
-      "id": "000002480",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "aestred-thurga-and-agathae-dolan"
-     },
-     {
-      "id": "000002481",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "celestian-sacresants"
-     },
-     {
-      "id": "000002482",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "dogmata"
-     },
-     {
-      "id": "000002483",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "paragon-warsuits"
-     },
-     {
-      "id": "000002484",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "castigator"
-     },
-     {
-      "id": "000002507",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "sisters-novitiate-squad"
-     },
-     {
-      "id": "000002771",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "daemonifuge"
+      "siteId": "canoness"
      },
      {
       "id": "000003714",
@@ -331,14 +254,9 @@
       "siteId": "canoness-with-jump-pack"
      },
      {
-      "id": "000003811",
+      "id": "000002484",
       "siteFaction": "adepta-sororitas",
-      "siteId": "celestian-sacresant-aveline"
-     },
-     {
-      "id": "000004075",
-      "siteFaction": "adepta-sororitas",
-      "siteId": "sanctifiers"
+      "siteId": "castigator"
      },
      {
       "id": "000004189",
@@ -346,9 +264,154 @@
       "siteId": "celestian-insidiants"
      },
      {
+      "id": "000003811",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "celestian-sacresant-aveline"
+     },
+     {
+      "id": "000002481",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "celestian-sacresants"
+     },
+     {
+      "id": "000000894",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "crusaders"
+     },
+     {
+      "id": "000002771",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "daemonifuge"
+     },
+     {
+      "id": "000000895",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "death-cult-assassins"
+     },
+     {
+      "id": "000000902",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "dialogus"
+     },
+     {
+      "id": "000002482",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "dogmata"
+     },
+     {
+      "id": "000000909",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "dominion-squad"
+     },
+     {
+      "id": "000000912",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "exorcist"
+     },
+     {
+      "id": "000000901",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "hospitaller"
+     },
+     {
+      "id": "000000900",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "imagifier"
+     },
+     {
+      "id": "000000911",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "immolator"
+     },
+     {
       "id": "000004215",
       "siteFaction": "adepta-sororitas",
       "siteId": "intranzia-fraye"
+     },
+     {
+      "id": "000002064",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "junith-eruita"
+     },
+     {
+      "id": "000001553",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "ministorum-priest"
+     },
+     {
+      "id": "000002067",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "mortifiers"
+     },
+     {
+      "id": "000002479",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "morvenn-vahl"
+     },
+     {
+      "id": "000002472",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "palatine"
+     },
+     {
+      "id": "000002483",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "paragon-warsuits"
+     },
+     {
+      "id": "000000897",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "penitent-engines"
+     },
+     {
+      "id": "000000907",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "repentia-squad"
+     },
+     {
+      "id": "000001199",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "repressor"
+     },
+     {
+      "id": "000000908",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "retributor-squad"
+     },
+     {
+      "id": "000000898",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "saint-celestine"
+     },
+     {
+      "id": "000004075",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "sanctifiers"
+     },
+     {
+      "id": "000000904",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "seraphim-squad"
+     },
+     {
+      "id": "000002507",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "sisters-novitiate-squad"
+     },
+     {
+      "id": "000000910",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "sororitas-rhino"
+     },
+     {
+      "id": "000002063",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "triumph-of-saint-katherine"
+     },
+     {
+      "id": "000002066",
+      "siteFaction": "adepta-sororitas",
+      "siteId": "zephyrim-squad"
      }
     ],
     "counts": {
@@ -848,19 +911,59 @@
     "same": 38,
     "pairs": [
      {
+      "id": "000002087",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "archaeopter-fusilave"
+     },
+     {
+      "id": "000002086",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "archaeopter-stratoraptor"
+     },
+     {
+      "id": "000002085",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "archaeopter-transvector"
+     },
+     {
       "id": "000000838",
       "siteFaction": "adeptus-mechanicus",
       "siteId": "belisarius-cawl"
      },
      {
-      "id": "000000839",
+      "id": "000000844",
       "siteFaction": "adeptus-mechanicus",
-      "siteId": "tech-priest-dominus"
+      "siteId": "corpuscarii-electro-priests"
      },
      {
-      "id": "000000840",
+      "id": "000000846",
       "siteFaction": "adeptus-mechanicus",
-      "siteId": "tech-priest-enginseer"
+      "siteId": "cybernetica-datasmith"
+     },
+     {
+      "id": "000000843",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "fulgurite-electro-priests"
+     },
+     {
+      "id": "000004211",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "hastarii-exterminators"
+     },
+     {
+      "id": "000004212",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "hastarii-fusiliers"
+     },
+     {
+      "id": "000000852",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "ironstrider-ballistarii"
+     },
+     {
+      "id": "000000845",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "kastelan-robots"
      },
      {
       "id": "000000841",
@@ -873,59 +976,19 @@
       "siteId": "kataphron-destroyers"
      },
      {
-      "id": "000000843",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "fulgurite-electro-priests"
-     },
-     {
-      "id": "000000844",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "corpuscarii-electro-priests"
-     },
-     {
-      "id": "000000845",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "kastelan-robots"
-     },
-     {
-      "id": "000000846",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "cybernetica-datasmith"
-     },
-     {
-      "id": "000000848",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "skitarii-rangers"
-     },
-     {
-      "id": "000000849",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "skitarii-vanguard"
-     },
-     {
-      "id": "000000850",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "sicarian-infiltrators"
-     },
-     {
-      "id": "000000851",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "sicarian-ruststalkers"
-     },
-     {
-      "id": "000000852",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "ironstrider-ballistarii"
-     },
-     {
-      "id": "000000853",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "sydonian-dragoons-with-taser-lances"
-     },
-     {
       "id": "000000854",
       "siteFaction": "adeptus-mechanicus",
       "siteId": "onager-dunecrawler"
+     },
+     {
+      "id": "000002084",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "pteraxii-skystalkers"
+     },
+     {
+      "id": "000002083",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "pteraxii-sterylizors"
      },
      {
       "id": "000001525",
@@ -938,29 +1001,9 @@
       "siteId": "secutarii-peltasts"
      },
      {
-      "id": "000001533",
+      "id": "000002082",
       "siteFaction": "adeptus-mechanicus",
-      "siteId": "terrax-pattern-termite"
-     },
-     {
-      "id": "000001580",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "tech-priest-manipulus"
-     },
-     {
-      "id": "000001650",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "skorpius-dunerider"
-     },
-     {
-      "id": "000001651",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "skorpius-disintegrator"
-     },
-     {
-      "id": "000001822",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "x-101"
+      "siteId": "serberys-raiders"
      },
      {
       "id": "000002081",
@@ -968,39 +1011,19 @@
       "siteId": "serberys-sulphurhounds"
      },
      {
-      "id": "000002082",
+      "id": "000004119",
       "siteFaction": "adeptus-mechanicus",
-      "siteId": "serberys-raiders"
+      "siteId": "servitor-battleclade"
      },
      {
-      "id": "000002083",
+      "id": "000000850",
       "siteFaction": "adeptus-mechanicus",
-      "siteId": "pteraxii-sterylizors"
+      "siteId": "sicarian-infiltrators"
      },
      {
-      "id": "000002084",
+      "id": "000000851",
       "siteFaction": "adeptus-mechanicus",
-      "siteId": "pteraxii-skystalkers"
-     },
-     {
-      "id": "000002085",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "archaeopter-transvector"
-     },
-     {
-      "id": "000002086",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "archaeopter-stratoraptor"
-     },
-     {
-      "id": "000002087",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "archaeopter-fusilave"
-     },
-     {
-      "id": "000002477",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "technoarcheologist"
+      "siteId": "sicarian-ruststalkers"
      },
      {
       "id": "000002478",
@@ -1008,9 +1031,34 @@
       "siteId": "skitarii-marshal"
      },
      {
+      "id": "000000848",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "skitarii-rangers"
+     },
+     {
+      "id": "000000849",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "skitarii-vanguard"
+     },
+     {
+      "id": "000001651",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "skorpius-disintegrator"
+     },
+     {
+      "id": "000001650",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "skorpius-dunerider"
+     },
+     {
       "id": "000003694",
       "siteFaction": "adeptus-mechanicus",
       "siteId": "sydonian-dragoons-with-radium-jezzails"
+     },
+     {
+      "id": "000000853",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "sydonian-dragoons-with-taser-lances"
      },
      {
       "id": "000003695",
@@ -1018,9 +1066,29 @@
       "siteId": "sydonian-skatros"
      },
      {
-      "id": "000004119",
+      "id": "000000839",
       "siteFaction": "adeptus-mechanicus",
-      "siteId": "servitor-battleclade"
+      "siteId": "tech-priest-dominus"
+     },
+     {
+      "id": "000000840",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "tech-priest-enginseer"
+     },
+     {
+      "id": "000001580",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "tech-priest-manipulus"
+     },
+     {
+      "id": "000002477",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "technoarcheologist"
+     },
+     {
+      "id": "000001533",
+      "siteFaction": "adeptus-mechanicus",
+      "siteId": "terrax-pattern-termite"
      },
      {
       "id": "000004210",
@@ -1028,14 +1096,9 @@
       "siteId": "thulia-ghuld"
      },
      {
-      "id": "000004211",
+      "id": "000001822",
       "siteFaction": "adeptus-mechanicus",
-      "siteId": "hastarii-exterminators"
-     },
-     {
-      "id": "000004212",
-      "siteFaction": "adeptus-mechanicus",
-      "siteId": "hastarii-fusiliers"
+      "siteId": "x-101"
      }
     ],
     "counts": {
@@ -1158,44 +1221,14 @@
     "same": 99,
     "pairs": [
      {
-      "id": "000000568",
+      "id": "000001598",
       "siteFaction": "aeldari",
-      "siteId": "eldrad-ulthran"
-     },
-     {
-      "id": "000000570",
-      "siteFaction": "aeldari",
-      "siteId": "illic-nightspear"
+      "siteId": "amallyn-shadowguide"
      },
      {
       "id": "000000571",
       "siteFaction": "aeldari",
       "siteId": "asurmen"
-     },
-     {
-      "id": "000000572",
-      "siteFaction": "aeldari",
-      "siteId": "jain-zar"
-     },
-     {
-      "id": "000000573",
-      "siteFaction": "aeldari",
-      "siteId": "karandras"
-     },
-     {
-      "id": "000000574",
-      "siteFaction": "aeldari",
-      "siteId": "fuegan"
-     },
-     {
-      "id": "000000575",
-      "siteFaction": "aeldari",
-      "siteId": "baharroth"
-     },
-     {
-      "id": "000000576",
-      "siteFaction": "aeldari",
-      "siteId": "maugan-ra"
      },
      {
       "id": "000000577",
@@ -1208,254 +1241,19 @@
       "siteId": "autarch-skyrunner"
      },
      {
+      "id": "000002759",
+      "siteFaction": "aeldari",
+      "siteId": "autarch-wayleaper"
+     },
+     {
       "id": "000000581",
       "siteFaction": "aeldari",
       "siteId": "avatar-of-khaine"
      },
      {
-      "id": "000000582",
+      "id": "000000575",
       "siteFaction": "aeldari",
-      "siteId": "farseer"
-     },
-     {
-      "id": "000000583",
-      "siteFaction": "aeldari",
-      "siteId": "farseer-skyrunner"
-     },
-     {
-      "id": "000000584",
-      "siteFaction": "aeldari",
-      "siteId": "warlock-conclave"
-     },
-     {
-      "id": "000000585",
-      "siteFaction": "aeldari",
-      "siteId": "warlock"
-     },
-     {
-      "id": "000000587",
-      "siteFaction": "aeldari",
-      "siteId": "warlock-skyrunners"
-     },
-     {
-      "id": "000000588",
-      "siteFaction": "aeldari",
-      "siteId": "spiritseer"
-     },
-     {
-      "id": "000000589",
-      "siteFaction": "aeldari",
-      "siteId": "guardian-defenders"
-     },
-     {
-      "id": "000000590",
-      "siteFaction": "aeldari",
-      "siteId": "storm-guardians"
-     },
-     {
-      "id": "000000591",
-      "siteFaction": "aeldari",
-      "siteId": "windriders"
-     },
-     {
-      "id": "000000592",
-      "siteFaction": "aeldari",
-      "siteId": "rangers"
-     },
-     {
-      "id": "000000593",
-      "siteFaction": "aeldari",
-      "siteId": "dire-avengers"
-     },
-     {
-      "id": "000000594",
-      "siteFaction": "aeldari",
-      "siteId": "howling-banshees"
-     },
-     {
-      "id": "000000595",
-      "siteFaction": "aeldari",
-      "siteId": "striking-scorpions"
-     },
-     {
-      "id": "000000596",
-      "siteFaction": "aeldari",
-      "siteId": "fire-dragons"
-     },
-     {
-      "id": "000000597",
-      "siteFaction": "aeldari",
-      "siteId": "wraithguard"
-     },
-     {
-      "id": "000000598",
-      "siteFaction": "aeldari",
-      "siteId": "wraithblades"
-     },
-     {
-      "id": "000000599",
-      "siteFaction": "aeldari",
-      "siteId": "wave-serpent"
-     },
-     {
-      "id": "000000600",
-      "siteFaction": "aeldari",
-      "siteId": "swooping-hawks"
-     },
-     {
-      "id": "000000601",
-      "siteFaction": "aeldari",
-      "siteId": "warp-spiders"
-     },
-     {
-      "id": "000000602",
-      "siteFaction": "aeldari",
-      "siteId": "shining-spears"
-     },
-     {
-      "id": "000000603",
-      "siteFaction": "aeldari",
-      "siteId": "crimson-hunter"
-     },
-     {
-      "id": "000000605",
-      "siteFaction": "aeldari",
-      "siteId": "vypers"
-     },
-     {
-      "id": "000000606",
-      "siteFaction": "aeldari",
-      "siteId": "hemlock-wraithfighter"
-     },
-     {
-      "id": "000000607",
-      "siteFaction": "aeldari",
-      "siteId": "dark-reapers"
-     },
-     {
-      "id": "000000609",
-      "siteFaction": "aeldari",
-      "siteId": "falcon"
-     },
-     {
-      "id": "000000610",
-      "siteFaction": "aeldari",
-      "siteId": "fire-prism"
-     },
-     {
-      "id": "000000611",
-      "siteFaction": "aeldari",
-      "siteId": "night-spinner"
-     },
-     {
-      "id": "000000612",
-      "siteFaction": "aeldari",
-      "siteId": "war-walkers"
-     },
-     {
-      "id": "000000613",
-      "siteFaction": "aeldari",
-      "siteId": "wraithlord"
-     },
-     {
-      "id": "000000614",
-      "siteFaction": "aeldari",
-      "siteId": "wraithknight"
-     },
-     {
-      "id": "000000615",
-      "siteFaction": "aeldari",
-      "siteId": "shadow-spectres"
-     },
-     {
-      "id": "000000616",
-      "siteFaction": "aeldari",
-      "siteId": "wasp-assault-walker"
-     },
-     {
-      "id": "000000617",
-      "siteFaction": "aeldari",
-      "siteId": "wraithseer"
-     },
-     {
-      "id": "000000618",
-      "siteFaction": "aeldari",
-      "siteId": "hornet"
-     },
-     {
-      "id": "000000619",
-      "siteFaction": "aeldari",
-      "siteId": "warp-hunter"
-     },
-     {
-      "id": "000000620",
-      "siteFaction": "aeldari",
-      "siteId": "lynx"
-     },
-     {
-      "id": "000000621",
-      "siteFaction": "aeldari",
-      "siteId": "scorpion"
-     },
-     {
-      "id": "000000622",
-      "siteFaction": "aeldari",
-      "siteId": "cobra"
-     },
-     {
-      "id": "000000623",
-      "siteFaction": "aeldari",
-      "siteId": "nightwing"
-     },
-     {
-      "id": "000000624",
-      "siteFaction": "aeldari",
-      "siteId": "phoenix"
-     },
-     {
-      "id": "000000625",
-      "siteFaction": "aeldari",
-      "siteId": "vampire-raider"
-     },
-     {
-      "id": "000000626",
-      "siteFaction": "aeldari",
-      "siteId": "vampire-hunter"
-     },
-     {
-      "id": "000000627",
-      "siteFaction": "aeldari",
-      "siteId": "skathach-wraithknight"
-     },
-     {
-      "id": "000000628",
-      "siteFaction": "aeldari",
-      "siteId": "revenant-titan"
-     },
-     {
-      "id": "000000629",
-      "siteFaction": "aeldari",
-      "siteId": "corsair-cloud-dancer-band"
-     },
-     {
-      "id": "000000630",
-      "siteFaction": "aeldari",
-      "siteId": "irillyth"
-     },
-     {
-      "id": "000000631",
-      "siteFaction": "aeldari",
-      "siteId": "phantom-titan"
-     },
-     {
-      "id": "000000632",
-      "siteFaction": "aeldari",
-      "siteId": "corsair-reaver-band"
-     },
-     {
-      "id": "000001393",
-      "siteFaction": "aeldari",
-      "siteId": "firestorm"
+      "siteId": "baharroth"
      },
      {
       "id": "000001400",
@@ -1463,14 +1261,29 @@
       "siteId": "bonesinger"
      },
      {
-      "id": "000001598",
+      "id": "000004238",
       "siteFaction": "aeldari",
-      "siteId": "amallyn-shadowguide"
+      "siteId": "clanblade"
      },
      {
-      "id": "000002459",
+      "id": "000000622",
       "siteFaction": "aeldari",
-      "siteId": "webway-gate"
+      "siteId": "cobra"
+     },
+     {
+      "id": "000000629",
+      "siteFaction": "aeldari",
+      "siteId": "corsair-cloud-dancer-band"
+     },
+     {
+      "id": "000000632",
+      "siteFaction": "aeldari",
+      "siteId": "corsair-reaver-band"
+     },
+     {
+      "id": "000004196",
+      "siteFaction": "aeldari",
+      "siteId": "corsair-skyreavers"
      },
      {
       "id": "000002531",
@@ -1483,24 +1296,19 @@
       "siteId": "corsair-voidscarred"
      },
      {
-      "id": "000002533",
+      "id": "000000603",
       "siteFaction": "aeldari",
-      "siteId": "shroud-runners"
+      "siteId": "crimson-hunter"
      },
      {
-      "id": "000002534",
+      "id": "000003910",
       "siteFaction": "aeldari",
-      "siteId": "troupe-master"
+      "siteId": "d-cannon-platform"
      },
      {
-      "id": "000002535",
+      "id": "000000607",
       "siteFaction": "aeldari",
-      "siteId": "shadowseer"
-     },
-     {
-      "id": "000002536",
-      "siteFaction": "aeldari",
-      "siteId": "troupe"
+      "siteId": "dark-reapers"
      },
      {
       "id": "000002537",
@@ -1508,9 +1316,189 @@
       "siteId": "death-jester"
      },
      {
-      "id": "000002538",
+      "id": "000000593",
       "siteFaction": "aeldari",
-      "siteId": "solitaire"
+      "siteId": "dire-avengers"
+     },
+     {
+      "id": "000004235",
+      "siteFaction": "aeldari",
+      "siteId": "dragon-knights"
+     },
+     {
+      "id": "000000568",
+      "siteFaction": "aeldari",
+      "siteId": "eldrad-ulthran"
+     },
+     {
+      "id": "000000609",
+      "siteFaction": "aeldari",
+      "siteId": "falcon"
+     },
+     {
+      "id": "000000582",
+      "siteFaction": "aeldari",
+      "siteId": "farseer"
+     },
+     {
+      "id": "000000583",
+      "siteFaction": "aeldari",
+      "siteId": "farseer-skyrunner"
+     },
+     {
+      "id": "000000596",
+      "siteFaction": "aeldari",
+      "siteId": "fire-dragons"
+     },
+     {
+      "id": "000000610",
+      "siteFaction": "aeldari",
+      "siteId": "fire-prism"
+     },
+     {
+      "id": "000001393",
+      "siteFaction": "aeldari",
+      "siteId": "firestorm"
+     },
+     {
+      "id": "000000574",
+      "siteFaction": "aeldari",
+      "siteId": "fuegan"
+     },
+     {
+      "id": "000000589",
+      "siteFaction": "aeldari",
+      "siteId": "guardian-defenders"
+     },
+     {
+      "id": "000000606",
+      "siteFaction": "aeldari",
+      "siteId": "hemlock-wraithfighter"
+     },
+     {
+      "id": "000000618",
+      "siteFaction": "aeldari",
+      "siteId": "hornet"
+     },
+     {
+      "id": "000000594",
+      "siteFaction": "aeldari",
+      "siteId": "howling-banshees"
+     },
+     {
+      "id": "000000570",
+      "siteFaction": "aeldari",
+      "siteId": "illic-nightspear"
+     },
+     {
+      "id": "000000630",
+      "siteFaction": "aeldari",
+      "siteId": "irillyth"
+     },
+     {
+      "id": "000000572",
+      "siteFaction": "aeldari",
+      "siteId": "jain-zar"
+     },
+     {
+      "id": "000000573",
+      "siteFaction": "aeldari",
+      "siteId": "karandras"
+     },
+     {
+      "id": "000004194",
+      "siteFaction": "aeldari",
+      "siteId": "kharseth"
+     },
+     {
+      "id": "000004236",
+      "siteFaction": "aeldari",
+      "siteId": "leystalker"
+     },
+     {
+      "id": "000003909",
+      "siteFaction": "aeldari",
+      "siteId": "lhykhis"
+     },
+     {
+      "id": "000000620",
+      "siteFaction": "aeldari",
+      "siteId": "lynx"
+     },
+     {
+      "id": "000000576",
+      "siteFaction": "aeldari",
+      "siteId": "maugan-ra"
+     },
+     {
+      "id": "000000611",
+      "siteFaction": "aeldari",
+      "siteId": "night-spinner"
+     },
+     {
+      "id": "000000623",
+      "siteFaction": "aeldari",
+      "siteId": "nightwing"
+     },
+     {
+      "id": "000000631",
+      "siteFaction": "aeldari",
+      "siteId": "phantom-titan"
+     },
+     {
+      "id": "000000624",
+      "siteFaction": "aeldari",
+      "siteId": "phoenix"
+     },
+     {
+      "id": "000004193",
+      "siteFaction": "aeldari",
+      "siteId": "prince-yriel"
+     },
+     {
+      "id": "000000592",
+      "siteFaction": "aeldari",
+      "siteId": "rangers"
+     },
+     {
+      "id": "000000628",
+      "siteFaction": "aeldari",
+      "siteId": "revenant-titan"
+     },
+     {
+      "id": "000000621",
+      "siteFaction": "aeldari",
+      "siteId": "scorpion"
+     },
+     {
+      "id": "000000615",
+      "siteFaction": "aeldari",
+      "siteId": "shadow-spectres"
+     },
+     {
+      "id": "000003911",
+      "siteFaction": "aeldari",
+      "siteId": "shadow-weaver-platform"
+     },
+     {
+      "id": "000002535",
+      "siteFaction": "aeldari",
+      "siteId": "shadowseer"
+     },
+     {
+      "id": "000000602",
+      "siteFaction": "aeldari",
+      "siteId": "shining-spears"
+     },
+     {
+      "id": "000002533",
+      "siteFaction": "aeldari",
+      "siteId": "shroud-runners"
+     },
+     {
+      "id": "000000627",
+      "siteFaction": "aeldari",
+      "siteId": "skathach-wraithknight"
      },
      {
       "id": "000002539",
@@ -1518,9 +1506,19 @@
       "siteId": "skyweavers"
      },
      {
-      "id": "000002540",
+      "id": "000002538",
       "siteFaction": "aeldari",
-      "siteId": "voidweaver"
+      "siteId": "solitaire"
+     },
+     {
+      "id": "000000588",
+      "siteFaction": "aeldari",
+      "siteId": "spiritseer"
+     },
+     {
+      "id": "000004195",
+      "siteFaction": "aeldari",
+      "siteId": "starfangs"
      },
      {
       "id": "000002541",
@@ -1528,9 +1526,24 @@
       "siteId": "starweaver"
      },
      {
-      "id": "000002542",
+      "id": "000004237",
       "siteFaction": "aeldari",
-      "siteId": "yvraine"
+      "siteId": "stonesinger"
+     },
+     {
+      "id": "000000590",
+      "siteFaction": "aeldari",
+      "siteId": "storm-guardians"
+     },
+     {
+      "id": "000000595",
+      "siteFaction": "aeldari",
+      "siteId": "striking-scorpions"
+     },
+     {
+      "id": "000000600",
+      "siteFaction": "aeldari",
+      "siteId": "swooping-hawks"
      },
      {
       "id": "000002543",
@@ -1543,24 +1556,24 @@
       "siteId": "the-yncarne"
      },
      {
-      "id": "000002759",
+      "id": "000002536",
       "siteFaction": "aeldari",
-      "siteId": "autarch-wayleaper"
+      "siteId": "troupe"
      },
      {
-      "id": "000003909",
+      "id": "000002534",
       "siteFaction": "aeldari",
-      "siteId": "lhykhis"
+      "siteId": "troupe-master"
      },
      {
-      "id": "000003910",
+      "id": "000000626",
       "siteFaction": "aeldari",
-      "siteId": "d-cannon-platform"
+      "siteId": "vampire-hunter"
      },
      {
-      "id": "000003911",
+      "id": "000000625",
       "siteFaction": "aeldari",
-      "siteId": "shadow-weaver-platform"
+      "siteId": "vampire-raider"
      },
      {
       "id": "000003912",
@@ -1568,9 +1581,94 @@
       "siteId": "vibro-cannon-platform"
      },
      {
+      "id": "000002540",
+      "siteFaction": "aeldari",
+      "siteId": "voidweaver"
+     },
+     {
+      "id": "000000605",
+      "siteFaction": "aeldari",
+      "siteId": "vypers"
+     },
+     {
+      "id": "000000612",
+      "siteFaction": "aeldari",
+      "siteId": "war-walkers"
+     },
+     {
+      "id": "000000585",
+      "siteFaction": "aeldari",
+      "siteId": "warlock"
+     },
+     {
+      "id": "000000584",
+      "siteFaction": "aeldari",
+      "siteId": "warlock-conclave"
+     },
+     {
+      "id": "000000587",
+      "siteFaction": "aeldari",
+      "siteId": "warlock-skyrunners"
+     },
+     {
+      "id": "000000619",
+      "siteFaction": "aeldari",
+      "siteId": "warp-hunter"
+     },
+     {
+      "id": "000000601",
+      "siteFaction": "aeldari",
+      "siteId": "warp-spiders"
+     },
+     {
+      "id": "000000616",
+      "siteFaction": "aeldari",
+      "siteId": "wasp-assault-walker"
+     },
+     {
+      "id": "000000599",
+      "siteFaction": "aeldari",
+      "siteId": "wave-serpent"
+     },
+     {
+      "id": "000002459",
+      "siteFaction": "aeldari",
+      "siteId": "webway-gate"
+     },
+     {
+      "id": "000000591",
+      "siteFaction": "aeldari",
+      "siteId": "windriders"
+     },
+     {
+      "id": "000000598",
+      "siteFaction": "aeldari",
+      "siteId": "wraithblades"
+     },
+     {
+      "id": "000000597",
+      "siteFaction": "aeldari",
+      "siteId": "wraithguard"
+     },
+     {
+      "id": "000000614",
+      "siteFaction": "aeldari",
+      "siteId": "wraithknight"
+     },
+     {
       "id": "000003913",
       "siteFaction": "aeldari",
       "siteId": "wraithknight-with-ghostglaive"
+     },
+     {
+      "id": "000000613",
+      "siteFaction": "aeldari",
+      "siteId": "wraithlord"
+     },
+     {
+      "id": "000000617",
+      "siteFaction": "aeldari",
+      "siteId": "wraithseer"
      },
      {
       "id": "000003914",
@@ -1578,9 +1676,9 @@
       "siteId": "ynnari-archon"
      },
      {
-      "id": "000003915",
+      "id": "000003918",
       "siteFaction": "aeldari",
-      "siteId": "ynnari-succubus"
+      "siteId": "ynnari-incubi"
      },
      {
       "id": "000003916",
@@ -1588,14 +1686,9 @@
       "siteId": "ynnari-kabalite-warriors"
      },
      {
-      "id": "000003917",
+      "id": "000003920",
       "siteFaction": "aeldari",
-      "siteId": "ynnari-wyches"
-     },
-     {
-      "id": "000003918",
-      "siteFaction": "aeldari",
-      "siteId": "ynnari-incubi"
+      "siteId": "ynnari-raider"
      },
      {
       "id": "000003919",
@@ -1603,9 +1696,9 @@
       "siteId": "ynnari-reavers"
      },
      {
-      "id": "000003920",
+      "id": "000003915",
       "siteFaction": "aeldari",
-      "siteId": "ynnari-raider"
+      "siteId": "ynnari-succubus"
      },
      {
       "id": "000003921",
@@ -1613,44 +1706,14 @@
       "siteId": "ynnari-venom"
      },
      {
-      "id": "000004193",
+      "id": "000003917",
       "siteFaction": "aeldari",
-      "siteId": "prince-yriel"
+      "siteId": "ynnari-wyches"
      },
      {
-      "id": "000004194",
+      "id": "000002542",
       "siteFaction": "aeldari",
-      "siteId": "kharseth"
-     },
-     {
-      "id": "000004195",
-      "siteFaction": "aeldari",
-      "siteId": "starfangs"
-     },
-     {
-      "id": "000004196",
-      "siteFaction": "aeldari",
-      "siteId": "corsair-skyreavers"
-     },
-     {
-      "id": "000004235",
-      "siteFaction": "aeldari",
-      "siteId": "dragon-knights"
-     },
-     {
-      "id": "000004236",
-      "siteFaction": "aeldari",
-      "siteId": "leystalker"
-     },
-     {
-      "id": "000004237",
-      "siteFaction": "aeldari",
-      "siteId": "stonesinger"
-     },
-     {
-      "id": "000004238",
-      "siteFaction": "aeldari",
-      "siteId": "clanblade"
+      "siteId": "yvraine"
      }
     ],
     "counts": {
@@ -3043,12 +3106,12 @@
      "outdated": 0
     },
     "enhancements": {
-     "same": 27,
+     "same": 28,
      "points": 0,
      "newOnSite": 0,
      "missingOnSite": 0,
-     "possibleRenames": 1,
-     "outdated": 0
+     "possibleRenames": 0,
+     "outdated": 1
     }
    },
    "datasheets": {
@@ -3067,29 +3130,9 @@
     "same": 20,
     "pairs": [
      {
-      "id": "000001094",
+      "id": "000001662",
       "siteFaction": "chaos-knights",
-      "siteId": "chaos-cerastus-knight-acheron"
-     },
-     {
-      "id": "000001095",
-      "siteFaction": "chaos-knights",
-      "siteId": "chaos-cerastus-knight-lancer"
-     },
-     {
-      "id": "000001096",
-      "siteFaction": "chaos-knights",
-      "siteId": "chaos-cerastus-knight-castigator"
-     },
-     {
-      "id": "000001097",
-      "siteFaction": "chaos-knights",
-      "siteId": "chaos-cerastus-knight-atrapos"
-     },
-     {
-      "id": "000001098",
-      "siteFaction": "chaos-knights",
-      "siteId": "chaos-questoris-knight-magaera"
+      "siteId": "chaos-acastus-knight-asterius"
      },
      {
       "id": "000001099",
@@ -3097,64 +3140,34 @@
       "siteId": "chaos-acastus-knight-porphyrion"
      },
      {
+      "id": "000001094",
+      "siteFaction": "chaos-knights",
+      "siteId": "chaos-cerastus-knight-acheron"
+     },
+     {
+      "id": "000001097",
+      "siteFaction": "chaos-knights",
+      "siteId": "chaos-cerastus-knight-atrapos"
+     },
+     {
+      "id": "000001096",
+      "siteFaction": "chaos-knights",
+      "siteId": "chaos-cerastus-knight-castigator"
+     },
+     {
+      "id": "000001095",
+      "siteFaction": "chaos-knights",
+      "siteId": "chaos-cerastus-knight-lancer"
+     },
+     {
+      "id": "000001098",
+      "siteFaction": "chaos-knights",
+      "siteId": "chaos-questoris-knight-magaera"
+     },
+     {
       "id": "000001100",
       "siteFaction": "chaos-knights",
       "siteId": "chaos-questoris-knight-styrix"
-     },
-     {
-      "id": "000001658",
-      "siteFaction": "chaos-knights",
-      "siteId": "knight-despoiler"
-     },
-     {
-      "id": "000001659",
-      "siteFaction": "chaos-knights",
-      "siteId": "knight-tyrant"
-     },
-     {
-      "id": "000001660",
-      "siteFaction": "chaos-knights",
-      "siteId": "knight-desecrator"
-     },
-     {
-      "id": "000001661",
-      "siteFaction": "chaos-knights",
-      "siteId": "knight-rampager"
-     },
-     {
-      "id": "000001662",
-      "siteFaction": "chaos-knights",
-      "siteId": "chaos-acastus-knight-asterius"
-     },
-     {
-      "id": "000001663",
-      "siteFaction": "chaos-knights",
-      "siteId": "war-dog-moirax"
-     },
-     {
-      "id": "000002562",
-      "siteFaction": "chaos-knights",
-      "siteId": "war-dog-executioner"
-     },
-     {
-      "id": "000002563",
-      "siteFaction": "chaos-knights",
-      "siteId": "war-dog-stalker"
-     },
-     {
-      "id": "000002564",
-      "siteFaction": "chaos-knights",
-      "siteId": "war-dog-karnivore"
-     },
-     {
-      "id": "000002565",
-      "siteFaction": "chaos-knights",
-      "siteId": "war-dog-brigand"
-     },
-     {
-      "id": "000002566",
-      "siteFaction": "chaos-knights",
-      "siteId": "war-dog-huntsman"
      },
      {
       "id": "000002567",
@@ -3162,9 +3175,59 @@
       "siteId": "knight-abominant"
      },
      {
+      "id": "000001660",
+      "siteFaction": "chaos-knights",
+      "siteId": "knight-desecrator"
+     },
+     {
+      "id": "000001658",
+      "siteFaction": "chaos-knights",
+      "siteId": "knight-despoiler"
+     },
+     {
+      "id": "000001661",
+      "siteFaction": "chaos-knights",
+      "siteId": "knight-rampager"
+     },
+     {
       "id": "000004134",
       "siteFaction": "chaos-knights",
       "siteId": "knight-ruinator"
+     },
+     {
+      "id": "000001659",
+      "siteFaction": "chaos-knights",
+      "siteId": "knight-tyrant"
+     },
+     {
+      "id": "000002565",
+      "siteFaction": "chaos-knights",
+      "siteId": "war-dog-brigand"
+     },
+     {
+      "id": "000002562",
+      "siteFaction": "chaos-knights",
+      "siteId": "war-dog-executioner"
+     },
+     {
+      "id": "000002566",
+      "siteFaction": "chaos-knights",
+      "siteId": "war-dog-huntsman"
+     },
+     {
+      "id": "000002564",
+      "siteFaction": "chaos-knights",
+      "siteId": "war-dog-karnivore"
+     },
+     {
+      "id": "000001663",
+      "siteFaction": "chaos-knights",
+      "siteId": "war-dog-moirax"
+     },
+     {
+      "id": "000002563",
+      "siteFaction": "chaos-knights",
+      "siteId": "war-dog-stalker"
      }
     ],
     "counts": {
@@ -3194,16 +3257,15 @@
      "pointsChanged": [],
      "newOnSite": [],
      "missingOnSite": [],
-     "outdated": [],
-     "possibleRenames": [
+     "outdated": [
       {
        "detachment": "Houndpack Lance",
-       "ours": "Panoply of the Cursed Knight",
-       "site": "Panoply of the Cursed Knights",
-       "points": 15
+       "name": "Panoply of the Cursed Knight",
+       "ours": 15
       }
      ],
-     "same": 27
+     "possibleRenames": [],
+     "same": 28
     },
     "same": 8,
     "counts": {
@@ -4863,49 +4925,24 @@
     "same": 23,
     "pairs": [
      {
-      "id": "000004077",
-      "siteFaction": "emperors-children",
-      "siteId": "fulgrim"
-     },
-     {
-      "id": "000004078",
-      "siteFaction": "emperors-children",
-      "siteId": "lord-exultant"
-     },
-     {
-      "id": "000004079",
-      "siteFaction": "emperors-children",
-      "siteId": "tormentors"
-     },
-     {
-      "id": "000004080",
-      "siteFaction": "emperors-children",
-      "siteId": "infractors"
-     },
-     {
-      "id": "000004081",
-      "siteFaction": "emperors-children",
-      "siteId": "chaos-terminators"
-     },
-     {
       "id": "000004082",
       "siteFaction": "emperors-children",
       "siteId": "chaos-land-raider"
      },
      {
-      "id": "000004083",
+      "id": "000004093",
       "siteFaction": "emperors-children",
-      "siteId": "lucius-the-eternal"
+      "siteId": "chaos-rhino"
      },
      {
-      "id": "000004084",
+      "id": "000004090",
       "siteFaction": "emperors-children",
-      "siteId": "lord-kakophonist"
+      "siteId": "chaos-spawn"
      },
      {
-      "id": "000004085",
+      "id": "000004081",
       "siteFaction": "emperors-children",
-      "siteId": "sorcerer"
+      "siteId": "chaos-terminators"
      },
      {
       "id": "000004086",
@@ -4918,44 +4955,14 @@
       "siteId": "daemon-prince-of-slaanesh-with-wings"
      },
      {
-      "id": "000004088",
-      "siteFaction": "emperors-children",
-      "siteId": "noise-marines"
-     },
-     {
-      "id": "000004089",
-      "siteFaction": "emperors-children",
-      "siteId": "flawless-blades"
-     },
-     {
-      "id": "000004090",
-      "siteFaction": "emperors-children",
-      "siteId": "chaos-spawn"
-     },
-     {
-      "id": "000004091",
-      "siteFaction": "emperors-children",
-      "siteId": "maulerfiend"
-     },
-     {
-      "id": "000004092",
-      "siteFaction": "emperors-children",
-      "siteId": "heldrake"
-     },
-     {
-      "id": "000004093",
-      "siteFaction": "emperors-children",
-      "siteId": "chaos-rhino"
-     },
-     {
-      "id": "000004094",
-      "siteFaction": "emperors-children",
-      "siteId": "shalaxi-helbane"
-     },
-     {
       "id": "000004095",
       "siteFaction": "emperors-children",
       "siteId": "daemonettes"
+     },
+     {
+      "id": "000004208",
+      "siteFaction": "emperors-children",
+      "siteId": "defiler"
      },
      {
       "id": "000004096",
@@ -4963,9 +4970,54 @@
       "siteId": "fiends"
      },
      {
+      "id": "000004089",
+      "siteFaction": "emperors-children",
+      "siteId": "flawless-blades"
+     },
+     {
+      "id": "000004077",
+      "siteFaction": "emperors-children",
+      "siteId": "fulgrim"
+     },
+     {
+      "id": "000004092",
+      "siteFaction": "emperors-children",
+      "siteId": "heldrake"
+     },
+     {
+      "id": "000004080",
+      "siteFaction": "emperors-children",
+      "siteId": "infractors"
+     },
+     {
       "id": "000004097",
       "siteFaction": "emperors-children",
       "siteId": "keeper-of-secrets"
+     },
+     {
+      "id": "000004078",
+      "siteFaction": "emperors-children",
+      "siteId": "lord-exultant"
+     },
+     {
+      "id": "000004084",
+      "siteFaction": "emperors-children",
+      "siteId": "lord-kakophonist"
+     },
+     {
+      "id": "000004083",
+      "siteFaction": "emperors-children",
+      "siteId": "lucius-the-eternal"
+     },
+     {
+      "id": "000004091",
+      "siteFaction": "emperors-children",
+      "siteId": "maulerfiend"
+     },
+     {
+      "id": "000004088",
+      "siteFaction": "emperors-children",
+      "siteId": "noise-marines"
      },
      {
       "id": "000004098",
@@ -4973,9 +5025,19 @@
       "siteId": "seekers"
      },
      {
-      "id": "000004208",
+      "id": "000004094",
       "siteFaction": "emperors-children",
-      "siteId": "defiler"
+      "siteId": "shalaxi-helbane"
+     },
+     {
+      "id": "000004085",
+      "siteFaction": "emperors-children",
+      "siteId": "sorcerer"
+     },
+     {
+      "id": "000004079",
+      "siteFaction": "emperors-children",
+      "siteId": "tormentors"
      }
     ],
     "counts": {
@@ -5065,16 +5127,16 @@
      "changed": 0
     },
     "detachments": {
-     "ours": 9,
+     "ours": 10,
      "site": 9,
-     "matched": 8,
+     "matched": 9,
      "dp": 0,
-     "newOnSite": 1,
-     "missingOnSite": 1,
-     "outdated": 0
+     "newOnSite": 0,
+     "missingOnSite": 0,
+     "outdated": 1
     },
     "enhancements": {
-     "same": 26,
+     "same": 30,
      "points": 0,
      "newOnSite": 0,
      "missingOnSite": 0,
@@ -5098,59 +5160,9 @@
     "same": 25,
     "pairs": [
      {
-      "id": "000000507",
-      "siteFaction": "genestealer-cults",
-      "siteId": "patriarch"
-     },
-     {
-      "id": "000000508",
-      "siteFaction": "genestealer-cults",
-      "siteId": "magus"
-     },
-     {
-      "id": "000000509",
-      "siteFaction": "genestealer-cults",
-      "siteId": "primus"
-     },
-     {
-      "id": "000000510",
-      "siteFaction": "genestealer-cults",
-      "siteId": "acolyte-iconward"
-     },
-     {
-      "id": "000000511",
-      "siteFaction": "genestealer-cults",
-      "siteId": "acolyte-hybrids-with-autopistols"
-     },
-     {
-      "id": "000000512",
-      "siteFaction": "genestealer-cults",
-      "siteId": "neophyte-hybrids"
-     },
-     {
-      "id": "000000513",
-      "siteFaction": "genestealer-cults",
-      "siteId": "hybrid-metamorphs"
-     },
-     {
       "id": "000000514",
       "siteFaction": "genestealer-cults",
       "siteId": "aberrants"
-     },
-     {
-      "id": "000000515",
-      "siteFaction": "genestealer-cults",
-      "siteId": "purestrain-genestealers"
-     },
-     {
-      "id": "000000516",
-      "siteFaction": "genestealer-cults",
-      "siteId": "goliath-truck"
-     },
-     {
-      "id": "000000521",
-      "siteFaction": "genestealer-cults",
-      "siteId": "goliath-rockgrinder"
      },
      {
       "id": "000001546",
@@ -5158,44 +5170,24 @@
       "siteId": "abominant"
      },
      {
-      "id": "000001565",
-      "siteFaction": "genestealer-cults",
-      "siteId": "jackal-alphus"
-     },
-     {
-      "id": "000001567",
-      "siteFaction": "genestealer-cults",
-      "siteId": "clamavus"
-     },
-     {
-      "id": "000001568",
-      "siteFaction": "genestealer-cults",
-      "siteId": "locus"
-     },
-     {
-      "id": "000001569",
-      "siteFaction": "genestealer-cults",
-      "siteId": "sanctus"
-     },
-     {
-      "id": "000001570",
-      "siteFaction": "genestealer-cults",
-      "siteId": "kelermorph"
-     },
-     {
-      "id": "000001571",
-      "siteFaction": "genestealer-cults",
-      "siteId": "nexos"
-     },
-     {
-      "id": "000001572",
-      "siteFaction": "genestealer-cults",
-      "siteId": "biophagus"
-     },
-     {
       "id": "000001573",
       "siteFaction": "genestealer-cults",
       "siteId": "achilles-ridgerunners"
+     },
+     {
+      "id": "000000511",
+      "siteFaction": "genestealer-cults",
+      "siteId": "acolyte-hybrids-with-autopistols"
+     },
+     {
+      "id": "000003716",
+      "siteFaction": "genestealer-cults",
+      "siteId": "acolyte-hybrids-with-hand-flamers"
+     },
+     {
+      "id": "000000510",
+      "siteFaction": "genestealer-cults",
+      "siteId": "acolyte-iconward"
      },
      {
       "id": "000001574",
@@ -5203,9 +5195,79 @@
       "siteId": "atalan-jackals"
      },
      {
-      "id": "000001576",
+      "id": "000003715",
       "siteFaction": "genestealer-cults",
-      "siteId": "tectonic-fragdrill"
+      "siteId": "benefictus"
+     },
+     {
+      "id": "000001572",
+      "siteFaction": "genestealer-cults",
+      "siteId": "biophagus"
+     },
+     {
+      "id": "000001567",
+      "siteFaction": "genestealer-cults",
+      "siteId": "clamavus"
+     },
+     {
+      "id": "000000521",
+      "siteFaction": "genestealer-cults",
+      "siteId": "goliath-rockgrinder"
+     },
+     {
+      "id": "000000516",
+      "siteFaction": "genestealer-cults",
+      "siteId": "goliath-truck"
+     },
+     {
+      "id": "000000513",
+      "siteFaction": "genestealer-cults",
+      "siteId": "hybrid-metamorphs"
+     },
+     {
+      "id": "000001565",
+      "siteFaction": "genestealer-cults",
+      "siteId": "jackal-alphus"
+     },
+     {
+      "id": "000001570",
+      "siteFaction": "genestealer-cults",
+      "siteId": "kelermorph"
+     },
+     {
+      "id": "000001568",
+      "siteFaction": "genestealer-cults",
+      "siteId": "locus"
+     },
+     {
+      "id": "000000508",
+      "siteFaction": "genestealer-cults",
+      "siteId": "magus"
+     },
+     {
+      "id": "000000512",
+      "siteFaction": "genestealer-cults",
+      "siteId": "neophyte-hybrids"
+     },
+     {
+      "id": "000001571",
+      "siteFaction": "genestealer-cults",
+      "siteId": "nexos"
+     },
+     {
+      "id": "000000507",
+      "siteFaction": "genestealer-cults",
+      "siteId": "patriarch"
+     },
+     {
+      "id": "000000509",
+      "siteFaction": "genestealer-cults",
+      "siteId": "primus"
+     },
+     {
+      "id": "000000515",
+      "siteFaction": "genestealer-cults",
+      "siteId": "purestrain-genestealers"
      },
      {
       "id": "000002525",
@@ -5213,14 +5275,14 @@
       "siteId": "reductus-saboteur"
      },
      {
-      "id": "000003715",
+      "id": "000001569",
       "siteFaction": "genestealer-cults",
-      "siteId": "benefictus"
+      "siteId": "sanctus"
      },
      {
-      "id": "000003716",
+      "id": "000001576",
       "siteFaction": "genestealer-cults",
-      "siteId": "acolyte-hybrids-with-hand-flamers"
+      "siteId": "tectonic-fragdrill"
      }
     ],
     "counts": {
@@ -5243,35 +5305,27 @@
    },
    "detachments": {
     "dpChanged": [],
-    "missingOnSite": [
+    "missingOnSite": [],
+    "outdated": [
      {
       "id": "000000888",
       "name": "Brood Brother Auxilia"
      }
     ],
-    "outdated": [],
-    "newOnSite": [
-     {
-      "siteId": "brood-brothers-auxilia",
-      "name": "Brood Brothers Auxilia",
-      "faction": "genestealer-cults",
-      "dp": 2,
-      "enhancements": 4
-     }
-    ],
+    "newOnSite": [],
     "enhancements": {
      "pointsChanged": [],
      "newOnSite": [],
      "missingOnSite": [],
      "outdated": [],
      "possibleRenames": [],
-     "same": 26
+     "same": 30
     },
-    "same": 8,
+    "same": 9,
     "counts": {
-     "ours": 9,
+     "ours": 10,
      "site": 9,
-     "matched": 8
+     "matched": 9
     }
    }
   },
@@ -5337,7 +5391,7 @@
      "newOnSite": 0,
      "missingOnSite": 0,
      "possibleRenames": 0,
-     "outdated": 0
+     "outdated": 2
     }
    },
    "datasheets": {
@@ -5356,21 +5410,6 @@
     "same": 31,
     "pairs": [
      {
-      "id": "000000373",
-      "siteFaction": "grey-knights",
-      "siteId": "kaldor-draigo"
-     },
-     {
-      "id": "000000374",
-      "siteFaction": "grey-knights",
-      "siteId": "grand-master-voldus"
-     },
-     {
-      "id": "000000375",
-      "siteFaction": "grey-knights",
-      "siteId": "grand-master"
-     },
-     {
       "id": "000000376",
       "siteFaction": "grey-knights",
       "siteId": "brother-captain"
@@ -5386,14 +5425,19 @@
       "siteId": "brotherhood-champion"
      },
      {
-      "id": "000000380",
+      "id": "000001362",
       "siteFaction": "grey-knights",
-      "siteId": "castellan-crowe"
+      "siteId": "brotherhood-chaplain"
      },
      {
-      "id": "000000381",
+      "id": "000001361",
       "siteFaction": "grey-knights",
-      "siteId": "strike-squad"
+      "siteId": "brotherhood-librarian"
+     },
+     {
+      "id": "000000399",
+      "siteFaction": "grey-knights",
+      "siteId": "brotherhood-techmarine"
      },
      {
       "id": "000000382",
@@ -5401,14 +5445,39 @@
       "siteId": "brotherhood-terminator-squad"
      },
      {
-      "id": "000000383",
+      "id": "000000380",
       "siteFaction": "grey-knights",
-      "siteId": "purifier-squad"
+      "siteId": "castellan-crowe"
      },
      {
-      "id": "000000384",
+      "id": "000000375",
       "siteFaction": "grey-knights",
-      "siteId": "paladin-squad"
+      "siteId": "grand-master"
+     },
+     {
+      "id": "000001360",
+      "siteFaction": "grey-knights",
+      "siteId": "grand-master-in-nemesis-dreadknight"
+     },
+     {
+      "id": "000000374",
+      "siteFaction": "grey-knights",
+      "siteId": "grand-master-voldus"
+     },
+     {
+      "id": "000000390",
+      "siteFaction": "grey-knights",
+      "siteId": "grey-knights-dreadnought"
+     },
+     {
+      "id": "000002768",
+      "siteFaction": "grey-knights",
+      "siteId": "grey-knights-relic-razorback"
+     },
+     {
+      "id": "000001197",
+      "siteFaction": "grey-knights",
+      "siteId": "grey-knights-thunderhawk-gunship"
      },
      {
       "id": "000000387",
@@ -5416,19 +5485,9 @@
       "siteId": "interceptor-squad"
      },
      {
-      "id": "000000388",
+      "id": "000000373",
       "siteFaction": "grey-knights",
-      "siteId": "purgation-squad"
-     },
-     {
-      "id": "000000389",
-      "siteFaction": "grey-knights",
-      "siteId": "nemesis-dreadknight"
-     },
-     {
-      "id": "000000390",
-      "siteFaction": "grey-knights",
-      "siteId": "grey-knights-dreadnought"
+      "siteId": "kaldor-draigo"
      },
      {
       "id": "000000391",
@@ -5446,6 +5505,26 @@
       "siteId": "land-raider-redeemer"
      },
      {
+      "id": "000000389",
+      "siteFaction": "grey-knights",
+      "siteId": "nemesis-dreadknight"
+     },
+     {
+      "id": "000000384",
+      "siteFaction": "grey-knights",
+      "siteId": "paladin-squad"
+     },
+     {
+      "id": "000000388",
+      "siteFaction": "grey-knights",
+      "siteId": "purgation-squad"
+     },
+     {
+      "id": "000000383",
+      "siteFaction": "grey-knights",
+      "siteId": "purifier-squad"
+     },
+     {
       "id": "000000395",
       "siteFaction": "grey-knights",
       "siteId": "razorback"
@@ -5461,44 +5540,14 @@
       "siteId": "servitors"
      },
      {
-      "id": "000000398",
-      "siteFaction": "grey-knights",
-      "siteId": "stormraven-gunship"
-     },
-     {
-      "id": "000000399",
-      "siteFaction": "grey-knights",
-      "siteId": "brotherhood-techmarine"
-     },
-     {
-      "id": "000000400",
-      "siteFaction": "grey-knights",
-      "siteId": "venerable-dreadnought"
-     },
-     {
-      "id": "000001197",
-      "siteFaction": "grey-knights",
-      "siteId": "grey-knights-thunderhawk-gunship"
-     },
-     {
-      "id": "000001360",
-      "siteFaction": "grey-knights",
-      "siteId": "grand-master-in-nemesis-dreadknight"
-     },
-     {
-      "id": "000001361",
-      "siteFaction": "grey-knights",
-      "siteId": "brotherhood-librarian"
-     },
-     {
-      "id": "000001362",
-      "siteFaction": "grey-knights",
-      "siteId": "brotherhood-chaplain"
-     },
-     {
       "id": "000001363",
       "siteFaction": "grey-knights",
       "siteId": "stormhawk-interceptor"
+     },
+     {
+      "id": "000000398",
+      "siteFaction": "grey-knights",
+      "siteId": "stormraven-gunship"
      },
      {
       "id": "000001364",
@@ -5506,9 +5555,14 @@
       "siteId": "stormtalon-gunship"
      },
      {
-      "id": "000002768",
+      "id": "000000381",
       "siteFaction": "grey-knights",
-      "siteId": "grey-knights-relic-razorback"
+      "siteId": "strike-squad"
+     },
+     {
+      "id": "000000400",
+      "siteFaction": "grey-knights",
+      "siteId": "venerable-dreadnought"
      }
     ],
     "counts": {
@@ -5538,7 +5592,18 @@
      "pointsChanged": [],
      "newOnSite": [],
      "missingOnSite": [],
-     "outdated": [],
+     "outdated": [
+      {
+       "detachment": "Banishers",
+       "name": "The Ephemeral Tome",
+       "ours": 15
+      },
+      {
+       "detachment": "Banishers",
+       "name": "The Sixty-sixth Seal",
+       "ours": 25
+      }
+     ],
      "possibleRenames": [],
      "same": 30
     },
@@ -6214,12 +6279,12 @@
      "outdated": 0
     },
     "enhancements": {
-     "same": 33,
+     "same": 34,
      "points": 0,
      "newOnSite": 0,
      "missingOnSite": 0,
-     "possibleRenames": 1,
-     "outdated": 0
+     "possibleRenames": 0,
+     "outdated": 1
     }
    },
    "datasheets": {
@@ -6238,24 +6303,14 @@
     "same": 22,
     "pairs": [
      {
-      "id": "000002593",
+      "id": "000004142",
       "siteFaction": "leagues-of-votann",
-      "siteId": "thar-the-destined"
+      "siteId": "arkanyst-evaluator"
      },
      {
-      "id": "000002594",
+      "id": "000004201",
       "siteFaction": "leagues-of-votann",
-      "siteId": "k-hl"
-     },
-     {
-      "id": "000002595",
-      "siteFaction": "leagues-of-votann",
-      "siteId": "einhyr-champion"
-     },
-     {
-      "id": "000002596",
-      "siteFaction": "leagues-of-votann",
-      "siteId": "grimnyr"
+      "siteId": "berehk-stornbr-w"
      },
      {
       "id": "000002597",
@@ -6263,44 +6318,9 @@
       "siteId": "br-khyr-iron-master"
      },
      {
-      "id": "000002598",
-      "siteFaction": "leagues-of-votann",
-      "siteId": "hearthkyn-warriors"
-     },
-     {
-      "id": "000002599",
-      "siteFaction": "leagues-of-votann",
-      "siteId": "einhyr-hearthguard"
-     },
-     {
-      "id": "000002600",
-      "siteFaction": "leagues-of-votann",
-      "siteId": "cthonian-beserks"
-     },
-     {
-      "id": "000002601",
-      "siteFaction": "leagues-of-votann",
-      "siteId": "hernkyn-pioneers"
-     },
-     {
-      "id": "000002602",
-      "siteFaction": "leagues-of-votann",
-      "siteId": "sagitaur"
-     },
-     {
       "id": "000002603",
       "siteFaction": "leagues-of-votann",
       "siteId": "br-khyr-thunderkyn"
-     },
-     {
-      "id": "000002604",
-      "siteFaction": "leagues-of-votann",
-      "siteId": "hekaton-land-fortress"
-     },
-     {
-      "id": "000003710",
-      "siteFaction": "leagues-of-votann",
-      "siteId": "hernkyn-yaegirs"
      },
      {
       "id": "000004140",
@@ -6308,14 +6328,49 @@
       "siteId": "buri-aegnirssen"
      },
      {
-      "id": "000004141",
+      "id": "000002600",
       "siteFaction": "leagues-of-votann",
-      "siteId": "memnyr-strategist"
+      "siteId": "cthonian-beserks"
      },
      {
-      "id": "000004142",
+      "id": "000004145",
       "siteFaction": "leagues-of-votann",
-      "siteId": "arkanyst-evaluator"
+      "siteId": "cthonian-earthshakers"
+     },
+     {
+      "id": "000002595",
+      "siteFaction": "leagues-of-votann",
+      "siteId": "einhyr-champion"
+     },
+     {
+      "id": "000002599",
+      "siteFaction": "leagues-of-votann",
+      "siteId": "einhyr-hearthguard"
+     },
+     {
+      "id": "000002596",
+      "siteFaction": "leagues-of-votann",
+      "siteId": "grimnyr"
+     },
+     {
+      "id": "000002598",
+      "siteFaction": "leagues-of-votann",
+      "siteId": "hearthkyn-warriors"
+     },
+     {
+      "id": "000002604",
+      "siteFaction": "leagues-of-votann",
+      "siteId": "hekaton-land-fortress"
+     },
+     {
+      "id": "000002601",
+      "siteFaction": "leagues-of-votann",
+      "siteId": "hernkyn-pioneers"
+     },
+     {
+      "id": "000003710",
+      "siteFaction": "leagues-of-votann",
+      "siteId": "hernkyn-yaegirs"
      },
      {
       "id": "000004143",
@@ -6328,14 +6383,9 @@
       "siteId": "ironkin-steeljacks-with-melee-weapons"
      },
      {
-      "id": "000004145",
+      "id": "000002594",
       "siteFaction": "leagues-of-votann",
-      "siteId": "cthonian-earthshakers"
-     },
-     {
-      "id": "000004146",
-      "siteFaction": "leagues-of-votann",
-      "siteId": "kapricus-defenders"
+      "siteId": "k-hl"
      },
      {
       "id": "000004147",
@@ -6343,9 +6393,24 @@
       "siteId": "kapricus-carrier"
      },
      {
-      "id": "000004201",
+      "id": "000004146",
       "siteFaction": "leagues-of-votann",
-      "siteId": "berehk-stornbr-w"
+      "siteId": "kapricus-defenders"
+     },
+     {
+      "id": "000004141",
+      "siteFaction": "leagues-of-votann",
+      "siteId": "memnyr-strategist"
+     },
+     {
+      "id": "000002602",
+      "siteFaction": "leagues-of-votann",
+      "siteId": "sagitaur"
+     },
+     {
+      "id": "000002593",
+      "siteFaction": "leagues-of-votann",
+      "siteId": "thar-the-destined"
      }
     ],
     "counts": {
@@ -6375,16 +6440,15 @@
      "pointsChanged": [],
      "newOnSite": [],
      "missingOnSite": [],
-     "outdated": [],
-     "possibleRenames": [
+     "outdated": [
       {
        "detachment": "Dêlve Assault Shift",
-       "ours": "Dêlvwerke Navigator",
-       "site": "Dêlvewerke Navigator",
-       "points": 25
+       "name": "Dêlvwerke Navigator",
+       "ours": 25
       }
      ],
-     "same": 33
+     "possibleRenames": [],
+     "same": 34
     },
     "same": 10,
     "counts": {
@@ -9983,214 +10047,9 @@
     "same": 57,
     "pairs": [
      {
-      "id": "000000460",
-      "siteFaction": "tyranids",
-      "siteId": "hive-tyrant"
-     },
-     {
-      "id": "000000461",
-      "siteFaction": "tyranids",
-      "siteId": "the-swarmlord"
-     },
-     {
-      "id": "000000462",
-      "siteFaction": "tyranids",
-      "siteId": "old-one-eye"
-     },
-     {
-      "id": "000000463",
-      "siteFaction": "tyranids",
-      "siteId": "broodlord"
-     },
-     {
-      "id": "000000465",
-      "siteFaction": "tyranids",
-      "siteId": "tervigon"
-     },
-     {
-      "id": "000000467",
-      "siteFaction": "tyranids",
-      "siteId": "genestealers"
-     },
-     {
-      "id": "000000468",
-      "siteFaction": "tyranids",
-      "siteId": "termagants"
-     },
-     {
-      "id": "000000469",
-      "siteFaction": "tyranids",
-      "siteId": "hormagaunts"
-     },
-     {
-      "id": "000000470",
-      "siteFaction": "tyranids",
-      "siteId": "ripper-swarms"
-     },
-     {
-      "id": "000000471",
-      "siteFaction": "tyranids",
-      "siteId": "tyrant-guard"
-     },
-     {
-      "id": "000000472",
-      "siteFaction": "tyranids",
-      "siteId": "hive-guard"
-     },
-     {
-      "id": "000000473",
-      "siteFaction": "tyranids",
-      "siteId": "lictor"
-     },
-     {
-      "id": "000000474",
-      "siteFaction": "tyranids",
-      "siteId": "maleceptor"
-     },
-     {
-      "id": "000000475",
-      "siteFaction": "tyranids",
-      "siteId": "zoanthropes"
-     },
-     {
-      "id": "000000476",
-      "siteFaction": "tyranids",
-      "siteId": "venomthropes"
-     },
-     {
-      "id": "000000477",
-      "siteFaction": "tyranids",
-      "siteId": "pyrovores"
-     },
-     {
-      "id": "000000478",
-      "siteFaction": "tyranids",
-      "siteId": "haruspex"
-     },
-     {
-      "id": "000000479",
-      "siteFaction": "tyranids",
-      "siteId": "deathleaper"
-     },
-     {
-      "id": "000000482",
-      "siteFaction": "tyranids",
-      "siteId": "raveners"
-     },
-     {
-      "id": "000000483",
-      "siteFaction": "tyranids",
-      "siteId": "sky-slasher-swarms"
-     },
-     {
-      "id": "000000484",
-      "siteFaction": "tyranids",
-      "siteId": "gargoyles"
-     },
-     {
-      "id": "000000485",
-      "siteFaction": "tyranids",
-      "siteId": "harpy"
-     },
-     {
-      "id": "000000486",
-      "siteFaction": "tyranids",
-      "siteId": "hive-crone"
-     },
-     {
-      "id": "000000487",
-      "siteFaction": "tyranids",
-      "siteId": "mucolid-spores"
-     },
-     {
-      "id": "000000488",
-      "siteFaction": "tyranids",
-      "siteId": "spore-mines"
-     },
-     {
-      "id": "000000489",
-      "siteFaction": "tyranids",
-      "siteId": "tyrannocyte"
-     },
-     {
-      "id": "000000490",
-      "siteFaction": "tyranids",
-      "siteId": "carnifexes"
-     },
-     {
-      "id": "000000491",
-      "siteFaction": "tyranids",
-      "siteId": "biovores"
-     },
-     {
-      "id": "000000493",
-      "siteFaction": "tyranids",
-      "siteId": "trygon"
-     },
-     {
-      "id": "000000494",
-      "siteFaction": "tyranids",
-      "siteId": "mawloc"
-     },
-     {
-      "id": "000000495",
-      "siteFaction": "tyranids",
-      "siteId": "exocrine"
-     },
-     {
-      "id": "000000496",
-      "siteFaction": "tyranids",
-      "siteId": "tyrannofex"
-     },
-     {
-      "id": "000000497",
-      "siteFaction": "tyranids",
-      "siteId": "toxicrene"
-     },
-     {
-      "id": "000000498",
-      "siteFaction": "tyranids",
-      "siteId": "sporocyst"
-     },
-     {
-      "id": "000000499",
-      "siteFaction": "tyranids",
-      "siteId": "malanthrope"
-     },
-     {
-      "id": "000000500",
-      "siteFaction": "tyranids",
-      "siteId": "dimachaeron"
-     },
-     {
       "id": "000000503",
       "siteFaction": "tyranids",
       "siteId": "barbed-hierodule"
-     },
-     {
-      "id": "000000504",
-      "siteFaction": "tyranids",
-      "siteId": "harridan"
-     },
-     {
-      "id": "000000505",
-      "siteFaction": "tyranids",
-      "siteId": "hierophant"
-     },
-     {
-      "id": "000000506",
-      "siteFaction": "tyranids",
-      "siteId": "scythed-hierodule"
-     },
-     {
-      "id": "000002528",
-      "siteFaction": "tyranids",
-      "siteId": "winged-hive-tyrant"
-     },
-     {
-      "id": "000002529",
-      "siteFaction": "tyranids",
-      "siteId": "parasite-of-mortrex"
      },
      {
       "id": "000002686",
@@ -10198,9 +10057,124 @@
       "siteId": "barbgaunts"
      },
      {
+      "id": "000000491",
+      "siteFaction": "tyranids",
+      "siteId": "biovores"
+     },
+     {
+      "id": "000000463",
+      "siteFaction": "tyranids",
+      "siteId": "broodlord"
+     },
+     {
+      "id": "000000490",
+      "siteFaction": "tyranids",
+      "siteId": "carnifexes"
+     },
+     {
+      "id": "000000479",
+      "siteFaction": "tyranids",
+      "siteId": "deathleaper"
+     },
+     {
+      "id": "000000500",
+      "siteFaction": "tyranids",
+      "siteId": "dimachaeron"
+     },
+     {
+      "id": "000000495",
+      "siteFaction": "tyranids",
+      "siteId": "exocrine"
+     },
+     {
+      "id": "000000484",
+      "siteFaction": "tyranids",
+      "siteId": "gargoyles"
+     },
+     {
+      "id": "000000467",
+      "siteFaction": "tyranids",
+      "siteId": "genestealers"
+     },
+     {
+      "id": "000000485",
+      "siteFaction": "tyranids",
+      "siteId": "harpy"
+     },
+     {
+      "id": "000000504",
+      "siteFaction": "tyranids",
+      "siteId": "harridan"
+     },
+     {
+      "id": "000000478",
+      "siteFaction": "tyranids",
+      "siteId": "haruspex"
+     },
+     {
+      "id": "000000505",
+      "siteFaction": "tyranids",
+      "siteId": "hierophant"
+     },
+     {
+      "id": "000000486",
+      "siteFaction": "tyranids",
+      "siteId": "hive-crone"
+     },
+     {
+      "id": "000000472",
+      "siteFaction": "tyranids",
+      "siteId": "hive-guard"
+     },
+     {
+      "id": "000000460",
+      "siteFaction": "tyranids",
+      "siteId": "hive-tyrant"
+     },
+     {
+      "id": "000000469",
+      "siteFaction": "tyranids",
+      "siteId": "hormagaunts"
+     },
+     {
+      "id": "000004117",
+      "siteFaction": "tyranids",
+      "siteId": "hyperadapted-raveners"
+     },
+     {
+      "id": "000000473",
+      "siteFaction": "tyranids",
+      "siteId": "lictor"
+     },
+     {
+      "id": "000000499",
+      "siteFaction": "tyranids",
+      "siteId": "malanthrope"
+     },
+     {
+      "id": "000000474",
+      "siteFaction": "tyranids",
+      "siteId": "maleceptor"
+     },
+     {
+      "id": "000000494",
+      "siteFaction": "tyranids",
+      "siteId": "mawloc"
+     },
+     {
+      "id": "000000487",
+      "siteFaction": "tyranids",
+      "siteId": "mucolid-spores"
+     },
+     {
       "id": "000002687",
       "siteFaction": "tyranids",
       "siteId": "neurogaunts"
+     },
+     {
+      "id": "000002753",
+      "siteFaction": "tyranids",
+      "siteId": "neurolictor"
      },
      {
       "id": "000002688",
@@ -10208,14 +10182,104 @@
       "siteId": "neurotyrant"
      },
      {
+      "id": "000002752",
+      "siteFaction": "tyranids",
+      "siteId": "norn-assimilator"
+     },
+     {
+      "id": "000002751",
+      "siteFaction": "tyranids",
+      "siteId": "norn-emissary"
+     },
+     {
+      "id": "000000462",
+      "siteFaction": "tyranids",
+      "siteId": "old-one-eye"
+     },
+     {
+      "id": "000002529",
+      "siteFaction": "tyranids",
+      "siteId": "parasite-of-mortrex"
+     },
+     {
       "id": "000002689",
       "siteFaction": "tyranids",
       "siteId": "psychophage"
      },
      {
+      "id": "000000477",
+      "siteFaction": "tyranids",
+      "siteId": "pyrovores"
+     },
+     {
+      "id": "000000482",
+      "siteFaction": "tyranids",
+      "siteId": "raveners"
+     },
+     {
+      "id": "000000470",
+      "siteFaction": "tyranids",
+      "siteId": "ripper-swarms"
+     },
+     {
       "id": "000002690",
       "siteFaction": "tyranids",
       "siteId": "screamer-killer"
+     },
+     {
+      "id": "000000506",
+      "siteFaction": "tyranids",
+      "siteId": "scythed-hierodule"
+     },
+     {
+      "id": "000000483",
+      "siteFaction": "tyranids",
+      "siteId": "sky-slasher-swarms"
+     },
+     {
+      "id": "000000488",
+      "siteFaction": "tyranids",
+      "siteId": "spore-mines"
+     },
+     {
+      "id": "000000498",
+      "siteFaction": "tyranids",
+      "siteId": "sporocyst"
+     },
+     {
+      "id": "000000468",
+      "siteFaction": "tyranids",
+      "siteId": "termagants"
+     },
+     {
+      "id": "000000465",
+      "siteFaction": "tyranids",
+      "siteId": "tervigon"
+     },
+     {
+      "id": "000004225",
+      "siteFaction": "tyranids",
+      "siteId": "the-red-terror"
+     },
+     {
+      "id": "000000461",
+      "siteFaction": "tyranids",
+      "siteId": "the-swarmlord"
+     },
+     {
+      "id": "000000497",
+      "siteFaction": "tyranids",
+      "siteId": "toxicrene"
+     },
+     {
+      "id": "000000493",
+      "siteFaction": "tyranids",
+      "siteId": "trygon"
+     },
+     {
+      "id": "000004202",
+      "siteFaction": "tyranids",
+      "siteId": "tyranid-prime-with-lash-whip"
      },
      {
       "id": "000002691",
@@ -10228,9 +10292,34 @@
       "siteId": "tyranid-warriors-with-ranged-bio-weapons"
      },
      {
+      "id": "000000489",
+      "siteFaction": "tyranids",
+      "siteId": "tyrannocyte"
+     },
+     {
+      "id": "000000496",
+      "siteFaction": "tyranids",
+      "siteId": "tyrannofex"
+     },
+     {
+      "id": "000000471",
+      "siteFaction": "tyranids",
+      "siteId": "tyrant-guard"
+     },
+     {
+      "id": "000000476",
+      "siteFaction": "tyranids",
+      "siteId": "venomthropes"
+     },
+     {
       "id": "000002693",
       "siteFaction": "tyranids",
       "siteId": "von-ryans-leapers"
+     },
+     {
+      "id": "000002528",
+      "siteFaction": "tyranids",
+      "siteId": "winged-hive-tyrant"
      },
      {
       "id": "000002694",
@@ -10238,34 +10327,9 @@
       "siteId": "winged-tyranid-prime"
      },
      {
-      "id": "000002751",
+      "id": "000000475",
       "siteFaction": "tyranids",
-      "siteId": "norn-emissary"
-     },
-     {
-      "id": "000002752",
-      "siteFaction": "tyranids",
-      "siteId": "norn-assimilator"
-     },
-     {
-      "id": "000002753",
-      "siteFaction": "tyranids",
-      "siteId": "neurolictor"
-     },
-     {
-      "id": "000004117",
-      "siteFaction": "tyranids",
-      "siteId": "hyperadapted-raveners"
-     },
-     {
-      "id": "000004202",
-      "siteFaction": "tyranids",
-      "siteId": "tyranid-prime-with-lash-whip"
-     },
-     {
-      "id": "000004225",
-      "siteFaction": "tyranids",
-      "siteId": "the-red-terror"
+      "siteId": "zoanthropes"
      }
     ],
     "counts": {

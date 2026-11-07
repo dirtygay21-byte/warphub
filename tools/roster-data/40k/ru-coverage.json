@@ -14,39 +14,39 @@
  "total": {
   "datasheets": {
    "total": 2911,
-   "ru": 2773
+   "ru": 2772
   },
   "factionAbilities": {
    "total": 2803,
-   "ru": 2648
+   "ru": 2647
   },
   "abilities": {
-   "total": 6159,
-   "ru": 5717
+   "total": 6131,
+   "ru": 5710
   },
   "detachments": {
-   "total": 295,
-   "ru": 254
+   "total": 296,
+   "ru": 255
   },
   "detRules": {
-   "total": 310,
-   "ru": 246
+   "total": 308,
+   "ru": 248
   },
   "coreStratagems": {
    "total": 236,
    "ru": 236
   },
   "stratagems": {
-   "total": 1445,
-   "ru": 1180
+   "total": 1452,
+   "ru": 1191
   },
   "enhancements": {
-   "total": 976,
-   "ru": 751
+   "total": 984,
+   "ru": 765
   },
   "armyRules": {
-   "total": 59,
-   "ru": 52
+   "total": 72,
+   "ru": 68
   }
  },
  "factions": {
@@ -62,8 +62,8 @@
      "ru": 123
     },
     "abilities": {
-     "total": 286,
-     "ru": 253
+     "total": 274,
+     "ru": 248
     },
     "detachments": {
      "total": 8,
@@ -86,22 +86,15 @@
      "ru": 25
     },
     "armyRules": {
-     "total": 1,
-     "ru": 1
+     "total": 3,
+     "ru": 3
     }
    },
    "missing": {
     "abilities": [
-     "Canoness: One Shot",
      "Dominion Squad: Holy Vanguard",
-     "Sororitas Rhino: One Shot",
-     "Immolator: One Shot",
-     "Exorcist: One Shot",
-     "Repressor: One Shot",
      "Ministorum Priest: Holy Mission",
      "Morvenn Vahl: SUPREME COMMANDER",
-     "Castigator: One Shot",
-     "Sanctifiers: One Shot",
      "Vindicare Assassin: SHADOW ASSIGNMENT",
      "Callidus Assassin: SHADOW ASSIGNMENT",
      "Eversor Assassin: SHADOW ASSIGNMENT",
@@ -128,7 +121,7 @@
     ]
    },
    "warphub": {
-    "applied": 37,
+    "applied": 26,
     "stale": [],
     "unknown": []
    }
@@ -319,8 +312,8 @@
      "ru": 123
     },
     "abilities": {
-     "total": 283,
-     "ru": 255
+     "total": 279,
+     "ru": 253
     },
     "detachments": {
      "total": 10,
@@ -336,22 +329,20 @@
     },
     "stratagems": {
      "total": 51,
-     "ru": 49
+     "ru": 51
     },
     "enhancements": {
      "total": 34,
      "ru": 34
     },
     "armyRules": {
-     "total": 1,
-     "ru": 1
+     "total": 3,
+     "ru": 3
     }
    },
    "missing": {
     "abilities": [
      "Belisarius Cawl: SUPREME COMMANDER",
-     "Tech-priest Dominus: Data-spike",
-     "Secutarii Hoplites: ATTACHED UNIT",
      "Sydonian Skatros: SYDONIAN SENTINEL",
      "Thulia Ghuld: SUPREME COMMANDER",
      "Vindicare Assassin: SHADOW ASSIGNMENT",
@@ -377,14 +368,10 @@
      "Spectrus Kill Team: TRANSPORT",
      "Spectrus Kill Team: Infiltrator Comms Array",
      "Spectrus Kill Team: Jump Pack"
-    ],
-    "stratagems": [
-     "THREAT‑COGITATION TARGETERS",
-     "SERVO‑DRIVEN CHARGE"
     ]
    },
    "warphub": {
-    "applied": 30,
+    "applied": 26,
     "stale": [],
     "unknown": []
    }
@@ -394,22 +381,22 @@
    "counts": {
     "datasheets": {
      "total": 99,
-     "ru": 99
+     "ru": 98
     },
     "factionAbilities": {
-     "total": 107,
-     "ru": 88
+     "total": 106,
+     "ru": 87
     },
     "abilities": {
-     "total": 196,
-     "ru": 196
+     "total": 195,
+     "ru": 195
     },
     "detachments": {
      "total": 15,
      "ru": 15
     },
     "detRules": {
-     "total": 17,
+     "total": 15,
      "ru": 15
     },
     "coreStratagems": {
@@ -418,35 +405,24 @@
     },
     "stratagems": {
      "total": 78,
-     "ru": 76
+     "ru": 78
     },
     "enhancements": {
      "total": 52,
-     "ru": 51
+     "ru": 52
     },
     "armyRules": {
-     "total": 2,
-     "ru": 1
+     "total": 7,
+     "ru": 7
     }
    },
    "missing": {
-    "detRules": [
-     "Eldritch Raiders: Veterans of the Void",
-     "Corsair Coterie: Veterans of the Void"
-    ],
-    "stratagems": [
-     "RAIDERS’ SPOILS",
-     "WEAVERS’ COILS"
-    ],
-    "enhancements": [
-     "Infamy (Aura)"
-    ],
-    "armyRules": [
-     "Disparate Paths"
+    "datasheets": [
+     "Vyper"
     ]
    },
    "warphub": {
-    "applied": 8,
+    "applied": 4,
     "stale": [],
     "unknown": []
    }
@@ -712,12 +688,12 @@
      "ru": 39
     },
     "enhancements": {
-     "total": 28,
-     "ru": 24
+     "total": 29,
+     "ru": 28
     },
     "armyRules": {
-     "total": 3,
-     "ru": 3
+     "total": 4,
+     "ru": 4
     }
    },
    "missing": {
@@ -736,14 +712,11 @@
      "Accursed Cultists: Accursed Horde"
     ],
     "enhancements": [
-     "Cruel Lashmaster (Aura)",
-     "Final Howl (Aura)",
-     "Iconoclast Idol (Aura)",
      "Panoply of the Cursed Knight"
     ]
    },
    "warphub": {
-    "applied": 20,
+    "applied": 17,
     "stale": [],
     "unknown": []
    }
@@ -1000,24 +973,24 @@
      "ru": 156
     },
     "abilities": {
-     "total": 311,
-     "ru": 300
+     "total": 309,
+     "ru": 298
     },
     "detachments": {
      "total": 10,
      "ru": 10
     },
     "detRules": {
-     "total": 11,
-     "ru": 9
+     "total": 10,
+     "ru": 10
     },
     "coreStratagems": {
      "total": 10,
      "ru": 10
     },
     "stratagems": {
-     "total": 51,
-     "ru": 50
+     "total": 52,
+     "ru": 51
     },
     "enhancements": {
      "total": 34,
@@ -1046,16 +1019,12 @@
      "Sorcerer: Prescience (Psychic)",
      "Sorcerer: Gift of Chaos (Psychic)"
     ],
-    "detRules": [
-     "Court of the Phoenician: Sensational Performance",
-     "Court of the Phoenician: Master of the Pageant"
-    ],
     "stratagems": [
      "ONTO THE NEXT"
     ]
    },
    "warphub": {
-    "applied": 22,
+    "applied": 20,
     "stale": [],
     "unknown": []
    }
@@ -1067,37 +1036,37 @@
      "total": 146,
      "ru": 145
     },
-    "abilities": {
-     "total": 290,
-     "ru": 230
-    },
     "factionAbilities": {
      "total": 25,
      "ru": 11
     },
+    "abilities": {
+     "total": 288,
+     "ru": 231
+    },
     "detachments": {
-     "total": 9,
-     "ru": 8
+     "total": 10,
+     "ru": 9
     },
     "detRules": {
-     "total": 10,
-     "ru": 8
+     "total": 11,
+     "ru": 9
     },
     "coreStratagems": {
      "total": 10,
      "ru": 10
     },
     "stratagems": {
-     "total": 45,
-     "ru": 39
+     "total": 51,
+     "ru": 45
     },
     "enhancements": {
-     "total": 30,
-     "ru": 26
+     "total": 34,
+     "ru": 30
     },
     "armyRules": {
      "total": 3,
-     "ru": 2
+     "ru": 3
     }
    },
    "missing": {
@@ -1106,9 +1075,6 @@
     ],
     "abilities": [
      "Patriarch: SUPREME COMMANDER",
-     "Goliath Rockgrinder: Grinding Clearance",
-     "Reductus Saboteur: One Shot",
-     "Acolyte Hybrids With Hand Flamers: One Shot",
      "Deathleaper: HUNTER ORGANISM",
      "Cadian Castellan: ORDERS",
      "Cadian Command Squad: ORDERS",
@@ -1186,13 +1152,10 @@
      "Adaptive Reprisal",
      "The Hero Returned",
      "Firepoint Commander"
-    ],
-    "armyRules": [
-     "Synapse"
     ]
    },
    "warphub": {
-    "applied": 79,
+    "applied": 76,
     "stale": [],
     "unknown": []
    }
@@ -1209,8 +1172,8 @@
      "ru": 105
     },
     "abilities": {
-     "total": 250,
-     "ru": 219
+     "total": 244,
+     "ru": 220
     },
     "detachments": {
      "total": 9,
@@ -1229,8 +1192,8 @@
      "ru": 45
     },
     "enhancements": {
-     "total": 30,
-     "ru": 28
+     "total": 32,
+     "ru": 30
     },
     "armyRules": {
      "total": 1,
@@ -1240,13 +1203,6 @@
    "missing": {
     "abilities": [
      "Kaldor Draigo: SUPREME COMMANDER",
-     "Castellan Crowe: Foresight (Psychic)",
-     "Land Raider: One Shot",
-     "Land Raider Crusader: One Shot",
-     "Land Raider Redeemer: One Shot",
-     "Razorback: One Shot",
-     "Rhino: One Shot",
-     "Grey Knights Relic Razorback: One Shot",
      "Vindicare Assassin: SHADOW ASSIGNMENT",
      "Callidus Assassin: SHADOW ASSIGNMENT",
      "Eversor Assassin: SHADOW ASSIGNMENT",
@@ -1277,7 +1233,7 @@
     ]
    },
    "warphub": {
-    "applied": 33,
+    "applied": 26,
     "stale": [],
     "unknown": []
    }
@@ -1437,8 +1393,8 @@
      "ru": 22
     },
     "abilities": {
-     "total": 55,
-     "ru": 53
+     "total": 54,
+     "ru": 54
     },
     "detachments": {
      "total": 10,
@@ -1457,25 +1413,21 @@
      "ru": 51
     },
     "enhancements": {
-     "total": 34,
-     "ru": 33
+     "total": 35,
+     "ru": 34
     },
     "armyRules": {
-     "total": 1,
-     "ru": 1
+     "total": 4,
+     "ru": 4
     }
    },
    "missing": {
-    "abilities": [
-     "Hearthkyn Warriors: Luck Has. Need Keeps. Toil Earns",
-     "Hekaton Land Fortress: One Shot"
-    ],
     "enhancements": [
      "Dêlvwerke Navigator"
     ]
    },
    "warphub": {
-    "applied": 3,
+    "applied": 1,
     "stale": [],
     "unknown": []
    }
@@ -2360,7 +2312,7 @@
      "ru": 57
     },
     "factionAbilities": {
-     "total": 74,
+     "total": 75,
      "ru": 17
     },
     "abilities": {
@@ -2385,27 +2337,20 @@
     },
     "enhancements": {
      "total": 34,
-     "ru": 32
+     "ru": 34
     },
     "armyRules": {
      "total": 2,
-     "ru": 1
+     "ru": 2
     }
    },
    "missing": {
     "abilities": [
      "Deathleaper: HUNTER ORGANISM"
-    ],
-    "enhancements": [
-     "Biophagic Flow (Aura)",
-     "The Dirgeheart of Kharis (Aura)"
-    ],
-    "armyRules": [
-     "Synapse"
     ]
    },
    "warphub": {
-    "applied": 4,
+    "applied": 2,
     "stale": [],
     "unknown": []
    }

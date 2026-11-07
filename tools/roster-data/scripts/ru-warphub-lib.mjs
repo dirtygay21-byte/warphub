@@ -209,6 +209,30 @@ function forEachEntry(t, fn) {
 const at = (o, p) => p.reduce((v, k) => v?.[k], o);
 
 /**
+ * Убрать из перевода WarpHub то, что больше не нужно (07.11.2026, обновление данных 40K): текст появился на wh-rules.ru
+ * (его больше нет среди пробелов) или английский текст изменился (перевод устарел — пробел переводится заново).
+ * Возвращает { t (новый перевод), removed: [{ where, why }] }. Пустые разделы удаляются.
+ */
+export function pruneTranslation(faction, ru, t) {
+  const gaps = collectGaps(faction, ru);
+  const out = structuredClone(t);
+  const removed = [];
+  forEachEntry(t, (where, tr, p) => {
+    const gap = at(gaps, p);
+    const why = !gap ? 'есть на wh-rules.ru' : gap.en !== tr.en ? 'английский текст изменился' : null;
+    if (!why) return;
+    const parent = at(out, p.slice(0, -1));
+    if (parent) delete parent[p.at(-1)];
+    removed.push({ where, why });
+  });
+  for (const ds of Object.values(out.datasheets ?? {})) if (ds.abilities && !Object.keys(ds.abilities).length) delete ds.abilities;
+  for (const [id, ds] of Object.entries(out.datasheets ?? {})) if (!Object.keys(ds).some((k) => k !== 'name')) delete out.datasheets[id];
+  for (const d of Object.values(out.detachments ?? {})) if (d.rules && !Object.keys(d.rules).length) delete d.rules;
+  for (const [id, d] of Object.entries(out.detachments ?? {})) if (!Object.keys(d).some((k) => k !== 'detachment')) delete out.detachments[id];
+  return { t: out, removed };
+}
+
+/**
  * Названия правил, способностей, стратагем, улучшений, детачментов фракции и основных способностей (раздел 24) —
  * в тексте перевода они остаются по-английски (решение владельца 07.11.2026; перевод — в скобках после названия).
  */
