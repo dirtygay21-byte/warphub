@@ -118,6 +118,11 @@
      "Spectrus Kill Team: Infiltrator Comms Array",
      "Spectrus Kill Team: Jump Pack"
     ]
+   },
+   "warphub": {
+    "applied": 33,
+    "stale": [],
+    "unknown": []
    }
   },
   "AC": {
@@ -283,6 +288,11 @@
      "Admonimortis",
      "Radiant Mantle"
     ]
+   },
+   "warphub": {
+    "applied": 116,
+    "stale": [],
+    "unknown": []
    }
   },
   "AdM": {
@@ -356,6 +366,11 @@
      "THREAT‑COGITATION TARGETERS",
      "SERVO‑DRIVEN CHARGE"
     ]
+   },
+   "warphub": {
+    "applied": 30,
+    "stale": [],
+    "unknown": []
    }
   },
   "AE": {
@@ -409,6 +424,11 @@
     "armyRules": [
      "Disparate Paths"
     ]
+   },
+   "warphub": {
+    "applied": 6,
+    "stale": [],
+    "unknown": []
    }
   },
   "AM": {
@@ -547,6 +567,11 @@
      "Sharp eyes, Light fingers",
      "Omnissian Unguents (Aura)"
     ]
+   },
+   "warphub": {
+    "applied": 95,
+    "stale": [],
+    "unknown": []
    }
   },
   "CD": {
@@ -620,6 +645,11 @@
      "Improbable Shield (Aura)",
      "Font of Spores (Aura)"
     ]
+   },
+   "warphub": {
+    "applied": 30,
+    "stale": [],
+    "unknown": []
    }
   },
   "QT": {
@@ -679,6 +709,11 @@
      "Iconoclast Idol (Aura)",
      "Panoply of the Cursed Knight"
     ]
+   },
+   "warphub": {
+    "applied": 20,
+    "stale": [],
+    "unknown": []
    }
   },
   "CSM": {
@@ -765,6 +800,11 @@
      "SOUL-TALLY OFFERING",
      "REAVERS’ HASTE"
     ]
+   },
+   "warphub": {
+    "applied": 87,
+    "stale": [],
+    "unknown": []
    }
   },
   "DG": {
@@ -842,6 +882,11 @@
     "armyRules": [
      "Pact of Decay"
     ]
+   },
+   "warphub": {
+    "applied": 78,
+    "stale": [],
+    "unknown": []
    }
   },
   "DRU": {
@@ -892,6 +937,11 @@
     "armyRules": [
      "Disparate Paths"
     ]
+   },
+   "warphub": {
+    "applied": 5,
+    "stale": [],
+    "unknown": []
    }
   },
   "EC": {
@@ -955,6 +1005,11 @@
     "stratagems": [
      "ONTO THE NEXT"
     ]
+   },
+   "warphub": {
+    "applied": 22,
+    "stale": [],
+    "unknown": []
    }
   },
   "GC": {
@@ -1083,6 +1138,11 @@
     "armyRules": [
      "Synapse"
     ]
+   },
+   "warphub": {
+    "applied": 79,
+    "stale": [],
+    "unknown": []
    }
   },
   "GK": {
@@ -1159,6 +1219,11 @@
      "The Ephemeral Tome",
      "The Sixty-sixth Seal"
     ]
+   },
+   "warphub": {
+    "applied": 33,
+    "stale": [],
+    "unknown": []
    }
   },
   "AoI": {
@@ -1208,6 +1273,11 @@
      "Vindicare Assassin: SHADOW ASSIGNMENT",
      "Voidsmen-at-Arms: NAVY BODYGUARD"
     ]
+   },
+   "warphub": {
+    "applied": 8,
+    "stale": [],
+    "unknown": []
    }
   },
   "QI": {
@@ -1284,6 +1354,11 @@
     "enhancements": [
      "Knight of the Opus Machina (Aura)"
     ]
+   },
+   "warphub": {
+    "applied": 29,
+    "stale": [],
+    "unknown": []
    }
   },
   "LoV": {
@@ -1330,6 +1405,11 @@
     "enhancements": [
      "Dêlvwerke Navigator"
     ]
+   },
+   "warphub": {
+    "applied": 3,
+    "stale": [],
+    "unknown": []
    }
   },
   "NEC": {
@@ -1386,6 +1466,11 @@
      "Mortality Shroud (Aura)",
      "Phasal Subjugator (Aura)"
     ]
+   },
+   "warphub": {
+    "applied": 11,
+    "stale": [],
+    "unknown": []
    }
   },
   "ORK": {
@@ -1453,6 +1538,11 @@
      "Throat-slittas",
      "Enhanced Runt-maw"
     ]
+   },
+   "warphub": {
+    "applied": 24,
+    "stale": [],
+    "unknown": []
    }
   },
   "SM": {
@@ -2007,6 +2097,11 @@
      "Adamantine Mantle",
      "Fusillade"
     ]
+   },
+   "warphub": {
+    "applied": 697,
+    "stale": [],
+    "unknown": []
    }
   },
   "TAU": {
@@ -2073,6 +2168,11 @@
     "stratagems": [
      "GUIDED FIRE"
     ]
+   },
+   "warphub": {
+    "applied": 21,
+    "stale": [],
+    "unknown": []
    }
   },
   "TS": {
@@ -2157,6 +2257,11 @@
     "armyRules": [
      "Pact of Sorcery"
     ]
+   },
+   "warphub": {
+    "applied": 85,
+    "stale": [],
+    "unknown": []
    }
   },
   "TYR": {
@@ -2206,6 +2311,11 @@
     "armyRules": [
      "Synapse"
     ]
+   },
+   "warphub": {
+    "applied": 4,
+    "stale": [],
+    "unknown": []
    }
   },
   "WE": {
@@ -2281,6 +2391,11 @@
     "armyRules": [
      "Pact of Blood"
     ]
+   },
+   "warphub": {
+    "applied": 78,
+    "stale": [],
+    "unknown": []
    }
   }
  }

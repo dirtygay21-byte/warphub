@@ -13,7 +13,7 @@ import { RuleTrigger, WeaponAbilityTag } from './common/RulePopover';
 import { useGlossary } from './common/useGlossary';
 import { useRu } from './common/useRu';
 import { RuleRichText } from './common/RulePopover';
-import { ruAbility, ruDatasheet, ruDetachmentRuleById, ruEnhancement, ruName, ruRule, ruStratagem, type RuOverlay, type RuText } from '../ru';
+import { isWarphub, ruAbility, ruDatasheet, ruDetachmentRuleById, ruEnhancement, ruName, ruRule, ruStratagem, WARPHUB_LABEL, type RuOverlay, type RuText } from '../ru';
 import type { Glossary } from '../glossary';
 import { findKeyword, splitWeaponKeywords } from '../glossary';
 
@@ -510,11 +510,11 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
             );
           })}
           <UnitRules c={c} cr={cr} L={L} detachmentIds={detachmentIds} ru={ru} />
-          {ds.damaged && <Txt title={`Повреждён: ${ds.damaged.w} ран`} text={ds.damaged.text} ru={rds?.damaged} g={g} />}
+          {ds.damaged && <Txt title={`Повреждён: ${ds.damaged.w} ран`} text={ds.damaged.text} ru={rds?.damaged} g={g} warphub={rds?.warphub?.includes('damaged')} />}
           {ds.composition.length > 0 && <Txt title="Состав отряда" text={ds.composition.join('\n')} />}
-          {ds.loadout && <Txt title="Снаряжение" text={ds.loadout} ru={rds?.loadout} g={g} />}
-          {rds?.options && <Txt title="Варианты снаряжения" text="" ru={rds.options.map((o) => `▪ ${o}`).join('\n')} g={g} />}
-          {ds.transport && <Txt title="Транспорт" text={ds.transport} ru={rds?.transport} g={g} />}
+          {ds.loadout && <Txt title="Снаряжение" text={ds.loadout} ru={rds?.loadout} g={g} warphub={rds?.warphub?.includes('loadout')} />}
+          {rds?.options && <Txt title="Варианты снаряжения" text="" ru={rds.options.map((o) => `▪ ${o}`).join('\n')} g={g} warphub={rds.warphub?.includes('options')} />}
+          {ds.transport && <Txt title="Транспорт" text={ds.transport} ru={rds?.transport} g={g} warphub={rds?.warphub?.includes('transport')} />}
           <div className="flex flex-wrap gap-1">
             {ds.keywords.map((k) =>
               g && findKeyword(g, k) ? (
@@ -533,10 +533,13 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
   );
 }
 
-function Txt({ title, text, ru, g }: { title: string; text: string; ru?: string | null; g?: Glossary | null }) {
+function Txt({ title, text, ru, g, warphub }: { title: string; text: string; ru?: string | null; g?: Glossary | null; warphub?: boolean }) {
   return (
     <div>
-      <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{title}</p>
+      <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">
+        {title}
+        {ru && warphub && <span className="font-normal normal-case tracking-normal"> · {WARPHUB_LABEL}</span>}
+      </p>
       {ru ? <RuleRichText text={ru} g={g ?? null} className="mt-0.5 text-[13px] leading-relaxed text-fg-2" /> : <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-fg-2">{cleanRuleText(text)}</p>}
     </div>
   );
@@ -606,7 +609,7 @@ function WeaponTable({ title, skill, weapons, count }: { title: string; skill: s
 function RuleChip({ name, text, accent, core, ru }: { name: string; text: string; accent?: boolean; core?: boolean; ru?: RuText | null }) {
   return (
     <RuleTrigger
-      source={core ? { lookup: 'ability', label: name } : ru ? { title: ruName(ru.name, name), text: ru.text, rich: true } : { title: name, text }}
+      source={core ? { lookup: 'ability', label: name } : ru ? { title: ruName(ru.name, name), text: ru.text, rich: true, ...(isWarphub(ru) ? { sub: WARPHUB_LABEL } : {}) } : { title: name, text }}
       className={cx('rounded-md px-2 py-1 text-[12px] font-semibold uppercase tracking-wide', accent ? 'bg-accent/15 text-accent' : 'bg-white/[0.07] text-fg-2')}
     >
       {name}

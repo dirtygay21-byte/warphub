@@ -1,0 +1,91 @@
+{
+ "schema": "warphub-ru-translation/1",
+ "faction": "AoI",
+ "name": "Imperial Agents",
+ "rules": {},
+ "datasheets": {
+  "000000871": {
+   "name": "Callidus Assassin",
+   "abilities": {
+    "SHADOW ASSIGNMENT": {
+     "en": "29646ecd3f",
+     "name": "Теневое задание",
+     "text": "Эту модель нельзя выбрать вашим WARLORD.\n\nЕсли фракция вашей армии — AGENTS OF THE IMPERIUM, то на шаге Declare Battle Formations вы можете заменить эту модель другой моделью OFFICIO ASSASSINORUM при условии, что общая стоимость в очках новой модели не превышает стоимость в очках заменённой ею модели. Ваша армия не может включать дубликаты одной и той же модели (т. е. после замены модели по этому правилу в вашей армии не может быть более 1 VINDICARE ASSASSIN, более 1 CULEXUS ASSASSIN, более 1 EVERSOR ASSASSIN и более 1 CALLIDUS ASSASSIN)."
+    }
+   }
+  },
+  "000000873": {
+   "name": "Culexus Assassin",
+   "abilities": {
+    "SHADOW ASSIGNMENT": {
+     "en": "29646ecd3f",
+     "name": "Теневое задание",
+     "text": "Эту модель нельзя выбрать вашим WARLORD.\n\nЕсли фракция вашей армии — AGENTS OF THE IMPERIUM, то на шаге Declare Battle Formations вы можете заменить эту модель другой моделью OFFICIO ASSASSINORUM при условии, что общая стоимость в очках новой модели не превышает стоимость в очках заменённой ею модели. Ваша армия не может включать дубликаты одной и той же модели (т. е. после замены модели по этому правилу в вашей армии не может быть более 1 VINDICARE ASSASSIN, более 1 CULEXUS ASSASSIN, более 1 EVERSOR ASSASSIN и более 1 CALLIDUS ASSASSIN)."
+    }
+   }
+  },
+  "000000872": {
+   "name": "Eversor Assassin",
+   "abilities": {
+    "SHADOW ASSIGNMENT": {
+     "en": "29646ecd3f",
+     "name": "Теневое задание",
+     "text": "Эту модель нельзя выбрать вашим WARLORD.\n\nЕсли фракция вашей армии — AGENTS OF THE IMPERIUM, то на шаге Declare Battle Formations вы можете заменить эту модель другой моделью OFFICIO ASSASSINORUM при условии, что общая стоимость в очках новой модели не превышает стоимость в очках заменённой ею модели. Ваша армия не может включать дубликаты одной и той же модели (т. е. после замены модели по этому правилу в вашей армии не может быть более 1 VINDICARE ASSASSIN, более 1 CULEXUS ASSASSIN, более 1 EVERSOR ASSASSIN и более 1 CALLIDUS ASSASSIN)."
+    }
+   }
+  },
+  "000003813": {
+   "name": "Grey Knights Terminator Squad",
+   "abilities": {
+    "Rites of Teleportation": {
+     "en": "35811cf18a",
+     "name": "Ритуалы телепортации",
+     "text": "Если на шаге Declare Battle Formations к этому юниту присоединены один или более юнитов INQUISITOR, модели этих юнитов имеют способность Deep Strike."
+    }
+   }
+  },
+  "000002767": {
+   "name": "Inquisitorial Agents",
+   "abilities": {
+    "INQUISITORIAL HENCHMEN": {
+     "en": "27946aa600",
+     "name": "Инквизиторские подручные",
+     "text": "Если фракция вашей армии не AGENTS OF THE IMPERIUM, то за каждый юнит INQUISITOR, включённый в вашу армию, вы можете включить в вашу армию один юнит INQUISITORIAL AGENTS, который не учитывается в числе юнитов RETINUE, которые может включать ваша армия (см. Assigned Agents)."
+    }
+   }
+  },
+  "000003818": {
+   "name": "Sisters of Battle Squad",
+   "abilities": {
+    "Simulacrum Imperials": {
+     "en": "047aee50ae",
+     "name": "Симулякрум Империалис",
+     "text": "Улучшите характеристику Лидерства (Leadership) моделей юнита носителя на 1."
+    }
+   }
+  },
+  "000000870": {
+   "name": "Vindicare Assassin",
+   "abilities": {
+    "SHADOW ASSIGNMENT": {
+     "en": "29646ecd3f",
+     "name": "Теневое задание",
+     "text": "Эту модель нельзя выбрать вашим WARLORD.\n\nЕсли фракция вашей армии — AGENTS OF THE IMPERIUM, то на шаге Declare Battle Formations вы можете заменить эту модель другой моделью OFFICIO ASSASSINORUM при условии, что общая стоимость в очках новой модели не превышает стоимость в очках заменённой ею модели. Ваша армия не может включать дубликаты одной и той же модели (т. е. после замены модели по этому правилу в вашей армии не может быть более 1 VINDICARE ASSASSIN, более 1 CULEXUS ASSASSIN, более 1 EVERSOR ASSASSIN и более 1 CALLIDUS ASSASSIN)."
+    }
+   }
+  },
+  "000002509": {
+   "name": "Voidsmen-at-Arms",
+   "abilities": {
+    "NAVY BODYGUARD": {
+     "en": "f4102e233a",
+     "name": "Флотская охрана",
+     "text": "Если фракция вашей армии не AGENTS OF THE IMPERIUM, то за каждый юнит VOIDFARERS CHARACTER, включённый в вашу армию, вы можете включить в вашу армию один юнит VOIDSMEN-AT-ARMS, который не учитывается в числе юнитов RETINUE, которые может включать ваша армия (см. Assigned Agents)."
+    }
+   }
+  }
+ },
+ "detachments": {},
+ "stratagems": {},
+ "enhancements": {}
+}

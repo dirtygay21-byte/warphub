@@ -41,4 +41,32 @@
 | Tyranids | 100 (0 нет) | 99 (1 нет) | 23 (57 нет) | 50 (1 нет) | 100 (0 нет) | 100 (0 нет) | 100 (0 нет) | 94 (2 нет) |
 | World Eaters | 91 (17 нет) | 96 (12 нет) | 97 (5 нет) | 50 (1 нет) | 100 (0 нет) | 100 (0 нет) | 100 (0 нет) | 100 (0 нет) |
 
-Списки того, чего нет, — в `ru-coverage.json` (поле missing у каждой фракции).
+Списки того, чего нет на сайте, — в `ru-coverage.json` (поле missing у каждой фракции).
+
+## Перевод WarpHub (тексты, которых нет на wh-rules.ru)
+
+| Фракция | Переводов применено | Устарели (английский изменился) | Неизвестные id |
+|---|---|---|---|
+| Adepta Sororitas | 33 | 0 | 0 |
+| Adeptus Custodes | 116 | 0 | 0 |
+| Adeptus Mechanicus | 30 | 0 | 0 |
+| Aeldari | 6 | 0 | 0 |
+| Astra Militarum | 95 | 0 | 0 |
+| Chaos Daemons | 30 | 0 | 0 |
+| Chaos Knights | 20 | 0 | 0 |
+| Chaos Space Marines | 87 | 0 | 0 |
+| Death Guard | 78 | 0 | 0 |
+| Drukhari | 5 | 0 | 0 |
+| Emperor’s Children | 22 | 0 | 0 |
+| Genestealer Cults | 79 | 0 | 0 |
+| Grey Knights | 33 | 0 | 0 |
+| Imperial Agents | 8 | 0 | 0 |
+| Imperial Knights | 29 | 0 | 0 |
+| Leagues of Votann | 3 | 0 | 0 |
+| Necrons | 11 | 0 | 0 |
+| Orks | 24 | 0 | 0 |
+| Space Marines | 697 | 0 | 0 |
+| T’au Empire | 21 | 0 | 0 |
+| Thousand Sons | 85 | 0 | 0 |
+| Tyranids | 4 | 0 | 0 |
+| World Eaters | 78 | 0 | 0 |

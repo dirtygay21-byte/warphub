@@ -7,21 +7,32 @@ export interface RuText {
   /** русское название (нет — как по-английски) */
   name?: string;
   text: string;
+  /** перевод WarpHub (текста нет на wh-rules.ru; решение владельца 06.11.2026) — показывать с пометкой WARPHUB_LABEL */
+  src?: 'warphub';
 }
+
+/** Пометка текстов, переведённых WarpHub (их нет на wh-rules.ru). */
+export const WARPHUB_LABEL = 'перевод WarpHub';
+export const isWarphub = (t: RuText | null | undefined) => t?.src === 'warphub';
 export interface RuOverlay {
   schema: 'warphub-ru/1';
   faction: string;
   source: { site: string; dataVersion: number; mfm: string | null; date: string; snapshot: string; fingerprint: string };
   /** армейские правила и ссылки на них (id правила фракции) */
   rules?: Record<string, RuText>;
-  datasheets?: Record<string, { abilities?: Record<string, RuText>; loadout?: string; options?: string[]; leader?: string; transport?: string; damaged?: string }>;
-  detachments?: Record<string, { name?: string; rules?: Record<string, RuText> }>;
+  /** warphub — поля инфолиста (loadout, options…), переведённые WarpHub */
+  datasheets?: Record<string, { abilities?: Record<string, RuText>; loadout?: string; options?: string[]; leader?: string; transport?: string; damaged?: string; warphub?: string[] }>;
+  /** nameSrc: 'warphub' — название детачмента переведено WarpHub */
+  detachments?: Record<string, { name?: string; nameSrc?: 'warphub'; rules?: Record<string, RuText> }>;
   stratagems?: Record<string, RuText>;
   enhancements?: Record<string, RuText>;
 }
 
-/** «Русское (English)», как названия на wh-rules.ru; без русского — английское. */
-export const ruName = (ru: string | null | undefined, en: string): string => (ru && ru.trim() && ru.trim().toLowerCase() !== en.trim().toLowerCase() ? `${ru.trim()} (${en})` : en);
+/**
+ * Название правила, способности, стратагемы, улучшения: английское (как в правилах), перевод — в скобках
+ * («Oath of Moment (Клятва момента)»; решение владельца 07.11.2026). Перевода нет или он совпадает — только английское.
+ */
+export const ruName = (ru: string | null | undefined, en: string): string => (ru && ru.trim() && ru.trim().toLowerCase() !== en.trim().toLowerCase() ? `${en} (${ru.trim()})` : en);
 
 export const ruRule = (o: RuOverlay | null, id: string | null | undefined) => (o && id ? (o.rules?.[id] ?? null) : null);
 export const ruAbility = (o: RuOverlay | null, dsId: string, name: string) => o?.datasheets?.[dsId]?.abilities?.[name] ?? null;

@@ -1,0 +1,564 @@
+{
+ "schema": "warphub-ru-translation/1",
+ "faction": "WE",
+ "name": "World Eaters",
+ "rules": {
+  "000010071": {
+   "en": "10b1ef36c0",
+   "name": "Пакт крови",
+   "text": "При сборе армии, если специально не указано иное, вы не можете выбрать BLOOD LEGIONS в качестве фракции вашей армии."
+  }
+ },
+ "datasheets": {
+  "000003589": {
+   "name": "Greater Brass Scorpion",
+   "abilities": {
+    "Super-heavy Walker": {
+     "en": "d758899c39",
+     "name": "Сверхтяжёлый шагоход",
+     "text": "Каждый раз, когда модель с этой способностью совершает обычный манёвр, продвижение или отступление, она может двигаться сквозь модели (исключая модели TITANIC) и участки элементов ландшафта высотой 4\" или менее. При этом:\n▪ Она может двигаться в радиусе связывания вражеских моделей, но не может закончить этот манёвр в радиусе связывания с ними.\n▪ Она также может двигаться сквозь участки элементов ландшафта высотой более 4\", но если она это делает, после её манёвра бросьте один D6: на 1 та модель в боевом шоке.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003590": {
+   "name": "Kytan Ravager",
+   "abilities": {
+    "Super-heavy Walker": {
+     "en": "d758899c39",
+     "name": "Сверхтяжёлый шагоход",
+     "text": "Каждый раз, когда модель с этой способностью совершает обычный манёвр, продвижение или отступление, она может двигаться сквозь модели (исключая модели TITANIC) и участки элементов ландшафта высотой 4\" или менее. При этом:\n▪ Она может двигаться в радиусе связывания вражеских моделей, но не может закончить этот манёвр в радиусе связывания с ними.\n▪ Она также может двигаться сквозь участки элементов ландшафта высотой более 4\", но если она это делает, после её манёвра бросьте один D6: на 1 та модель в боевом шоке.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000003609": {
+   "name": "Land Raider Achilles",
+   "abilities": {
+    "Assault Ramp": {
+     "en": "de8e6c75c8",
+     "name": "Штурмовая аппарель",
+     "text": "Каждый раз, когда юнит высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    },
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   },
+   "loadout": {
+    "en": "f0d3f0c98d",
+    "text": "**Эта модель вооружена:** quad launcher; 2 twin volkite culverins; armoured tracks."
+   },
+   "transport": {
+    "en": "4b1edb0c62",
+    "text": "Эта модель имеет транспортную вместимость 12 моделей WORLD EATERS INFANTRY. Каждая модель JUMP PACK, WULFEN, GRAVIS, POSSESSED или TERMINATOR занимает место 2 моделей, а каждая модель CENTURION или OBLITERATOR занимает место 3 моделей."
+   },
+   "options": {
+    "en": "b1ae3165e2",
+    "items": [
+     "2 twin volkite culverins этой модели можно заменить на 2 twin multi-melta",
+     "Эту модель можно снабдить 1 hunter-killer missile.",
+     "Эту модель можно снабдить 1 storm bolter."
+    ]
+   }
+  },
+  "000003613": {
+   "name": "Land Raider Proteus",
+   "abilities": {
+    "Assault Ramp": {
+     "en": "de8e6c75c8",
+     "name": "Штурмовая аппарель",
+     "text": "Каждый раз, когда юнит высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    },
+    "Explorator Augury Web": {
+     "en": "bb743c2e8e",
+     "name": "Разведывательная сеть эксплораторов",
+     "text": "Вражеские юниты, выставляемые на поле боя как Подкрепления, не могут быть выставлены в пределах 12\" от носителя, но транспортная вместимость носителя уменьшается вдвое."
+    },
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   },
+   "loadout": {
+    "en": "ca9f1e00d4",
+    "text": "**Эта модель вооружена:** 2 twin lascannons; armoured tracks."
+   },
+   "transport": {
+    "en": "4b1edb0c62",
+    "text": "Эта модель имеет транспортную вместимость 12 моделей WORLD EATERS INFANTRY. Каждая модель JUMP PACK, WULFEN, GRAVIS, POSSESSED или TERMINATOR занимает место 2 моделей, а каждая модель CENTURION или OBLITERATOR занимает место 3 моделей."
+   },
+   "options": {
+    "en": "ae5dd5a84c",
+    "items": [
+     "Эту модель можно снабдить одним из следующего:\n▪ 1 heavy bolter\n▪ 1 multi-melta\n▪ 1 twin heavy bolter\n▪ 1 twin heavy flamer",
+     "Эту модель можно снабдить 1 hunter-killer missile.",
+     "Эту модель можно снабдить 1 storm bolter.",
+     "Эту модель можно снабдить 1 explorator augury web."
+    ]
+   }
+  },
+  "000003617": {
+   "name": "Fire Raptor Gunship",
+   "abilities": {
+    "Strafing Run": {
+     "en": "cbd7962ec3",
+     "name": "Штурмовой заход",
+     "text": "Каждый раз, когда эта модель совершает дальнобойную атаку по юниту, что не может FLY, прибавьте 1 к броску попадания."
+    }
+   },
+   "loadout": {
+    "en": "f89c8bc2a1",
+    "text": "**Эта модель вооружена:** twin avenger bolt cannon; 2 twin autocannons; 2 twin hellstrike launchers; armoured hull"
+   },
+   "options": {
+    "en": "066946b831",
+    "items": [
+     "2 twin hellstrike missile launchers этой модели можно заменить на 2 twin lascannons",
+     "2 twin autocannons этой модели можно заменить на 2 quad heavy bolters."
+    ]
+   }
+  },
+  "000003621": {
+   "name": "Spartan",
+   "abilities": {
+    "Assault Ramp": {
+     "en": "de8e6c75c8",
+     "name": "Штурмовая аппарель",
+     "text": "Каждый раз, когда юнит высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    }
+   },
+   "loadout": {
+    "en": "97008c9546",
+    "text": "**Эта модель вооружена:** 2 quad lascannons; twin heavy bolter; armoured tracks."
+   },
+   "transport": {
+    "en": "bd2b6a8e6c",
+    "text": "Эта модель имеет транспортную вместимость 28 моделей WORLD EATERS INFANTRY. Каждая модель JUMP PACK, WULFEN, GRAVIS, POSSESSED или TERMINATOR занимает место 2 моделей, а каждая модель CENTURION или OBLITERATOR занимает место 3 моделей."
+   },
+   "options": {
+    "en": "7e51bace1d",
+    "items": [
+     "2 quad lascannons этой модели можно заменить на 2 laser destroyers.",
+     "twin heavy bolter этой модели можно заменить на 1 twin heavy flamer",
+     "Эту модель можно снабдить одним из следующего:\n▪ 1 heavy bolter\n▪ 1 heavy flamer\n▪ 1 multi-melta\n▪ 1 storm bolter"
+    ]
+   }
+  },
+  "000003625": {
+   "name": "Deredeo Dreadnought",
+   "abilities": {
+    "Deredeo Strike": {
+     "en": "b02cd8e93d",
+     "name": "Удар Deredeo",
+     "text": "Каждый раз, когда эта модель совершает дальнобойную атаку по юниту, что не ниже половинной численности, вы можете перебросить бросок попадания."
+    }
+   },
+   "loadout": {
+    "en": "bd48b7ce0c",
+    "text": "**Эта модель вооружена:** anvilus autocannon battery; twin heavy bolter; armoured feet."
+   },
+   "options": {
+    "en": "642d9c74b4",
+    "items": [
+     "anvilus autocannon battery этой модели можно заменить на одно из следующего:\n▪ 1 arachnus heavy lascannon battery\n▪ 1 hellfire plasma carronade\n▪ 1 volkite falconet battery",
+     "twin heavy bolter этой модели можно заменить на 1 twin heavy flamer.",
+     "Эту модель можно снабдить одним из следующего:\n▪ 1 aiolos missile launcher\n▪ 1 boreas air defence missiles"
+    ]
+   }
+  },
+  "000003633": {
+   "name": "Kratos",
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
+  },
+  "000003637": {
+   "name": "Sokar-pattern Stormbird",
+   "abilities": {
+    "Aerial Assault": {
+     "en": "672575df69",
+     "name": "Воздушный штурм",
+     "text": "Каждый раз, когда юнит со способностью Deep Strike высаживается из этой модели после того, как она совершила обычный манёвр, этот юнит по-прежнему может объявить нападение в этот ход.",
+     "by": "wh-rules"
+    }
+   },
+   "loadout": {
+    "en": "c773023e71",
+    "text": "**Эта модель вооружена:** hellstrike missile battery; 3 twin heavy bolters; 4 twin lascannons; armoured hull."
+   },
+   "transport": {
+    "en": "98f37b4918",
+    "text": "Эта модель имеет транспортную вместимость 55 моделей WORLD EATERS INFANTRY или WORLD EATERS MOUNTED. Каждая модель JUMP PACK, WULFEN, GRAVIS, POSSESSED или TERMINATOR занимает место 2 моделей, а каждая модель MOUNTED, CENTURION или OBLITERATOR занимает место 3 моделей. Эта модель также может перевозить до 1 модели RHINO (эта модель — и все модели, погруженные в неё, — занимают место 25 моделей)."
+   }
+  },
+  "000003641": {
+   "name": "Sicaran Battle Tank",
+   "abilities": {
+    "Armoured Spearhead": {
+     "en": "43a663914a",
+     "name": "Бронированный наконечник",
+     "text": "Каждый раз, когда эта модель совершает атаку по вражескому юниту, перебросьте бросок попадания, равный 1, и, если этот юнит находится в радиусе маркера цели, который вы не контролируете, вы можете вместо этого перебросить бросок попадания.",
+     "by": "wh-rules"
+    },
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   },
+   "loadout": {
+    "en": "0b4b47baba",
+    "text": "**Эта модель вооружена:** heavy bolter; Herakles-pattern autocannon; armoured tracks."
+   },
+   "options": {
+    "en": "b005d70e76",
+    "items": [
+     "Эту модель можно снабдить одним из следующего:\n▪ 2 heavy bolters\n▪ 2 lascannons",
+     "Эту модель можно снабдить 1 hunter-killer missile.",
+     "Эту модель можно снабдить 1 storm bolter."
+    ]
+   }
+  },
+  "000003649": {
+   "name": "Leviathan Dreadnought",
+   "abilities": {
+    "Duty Eternal": {
+     "en": "c17e8cc287",
+     "name": "Вечный долг",
+     "text": "Каждый раз, когда атака распределяется по этой модели, вычтите 1 из характеристики Урона (Damage) этой атаки."
+    },
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   },
+   "loadout": {
+    "en": "ce54e22f77",
+    "text": "**Эта модель вооружена:** 2 heavy flamers; 2 grav-flux bombards; armoured feet."
+   },
+   "options": {
+    "en": "f4be65fc36",
+    "items": [
+     "Каждую grav-flux bombard этой модели можно заменить на одно из следующего:\n▪ 1 cyclonic melta lance\n▪ 1 storm cannon\n▪ 1 meltagun и 1 Leviathan siege claw\n▪ 1 meltagun и 1 Leviathan siege drill",
+     "2 heavy flamers этой модели можно заменить на 2 twin volkite calivers.",
+     "Эту модель можно снабдить 3 hunter-killer missiles."
+    ]
+   }
+  },
+  "000003653": {
+   "name": "Fellblade",
+   "abilities": {
+    "Rolling Fortress": {
+     "en": "56713e0a6a",
+     "name": "Катящаяся крепость",
+     "text": "Каждый раз, когда дальнобойная атака распределяется по модели из вашей армии, если эта модель не полностью видима каждой модели атакующего юнита из-за этой модели Fellblade, эта модель имеет Benefit of Cover против этой атаки."
+    }
+   },
+   "loadout": {
+    "en": "9fb98d7468",
+    "text": "**Эта модель вооружена:** demolisher cannon; Fellblade accelerator cannon; 2 quad lascannons; twin heavy bolter; armoured tracks."
+   },
+   "options": {
+    "en": "68270df40d",
+    "items": [
+     "2 quad lascannons этой модели можно заменить на одно из следующего:\n▪ 2 laser destroyers\n▪ 2 quad heavy bolters",
+     "twin heavy bolter этой модели можно заменить на 1 twin heavy flamer.",
+     "Эту модель можно снабдить 1 havoc launcher.",
+     "Эту модель можно снабдить одним из следующего:\n▪ 1 combi-weapon\n▪ 1 heavy bolter\n▪ 1 heavy flamer\n▪ 1 multi-melta\n▪ 1 storm bolter"
+    ]
+   }
+  },
+  "000003657": {
+   "name": "Relic Contemptor Dreadnought",
+   "abilities": {
+    "Conversion": {
+     "en": "eed641bd9f",
+     "text": "Каждый раз, когда атака этим оружием нацеливается на вражеский юнит, который не находится в пределах 12\", немодифицированный бросок попадания 4+ считается критическим попаданием.",
+     "by": "wh-rules"
+    },
+    "Even In Death I Serve": {
+     "en": "82712b8a9e",
+     "name": "Даже в смерти я служу",
+     "text": "Когда эта модель уничтожается в первый раз, уберите её из игры, не применяя её способность Deadly Demise. Затем, в конце фазы, бросьте один D6: на 2+ снова выставьте эту модель на поле боя как можно ближе к месту, где она была уничтожена, не в дистанции ввязывания вражеских юнитов, с D6 оставшимися ранами."
+    }
+   },
+   "loadout": {
+    "en": "fdb2366b69",
+    "text": "**Эта модель вооружена:** 2 heavy plasma cannons; armoured feet."
+   },
+   "options": {
+    "en": "61047f1da1",
+    "items": [
+     "Каждую heavy plasma cannon этой модели можно заменить на одно из следующего:\n▪ 1 conversion beam cannon\n▪ 1 kheres-pattern assault cannon\n▪ 1 multi-melta\n▪ 1 twin autocannon\n▪ 1 twin heavy bolter\n▪ 1 twin lascannon\n▪ 1 twin volkite culverin\n▪ 1 Dreadnought chainfist и 1 combi-bolter\n▪ 1 Dreadnought combat weapon и 1 combi-bolter",
+     "Каждый combi-bolter этой модели можно заменить на одно из следующего:\n▪ 1 graviton blaster\n▪ 1 heavy flamer\n▪ 1 plasma blaster",
+     "Эту модель можно снабдить 1 cyclone missile launcher."
+    ]
+   }
+  },
+  "000003661": {
+   "name": "Whirlwind Scorpius",
+   "abilities": {
+    "Pinning Bombardment": {
+     "en": "133fbc683c",
+     "name": "Прижимающий обстрел",
+     "text": "В вашей фазе стрельбы, после того как эта модель отстрелялась, если одна или более из этих атак, сделанных её Scorpius multi-launcher, поразили вражеский юнит INFANTRY, этот юнит должен пройти проверку боевого шока."
+    },
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   },
+   "loadout": {
+    "en": "42d07f23da",
+    "text": "**Эта модель вооружена:** Scorpius multi-launcher; armoured tracks."
+   },
+   "options": {
+    "en": "db4d22c100",
+    "items": [
+     "Эту модель можно снабдить 1 hunter-killer missile.",
+     "Эту модель можно снабдить 1 storm bolter."
+    ]
+   }
+  },
+  "000003665": {
+   "name": "Xiphon Interceptor",
+   "abilities": {
+    "Interceptor": {
+     "en": "a322cdd8ff",
+     "name": "Перехватчик",
+     "text": "Каждый раз, когда эта модель совершает дальнобойную атаку по юниту, что может FLY, прибавьте 1 к броску попадания."
+    }
+   },
+   "loadout": {
+    "en": "23548302e3",
+    "text": "**Эта модель вооружена:** 2 twin lascannons; Xiphon missile battery; armoured hull."
+   }
+  },
+  "000003673": {
+   "name": "Storm Eagle Gunship",
+   "abilities": {
+    "Armoured Resilience": {
+     "en": "3fc85c8289",
+     "name": "Бронированная стойкость",
+     "text": "Каждый раз, когда атака распределяется по этой модели, вычтите 1 из характеристики Урона (Damage) этой атаки.",
+     "by": "wh-rules"
+    }
+   },
+   "loadout": {
+    "en": "345c17786a",
+    "text": "**Эта модель вооружена:** twin heavy bolter; 2 twin hellstrike launchers; vengeance launcher; armoured hull."
+   },
+   "transport": {
+    "en": "7972687027",
+    "text": "Эта модель имеет транспортную вместимость 22 моделей WORLD EATERS INFANTRY и 1 модели DREADNOUGHT. Каждая модель JUMP PACK, WULFEN, GRAVIS, TERMINATOR или POSSESSED занимает место 2 моделей, а каждая модель CENTURION или OBLITERATOR занимает место 3 моделей."
+   },
+   "options": {
+    "en": "9caf80eedc",
+    "items": [
+     "twin heavy bolter этой модели можно заменить на одно из следующего:\n▪ 1 twin multi-melta\n▪ 1 typhoon missile launcher",
+     "2 twin hellstrike missile launchers этой модели можно заменить на 2 twin lascannons"
+    ]
+   }
+  },
+  "000003677": {
+   "name": "Sicaran Venator",
+   "abilities": {
+    "Ferocious Assault": {
+     "en": "464cc93f91",
+     "name": "Яростный штурм",
+     "text": "Каждый раз, когда эта модель совершает дальнобойную атаку по ближайшему подходящему юниту MONSTER или VEHICLE, прибавьте 1 к броску попадания."
+    },
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   },
+   "loadout": {
+    "en": "01bec71438",
+    "text": "**Эта модель вооружена:** heavy bolter; Venator neutron laser; armoured tracks."
+   },
+   "options": {
+    "en": "b005d70e76",
+    "items": [
+     "Эту модель можно снабдить одним из следующего:\n▪ 2 heavy bolters\n▪ 2 lascannons",
+     "Эту модель можно снабдить 1 hunter-killer missile.",
+     "Эту модель можно снабдить 1 storm bolter."
+    ]
+   }
+  },
+  "000003685": {
+   "name": "Sicaran Punisher",
+   "abilities": {
+    "Rotating Death": {
+     "en": "85cf92b64f",
+     "name": "Вращающаяся смерть",
+     "text": "Punisher rotary cannon этой модели имеет способность [SUSTAINED HITS 1] при атаках по юнитам INFANTRY."
+    },
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   },
+   "loadout": {
+    "en": "93fc0d53ac",
+    "text": "**Эта модель вооружена:** heavy bolter; Punisher rotary cannon; armoured tracks."
+   },
+   "options": {
+    "en": "b005d70e76",
+    "items": [
+     "Эту модель можно снабдить одним из следующего:\n▪ 2 heavy bolters\n▪ 2 lascannons",
+     "Эту модель можно снабдить 1 hunter-killer missile.",
+     "Эту модель можно снабдить 1 storm bolter."
+    ]
+   }
+  },
+  "000001105": {
+   "name": "Skarbrand",
+   "abilities": {
+    "Greater Daemon of Khorne (Aura)": {
+     "en": "6ccc88006a",
+     "name": "Великий демон Кхорна (Аура)",
+     "text": "Пока дружественный юнит KHORNE LEGIONES DAEMONICA находится в пределах 6\" от этой модели, этот юнит находится в Shadow of Chaos вашей армии.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000001126": {
+   "name": "Exalted Flamer",
+   "abilities": {
+    "MANIFESTATION OF DESTRUCTION": {
+     "en": "3228360af9",
+     "name": "Воплощение разрушения",
+     "text": "Эта модель не может быть вашим WARLORD и не может получать Enhancement."
+    }
+   }
+  },
+  "000001148": {
+   "name": "Be’lakor",
+   "abilities": {
+    "Shadow Form": {
+     "en": "b93167fb8e",
+     "name": "Теневая форма",
+     "text": "В начале раунда боя выберите одну способность Shadow Form (см. ниже). До конца раунда боя эта модель имеет эту способность."
+    },
+    "SUPREME COMMANDER": {
+     "en": "b0f1b5fdaa",
+     "name": "Верховный командующий",
+     "text": "Если эта модель в вашей армии, она обязана быть вашим WARLORD."
+    }
+   }
+  },
+  "000001149": {
+   "name": "Daemon Prince of Chaos",
+   "abilities": {
+    "DAEMONIC ALLEGIANCE": {
+     "en": "0d13c65cdd",
+     "name": "Демоническая верность",
+     "text": "Когда вы выбираете эту модель для включения в свою армию, вы обязаны выбрать одно из следующих ключевых слов, которое она получит:\n\n▪ KHORNE\n▪ TZEENTCH\n▪ NURGLE\n▪ SLAANESH\n\nВыбранное ключевое слово также повлияет на некоторые характеристики этой модели, как указано на обороте."
+    }
+   }
+  },
+  "000001329": {
+   "name": "An’ggrath the Unbound",
+   "abilities": {
+    "Relentless Carnage": {
+     "en": "39ff43d2a2",
+     "name": "Неустанная бойня",
+     "text": "В конце фазы ближнего боя вы можете выбрать один вражеский юнит в дистанции ввязывания от этой модели и бросить восемь D6: за каждый 4+ этот вражеский юнит получает 1 смертельную рану.",
+     "by": "wh-rules"
+    },
+    "Emissary of the Blood God (Aura)": {
+     "en": "9b7ffd609e",
+     "name": "Посланник Кровавого Бога (Аура)",
+     "text": "Пока дружественный юнит KHORNE LEGIONES DAEMONICA находится в пределах 6\" от этой модели, вы можете перебросить проверки боевого шока, проходимые для этого юнита."
+    }
+   },
+   "loadout": {
+    "en": "7ad6341dfa",
+    "text": "**Эта модель вооружена:** bloodlash; axe of Khorne."
+   },
+   "damaged": {
+    "en": "bf9c4cc3d5",
+    "text": "Пока у этой модели осталось 1–8 ран, каждый раз, когда эта модель совершает атаку, вычтите 1 из броска попадания."
+   }
+  },
+  "000001333": {
+   "name": "Aetaos’rau’keres",
+   "abilities": {
+    "Emissary of the Great Mutator (Aura)": {
+     "en": "f6455010cd",
+     "name": "Посланник Великого Изменятеля (Аура)",
+     "text": "Пока дружественный юнит TZEENTCH LEGIONES DAEMONICA находится в пределах 6\" от этой модели, вы можете перебросить проверки боевого шока, проходимые для этого юнита."
+    },
+    "Master of Magicks (Psychic)": {
+     "en": "a7a6d6376d",
+     "name": "Мастер магии (Психика)",
+     "text": "В вашей фазе стрельбы выберите одну из следующих способностей: [IGNORES COVER]; [LETHAL HITS]; [SUSTAINED HITS D3]. До конца фазы оружие дальнего боя этой модели имеет эту способность."
+    }
+   },
+   "loadout": {
+    "en": "c788fbb588",
+    "text": "**Эта модель вооружена:** Bolt of Tzeentch; staff of cataclysm; warpfire talons."
+   },
+   "damaged": {
+    "en": "bf9c4cc3d5",
+    "text": "Пока у этой модели осталось 1–8 ран, каждый раз, когда эта модель совершает атаку, вычтите 1 из броска попадания."
+   }
+  },
+  "000002582": {
+   "name": "Bloodthirster",
+   "abilities": {
+    "Greater Daemon of Khorne (Aura)": {
+     "en": "6ccc88006a",
+     "name": "Великий демон Кхорна (Аура)",
+     "text": "Пока дружественный юнит KHORNE LEGIONES DAEMONICA находится в пределах 6\" от этой модели, этот юнит находится в Shadow of Chaos вашей армии.",
+     "by": "wh-rules"
+    }
+   }
+  },
+  "000002584": {
+   "name": "Pink Horrors",
+   "abilities": {
+    "HORRORS ARE PINK. HORRORS ARE BLUE. WHEREONCE THERE WAS ONE, NOW THERE ARE TWO.": {
+     "en": "f7ed65e7b1",
+     "name": "Ужасы розовые. Ужасы синие. Где был один, теперь их двое.",
+     "text": "Если в какой-либо момент в этом юните нет моделей PINK HORROR, используйте для этого юнита лист данных BLUE HORRORS.\n\nПримечание разработчиков: пока в этом юните есть одна или более моделей PINK HORROR, способности Sullen Malevolence и Exploding Horrors из листа данных BLUE HORRORS не применяются к этому юниту."
+    }
+   }
+  },
+  "000002758": {
+   "name": "Daemon Prince Of Chaos With Wings",
+   "abilities": {
+    "DAEMONIC ALLEGIANCE": {
+     "en": "0d13c65cdd",
+     "name": "Демоническая верность",
+     "text": "Когда вы выбираете эту модель для включения в свою армию, вы обязаны выбрать одно из следующих ключевых слов, которое она получит:\n\n▪ KHORNE\n▪ TZEENTCH\n▪ NURGLE\n▪ SLAANESH\n\nВыбранное ключевое слово также повлияет на некоторые характеристики этой модели, как указано на обороте."
+    }
+   }
+  },
+  "000004052": {
+   "name": "Accursed Cultists",
+   "abilities": {
+    "Accursed Horde": {
+     "en": "e460a849d3",
+     "name": "Проклятая орда",
+     "text": "В фазе стрельбы вашего оппонента, когда вражеский юнит отстрелялся, если модель этого юнита была уничтожена в результате этих атак, этот юнит может совершить рывок (Surge move) до D6\"."
+    }
+   }
+  }
+ }
+}
