@@ -176,3 +176,29 @@ test('экран использует библиотеку, официальну
   const screen = readFileSync(join(import.meta.dirname, '../../../client/src/features/roster/ui/warcry/WarcryFullGameScreen.tsx'), 'utf8');
   for (const token of ['StartCard', 'WarcrySavedList', 'WarcryDeploymentPanel', 'OnlinePlayerSetup', 'initiative-roll', 'wild-set', 'ActivationPanel', 'ReactionPanel', 'player-set']) assert.ok(screen.includes(token), token);
 });
+
+test('инициатива вручную: введённые 6D6 дают те же singles и ability dice, что бросок приложения', () => {
+  const dice = { p1: [3, 3, 5, 1, 6, 2], p2: [4, 4, 4, 2, 6, 1] };
+  let state = dispatch(base(), { type: 'initiative-roll', manual: { dice } });
+  assert.deepEqual(state.initiativeDice, dice);
+  assert.equal(state.players.p1.singles, 4);
+  assert.equal(state.players.p2.singles, 3);
+  assert.equal(state.initiative, 'p1');
+  assert.equal(state.players.p2.abilityRank, 3, 'тройка четвёрок — triple');
+  assert.equal(state.abilityDiceManual, false);
+  assert.equal(applyWarcryEvent(base(), ev({ type: 'initiative-roll', manual: { dice: { p1: [1, 2, 3], p2: dice.p2 } } }), data).ok, false, 'нужно по 6 значений');
+  assert.equal(applyWarcryEvent(base(), ev({ type: 'initiative-roll', manual: { dice: { p1: [1, 2, 3, 4, 5, 7], p2: dice.p2 } } }), data).ok, false, 'значения 1–6');
+  state = declareBoth(state);
+  assert.equal(state.phase, 'reserve');
+});
+
+test('инициатива вручную только итогом: без wild dice сразу Reserve, способности без ability dice', () => {
+  let state = dispatch(base(), { type: 'initiative-roll', manual: { winner: 'p2' } });
+  assert.equal(state.initiative, 'p2');
+  assert.equal(state.phase, 'reserve');
+  assert.equal(state.abilityDiceManual, true);
+  state = dispatch(state, { type: 'phase-advanced', first: 'p1' });
+  state = dispatch(state, { type: 'activate', seat: 'p1', fighterId: 'f1', actions: ['move', 'attack'], abilityId: 'a-double', abilityAfter: 1 });
+  assert.equal(state.players.p1.activationLog.f1!.abilityId, 'a-double');
+  assert.equal(applyWarcryEvent(base(), ev({ type: 'initiative-roll', manual: {} }), data).ok, false, 'без итога и кубиков — ошибка');
+});

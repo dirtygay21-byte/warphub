@@ -118,3 +118,9 @@ test('экран использует библиотеку, карту, online c
   assert.ok(online.includes('setOnline({ ...result.data.game, seat: online.seat })'), 'polling обновляет сведения о вошедшем сопернике');
   assert.ok(screen.includes("state.stage === 'battle' && state.round === 1 && !state.initiativeRolls"), 'выбор ростера и секрета доступен только до первой инициативы');
 });
+
+test('игра с ростера из редактора: число оперативников известно сразу (07.11.2026)', () => {
+  const screen = readFileSync(new URL('../../../client/src/features/roster/ui/kt/KtFullGameScreen.tsx', import.meta.url), 'utf8');
+  assert.ok(screen.includes("operatives: rosters.find((r) => r.id === initialRosterId)?.operatives.length ?? 0"));
+  assert.ok(!screen.includes('<select'), 'системные списки заменены ChoiceField');
+});

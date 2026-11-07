@@ -6,6 +6,8 @@ import { Button, Field, Segmented } from '../kit';
 import { ActAs } from './ActAs';
 import { CampaignFill } from './DominatusCampaign';
 import { useOpenCard } from './cardViewer';
+import { DiceModeSwitch } from '../common/DiceMode';
+import { useDiceMode } from '../common/useDiceMode';
 import type { GameHook } from './useGame';
 
 const SEATS: Seat[] = ['p1', 'p2'];
@@ -24,6 +26,7 @@ export function StepCampaign({ game, onNext }: { game: GameHook; onNext: () => v
   const [phase, setPhase] = useState<CampaignPhase>(d.phase ?? 1);
   const location = data.locations.find((l) => l.id === d.locationId) ?? null;
   const attempt = d.phase === phase ? d.locationDraws : 0;
+  const dice = useDiceMode((s) => s.mode);
 
   const roll = () => {
     const value = rollD6(state.seed, `location-${phase}`, attempt);
@@ -48,6 +51,9 @@ export function StepCampaign({ game, onNext }: { game: GameHook; onNext: () => v
 
       <Field label="Локация" hint="D6: 1–2 / 3–4 / 5–6">
         <div className="space-y-1.5">
+          <div className="flex justify-end">
+            <DiceModeSwitch />
+          </div>
           {data.locations
             .filter((l) => l.phase === phase)
             .map((l) => {
@@ -69,9 +75,13 @@ export function StepCampaign({ game, onNext }: { game: GameHook; onNext: () => v
                 </button>
               );
             })}
-          <Button className="w-full" onClick={roll}>
-            {d.locationSource === 'random' && d.phase === phase ? 'Бросить D6 ещё раз' : 'Бросить D6'}
-          </Button>
+          {dice === 'app' ? (
+            <Button className="w-full" onClick={roll}>
+              {d.locationSource === 'random' && d.phase === phase ? 'Бросить D6 ещё раз' : 'Бросить D6'}
+            </Button>
+          ) : (
+            <p className="text-[12px] text-fg-3">Бросьте D6 сами и выберите локацию по выпавшему значению.</p>
+          )}
         </div>
       </Field>
 

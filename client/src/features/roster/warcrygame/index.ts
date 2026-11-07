@@ -51,6 +51,8 @@ export interface WcState {
   endRound: number | null;
   initiative: Seat;
   initiativeDice: Record<Seat, number[]> | null;
+  /** инициатива записана только итогом (кубики бросали сами, 07.11.2026): ability dice не отслеживаются */
+  abilityDiceManual?: boolean;
   baseSingles: Record<Seat, number> | null;
   baseTie: boolean;
   wildDeclared: Record<Seat, boolean>;
@@ -65,7 +67,11 @@ export type WcEventBody =
   | { type: 'game-created'; schema: number; seed: string; game?: 'warcry'; names: Record<Seat, string> }
   | { type: 'setup'; deploymentId: string; victoryId: string; twistId?: string | null; matchedPlay: boolean; attacker: Seat; rosters: Record<Seat, WcRosterSetup> }
   | { type: 'player-set'; seat: Seat; roster: WcRosterSetup }
-  | { type: 'initiative-roll' }
+  | {
+      type: 'initiative-roll';
+      /** кубики бросали сами: dice — по 6 значений игроков (дальше всё как при броске), или только winner (ability dice не отслеживаются) */
+      manual?: { dice?: Record<Seat, number[]>; winner?: Seat };
+    }
   | { type: 'wild-set'; seat: Seat; singles: number; save: number; improve: WcWildImprove[] }
   | { type: 'initiative'; wild?: Partial<Record<Seat, { singles?: number; improve?: number; save?: number }>> }
   | { type: 'phase-advanced'; first?: Seat }
@@ -157,10 +163,32 @@ export function applyWarcryEvent(current: WcState | null, ev: WcEvent, data: War
     }
     case 'initiative-roll': {
       if (s.stage !== 'battle' || s.phase !== 'initiative' || s.initiativeDice) return fail(s, 'Инициатива в этом раунде уже определена');
-      const dice = rollDice(s);
+      const manual = ev.manual;
+      if (manual && !manual.dice) {
+        if (!manual.winner || !SEATS.includes(manual.winner)) return fail(s, 'Выберите, у кого инициатива');
+        for (const seat of SEATS) {
+          const p = s.players[seat];
+          p.singles = 0;
+          p.dice = [];
+          p.abilityRank = null;
+        }
+        s.initiativeDice = { p1: [], p2: [] };
+        s.baseSingles = { p1: 0, p2: 0 };
+        s.baseTie = false;
+        s.wildDeclared = { p1: true, p2: true };
+        s.initiative = manual.winner;
+        s.abilityDiceManual = true;
+        s.phase = 'reserve';
+        return { ok: true, state: s };
+      }
+      if (manual?.dice && !SEATS.every((seat) => manual.dice![seat]?.length === 6 && manual.dice![seat].every((v) => Number.isInteger(v) && v >= 1 && v <= 6)))
+        return fail(s, 'Введите по 6 значений кубиков (1–6) для каждого игрока');
+      const dice = manual?.dice ? { p1: [...manual.dice.p1], p2: [...manual.dice.p2] } : rollDice(s);
       const baseSingles = { p1: singlesOf(dice.p1), p2: singlesOf(dice.p2) };
       const baseTie = baseSingles.p1 === baseSingles.p2;
-      const baseWinner = rollOff(s.seed, `warcry-initiative-tie-${s.round}`, 0).winner;
+      // ничья по singles: при ручном вводе — победитель roll-off, которого назвали игроки (если назвали)
+      const baseWinner = manual?.winner ?? rollOff(s.seed, `warcry-initiative-tie-${s.round}`, 0).winner;
+      s.abilityDiceManual = false;
       for (const seat of SEATS) {
         const p = s.players[seat];
         p.singles = baseSingles[seat];
@@ -257,6 +285,13 @@ export function applyWarcryEvent(current: WcState | null, ev: WcEvent, data: War
           const ability = info.abilities.find((item) => item.id === ev.abilityId);
           const required = ability ? costRank(ability.cost) : null;
           if (!ability || !required) return fail(s, 'Эта способность недоступна во время активации');
+          if (s.abilityDiceManual) {
+            // инициатива записана итогом: ability dice игроки отслеживают сами
+            if (ev.abilityAfter != null && ![0, 1, 2].includes(ev.abilityAfter)) return fail(s, 'Неверный момент способности');
+            log.abilityId = ev.abilityId;
+            log.abilityAfter = ev.abilityAfter ?? 0;
+            p.activationLog[ev.fighterId] = log;
+          } else {
           if (ev.diceIndex == null || !Number.isInteger(ev.diceIndex)) return fail(s, 'Выберите ability dice');
           const die = p.dice[ev.diceIndex];
           if (!die || die.used) return fail(s, 'Ability dice уже использован');
@@ -265,6 +300,7 @@ export function applyWarcryEvent(current: WcState | null, ev: WcEvent, data: War
           die.used = true;
           log.abilityId = ev.abilityId; log.diceIndex = ev.diceIndex; log.abilityAfter = ev.abilityAfter ?? 0;
           p.abilityRank = maxRank(p.dice.filter((item) => !item.used));
+          }
         }
         p.activationLog[ev.fighterId] = log;
       }
@@ -279,7 +315,7 @@ export function applyWarcryEvent(current: WcState | null, ev: WcEvent, data: War
       if (s.turn && ev.seat !== s.turn) return fail(s, 'Способность используется во время своей активации');
       const p = s.players[ev.seat];
       if (!p.fighters.includes(ev.fighterId)) return fail(s, 'Этого бойца нет в варбанде');
-      if (!p.abilityRank || p.abilityRank > ev.rank) return fail(s, `Нужен ability dice ${ev.rank}`);
+      if (!s.abilityDiceManual && (!p.abilityRank || p.abilityRank > ev.rank)) return fail(s, `Нужен ability dice ${ev.rank}`);
       if (p.abilities.includes(ev.fighterId)) return fail(s, 'Боец уже использовал способность в этой активации');
       p.abilities.push(ev.fighterId);
       return { ok: true, state: s };
@@ -332,7 +368,7 @@ export function applyWarcryEvent(current: WcState | null, ev: WcEvent, data: War
         p.activations = []; p.activationLog = {}; p.abilities = []; p.reactions = []; p.singles = 0; p.abilityRank = null; p.dice = [];
         s.wildDeclared[seat] = false;
       }
-      s.initiativeDice = null; s.baseSingles = null; s.baseTie = false; s.turn = null; s.passes = 0; s.activationSerial = 0; s.lastActivation = null;
+      s.initiativeDice = null; s.abilityDiceManual = false; s.baseSingles = null; s.baseTie = false; s.turn = null; s.passes = 0; s.activationSerial = 0; s.lastActivation = null;
       s.phase = 'initiative';
       s.round++;
       return { ok: true, state: s };

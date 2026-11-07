@@ -8,6 +8,9 @@ import { cx, fmtPts } from '../util';
 import { SetupStep as Step } from '../common/SetupStep';
 import { BattleplanMap } from './BattleplanMap';
 import { isMapTerritory, rosterRefOf, territoryLabel, TIER_LABEL } from './refs';
+import { DiceHead } from '../common/DiceMode';
+import { useDiceMode } from '../common/useDiceMode';
+import { ChoiceField } from '../common/GameControls';
 import type { AosGameHook } from './useAosGame';
 
 /** Подготовка: шаги по порядку General's Handbook; каждый шаг — отдельная карточка, готовые отмечены. */
@@ -182,6 +185,7 @@ function StepBattleplan({ game }: { game: AosGameHook }) {
   const s = game.state!;
   const bp = game.bp!;
   const [manual, setManual] = useState(false);
+  const dice = useDiceMode((m) => m.mode);
   const last = s.battleplanSource === 'random' && s.battleplanDraws ? battleplanRoll(s.seed, s.battleplanDraws - 1) : null;
   const roll = () => {
     const r = battleplanRoll(s.seed, s.battleplanDraws);
@@ -195,30 +199,28 @@ function StepBattleplan({ game }: { game: AosGameHook }) {
           Бросок: D6 таблицы — {last.tableDie} (таблица {last.table}), D6 батлплана — {last.planDie}.
         </p>
       )}
-      <div className="flex gap-2">
-        <Button variant={s.battleplan ? 'ghost' : 'primary'} className="flex-1" onClick={roll}>
-          {s.battleplan ? 'Перебросить' : 'Бросить D6 + D6'}
-        </Button>
-        <Button variant="outline" onClick={() => setManual((v) => !v)}>
-          Выбрать
-        </Button>
-      </div>
-      {manual && (
-        <select
+      <DiceHead title="Батлплан: D6 таблицы + D6 батлплана" hint="батлплан по выпавшим значениям" />
+      {dice === 'app' && (
+        <div className="flex gap-2">
+          <Button variant={s.battleplan ? 'ghost' : 'primary'} className="flex-1" onClick={roll}>
+            {s.battleplan ? 'Перебросить' : 'Бросить D6 + D6'}
+          </Button>
+          <Button variant="outline" onClick={() => setManual((v) => !v)}>
+            Выбрать
+          </Button>
+        </div>
+      )}
+      {(manual || dice === 'manual') && (
+        <ChoiceField
+          label="Батлплан"
+          placeholder="Батлплан по броску или договорённости…"
           value={s.battleplan ?? ''}
-          onChange={(e) => {
-            const n = Number(e.target.value);
-            if (n && game.dispatch({ type: 'battleplan-set', n, source: 'manual' })) setManual(false);
+          inlineMax={0}
+          onChange={(n) => {
+            if (game.dispatch({ type: 'battleplan-set', n, source: 'manual' })) setManual(false);
           }}
-          className="w-full rounded-lg border border-white/10 bg-app-elevated px-3 py-2 text-sm outline-none"
-        >
-          <option value="">Батлплан по договорённости…</option>
-          {bp.battleplans.map((b) => (
-            <option key={b.n} value={b.n}>
-              {b.n}. {b.name}
-            </option>
-          ))}
-        </select>
+          options={bp.battleplans.map((b) => ({ value: b.n, label: `${b.n}. ${b.name}` }))}
+        />
       )}
     </>
   );
@@ -229,6 +231,7 @@ function StepRoles({ game }: { game: AosGameHook }) {
   const names = { p1: s.players.p1.name, p2: s.players.p2.name };
   // бросок «кто выше» показывается до выбора; засчитывается вместе с выбором победителя (как priority)
   const [rolled, setRolled] = useState(false);
+  const dice = useDiceMode((m) => m.mode);
   const r = rolesRoll(s.seed, s.rollCount.roles);
   const atk = SEATS.find((x) => s.players[x].role === 'attacker');
   const choose = (attacker: Seat, source: 'random' | 'manual') => {
@@ -243,7 +246,16 @@ function StepRoles({ game }: { game: AosGameHook }) {
         </p>
       )}
       {s.rolesRoll && atk && !rolled && <p className="text-[12px] text-fg-3">Бросок: {s.rolesRoll.map((x) => `${x.p1}:${x.p2}`).join(', ')}</p>}
-      {!rolled ? (
+      <DiceHead title="Бросок «кто выше»" hint="кто атакует (решает победитель броска)" />
+      {dice === 'manual' ? (
+        <div className="grid grid-cols-2 gap-2">
+          {SEATS.map((x) => (
+            <Button key={x} variant={atk === x ? 'primary' : 'outline'} className="text-xs" onClick={() => choose(x, 'manual')}>
+              Атакует {names[x]}
+            </Button>
+          ))}
+        </div>
+      ) : !rolled ? (
         <div className="flex gap-2">
           <Button variant={atk ? 'ghost' : 'primary'} className="flex-1" onClick={() => setRolled(true)}>
             {atk ? 'Перебросить' : 'Бросок «кто выше»'}
@@ -263,16 +275,6 @@ function StepRoles({ game }: { game: AosGameHook }) {
           </div>
         </>
       )}
-      <details>
-        <summary className="cursor-pointer text-[12px] text-fg-3">Без броска, по договорённости</summary>
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          {SEATS.map((x) => (
-            <Button key={x} variant="outline" className="text-xs" onClick={() => choose(x, 'manual')}>
-              Атакует {names[x]}
-            </Button>
-          ))}
-        </div>
-      </details>
     </>
   );
 }

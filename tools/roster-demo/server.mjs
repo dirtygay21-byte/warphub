@@ -152,17 +152,21 @@ async function api(req, res, p) {
     const [s, body] = redeem(user, (await readBody(req)).code);
     return send(res, s, body);
   }
-  const data = /^\/roster\/data\/([A-Za-z]{1,6}|index|battlefield)$/.exec(p);
+  // данные Roster Builder — те же имена, что у бэкенда (backend/src/modules/roster/data.ts → readRosterData):
+  // 40K, Age of Sigmar, Kill Team, Warcry (07.11.2026: раньше демо отдавало только 40K и AoS)
+  const data = /^\/roster\/data\/(?:(aos|kt|warcry)\/)?([A-Za-z0-9-]{1,60})$/.exec(p);
   if (data) {
     if (!hasAccess(user)) return send(res, 403, { error: 'Нет доступа к Roster Builder' });
-    const f = data[1] === 'index' || data[1] === 'battlefield' ? path.join(DATA, `${data[1]}.json`) : path.join(DATA, 'f', `${data[1]}.json`);
-    if (!fs.existsSync(f)) return send(res, 404, { error: 'Нет данных' });
-    return send(res, 200, fs.readFileSync(f));
-  }
-  const aos = /^\/roster\/data\/aos\/([A-Za-z]{1,6}|index)$/.exec(p);
-  if (aos) {
-    if (!hasAccess(user)) return send(res, 403, { error: 'Нет доступа к Roster Builder' });
-    const f = aos[1] === 'index' ? path.join(DATA, 'aos', 'index.json') : path.join(DATA, 'aos', 'f', `${aos[1]}.json`);
+    const [, system = '40k', name] = data;
+    const ok =
+      system === 'kt' ? /^(index|game|[A-Z]{2,6}-[A-Z0-9]{2,8})$/.test(name)
+      : system === 'warcry' ? /^(index|game|[a-z][a-z0-9-]{1,59})$/.test(name)
+      : system === 'aos' ? /^(index|battlepack|[A-Za-z]{1,6})$/.test(name)
+      : /^(index|battlefield|missions|dominatus|glossary|[A-Za-z]{1,6}|ru-[A-Za-z]{1,6})$/.test(name);
+    if (!ok) return send(res, 404, { error: 'Нет данных' });
+    const dir = system === '40k' ? DATA : path.join(DATA, system);
+    const top = name === 'index' || ((system === 'kt' || system === 'warcry') && name === 'game') || (system === '40k' && ['battlefield', 'missions', 'dominatus', 'glossary'].includes(name)) || (system === 'aos' && name === 'battlepack');
+    const f = top ? path.join(dir, `${name}.json`) : system === '40k' && name.startsWith('ru-') ? path.join(dir, 'ru', `${name.slice(3)}.json`) : path.join(dir, system === 'kt' ? 't' : 'f', `${name}.json`);
     if (!fs.existsSync(f)) return send(res, 404, { error: 'Нет данных' });
     return send(res, 200, fs.readFileSync(f));
   }

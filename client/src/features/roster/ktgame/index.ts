@@ -37,6 +37,8 @@ export interface KtState {
   round: number;
   initiative: Seat;
   initiativeRolls: Record<Seat, number> | null;
+  /** инициатива записана вручную (кубики бросали сами, 07.11.2026): initiativeRolls — введённые значения или 0 */
+  initiativeManual?: boolean;
   secured: Record<string, Seat>;
   transmitting: Record<string, Seat>;
   looted: Record<string, number>;
@@ -55,7 +57,14 @@ export interface KtState {
 export type KtEventBody =
   | { type: 'game-created'; schema: number; seed: string; game?: 'kt'; names: Record<Seat, string> }
   | { type: 'setup'; missionId: string; killzone: string; map: number; dropZoneLoser: Seat; rosters: Record<Seat, { id: string; operatives: number; tacOp: string }> }
-  | { type: 'initiative'; round: number; attempt: number; cards?: Partial<Record<Seat, { reroll?: boolean; modifier?: number }>> }
+  | {
+      type: 'initiative';
+      round: number;
+      attempt: number;
+      cards?: Partial<Record<Seat, { reroll?: boolean; modifier?: number }>>;
+      /** кубики бросали сами: кто выиграл инициативу и (по желанию) выпавшие значения; карты только списываются */
+      manual?: { winner: Seat; rolls?: Partial<Record<Seat, number>> };
+    }
   | { type: 'crit-action'; seat: Seat; action: string; marker?: string; target?: string }
   | { type: 'incapacitated'; seat: Seat; wounds: number; within6: boolean; marker?: string; manualTacOp?: boolean }
   | { type: 'tac-score'; seat: Seat; points: 1 | 2 }
@@ -124,6 +133,29 @@ export function applyKtEvent(current: KtState | null, ev: KtEvent, data: KtGameD
     }
     case 'initiative': {
       if (s.stage !== 'battle' || ev.round !== s.round || s.initiativeRolls) return fail(s, 'Инициатива в этом turning point уже определена');
+      if (ev.manual) {
+        if (!SEATS.includes(ev.manual.winner)) return fail(s, 'Выберите, кто выиграл инициативу');
+        for (const seat of SEATS) {
+          const p = s.players[seat];
+          const card = ev.cards?.[seat];
+          if (card?.modifier) {
+            if (!p.initiativeCards.includes(Math.abs(card.modifier))) return fail(s, `${p.name}: нет initiative card ${card.modifier}`);
+            p.initiativeCards.splice(p.initiativeCards.indexOf(Math.abs(card.modifier)), 1);
+          }
+          if (card?.reroll) {
+            if (!p.rerollCard) return fail(s, `${p.name}: Re-roll initiative card уже использована`);
+            p.rerollCard = false;
+          }
+          const v = ev.manual.rolls?.[seat];
+          if (v != null && (!Number.isInteger(v) || v < -6 || v > 12)) return fail(s, 'Неверное значение броска');
+        }
+        const winner = ev.manual.winner;
+        s.initiative = winner;
+        if (s.round < data.game.turningPoints) s.players[other(winner)].initiativeCards.push(s.round);
+        s.initiativeRolls = { p1: ev.manual.rolls?.p1 ?? 0, p2: ev.manual.rolls?.p2 ?? 0 };
+        s.initiativeManual = true;
+        return { ok: true, state: s };
+      }
       const rolls: Partial<Record<Seat, number>> = {};
       for (const seat of SEATS) {
         const p = s.players[seat];
@@ -146,6 +178,7 @@ export function applyKtEvent(current: KtState | null, ev: KtEvent, data: KtGameD
       s.initiative = winner;
       if (s.round < data.game.turningPoints) s.players[loser].initiativeCards.push(s.round);
       s.initiativeRolls = { p1: rolls.p1!, p2: rolls.p2! };
+      s.initiativeManual = false;
       return { ok: true, state: s };
     }
     case 'phase-advanced': {
@@ -283,7 +316,7 @@ export function applyKtEvent(current: KtState | null, ev: KtEvent, data: KtGameD
         }
         s.compiled[seat] = 0; s.genericTacVp[seat] = 0; s.routVp[seat] = 0;
       }
-      s.transmitting = {}; s.carrying = ev.carrying ?? {}; s.initiativeRolls = null; s.phase = 'strategy';
+      s.transmitting = {}; s.carrying = ev.carrying ?? {}; s.initiativeRolls = null; s.initiativeManual = false; s.phase = 'strategy';
       if (s.round < data.game.turningPoints) s.round++;
       else s.round = data.game.turningPoints + 1;
       return { ok: true, state: s };

@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { rollOff, type Seat } from '../../game';
 import { haptic } from '../../telegram';
 import { Button } from '../kit';
+import { cx } from '../util';
 import { useMySeat } from './cardViewer';
 import { Dice } from './Dice';
 import type { GameHook } from './useGame';
+import { DiceHead } from '../common/DiceMode';
+import { useDiceMode } from '../common/useDiceMode';
 
 /**
  * Шаг «Атакующий и защитник» (правила: бросок «кто выше», победитель решает, кто атакующий, а кто защитник).
@@ -18,6 +21,7 @@ export function StepRoles({ game, onNext }: { game: GameHook; onNext: () => void
   const locked = state.secondariesRevealed;
   const [mode, setMode] = useState<'idle' | 'roll' | 'manual'>('idle');
   const mine = useMySeat();
+  const dice = useDiceMode((s) => s.mode);
   const attempt = state.rollCount.roles;
   const roll = rollOff(state.seed, 'roles', attempt);
 
@@ -32,6 +36,7 @@ export function StepRoles({ game, onNext }: { game: GameHook; onNext: () => void
 
   return (
     <div className="mt-3 space-y-2.5">
+      {!locked && <DiceHead title="Бросок «кто выше»" hint="кто атакующий (решает победитель броска)" />}
       {mode === 'roll' && (
         <>
           <Dice rolls={roll.rolls} winner={roll.winner} names={names} />
@@ -85,21 +90,32 @@ export function StepRoles({ game, onNext }: { game: GameHook; onNext: () => void
           <p className="mt-1.5 text-[12px] text-fg-3">{state.rolesSource === 'random' ? 'По броску' : 'По договорённости'}. Зоны и края — как на карте раскладки.</p>
           {!locked && (
             <div className="mt-2 grid grid-cols-2 gap-2">
-              <Button onClick={() => setMode('roll')}>Перебросить</Button>
-              <Button onClick={() => setMode('manual')}>Изменить вручную</Button>
+              {dice === 'app' && <Button onClick={() => setMode('roll')}>Перебросить</Button>}
+              <Button className={cx(dice === 'manual' && 'col-span-2')} onClick={() => setMode('manual')}>
+                Изменить вручную
+              </Button>
             </div>
           )}
           {locked && <p className="mt-1.5 text-[12px] text-fg-3">Вторичные миссии уже раскрыты — роли закреплены.</p>}
         </div>
       )}
 
-      {mode === 'idle' && !attacker && (
-        <div className="grid grid-cols-1 gap-2">
-          <Button variant="primary" onClick={() => setMode('roll')}>
-            Бросить кубики
-          </Button>
-          <Button onClick={() => setMode('manual')}>Договорились без броска</Button>
-        </div>
+      {mode === 'idle' && !attacker && dice === 'app' && (
+        <Button variant="primary" className="w-full" onClick={() => setMode('roll')}>
+          Бросить кубики
+        </Button>
+      )}
+      {mode === 'idle' && !attacker && dice === 'manual' && (
+        <>
+          <p className="text-sm text-fg-2">Кто атакующий?</p>
+          <div className="grid grid-cols-2 gap-2">
+            {(['p1', 'p2'] as const).map((s) => (
+              <Button key={s} variant="primary" onClick={() => set(s, false)}>
+                {names[s]}
+              </Button>
+            ))}
+          </div>
+        </>
       )}
 
       <Button variant="primary" className="w-full" disabled={!attacker || mode !== 'idle'} onClick={onNext}>

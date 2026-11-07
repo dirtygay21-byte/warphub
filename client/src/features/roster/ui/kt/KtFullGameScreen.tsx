@@ -7,7 +7,7 @@ import type { KtRoster } from '../../kt/roster';
 import { decodeKtRoster } from '../../kt/roster';
 import type { KtIndex } from '../../kt/types';
 import { haptic, openExternal } from '../../telegram';
-import { Button, Icon, IconButton, Segmented } from '../kit';
+import { Button, Icon, Segmented } from '../kit';
 import { cx } from '../util';
 import { useSkirmishOnline } from '../skirmish/useSkirmishOnline';
 import { OnlineBar, OnlineStart } from '../game/Online';
@@ -16,6 +16,10 @@ import { SavedGamesFrame } from '../common/SavedGamesFrame';
 import { SetupStep } from '../common/SetupStep';
 import { RoundDots } from '../common/RoundDots';
 import { ScoreboardGrid } from '../common/ScoreboardGrid';
+import { GameShell } from '../common/GameShell';
+import { ChoiceField, GameCounter, GameLabel, ToggleChip, type Choice } from '../common/GameControls';
+import { DiceHead } from '../common/DiceMode';
+import { useDiceMode } from '../common/useDiceMode';
 import { readKtLibrary, readKtLocal, rememberKtOnline, removeKtSaved, saveKtLocal, type KtSavedEntry } from '../../ktgame/library';
 import { injectKtSecret, readKtSecret, redactKtSetup, writeKtSecret } from '../../ktgame/secrets';
 import { KtMapPanel } from '../skirmish/SkirmishMaps';
@@ -175,9 +179,28 @@ export function KtFullGameScreen({ onBack, rosters, index, initialRosterId }: { 
         <>
           <RoundDots round={state.round} rounds={data.game.turningPoints} finished={state.stage === 'finished'} />
           {onlineGame.online && state.stage === 'battle' && state.round === 1 && !state.initiativeRolls && <OnlinePlayerSetup rosters={rosters} index={index} data={data} onlineSeat={onlineGame.online.seat} onRoster={(rosterId, operatives) => dispatch({ type: 'player-set', seat: onlineGame.online!.seat, rosterId, operatives })} onTac={(tacOp) => dispatch({ type: 'tac-set', seat: onlineGame.online!.seat, tacOp })} />}
-          <BattleHeader state={state} data={data} onInitiative={(cards) => dispatch({ type: 'initiative', round: state.round, attempt: 0, cards })} onPhase={() => dispatch({ type: 'phase-advanced' })} />
+          <BattleHeader state={state} data={data} onInitiative={(cards, manual) => dispatch({ type: 'initiative', round: state.round, attempt: 0, cards, ...(manual ? { manual } : {}) })} onPhase={() => dispatch({ type: 'phase-advanced' })} />
           <ScoreboardGrid className="mb-3 text-center">
-            {SEATS.map((seat) => <div key={seat} className="rounded-2xl border border-white/10 bg-white/[0.03] py-2"><p className="truncate px-2 text-[12px] uppercase text-fg-3">{state.players[seat].name}</p><p className="font-display text-[30px] font-semibold leading-none tabular-nums"><span key={totalKtVp(state, seat)} className="fx-strong fx-bump">{totalKtVp(state, seat)}</span></p><p className="mt-0.5 text-[12px] text-fg-3">VP</p></div>)}
+            {SEATS.map((seat) => {
+              const p = state.players[seat];
+              return (
+                <div key={seat} className={cx('rounded-2xl border py-2', state.initiative === seat && state.stage === 'battle' ? 'border-accent bg-accent/10' : 'border-white/10 bg-white/[0.03]')}>
+                  <p className="truncate px-2 text-[12px] font-semibold uppercase tracking-wider text-fg-3">
+                    {p.name}
+                    {state.initiative === seat && state.stage === 'battle' ? ' · инициатива' : ''}
+                  </p>
+                  <p className="font-display text-[30px] font-semibold leading-none tabular-nums">
+                    <span key={totalKtVp(state, seat)} className="fx-strong fx-bump">
+                      {totalKtVp(state, seat)}
+                    </span>
+                  </p>
+                  <p className="mt-0.5 text-[12px] text-fg-3">
+                    Crit {p.critVp} · Kill {p.killVp} · Tac {p.tacVp}
+                    {p.bonusVp > 0 ? ` · +${p.bonusVp}` : ''}
+                  </p>
+                </div>
+              );
+            })}
           </ScoreboardGrid>
           <div className="space-y-3">
             {SEATS.map((seat) => <Player key={seat} state={state} seat={seat} rosterName={rosterName(state.players[seat].rosterId)} tacOpName={data.tacOps.find((t) => t.id === state.players[seat].tacOp)?.name ?? state.players[seat].tacOp} reveal={state.stage === 'finished' || !onlineGame.online || onlineGame.online.seat === seat} dispatch={dispatch} />)}
@@ -240,22 +263,43 @@ function KtSavedList({ entries, onClose, onOpen, onRemove }: { entries: KtSavedE
   );
 }
 
-function Setup({ rosters, index, initialRosterId, data, online, onSetup }: { rosters: KtRoster[]; index: KtIndex; initialRosterId?: string; data: import('../../skirmish/types').KtGameData; online: ReturnType<typeof useSkirmishOnline>['online']; onSetup: (body: KtEventBody) => boolean }) {
+const seatName = (seat: Seat) => (seat === 'p1' ? 'Игрок 1' : 'Игрок 2');
+const SEAT_CHOICES: Choice<Seat>[] = [
+  { value: 'p1', label: 'Игрок 1' },
+  { value: 'p2', label: 'Игрок 2' },
+];
+const MARKERS: Choice<string>[] = [
+  { value: 'home', label: 'Home' },
+  { value: 'centre', label: 'Centre' },
+  { value: 'enemy', label: 'Enemy' },
+];
+type KtData = import('../../skirmish/types').KtGameData;
+const rosterChoices = (rosters: KtRoster[], index: KtIndex): Choice<string>[] =>
+  rosters.map((r) => ({ value: r.id, label: r.name, sub: `${index.teams.find((team) => team.id === r.teamId)?.name ?? r.teamId} · ${r.operatives.length} опер.` }));
+const tacChoices = (data: KtData): Choice<string>[] => data.tacOps.map((t) => ({ value: t.id, label: t.name, sub: t.archetype }));
+
+function Setup({ rosters, index, initialRosterId, data, online, onSetup }: { rosters: KtRoster[]; index: KtIndex; initialRosterId?: string; data: KtData; online: ReturnType<typeof useSkirmishOnline>['online']; onSetup: (body: KtEventBody) => boolean }) {
   const [missionId, setMission] = useState(data.critOps[0]!.id);
   const [killzone, setKillzone] = useState(data.missionPack.killzones[0]!);
   const [map, setMap] = useState(1);
   const [dropZoneLoser, setLoser] = useState<Seat>('p2');
   const [selection, setSelection] = useState<Record<Seat, { id: string; operatives: number; tacOp: string }>>({
-    p1: { id: initialRosterId ?? '', operatives: 0, tacOp: data.tacOps[0]!.id },
+    // ростер, с которого начали игру (меню редактора): число оперативников сразу — иначе «ростер не выбран» до повторного выбора
+    p1: { id: initialRosterId ?? '', operatives: rosters.find((r) => r.id === initialRosterId)?.operatives.length ?? 0, tacOp: data.tacOps[0]!.id },
     p2: { id: '', operatives: 0, tacOp: data.tacOps[0]!.id },
   });
-  const chooseRoster = (seat: Seat, id: string) => { const r = rosters.find((x) => x.id === id); setSelection((s) => ({ ...s, [seat]: { ...s[seat], id, operatives: r?.operatives.length ?? 0 } })); };
+  const chooseRoster = (seat: Seat, id: string) => {
+    const r = rosters.find((x) => x.id === id);
+    setSelection((s) => ({ ...s, [seat]: { ...s[seat], id, operatives: r?.operatives.length ?? 0 } }));
+  };
   const chooseCode = (seat: Seat, code: string) => {
     try {
       const r = decodeKtRoster(code.trim(), index.teams.map((team) => team.id));
       setSelection((s) => ({ ...s, [seat]: { ...s[seat], id: r.id, operatives: r.operatives.length } }));
       return null;
-    } catch (e) { return e instanceof Error ? e.message : 'Код не распознан'; }
+    } catch (e) {
+      return e instanceof Error ? e.message : 'Код не распознан';
+    }
   };
   const ready = selection.p1.id && selection.p2.id && selection.p1.tacOp && selection.p2.tacOp;
   const mapData = data.maps.find((item) => item.killzone === killzone && item.map === map) ?? null;
@@ -267,43 +311,61 @@ function Setup({ rosters, index, initialRosterId, data, online, onSetup }: { ros
         ))}
       </SetupStep>
       <SetupStep n={2} title="Crit Op и официальная карта" done={!!missionId && !!killzone && !!mapData}>
-        <label className={labelClass}>Crit Op<select value={missionId} onChange={(e) => setMission(e.target.value)} className={selectClass}>{data.critOps.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</select></label>
-        <div className="grid grid-cols-[minmax(0,1fr)_5rem] gap-2"><label className={labelClass}>Killzone<select value={killzone} onChange={(e) => { setKillzone(e.target.value); setMap(1); }} className={selectClass}>{data.missionPack.killzones.map((k) => <option key={k}>{k}</option>)}</select></label><label className={labelClass}>Карта<select value={map} onChange={(e) => setMap(Number(e.target.value))} className={selectClass}>{Array.from({ length: 6 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}</select></label></div>
+        <ChoiceField label="Crit Op" value={missionId} onChange={setMission} options={data.critOps.map((m) => ({ value: m.id, label: m.name }))} />
+        <ChoiceField
+          label="Killzone"
+          value={killzone}
+          onChange={(k) => (setKillzone(k), setMap(1))}
+          options={data.missionPack.killzones.map((k) => ({ value: k, label: k }))}
+        />
+        <ChoiceField label="Карта" value={map} onChange={setMap} inlineMax={6} options={Array.from({ length: 6 }, (_, i) => ({ value: i + 1, label: String(i + 1) }))} />
         {mapData && <KtMapPanel map={mapData} />}
       </SetupStep>
       <SetupStep n={3} title="Секретные Tac Ops" done={!!ready}>
-        {SEATS.map((seat) => online && online.seat !== seat ? (
-          <p key={seat} className="rounded-xl border border-white/10 bg-black/20 p-3 text-[12px] text-fg-3">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · секрет выбирается на телефоне соперника.</p>
-        ) : (
-          <label key={seat} className="block rounded-xl border border-white/10 bg-black/20 p-3 text-[12px] font-semibold uppercase text-fg-3">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · ваш секрет
-            <select value={selection[seat].tacOp} onChange={(e) => setSelection((s) => ({ ...s, [seat]: { ...s[seat], tacOp: e.target.value } }))} className={selectClass}>{data.tacOps.map((t) => <option key={t.id} value={t.id}>{t.archetype} · {t.name}</option>)}</select>
-          </label>
-        ))}
+        {SEATS.map((seat) =>
+          online && online.seat !== seat ? (
+            <p key={seat} className="rounded-xl border border-white/10 bg-black/20 p-3 text-[12px] text-fg-3">
+              {seatName(seat)} · секрет выбирается на телефоне соперника.
+            </p>
+          ) : (
+            <ChoiceField
+              key={seat}
+              label={`${seatName(seat)} · ваш секрет`}
+              value={selection[seat].tacOp}
+              onChange={(tacOp) => setSelection((s) => ({ ...s, [seat]: { ...s[seat], tacOp } }))}
+              options={tacChoices(data)}
+            />
+          ),
+        )}
       </SetupStep>
       <SetupStep n={4} title="Drop zone и начало" done={false}>
-        <p className="text-[12px] leading-snug text-fg-3">Кто проиграл roll-off и получил Re-roll initiative</p>
-        <Segmented<Seat> value={dropZoneLoser} onChange={setLoser} options={[{ value: 'p1', label: 'Игрок 1' }, { value: 'p2', label: 'Игрок 2' }]} />
-        <Button variant="primary" className="h-12 w-full" disabled={!ready} onClick={() => onSetup({ type: 'setup', missionId, killzone, map, dropZoneLoser, rosters: selection })}>Начать битву</Button>
+        <ChoiceField label="Проиграл roll-off и получил Re-roll initiative" value={dropZoneLoser} onChange={setLoser} options={SEAT_CHOICES} />
+        <Button variant="primary" className="h-12 w-full" disabled={!ready} onClick={() => onSetup({ type: 'setup', missionId, killzone, map, dropZoneLoser, rosters: selection })}>
+          Начать битву
+        </Button>
       </SetupStep>
     </section>
   );
 }
 
-function OnlinePlayerSetup({ rosters, index, data, onlineSeat, onRoster, onTac }: { rosters: KtRoster[]; index: KtIndex; data: import('../../skirmish/types').KtGameData; onlineSeat: Seat; onRoster: (id: string, operatives: number) => boolean; onTac: (tacOp: string) => boolean }) {
+function OnlinePlayerSetup({ rosters, index, data, onlineSeat, onRoster, onTac }: { rosters: KtRoster[]; index: KtIndex; data: KtData; onlineSeat: Seat; onRoster: (id: string, operatives: number) => boolean; onTac: (tacOp: string) => boolean }) {
   const [rosterId, setRosterId] = useState('');
   const [tacOp, setTacOp] = useState(data.tacOps[0]!.id);
   const [saved, setSaved] = useState(false);
   return (
     <div className="mb-3 space-y-2 rounded-2xl border border-accent/30 bg-accent/10 p-3">
-      <p className="text-sm font-semibold">{onlineSeat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · ваш ростер и секрет</p>
-      <select value={rosterId} onChange={(e) => { setRosterId(e.target.value); setSaved(false); }} className={selectClass}>
-        <option value="">Выберите kill team</option>
-        {rosters.map((r) => <option key={r.id} value={r.id}>{r.name} · {index.teams.find((team) => team.id === r.teamId)?.name ?? r.teamId} · {r.operatives.length} опер.</option>)}
-      </select>
-      <select value={tacOp} onChange={(e) => { setTacOp(e.target.value); setSaved(false); }} className={selectClass}>{data.tacOps.map((t) => <option key={t.id} value={t.id}>{t.archetype} · {t.name}</option>)}</select>
+      <p className="text-sm font-semibold">{seatName(onlineSeat)} · ваш ростер и секрет</p>
+      <ChoiceField label="Kill team" placeholder="Выберите kill team" value={rosterId} onChange={(id) => (setRosterId(id), setSaved(false))} options={rosterChoices(rosters, index)} inlineMax={0} />
+      <ChoiceField label="Tac Op" value={tacOp} onChange={(id) => (setTacOp(id), setSaved(false))} options={tacChoices(data)} />
       <div className="grid grid-cols-2 gap-2">
-        <Button disabled={!rosterId} onClick={() => onRoster(rosterId, rosters.find((r) => r.id === rosterId)?.operatives.length ?? 0)}>Сохранить ростер</Button>
-        <Button variant="primary" onClick={() => { if (onTac(tacOp)) setSaved(true); }}>{saved ? 'Tac Op сохранён ✓' : 'Подтвердить Tac Op'}</Button>
+        <Button disabled={!rosterId} onClick={() => onRoster(rosterId, rosters.find((r) => r.id === rosterId)?.operatives.length ?? 0)}>
+          Сохранить ростер
+        </Button>
+        <Button variant="primary" onClick={() => {
+            if (onTac(tacOp)) setSaved(true);
+          }}>
+          {saved ? 'Tac Op сохранён ✓' : 'Подтвердить Tac Op'}
+        </Button>
       </div>
     </div>
   );
@@ -315,44 +377,115 @@ function RosterChoice({ seat, rosters, index, selected, onSelect, onCode }: { se
   const [error, setError] = useState<string | null>(null);
   return (
     <div className="space-y-2 rounded-xl border border-white/10 bg-black/20 p-3">
-      <p className="text-[12px] font-semibold uppercase text-fg-3">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'}</p>
+      <GameLabel>{seatName(seat)}</GameLabel>
       <Segmented value={mode} onChange={setMode} options={[{ value: 'own', label: 'Мой ростер' }, { value: 'code', label: 'По коду' }]} />
       {mode === 'own' ? (
-        <select value={selected} onChange={(e) => onSelect(e.target.value)} className={selectClass}><option value="">Выберите kill team</option>{rosters.map((r) => <option key={r.id} value={r.id}>{r.name} · {index.teams.find((team) => team.id === r.teamId)?.name ?? r.teamId} · {r.operatives.length} опер.</option>)}</select>
+        <ChoiceField placeholder="Выберите kill team" value={selected} onChange={onSelect} options={rosterChoices(rosters, index)} inlineMax={0} />
       ) : (
         <>
-          <textarea value={code} onChange={(e) => setCode(e.target.value)} rows={2} placeholder="KT1.…" className="w-full rounded-lg border border-white/10 bg-white/[0.04] p-2 font-mono text-xs outline-none focus:border-accent" />
+          <textarea value={code} onChange={(e) => setCode(e.target.value)} rows={2} placeholder="KT1.…" className="w-full rounded-xl border border-white/10 bg-white/[0.04] p-2.5 font-mono text-xs outline-none focus:border-accent" />
           {error && <p className="text-[12px] text-danger">{error}</p>}
-          <Button className="w-full" disabled={!code.trim()} onClick={() => { const result = onCode(code); setError(result); if (!result) setCode(''); }}>Добавить по коду</Button>
+          <Button
+            className="w-full"
+            disabled={!code.trim()}
+            onClick={() => {
+              const result = onCode(code);
+              setError(result);
+              if (!result) setCode('');
+            }}
+          >
+            Добавить по коду
+          </Button>
         </>
       )}
     </div>
   );
 }
 
-function BattleHeader({ state, data, onInitiative, onPhase }: { state: KtState; data: import('../../skirmish/types').KtGameData; onInitiative: (cards: Partial<Record<Seat, { reroll?: boolean; modifier?: number }>>) => boolean; onPhase: () => boolean }) {
+type Cards = Partial<Record<Seat, { reroll?: boolean; modifier?: number }>>;
+type ManualInitiative = { winner: Seat; rolls?: Partial<Record<Seat, number>> };
+
+function BattleHeader({ state, data, onInitiative, onPhase }: { state: KtState; data: KtData; onInitiative: (cards: Cards, manual?: ManualInitiative) => boolean; onPhase: () => boolean }) {
   return (
     <div className="mb-3 rounded-2xl border border-white/10 bg-app-elevated p-3.5">
-      <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">{state.stage === 'finished' ? 'Битва окончена' : `Turning point ${Math.min(state.round, 4)} / ${data.game.turningPoints}`}</p>
-      <p className="mt-1 text-sm text-fg-2">{data.critOps.find((m) => m.id === state.missionId)?.name} · {state.killzone} · Карта {state.map}</p>
+      <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">
+        {state.stage === 'finished' ? 'Битва окончена' : `Turning point ${Math.min(state.round, 4)} / ${data.game.turningPoints} · ${state.phase === 'strategy' ? 'Strategy' : 'Firefight'}`}
+      </p>
+      <p className="mt-1 text-sm text-fg-2">
+        {data.critOps.find((m) => m.id === state.missionId)?.name} · {state.killzone} · Карта {state.map}
+      </p>
       {state.stage === 'battle' && !state.initiativeRolls && state.round <= 4 && <InitiativePanel state={state} onRoll={onInitiative} />}
-      {state.initiativeRolls && <p className="mt-1 text-[12px] text-fg-3">Инициатива: {state.initiative === 'p1' ? 'Игрок 1' : 'Игрок 2'} · броски {state.initiativeRolls.p1} : {state.initiativeRolls.p2}</p>}
-      {state.phase === 'strategy' && state.initiativeRolls && <Button variant="primary" className="mt-2 w-full" onClick={onPhase} disabled={state.round === 1 && (!state.players.p1.primaryOp || !state.players.p2.primaryOp)}>Перейти к Firefight</Button>}
+      {state.initiativeRolls && (
+        <p className="mt-1 text-[12px] text-fg-3">
+          Инициатива: {seatName(state.initiative)}
+          {state.initiativeManual
+            ? state.initiativeRolls.p1 || state.initiativeRolls.p2
+              ? ` · вручную, броски ${state.initiativeRolls.p1} : ${state.initiativeRolls.p2}`
+              : ' · вручную'
+            : ` · броски ${state.initiativeRolls.p1} : ${state.initiativeRolls.p2}`}
+        </p>
+      )}
+      {state.phase === 'strategy' && state.initiativeRolls && (
+        <Button variant="primary" className="mt-3 w-full" onClick={onPhase} disabled={state.round === 1 && (!state.players.p1.primaryOp || !state.players.p2.primaryOp)}>
+          Перейти к Firefight
+        </Button>
+      )}
     </div>
   );
 }
 
-function InitiativePanel({ state, onRoll }: { state: KtState; onRoll: (cards: Partial<Record<Seat, { reroll?: boolean; modifier?: number }>>) => boolean }) {
-  const [cards, setCards] = useState<Partial<Record<Seat, { reroll?: boolean; modifier?: number }>>>({});
+function InitiativePanel({ state, onRoll }: { state: KtState; onRoll: (cards: Cards, manual?: ManualInitiative) => boolean }) {
+  const [cards, setCards] = useState<Cards>({});
+  const dice = useDiceMode((s) => s.mode);
+  const [winner, setWinner] = useState<Seat | ''>('');
+  const [rolls, setRolls] = useState<Partial<Record<Seat, number>>>({});
+  const D6: Choice<number>[] = [1, 2, 3, 4, 5, 6].map((n) => ({ value: n, label: String(n) }));
   return (
-    <div className="mt-2 rounded-xl bg-black/25 p-2.5">
-      {SEATS.map((seat) => state.players[seat].initiativeCards.length > 0 && (
-        <label key={seat} className="mb-1 flex items-center gap-2 text-[12px] text-fg-3">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · карты {state.players[seat].initiativeCards.join(', ')}
-          <select value={cards[seat]?.modifier ?? 0} onChange={(e) => setCards((c) => ({ ...c, [seat]: { ...c[seat], modifier: Number(e.target.value) } }))} className="rounded bg-app-surface px-2 py-1"><option value={0}>Без модификатора</option>{state.players[seat].initiativeCards.flatMap((n) => <><option key={`plus${n}`} value={n}>+{n}</option><option key={`minus${n}`} value={-n}>−{n}</option></>)}</select>
-        </label>
-      ))}
-      {SEATS.map((seat) => state.players[seat].rerollCard && <label key={`reroll${seat}`} className="flex items-center gap-2 text-[12px] text-fg-3"><input type="checkbox" checked={!!cards[seat]?.reroll} onChange={(e) => setCards((c) => ({ ...c, [seat]: { ...c[seat], reroll: e.target.checked } }))} /> Re-roll: {seat === 'p1' ? 'Игрок 1' : 'Игрок 2'}</label>)}
-      <Button variant="primary" className="mt-2 w-full" onClick={() => onRoll(cards)}>Бросить инициативу</Button>
+    <div className="mt-3 space-y-2 rounded-xl bg-black/25 p-3">
+      <DiceHead title="Инициатива" hint="кто выиграл (значения — по желанию)" />
+      {SEATS.map(
+        (seat) =>
+          state.players[seat].initiativeCards.length > 0 && (
+            <ChoiceField
+              key={seat}
+              label={`${seatName(seat)} · карты ${state.players[seat].initiativeCards.join(', ')}`}
+              value={cards[seat]?.modifier ?? 0}
+              onChange={(modifier) => setCards((c) => ({ ...c, [seat]: { ...c[seat], modifier } }))}
+              inlineMax={5}
+              options={[{ value: 0, label: 'Без' }, ...state.players[seat].initiativeCards.flatMap((n) => [{ value: n, label: `+${n}` }, { value: -n, label: `−${n}` }])]}
+            />
+          ),
+      )}
+      {SEATS.map(
+        (seat) =>
+          state.players[seat].rerollCard && (
+            <ToggleChip key={`reroll${seat}`} checked={!!cards[seat]?.reroll} onChange={(reroll) => setCards((c) => ({ ...c, [seat]: { ...c[seat], reroll } }))}>
+              Re-roll: {seatName(seat)}
+            </ToggleChip>
+          ),
+      )}
+      {dice === 'manual' ? (
+        <>
+          {SEATS.map((seat) => (
+            <ChoiceField
+              key={`roll${seat}`}
+              label={`${seatName(seat)}: выпало (по желанию)`}
+              value={rolls[seat] ?? ''}
+              onChange={(v) => setRolls((r) => ({ ...r, [seat]: v }))}
+              inlineMax={6}
+              options={D6}
+            />
+          ))}
+          <ChoiceField label="Инициативу выиграл" value={winner} onChange={setWinner} options={SEAT_CHOICES} />
+          <Button variant="primary" className="w-full" disabled={!winner} onClick={() => winner && onRoll(cards, { winner, rolls })}>
+            Записать инициативу
+          </Button>
+        </>
+      ) : (
+        <Button variant="primary" className="w-full" onClick={() => onRoll(cards)}>
+          <Icon name="spark" /> Бросить инициативу
+        </Button>
+      )}
     </div>
   );
 }
@@ -360,17 +493,45 @@ function InitiativePanel({ state, onRoll }: { state: KtState; onRoll: (cards: Pa
 function Player({ state, seat, rosterName, tacOpName, reveal, dispatch }: { state: KtState; seat: Seat; rosterName: string; tacOpName: string; reveal: boolean; dispatch: (body: KtEventBody) => boolean }) {
   const p = state.players[seat];
   return (
-    <article className="rounded-2xl border border-white/10 bg-app-elevated p-3.5">
-      <div className="flex items-start justify-between gap-2"><div className="min-w-0"><p className="truncate text-sm font-semibold">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · {rosterName}</p><p className="truncate text-[12px] text-fg-3">{reveal ? `Tac Op: ${tacOpName} · Primary: ${p.primaryOp ?? '—'}` : 'Секреты соперника скрыты'} · Kill Grade {p.killGrade}</p></div><b className="font-display text-xl">{totalKtVp(state, seat)} VP</b></div>
-      <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[12px]"><span className="rounded bg-black/25 px-2 py-1">Crit {p.critVp}</span><span className="rounded bg-black/25 px-2 py-1">Kill {p.killVp}</span><span className="rounded bg-black/25 px-2 py-1">Tac {p.tacVp}</span>{p.bonusVp > 0 && <span className="rounded bg-accent/15 px-2 py-1 text-accent">Primary +{p.bonusVp}</span>}</div>
-      {state.stage === 'battle' && state.initiativeRolls && <div className="mt-2 flex items-center gap-2 text-[12px]"><span className="text-fg-3">CP</span><button type="button" aria-label={`CP минус ${seat}`} onClick={() => dispatch({ type: 'cp-adjust', seat, delta: -1 })} className="size-7 rounded border border-white/10">−</button><b>{p.cp}</b><button type="button" aria-label={`CP плюс ${seat}`} onClick={() => dispatch({ type: 'cp-adjust', seat, delta: 1 })} className="size-7 rounded border border-white/10">+</button>{state.round === 1 && state.initiativeRolls && <span className="ml-auto flex gap-1">{(['crit', 'kill', 'tac'] as Op[]).map((op) => <button key={op} type="button" onClick={() => dispatch({ type: 'primary-op', seat, op })} className={cx('rounded border px-2 py-1', p.primaryOp === op ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 text-fg-3')}>{op}</button>)}</span>}</div>}
+    <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+      <p className="truncate text-[13px] font-semibold text-white/90">
+        {seatName(seat)} · {rosterName}
+      </p>
+      <p className="truncate text-[12px] text-fg-3">
+        {reveal ? `Tac Op: ${tacOpName} · Primary: ${p.primaryOp ?? '—'}` : 'Секреты соперника скрыты'} · Kill Grade {p.killGrade}
+      </p>
+      {state.stage === 'battle' && state.initiativeRolls && (
+        <>
+          <GameCounter label="CP" value={p.cp} onMinus={() => dispatch({ type: 'cp-adjust', seat, delta: -1 })} onPlus={() => dispatch({ type: 'cp-adjust', seat, delta: 1 })} />
+          {state.round === 1 && (
+            <div className="mt-2">
+              <ChoiceField
+                label="Primary op"
+                value={p.primaryOp ?? ''}
+                onChange={(op) => dispatch({ type: 'primary-op', seat, op })}
+                options={(['crit', 'kill', 'tac'] as Op[]).map((op) => ({ value: op, label: op === 'crit' ? 'Crit' : op === 'kill' ? 'Kill' : 'Tac' }))}
+              />
+            </div>
+          )}
+        </>
+      )}
     </article>
   );
 }
 
 const ACTIONS: Record<string, { action: string; label: string }[]> = {
-  secure: [{ action: 'secure', label: 'Secure 1AP' }], loot: [{ action: 'loot', label: 'Loot 1AP' }], transmission: [{ action: 'transmit', label: 'Initiate Transmission 1AP' }], orb: [{ action: 'orb', label: 'Move Orb 1AP' }], download: [{ action: 'download', label: 'Download 1AP' }], data: [{ action: 'compile', label: 'Compile Data 1AP' }, { action: 'send', label: 'Send Data 1AP' }], reboot: [{ action: 'reboot', label: 'Reboot 2AP' }],
+  secure: [{ action: 'secure', label: 'Secure 1AP' }],
+  loot: [{ action: 'loot', label: 'Loot 1AP' }],
+  transmission: [{ action: 'transmit', label: 'Initiate Transmission 1AP' }],
+  orb: [{ action: 'orb', label: 'Move Orb 1AP' }],
+  download: [{ action: 'download', label: 'Download 1AP' }],
+  data: [
+    { action: 'compile', label: 'Compile Data 1AP' },
+    { action: 'send', label: 'Send Data 1AP' },
+  ],
+  reboot: [{ action: 'reboot', label: 'Reboot 2AP' }],
 };
+
 function InitiativeAndActions({ state, dispatch }: { state: KtState; dispatch: (body: KtEventBody) => boolean }) {
   const [seat, setSeat] = useState<Seat>('p1');
   const [marker, setMarker] = useState('home');
@@ -379,17 +540,43 @@ function InitiativeAndActions({ state, dispatch }: { state: KtState; dispatch: (
   const [within6, setWithin6] = useState(true);
   const actions = ACTIONS[state.missionId] ?? [];
   return (
-    <section className="mt-3 space-y-3 rounded-2xl border border-white/10 bg-app-elevated p-3">
+    <section className="mt-3 space-y-3 rounded-2xl border border-white/10 bg-app-elevated p-3.5">
       <Segmented<Seat> value={seat} onChange={setSeat} options={[{ value: 'p1', label: 'Действует игрок 1' }, { value: 'p2', label: 'Действует игрок 2' }]} />
-      {actions.length > 0 && <div className="grid grid-cols-[1fr_1fr] gap-2"><select value={marker} onChange={(e) => setMarker(e.target.value)} className={selectClass}><option value="home">Home</option><option value="centre">Centre</option><option value="enemy">Enemy</option></select><select value={target} onChange={(e) => setTarget(e.target.value)} className={selectClass}><option value="home">Target: Home</option><option value="centre">Target: Centre</option><option value="enemy">Target: Enemy</option></select></div>}
-      {actions.map((a) => <Button key={a.action} className="w-full" onClick={() => dispatch({ type: 'crit-action', seat, action: a.action, marker, target })}>{a.label}</Button>)}
-      {state.missionId === 'reboot' && <Button className="w-full" onClick={() => dispatch({ type: 'crit-action', seat, action: 'reboot-select', marker, target })}>Выбрать inert: P1={marker}, P2={target}</Button>}
-      <div className="border-t border-white/10 pt-2">
-        <p className="mb-2 text-[12px] font-semibold uppercase text-fg-3">Вражеский оперативник incapacitated</p>
-        <div className="flex items-center gap-2"><select value={wounds} onChange={(e) => setWounds(Number(e.target.value))} className={selectClass}>{[4, 8, 12, 16].map((n) => <option key={n} value={n}>Wounds {n}</option>)}</select><label className="flex items-center gap-1 text-[12px] text-fg-3"><input type="checkbox" checked={within6} onChange={(e) => setWithin6(e.target.checked)} /> в 6″ drop zone</label></div>
-        <Button className="mt-2 w-full" onClick={() => dispatch({ type: 'incapacitated', seat, wounds, within6, marker, manualTacOp: true })}>Записать incapacitation</Button>
+      {actions.length > 0 && (
+        <div className="space-y-2">
+          <GameLabel>Действие миссии</GameLabel>
+          <ChoiceField label="Маркер" value={marker} onChange={setMarker} options={MARKERS} />
+          <ChoiceField label="Цель" value={target} onChange={setTarget} options={MARKERS} />
+          {actions.map((a) => (
+            <Button key={a.action} className="w-full" onClick={() => dispatch({ type: 'crit-action', seat, action: a.action, marker, target })}>
+              {a.label}
+            </Button>
+          ))}
+          {state.missionId === 'reboot' && (
+            <Button className="w-full" onClick={() => dispatch({ type: 'crit-action', seat, action: 'reboot-select', marker, target })}>
+              Выбрать inert: P1={marker}, P2={target}
+            </Button>
+          )}
+        </div>
+      )}
+      <div className="space-y-2 border-t border-white/10 pt-3">
+        <GameLabel>Вражеский оперативник incapacitated</GameLabel>
+        <ChoiceField label="Wounds" value={wounds} onChange={setWounds} inlineMax={4} options={[4, 8, 12, 16].map((n) => ({ value: n, label: String(n) }))} />
+        <ToggleChip checked={within6} onChange={setWithin6}>
+          В 6″ от drop zone
+        </ToggleChip>
+        <Button className="w-full" onClick={() => dispatch({ type: 'incapacitated', seat, wounds, within6, marker, manualTacOp: true })}>
+          Записать incapacitation
+        </Button>
       </div>
-      <div className="border-t border-white/10 pt-2"><p className="mb-1 text-[12px] text-fg-3">Tac Op, включая Rout: подтвердите результат по тексту карты (не больше 2VP за turning point)</p><div className="grid grid-cols-2 gap-2"><Button onClick={() => dispatch({ type: 'tac-score', seat, points: 1 })}>+1 Tac VP</Button><Button onClick={() => dispatch({ type: 'tac-score', seat, points: 2 })}>+2 Tac VP</Button></div></div>
+      <div className="space-y-2 border-t border-white/10 pt-3">
+        <GameLabel>Tac Op</GameLabel>
+        <p className="text-[12px] leading-snug text-fg-3">Включая Rout: подтвердите результат по тексту карты (не больше 2VP за turning point).</p>
+        <div className="grid grid-cols-2 gap-2">
+          <Button onClick={() => dispatch({ type: 'tac-score', seat, points: 1 })}>+1 Tac VP</Button>
+          <Button onClick={() => dispatch({ type: 'tac-score', seat, points: 2 })}>+2 Tac VP</Button>
+        </div>
+      </div>
     </section>
   );
 }
@@ -400,23 +587,119 @@ function EndRound({ state, dispatch }: { state: KtState; dispatch: (body: KtEven
   const [claims, setClaims] = useState<Partial<Record<Seat, { marker: string; control: boolean; uncontested: boolean }>>>({});
   if (state.round > 4) return null;
   return (
-    <section className="mt-3 rounded-2xl border border-white/10 bg-app-elevated p-3">
-      <p className="text-sm font-semibold">Конец turning point {state.round}: контроль маркеров</p>
-      {Object.keys(controls).map((marker) => <label key={marker} className="mt-2 flex items-center gap-2 text-[12px] capitalize text-fg-3">{marker}<select value={controls[marker] ?? ''} onChange={(e) => setControls((c) => ({ ...c, [marker]: (e.target.value || null) as Seat | null }))} className={selectClass}><option value="">Никто / спорно</option><option value="p1">Игрок 1</option><option value="p2">Игрок 2</option></select>{state.missionId === 'energy-cells' && <select value={carrying[marker] ?? ''} onChange={(e) => setCarrying((c) => ({ ...c, [marker]: e.target.value as Seat }))} className={selectClass}><option value="">Не несут</option><option value="p1">Несёт P1</option><option value="p2">Несёт P2</option></select>}</label>)}
-      {state.missionId === 'stake-claim' && SEATS.map((seat) => <div key={seat} className="mt-2 rounded-xl bg-black/25 p-2 text-[12px] text-fg-3">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · claim<select value={claims[seat]?.marker ?? 'home'} onChange={(e) => setClaims((c) => ({ ...c, [seat]: { marker: e.target.value, control: c[seat]?.control ?? true, uncontested: false } }))} className={selectClass}><option value="home">Home</option><option value="centre">Centre</option><option value="enemy">Enemy</option></select><select value={claims[seat]?.control === false ? 'uncontested' : 'control'} onChange={(e) => setClaims((c) => ({ ...c, [seat]: { marker: c[seat]?.marker ?? 'home', control: e.target.value === 'control', uncontested: e.target.value !== 'control' } }))} className={selectClass}><option value="control">Буду контролировать</option><option value="uncontested">Враг не будет contest</option></select></div>)}
-      <Button variant="primary" className="mt-3 w-full" onClick={() => dispatch({ type: 'end-round', controls, carrying, claims: state.missionId === 'stake-claim' ? claims : undefined })}>Завершить turning point</Button>
+    <section className="mt-3 space-y-3 rounded-2xl border border-white/10 bg-app-elevated p-3.5">
+      <p className="font-display text-lg font-semibold uppercase">Конец turning point {state.round}</p>
+      <GameLabel>Контроль маркеров</GameLabel>
+      {Object.keys(controls).map((marker) => (
+        <div key={marker} className="space-y-1.5">
+          <ChoiceField
+            label={marker[0]!.toUpperCase() + marker.slice(1)}
+            value={controls[marker] ?? 'none'}
+            onChange={(v) => setControls((c) => ({ ...c, [marker]: v === 'none' ? null : (v as Seat) }))}
+            options={[{ value: 'none', label: 'Никто' }, ...SEAT_CHOICES]}
+          />
+          {state.missionId === 'energy-cells' && (
+            <ChoiceField
+              value={carrying[marker] ?? 'none'}
+              onChange={(v) =>
+                setCarrying((c) => {
+                  const next = { ...c };
+                  if (v === 'none') delete next[marker];
+                  else next[marker] = v as Seat;
+                  return next;
+                })
+              }
+              options={[
+                { value: 'none', label: 'Не несут' },
+                { value: 'p1', label: 'Несёт P1' },
+                { value: 'p2', label: 'Несёт P2' },
+              ]}
+            />
+          )}
+        </div>
+      ))}
+      {state.missionId === 'stake-claim' &&
+        SEATS.map((seat) => (
+          <div key={seat} className="space-y-1.5 rounded-xl bg-black/25 p-3">
+            <GameLabel>{seatName(seat)} · claim</GameLabel>
+            <ChoiceField
+              value={claims[seat]?.marker ?? 'home'}
+              onChange={(m) => setClaims((c) => ({ ...c, [seat]: { marker: m, control: c[seat]?.control ?? true, uncontested: false } }))}
+              options={MARKERS}
+            />
+            <ChoiceField
+              value={claims[seat]?.control === false ? 'uncontested' : 'control'}
+              onChange={(v) => setClaims((c) => ({ ...c, [seat]: { marker: c[seat]?.marker ?? 'home', control: v === 'control', uncontested: v !== 'control' } }))}
+              options={[
+                { value: 'control', label: 'Буду контролировать' },
+                { value: 'uncontested', label: 'Враг не будет contest' },
+              ]}
+            />
+          </div>
+        ))}
+      <Button variant="primary" className="w-full" onClick={() => dispatch({ type: 'end-round', controls, carrying, claims: state.missionId === 'stake-claim' ? claims : undefined })}>
+        Завершить turning point
+      </Button>
     </section>
   );
 }
 
 function Result({ state }: { state: KtState }) {
-  return <section className="my-3 rounded-2xl border border-accent/40 bg-accent/10 p-4 text-center"><p className="font-display text-2xl font-semibold uppercase">{state.winner === 'draw' ? 'Ничья' : `Победа: ${state.winner === 'p1' ? 'Игрок 1' : 'Игрок 2'}`}</p><p className="mt-1 text-lg">{totalKtVp(state, 'p1')} : {totalKtVp(state, 'p2')}</p></section>;
+  return (
+    <section className="my-3 rounded-2xl border border-accent/40 bg-accent/10 p-4 text-center">
+      <p className="font-display text-2xl font-semibold uppercase">{state.winner === 'draw' ? 'Ничья' : `Победа: ${seatName(state.winner as Seat)}`}</p>
+      <p className="mt-1 text-lg">
+        {totalKtVp(state, 'p1')} : {totalKtVp(state, 'p2')}
+      </p>
+    </section>
+  );
 }
-function Rules({ state, data, onlineSeat }: { state: KtState; data: import('../../skirmish/types').KtGameData; onlineSeat: Seat }) {
+
+function Rules({ state, data, onlineSeat }: { state: KtState; data: KtData; onlineSeat: Seat }) {
   const mission = data.critOps.find((m) => m.id === state.missionId);
-  return <details className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3"><summary className="cursor-pointer text-sm font-semibold">Правила миссии и Tac Ops</summary>{mission && <div className="mt-2"><SkirmishRuleText text={mission.text} /></div>}{SEATS.map((seat) => { const p = state.players[seat], tac = data.tacOps.find((t) => t.id === p.tacOp); if (state.stage !== 'finished' && seat !== onlineSeat) return <p key={seat} className="mt-3 border-t border-white/10 pt-2 text-[12px] text-fg-3">{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · секрет соперника скрыт до конца игры</p>; return tac ? <p key={seat} className="mt-3 whitespace-pre-line border-t border-white/10 pt-2 text-[12px] leading-relaxed text-fg-2"><b>{seat === 'p1' ? 'Игрок 1' : 'Игрок 2'} · {tac.name}</b><SkirmishRuleText text={tac.text} /></p> : null; })}<p className="mt-3 border-t border-white/10 pt-2 text-[12px] text-fg-3">{data.killOp.text}<br />{data.game.primaryOpBonus}</p></details>;
+  return (
+    <details className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+      <summary className="cursor-pointer text-sm font-semibold">Правила миссии и Tac Ops</summary>
+      {mission && (
+        <div className="mt-2">
+          <SkirmishRuleText text={mission.text} />
+        </div>
+      )}
+      {SEATS.map((seat) => {
+        const p = state.players[seat];
+        const tac = data.tacOps.find((t) => t.id === p.tacOp);
+        if (state.stage !== 'finished' && seat !== onlineSeat)
+          return (
+            <p key={seat} className="mt-3 border-t border-white/10 pt-2 text-[12px] text-fg-3">
+              {seatName(seat)} · секрет соперника скрыт до конца игры
+            </p>
+          );
+        return tac ? (
+          <div key={seat} className="mt-3 border-t border-white/10 pt-2 text-[12px] leading-relaxed text-fg-2">
+            <p className="font-semibold">
+              {seatName(seat)} · {tac.name}
+            </p>
+            <SkirmishRuleText text={tac.text} />
+          </div>
+        ) : null;
+      })}
+      <p className="mt-3 border-t border-white/10 pt-2 text-[12px] text-fg-3">
+        {data.killOp.text}
+        <br />
+        {data.game.primaryOpBonus}
+      </p>
+    </details>
+  );
 }
-const selectClass = 'mt-1 h-10 w-full rounded-xl border border-white/10 bg-app-surface px-2 text-[13px] text-fg outline-none';
-const labelClass = 'block rounded-2xl border border-white/10 bg-app-elevated p-3 text-[12px] font-semibold uppercase tracking-wider text-fg-3';
-function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => void; children: ReactNode }) { return <div className="mx-auto min-h-dvh max-w-lg px-4 pb-24 pt-5"><header className="mb-4 flex items-end gap-3"><IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" /><div className="min-w-0 flex-1"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Kill Team · Approved Ops 2025</p><h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Полная игра</h1></div>{undo && <button type="button" onClick={undo} className="rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold">Отменить</button>}</header>{children}</div>; }
-function Spinner() { return <div className="mx-auto mt-16 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />; }
+
+function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => void; children: ReactNode }) {
+  return (
+    <GameShell onBack={onBack} undo={undo} kicker="Kill Team · Approved Ops" title="Полная игра" className="pb-24">
+      {children}
+    </GameShell>
+  );
+}
+
+function Spinner() {
+  return <div className="mx-auto mt-16 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />;
+}
