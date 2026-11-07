@@ -148,6 +148,9 @@ for (const [label, name] of [
     await page.getByRole('button', { name: 'Начать битву' }).first().click({ timeout: 5000 });
     await page.waitForTimeout(1500);
     await shot(`${label}-battle`, true);
+    await page.getByRole('button', { name: /Бросить/ }).first().click({ timeout: 5000 });
+    await page.waitForTimeout(800);
+    await shot(`${label}-battle-initiative`, true);
   });
 }
 

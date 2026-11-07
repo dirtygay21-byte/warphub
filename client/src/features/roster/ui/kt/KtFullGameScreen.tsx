@@ -282,7 +282,8 @@ function Setup({ rosters, index, initialRosterId, data, online, onSetup }: { ros
   const [map, setMap] = useState(1);
   const [dropZoneLoser, setLoser] = useState<Seat>('p2');
   const [selection, setSelection] = useState<Record<Seat, { id: string; operatives: number; tacOp: string }>>({
-    p1: { id: initialRosterId ?? '', operatives: 0, tacOp: data.tacOps[0]!.id },
+    // ростер, с которого начали игру (меню редактора): число оперативников сразу — иначе «ростер не выбран» до повторного выбора
+    p1: { id: initialRosterId ?? '', operatives: rosters.find((r) => r.id === initialRosterId)?.operatives.length ?? 0, tacOp: data.tacOps[0]!.id },
     p2: { id: '', operatives: 0, tacOp: data.tacOps[0]!.id },
   });
   const chooseRoster = (seat: Seat, id: string) => {
