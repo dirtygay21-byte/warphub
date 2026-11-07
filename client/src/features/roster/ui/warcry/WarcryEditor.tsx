@@ -193,7 +193,7 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
 
         {/* ---- правила (как панель лоров AoS) ---- */}
         <RulesPanel
-          label={`Боевые черты и универсальные способности · ${battletraits.length + index.universal.length}`}
+          label={`Правила варбанды · ${battletraits.length + index.universal.length}`}
           line={battletraits.map((a) => a.name).join(' · ') || 'Боевых черт фракции нет в данных'}
           open={rulesOpen}
           onToggle={() => setRulesOpen((o) => !o)}
