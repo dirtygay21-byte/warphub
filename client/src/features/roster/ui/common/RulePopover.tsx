@@ -32,6 +32,7 @@ export function RuleTrigger({ source, className, children, title }: { source: Ru
       <button
         type="button"
         title={title}
+        data-rule-trigger=""
         onClick={(e) => {
           e.stopPropagation();
           if (anchor) return close();
@@ -77,7 +78,20 @@ function RulePopover({ anchor, source, onClose }: { anchor: DOMRect; source: Rul
   useEffect(() => {
     closeOpen = onClose;
     const pop = pushOverlay(onClose);
-    const onDown = (e: PointerEvent) => !box.current?.contains(e.target as Node) && onClose();
+    // нажатие мимо карточки только закрывает её (07.11.2026): следующий click не доходит до того, что под пальцем
+    // (иначе в редакторе KT/Warcry выбирался или снимался вариант снаряжения). Другая подсказка открывается сразу.
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as Element;
+      if (box.current?.contains(t)) return;
+      onClose();
+      if (t.closest?.('[data-rule-trigger]')) return;
+      const swallow = (c: MouseEvent) => {
+        c.stopPropagation();
+        c.preventDefault();
+      };
+      document.addEventListener('click', swallow, { capture: true, once: true });
+      window.setTimeout(() => document.removeEventListener('click', swallow, { capture: true }), 500);
+    };
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
     // карточка привязана к месту на экране: при прокрутке страницы закрывается (внутри карточки — нет)
     const onScroll = (e: Event) => !box.current?.contains(e.target as Node) && onClose();
@@ -119,7 +133,17 @@ function RulePopover({ anchor, source, onClose }: { anchor: DOMRect; source: Rul
   );
 
   return createPortal(
-    <div ref={box} role="dialog" aria-modal={false} style={style} className="fade-enter fixed z-[60] flex flex-col overflow-hidden rounded-xl border border-accent/30 bg-app-elevated shadow-2xl shadow-black/60">
+    // карточка в портале, но события React всплывают по дереву компонентов — до строки, где стоит подсказка
+    // (строка оружия KT — выбор снаряжения). Нажатия внутри карточки дальше не идут.
+    <div
+      ref={box}
+      role="dialog"
+      aria-modal={false}
+      style={style}
+      onClick={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
+      onKeyDown={(e) => e.stopPropagation()}
+      className="fade-enter fixed z-[60] flex flex-col overflow-hidden rounded-xl border border-accent/30 bg-app-elevated shadow-2xl shadow-black/60">
       <div className="flex items-center gap-2 border-b border-white/[0.08] px-3 py-1.5">
         {stack.length > 0 && <IconButton icon="back" label="Назад" onClick={() => setStack((s) => s.slice(0, -1))} className="size-7" />}
         <p className="min-w-0 flex-1 truncate">{shown ? <Head shown={shown} /> : <span className="text-[13px] text-fg-3">Загрузка…</span>}</p>
