@@ -2,178 +2,442 @@
  "schema": "warphub-ru-translation/1",
  "faction": "AM",
  "name": "Astra Militarum",
+ "rules": {},
  "datasheets": {
   "000000680": {
    "name": "Leman Russ Commander",
-   "abilities": {}
+   "abilities": {
+    "ORDERS": {
+     "en": "1a994275bc",
+     "name": "Приказы",
+     "text": "Этот OFFICER может издать до 2 Orders юнитам SQUADRON."
+    },
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000686": {
    "name": "Cadian Heavy Weapons Squad",
-   "abilities": {}
+   "abilities": {
+    "EMBARKING": {
+     "en": "367b6530ab",
+     "name": "Погрузка",
+     "text": "Будучи погруженной в TRANSPORT, каждая модель занимает место 2 моделей, а каждое оружие, которым вооружены эти модели, считается оружием 2 моделей для целей способности Firing Deck."
+    }
+   }
   },
   "000000690": {
    "name": "Scout Sentinels",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000691": {
    "name": "Armoured Sentinels",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000692": {
    "name": "Chimera",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000694": {
    "name": "Hellhound",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000695": {
    "name": "Basilisk",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000696": {
    "name": "Hydra",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000697": {
    "name": "Wyvern",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000698": {
    "name": "Manticore",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000699": {
    "name": "Deathstrike",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000700": {
    "name": "Leman Russ Battle Tank",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000701": {
    "name": "Leman Russ Demolisher",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000719": {
    "name": "Militarum Tempestus Command Squad",
-   "abilities": {}
+   "abilities": {
+    "ORDERS": {
+     "en": "14f8a0071d",
+     "name": "Приказы",
+     "text": "OFFICER этого юнита может издать 1 Order юниту REGIMENT."
+    }
+   }
   },
   "000000728": {
    "name": "Atlas Recovery Vehicle",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000729": {
    "name": "Salamander Command Vehicle",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000731": {
    "name": "Centaur Light Carrier",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000733": {
    "name": "Trojan Support Vehicle",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000735": {
    "name": "Salamander Scout Vehicle",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000736": {
    "name": "Tauros Assault Vehicle",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000737": {
    "name": "Tauros Venator",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000739": {
    "name": "Armageddon-pattern Medusa",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000740": {
    "name": "Colossus",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000741": {
    "name": "Cyclops Demolition Vehicle",
-   "abilities": {}
+   "abilities": {
+    "COMPACT": {
+     "en": "2a4618860c",
+     "name": "Компактный",
+     "text": "Эта модель может погружаться в модель ASTRA MILITARUM TRANSPORT, как если бы она была моделью INFANTRY. Если она это делает, она занимает место 7 моделей."
+    }
+   }
   },
   "000000751": {
    "name": "Malcador Annihilator",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000752": {
    "name": "Malcador Defender",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000753": {
    "name": "Malcador",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000754": {
    "name": "Malcador Infernus",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000760": {
    "name": "Stygies Destroyer Tank Hunter",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000763": {
    "name": "Stormblade",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000764": {
    "name": "Arkurian Stormhammer",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000767": {
    "name": "Dominus Armoured Siege Bombard",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000768": {
    "name": "Gorgon Heavy Transport",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000769": {
    "name": "Macharius",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000770": {
    "name": "Macharius Omega",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000771": {
    "name": "Macharius Vanquisher",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000772": {
    "name": "Macharius Vulcan",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000777": {
    "name": "Valdor",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000001406": {
    "name": "Sly Marbo",
-   "abilities": {}
+   "abilities": {
+    "LONER": {
+     "en": "9f415c35ab",
+     "name": "Одиночка",
+     "text": "Эту модель нельзя выбрать вашим WARLORD."
+    }
+   }
   },
   "000001596": {
    "name": "Rein And Raus",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000001994": {
    "name": "Carnodon",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000002379": {
    "name": "Storm Chimera",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000002485": {
    "name": "Gaunt’s Ghosts",
-   "abilities": {}
+   "abilities": {
+    "ORDERS": {
+     "en": "d217570325",
+     "name": "Приказы",
+     "text": "OFFICER этого юнита может издать до 2 Orders юнитам REGIMENT или GAUNT’S GHOSTS."
+    }
+   }
   },
   "000002605": {
    "name": "Lord Solar Leontus",
@@ -182,104 +446,272 @@
      "en": "7bea4eed23",
      "text": "Если эта модель в вашей армии, она обязана быть вашим WARLORD.",
      "by": "wh-rules"
+    },
+    "ORDERS": {
+     "en": "4a37637076",
+     "name": "Приказы",
+     "text": "Этот OFFICER может издать до 3 Orders:\n\n▪ юнитам REGIMENT\n▪ юнитам SQUADRON\n▪ юнитам TITANIC"
     }
    }
   },
   "000002606": {
    "name": "Ursula Creed",
-   "abilities": {}
+   "abilities": {
+    "ORDERS": {
+     "en": "cb2b1799b2",
+     "name": "Приказы",
+     "text": "Этот OFFICER может издать до 3 Orders юнитам REGIMENT."
+    }
+   }
   },
   "000002607": {
    "name": "Cadian Castellan",
-   "abilities": {}
+   "abilities": {
+    "ORDERS": {
+     "en": "f306f718e2",
+     "name": "Приказы",
+     "text": "Этот OFFICER может издать 2 Orders юнитам REGIMENT."
+    }
+   }
   },
   "000002609": {
    "name": "Cadian Command Squad",
-   "abilities": {}
+   "abilities": {
+    "ORDERS": {
+     "en": "14f8a0071d",
+     "name": "Приказы",
+     "text": "OFFICER этого юнита может издать 1 Order юниту REGIMENT."
+    }
+   }
   },
   "000002610": {
    "name": "Regimental Attachés",
-   "abilities": {}
+   "abilities": {
+    "Artillery Commander": {
+     "en": "d49d7d40ce",
+     "name": "Артиллерийский командир",
+     "text": "В начале вашей фазы стрельбы выберите один вражеский юнит в пределах 30\" от модели Master of Ordnance этого юнита и видимый ей, который ещё не был выбран для этой способности в этой фазе. До конца фазы оружие Blast, которым вооружены дружественные модели ASTRA MILITARUM ARTILLERY, имеет способность [SUSTAINED HITS 1] при атаках по этому юниту."
+    },
+    "Aeronautica Commander": {
+     "en": "e1ba48da87",
+     "name": "Командир аэронавтики",
+     "text": "В начале вашей фазы стрельбы выберите один вражеский юнит в пределах 30\" от модели Officer of the Fleet этого юнита и видимый ей. До конца фазы каждый раз, когда дружественная модель ASTRA MILITARUM AIRCRAFT совершает атаку дальнего боя по этому юниту, прибавьте 1 к броску попадания."
+    },
+    "Divination (Psychic)": {
+     "en": "9c8cf9b2c5",
+     "name": "Прорицание (Психика)",
+     "text": "Вражеские юниты, выставляемые на поле боя как Подкрепления, не могут быть выставлены в пределах 12\" от модели Astropath этого юнита."
+    },
+    "ATTACHÉS": {
+     "en": "66ef73dbe3",
+     "name": "Прикомандированные",
+     "text": "В начале шага Declare Battle Formations этот юнит обязан присоединиться к одному юниту COMMAND SQUAD из вашей армии (к юниту COMMAND SQUAD не может быть присоединено более одного юнита REGIMENTAL ATTACHÉ). До конца битвы каждая модель этого юнита считается частью этого юнита COMMAND SQUAD, а его начальная численность соответственно увеличивается. Если таким образом присоединить юнит REGIMENTAL ATTACHÉ к COMMAND SQUAD невозможно, он не участвует в битве и считается уничтоженным.\n\nПока этот юнит присоединён к юниту, он может погружаться в любой TRANSPORT, в который может погрузиться тот юнит."
+    }
+   },
+   "loadout": {
+    "en": "aa6611ec6d",
+    "text": "**Master of Ordnance и Officer of the Fleet вооружены:** laspistol; close combat weapon.\n\n**Astropath вооружён:** laspistol; Astropath’s stave."
+   }
   },
   "000002619": {
    "name": "Aegis Defence Line",
-   "abilities": {}
+   "abilities": {
+    "DEPLOYMENT": {
+     "en": "47cd500d47",
+     "name": "Развёртывание",
+     "text": "Когда эта модель выставляется, она состоит из 1 секции платформы, до 5 секций щитов, до 2 секций разрушенных щитов и до 2 концевых секций. Все секции должны соединяться друг с другом, образуя непрерывную линию обороны; две секции разрушенных щитов можно разместить либо на конце линии обороны, либо в её середине так, чтобы они находились в пределах 1/2\" друг от друга (в этом случае эти две секции считаются соединёнными друг с другом). Затем все выставленные секции считаются одной моделью для всех целей правил."
+    }
+   }
   },
   "000002740": {
    "name": "Elysian Drop Sentinel",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000002741": {
    "name": "Leman Russ Eradicator",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000002742": {
    "name": "Leman Russ Executioner",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000002743": {
    "name": "Leman Russ Exterminator",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000002744": {
    "name": "Leman Russ Punisher",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000002745": {
    "name": "Leman Russ Vanquisher",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000003889": {
    "name": "Krieg Command Squad",
-   "abilities": {}
+   "abilities": {
+    "ORDERS": {
+     "en": "14f8a0071d",
+     "name": "Приказы",
+     "text": "OFFICER этого юнита может издать 1 Order юниту REGIMENT."
+    }
+   }
   },
   "000003890": {
    "name": "Lord Marshal Dreir",
-   "abilities": {}
+   "abilities": {
+    "ORDERS": {
+     "en": "cb2b1799b2",
+     "name": "Приказы",
+     "text": "Этот OFFICER может издать до 3 Orders юнитам REGIMENT."
+    }
+   }
   },
   "000003891": {
    "name": "Catachan Command Squad",
-   "abilities": {}
+   "abilities": {
+    "ORDERS": {
+     "en": "14f8a0071d",
+     "name": "Приказы",
+     "text": "OFFICER этого юнита может издать 1 Order юниту REGIMENT."
+    }
+   }
   },
   "000003892": {
    "name": "Rogal Dorn Commander",
-   "abilities": {}
+   "abilities": {
+    "ORDERS": {
+     "en": "1a994275bc",
+     "name": "Приказы",
+     "text": "Этот OFFICER может издать до 2 Orders юнитам SQUADRON."
+    }
+   }
   },
   "000003894": {
    "name": "Catachan Heavy Weapons Squad",
-   "abilities": {}
+   "abilities": {
+    "EMBARKING": {
+     "en": "367b6530ab",
+     "name": "Погрузка",
+     "text": "Будучи погруженной в TRANSPORT, каждая модель занимает место 2 моделей, а каждое оружие, которым вооружены эти модели, считается оружием 2 моделей для целей способности Firing Deck."
+    }
+   }
   },
   "000003895": {
    "name": "Krieg Heavy Weapons Squad",
-   "abilities": {}
+   "abilities": {
+    "EMBARKING": {
+     "en": "a34ad3d798",
+     "name": "Погрузка",
+     "text": "Будучи погруженной в TRANSPORT, каждая модель Heavy Weapons Gunner занимает место 2 моделей, а каждое оружие, которым вооружены эти модели, считается оружием 2 моделей для целей способности Firing Deck."
+    }
+   }
   },
   "000003922": {
    "name": "Hell’s Last",
-   "abilities": {}
+   "abilities": {
+    "One Shot": {
+     "en": "4bd2d5f2b1",
+     "name": "Один выстрел",
+     "text": "Носитель может стрелять из этого оружия только один раз за битву."
+    }
+   }
   },
   "000000870": {
    "name": "Vindicare Assassin",
-   "abilities": {}
+   "abilities": {
+    "SHADOW ASSIGNMENT": {
+     "en": "29646ecd3f",
+     "name": "Теневое задание",
+     "text": "Эту модель нельзя выбрать вашим WARLORD.\n\nЕсли фракция вашей армии — AGENTS OF THE IMPERIUM, то на шаге Declare Battle Formations вы можете заменить эту модель другой моделью OFFICIO ASSASSINORUM при условии, что общая стоимость в очках новой модели не превышает стоимость в очках заменённой ею модели. Ваша армия не может включать дубликаты одной и той же модели (т. е. после замены модели по этому правилу в вашей армии не может быть более 1 VINDICARE ASSASSIN, более 1 CULEXUS ASSASSIN, более 1 EVERSOR ASSASSIN и более 1 CALLIDUS ASSASSIN)."
+    }
+   }
   },
   "000000871": {
    "name": "Callidus Assassin",
-   "abilities": {}
+   "abilities": {
+    "SHADOW ASSIGNMENT": {
+     "en": "29646ecd3f",
+     "name": "Теневое задание",
+     "text": "Эту модель нельзя выбрать вашим WARLORD.\n\nЕсли фракция вашей армии — AGENTS OF THE IMPERIUM, то на шаге Declare Battle Formations вы можете заменить эту модель другой моделью OFFICIO ASSASSINORUM при условии, что общая стоимость в очках новой модели не превышает стоимость в очках заменённой ею модели. Ваша армия не может включать дубликаты одной и той же модели (т. е. после замены модели по этому правилу в вашей армии не может быть более 1 VINDICARE ASSASSIN, более 1 CULEXUS ASSASSIN, более 1 EVERSOR ASSASSIN и более 1 CALLIDUS ASSASSIN)."
+    }
+   }
   },
   "000000872": {
    "name": "Eversor Assassin",
-   "abilities": {}
+   "abilities": {
+    "SHADOW ASSIGNMENT": {
+     "en": "29646ecd3f",
+     "name": "Теневое задание",
+     "text": "Эту модель нельзя выбрать вашим WARLORD.\n\nЕсли фракция вашей армии — AGENTS OF THE IMPERIUM, то на шаге Declare Battle Formations вы можете заменить эту модель другой моделью OFFICIO ASSASSINORUM при условии, что общая стоимость в очках новой модели не превышает стоимость в очках заменённой ею модели. Ваша армия не может включать дубликаты одной и той же модели (т. е. после замены модели по этому правилу в вашей армии не может быть более 1 VINDICARE ASSASSIN, более 1 CULEXUS ASSASSIN, более 1 EVERSOR ASSASSIN и более 1 CALLIDUS ASSASSIN)."
+    }
+   }
   },
   "000000873": {
    "name": "Culexus Assassin",
-   "abilities": {}
+   "abilities": {
+    "SHADOW ASSIGNMENT": {
+     "en": "29646ecd3f",
+     "name": "Теневое задание",
+     "text": "Эту модель нельзя выбрать вашим WARLORD.\n\nЕсли фракция вашей армии — AGENTS OF THE IMPERIUM, то на шаге Declare Battle Formations вы можете заменить эту модель другой моделью OFFICIO ASSASSINORUM при условии, что общая стоимость в очках новой модели не превышает стоимость в очках заменённой ею модели. Ваша армия не может включать дубликаты одной и той же модели (т. е. после замены модели по этому правилу в вашей армии не может быть более 1 VINDICARE ASSASSIN, более 1 CULEXUS ASSASSIN, более 1 EVERSOR ASSASSIN и более 1 CALLIDUS ASSASSIN)."
+    }
+   }
   },
   "000002509": {
    "name": "Voidsmen-at-Arms",
-   "abilities": {}
+   "abilities": {
+    "NAVY BODYGUARD": {
+     "en": "f4102e233a",
+     "name": "Флотская охрана",
+     "text": "Если фракция вашей армии не AGENTS OF THE IMPERIUM, то за каждый юнит VOIDFARERS CHARACTER, включённый в вашу армию, вы можете включить в вашу армию один юнит VOIDSMEN-AT-ARMS, который не учитывается в числе юнитов RETINUE, которые может включать ваша армия (см. Assigned Agents)."
+    }
+   }
   },
   "000002767": {
    "name": "Inquisitorial Agents",
-   "abilities": {}
+   "abilities": {
+    "INQUISITORIAL HENCHMEN": {
+     "en": "27946aa600",
+     "name": "Инквизиторские подручные",
+     "text": "Если фракция вашей армии не AGENTS OF THE IMPERIUM, то за каждый юнит INQUISITOR, включённый в вашу армию, вы можете включить в вашу армию один юнит INQUISITORIAL AGENTS, который не учитывается в числе юнитов RETINUE, которые может включать ваша армия (см. Assigned Agents)."
+    }
+   }
   },
   "000003812": {
    "name": "Ministorum Priest",
@@ -300,7 +732,13 @@
   },
   "000003813": {
    "name": "Grey Knights Terminator Squad",
-   "abilities": {}
+   "abilities": {
+    "Rites of Teleportation": {
+     "en": "35811cf18a",
+     "name": "Ритуалы телепортации",
+     "text": "Если на шаге Declare Battle Formations к этому юниту присоединены один или более юнитов INQUISITOR, модели этих юнитов имеют способность Deep Strike."
+    }
+   }
   },
   "000003815": {
    "name": "Watch Master",
@@ -315,7 +753,13 @@
   },
   "000003818": {
    "name": "Sisters of Battle Squad",
-   "abilities": {}
+   "abilities": {
+    "Simulacrum Imperials": {
+     "en": "047aee50ae",
+     "name": "Симулякрум Империалис",
+     "text": "Улучшите характеристику Лидерства (Leadership) моделей юнита носителя на 1."
+    }
+   }
   },
   "000003822": {
    "name": "Deathwatch Terminator Squad",
@@ -413,6 +857,24 @@
    }
   }
  },
- "stratagems": {},
- "enhancements": {}
+ "detachments": {},
+ "stratagems": {
+  "000009802004": {
+   "en": "77d75233b1",
+   "name": "Сервоцелеуказатели",
+   "text": "КОГДА: Ваша фаза стрельбы, когда дружественный юнит MILITARUM TEMPESTUS отстрелялся.\n\nЦЕЛЬ: Этот юнит MILITARUM TEMPESTUS.\n\nЭФФЕКТ: Выберите один вражеский юнит, поражённый этими атаками дальнего боя. Атаки дальнего боя дружественных юнитов MILITARUM TEMPESTUS по этому вражескому юниту имеют [IGNORES COVER]."
+  }
+ },
+ "enhancements": {
+  "000010912002": {
+   "en": "05a4e51719",
+   "name": "Зоркий глаз, ловкие пальцы",
+   "text": "Только юнит RATLINGS. Когда этот юнит выбирается для стрельбы, вражеские юниты получают +6\" к радиусу обнаружения, пока этот юнит не отстреляется."
+  },
+  "000010791004": {
+   "en": "94e4db2539",
+   "name": "Омниссианские мази (Аура)",
+   "text": "Только модель ASTRA MILITARUM TECH-PRIEST ENGINSEER. Пока дружественный юнит ARMOURED SKIRMISHER находится в пределах 3\" от носителя, этот юнит имеет способность Feel No Pain 5+."
+  }
+ }
 }

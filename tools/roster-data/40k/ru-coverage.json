@@ -290,7 +290,7 @@
     ]
    },
    "warphub": {
-    "applied": 16,
+    "applied": 116,
     "stale": [],
     "unknown": []
    }
@@ -569,7 +569,7 @@
     ]
    },
    "warphub": {
-    "applied": 17,
+    "applied": 95,
     "stale": [],
     "unknown": []
    }
@@ -802,7 +802,7 @@
     ]
    },
    "warphub": {
-    "applied": 10,
+    "applied": 87,
     "stale": [],
     "unknown": []
    }
@@ -884,7 +884,7 @@
     ]
    },
    "warphub": {
-    "applied": 10,
+    "applied": 78,
     "stale": [],
     "unknown": []
    }
@@ -1138,6 +1138,11 @@
     "armyRules": [
      "Synapse"
     ]
+   },
+   "warphub": {
+    "applied": 79,
+    "stale": [],
+    "unknown": []
    }
   },
   "GK": {
@@ -2094,7 +2099,7 @@
     ]
    },
    "warphub": {
-    "applied": 38,
+    "applied": 697,
     "stale": [],
     "unknown": []
    }
@@ -2254,7 +2259,7 @@
     ]
    },
    "warphub": {
-    "applied": 15,
+    "applied": 85,
     "stale": [],
     "unknown": []
    }
@@ -2388,7 +2393,7 @@
     ]
    },
    "warphub": {
-    "applied": 12,
+    "applied": 78,
     "stale": [],
     "unknown": []
    }

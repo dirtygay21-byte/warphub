@@ -48,24 +48,25 @@
 | Фракция | Переводов применено | Устарели (английский изменился) | Неизвестные id |
 |---|---|---|---|
 | Adepta Sororitas | 33 | 0 | 0 |
-| Adeptus Custodes | 16 | 0 | 0 |
+| Adeptus Custodes | 116 | 0 | 0 |
 | Adeptus Mechanicus | 30 | 0 | 0 |
 | Aeldari | 6 | 0 | 0 |
-| Astra Militarum | 17 | 0 | 0 |
+| Astra Militarum | 95 | 0 | 0 |
 | Chaos Daemons | 30 | 0 | 0 |
 | Chaos Knights | 20 | 0 | 0 |
-| Chaos Space Marines | 10 | 0 | 0 |
-| Death Guard | 10 | 0 | 0 |
+| Chaos Space Marines | 87 | 0 | 0 |
+| Death Guard | 78 | 0 | 0 |
 | Drukhari | 5 | 0 | 0 |
 | Emperor’s Children | 22 | 0 | 0 |
+| Genestealer Cults | 79 | 0 | 0 |
 | Grey Knights | 33 | 0 | 0 |
 | Imperial Agents | 8 | 0 | 0 |
 | Imperial Knights | 29 | 0 | 0 |
 | Leagues of Votann | 3 | 0 | 0 |
 | Necrons | 11 | 0 | 0 |
 | Orks | 24 | 0 | 0 |
-| Space Marines | 38 | 0 | 0 |
+| Space Marines | 697 | 0 | 0 |
 | T’au Empire | 21 | 0 | 0 |
-| Thousand Sons | 15 | 0 | 0 |
+| Thousand Sons | 85 | 0 | 0 |
 | Tyranids | 4 | 0 | 0 |
-| World Eaters | 12 | 0 | 0 |
+| World Eaters | 78 | 0 | 0 |

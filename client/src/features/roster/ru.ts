@@ -28,8 +28,11 @@ export interface RuOverlay {
   enhancements?: Record<string, RuText>;
 }
 
-/** «Русское (English)», как названия на wh-rules.ru; без русского — английское. */
-export const ruName = (ru: string | null | undefined, en: string): string => (ru && ru.trim() && ru.trim().toLowerCase() !== en.trim().toLowerCase() ? `${ru.trim()} (${en})` : en);
+/**
+ * Название правила, способности, стратагемы, улучшения: английское (как в правилах), перевод — в скобках
+ * («Oath of Moment (Клятва момента)»; решение владельца 07.11.2026). Перевода нет или он совпадает — только английское.
+ */
+export const ruName = (ru: string | null | undefined, en: string): string => (ru && ru.trim() && ru.trim().toLowerCase() !== en.trim().toLowerCase() ? `${en} (${ru.trim()})` : en);
 
 export const ruRule = (o: RuOverlay | null, id: string | null | undefined) => (o && id ? (o.rules?.[id] ?? null) : null);
 export const ruAbility = (o: RuOverlay | null, dsId: string, name: string) => o?.datasheets?.[dsId]?.abilities?.[name] ?? null;
