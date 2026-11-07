@@ -1,5 +1,5 @@
 {
- "about": "P1-T5c: варианты конструктора ростеров wh-rules.ru (40k/whrules-995-roster.json), формулировки которых нет в наших options сопоставленных инфолистов, после обновления whrules-995-wargear. wording — тот же вариант другими словами; not-option — не вариант; conflict — содержание расходится, не меняется без решения владельца (все конфликты решены в P1-T5e — resolved). Проверка — tests/paid-wargear.test.ts. 07.11.2026: 4 записи (AS Celestian Insidiants, AE Guardian Defenders/платформа, QT ×2) убраны — после полной конвертации из wh-rules 995 формулировка вариантов совпадает с конструктором. Партия 2: запись DRU Razorwing Jetfighter/void lances убрана — формулировка совпадает с конструктором. Партия 3: убраны записи AM Griffon Mortar Carrier, AM Death Korps Of Krieg и TAU Crisis Sunforge Battlesuits (две одинаковые) — формулировки совпадают с конструктором.",
+ "about": "P1-T5c: варианты конструктора ростеров wh-rules.ru (40k/whrules-995-roster.json), формулировки которых нет в наших options сопоставленных инфолистов, после обновления whrules-995-wargear. wording — тот же вариант другими словами; not-option — не вариант; conflict — содержание расходится, не меняется без решения владельца (все конфликты решены в P1-T5e — resolved). Проверка — tests/paid-wargear.test.ts. 07.11.2026: 4 записи (AS Celestian Insidiants, AE Guardian Defenders/платформа, QT ×2) убраны — после полной конвертации из wh-rules 995 формулировка вариантов совпадает с конструктором. Партия 2: запись DRU Razorwing Jetfighter/void lances убрана — формулировка совпадает с конструктором. Партия 3: убраны записи AM Griffon Mortar Carrier, AM Death Korps Of Krieg и TAU Crisis Sunforge Battlesuits (две одинаковые) — формулировки совпадают с конструктором. Партия 4: убрана запись CSM 000002732 — формулировка совпадает с конструктором.",
  "roster": "whrules-995-roster.json",
  "items": [
   {
@@ -17,14 +17,6 @@
    "site": "Daemonic Allegiance Additional Wargear",
    "verdict": "not-option",
    "note": "заголовок группы «Daemonic Allegiance Additional Wargear» в конструкторе, не вариант снаряжения"
-  },
-  {
-   "army": "CSM",
-   "id": "000002732",
-   "unit": "Renegade Heavy Weapons Squad",
-   "site": "Any number of models’ heavy stubbers can each be replaced with one of the following:",
-   "verdict": "wording",
-   "note": "тот же вариант, другая формулировка или разбивка (у нас есть)"
   },
   {
    "army": "CSM",

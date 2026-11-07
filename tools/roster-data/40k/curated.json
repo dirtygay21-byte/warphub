@@ -308,6 +308,59 @@
         "note": "Полная конвертация TAU из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 3)."
       },
       {
+        "id": "whrules-995-chaos-space-marines",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-chaos-space-marines+imperial-knights.json",
+        "points": "whrules-995.json",
+        "faction": "chaos-space-marines",
+        "army": "CSM",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "CSM"
+        ],
+        "note": "Полная конвертация CSM из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 4)."
+      },
+      {
+        "id": "whrules-995-imperial-knights",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-chaos-space-marines+imperial-knights.json",
+        "points": "whrules-995.json",
+        "faction": "imperial-knights",
+        "army": "QI",
+        "keepOldLimits": true,
+        "syncCopies": true,
+        "weaponFixes": [
+          {
+            "unit": "Knight Destrier",
+            "weapon": "Titanic feet",
+            "field": "S",
+            "from": "8",
+            "to": "7",
+            "why": "У wh-rules 995 у Knight Destrier Titanic feet S8; у Warmind (BSData wh40k-11e-mfm) и в прежних данных (Wahapedia) — S7. Взято S7 (сверка 07.11.2026)."
+          }
+        ],
+        "enabled": true,
+        "scope": [
+          "QI"
+        ],
+        "note": "Полная конвертация QI из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 4)."
+      },
+      {
+        "id": "whrules-995-orks",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-orks.json",
+        "points": "whrules-995.json",
+        "faction": "orks",
+        "army": "ORK",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "ORK"
+        ],
+        "note": "Полная конвертация ORK из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 4)."
+      },
+      {
         "id": "whrules-995-points",
         "kind": "whrules-points",
         "snapshot": "whrules-995.json",
@@ -498,7 +551,10 @@
           "WE",
           "AM",
           "NEC",
-          "TAU"
+          "TAU",
+          "CSM",
+          "QI",
+          "ORK"
         ],
         "note": "Leader по Warmind (решение владельца 2026-11-07): к своим связям добавлены юниты из списка Warmind («attachTo»), если такой инфолист есть в файле армии; наши связи не убираются. Армии — полностью сконвертированные из wh-rules 995; остальные добавятся после своих партий."
       }

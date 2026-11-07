@@ -345,6 +345,15 @@ export function makeConverter({ full, olds, ourIdOf, armyFactions, factionOf, so
     const allied = group === 'ally:agents';
     const costs = costsOf(site.points, { allied });
     if (allied && !costs.length) costs.push(...costsOf(site.points));
+    // подпись размера без пояснения сайта («10 models») — прежняя, если размер тот же («10 Gretchin», Orks 995):
+    // сохранённые ростеры выбирают размер по подписи
+    for (const b of costs)
+      for (const o of b.options) {
+        if (!/^\d+ models?$/.test(o.label)) continue;
+        const ob = old?.costs.find((x) => x.from === b.from) ?? old?.costs[0];
+        const same = ob?.options.filter((x) => x.models === o.models) ?? [];
+        if (same.length === 1 && same[0].label !== o.label && !b.options.some((x) => x.label === same[0].label)) o.label = same[0].label;
+      }
     // стоимость снаряжения и добавок: в снимке нет — текущие значения остаются как наследие, не проверены
     const oldExtras = old ? old.costs.flatMap((b) => [...b.wargear.map((w) => ['wargear', w]), ...b.addons.map((a) => ['addons', a])]) : [];
     if (oldExtras.length) {
@@ -1036,7 +1045,7 @@ export function applyWhrulesFactionConvert(files, full, u) {
   let fixed = 0;
   for (const fx of u.weaponFixes ?? []) {
     let n = 0;
-    for (const d of next.datasheets.filter((x) => x.group === 'own'))
+    for (const d of next.datasheets.filter((x) => x.group === 'own' && (!fx.unit || x.name.toLowerCase() === fx.unit.toLowerCase())))
       for (const w of d.weapons ?? [])
         for (const pr of w.profiles ?? [])
           if ((pr.name ?? w.name).toLowerCase() === fx.weapon.toLowerCase() && String(pr[fx.field]) === String(fx.from)) {
@@ -1091,6 +1100,25 @@ export function applyWhrulesFactionConvert(files, full, u) {
       copies += n;
     }
   }
+  // копии с другим id (инфолисты детачментов и союзников из выгрузки Wahapedia: AM у Brood Brothers GC, Harlequins у DRU,
+  // CSM у Legiones Daemonica CD и союзников-демонов): цены и Legends — как у инфолиста армии с тем же названием и её
+  // ключевыми словами фракции (раньше их переносило обновление очков, после конвертации армии оно их не видит; 07.11.2026)
+  const ownByName = new Map();
+  for (const o of own.values()) ownByName.set(o.name.toLowerCase(), [...(ownByName.get(o.name.toLowerCase()) ?? []), o]);
+  let priced = 0;
+  // и в файле самой армии (CSM: союзники-демоны ally:daemons — копии записей CD с юнитами CSM)
+  for (const F of Object.values(files)) {
+    if (!Array.isArray(F?.datasheets)) continue;
+    for (const x of F.datasheets) {
+      if (x.group === 'own' || x.group === 'ally:agents' || own.has(x.id)) continue;
+      const o = (ownByName.get(String(x.name).toLowerCase()) ?? []).filter((d) => d.factionKeywords.every((k) => (x.factionKeywords ?? []).includes(k)));
+      if (o.length !== 1) continue;
+      if (JSON.stringify(x.costs) === JSON.stringify(o[0].costs) && x.legends === o[0].legends) continue;
+      x.costs = structuredClone(o[0].costs);
+      x.legends = o[0].legends;
+      priced++;
+    }
+  }
   const s = r.summary;
   return {
     changed: 1,
@@ -1099,6 +1127,7 @@ export function applyWhrulesFactionConvert(files, full, u) {
       `проверки: ${r.checks.length} — все пройдены`,
       ...(copies ? [`копии у союзников обновлены: ${copies} (${copyFiles.join(', ')})`] : []),
       ...(fixed ? [`исправлено профилей оружия: ${fixed}`] : []),
+      ...(priced ? [`цены копий с другим id (детачменты, союзники): ${priced}`] : []),
     ],
   };
 }
@@ -1213,7 +1242,9 @@ export function dryRunFaction({ slug, armyId, snapshot = 'whrules-995.json', ful
   for (const d of after) for (const t of [d.loadout, d.transport, ...d.composition, ...d.options.map((o) => o.text), ...d.abilities.map((a) => a.text)]) if (hasMd(t)) md.push(d.name);
   for (const x of [...F.stratagems, ...F.enhancements, ...F.detachments.flatMap((d) => d.abilities), ...Object.values(F.rules)]) if (hasMd(x?.text)) md.push(x.name);
   C('в текстах не осталось разметки wh-rules', !md.length, [...new Set(md)]);
-  C('у каждого своего инфолиста есть цена', after.every((d) => d.costs.length), after.filter((d) => !d.costs.length).map((d) => d.name));
+  // без цены и у сайта, и в прежних данных (Sir Hekhtur — модель в составе Canis Rex, отдельно не берётся) — не ошибка конвертации
+  const noPrice = after.filter((d) => !d.costs.length && !(before.find((o) => o.id === d.id) && !before.find((o) => o.id === d.id).costs.length));
+  C('у каждого своего инфолиста есть цена', !noPrice.length, noPrice.map((d) => d.name));
   C('у каждого детачмента есть Force Disposition', F.detachments.every((d) => d.forceDispositions?.length || d.forceDisposition), F.detachments.filter((d) => !d.forceDispositions?.length && !d.forceDisposition).map((d) => d.name));
   C('все прежние id своих инфолистов сохранены', before.every((d) => all.has(d.id)), before.filter((d) => !all.has(d.id)).map((d) => d.name));
   const notOwn = (X) => norm(X.datasheets.filter((d) => !(d.group === 'own' && d.faction === A.id)));

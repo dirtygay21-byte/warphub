@@ -132,7 +132,9 @@ test('совместный отряд: правило детачмента Tankb
   const rules = groupDetRules(members, L, r.detachmentIds);
   const wl = rules.find((x) => /Wreckin/.test(x.name));
   assert.ok(wl, 'правило Wreckas для Tankbustas');
-  assert.deepEqual(wl!.via, ['Tankbustas'], 'Big Mek получает правило через Tankbustas');
+  // с 07.11.2026 (Task C, партия 4) Orks сконвертированы из wh-rules 995: правила детачмента привязаны ко всем инфолистам фракции
+  // (как у остальных сконвертированных армий), поэтому правило есть и у самого Big Mek
+  assert.ok(wl!.via.includes('Tankbustas'), 'правило действует через Tankbustas');
   // без присоединения у Big Mek этого правила нет
   const alone = computeRoster(updateUnit(r, r.units[1]!.uid, { attachedTo: null }), L);
   assert.equal(groupOf(alone.units[1]!, alone).length, 0);

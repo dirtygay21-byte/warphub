@@ -473,6 +473,54 @@
    }
   },
   {
+   "id": "whrules-995-chaos-space-marines",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "CSM"
+   ],
+   "note": "Полная конвертация CSM из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 4).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-chaos-space-marines+imperial-knights.json",
+    "fingerprint": "386b9585f09186d2ad8dada9dc37bfe5b315bd8e06eca649a84e95048e468ec8"
+   }
+  },
+  {
+   "id": "whrules-995-imperial-knights",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "QI"
+   ],
+   "note": "Полная конвертация QI из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 4).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-chaos-space-marines+imperial-knights.json",
+    "fingerprint": "386b9585f09186d2ad8dada9dc37bfe5b315bd8e06eca649a84e95048e468ec8"
+   }
+  },
+  {
+   "id": "whrules-995-orks",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "ORK"
+   ],
+   "note": "Полная конвертация ORK из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 4).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-orks.json",
+    "fingerprint": "82fbad05b0a958458728396b110b5e29d47251d74c7d8aa25a8d95c72d917ba6"
+   }
+  },
+  {
    "id": "whrules-995-points",
    "kind": "whrules-points",
    "scope": [
@@ -559,7 +607,10 @@
     "WE",
     "AM",
     "NEC",
-    "TAU"
+    "TAU",
+    "CSM",
+    "QI",
+    "ORK"
    ],
    "note": "Leader по Warmind (решение владельца 2026-11-07): к своим связям добавлены юниты из списка Warmind («attachTo»), если такой инфолист есть в файле армии; наши связи не убираются. Армии — полностью сконвертированные из wh-rules 995; остальные добавятся после своих партий.",
    "source": {

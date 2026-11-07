@@ -13,6 +13,8 @@ const KNOWN: Record<string, string[]> = {
   // Venomcrest Spit: навык «N/A» у нас, «-» у Warmind (одно и то же); Gaping maw: AP 0 у нас, «-» у Warmind
   'AE/weapons': ['Stonesinger'],
   'TYR/weapons': ['The Red Terror'],
+  // Nobz on Warbikes и Skorchas у Warmind — Warhammer Legends, на сайте и у нас их нет (связь некуда добавить)
+  'ORK/leads': ['Warboss on Warbike'],
 };
 test('армии, сконвертированные из wh-rules 995, по цифрам совпадают с Warmind (кроме известных расхождений)', () => {
   execFileSync('bun', [path.join(ROOT, 'scripts', 'warmind-compare.mjs')], { cwd: ROOT, stdio: 'ignore' });

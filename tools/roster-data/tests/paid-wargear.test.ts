@@ -369,8 +369,9 @@ test('Gargantuan Squiggoth: Kannon в стандартном снаряжени�
 
 test('сохранённые выборы у инфолистов с изменёнными вариантами: таблица перевода wh-rules 995 wargear (Kill Tank — прежние замены откладываются)', () => {
   const F = fac('ORK');
-  const mig = (Array.isArray(F.migrations) ? F.migrations : [F.migrations]).find((m) => m?.source === 'wh-rules 995 wargear')!;
+  // с 07.11.2026 (Task C, партия 4) Orks сконвертированы целиком — таблица перевода в миграции конвертации, а не wargear
   const kt = sheet('ORK', 'Kill Tank');
+  const mig = (Array.isArray(F.migrations) ? F.migrations : [F.migrations]).find((m) => m?.options?.[kt.id])!;
   assert.ok(mig.options?.[kt.id], 'есть перевод для Kill Tank');
   assert.equal(mig.options![kt.id]!.keys['0'], null, 'прежняя «+ Big Shoota» без Deff Rolla — не переводится');
 });

@@ -66,7 +66,9 @@ function compareArmy(army, slugs, wm) {
     // характеристики: по подписи профиля, иначе по порядку
     const ws = u.statlines ?? [];
     (d.stats ?? []).forEach((s, i) => {
-      const w = ws.find((x) => norm(x.label) === norm(s.name)) ?? (ws.length === (d.stats ?? []).length ? ws[i] : null);
+      // подписи профиля — без учёта множественного числа («Gellerpox Mutants» у нас, «Gellerpox Mutant» у Warmind)
+      const one = (t) => norm(t).replace(/s$/, '');
+      const w = ws.find((x) => one(x.label) === one(s.name)) ?? (ws.length === (d.stats ?? []).length ? ws[i] : null);
       if (!w) return;
       const k1 = statKey({ M: s.M, T: s.T, Sv: s.Sv, W: s.W, Ld: s.Ld, OC: s.OC });
       const k2 = statKey(w);
