@@ -114,3 +114,36 @@ export function parseRich(text: string): RichPart[] {
   if (last < text.length) out.push({ t: 'text', s: text.slice(last) });
   return out;
 }
+
+/** Группа страницы «Термины» (07.11.2026). */
+export type GlossaryGroup = 'unit' | 'weapon' | 'faction' | 'terms';
+export const GLOSSARY_GROUPS: { key: GlossaryGroup; label: string }[] = [
+  { key: 'unit', label: 'Способности' },
+  { key: 'weapon', label: 'Оружие' },
+  { key: 'faction', label: 'Оружие фракций' },
+  { key: 'terms', label: 'Термины' },
+];
+export type GlossaryEntry = { id: string; group: GlossaryGroup; name: string; num: string | null; texts: string[] };
+
+/**
+ * Записи страницы «Термины» из глоссария (уже на выбранном языке — localizeGlossary): основные способности юнитов и
+ * оружия (раздел 24), особые способности оружия фракций (варианты текста), термины. По группе, внутри — по названию.
+ */
+export function glossaryEntries(g: Glossary): GlossaryEntry[] {
+  const out: GlossaryEntry[] = [
+    ...Object.entries(g.abilities).map(([id, a]) => ({ id: 'a:' + id, group: a.type === 'weapon' ? ('weapon' as const) : ('unit' as const), name: a.name, num: a.num, texts: [a.text, ...(a.example ? [a.example] : [])] })),
+    ...Object.entries(g.weapon).map(([id, v]) => ({ id: 'w:' + id, group: 'faction' as const, name: id, num: null, texts: v })),
+    ...Object.entries(g.terms).map(([id, t]) => ({ id: 't:' + id, group: 'terms' as const, name: t.term, num: null, texts: [t.text] })),
+  ];
+  const order = GLOSSARY_GROUPS.map((x) => x.key);
+  const bare = (s: string) => s.replace(/^\[|\]$/g, '').toLowerCase();
+  return out.sort((a, b) => order.indexOf(a.group) - order.indexOf(b.group) || bare(a.name).localeCompare(bare(b.name)));
+}
+
+/** Поиск: часть названия (без скобок, регистра) или текста; совпадение по названию — выше (sortByHit). */
+export function matchGlossary(e: GlossaryEntry, q: string): 0 | 1 | 2 {
+  const n = q.trim().toLowerCase().replace(/[[\]]/g, '');
+  if (!n) return 1;
+  if (e.name.toLowerCase().replace(/[[\]]/g, '').includes(n)) return 2;
+  return e.texts.some((t) => t.toLowerCase().includes(n)) ? 1 : 0;
+}
