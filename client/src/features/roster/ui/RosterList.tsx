@@ -6,7 +6,7 @@ import type { BattleSize, DataIndex, Roster } from '../engine/types';
 import { cloudEnabled } from '../storage';
 import { confirmAsk, haptic } from '../telegram';
 import { Button, Empty, Field, Icon, Segmented, Sheet, Tag } from './kit';
-import { ListHeader, ToolTile } from './common/BuilderKit';
+import { ListHeader, ToolMenus } from './common/BuilderKit';
 import { cx, fmtPts } from './util';
 import { indexCredit, indexCreditDetails } from '../engine/source';
 
@@ -49,19 +49,17 @@ export function RosterList({
       <ListHeader kicker="WarpBuilder · 40K 11-я редакция" title="Warhammer 40,000" onBack={onExit} onImport={() => setImporting(true)} />
       {switcher}
 
-      <div className="mb-5 grid grid-cols-2 gap-2">
-        <ToolTile icon="book" title="Правила" sub="Стратагемы · Core Rules" onClick={onRules} />
-        <ToolTile icon="map" title="Начать игру" sub="Миссии · раскладки · трекер" onClick={onStartGame} />
-        <div className="col-span-2">
-          <ToolTile icon="shield" title="Test Army" sub="Расставить армию на поле · построения · линейка" onClick={onTestArmy} />
-        </div>
-        <div className="col-span-2">
-          <ToolTile icon="spark" title="Как играть" sub="Обучение для новичков: ход, стрельба, бой" onClick={() => navigate('/learn/40k')} />
-        </div>
-        <div className="col-span-2 min-w-0">
-          <ToolTile icon="shield" title="Обучающая игра" sub="Раунд по шагам за столом" onClick={() => navigate('/learn/40k/round')} />
-        </div>
-      </div>
+      <ToolMenus
+        rules={[
+          { icon: 'book', title: 'Правила', sub: 'Стратагемы · Core Rules', onClick: onRules },
+          { icon: 'spark', title: 'Как играть', sub: 'Обучение для новичков: ход, стрельба, бой', onClick: () => navigate('/learn/40k') },
+          { icon: 'shield', title: 'Обучающая игра', sub: 'Раунд по шагам за столом', onClick: () => navigate('/learn/40k/round') },
+        ]}
+        game={[
+          { icon: 'map', title: 'Начать игру', sub: 'Миссии · раскладки · трекер', onClick: onStartGame },
+          { icon: 'shield', title: 'Test Army', sub: 'Расставить армию на поле · построения · линейка', onClick: onTestArmy },
+        ]}
+      />
 
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Соберите первый ростер — очки, детачменты и правила проверяются на лету.</Empty>

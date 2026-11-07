@@ -191,16 +191,17 @@ function Controls({
         );
       })}
       {ws.unique && types.length === 0 && ws.hero && <p className="text-[12px] text-fg-3">UNIQUE — улучшения недоступны.</p>}
-      <div className="flex flex-wrap gap-2 pt-1">
+      {/* 07.11.2026: действия — одной строкой равной ширины (на узком экране «Удалить» не уходит на отдельную строку) */}
+      <div className={cx('grid gap-1.5 pt-1', leader ? 'grid-cols-2' : 'grid-cols-3')}>
         {!leader && (
-          <Button className="h-9 px-3 text-xs" onClick={actions.onMove}>
+          <Button className="h-9 px-2 text-xs" onClick={actions.onMove}>
             <Icon name="chevron" className="size-4" /> Перенести
           </Button>
         )}
-        <Button className="h-9 px-3 text-xs" onClick={actions.onDuplicate}>
+        <Button className="h-9 px-2 text-xs" onClick={actions.onDuplicate}>
           <Icon name="copy" className="size-4" /> {leader ? 'Ещё такой полк' : 'Копия'}
         </Button>
-        <Button variant="danger" className="h-9 px-3 text-xs" onClick={actions.onRemove}>
+        <Button variant="danger" className="h-9 px-2 text-xs" onClick={actions.onRemove}>
           <Icon name="trash" className="size-4" /> {leader ? 'Удалить полк' : 'Удалить'}
         </Button>
       </div>

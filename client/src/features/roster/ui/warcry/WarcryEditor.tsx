@@ -206,7 +206,7 @@ export function WarcryEditor({ roster, index, onBack, onStartGame, onTestArmy, o
         {!n && <Empty title="Нет бойцов">Добавьте бойцов — первый боец становится лидером варбанды.</Empty>}
         {n > 1 && !view && (
           <Button variant="outline" className="w-full" disabled={view} onClick={() => (haptic.select(), onChange(autoGroups(roster)))}>
-            <Icon name="spark" className="size-4" /> Распределить по группам автоматически
+            <Icon name="spark" className="size-4" /> Распределить по группам
           </Button>
         )}
         {sections.map((sec) =>

@@ -273,6 +273,14 @@ for (const width of [390, 360]) {
       await page.getByRole('button', { name: sw }).first().click({ timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(800);
       await shot(`layout-${width}-${label}-list`, true);
+      if (width === 390)
+        for (const [k, t] of [['rules', /^Правила/], ['game', /^Игра/]]) {
+          await page.getByRole('button', { name: t }).first().click({ timeout: 5000 });
+          await page.waitForTimeout(500);
+          await shot(`layout-${label}-menu-${k}`);
+          await page.keyboard.press('Escape');
+          await page.waitForTimeout(400);
+        }
       await clickText(name);
       await page.waitForTimeout(1500);
       await shot(`layout-${width}-${label}-editor`, true);

@@ -7,7 +7,7 @@ import { cloudEnabled } from '../../storage';
 import { confirmAsk, haptic, openExternal } from '../../telegram';
 import { Button, Empty, Field, Icon, Segmented, Sheet, Tag } from '../kit';
 import { cx } from '../util';
-import { ListHeader, RosterCard, ToolTile } from '../common/BuilderKit';
+import { ListHeader, RosterCard, ToolMenus } from '../common/BuilderKit';
 
 const ALLIANCE_RU: Record<string, string> = { ORDER: 'Порядок', CHAOS: 'Хаос', DEATH: 'Смерть', DESTRUCTION: 'Разрушение' };
 
@@ -46,18 +46,18 @@ export function AosList({
       <ListHeader kicker="WarpBuilder · AoS 4-я редакция" title="Age of Sigmar" onBack={onExit} onImport={() => setImporting(true)} />
       {switcher}
 
-      <div className="mb-5 grid grid-cols-2 gap-2">
-        <ToolTile icon="spark" title="Начать игру" sub="Батлплан, priority, CP, тактики" onClick={onStartGame} />
-        <ToolTile icon="map" title="Test Army" sub="Расстановка на карте батлплана" onClick={onTestArmy} />
-        <ToolTile icon="book" title="Правила" sub="Core Rules · Wahapedia" onClick={() => openExternal('https://wahapedia.ru/aos4/the-rules/the-core-rules/')} />
-        <ToolTile icon="shield" title="Сезон" sub="General’s Handbook 2026-27" onClick={() => openExternal('https://wahapedia.ru/aos4/the-rules/general-s-handbook-2026-27/')} />
-        <div className="col-span-2">
-          <ToolTile icon="spark" title="Как играть" sub="Обучение для новичков: ход, бой, объекты" onClick={() => navigate('/learn/aos')} />
-        </div>
-        <div className="col-span-2 min-w-0">
-          <ToolTile icon="shield" title="Обучающая игра" sub="Раунд по шагам за столом" onClick={() => navigate('/learn/aos/round')} />
-        </div>
-      </div>
+      <ToolMenus
+        rules={[
+          { icon: 'book', title: 'Правила', sub: 'Core Rules · Wahapedia', onClick: () => openExternal('https://wahapedia.ru/aos4/the-rules/the-core-rules/') },
+          { icon: 'shield', title: 'Сезон', sub: 'General’s Handbook 2026-27', onClick: () => openExternal('https://wahapedia.ru/aos4/the-rules/general-s-handbook-2026-27/') },
+          { icon: 'spark', title: 'Как играть', sub: 'Обучение для новичков: ход, бой, объекты', onClick: () => navigate('/learn/aos') },
+          { icon: 'shield', title: 'Обучающая игра', sub: 'Раунд по шагам за столом', onClick: () => navigate('/learn/aos/round') },
+        ]}
+        game={[
+          { icon: 'spark', title: 'Начать игру', sub: 'Батлплан, priority, CP, тактики', onClick: onStartGame },
+          { icon: 'map', title: 'Test Army', sub: 'Расстановка на карте батлплана', onClick: onTestArmy },
+        ]}
+      />
 
       {rosters.length === 0 ? (
         <Empty title="Пока пусто">Соберите первую армию: полки с героями, вспомогательные юниты, лоры и улучшения проверяются сразу.</Empty>
