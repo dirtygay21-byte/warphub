@@ -27,6 +27,8 @@ import type { WarcryAbility, WarcryFaction, WarcryFighter, WarcryIndex, WarcryWe
 import { confirmAsk, haptic, openExternal, shareText } from '../../telegram';
 import { Button, Empty, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
 import { cx } from '../util';
+import { RuleTrigger } from '../common/RulePopover';
+import { runemarkHint } from '../../warcry/runemarks';
 import { AddRow, ArmyBlock, ControlRow, CostBadge, DatasheetBlock, EditorHeader, GroupHeading, HeaderStat, RuleCard, RulesPanel, SearchField, SectionTitle, StatTiles, UnitRowCard, type BuilderIssue } from '../common/BuilderKit';
 
 const ALLIANCE: Record<string, string> = { chaos: 'Chaos', death: 'Death', destruction: 'Destruction', order: 'Order' };
@@ -438,9 +440,18 @@ function FighterCard({
         {(f.subfaction || f.runemarks.length > 0) && (
           <div className="flex flex-wrap gap-1">
             {f.subfaction && <Tag tone="accent">{f.subfaction}</Tag>}
-            {f.runemarks.map((r) => (
-              <Tag key={r}>{r}</Tag>
-            ))}
+            {f.runemarks.map((r) => {
+              // рунмарка нажимается: какие способности она открывает этому бойцу
+              const hint = runemarkHint(r, [...abilities, ...univ]);
+              return (
+                <RuleTrigger key={r} source={{ title: hint.title, text: hint.text, sub: hint.sub }} className="inline-flex">
+                  <Tag tone={hint.count ? 'accent' : undefined}>
+                    {r}
+                    {hint.count ? ` · ${hint.count}` : ''}
+                  </Tag>
+                </RuleTrigger>
+              );
+            })}
           </div>
         )}
       </DatasheetBlock>

@@ -293,6 +293,17 @@ for (const width of [390, 360]) {
       await clickText(name);
       await page.waitForTimeout(1500);
       await shot(`layout-${width}-${label}-editor`, true);
+      if (label === 'warcry' && width === 390) {
+        // рунмарка бойца: какие способности она открывает
+        await page.locator('[id^="u-"] > button[aria-expanded]').first().click({ timeout: 5000 });
+        await page.getByRole('button', { name: 'Датакарта' }).first().click({ timeout: 5000 });
+        const rm = page.locator('[id^="u-"] div.flex-wrap > button').last();
+        await rm.scrollIntoViewIfNeeded();
+        await rm.click({ timeout: 5000 });
+        await page.waitForTimeout(400);
+        await shot('warcry-runemark');
+        await page.keyboard.press('Escape');
+      }
       if (unit) {
         await page.getByText(unit, { exact: false }).first().click({ timeout: 5000 });
         await page.waitForTimeout(1000);
