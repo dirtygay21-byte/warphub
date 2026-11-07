@@ -178,8 +178,8 @@ export function isOnSlotGrid(
 // ----------------------------------------------------------------------------
 
 export const TABLE_CATEGORY_LABEL = {
-  wh: 'Full-scale Wargaming',
-  small: 'Tactical Games',
+  wh: 'Полномасштабный варгейм',
+  small: 'Тактические игры',
 } as const;
 
 /** Категория стола для игры: 40k/aos → wh, kt/warcry → small; неизвестная игра → null */

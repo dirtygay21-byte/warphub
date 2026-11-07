@@ -5,8 +5,8 @@
 export type TableCategory = "wh" | "small";
 
 export const TABLE_CATEGORY_LABEL: Record<TableCategory, string> = {
-  wh: "Full-scale Wargaming",
-  small: "Tactical Games",
+  wh: "Полномасштабный варгейм",
+  small: "Тактические игры",
 };
 
 /** Игры, которые можно выбрать на столе категории */
