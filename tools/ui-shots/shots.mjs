@@ -138,8 +138,9 @@ for (const [label, name] of [
     await page.waitForTimeout(800);
     await shot(`${label}-game-setup`, true);
     // оба игрока — демо-ростер (выбор из листа), затем начало битвы
-    for (let i = 0; i < 2; i++) {
-      await page.getByRole('button', { name: label === 'kt' ? /Выберите kill team/ : /Выберите варбанду/ }).first().click({ timeout: 5000 });
+    const empty = page.getByRole('button', { name: label === 'kt' ? /Выберите kill team/ : /Выберите варбанду/ });
+    for (let i = 0; i < 2 && (await empty.count()) > 0; i++) {
+      await empty.first().click({ timeout: 5000 });
       await page.getByRole('button', { name: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }).last().click({ timeout: 5000 });
       await page.waitForTimeout(300);
     }
