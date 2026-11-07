@@ -195,14 +195,14 @@ function Controls({
       <div className={cx('grid gap-1.5 pt-1', leader ? 'grid-cols-2' : 'grid-cols-3')}>
         {!leader && (
           <Button className="h-9 px-2 text-xs" onClick={actions.onMove}>
-            <Icon name="chevron" className="size-4" /> Перенести
+            <Icon name="chevron" className="size-4 shrink-0" /> Перенести
           </Button>
         )}
         <Button className="h-9 px-2 text-xs" onClick={actions.onDuplicate}>
-          <Icon name="copy" className="size-4" /> {leader ? 'Ещё такой полк' : 'Копия'}
+          <Icon name="copy" className="size-4 shrink-0" /> {leader ? 'Ещё такой полк' : 'Копия'}
         </Button>
         <Button variant="danger" className="h-9 px-2 text-xs" onClick={actions.onRemove}>
-          <Icon name="trash" className="size-4" /> {leader ? 'Удалить полк' : 'Удалить'}
+          <Icon name="trash" className="size-4 shrink-0" /> {leader ? 'Удалить полк' : 'Удалить'}
         </Button>
       </div>
       <p className="text-[12px] text-fg-3">
