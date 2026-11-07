@@ -151,7 +151,7 @@ export function UnitPicker({
   const visible =
     prefs.sort === 'type'
       ? bySection
-      : [{ key: 'flat', title: PICKER_SORTS.find((x) => x.key === prefs.sort)!.label, chip: '', items: sortPicker(bySection.flatMap((x) => x.items), prefs.sort, (ds) => cheapest(ds, countOf(ds), chapter)) }];
+      : [{ key: 'flat', title: PICKER_SORTS.find((x) => x.key === prefs.sort)!.title, chip: '', items: sortPicker(bySection.flatMap((x) => x.items), prefs.sort, (ds) => cheapest(ds, countOf(ds), chapter)) }];
   const allyInfo = active.startsWith('ally:') ? L.faction.allies.filter((a) => 'ally:' + a.key === active) : [];
 
   return (
@@ -174,6 +174,7 @@ export function UnitPicker({
                 type="button"
                 role="radio"
                 aria-checked={prefs.sort === x.key}
+                aria-label={x.title}
                 onClick={() => (haptic.select(), setPrefs({ sort: x.key }))}
                 className={cx('min-w-0 flex-1 truncate rounded-md px-2 py-1.5 text-xs font-semibold transition', prefs.sort === x.key ? 'bg-white/[0.12] text-white' : 'text-fg-3')}
               >

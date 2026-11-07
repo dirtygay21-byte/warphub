@@ -7,10 +7,11 @@ import type { Datasheet } from './types';
 import type { RuOverlay } from '../ru';
 
 export type PickerSort = 'type' | 'az' | 'points';
-export const PICKER_SORTS: { key: PickerSort; label: string }[] = [
-  { key: 'type', label: 'По типу' },
-  { key: 'az', label: 'А–Я' },
-  { key: 'points', label: 'По очкам' },
+/** label — кнопка (коротко: три кнопки и «Помещается» в одну строку на 360 px), title — заголовок списка. */
+export const PICKER_SORTS: { key: PickerSort; label: string; title: string }[] = [
+  { key: 'type', label: 'Тип', title: 'По типу' },
+  { key: 'az', label: 'А–Я', title: 'По алфавиту' },
+  { key: 'points', label: 'Очки', title: 'По очкам' },
 ];
 
 const low = (s: string) => s.toLowerCase().replace(/[’‘]/g, "'");
