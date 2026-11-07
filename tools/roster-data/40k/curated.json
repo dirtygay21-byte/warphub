@@ -33,6 +33,346 @@
         "note": "Adeptus Custodes (новый кодекс) из полного снимка wh-rules.ru 995: инфолисты, детачменты, улучшения, стратагемы, правила армии; id сохранены (9 переименований по таблице сайта), 5 новых; прежние детачменты, улучшения и стратагемы — устаревшие (для старых ростеров). Одобрено владельцем 2026-10-23 (P1-T4c, решения 1–4)."
       },
       {
+        "id": "whrules-995-adepta-sororitas",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "adepta-sororitas",
+        "army": "AS",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "AS"
+        ],
+        "note": "Полная конвертация AS из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1)."
+      },
+      {
+        "id": "whrules-995-adeptus-mechanicus",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "adeptus-mechanicus",
+        "army": "AdM",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "AdM"
+        ],
+        "note": "Полная конвертация AdM из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1)."
+      },
+      {
+        "id": "whrules-995-aeldari",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "aeldari",
+        "army": "AE",
+        "keepOldLimits": true,
+        "syncCopies": true,
+        "enabled": true,
+        "scope": [
+          "AE"
+        ],
+        "note": "Полная конвертация AE из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1).",
+        "weaponFixes": [
+          {
+            "weapon": "Twin shuriken catapult",
+            "field": "AP",
+            "from": "3",
+            "to": "-3",
+            "why": "wh-rules 995: AP «3» без минуса у Warp Hunter, Corsair Cloud Dancer Band, Firestorm; прежние данные (Wahapedia) и Warmind — -3 (07.11.2026, сверка с Warmind)"
+          }
+        ]
+      },
+      {
+        "id": "whrules-995-chaos-knights",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "chaos-knights",
+        "army": "QT",
+        "keepOldLimits": true,
+        "syncCopies": true,
+        "enabled": true,
+        "scope": [
+          "QT"
+        ],
+        "note": "Полная конвертация QT из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1)."
+      },
+      {
+        "id": "whrules-995-emperors-children",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "emperors-children",
+        "army": "EC",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "EC"
+        ],
+        "note": "Полная конвертация EC из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1)."
+      },
+      {
+        "id": "whrules-995-genestealer-cults",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "genestealer-cults",
+        "army": "GC",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "GC"
+        ],
+        "note": "Полная конвертация GC из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1)."
+      },
+      {
+        "id": "whrules-995-grey-knights",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "grey-knights",
+        "army": "GK",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "GK"
+        ],
+        "note": "Полная конвертация GK из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1)."
+      },
+      {
+        "id": "whrules-995-leagues-of-votann",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "leagues-of-votann",
+        "army": "LoV",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "LoV"
+        ],
+        "note": "Полная конвертация LoV из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1)."
+      },
+      {
+        "id": "whrules-995-tyranids",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "tyranids",
+        "army": "TYR",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "TYR"
+        ],
+        "note": "Полная конвертация TYR из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1)."
+      },
+      {
+        "id": "whrules-995-chaos-daemons",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "chaos-daemons",
+        "army": "CD",
+        "keepOldLimits": true,
+        "syncCopies": true,
+        "enabled": true,
+        "scope": [
+          "CD"
+        ],
+        "note": "Полная конвертация CD из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2)."
+      },
+      {
+        "id": "whrules-995-death-guard",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "death-guard",
+        "army": "DG",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "DG"
+        ],
+        "note": "Полная конвертация DG из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2)."
+      },
+      {
+        "id": "whrules-995-drukhari",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "drukhari",
+        "army": "DRU",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "DRU"
+        ],
+        "note": "Полная конвертация DRU из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2)."
+      },
+      {
+        "id": "whrules-995-thousand-sons",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "thousand-sons",
+        "army": "TS",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "TS"
+        ],
+        "note": "Полная конвертация TS из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2)."
+      },
+      {
+        "id": "whrules-995-world-eaters",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "world-eaters",
+        "army": "WE",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "WE"
+        ],
+        "note": "Полная конвертация WE из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2)."
+      },
+      {
+        "id": "whrules-995-astra-militarum",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "astra-militarum",
+        "army": "AM",
+        "keepOldLimits": true,
+        "syncCopies": true,
+        "statFixes": [
+          {
+            "unit": "Avenger Strike Fighter",
+            "field": "M",
+            "from": "20+\"",
+            "to": "-",
+            "why": "У wh-rules 995 у Avenger Strike Fighter прежний профиль (M 20+\", OC 0); у всех остальных Aircraft 11-й редакции на сайте и у Warmind (BSData wh40k-11e-mfm) — «-». Взято значение Warmind (сверка 07.11.2026)."
+          },
+          {
+            "unit": "Avenger Strike Fighter",
+            "field": "OC",
+            "from": "0",
+            "to": "-",
+            "why": "У wh-rules 995 у Avenger Strike Fighter прежний профиль (M 20+\", OC 0); у всех остальных Aircraft 11-й редакции на сайте и у Warmind (BSData wh40k-11e-mfm) — «-». Взято значение Warmind (сверка 07.11.2026)."
+          }
+        ],
+        "loadoutFixes": [
+          {
+            "unit": "Valkyrie",
+            "from": "Militarum multi-laser",
+            "to": "multi-laser",
+            "why": "У wh-rules 995 в снаряжении Valkyrie «Militarum multi-laser», а профиль оружия и вариант замены — «multi-laser»; без исправления стандартное снаряжение теряет мульти-лазер, и вариант замены не срабатывает."
+          }
+        ],
+        "enabled": true,
+        "scope": [
+          "AM"
+        ],
+        "note": "Полная конвертация AM из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 3)."
+      },
+      {
+        "id": "whrules-995-necrons",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "necrons",
+        "army": "NEC",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "NEC"
+        ],
+        "note": "Полная конвертация NEC из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 3)."
+      },
+      {
+        "id": "whrules-995-tau-empire",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "tau-empire",
+        "army": "TAU",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "TAU"
+        ],
+        "note": "Полная конвертация TAU из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 3)."
+      },
+      {
+        "id": "whrules-995-chaos-space-marines",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-chaos-space-marines+imperial-knights.json",
+        "points": "whrules-995.json",
+        "faction": "chaos-space-marines",
+        "army": "CSM",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "CSM"
+        ],
+        "note": "Полная конвертация CSM из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 4)."
+      },
+      {
+        "id": "whrules-995-imperial-knights",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-chaos-space-marines+imperial-knights.json",
+        "points": "whrules-995.json",
+        "faction": "imperial-knights",
+        "army": "QI",
+        "keepOldLimits": true,
+        "syncCopies": true,
+        "weaponFixes": [
+          {
+            "unit": "Knight Destrier",
+            "weapon": "Titanic feet",
+            "field": "S",
+            "from": "8",
+            "to": "7",
+            "why": "У wh-rules 995 у Knight Destrier Titanic feet S8; у Warmind (BSData wh40k-11e-mfm) и в прежних данных (Wahapedia) — S7. Взято S7 (сверка 07.11.2026)."
+          }
+        ],
+        "enabled": true,
+        "scope": [
+          "QI"
+        ],
+        "note": "Полная конвертация QI из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 4)."
+      },
+      {
+        "id": "whrules-995-orks",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-orks.json",
+        "points": "whrules-995.json",
+        "faction": "orks",
+        "army": "ORK",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "ORK"
+        ],
+        "note": "Полная конвертация ORK из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 4)."
+      },
+      {
+        "id": "whrules-995-space-marines",
+        "kind": "whrules-faction",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "enabled": true,
+        "scope": [
+          "SM",
+          "AoI"
+        ],
+        "note": "Space Marines (с орденами) и Imperial Agents из wh-rules.ru 995; копии Imperial Agents в AC, AM, AS, AdM, GK, QI, TL"
+      },
+      {
         "id": "whrules-995-points",
         "kind": "whrules-points",
         "snapshot": "whrules-995.json",
@@ -150,6 +490,20 @@
             "id": "000000139",
             "remove": "Thunderhawk cluster bombs",
             "why": "устаревшая строка: у сайта Hellstrike Missile Battery уже в стандартном снаряжении, у конструктора варианта нет (P1-T5d)"
+          },
+          {
+            "army": "AE",
+            "id": "000000590",
+            "replace": "Guardian combat weapon",
+            "site": "Up to 2 Storm Guardians can each have their close combat weapon replaced",
+            "why": "Storm Guardians: в инфолисте сайта 995 вариант меняет «Guardian combat weapon», которого в снаряжении нет (у отряда close combat weapon); конструктор ростеров сайта — close combat weapon (07.11.2026, Task C)"
+          },
+          {
+            "army": "AdM",
+            "id": "000002081",
+            "replace": "twin phosphor pistols",
+            "site": "2 phosphor pistols can be replaced with 1 phosphor blast carbine",
+            "why": "Serberys Sulphurhounds: в инфолисте сайта 995 вариант меняет «twin phosphor pistols», в снаряжении — 2 phosphor pistols; конструктор ростеров сайта — 2 phosphor pistols (07.11.2026, Task C)"
           }
         ],
         "datasheets": [
@@ -185,6 +539,38 @@
           }
         ],
         "loadoutRepair": true
+      },
+      {
+        "id": "warmind-leaders",
+        "kind": "warmind-leaders",
+        "snapshot": "warmind-11e.json",
+        "enabled": true,
+        "scope": [
+          "AS",
+          "AC",
+          "AdM",
+          "AE",
+          "QT",
+          "EC",
+          "GC",
+          "GK",
+          "LoV",
+          "TYR",
+          "CD",
+          "DG",
+          "DRU",
+          "TS",
+          "WE",
+          "AM",
+          "NEC",
+          "TAU",
+          "CSM",
+          "QI",
+          "ORK",
+          "SM",
+          "AoI"
+        ],
+        "note": "Leader по Warmind (решение владельца 2026-11-07): к своим связям добавлены юниты из списка Warmind («attachTo»), если такой инфолист есть в файле армии; наши связи не убираются. Армии — полностью сконвертированные из wh-rules 995; остальные добавятся после своих партий."
       }
     ]
   }

@@ -70,7 +70,9 @@ export const loadFull = (file, dir = SNAP_DIR, require = FULL_FACTIONS) => check
 /** Имя файла полного снимка: прежнее для 7 фракций Space Marines, иначе с фракциями в имени. */
 export const fullFileName = (r) => {
   const fs_ = Object.keys(r.factions).sort();
-  return fs_.join() === [...FULL_FACTIONS].sort().join() ? `whrules-${r.source.dataVersion}-full.json` : `whrules-${r.source.dataVersion}-full-${fs_.join('+')}.json`;
+  if (fs_.join() === [...FULL_FACTIONS].sort().join()) return `whrules-${r.source.dataVersion}-full.json`;
+  // много фракций (07.11.2026: снимок всех фракций для английских текстов) — имя по числу фракций, список — внутри файла
+  return fs_.length > 4 ? `whrules-${r.source.dataVersion}-full-${fs_.length}-factions.json` : `whrules-${r.source.dataVersion}-full-${fs_.join('+')}.json`;
 };
 
 /** Фракция сайта для инфолиста приложения (по ключевому слову ордена). */

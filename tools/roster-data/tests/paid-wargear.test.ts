@@ -129,7 +129,8 @@ test('разбор вариантов: составные замены — Knigh
 
 test('варианты из конструктора сайта у инфолистов без вариантов в тексте: Impulsor (Orbital Comms Array — автоматически), Repulsor Executioner (замена Heavy Laser Destroyer)', () => {
   const imp = sheet('SM', 'Impulsor', 'Space Marines');
-  assert.ok(imp.options.length && imp.options.every((o) => o.source === 'whrules-roster'));
+  // в 981 вариантов в тексте инфолиста не было (взяты из конструктора сайта, source «whrules-roster»); в 995 они в тексте сайта
+  assert.ok(imp.options.some((o) => o.text.includes('Orbital Comms Array')));
   assert.equal(paidIsAuto(imp, 'Orbital Comms Array'), true);
   assert.equal(extra(build('SM', imp).last), 0);
   assert.equal(extra(build('SM', imp, { picks: pick(opt(imp, 'Orbital Comms Array'), 'Orbital Comms Array', 1) }).last), 10);
@@ -369,8 +370,9 @@ test('Gargantuan Squiggoth: Kannon в стандартном снаряжени�
 
 test('сохранённые выборы у инфолистов с изменёнными вариантами: таблица перевода wh-rules 995 wargear (Kill Tank — прежние замены откладываются)', () => {
   const F = fac('ORK');
-  const mig = (Array.isArray(F.migrations) ? F.migrations : [F.migrations]).find((m) => m?.source === 'wh-rules 995 wargear')!;
+  // с 07.11.2026 (Task C, партия 4) Orks сконвертированы целиком — таблица перевода в миграции конвертации, а не wargear
   const kt = sheet('ORK', 'Kill Tank');
+  const mig = (Array.isArray(F.migrations) ? F.migrations : [F.migrations]).find((m) => m?.options?.[kt.id])!;
   assert.ok(mig.options?.[kt.id], 'есть перевод для Kill Tank');
   assert.equal(mig.options![kt.id]!.keys['0'], null, 'прежняя «+ Big Shoota» без Deff Rolla — не переводится');
 });

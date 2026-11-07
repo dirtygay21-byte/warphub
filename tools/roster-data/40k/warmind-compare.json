@@ -1,0 +1,479 @@
+{
+ "schema": "warmind-compare/1",
+ "snapshot": {
+  "file": "40k/warmind-11e.json",
+  "fingerprint": "adfa402cb0b52a72155ee8508b8dce91bc9b9fb424c72a5bdbbc81d493ef649f",
+  "source": {
+   "site": "https://warmind.online/app/",
+   "bundle": "entry-d07c2982a65fce6092674ce3fb6c7ce0.js",
+   "dataSource": "BSData wh40k-11e-mfm · Munitorum Field Manual",
+   "label": "11th Edition",
+   "extractedAt": "2026-11-07T16:32:30.726Z"
+  }
+ },
+ "armies": [
+  {
+   "army": "AS",
+   "matched": 38,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "AC",
+   "matched": 36,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "AdM",
+   "matched": 38,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "AE",
+   "matched": 99,
+   "onlyOurs": [],
+   "points": [
+    {
+     "unit": "Shadow Spectres",
+     "ours": {
+      "1": 30,
+      "5": 115,
+      "10": 230
+     },
+     "warmind": {
+      "5": 115,
+      "10": 230
+     }
+    }
+   ],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "AM",
+   "matched": 135,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "CD",
+   "matched": 63,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "QT",
+   "matched": 20,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "CSM",
+   "matched": 85,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "DG",
+   "matched": 41,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "DRU",
+   "matched": 30,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "EC",
+   "matched": 23,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "GC",
+   "matched": 25,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "GK",
+   "matched": 31,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "AoI",
+   "matched": 46,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [
+    {
+     "unit": "Aquila Kill Team",
+     "profile": "Kill Team Sergeant",
+     "ours": "M6 T5 Sv3+ W2 Ld6+ OC2",
+     "warmind": "M6 T4 Sv3+ W2 Ld6+ OC2"
+    }
+   ],
+   "weapons": [
+    {
+     "unit": "Aquila Kill Team",
+     "weapon": "Bolt Pistol",
+     "ours": "12/1/3/5/-1/1",
+     "warmind": "12/1/3/4/0/1"
+    },
+    {
+     "unit": "Aquila Kill Team",
+     "weapon": "Special-issue Bolt Pistol",
+     "ours": "18/1/3/5/-1/1",
+     "warmind": "18/1/3/4/-1/1"
+    },
+    {
+     "unit": "Aquila Kill Team",
+     "weapon": "Plasma Incinerator – standard",
+     "ours": "24/2/3/7/-2/2",
+     "warmind": "24/2/3/7/-2/1"
+    },
+    {
+     "unit": "Aquila Kill Team",
+     "weapon": "Frag Cannon",
+     "ours": "18/2/3/7/-2/2",
+     "warmind": "18/d3/3/7/-2/2"
+    },
+    {
+     "unit": "Aquila Kill Team",
+     "weapon": "Power Weapon",
+     "ours": "melee/4/3/5/-2/1",
+     "warmind": "melee/4/3/5/-2/2"
+    }
+   ],
+   "leads": [],
+   "leadsExtra": [
+    {
+     "unit": "Inquisitor",
+     "onlyOurs": [
+      "deathwatch kill team"
+     ]
+    },
+    {
+     "unit": "Inquisitor Coteaz",
+     "onlyOurs": [
+      "aquila kill team",
+      "deathwatch kill team"
+     ]
+    },
+    {
+     "unit": "Inquisitor Draxus",
+     "onlyOurs": [
+      "deathwatch kill team"
+     ]
+    },
+    {
+     "unit": "Inquisitor Greyfax",
+     "onlyOurs": [
+      "aquila kill team",
+      "deathwatch kill team"
+     ]
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "QI",
+   "matched": 22,
+   "onlyOurs": [
+    "Sir Hekhtur"
+   ],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "LoV",
+   "matched": 22,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "NEC",
+   "matched": 63,
+   "onlyOurs": [
+    "Sentry Pylon (Legends)"
+   ],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "ORK",
+   "matched": 67,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "SM",
+   "matched": 222,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [
+    {
+     "unit": "Thunderhawk Gunship",
+     "profile": "Thunderhawk Gunship",
+     "ours": "M14 T12 Sv2+ W30 Ld6+ OC0",
+     "warmind": "M20 T12 Sv2+ W30 Ld6+ OC0"
+    }
+   ],
+   "weapons": [
+    {
+     "unit": "Lieutenant in Phobos Armour",
+     "weapon": "Master-crafted bolt carbine",
+     "ours": "24/2/2/4/0/2",
+     "warmind": "24/2/2/5/-1/2"
+    },
+    {
+     "unit": "Suboden Khan",
+     "weapon": "Onslaught gatling cannon",
+     "ours": "24/8/2/5/0/1",
+     "warmind": "24/8/2/5/-1/1"
+    },
+    {
+     "unit": "Bjorn the Fell-handed",
+     "weapon": "Assault Cannon",
+     "ours": "24/6/2/6/-2/1",
+     "warmind": "24/6/3/6/-2/1"
+    }
+   ],
+   "leads": [],
+   "leadsExtra": [
+    {
+     "unit": "Ancient in Terminator Armour",
+     "onlyOurs": [
+      "wolf guard terminators"
+     ]
+    },
+    {
+     "unit": "Captain in Phobos Armour",
+     "onlyOurs": [
+      "wolf scouts"
+     ]
+    },
+    {
+     "unit": "Captain in Terminator Armour",
+     "onlyOurs": [
+      "wolf guard terminators"
+     ]
+    },
+    {
+     "unit": "Captain on Bike",
+     "onlyOurs": [
+      "ravenwing black knights"
+     ]
+    },
+    {
+     "unit": "Chaplain in Terminator Armour",
+     "onlyOurs": [
+      "wolf guard terminators"
+     ]
+    },
+    {
+     "unit": "Librarian in Phobos Armour",
+     "onlyOurs": [
+      "wolf scouts"
+     ]
+    },
+    {
+     "unit": "Librarian in Terminator Armour",
+     "onlyOurs": [
+      "wolf guard terminators"
+     ]
+    },
+    {
+     "unit": "Lieutenant in Phobos Armour",
+     "onlyOurs": [
+      "wolf scouts"
+     ]
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "TAU",
+   "matched": 62,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "TS",
+   "matched": 34,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "TYR",
+   "matched": 57,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [
+    {
+     "unit": "The Red Terror",
+     "weapon": "Gaping maw",
+     "ours": "melee/1/2/5/0/d3+2",
+     "warmind": "melee/1/2/5/-/d3+2"
+    }
+   ],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "WE",
+   "matched": 30,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "leadsExtra": [],
+   "detachments": [],
+   "enhancements": []
+  }
+ ]
+}

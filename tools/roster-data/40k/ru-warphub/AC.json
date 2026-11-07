@@ -120,16 +120,6 @@
     }
    }
   },
-  "000003818": {
-   "name": "Sisters of Battle Squad",
-   "abilities": {
-    "Simulacrum Imperials": {
-     "en": "047aee50ae",
-     "name": "Симулякрум Империалис",
-     "text": "Улучшите характеристику Лидерства (Leadership) моделей юнита носителя на 1."
-    }
-   }
-  },
   "000003822": {
    "name": "Deathwatch Terminator Squad",
    "abilities": {

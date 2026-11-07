@@ -26,7 +26,9 @@ function ds(id: string, name: string, group?: string): Datasheet {
   return d!;
 }
 function det(id: string, name: string) {
-  const d = fac(id).F.detachments.find((x) => x.name === name);
+  // апостроф: у сайта (wh-rules 995) — прямой «'», в прежних данных — «’»
+  const ap = (n: string) => n.replace(/[’']/g, "'");
+  const d = fac(id).F.detachments.find((x) => ap(x.name) === ap(name));
   assert.ok(d, `${id}: нет детачмента «${name}»`);
   return d!;
 }

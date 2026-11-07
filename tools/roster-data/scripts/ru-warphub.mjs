@@ -4,13 +4,15 @@
  *   node scripts/ru-warphub.mjs --gaps [ID…]   — английские исходники того, чего нет по-русски → 40k/ru-warphub/_source/<ID>.json;
  *   node scripts/ru-warphub.mjs --prefill [ID…] — из памяти переводов wh-rules.ru (тот же английский текст у других
  *                                               инфолистов/фракций) — в 40k/ru-warphub/<ID>.json с пометкой by: "wh-rules";
- *   node scripts/ru-warphub.mjs --check [ID…]  — проверка переводов 40k/ru-warphub/<ID>.json.
+ *   node scripts/ru-warphub.mjs --check [ID…]  — проверка переводов 40k/ru-warphub/<ID>.json;
+ *   node scripts/ru-warphub.mjs --prune [ID…]  — убрать переводы, ставшие ненужными (текст есть на сайте) или устаревшие
+ *                                               (английский изменился) — после обновления данных фракции.
  * Применение — node scripts/whrules-ru.mjs --apply.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { latestRuSnapshot, matchFaction } from './whrules-ru.mjs';
-import { buildMemory, checkTranslation, collectGaps, DATA, forEachEntry, readTranslation, recall, WARPHUB_DIR } from './ru-warphub-lib.mjs';
+import { buildMemory, checkTranslation, collectGaps, pruneTranslation, DATA, forEachEntry, readTranslation, recall, WARPHUB_DIR } from './ru-warphub-lib.mjs';
 
 // ---------------------------------------------------------------- команды
 
@@ -62,6 +64,17 @@ function main() {
       for (const [dsId, d] of Object.entries(t.datasheets ?? {})) if (!d.abilities || !Object.keys(d.abilities).length) if (Object.keys(d).length <= 1) delete t.datasheets[dsId];
       if (n) fs.writeFileSync(path.join(WARPHUB_DIR, `${f.id}.json`), JSON.stringify(t, null, 1) + '\n');
       console.log(`${f.id.padEnd(4)} из памяти wh-rules: ${n}`);
+    }
+  } else if (cmd === '--prune') {
+    // убрать переводы, которые больше не нужны: текст есть на wh-rules.ru или английский текст изменился
+    for (const f of list) {
+      const t = readTranslation(f.id);
+      if (!t) continue;
+      const faction = JSON.parse(fs.readFileSync(path.join(DATA, 'f', `${f.id}.json`), 'utf8'));
+      const r = pruneTranslation(faction, matchFaction(snap, faction).ru, t);
+      if (r.removed.length) fs.writeFileSync(path.join(WARPHUB_DIR, `${f.id}.json`), JSON.stringify(r.t, null, 1) + '\n');
+      const by = (w) => r.removed.filter((x) => x.why === w).length;
+      console.log(`${f.id.padEnd(4)} убрано ${r.removed.length} (есть на сайте ${by('есть на wh-rules.ru')}, английский изменился ${by('английский текст изменился')})`);
     }
   } else if (cmd === '--check') {
     let bad = 0;

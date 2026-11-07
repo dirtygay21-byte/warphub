@@ -285,7 +285,8 @@ export function summaryOf(a, det) {
 export function buildReport(files, index, snap, snapshotFile) {
   // дата нашего источника: обновление из wh-rules (по scope) или выгрузка Wahapedia
   const whrScope = new Map();
-  for (const u of index.updates ?? []) for (const id of u.scope ?? []) whrScope.set(id, u.source);
+  // Leader по Warmind — не источник данных wh-rules (версия 1.6 — версия MFM у Warmind)
+  for (const u of index.updates ?? []) if (u.kind !== 'warmind-leaders') for (const id of u.scope ?? []) whrScope.set(id, u.source);
   const wahaDate = String(index.lastUpdate ?? '').slice(0, 10);
   const armies = {};
   for (const [id, slugs] of Object.entries(ARMIES)) {

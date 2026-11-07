@@ -200,7 +200,8 @@ TB('подпись источника: Space Marines и Imperial Agents — wh-r
   assert.equal(sourceLabel(sm.source!), 'wh-rules.ru · версия 981 · 14.10.2026');
   const idx = { lastUpdate: '2026-09-28 02:38', factions: [{ id: 'SM', name: 'Space Marines', allegiance: '', units: 0, detachments: 0 }, { id: 'AoI', name: 'Imperial Agents', allegiance: '', units: 0, detachments: 0 }], updates: [R.scope.indexUpdate] };
   assert.equal(factionCredit(aoi, idx), 'Очки и правила: MFM 1.6 · wh-rules.ru 981 · 14.10.2026');
-  const other = JSON.parse(fs.readFileSync(path.join(DATA, 'f', 'NEC.json'), 'utf8')) as FactionData;
+  // фракция без собственного источника (данные выгрузки Wahapedia); с 07.11.2026 все армии переходят на wh-rules 995 партиями
+  const other = { id: 'XX', source: undefined } as Pick<FactionData, 'id' | 'source'>;
   assert.equal(factionCredit(other, idx), 'powered by Wahapedia · 28.09.2026');
   assert.equal(indexCredit(idx), 'Очки: MFM 1.6 · wh-rules.ru 981 · 14.10.2026');
 });

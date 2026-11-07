@@ -21,6 +21,12 @@ Mini App WarpHub (Telegram) и скрытый раздел Roster Builder (Warha
 > сверка — `scripts/whrules-compare.mjs`, отчёт `40k/freshness-report.{json,md}`). Остальные правила раздела действуют:
 > ничего не придумывать, источник и версию записывать, конфликты фиксировать.
 >
+> **Сверка 40K с Warmind (решение владельца 07.11.2026):** основной источник 40K остаётся wh-rules.ru (официальные формулировки и
+> русский текст); warmind.online — вторая проверка цифр (тот же выпуск GW: данные 995, MFM 1.6). Снимок `tools/roster-data/40k/warmind-11e.json`
+> (данные встроены в скрипт веб-приложения Warmind; его источник — BSData wh40k-11e-mfm), сверка — `bun scripts/warmind-compare.mjs`
+> → `40k/warmind-compare.{json,md}` (очки, за копии, характеристики, оружие, Leader, DP, улучшения). Тексты правил Warmind не берутся
+> (местами пересказаны). Расхождение — не решать молча: ошибка wh-rules исправляется точечно (`weaponFixes` у обновления) с объяснением.
+>
 > **Решение владельца от 30.10.2026: источники AoS** — выгрузка Wahapedia (основной, как раньше) и sigdex.io / BSData
 > `age-of-sigmar-4th` (второй: сверка очков и юнитов `scripts/bsdata-aos-compare.py` → `aos/bsdata-compare.json`,
 > карты батлпланов `aos/sigdex-battleplans-2026-27.json`). Официальные документы GW важнее обоих (`curated.json → officialUpdates`).
