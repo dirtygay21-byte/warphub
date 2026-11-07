@@ -137,7 +137,19 @@ async function popoverHasNoSideEffect(label, trigger, _state, outside) {
     const before = await state();
     at = 'открыть подсказку';
     await trigger.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(600);
+    // события, которые закрывают подсказку (прокрутка, смена размера окна) — для разбора, если она не открылась
+    await page.evaluate(() => {
+      window.__closers = [];
+      for (const t of ['scroll', 'resize']) window.addEventListener(t, (e) => window.__closers.push(`${t}:${e.target?.nodeName ?? e.target?.id ?? '?'}`), true);
+    });
     await trigger.click({ timeout: 5000 });
+    await page.waitForTimeout(300);
+    if (!(await page.getByRole('dialog').count())) {
+      log.push(`  ${label}: подсказка не открылась с первого нажатия; события: ${(await page.evaluate(() => window.__closers.slice(0, 8).join(', ')))}`);
+      await trigger.click({ timeout: 5000 });
+      await page.waitForTimeout(300);
+    }
     at = 'закрыть крестиком';
     await page.getByRole('dialog').getByRole('button', { name: 'Закрыть' }).click({ timeout: 5000 });
     await page.waitForTimeout(300);
