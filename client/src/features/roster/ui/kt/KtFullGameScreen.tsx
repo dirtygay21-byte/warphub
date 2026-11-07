@@ -1,12 +1,13 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { applyKtEvent, createKtState, KT_GAME_SCHEMA, ktUndoTarget, replayKt, totalKtVp, type KtEvent, type KtEventBody, type KtState, type Op, type Seat } from '../../ktgame';
 import { newSeed } from '../../game/rng';
 import { usePersistentGameData } from '../skirmish/useSkirmishData';
 import type { KtRoster } from '../../kt/roster';
 import { decodeKtRoster } from '../../kt/roster';
 import type { KtIndex } from '../../kt/types';
-import { haptic, openExternal } from '../../telegram';
+import { haptic, openExternal, pushOverlay } from '../../telegram';
+import { KtEditor } from './KtEditor';
 import { Button, Icon, Segmented } from '../kit';
 import { cx } from '../util';
 import { useSkirmishOnline } from '../skirmish/useSkirmishOnline';
@@ -29,7 +30,16 @@ const SEATS: Seat[] = ['p1', 'p2'];
 export function KtFullGameScreen({ onBack, rosters, index, initialRosterId }: { onBack: () => void; rosters: KtRoster[]; index: KtIndex; initialRosterId?: string }) {
   const { data, error: loadError } = usePersistentGameData('kt');
   const [events, setEvents] = useState<KtEvent[]>([]);
-  const [view, setView] = useState<'start' | 'saved' | 'game'>('start');
+  const [view, setView] = useState<'start' | 'saved' | 'game' | 'field'>('start');
+  // режим мастера (как в 40K, тот же ключ на телефоне): ростеры игроков открываются для просмотра
+  const [master, setMaster] = useState(readMaster);
+  const toggleMaster = () => {
+    writeMaster(!master);
+    setMaster(!master);
+  };
+  const [shownRoster, setShownRoster] = useState<string | null>(null);
+  useEffect(() => (shownRoster ? pushOverlay(() => setShownRoster(null)) : undefined), [shownRoster]);
+  const rosterCtx = useMemo<RosterCtx | null>(() => (master ? { open: setShownRoster, has: (id) => rosters.some((r) => r.id === id) } : null), [master, rosters]);
   const [error, setError] = useState<string | null>(null);
   const [library, setLibrary] = useState<KtSavedEntry[]>(readKtLibrary);
   const onlineGame = useSkirmishOnline({ events, setEvents, replay: (list) => (data ? replayKt(list, data) : { ok: false as const, error: 'Данные ещё загружаются' }) });
@@ -165,13 +175,39 @@ export function KtFullGameScreen({ onBack, rosters, index, initialRosterId }: { 
   const errorText = loadError ?? error ?? (replay && !replay.ok ? replay.error : null);
   const revealedSeats = new Set<Seat>(events.flatMap((event) => event.type === 'secret-revealed' ? [event.seat] : []));
   const onlineLike = { online: onlineGame.online, state, sync: onlineGame.sync, joinOnline: joinAndOpen, closeGame };
+  const viewed = shownRoster ? rosters.find((r) => r.id === shownRoster) : undefined;
+  if (viewed) {
+    const noop = () => undefined;
+    return <KtEditor roster={viewed} index={index} viewOnly onBack={() => setShownRoster(null)} onStartGame={noop} onTestArmy={noop} onChange={noop} onDuplicate={noop} onDelete={noop} />;
+  }
   if (!data) return <Shell onBack={onBack}>{loadError ? <p className="text-sm text-danger">{loadError}</p> : <Spinner />}</Shell>;
 
   return (
-    <Shell onBack={view === 'game' ? closeGame : onBack} undo={view === 'game' && state && ktUndoTarget(events) ? () => dispatch({ type: 'event-reverted' }) : undefined}>
+    <RosterContext.Provider value={rosterCtx}>
+    <Shell
+      onBack={view === 'game' || view === 'field' ? closeGame : onBack}
+      undo={view === 'game' && state && ktUndoTarget(events) ? () => dispatch({ type: 'event-reverted' }) : undefined}
+      master={master}
+      onMaster={toggleMaster}
+    >
       {errorText && <p className="mb-3 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{errorText}</p>}
       {onlineGame.online && <OnlineBar game={onlineLike} system="kt" />}
       {view === 'start' && <StartCard library={library} game={onlineLike} onNew={newGame} onOnline={startOnline} onList={() => setView('saved')} />}
+      {view === 'start' && (
+        <button
+          type="button"
+          onClick={() => setView('field')}
+          className="mt-3 flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10"
+        >
+          <Icon name="map" className="size-5 text-accent" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-semibold">Поле боя</span>
+            <span className="block text-[12px] text-fg-3">Просмотр без игры: официальные карты killzone</span>
+          </span>
+          <Icon name="chevron" className="size-4 text-fg-3" />
+        </button>
+      )}
+      {view === 'field' && <FieldView data={data} />}
       {view === 'saved' && <KtSavedList entries={library} onClose={closeGame} onOpen={openSaved} onRemove={(key) => { removeKtSaved(key); refreshLibrary(); }} />}
       {view === 'game' && !state && <Spinner />}
       {view === 'game' && state && state.stage === 'setup' && <Setup rosters={rosters} index={index} initialRosterId={initialRosterId} data={data} online={onlineGame.online} onSetup={(body) => dispatch(body)} />}
@@ -179,6 +215,7 @@ export function KtFullGameScreen({ onBack, rosters, index, initialRosterId }: { 
         <>
           <RoundDots round={state.round} rounds={data.game.turningPoints} finished={state.stage === 'finished'} />
           {onlineGame.online && state.stage === 'battle' && state.round === 1 && !state.initiativeRolls && <OnlinePlayerSetup rosters={rosters} index={index} data={data} onlineSeat={onlineGame.online.seat} onRoster={(rosterId, operatives) => dispatch({ type: 'player-set', seat: onlineGame.online!.seat, rosterId, operatives })} onTac={(tacOp) => dispatch({ type: 'tac-set', seat: onlineGame.online!.seat, tacOp })} />}
+          <BattleMap state={state} data={data} />
           <BattleHeader state={state} data={data} onInitiative={(cards, manual) => dispatch({ type: 'initiative', round: state.round, attempt: 0, cards, ...(manual ? { manual } : {}) })} onPhase={() => dispatch({ type: 'phase-advanced' })} />
           <ScoreboardGrid className="mb-3 text-center">
             {SEATS.map((seat) => {
@@ -217,11 +254,19 @@ export function KtFullGameScreen({ onBack, rosters, index, initialRosterId }: { 
             </>
           )}
           {state.stage === 'finished' && <Result state={state} />}
+          {state.stage === 'finished' && rosterCtx && (
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {SEATS.map((seat) => (
+                <RosterButton key={seat} rosterId={state.players[seat].rosterId} label={`Ростер: ${seatName(seat)}`} />
+              ))}
+            </div>
+          )}
           <Rules state={state} data={data} onlineSeat={onlineGame.online?.seat ?? 'p1'} />
         </>
       )}
       {data && <button type="button" onClick={() => openExternal(data.source.url)} className="mt-5 w-full rounded-xl px-2 py-2 text-left text-[12px] text-fg-3">Источник правил и карт: {data.source.name} · {data.source.checked}</button>}
     </Shell>
+    </RosterContext.Provider>
   );
 }
 
@@ -377,7 +422,12 @@ function RosterChoice({ seat, rosters, index, selected, onSelect, onCode }: { se
   const [error, setError] = useState<string | null>(null);
   return (
     <div className="space-y-2 rounded-xl border border-white/10 bg-black/20 p-3">
-      <GameLabel>{seatName(seat)}</GameLabel>
+      <div className="flex items-center gap-2">
+        <span className="min-w-0 flex-1">
+          <GameLabel>{seatName(seat)}</GameLabel>
+        </span>
+        {selected && <RosterButton rosterId={selected} />}
+      </div>
       <Segmented value={mode} onChange={setMode} options={[{ value: 'own', label: 'Мой ростер' }, { value: 'code', label: 'По коду' }]} />
       {mode === 'own' ? (
         <ChoiceField placeholder="Выберите kill team" value={selected} onChange={onSelect} options={rosterChoices(rosters, index)} inlineMax={0} />
@@ -494,9 +544,12 @@ function Player({ state, seat, rosterName, tacOpName, reveal, dispatch }: { stat
   const p = state.players[seat];
   return (
     <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-      <p className="truncate text-[13px] font-semibold text-white/90">
-        {seatName(seat)} · {rosterName}
-      </p>
+      <div className="flex items-start gap-2">
+        <p className="min-w-0 flex-1 truncate text-[13px] font-semibold text-white/90">
+          {seatName(seat)} · {rosterName}
+        </p>
+        <RosterButton rosterId={p.rosterId} />
+      </div>
       <p className="truncate text-[12px] text-fg-3">
         {reveal ? `Tac Op: ${tacOpName} · Primary: ${p.primaryOp ?? '—'}` : 'Секреты соперника скрыты'} · Kill Grade {p.killGrade}
       </p>
@@ -692,9 +745,9 @@ function Rules({ state, data, onlineSeat }: { state: KtState; data: KtData; onli
   );
 }
 
-function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => void; children: ReactNode }) {
+function Shell({ onBack, undo, master, onMaster, children }: { onBack: () => void; undo?: () => void; master?: boolean; onMaster?: () => void; children: ReactNode }) {
   return (
-    <GameShell onBack={onBack} undo={undo} kicker="Kill Team · Approved Ops" title="Полная игра" className="pb-24">
+    <GameShell onBack={onBack} undo={undo} master={master} onMaster={onMaster} kicker="Kill Team · Approved Ops" title="Полная игра" className="pb-24">
       {children}
     </GameShell>
   );
@@ -702,4 +755,76 @@ function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => vo
 
 function Spinner() {
   return <div className="mx-auto mt-16 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />;
+}
+
+// ---------- режим мастера и карта (07.11.2026) ----------
+
+const MASTER_KEY = 'warphub.game.master';
+const readMaster = () => {
+  try {
+    return localStorage.getItem(MASTER_KEY) === '1';
+  } catch {
+    return false;
+  }
+};
+const writeMaster = (on: boolean) => {
+  try {
+    localStorage.setItem(MASTER_KEY, on ? '1' : '0');
+  } catch {
+    // нет доступа к хранилищу — режим действует до перезапуска
+  }
+};
+type RosterCtx = { open: (id: string) => void; has: (id: string) => boolean };
+const RosterContext = createContext<RosterCtx | null>(null);
+
+/** «Ростер» игрока — только в режиме мастера; ростера нет на этом телефоне (по коду, соперника) — неактивная кнопка. */
+function RosterButton({ rosterId, label = 'Ростер' }: { rosterId: string; label?: string }) {
+  const ctx = useContext(RosterContext);
+  if (!ctx || !rosterId) return null;
+  const has = ctx.has(rosterId);
+  return (
+    <button
+      type="button"
+      disabled={!has}
+      title={has ? 'Открыть ростер' : 'Ростер не сохранён на этом телефоне'}
+      onClick={() => (haptic.tap(), ctx.open(rosterId))}
+      className="ds-hit shrink-0 rounded-lg border border-accent/40 px-2.5 py-1 text-[12px] font-semibold text-accent active:bg-accent/10 disabled:border-white/10 disabled:text-fg-3"
+    >
+      {has ? label : 'Нет на телефоне'}
+    </button>
+  );
+}
+
+/** Официальная карта партии (killzone и номер из подготовки) — свёрнута, раскрывается во время битвы. */
+function BattleMap({ state, data }: { state: KtState; data: KtData }) {
+  const map = data.maps.find((item) => item.killzone === state.killzone && item.map === state.map);
+  if (!map) return null;
+  return (
+    <details className="mb-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+      <summary className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
+        <Icon name="map" className="size-4 text-accent" />
+        <span className="min-w-0 flex-1">
+          Карта · {state.killzone} · Map {state.map}
+        </span>
+      </summary>
+      <div className="mt-3">
+        <KtMapPanel map={map} />
+      </div>
+    </details>
+  );
+}
+
+/** «Поле боя» без игры: любая официальная карта killzone (как «Поле боя» в 40K). */
+function FieldView({ data }: { data: KtData }) {
+  const [killzone, setKillzone] = useState(data.missionPack.killzones[0]!);
+  const [map, setMap] = useState(1);
+  const shown = data.maps.find((item) => item.killzone === killzone && item.map === map) ?? null;
+  return (
+    <section className="space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <p className="font-display text-xl font-semibold uppercase">Поле боя</p>
+      <ChoiceField label="Killzone" value={killzone} onChange={(k) => (setKillzone(k), setMap(1))} options={data.missionPack.killzones.map((k) => ({ value: k, label: k }))} />
+      <ChoiceField label="Карта" value={map} onChange={setMap} inlineMax={6} options={Array.from({ length: data.missionPack.mapsPerKillzone }, (_, i) => ({ value: i + 1, label: String(i + 1) }))} />
+      {shown ? <KtMapPanel map={shown} /> : <p className="text-sm text-fg-3">Этой карты нет в данных.</p>}
+    </section>
+  );
 }

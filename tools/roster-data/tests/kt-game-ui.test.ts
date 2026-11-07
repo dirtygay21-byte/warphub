@@ -124,3 +124,11 @@ test('игра с ростера из редактора: число опера�
   assert.ok(screen.includes("operatives: rosters.find((r) => r.id === initialRosterId)?.operatives.length ?? 0"));
   assert.ok(!screen.includes('<select'), 'системные списки заменены ChoiceField');
 });
+
+test('режим мастера и карта в игре Kill Team (07.11.2026)', () => {
+  const screen = readFileSync(new URL('../../../client/src/features/roster/ui/kt/KtFullGameScreen.tsx', import.meta.url), 'utf8');
+  for (const token of ["const MASTER_KEY = 'warphub.game.master'", 'master={master}', 'onMaster={toggleMaster}', '<RosterButton rosterId={p.rosterId} />', 'viewOnly', '<BattleMap state={state} data={data} />', '<FieldView data={data} />', 'Ростер не сохранён на этом телефоне'])
+    assert.ok(screen.includes(token), token);
+  const editor = readFileSync(new URL('../../../client/src/features/roster/ui/kt/KtEditor.tsx', import.meta.url), 'utf8');
+  assert.ok(editor.includes('useState(viewOnly)') && editor.includes('if (!team || viewOnly) return;'), 'просмотр ростера не меняет его и не открывает редактирование');
+});

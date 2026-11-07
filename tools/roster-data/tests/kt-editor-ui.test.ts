@@ -10,7 +10,7 @@ const expectTokens = (text: string, tokens: string[]) => {
 test('редактор Kill Team имеет общий view/edit контракт и read-only датакарты', () => {
   const text = source('ui/kt/KtEditor.tsx');
   expectTokens(text, [
-    'const [view, setView] = useState(false)',
+    'const [view, setView] = useState(viewOnly)',
     'readOnly={view}',
     "view ? 'Редактировать' : 'Режим просмотра'",
     'onOpenIssue={(issue) =>',

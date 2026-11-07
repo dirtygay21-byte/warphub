@@ -14,7 +14,28 @@ import { Md } from './Md';
  * Редактор команды Kill Team (W3; вид 07.11.2026 — из тех же блоков, что AoS и 40K): шапка со счётом и проверкой,
  * блок команды (снаряжение — строкой выбора), панели правил и уловок, оперативники одной группой — карточки как у юнитов AoS.
  */
-export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onChange, onDuplicate, onDelete }: { roster: KtRoster; index: KtIndex; onBack: () => void; onStartGame: () => void; onTestArmy: () => void; onChange: (r: KtRoster) => void; onDuplicate: (r: KtRoster) => void; onDelete: () => void }) {
+export function KtEditor({
+  roster,
+  index,
+  onBack,
+  onStartGame,
+  onTestArmy,
+  onChange,
+  onDuplicate,
+  onDelete,
+  viewOnly = false,
+}: {
+  roster: KtRoster;
+  index: KtIndex;
+  onBack: () => void;
+  onStartGame: () => void;
+  onTestArmy: () => void;
+  onChange: (r: KtRoster) => void;
+  onDuplicate: (r: KtRoster) => void;
+  onDelete: () => void;
+  /** только просмотр (режим мастера в игре, 07.11.2026): без переключения в редактирование, меню и нижней панели */
+  viewOnly?: boolean;
+}) {
   const [team, setTeam] = useState<KtTeam | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -23,11 +44,11 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
   }, [roster.teamId, attempt]);
   const issues = useMemo(() => (team ? checkKtRoster(roster, team) : []), [roster, team]);
   useEffect(() => {
-    if (!team) return;
+    if (!team || viewOnly) return;
     const s = { operatives: roster.operatives.length, errors: issues.filter((i) => i.level === 'error').length, warnings: issues.filter((i) => i.level === 'warning').length };
     const o = roster.summary;
     if (!o || o.operatives !== s.operatives || o.errors !== s.errors || o.warnings !== s.warnings) onChange({ ...roster, summary: s });
-  }, [team, issues, roster, onChange]);
+  }, [team, issues, roster, onChange, viewOnly]);
   const [adding, setAdding] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -36,7 +57,7 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
   const [ploysOpen, setPloysOpen] = useState(false);
   const [equipOpen, setEquipOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [view, setView] = useState(false);
+  const [view, setView] = useState(viewOnly);
 
   // правила фракции повторяются в каждом оперативнике источника — показываются один раз во вкладке «Правила»
   const factionRules = useMemo(() => {
@@ -75,6 +96,7 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
         onName={(name) => onChange(touchKt({ ...roster, name: name.slice(0, 80) }))}
         onBack={onBack}
         actions={
+          viewOnly ? undefined : (
           <>
             <IconButton
               icon={view ? 'edit' : 'eye'}
@@ -89,6 +111,7 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
               </>
             )}
           </>
+          )
         }
         big={roster.operatives.length}
         bigLimit={total}
@@ -211,6 +234,7 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
           </div>
         </section>
       </div>
+      {!viewOnly && (
       <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
         <div className="mx-auto flex max-w-lg gap-2 lg:max-w-3xl lg:px-4">
           {view ? (
@@ -227,7 +251,7 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
           </Button>
         </div>
       </div>
-
+      )}
       <AddSheet open={adding} team={team} roster={roster} onClose={() => setAdding(false)} onAdd={(o) => (haptic.tap(), onChange(addOperative(roster, o)), setAdding(false))} />
       <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} team={team} />
       <Sheet open={equipOpen} onClose={() => setEquipOpen(false)} title={`Снаряжение · выбрано ${roster.equipment.length}`} tall>
