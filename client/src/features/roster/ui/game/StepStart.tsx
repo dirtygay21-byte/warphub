@@ -7,7 +7,8 @@ import { CardLink } from './CardSheet';
 import { Dice } from './Dice';
 import { RosterButton } from './RosterViewer';
 import type { GameHook } from './useGame';
-import { DiceHead, useDiceMode } from '../common/DiceMode';
+import { DiceHead } from '../common/DiceMode';
+import { useDiceMode } from '../common/useDiceMode';
 
 const LETTERS = ['A', 'B', 'C'];
 

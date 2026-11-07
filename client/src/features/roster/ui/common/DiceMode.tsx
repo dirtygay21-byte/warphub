@@ -5,32 +5,9 @@
  * запоминается: переключили в одной игре — так открываются броски и в остальных.
  */
 import type { ReactNode } from 'react';
-import { create } from 'zustand';
 import { haptic } from '../../telegram';
 import { cx } from '../util';
-
-export type DiceMode = 'app' | 'manual';
-const STORAGE_KEY = 'warphub:dice-mode';
-
-function readMode(): DiceMode {
-  try {
-    return localStorage.getItem(STORAGE_KEY) === 'manual' ? 'manual' : 'app';
-  } catch {
-    return 'app';
-  }
-}
-
-export const useDiceMode = create<{ mode: DiceMode; setMode: (mode: DiceMode) => void }>((set) => ({
-  mode: readMode(),
-  setMode: (mode) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, mode);
-    } catch {
-      // нет доступа к хранилищу — выбор действует до перезапуска
-    }
-    set({ mode });
-  },
-}));
+import { useDiceMode } from './useDiceMode';
 
 /** Компактный переключатель «В приложении / Вручную». */
 export function DiceModeSwitch({ className }: { className?: string }) {

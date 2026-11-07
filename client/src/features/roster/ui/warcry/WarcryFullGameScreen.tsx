@@ -20,7 +20,8 @@ import { RoundDots } from '../common/RoundDots';
 import { ScoreboardGrid } from '../common/ScoreboardGrid';
 import { GameShell } from '../common/GameShell';
 import { ChoiceField, GameLabel, type Choice } from '../common/GameControls';
-import { DiceHead, useDiceMode } from '../common/DiceMode';
+import { DiceHead } from '../common/DiceMode';
+import { useDiceMode } from '../common/useDiceMode';
 import { WarcryDeploymentPanel } from '../skirmish/SkirmishMaps';
 
 const SEATS: Seat[] = ['p1', 'p2'];

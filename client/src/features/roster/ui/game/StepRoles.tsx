@@ -6,7 +6,8 @@ import { cx } from '../util';
 import { useMySeat } from './cardViewer';
 import { Dice } from './Dice';
 import type { GameHook } from './useGame';
-import { DiceHead, useDiceMode } from '../common/DiceMode';
+import { DiceHead } from '../common/DiceMode';
+import { useDiceMode } from '../common/useDiceMode';
 
 /**
  * Шаг «Атакующий и защитник» (правила: бросок «кто выше», победитель решает, кто атакующий, а кто защитник).

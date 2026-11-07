@@ -8,7 +8,8 @@ import { cx, fmtPts } from '../util';
 import { SetupStep as Step } from '../common/SetupStep';
 import { BattleplanMap } from './BattleplanMap';
 import { isMapTerritory, rosterRefOf, territoryLabel, TIER_LABEL } from './refs';
-import { DiceHead, useDiceMode } from '../common/DiceMode';
+import { DiceHead } from '../common/DiceMode';
+import { useDiceMode } from '../common/useDiceMode';
 import { ChoiceField } from '../common/GameControls';
 import type { AosGameHook } from './useAosGame';
 

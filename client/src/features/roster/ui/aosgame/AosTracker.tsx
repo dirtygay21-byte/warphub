@@ -6,7 +6,8 @@ import { cx } from '../util';
 import { BattleplanInfo, TacticCards } from './AosSetup';
 import { territoryLabel, TIER_LABEL } from './refs';
 import type { AosGameHook } from './useAosGame';
-import { DiceModeSwitch, useDiceMode } from '../common/DiceMode';
+import { DiceModeSwitch } from '../common/DiceMode';
+import { useDiceMode } from '../common/useDiceMode';
 import { ScoreboardGrid } from '../common/ScoreboardGrid';
 
 /** Трекер битвы AoS: счёт, priority в начале раунда, ресурсы игроков, конец хода (батлплан и тактики), итог. */

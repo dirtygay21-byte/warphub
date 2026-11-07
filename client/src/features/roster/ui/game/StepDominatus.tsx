@@ -6,7 +6,8 @@ import { Button, Field, Segmented } from '../kit';
 import { ActAs } from './ActAs';
 import { CampaignFill } from './DominatusCampaign';
 import { useOpenCard } from './cardViewer';
-import { DiceModeSwitch, useDiceMode } from '../common/DiceMode';
+import { DiceModeSwitch } from '../common/DiceMode';
+import { useDiceMode } from '../common/useDiceMode';
 import type { GameHook } from './useGame';
 
 const SEATS: Seat[] = ['p1', 'p2'];
