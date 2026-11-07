@@ -178,8 +178,8 @@ export function parseWeaponKeywords(s: string, target: Target): Parsed {
 // ---------- броски ----------
 
 /** Вероятности исхода одного броска D6 с перебросом: fn(face) → исход. */
-function rollProbs<K extends string>(outcome: (face: number) => K, reroll: (face: number, o: K) => boolean): Record<K, number> {
-  const p = {} as Record<K, number>;
+function rollProbs<K extends string>(outcome: (face: number) => K, reroll: (face: number, o: K) => boolean): Partial<Record<K, number>> {
+  const p: Partial<Record<K, number>> = {};
   const add = (k: K, v: number) => (p[k] = (p[k] ?? 0) + v);
   for (let f = 1; f <= 6; f++) {
     const o = outcome(f);
