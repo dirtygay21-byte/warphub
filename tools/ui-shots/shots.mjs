@@ -362,6 +362,25 @@ for (const width of [390, 360]) {
       await clickText(name);
       await page.waitForTimeout(1500);
       await shot(`layout-${width}-${label}-editor`, true);
+      if (label === '40k') {
+        // Добавить юнит (07.11.2026): цены размеров, сортировка, «Помещается», поиск по ключевому слову
+        await page.getByRole('button', { name: 'Добавить юнит' }).first().click({ timeout: 5000 });
+        await page.waitForTimeout(600);
+        await shot(`layout-${width}-40k-picker`);
+        await page.getByRole('radio', { name: 'По очкам' }).click({ timeout: 5000 });
+        const fits = page.getByRole('button', { name: /^Помещается/ });
+        if (await fits.count()) await fits.click({ timeout: 5000 });
+        else fail('40K: в «Добавить юнит» нет «Помещается» (у ростера нет лимита очков?)');
+        await page.getByPlaceholder('Название, ключевое слово или способность').fill('fly');
+        await page.waitForTimeout(400);
+        await shot(`layout-${width}-40k-picker-sorted`);
+        if (!(await page.locator('[role="dialog"] li').count())) fail('40K: поиск «fly» в «Добавить юнит» ничего не нашёл');
+        // настройки — на устройстве; вернуть по умолчанию для следующих шагов
+        await page.getByRole('radio', { name: 'По типу' }).click({ timeout: 5000 });
+        if (await fits.count()) await fits.click({ timeout: 5000 });
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(400);
+      }
       if (label === 'warcry' && width === 390) {
         // рунмарка бойца: какие способности она открывает
         await page.locator('[id^="u-"] > button[aria-expanded]').first().click({ timeout: 5000 });
