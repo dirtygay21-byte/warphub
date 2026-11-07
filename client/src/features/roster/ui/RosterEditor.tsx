@@ -12,6 +12,7 @@ import { cx, fmtPts } from './util';
 import { UnitCard } from './UnitCard';
 import { sortRosterUnits } from '../engine/sort';
 import { UnitPicker } from './UnitPicker';
+import { BattleSheet } from './BattleSheet';
 import { ExportSheet } from './ExportSheet';
 import { DetachmentPanel, RuleText } from './DetachmentPanel';
 import { useRu } from './common/useRu';
@@ -137,6 +138,7 @@ function Editor({
   const [picker, setPicker] = useState(false);
   const [problems, setProblems] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [battle, setBattle] = useState(false);
   const [detSheet, setDetSheet] = useState(false);
   const [menu, setMenu] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(roster.detachmentIds.length === 0);
@@ -436,6 +438,11 @@ function Editor({
               <Icon name="plus" /> <span className="whitespace-nowrap">Добавить юнит</span>
             </Button>
           )}
+          {(view || viewOnly) && (
+            <Button variant="ghost" className="h-12 px-4" onClick={() => (haptic.tap(), setBattle(true))}>
+              <Icon name="book" /> <span className="max-[359px]:sr-only">Лист</span>
+            </Button>
+          )}
           <Button variant="ghost" className="h-12 px-4" onClick={() => setExporting(true)}>
             <Icon name="share" /> <span className="max-[359px]:sr-only">Экспорт</span>
           </Button>
@@ -504,12 +511,17 @@ function Editor({
         )}
       </Sheet>
 
+      <BattleSheet open={battle} onClose={() => setBattle(false)} L={L} cr={cr} detachmentIds={roster.detachmentIds} />
+
       <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} L={L} cr={cr} dataVersion={index.lastUpdate} credit={factionCredit(L.faction, index, 'en')} />
 
       <Sheet open={menu} onClose={() => setMenu(false)} title="Ростер">
         <div className="space-y-2 pb-2">
           <Button className="w-full justify-start" onClick={() => (setMenu(false), onRules())}>
             <Icon name="book" /> Стратагемы армии и правила
+          </Button>
+          <Button className="w-full justify-start" onClick={() => (setMenu(false), setBattle(true))}>
+            <Icon name="book" /> Боевой лист: стратагемы по фазам и юниты
           </Button>
           <Button className="w-full justify-start" onClick={() => (setMenu(false), onStartGame())}>
             <Icon name="map" /> Начать игру с этим ростером
