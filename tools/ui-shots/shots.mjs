@@ -155,6 +155,9 @@ async function popoverHasNoSideEffect(label, trigger, _state, outside) {
     if (await page.getByRole('dialog').count()) fail(`${label}: подсказка не закрылась`);
   } catch (e) {
     fail(`${label}: проверка не выполнена (${at}): ${String(e.message ?? e).split('\n')[0]}`);
+    const html = await trigger.evaluate((el) => el.outerHTML.slice(0, 300)).catch(() => '?');
+    log.push(`  подсказка: ${html}; диалогов: ${await page.getByRole('dialog').count()}`);
+    await shot(`FAILED-check-${label.split(':')[0]}`);
   }
 }
 const shot = async (name, full = false) => {
