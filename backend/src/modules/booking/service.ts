@@ -986,7 +986,7 @@ export async function createReservation(
       throw new BookingError('TABLE_NOT_FOUND', 'Table not found');
     }
     if (details?.kind === 'wh_player' && !gameFitsTable(details.game, table.category)) {
-      throw new BookingError('INVALID_DETAILS', `This table is for ${TABLE_CATEGORY_LABEL[table.category]}`);
+      throw new BookingError('INVALID_DETAILS', `Этот стол предназначен для категории «${TABLE_CATEGORY_LABEL[table.category]}»`);
     }
 
     const bookings = await getTableReservations(tx, [tableId], openAt, closeAt);
@@ -1650,7 +1650,7 @@ export async function updateReservationDetails(
   if (details.kind === 'wh_player' && reservation.tableId !== null) {
     const [table] = await db.select({ category: tablesTable.category }).from(tablesTable).where(eq(tablesTable.id, reservation.tableId)).limit(1);
     if (table && !gameFitsTable(details.game, table.category)) {
-      throw new BookingError('INVALID_DETAILS', `This table is for ${TABLE_CATEGORY_LABEL[table.category]}`);
+      throw new BookingError('INVALID_DETAILS', `Этот стол предназначен для категории «${TABLE_CATEGORY_LABEL[table.category]}»`);
     }
   }
 
@@ -2023,7 +2023,7 @@ export async function moveReservationToTable(
       throw new BookingError('TABLE_NOT_FOUND', 'Table not found');
     }
     if (reservation.details?.kind === 'wh_player' && !gameFitsTable(reservation.details.game, table.category)) {
-      throw new BookingError('INVALID_DETAILS', `This table is for ${TABLE_CATEGORY_LABEL[table.category]}`);
+      throw new BookingError('INVALID_DETAILS', `Этот стол предназначен для категории «${TABLE_CATEGORY_LABEL[table.category]}»`);
     }
     if (table.category === 'small' && (await paintingBookedDuring(tx, startsAt, endsAt))) {
       throw new BookingError('SLOT_UNAVAILABLE', 'Painting is booked at this time');

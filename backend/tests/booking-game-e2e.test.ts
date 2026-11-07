@@ -87,7 +87,7 @@ describe('игра в записи на Warhammer', () => {
     const wrong = await book('wrong', { game: '40k', army: 'Orks', points: 1000, experienceLevel: 'player' });
     expect(wrong.status).toBe(400);
     // стол категории Tactical Games: 40K здесь не принимается (решение 05.11.2026)
-    expect(String(wrong.json.error)).toContain('Tactical Games');
+    expect(String(wrong.json.error)).toContain('Тактические игры');
     const right = await book('right', { game: 'kt', army: 'Kasrkin', experienceLevel: 'beginner' });
     if (right.status !== 200) console.error(`::error::join → ${right.status}: ${JSON.stringify(right.json).slice(0, 600)}`);
     expect(right.status).toBe(200);

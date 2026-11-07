@@ -1,11 +1,11 @@
 /**
  * Ростер Kill Team (W3 30.10.2026): команда, оперативники с выбранным оружием, снаряжение команды.
- * Проверки — только то, что надёжно следует из данных ktdash: лидер (ключевое слово LEADER) и численность по тексту
- * состава, если он однозначен (строки «- N … operative(s)» без вариантов «Or» / «- up to» на верхнем уровне). Остальное правило состава — текст
- * источника на экране; лимит снаряжения в источнике не записан — не проверяется (ничего не придумываем).
+ * Проверки — только то, что надёжно следует из данных ktdash: лидер (ключевое слово LEADER или оперативник
+ * из состава), выборы по тексту состава, включая половины Grot/Bomb Squig, и явные комбинации wargear.
+ * Остальные правила состава и снаряжения — текст источника на экране; неоднозначные ограничения не придумываем.
  */
 import { uid } from '../engine/roster';
-import type { KtIndex, KtOperative, KtTeam } from './types';
+import type { KtIndex, KtOperative, KtTeam, KtWeapon } from './types';
 
 export interface KtRosterOp {
   uid: string;
@@ -54,6 +54,82 @@ export function compositionTotal(text: string): number | null {
   return top.length ? top.reduce((a, b) => a + b, 0) : null;
 }
 
+const norm = (value: string) => value.toLocaleLowerCase('ru').replace(/[^a-zа-я0-9]+/gi, '');
+const weaponNorm = (value: string) => norm(value).replace(/klaw/g, 'claw');
+
+/** Explicit keywords win. Fallback is only the single operative named by the first composition bullet. */
+export function isLeaderOperative(team: KtTeam, operative: KtOperative): boolean {
+  if (team.operatives.some((o) => o.keywords.includes('LEADER'))) return operative.keywords.includes('LEADER');
+  const first = team.composition.split('\n').find((line) => line.trim().startsWith('-'));
+  if (!first || !/^\s*-\s*1\s+(?!if\b)/i.test(first) || !/operative\b/i.test(first)) return false;
+  return norm(first).includes(norm(operative.name));
+}
+
+function halfSelectionIds(team: KtTeam): Set<string> {
+  const names = [...team.composition.matchAll(/^\s*-\s*([^;\n(]+?)\s*\(X\)\s*$/gm)]
+    .map((match) => norm(match[1]!));
+  const footnotes = [...team.composition.matchAll(/\*\*\((\d+)\):\*\*\s*These operatives count as half a selection each\./gi)];
+  for (const footnote of footnotes) {
+    const marker = `\\*\\(${footnote[1]}\\)\\*`;
+    const bullet = new RegExp(`^\\s*-\\s*([^;\\n]+?)\\s*${marker}`, 'gm');
+    for (const match of team.composition.matchAll(bullet)) names.push(norm(match[1]!.split(/[\r\n]/).pop()!));
+  }
+  return new Set(team.operatives.filter((o) => names.some((name) => norm(o.name).endsWith(name))).map((o) => o.id));
+}
+
+/** Counts selections rather than cards: Grot and Bomb Squig together are one selection. */
+export function rosterSelectionCount(r: KtRoster, team: KtTeam): number {
+  const byId = new Map(team.operatives.map((o) => [o.id, o]));
+  const half = halfSelectionIds(team);
+  return r.operatives.reduce((sum, op) => {
+    const operative = byId.get(op.opTypeId);
+    if (!operative) return sum;
+    return sum + (half.has(operative.id) ? 0.5 : 1);
+  }, 0);
+}
+
+/** Explicit wargear combinations from the operative's own composition block, if present. */
+export function allowedWeaponCombos(team: KtTeam, operative: KtOperative): string[][] | null {
+  const lines = team.composition.split('\n');
+  const name = norm(operative.name);
+  const start = lines.findIndex((line) => norm(line).includes(name) && /one of the following options/i.test(line));
+  if (start < 0) return null;
+  // Nested "Or one option from each" branches are not simple pairs/triples; leave them to source text.
+  if (lines.slice(start + 1).some((line) => /^\s*Or\b/i.test(line))) return null;
+  const combos: string[][] = [];
+  for (let i = start + 1; i < lines.length; i += 1) {
+    const line = lines[i]!.trim();
+    if (!line.includes(';')) break;
+    const names = line.replace(/^-/, '').split(';').map((part) => part.trim());
+    const ids = names.map((option) => operative.weapons.find((weapon) => weaponNorm(weapon.name) === weaponNorm(option))?.id);
+    if (ids.some((id) => !id)) return null;
+    combos.push(ids as string[]);
+  }
+  return combos.length ? combos : null;
+}
+
+const sameSet = (a: string[], b: string[]) => a.length === b.length && a.every((id) => b.includes(id));
+const comboText = (operative: KtOperative, combo: string[]) => combo.map((id) => operative.weapons.find((weapon) => weapon.id === id)?.name ?? id).join(' + ');
+
+/** Allows valid partial selections and switches to the valid pair when a combination would be invalid. */
+export function nextWeaponsForToggle(team: KtTeam, operative: KtOperative, current: string[], toggled: KtWeapon): string[] {
+  const next = current.includes(toggled.id) ? current.filter((id) => id !== toggled.id) : [...current, toggled.id];
+  const combos = allowedWeaponCombos(team, operative);
+  if (!combos) return next;
+  if (next.length === 0) return next;
+  if (combos.some((combo) => combo.some((id) => next.includes(id)) && next.every((id) => combo.includes(id)))) return next;
+  const replacement = combos.find((combo) => combo.includes(toggled.id));
+  return replacement ?? current;
+}
+
+const countText = (value: number) => Number.isInteger(value) ? String(value) : value.toFixed(1).replace('.', ',');
+
+/** Required operative keywords such as the Sorcerer in Warp Coven — requirements, not leadership. */
+export function requiredOperativeKeywords(team: KtTeam): string[] {
+  return [...team.composition.matchAll(/must select at least one friendly ([A-Z ]+) operative/gi)]
+    .map((match) => match[1]!.trim().toUpperCase());
+}
+
 export type KtIssue = { level: 'error' | 'warning'; message: string; uids?: string[] };
 export function checkKtRoster(r: KtRoster, team: KtTeam): KtIssue[] {
   const out: KtIssue[] = [];
@@ -63,16 +139,26 @@ export function checkKtRoster(r: KtRoster, team: KtTeam): KtIssue[] {
   const known = ops.filter((p) => p.o);
   // пустая команда — не «OK» (UI-аудит B1)
   if (!r.operatives.length) out.push({ level: 'warning', message: 'В команде нет оперативников — добавьте лидера и остальных' });
-  if (team.operatives.some((o) => o.keywords.includes('LEADER'))) {
-    const leaders = known.filter((p) => p.o!.keywords.includes('LEADER')).length;
-    if (leaders === 0 && known.length) out.push({ level: 'error', message: 'Нет лидера (оперативник с ключевым словом LEADER)' });
-    if (leaders > 1) out.push({ level: 'error', message: `Лидеров ${leaders} — нужен один`, uids: known.filter((p) => p.o!.keywords.includes('LEADER')).map((p) => p.x.uid) });
+  if (team.operatives.some((o) => isLeaderOperative(team, o))) {
+    const leaders = known.filter((p) => isLeaderOperative(team, p.o!)).length;
+    if (leaders === 0 && known.length) out.push({ level: 'error', message: 'Нет лидера команды (см. состав источника)' });
+    if (leaders > 1) out.push({ level: 'error', message: `Лидеров ${leaders} — нужен один`, uids: known.filter((p) => isLeaderOperative(team, p.o!)).map((p) => p.x.uid) });
+  }
+  for (const keyword of requiredOperativeKeywords(team)) {
+    if (!known.some((p) => p.o!.keywords.includes(keyword))) out.push({ level: 'error', message: `Обязательный оперативник: ${keyword}` });
   }
   const total = compositionTotal(team.composition);
-  if (total != null && known.length !== total) out.push({ level: 'warning', message: `По составу команды — ${total} оперативников, выбрано ${known.length}` });
+  const selections = rosterSelectionCount(r, team);
+  if (total != null && Math.abs(selections - total) > 0.001) out.push({ level: 'warning', message: `По составу команды — ${total} оперативников, выбрано ${countText(selections)} выборов (${known.length} моделей)` });
   for (const { x, o } of known) {
+    const unknown = x.weapons.filter((id) => !o!.weapons.some((w) => w.id === id));
+    if (unknown.length) out.push({ level: 'error', message: `${x.name || o!.name}: оружие ${unknown.join(', ')} не найдено в данных`, uids: [x.uid] });
     const ws = x.weapons.filter((id) => o!.weapons.some((w) => w.id === id));
     if (!ws.length && o!.weapons.length) out.push({ level: 'warning', message: `${x.name || o!.name}: не выбрано оружие`, uids: [x.uid] });
+    const combos = allowedWeaponCombos(team, o!);
+    if (ws.length && combos && !combos.some((combo) => sameSet(combo, ws))) {
+      out.push({ level: 'error', message: `${x.name || o!.name}: доступные комбинации — ${combos.map((combo) => comboText(o!, combo)).join(' или ')}`, uids: [x.uid] });
+    }
   }
   for (const id of r.equipment) if (!team.equipment.some((e) => e.id === id)) out.push({ level: 'error', message: `Снаряжения ${id} нет в данных команды — снимите его` });
   return out;

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { loadKtTeam } from '../../data';
 import { uid } from '../../engine/roster';
-import { addOperative, checkKtRoster, compositionTotal, encodeKtRoster, ktTeamGroup, removeOperative, toggleEquipment, touchKt, updateOperative, type KtRoster, type KtRosterOp } from '../../kt/roster';
+import { addOperative, checkKtRoster, compositionTotal, encodeKtRoster, isLeaderOperative, ktTeamGroup, nextWeaponsForToggle, removeOperative, rosterSelectionCount, toggleEquipment, touchKt, updateOperative, type KtRoster, type KtRosterOp } from '../../kt/roster';
 import type { KtIndex, KtOperative, KtTeam, KtWeapon } from '../../kt/types';
 import { confirmAsk, haptic, openExternal, shareText } from '../../telegram';
 import { Button, Empty, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
@@ -83,8 +83,12 @@ export function KtEditor({
   if (!team) return <div className="mx-auto mt-24 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />;
   const opOf = (x: KtRosterOp) => team.operatives.find((o) => o.id === x.opTypeId);
   const total = compositionTotal(team.composition);
+  const selections = rosterSelectionCount(roster, team);
   const meta = index.teams.find((t) => t.id === team.id);
-  const leader = roster.operatives.some((x) => opOf(x)?.keywords.includes('LEADER'));
+  const leader = roster.operatives.some((x) => {
+    const operative = opOf(x);
+    return operative ? isLeaderOperative(team, operative) : false;
+  });
   const ploys = team.ploys.filter((p) => p.type !== 'rule');
   const teamRules = team.ploys.filter((p) => p.type === 'rule');
   const scrollToOperative = (id: string) => {
@@ -116,9 +120,9 @@ export function KtEditor({
           </>
           )
         }
-        big={roster.operatives.length}
+        big={selections}
         bigLimit={total}
-        bigUnit={total == null ? 'оперативн.' : undefined}
+        bigUnit={total == null ? 'оперативн.' : 'выборов'}
         stats={
           <>
             <HeaderStat label="Лидер" value={leader ? '✓' : '—'} bad={!leader && roster.operatives.length > 0} />
@@ -202,7 +206,7 @@ export function KtEditor({
         <section>
           <GroupHeading
             title="Оперативники"
-            count={total == null ? roster.operatives.length : `${roster.operatives.length}/${total}`}
+            count={total == null ? roster.operatives.length : `${roster.operatives.length} моделей · ${selections}/${total} выборов`}
             right={<span className={cx('text-xs font-semibold', leader ? 'text-fg-3' : 'text-warn')}>{leader ? 'лидер есть' : roster.operatives.length ? 'нет лидера' : ''}</span>}
           />
           <div className="space-y-2">
@@ -215,6 +219,8 @@ export function KtEditor({
                   n={n + 1}
                   x={x}
                   o={o}
+                  team={team}
+                  isLeader={isLeaderOperative(team, o)}
                   issues={issues.filter((i) => i.uids?.includes(x.uid))}
                   open={expanded === x.uid}
                   onToggle={() => setExpanded((e) => (e === x.uid ? null : x.uid))}
@@ -322,6 +328,8 @@ function OpCard({
   n,
   x,
   o,
+  team,
+  isLeader,
   issues,
   open,
   onToggle,
@@ -333,6 +341,8 @@ function OpCard({
   n: number;
   x: KtRosterOp;
   o: KtOperative;
+  team: KtTeam;
+  isLeader: boolean;
   issues: BuilderIssue[];
   open: boolean;
   onToggle: () => void;
@@ -342,8 +352,8 @@ function OpCard({
   findRule: FindRule;
 }) {
   const chosen = o.weapons.filter((w) => x.weapons.includes(w.id));
-  const toggle = (w: KtWeapon) => (haptic.select(), onChange({ weapons: x.weapons.includes(w.id) ? x.weapons.filter((id) => id !== w.id) : [...x.weapons, w.id] }));
-  const leader = o.keywords.includes('LEADER');
+  const toggle = (w: KtWeapon) => (haptic.select(), onChange({ weapons: nextWeaponsForToggle(team, o, x.weapons, w) }));
+  const leader = isLeader;
   const own = o.abilities.filter((a) => !a.factionRule);
   return (
     <UnitRowCard
@@ -542,8 +552,8 @@ function WeaponRules({ index }: { index: KtIndex }) {
 
 /** Добавление оперативника: лидеры сверху, у каждого — характеристики и число уже взятых. */
 function AddSheet({ open, team, roster, onClose, onAdd }: { open: boolean; team: KtTeam; roster: KtRoster; onClose: () => void; onAdd: (o: KtOperative) => void }) {
-  const leaders = team.operatives.filter((o) => o.keywords.includes('LEADER'));
-  const others = team.operatives.filter((o) => !o.keywords.includes('LEADER'));
+  const leaders = team.operatives.filter((o) => isLeaderOperative(team, o));
+  const others = team.operatives.filter((o) => !isLeaderOperative(team, o));
   const row = (o: KtOperative) => {
     const count = roster.operatives.filter((x) => x.opTypeId === o.id).length;
     return (

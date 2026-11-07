@@ -86,7 +86,7 @@ describe('категории столов: игры только на своих
   test('40K не ставится на стол Tactical Games; Kill Team — ставится', async () => {
     const wrong = await bookGame('p1', smallTable, '12:00', W40);
     expect(wrong.status).toBe(400);
-    expect(String(wrong.json.error)).toContain('Tactical Games');
+    expect(String(wrong.json.error)).toContain('Тактические игры');
     const right = await bookGame('p1', smallTable, '12:00', KT);
     expect(right.status).toBe(200);
   });
@@ -94,7 +94,7 @@ describe('категории столов: игры только на своих
   test('Kill Team не ставится на стол Full-scale Wargaming; 40K — ставится', async () => {
     const wrong = await bookGame('p2', whTable, '12:00', KT);
     expect(wrong.status).toBe(400);
-    expect(String(wrong.json.error)).toContain('Full-scale Wargaming');
+    expect(String(wrong.json.error)).toContain('Полномасштабный варгейм');
     const right = await bookGame('p2', whTable, '12:00', W40);
     expect(right.status).toBe(200);
   });
