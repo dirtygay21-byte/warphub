@@ -208,6 +208,10 @@ await step('learn-kt-round', async () => {
     await page.goto(`${BASE}/learn/aos/round?p=${p}`, { waitUntil: 'networkidle' });
     await shot(`learn-aos-round-${p}`, true);
   }
+  for (const p of [0, 4, 8, 12]) {
+    await page.goto(`${BASE}/learn/40k/round?p=${p}`, { waitUntil: 'networkidle' });
+    await shot(`learn-40k-round-${p}`, true);
+  }
 });
 
 fs.writeFileSync(path.join(OUT, 'log.txt'), log.join('\n') + '\n');

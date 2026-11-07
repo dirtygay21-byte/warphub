@@ -29,6 +29,20 @@ describe('учебный раунд', () => {
     const list = fs.readFileSync(path.join(ROOT, 'features', 'roster', 'ui', 'aos', 'AosList.tsx'), 'utf8');
     expect(list).toContain("navigate('/learn/aos/round')");
   });
+  test('40K: подготовка по колоде миссий, 5 фаз, атака, конец хода и следующий раунд', () => {
+    const w = TUTORIAL_WALKS['40k']!;
+    expect(w.steps.length).toBeGreaterThanOrEqual(10);
+    for (const ph of [1, 2, 3, 4, 5]) expect(w.steps.some((s) => s.phase === ph)).toBe(true);
+    for (const s of w.steps) if (s.example) expect(s.example.title.startsWith('Пример')).toBe(true);
+    expect(w.sample.lines.filter((l) => /\d/.test(l) && !l.includes('Пример')).length).toBe(0);
+    // числа правил — из данных приложения: лимиты ПО (missions.json → caps), CP и карты за фазу командования (движок)
+    const caps = JSON.parse(fs.readFileSync(path.join(ROOT, '..', '..', 'backend', 'roster-data', 'missions.json'), 'utf8')).caps;
+    const repeat = w.repeat.join(' ');
+    expect(repeat).toContain(`до ${caps.primaryRound} за раунд и до ${caps.primaryGame} за битву`);
+    expect(w.source).toContain('11-я редакция');
+    const list = fs.readFileSync(path.join(ROOT, 'features', 'roster', 'ui', 'RosterList.tsx'), 'utf8');
+    expect(list).toContain("navigate('/learn/40k/round')");
+  });
   test('Kill Team: подготовка, обе фазы, конец turning point и следующий раунд', () => {
     const kt = TUTORIAL_WALKS.kt!;
     expect(kt.steps.length).toBeGreaterThanOrEqual(10);

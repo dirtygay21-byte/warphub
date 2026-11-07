@@ -58,6 +58,9 @@ export function RosterList({
         <div className="col-span-2">
           <ToolTile icon="spark" title="Как играть" sub="Обучение для новичков: ход, стрельба, бой" onClick={() => navigate('/learn/40k')} />
         </div>
+        <div className="col-span-2 min-w-0">
+          <ToolTile icon="shield" title="Обучающая игра" sub="Раунд по шагам за столом" onClick={() => navigate('/learn/40k/round')} />
+        </div>
       </div>
 
       {rosters.length === 0 ? (
