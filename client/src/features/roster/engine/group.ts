@@ -21,3 +21,16 @@ export function groupDetRules(members: ComputedUnit[], L: DataLookup, detachment
   return out;
 }
 
+
+/**
+ * Правила, действующие на юнит (карточка 40K, 07.11.2026): армейское правило (способности инфолиста типа faction —
+ * «Oath of Moment», «Reanimation Protocols») и правила выбранных детачментов — в том числе через присоединённого
+ * Leader / телохранителей (groupDetRules; own — правило есть у самого юнита).
+ */
+export function unitAppliedRules(c: ComputedUnit, cr: ComputedRoster, L: DataLookup, detachmentIds: string[]) {
+  const ds = c.ds!;
+  const army = ds.abilities.filter((a) => a.type === 'faction').map((a) => ({ kind: 'army' as const, ability: a, name: a.name + (a.param ? ' ' + a.param : ''), text: a.ref ? (L.faction.rules[a.ref]?.text ?? '') : a.text }));
+  const members = groupOf(c, cr);
+  const det = groupDetRules(members.length ? members : [c], L, detachmentIds).map((r) => ({ kind: 'detachment' as const, ...r, own: r.via.includes(ds.name) }));
+  return { army, det };
+}

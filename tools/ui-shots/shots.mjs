@@ -397,6 +397,17 @@ for (const width of [390, 360]) {
         await page.getByText(unit, { exact: false }).first().click({ timeout: 5000 });
         await page.waitForTimeout(1000);
         await shot(`layout-${width}-${label}-unit`, true);
+        if (label === '40k') {
+          // «Действует на юнит» (07.11.2026): армейское правило и детачмент — сразу при открытии юнита
+          const row = page.locator('[id^="u-"]').getByText('Действует на юнит').first();
+          if (!(await row.count()) || !(await row.isVisible())) fail(`40K ${width}: в карточке юнита нет «Действует на юнит»`);
+          else {
+            await row.scrollIntoViewIfNeeded();
+            await page.waitForTimeout(300);
+            await shot(`layout-${width}-40k-unit-rules`);
+            if (width === 390) await popoverHasNoSideEffect('40K: правило армии', page.locator('[id^="u-"] [data-rule-trigger]', { hasText: 'Армия' }).first(), null, null);
+          }
+        }
         if (label === '40k' && width === 390) {
           // способность оружия 40K в карточке юнита: подсказка не меняет карточку
           const tag = page.locator('[id^="u-"] [data-rule-trigger]').first();
