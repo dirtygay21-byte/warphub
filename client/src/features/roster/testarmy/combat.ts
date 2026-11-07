@@ -95,6 +95,8 @@ export type WeaponInput = {
   keywords: string;
   /** сколько моделей атакуют этим оружием */
   count: number;
+  /** цель в пределах половины дальности именно этого оружия (S2, со стола); не задано — Situation.halfRange */
+  halfRange?: boolean;
 };
 
 export type Situation = {
@@ -286,6 +288,7 @@ export function simulate(weapons: WeaponInput[], target: Target, sit: Situation 
 
 function weaponGroup(w: WeaponInput, target: Target, sit: Situation, start: State, models: number, W: number): { state: State; math: WeaponMath } | { error: string } {
   const kw = parseWeaponKeywords(w.keywords, target);
+  const half = w.halfRange ?? !!sit.halfRange;
   const notes: string[] = [];
   const A = diceDist(w.A);
   const D0 = diceDist(w.D);
@@ -295,11 +298,11 @@ function weaponGroup(w: WeaponInput, target: Target, sit: Situation, start: Stat
 
   // кубики атаки одной модели: A + RAPID FIRE (половина дальности) + BLAST / CLEAVE (каждые 5 моделей цели)
   let perModel = A;
-  if (kw.rapid && sit.halfRange) perModel = convolve(perModel, kw.rapid);
+  if (kw.rapid && half) perModel = convolve(perModel, kw.rapid);
   const per5 = Math.floor(target.models / 5);
   if (kw.blast) perModel = shift(perModel, kw.blast * per5);
   if (kw.cleave) perModel = shift(perModel, kw.cleave * per5);
-  if (kw.rapid && !sit.halfRange) notes.push('RAPID FIRE: цель не в пределах половины дальности');
+  if (kw.rapid && !half) notes.push('RAPID FIRE: цель не в пределах половины дальности');
 
   // попадание
   const indirect = !!(sit.indirect && kw.indirect && !w.melee);
@@ -364,9 +367,9 @@ function weaponGroup(w: WeaponInput, target: Target, sit: Situation, start: Stat
 
   // потеря ран за один непройденный удар: D (+MELTA, +dMod), каждая рана — FNP
   let D = D0;
-  if (kw.melta && sit.halfRange) D = convolve(D, kw.melta);
+  if (kw.melta && half) D = convolve(D, kw.melta);
   if (sit.dMod) D = sit.dMod > 0 ? shift(D, sit.dMod) : clampMin1(D, sit.dMod);
-  if (kw.melta && sit.halfRange) notes.push('MELTA: + к D на половине дальности');
+  if (kw.melta && half) notes.push('MELTA: + к D на половине дальности');
   const keep = target.fnp != null ? (target.fnp - 1) / 6 : 1; // вероятность потерять каждую рану
   const lost: Dist = [0];
   D.forEach((pd, d) => pd > EPS && binom(d, keep).forEach((q, l) => (lost[l] = (lost[l] ?? 0) + pd * q)));
