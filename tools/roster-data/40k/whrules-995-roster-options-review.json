@@ -1,5 +1,5 @@
 {
- "about": "P1-T5c: варианты конструктора ростеров wh-rules.ru (40k/whrules-995-roster.json), формулировки которых нет в наших options сопоставленных инфолистов, после обновления whrules-995-wargear. wording — тот же вариант другими словами; not-option — не вариант; conflict — содержание расходится, не меняется без решения владельца (все конфликты решены в P1-T5e — resolved). Проверка — tests/paid-wargear.test.ts. 07.11.2026: 4 записи (AS Celestian Insidiants, AE Guardian Defenders/платформа, QT ×2) убраны — после полной конвертации из wh-rules 995 формулировка вариантов совпадает с конструктором.",
+ "about": "P1-T5c: варианты конструктора ростеров wh-rules.ru (40k/whrules-995-roster.json), формулировки которых нет в наших options сопоставленных инфолистов, после обновления whrules-995-wargear. wording — тот же вариант другими словами; not-option — не вариант; conflict — содержание расходится, не меняется без решения владельца (все конфликты решены в P1-T5e — resolved). Проверка — tests/paid-wargear.test.ts. 07.11.2026: 4 записи (AS Celestian Insidiants, AE Guardian Defenders/платформа, QT ×2) убраны — после полной конвертации из wh-rules 995 формулировка вариантов совпадает с конструктором. Партия 2: запись DRU Razorwing Jetfighter/void lances убрана — формулировка совпадает с конструктором.",
  "roster": "whrules-995-roster.json",
  "items": [
   {
@@ -79,14 +79,6 @@
    "id": "000000650",
    "unit": "Wracks",
    "site": "For every 5 models in the unit:",
-   "verdict": "wording",
-   "note": "тот же вариант, другая формулировка или разбивка (у нас есть)"
-  },
-  {
-   "army": "DRU",
-   "id": "000000661",
-   "unit": "Voidraven Bomber",
-   "site": "The model’s 2 void lances can be replaced with 2 dark scythes.",
    "verdict": "wording",
    "note": "тот же вариант, другая формулировка или разбивка (у нас есть)"
   },

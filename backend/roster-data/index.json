@@ -345,6 +345,86 @@
    }
   },
   {
+   "id": "whrules-995-chaos-daemons",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "CD"
+   ],
+   "note": "Полная конвертация CD из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-death-guard",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "DG"
+   ],
+   "note": "Полная конвертация DG из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-drukhari",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "DRU"
+   ],
+   "note": "Полная конвертация DRU из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-thousand-sons",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "TS"
+   ],
+   "note": "Полная конвертация TS из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-world-eaters",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "WE"
+   ],
+   "note": "Полная конвертация WE из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
    "id": "whrules-995-points",
    "kind": "whrules-points",
    "scope": [
@@ -423,7 +503,12 @@
     "GC",
     "GK",
     "LoV",
-    "TYR"
+    "TYR",
+    "CD",
+    "DG",
+    "DRU",
+    "TS",
+    "WE"
    ],
    "note": "Leader по Warmind (решение владельца 2026-11-07): к своим связям добавлены юниты из списка Warmind («attachTo»), если такой инфолист есть в файле армии; наши связи не убираются. Армии — полностью сконвертированные из wh-rules 995; остальные добавятся после своих партий.",
    "source": {

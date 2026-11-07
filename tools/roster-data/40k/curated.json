@@ -170,6 +170,77 @@
         "note": "Полная конвертация TYR из wh-rules.ru 995 (MFM 1.6): инфолисты (характеристики, оружие, способности, снаряжение, Leader), детачменты, улучшения, стратагемы, правила армии; id сохранены; прежнее, чего нет на сайте, — устаревшее (для старых ростеров). Одобрено владельцем 2026-11-07 (Task C, партия 1)."
       },
       {
+        "id": "whrules-995-chaos-daemons",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "chaos-daemons",
+        "army": "CD",
+        "keepOldLimits": true,
+        "syncCopies": true,
+        "enabled": true,
+        "scope": [
+          "CD"
+        ],
+        "note": "Полная конвертация CD из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2)."
+      },
+      {
+        "id": "whrules-995-death-guard",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "death-guard",
+        "army": "DG",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "DG"
+        ],
+        "note": "Полная конвертация DG из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2)."
+      },
+      {
+        "id": "whrules-995-drukhari",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "drukhari",
+        "army": "DRU",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "DRU"
+        ],
+        "note": "Полная конвертация DRU из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2)."
+      },
+      {
+        "id": "whrules-995-thousand-sons",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "thousand-sons",
+        "army": "TS",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "TS"
+        ],
+        "note": "Полная конвертация TS из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2)."
+      },
+      {
+        "id": "whrules-995-world-eaters",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "world-eaters",
+        "army": "WE",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "WE"
+        ],
+        "note": "Полная конвертация WE из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2)."
+      },
+      {
         "id": "whrules-995-points",
         "kind": "whrules-points",
         "snapshot": "whrules-995.json",
@@ -352,7 +423,12 @@
           "GC",
           "GK",
           "LoV",
-          "TYR"
+          "TYR",
+          "CD",
+          "DG",
+          "DRU",
+          "TS",
+          "WE"
         ],
         "note": "Leader по Warmind (решение владельца 2026-11-07): к своим связям добавлены юниты из списка Warmind («attachTo»), если такой инфолист есть в файле армии; наши связи не убираются. Армии — полностью сконвертированные из wh-rules 995; остальные добавятся после своих партий."
       }
