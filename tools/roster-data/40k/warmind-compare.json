@@ -1,0 +1,3290 @@
+{
+ "schema": "warmind-compare/1",
+ "snapshot": {
+  "file": "40k/warmind-11e.json",
+  "fingerprint": "adfa402cb0b52a72155ee8508b8dce91bc9b9fb424c72a5bdbbc81d493ef649f",
+  "source": {
+   "site": "https://warmind.online/app/",
+   "bundle": "entry-d07c2982a65fce6092674ce3fb6c7ce0.js",
+   "dataSource": "BSData wh40k-11e-mfm · Munitorum Field Manual",
+   "label": "11th Edition",
+   "extractedAt": "2026-11-07T16:32:30.726Z"
+  }
+ },
+ "armies": [
+  {
+   "army": "AS",
+   "matched": 38,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [
+    {
+     "unit": "Dialogus",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "crusaders"
+     ]
+    },
+    {
+     "unit": "Dogmata",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "crusaders"
+     ]
+    },
+    {
+     "unit": "Hospitaller",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "crusaders"
+     ]
+    },
+    {
+     "unit": "Imagifier",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "crusaders"
+     ]
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "AC",
+   "matched": 36,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [
+    {
+     "unit": "Blade Champion",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "custodian guard"
+     ]
+    },
+    {
+     "unit": "Knight-Centura",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "prosecutors",
+      "vigilators",
+      "witchseekers"
+     ]
+    },
+    {
+     "unit": "Shield-Captain",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "custodian guard"
+     ]
+    },
+    {
+     "unit": "Shield-Captain in Allarus Terminator Armour",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "aquilon custodians"
+     ]
+    },
+    {
+     "unit": "Shield-Captain on Dawneagle Jetbike",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "agamatus custodians"
+     ]
+    },
+    {
+     "unit": "Trajann Valoris",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "aquilon custodians",
+      "custodian guard"
+     ]
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "AdM",
+   "matched": 38,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [
+    {
+     "unit": "Skitarii Marshal",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "secutarii hoplites",
+      "secutarii peltasts"
+     ]
+    },
+    {
+     "unit": "Tech-Priest Enginseer",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "hastarii exterminators",
+      "hastarii fusiliers",
+      "servitor battleclade"
+     ]
+    },
+    {
+     "unit": "Technoarcheologist",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "secutarii hoplites",
+      "secutarii peltasts"
+     ]
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "AE",
+   "matched": 99,
+   "onlyOurs": [],
+   "points": [
+    {
+     "unit": "Shadow Spectres",
+     "ours": {
+      "1": 30,
+      "5": 115,
+      "10": 230
+     },
+     "warmind": {
+      "5": 115,
+      "10": 230
+     }
+    }
+   ],
+   "copies": [],
+   "stats": [],
+   "weapons": [
+    {
+     "unit": "Stonesinger",
+     "weapon": "Venomcrest Spit",
+     "ours": "12/3/n/a/3/-2/2",
+     "warmind": "12/3/-/3/-2/2"
+    }
+   ],
+   "leads": [
+    {
+     "unit": "Eldrad Ulthran",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "warlock conclave"
+     ]
+    },
+    {
+     "unit": "Farseer",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "warlock conclave"
+     ]
+    },
+    {
+     "unit": "The Visarch",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "corsair reaver band"
+     ]
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "AM",
+   "matched": 135,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [
+    {
+     "unit": "Avenger Strike Fighter",
+     "profile": "Avenger Strike Fighter",
+     "ours": "M20+ T9 Sv3+ W14 Ld7+ OC0",
+     "warmind": "M- T9 Sv3+ W14 Ld7+ OC-"
+    }
+   ],
+   "weapons": [
+    {
+     "unit": "Cadian Castellan",
+     "weapon": "Close combat weapon",
+     "ours": "melee/3/4/3/0/1",
+     "warmind": "melee/3/3/3/0/1"
+    },
+    {
+     "unit": "Kasrkin",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/4/4/0/1",
+     "warmind": "12/1/3/4/0/1"
+    },
+    {
+     "unit": "Kasrkin",
+     "weapon": "Plasma pistol – standard",
+     "ours": "12/1/4/7/-2/1",
+     "warmind": "12/1/3/7/-2/1"
+    },
+    {
+     "unit": "Kasrkin",
+     "weapon": "Plasma pistol – supercharge",
+     "ours": "12/1/4/8/-3/2",
+     "warmind": "12/1/3/8/-3/2"
+    },
+    {
+     "unit": "Tempestus Scions",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/4/4/0/1",
+     "warmind": "12/1/3/4/0/1"
+    },
+    {
+     "unit": "Tempestus Aquilons",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/4/4/0/1",
+     "warmind": "12/1/3/4/0/1"
+    }
+   ],
+   "leads": [
+    {
+     "unit": "Death Rider Commissar",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "lord marshal dreir",
+      "lord solar leontus"
+     ]
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "CD",
+   "matched": 63,
+   "onlyOurs": [
+    "Chaos Lord On Disc Of Tzeentch (Legends)",
+    "Chaos Lord On Juggernaut (Legends)",
+    "Chaos Lord On Palanquin Of Nurgle (Legends)",
+    "Chaos Lord On Steed Of Slaanesh (Legends)",
+    "Sorcerer On Disc Of Tzeentch (Legends)",
+    "Sorcerer On Palanquin Of Nurgle (Legends)",
+    "Sorcerer On Steed Of Slaanesh (Legends)"
+   ],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "QT",
+   "matched": 20,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "CSM",
+   "matched": 111,
+   "onlyOurs": [],
+   "points": [
+    {
+     "unit": "Khorne Berzerkers",
+     "ours": {
+      "10": 160,
+      "20": 320
+     },
+     "warmind": {
+      "10": 170,
+      "20": 330
+     }
+    },
+    {
+     "unit": "Rubric Marines",
+     "ours": {
+      "5": 100,
+      "10": 190
+     },
+     "warmind": {
+      "5": 115,
+      "10": 210
+     }
+    },
+    {
+     "unit": "Plague Marines",
+     "ours": {
+      "5": 90,
+      "7": 125,
+      "10": 180
+     },
+     "warmind": {
+      "5": 90,
+      "7": 125,
+      "10": 175
+     }
+    },
+    {
+     "unit": "Sicaran Battle Tank",
+     "ours": {
+      "1": 160
+     },
+     "warmind": {
+      "1": 180
+     }
+    },
+    {
+     "unit": "Noise Marines",
+     "ours": {
+      "6": 145
+     },
+     "warmind": {
+      "6": 160
+     }
+    }
+   ],
+   "copies": [
+    {
+     "unit": "Rubric Marines",
+     "ours": {
+      "from": 4,
+      "sizes": {
+       "5": 110,
+       "10": 200
+      }
+     },
+     "warmind": {
+      "from": 4,
+      "sizes": {
+       "5": 125,
+       "10": 220
+      }
+     }
+    },
+    {
+     "unit": "Noise Marines",
+     "ours": {
+      "from": 3,
+      "sizes": {
+       "6": 160
+      }
+     },
+     "warmind": {
+      "from": 3,
+      "sizes": {
+       "6": 175
+      }
+     }
+    }
+   ],
+   "stats": [
+    {
+     "unit": "Abaddon The Despoiler",
+     "profile": "Abaddon The Despoiler",
+     "ours": "M5 T5 Sv2+ W9 Ld5+ OC4",
+     "warmind": "M5 T6 Sv2+ W9 Ld5+ OC4"
+    },
+    {
+     "unit": "Huron Blackheart",
+     "profile": "Huron Blackheart",
+     "ours": "M6 T5 Sv3+ W5 Ld6+ OC1",
+     "warmind": "M6 T6 Sv3+ W5 Ld6+ OC1"
+    },
+    {
+     "unit": "Cypher",
+     "profile": "Cypher",
+     "ours": "M6 T4 Sv3+ W5 Ld6+ OC1",
+     "warmind": "M6 T5 Sv3+ W5 Ld6+ OC1"
+    },
+    {
+     "unit": "Fabius Bile",
+     "profile": "FABIUS BILE",
+     "ours": "M6 T4 Sv3+ W5 Ld6+ OC1",
+     "warmind": "M6 T5 Sv3+ W5 Ld6+ OC1"
+    },
+    {
+     "unit": "Fabius Bile",
+     "profile": "SURGEON ACOLYTE",
+     "ours": "M6 T4 Sv6+ W1 Ld7+ OC1",
+     "warmind": "M6 T5 Sv6+ W1 Ld7+ OC1"
+    },
+    {
+     "unit": "Chaos Lord",
+     "profile": "Chaos Lord",
+     "ours": "M6 T4 Sv3+ W5 Ld6+ OC1",
+     "warmind": "M6 T5 Sv3+ W5 Ld6+ OC1"
+    },
+    {
+     "unit": "Chaos Lord In Terminator Armour",
+     "profile": "Chaos Lord In Terminator Armour",
+     "ours": "M5 T5 Sv2+ W6 Ld6+ OC1",
+     "warmind": "M5 T6 Sv2+ W6 Ld6+ OC1"
+    },
+    {
+     "unit": "Dark Apostle",
+     "profile": "DARK APOSTLE",
+     "ours": "M6 T4 Sv3+ W4 Ld5+ OC1",
+     "warmind": "M6 T5 Sv3+ W4 Ld5+ OC1"
+    },
+    {
+     "unit": "Dark Apostle",
+     "profile": "DARK DISCIPLE",
+     "ours": "M6 T4 Sv6+ W1 Ld7+ OC1",
+     "warmind": "M6 T5 Sv6+ W1 Ld7+ OC1"
+    },
+    {
+     "unit": "Sorcerer",
+     "profile": "Sorcerer",
+     "ours": "M6 T4 Sv3+ W4 Ld6+ OC1",
+     "warmind": "M6 T5 Sv3+ W4 Ld6+ OC1"
+    },
+    {
+     "unit": "Sorcerer In Terminator Armour",
+     "profile": "Sorcerer In Terminator Armour",
+     "ours": "M5 T5 Sv2+ W5 Ld6+ OC1",
+     "warmind": "M5 T6 Sv2+ W5 Ld6+ OC1"
+    },
+    {
+     "unit": "Warpsmith",
+     "profile": "Warpsmith",
+     "ours": "M6 T4 Sv2+ W4 Ld6+ OC1",
+     "warmind": "M6 T5 Sv2+ W4 Ld6+ OC1"
+    },
+    {
+     "unit": "Chosen",
+     "profile": "Chosen",
+     "ours": "M6 T4 Sv3+ W3 Ld6+ OC1",
+     "warmind": "M6 T5 Sv3+ W3 Ld6+ OC1"
+    },
+    {
+     "unit": "Chaos Bikers",
+     "profile": "Chaos Bikers",
+     "ours": "M12 T5 Sv3+ W3 Ld6+ OC2",
+     "warmind": "M12 T6 Sv3+ W3 Ld6+ OC2"
+    },
+    {
+     "unit": "Raptors",
+     "profile": "Raptors",
+     "ours": "M12 T4 Sv3+ W2 Ld6+ OC1",
+     "warmind": "M12 T5 Sv3+ W2 Ld6+ OC1"
+    },
+    {
+     "unit": "Warp Talons",
+     "profile": "Warp Talons",
+     "ours": "M12 T4 Sv3+ W2 Ld6+ OC1",
+     "warmind": "M12 T5 Sv3+ W2 Ld6+ OC1"
+    },
+    {
+     "unit": "Havocs",
+     "profile": "Havocs",
+     "ours": "M5 T5 Sv3+ W2 Ld6+ OC1",
+     "warmind": "M5 T5 Sv3+ W3 Ld6+ OC1"
+    },
+    {
+     "unit": "Haarken Worldclaimer",
+     "profile": "Haarken Worldclaimer",
+     "ours": "M12 T4 Sv3+ W5 Ld6+ OC1",
+     "warmind": "M12 T5 Sv3+ W5 Ld6+ OC1"
+    },
+    {
+     "unit": "Master Of Possession",
+     "profile": "Master Of Possession",
+     "ours": "M8 T4 Sv3+ W4 Ld6+ OC1",
+     "warmind": "M8 T5 Sv3+ W4 Ld6+ OC1"
+    },
+    {
+     "unit": "Master Of Executions",
+     "profile": "Master Of Executions",
+     "ours": "M6 T4 Sv3+ W4 Ld6+ OC1",
+     "warmind": "M6 T5 Sv3+ W4 Ld6+ OC1"
+    },
+    {
+     "unit": "Legionaries",
+     "profile": "Legionaries",
+     "ours": "M6 T4 Sv3+ W2 Ld6+ OC2",
+     "warmind": "M6 T5 Sv3+ W2 Ld6+ OC2"
+    },
+    {
+     "unit": "Gellerpox Infected",
+     "profile": "GELLERPOX MUTANTS",
+     "ours": "M5 T5 Sv6+ W1 Ld7+ OC1",
+     "warmind": "M5 T5 Sv6+ W4 Ld7+ OC1"
+    },
+    {
+     "unit": "Khorne Berzerkers",
+     "profile": "Khorne Berzerkers",
+     "ours": "M8 T4 Sv3+ W2 Ld6+ OC2",
+     "warmind": "M8 T5 Sv3+ W2 Ld6+ OC2"
+    },
+    {
+     "unit": "Rubric Marines",
+     "profile": "Rubric Marine",
+     "ours": "M6 T4 Sv3+ W2 Ld7+ OC2",
+     "warmind": "M6 T5 Sv3+ W2 Ld7+ OC2"
+    },
+    {
+     "unit": "Rubric Marines",
+     "profile": "Aspiring Sorcerer",
+     "ours": "M6 T4 Sv3+ W3 Ld6+ OC2",
+     "warmind": "M6 T5 Sv3+ W3 Ld6+ OC2"
+    },
+    {
+     "unit": "Chaos Lord with Jump Pack",
+     "profile": "Chaos Lord",
+     "ours": "M12 T4 Sv3+ W5 Ld6+ OC1",
+     "warmind": "M12 T5 Sv3+ W5 Ld6+ OC1"
+    },
+    {
+     "unit": "Nemesis Claw",
+     "profile": "Legionaries",
+     "ours": "M6 T4 Sv3+ W2 Ld6+ OC1",
+     "warmind": "M6 T5 Sv3+ W2 Ld6+ OC1"
+    },
+    {
+     "unit": "Noise Marines",
+     "profile": "Noise Marines",
+     "ours": "M6 T5 Sv3+ W2 Ld6+ OC1",
+     "warmind": "M6 T5 Sv3+ W3 Ld6+ OC1"
+    },
+    {
+     "unit": "Red Corsairs Reave-Captain",
+     "profile": "",
+     "ours": "M6 T4 Sv3+ W5 Ld6+ OC1",
+     "warmind": "M6 T5 Sv3+ W5 Ld6+ OC1"
+    },
+    {
+     "unit": "Kravek Morne",
+     "profile": "",
+     "ours": "M5 T5 Sv2+ W6 Ld6+ OC1",
+     "warmind": "M5 T6 Sv2+ W6 Ld6+ OC1"
+    }
+   ],
+   "weapons": [
+    {
+     "unit": "Cypher",
+     "weapon": "Cypher’s bolt pistol",
+     "ours": "12/6/2/4/-1/1",
+     "warmind": "12/6/2/5/-1/1"
+    },
+    {
+     "unit": "Chaos Lord",
+     "weapon": "Astartes chainblade",
+     "ours": "melee/7/2/4/-1/1",
+     "warmind": "melee/7/2/5/-1/1"
+    },
+    {
+     "unit": "Chaos Lord In Terminator Armour",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/2/4/0/1",
+     "warmind": "24/2/2/5/-1/1"
+    },
+    {
+     "unit": "Chaos Lord In Terminator Armour",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/3/4/0/1",
+     "warmind": "24/1/3/5/-1/1"
+    },
+    {
+     "unit": "Dark Apostle",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Sorcerer",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Sorcerer In Terminator Armour",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Sorcerer In Terminator Armour",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Terminator Squad",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Terminator Squad",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Chosen",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Chosen",
+     "weapon": "Boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chosen",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Possessed",
+     "weapon": "Hideous mutations",
+     "ours": "melee/4/3/5/-1/2",
+     "warmind": "melee/4/3/6/-1/2"
+    },
+    {
+     "unit": "Helbrute",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Rhino",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Rhino",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Bikers",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Bikers",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Bikers",
+     "weapon": "Close combat weapon",
+     "ours": "melee/3/3/4/0/1",
+     "warmind": "melee/3/3/5/0/1"
+    },
+    {
+     "unit": "Chaos Bikers",
+     "weapon": "Astartes chainsword",
+     "ours": "melee/4/3/4/-1/1",
+     "warmind": "melee/4/3/5/-1/1"
+    },
+    {
+     "unit": "Raptors",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Raptors",
+     "weapon": "Astartes chainsword",
+     "ours": "melee/4/3/4/-1/1",
+     "warmind": "melee/4/3/5/-1/1"
+    },
+    {
+     "unit": "Raptors",
+     "weapon": "Close combat weapon",
+     "ours": "melee/3/3/4/0/1",
+     "warmind": "melee/3/3/5/0/1"
+    },
+    {
+     "unit": "Chaos Land Raider",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Land Raider",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Predator Destructor",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Predator Destructor",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Vindicator",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Vindicator",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Havocs",
+     "weapon": "Boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Havocs",
+     "weapon": "Astartes chainsword",
+     "ours": "melee/5/3/4/-1/1",
+     "warmind": "melee/5/3/5/-1/1"
+    },
+    {
+     "unit": "Havocs",
+     "weapon": "Close combat weapon",
+     "ours": "melee/3/3/4/0/1",
+     "warmind": "melee/3/3/5/0/1"
+    },
+    {
+     "unit": "Master Of Possession",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Lord Discordant On Helstalker",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/2/4/0/1",
+     "warmind": "12/1/2/5/-1/1"
+    },
+    {
+     "unit": "Master Of Executions",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Legionaries",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Legionaries",
+     "weapon": "Boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Legionaries",
+     "weapon": "Astartes chainsword",
+     "ours": "melee/4/3/4/-1/1",
+     "warmind": "melee/4/3/5/-1/1"
+    },
+    {
+     "unit": "Legionaries",
+     "weapon": "Close combat weapon",
+     "ours": "melee/3/3/4/0/1",
+     "warmind": "melee/3/3/5/0/1"
+    },
+    {
+     "unit": "Chaos Predator Annihilator",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Predator Annihilator",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Khorne Berzerkers",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/4/4/0/1",
+     "warmind": "12/1/4/5/-1/1"
+    },
+    {
+     "unit": "Khorne Berzerkers",
+     "weapon": "Chainblade",
+     "ours": "melee/4/3/4/-1/1",
+     "warmind": "melee/4/3/5/-1/1"
+    },
+    {
+     "unit": "Rubric Marines",
+     "weapon": "Inferno bolt pistol",
+     "ours": "12/1/3/4/-1/1",
+     "warmind": "12/1/3/5/-2/1"
+    },
+    {
+     "unit": "Rubric Marines",
+     "weapon": "Inferno boltgun",
+     "ours": "24/2/3/4/-2/1",
+     "warmind": "24/2/3/5/-2/1"
+    },
+    {
+     "unit": "Rubric Marines",
+     "weapon": "Close combat weapon",
+     "ours": "melee/2/3/4/0/1",
+     "warmind": "melee/2/3/5/0/1"
+    },
+    {
+     "unit": "Plague Marines",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Plague Marines",
+     "weapon": "Boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Plague Marines",
+     "weapon": "Plague knives",
+     "ours": "melee/3/3/4/0/1",
+     "warmind": "melee/3/3/5/-1/1"
+    },
+    {
+     "unit": "Terrax-pattern Termite",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Terrax-pattern Termite",
+     "weapon": "Terrax melta cutter",
+     "ours": "12/5/3/9/-4/d6",
+     "warmind": "12/5/3/9/-3/d3+2"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Storm bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Lascannon",
+     "ours": "48/1/3/12/-3/d6+1",
+     "warmind": "48/1/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Cerberus neutron pulse array",
+     "ours": "48/3/3/16/-4/d6+3",
+     "warmind": "48/3/3/16/-3/d3+6"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Havoc launcher",
+     "ours": "48/d6/3/5/0/1",
+     "warmind": "48/3/3/5/-1/1"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Melta blast-gun",
+     "ours": "24/4/3/12/-4/d6",
+     "warmind": "24/4/3/12/-3/d3+2"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Twin boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Hunter-killer missile",
+     "ours": "48/1/2/14/-3/d6",
+     "warmind": "48/1/2/14/-3/d3+3"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Autocannon",
+     "ours": "48/2/3/9/-1/3",
+     "warmind": "48/4/3/9/-1/3"
+    },
+    {
+     "unit": "Mastodon",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Mastodon",
+     "weapon": "Lascannon",
+     "ours": "48/1/3/12/-3/d6+1",
+     "warmind": "48/1/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Mastodon",
+     "weapon": "Siege melta array",
+     "ours": "24/6/3/9/-4/d6",
+     "warmind": "24/6/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Fellblade",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/3/4/0/1"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/1/3/5/-1/1"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Graviton cannon",
+     "ours": "36/d6/3/6/-2/2",
+     "warmind": "36/3/3/6/-2/2"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Laser destroyer",
+     "ours": "36/3/3/14/-4/d6+1",
+     "warmind": "72/2/3/14/-3/d6+3"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Quad launcher – thunderfire shells",
+     "ours": "60/d6+4/3/5/0/1",
+     "warmind": "60/d3+6/3/5/0/1"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Dreadhammer siege cannon",
+     "ours": "24/d6+6/3/14/-3/d6",
+     "warmind": "24/d6+6/3/14/-3/d3+3"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Lascannon",
+     "ours": "48/1/3/12/-3/d6+1",
+     "warmind": "48/1/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Storm bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Quad lascannon",
+     "ours": "48/4/3/12/-3/d6+1",
+     "warmind": "48/4/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Laser destroyer",
+     "ours": "36/3/3/14/-4/d6+1",
+     "warmind": "72/2/3/14/-3/d6+3"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Twin Falchion volcano cannon",
+     "ours": "120/d3+1/3/24/-5/12",
+     "warmind": "120/d3+1/3/24/-4/12"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Storm bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Twin heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Chaos Lord with Jump Pack",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/2/4/0/1",
+     "warmind": "12/1/2/5/-1/1"
+    },
+    {
+     "unit": "Cultist Firebrand",
+     "weapon": "Close combat weapon",
+     "ours": "melee/4/4/4/-1/1",
+     "warmind": "melee/4/4/4/0/1"
+    },
+    {
+     "unit": "Nemesis Claw",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Nemesis Claw",
+     "weapon": "Boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Nemesis Claw",
+     "weapon": "Astartes chainsword",
+     "ours": "melee/4/3/4/-1/1",
+     "warmind": "melee/4/3/5/-1/1"
+    },
+    {
+     "unit": "Nemesis Claw",
+     "weapon": "Nostraman chainblade",
+     "ours": "melee/5/3/4/-1/1",
+     "warmind": "melee/5/3/5/-1/1"
+    },
+    {
+     "unit": "Noise Marines",
+     "weapon": "Close combat weapon",
+     "ours": "melee/3/3/4/0/1",
+     "warmind": "melee/3/3/5/0/1"
+    },
+    {
+     "unit": "Masters of the Maelstrom",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/-1/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Red Corsairs Raiders",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Red Corsairs Raiders",
+     "weapon": "Boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Red Corsairs Reave-Captain",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/2/4/0/1",
+     "warmind": "12/1/2/5/-1/1"
+    },
+    {
+     "unit": "Kravek Morne",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/2/4/0/1",
+     "warmind": "24/2/2/5/-1/1"
+    }
+   ],
+   "leads": [
+    {
+     "unit": "Huron Blackheart",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "masters of the maelstrom"
+     ]
+    },
+    {
+     "unit": "Chaos Lord On Juggernaut",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "khorne berzerkers"
+     ]
+    },
+    {
+     "unit": "Chaos Lord On Disc Of Tzeentch",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "rubric marines"
+     ]
+    },
+    {
+     "unit": "Chaos Lord On Palanquin Of Nurgle",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "plague marines"
+     ]
+    },
+    {
+     "unit": "Sorcerer On Disc Of Tzeentch",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "rubric marines"
+     ]
+    },
+    {
+     "unit": "Sorcerer On Palanquin Of Nurgle",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "plague marines"
+     ]
+    },
+    {
+     "unit": "Exalted Champion",
+     "onlyOurs": [
+      "nemesis claw",
+      "red corsairs raiders"
+     ],
+     "onlyWarmind": []
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "DG",
+   "matched": 70,
+   "onlyOurs": [
+    "Myphitic Blight-hauler"
+   ],
+   "points": [
+    {
+     "unit": "Sicaran Battle Tank",
+     "ours": {
+      "1": 160
+     },
+     "warmind": {
+      "1": 180
+     }
+    }
+   ],
+   "copies": [],
+   "stats": [
+    {
+     "unit": "Gellerpox Infected",
+     "profile": "GELLERPOX MUTANTS",
+     "ours": "M5 T5 Sv6+ W1 Ld7+ OC1",
+     "warmind": "M5 T5 Sv6+ W4 Ld7+ OC1"
+    }
+   ],
+   "weapons": [
+    {
+     "unit": "Plague Marines",
+     "weapon": "Boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Plague Marines",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Plague Marines",
+     "weapon": "Plague knives",
+     "ours": "melee/3/3/4/0/1",
+     "warmind": "melee/3/3/5/-1/1"
+    },
+    {
+     "unit": "Helbrute",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Rhino",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Rhino",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Land Raider",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Land Raider",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Predator Annihilator",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Predator Annihilator",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Malignant Plaguecaster",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Foul Blightspawn",
+     "weapon": "Close combat weapon",
+     "ours": "melee/4/3/4/0/1",
+     "warmind": "melee/4/3/5/0/1"
+    },
+    {
+     "unit": "Biologus Putrifier",
+     "weapon": "Plague knives",
+     "ours": "melee/4/3/4/0/1",
+     "warmind": "melee/4/3/5/-1/1"
+    },
+    {
+     "unit": "Plague Surgeon",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/3/5/-1/1"
+    },
+    {
+     "unit": "Tallyman",
+     "weapon": "Close combat weapon",
+     "ours": "melee/4/3/4/0/1",
+     "warmind": "melee/4/3/5/0/1"
+    },
+    {
+     "unit": "Blightlord Terminators",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Blightlord Terminators",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Blightlord Terminators",
+     "weapon": "Close combat weapon",
+     "ours": "melee/3/3/4/0/1",
+     "warmind": "melee/3/3/5/0/1"
+    },
+    {
+     "unit": "Chaos Predator Destructor",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Predator Destructor",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Icon Bearer",
+     "weapon": "Boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Icon Bearer",
+     "weapon": "Plague knife",
+     "ours": "melee/4/3/4/0/1",
+     "warmind": "melee/4/3/5/-1/1"
+    },
+    {
+     "unit": "Terrax-pattern Termite",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Terrax-pattern Termite",
+     "weapon": "Terrax melta cutter",
+     "ours": "12/5/3/9/-4/d6",
+     "warmind": "12/5/3/9/-3/d3+2"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Cerberus neutron pulse array",
+     "ours": "48/3/3/16/-4/d6+3",
+     "warmind": "48/3/3/16/-3/d3+6"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Storm bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Lascannon",
+     "ours": "48/1/3/12/-3/d6+1",
+     "warmind": "48/1/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Hunter-killer missile",
+     "ours": "48/1/2/14/-3/d6",
+     "warmind": "48/1/2/14/-3/d3+3"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Autocannon",
+     "ours": "48/2/3/9/-1/3",
+     "warmind": "48/4/3/9/-1/3"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Havoc launcher",
+     "ours": "48/d6/3/5/0/1",
+     "warmind": "48/3/3/5/-1/1"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Melta blast-gun",
+     "ours": "24/4/3/12/-4/d6",
+     "warmind": "24/4/3/12/-3/d3+2"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Twin boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Mastodon",
+     "weapon": "Lascannon",
+     "ours": "48/1/3/12/-3/d6+1",
+     "warmind": "48/1/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Mastodon",
+     "weapon": "Siege melta array",
+     "ours": "24/6/3/9/-4/d6",
+     "warmind": "24/6/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Mastodon",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Fellblade",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/3/4/0/1"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/1/3/5/-1/1"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Graviton cannon",
+     "ours": "36/d6/3/6/-2/2",
+     "warmind": "36/3/3/6/-2/2"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Laser destroyer",
+     "ours": "36/3/3/14/-4/d6+1",
+     "warmind": "72/2/3/14/-3/d6+3"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Quad launcher – thunderfire shells",
+     "ours": "60/d6+4/3/5/0/1",
+     "warmind": "60/d3+6/3/5/0/1"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Lascannon",
+     "ours": "48/1/3/12/-3/d6+1",
+     "warmind": "48/1/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Dreadhammer siege cannon",
+     "ours": "24/d6+6/3/14/-3/d6",
+     "warmind": "24/d6+6/3/14/-3/d3+3"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Storm bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Twin Falchion volcano cannon",
+     "ours": "120/d3+1/3/24/-5/12",
+     "warmind": "120/d3+1/3/24/-4/12"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Storm bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Quad lascannon",
+     "ours": "48/4/3/12/-3/d6+1",
+     "warmind": "48/4/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Laser destroyer",
+     "ours": "36/3/3/14/-4/d6+1",
+     "warmind": "72/2/3/14/-3/d6+3"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Twin heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    }
+   ],
+   "leads": [
+    {
+     "unit": "Chaos Lord On Palanquin Of Nurgle",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "plague marines"
+     ]
+    },
+    {
+     "unit": "Sorcerer On Palanquin Of Nurgle",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "plague marines"
+     ]
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "DRU",
+   "matched": 30,
+   "onlyOurs": [
+    "Corsair Voidreavers",
+    "Corsair Voidscarred",
+    "Corsair Cloud Dancer Band (Legends)",
+    "Corsair Reaver Band (Legends)",
+    "Kharseth",
+    "Prince Yriel",
+    "Corsair Skyreavers",
+    "Starfangs"
+   ],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [
+    {
+     "unit": "Voidraven Bomber",
+     "weapon": "Voidraven missiles – shatterfield missiles",
+     "ours": "48/d6/3/7/-2/1",
+     "warmind": "48/d6/3/7/-1/1"
+    }
+   ],
+   "leads": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "EC",
+   "matched": 23,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "GC",
+   "matched": 25,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "GK",
+   "matched": 31,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "AoI",
+   "matched": 46,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [
+    {
+     "unit": "Aquila Kill Team",
+     "profile": "Kill Team Sergeant",
+     "ours": "M6 T5 Sv3+ W2 Ld6+ OC2",
+     "warmind": "M6 T4 Sv3+ W2 Ld6+ OC2"
+    }
+   ],
+   "weapons": [
+    {
+     "unit": "Aquila Kill Team",
+     "weapon": "Bolt Pistol",
+     "ours": "12/1/3/5/-1/1",
+     "warmind": "12/1/3/4/0/1"
+    },
+    {
+     "unit": "Aquila Kill Team",
+     "weapon": "Special-issue Bolt Pistol",
+     "ours": "18/1/3/5/-1/1",
+     "warmind": "18/1/3/4/-1/1"
+    },
+    {
+     "unit": "Aquila Kill Team",
+     "weapon": "Plasma Incinerator – standard",
+     "ours": "24/2/3/7/-2/2",
+     "warmind": "24/2/3/7/-2/1"
+    },
+    {
+     "unit": "Aquila Kill Team",
+     "weapon": "Frag Cannon",
+     "ours": "18/2/3/7/-2/2",
+     "warmind": "18/d3/3/7/-2/2"
+    },
+    {
+     "unit": "Aquila Kill Team",
+     "weapon": "Power Weapon",
+     "ours": "melee/4/3/5/-2/1",
+     "warmind": "melee/4/3/5/-2/2"
+    }
+   ],
+   "leads": [
+    {
+     "unit": "Inquisitor",
+     "onlyOurs": [
+      "deathwatch kill team"
+     ],
+     "onlyWarmind": []
+    },
+    {
+     "unit": "Inquisitor Coteaz",
+     "onlyOurs": [
+      "aquila kill team",
+      "deathwatch kill team"
+     ],
+     "onlyWarmind": []
+    },
+    {
+     "unit": "Inquisitor Draxus",
+     "onlyOurs": [
+      "deathwatch kill team"
+     ],
+     "onlyWarmind": []
+    },
+    {
+     "unit": "Inquisitor Greyfax",
+     "onlyOurs": [
+      "aquila kill team",
+      "deathwatch kill team"
+     ],
+     "onlyWarmind": []
+    },
+    {
+     "unit": "Inquisitor Karamazov",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "sanctifiers"
+     ]
+    },
+    {
+     "unit": "Inquisitor Kroyle",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "sanctifiers"
+     ]
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "QI",
+   "matched": 22,
+   "onlyOurs": [
+    "Sir Hekhtur",
+    "Skitarii Marshal",
+    "Skitarii Rangers"
+   ],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "LoV",
+   "matched": 22,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "NEC",
+   "matched": 63,
+   "onlyOurs": [
+    "Sentry Pylon (Legends)"
+   ],
+   "points": [],
+   "copies": [],
+   "stats": [
+    {
+     "unit": "Canoptek Reanimator",
+     "profile": "Canoptek Reanimator",
+     "ours": "M8 T6 Sv3+ W6 Ld7+ OC3",
+     "warmind": "M8 T6 Sv3+ W6 Ld8+ OC3"
+    }
+   ],
+   "weapons": [],
+   "leads": [
+    {
+     "unit": "Vargard Obyron",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "nemesor zahndrekh"
+     ]
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "ORK",
+   "matched": 67,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [
+    {
+     "unit": "Warboss",
+     "weapon": "Kombi-skorcha - Skorcha",
+     "ours": "12/3/-/5/0/1",
+     "warmind": "12/3/n/a/5/0/1"
+    },
+    {
+     "unit": "Weirdboy",
+     "weapon": "Power Vomit",
+     "ours": "12/3/-/5/-3/2",
+     "warmind": "12/3/n/a/5/-3/2"
+    },
+    {
+     "unit": "Big Mek In Mega Armour",
+     "weapon": "Kombi-weapon - Point Blank",
+     "ours": "12/3/-/5/0/1",
+     "warmind": "12/3/n/a/5/0/1"
+    },
+    {
+     "unit": "Big Mek In Mega Armour",
+     "weapon": "Kustom Shoota - Point Blank",
+     "ours": "6/d3+3/-/4/0/1",
+     "warmind": "6/d3+3/n/a/4/0/1"
+    },
+    {
+     "unit": "Ghazghkull Thraka",
+     "weapon": "Mork’s Roar - Point Blank",
+     "ours": "9/2d6+2/-/6/-1/1",
+     "warmind": "9/2d6+2/n/a/6/-1/1"
+    },
+    {
+     "unit": "Boyz",
+     "weapon": "Burna",
+     "ours": "12/3/-/4/0/1",
+     "warmind": "12/3/n/a/4/0/1"
+    },
+    {
+     "unit": "Boyz",
+     "weapon": "Kombi-skorcha - Skorcha",
+     "ours": "12/3/-/5/0/1",
+     "warmind": "12/3/n/a/5/0/1"
+    },
+    {
+     "unit": "Burna Boyz",
+     "weapon": "Burna",
+     "ours": "12/3/-/4/0/1",
+     "warmind": "12/3/n/a/4/0/1"
+    },
+    {
+     "unit": "Nobz",
+     "weapon": "Big Skorcha",
+     "ours": "18/3/-/5/-1/1",
+     "warmind": "18/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Meganobz",
+     "weapon": "Kombi-weapon - Point Blank",
+     "ours": "12/3/-/5/0/1",
+     "warmind": "12/3/n/a/5/0/1"
+    },
+    {
+     "unit": "Meganobz",
+     "weapon": "Kustom Shoota - Point Blank",
+     "ours": "6/d3+3/-/4/0/1",
+     "warmind": "6/d3+3/n/a/4/0/1"
+    },
+    {
+     "unit": "Kommandos",
+     "weapon": "Burna",
+     "ours": "12/3/-/4/0/1",
+     "warmind": "12/3/n/a/4/0/1"
+    },
+    {
+     "unit": "Warbuggies",
+     "weapon": "Rivet Kannon - Point Blank",
+     "ours": "6/d3+1/-/7/-2/2",
+     "warmind": "6/d3+1/n/a/7/-2/2"
+    },
+    {
+     "unit": "Warbuggies",
+     "weapon": "Mek Speshul - Point Blank",
+     "ours": "6/2d6+2/-/5/-1/1",
+     "warmind": "6/2d6+2/n/a/5/-1/1"
+    },
+    {
+     "unit": "Deff Dread",
+     "weapon": "Skorcha",
+     "ours": "12/3/-/5/0/1",
+     "warmind": "12/3/n/a/5/0/1"
+    },
+    {
+     "unit": "Killa Kans",
+     "weapon": "Kan Blasta - Point Blank",
+     "ours": "12/3/-/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Gorkanaut",
+     "weapon": "Deffstorm Mega-shoota - Point Blank",
+     "ours": "12/3d6/-/6/-1/1",
+     "warmind": "12/3d6/n/a/6/-1/1"
+    },
+    {
+     "unit": "Gorkanaut",
+     "weapon": "Skorcha",
+     "ours": "12/3/-/5/0/1",
+     "warmind": "12/3/n/a/5/0/1"
+    },
+    {
+     "unit": "Stompa",
+     "weapon": "Skorcha",
+     "ours": "12/3/-/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Stompa",
+     "weapon": "Supa-gatler - Point Blank",
+     "ours": "12/3d6+3/-/7/-2/2",
+     "warmind": "12/3d6+3/n/a/7/-2/2"
+    },
+    {
+     "unit": "Grot Tanks",
+     "weapon": "Skorcha",
+     "ours": "12/3/-/5/0/1",
+     "warmind": "12/3/n/a/5/0/1"
+    },
+    {
+     "unit": "Grot Mega-tank",
+     "weapon": "Dual Skorcha",
+     "ours": "12/3/-/5/0/1",
+     "warmind": "12/3/n/a/5/0/1"
+    },
+    {
+     "unit": "Kill Rig",
+     "weapon": "Wurrtower",
+     "ours": "24/1/-/12/-3/6",
+     "warmind": "24/1/n/a/12/-3/6"
+    },
+    {
+     "unit": "Nazdreg",
+     "weapon": "Kustom Blasta X - Skorcha",
+     "ours": "12/3/-/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    }
+   ],
+   "leads": [
+    {
+     "unit": "Warboss on Warbike",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "nobz on warbikes",
+      "skorchas"
+     ]
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "SM",
+   "matched": 222,
+   "onlyOurs": [],
+   "points": [
+    {
+     "unit": "Crusader Squad",
+     "ours": {},
+     "warmind": {
+      "10": 160,
+      "20": 305
+     }
+    },
+    {
+     "unit": "Wolf Guard Headtakers",
+     "ours": {},
+     "warmind": {
+      "3": 85,
+      "6": 170,
+      "12": 230
+     }
+    }
+   ],
+   "copies": [
+    {
+     "unit": "Wolf Guard Headtakers",
+     "ours": {
+      "from": 3,
+      "sizes": {}
+     },
+     "warmind": {
+      "from": 3,
+      "sizes": {
+       "3": 95,
+       "6": 180,
+       "12": 240
+      }
+     }
+    }
+   ],
+   "stats": [
+    {
+     "unit": "Thunderhawk Gunship",
+     "profile": "Thunderhawk Gunship",
+     "ours": "M14 T12 Sv2+ W30 Ld6+ OC0",
+     "warmind": "M20 T12 Sv2+ W30 Ld6+ OC0"
+    },
+    {
+     "unit": "Chaplain Grimaldus",
+     "profile": "Chaplain Grimaldus",
+     "ours": "M6 T5 Sv3+ W5 Ld5+ OC1",
+     "warmind": "M6 T4 Sv3+ W1 Ld8+ OC1"
+    },
+    {
+     "unit": "Crusader Squad",
+     "profile": "Neophyte",
+     "ours": "M6 T4 Sv4+ W2 Ld6+ OC2",
+     "warmind": "M6 T5 Sv3+ W2 Ld6+ OC2"
+    }
+   ],
+   "weapons": [
+    {
+     "unit": "Lieutenant in Phobos Armour",
+     "weapon": "Master-crafted bolt carbine",
+     "ours": "24/2/2/4/0/2",
+     "warmind": "24/2/2/5/-1/2"
+    },
+    {
+     "unit": "Suboden Khan",
+     "weapon": "Onslaught gatling cannon",
+     "ours": "24/8/2/5/0/1",
+     "warmind": "24/8/2/5/-1/1"
+    },
+    {
+     "unit": "Death Company Captain",
+     "weapon": "Power Fist",
+     "ours": "melee/3/3/8/-2/2",
+     "warmind": "melee/6/2/8/-2/2"
+    },
+    {
+     "unit": "Talonstrike Kill Team",
+     "weapon": "Hand Flamer",
+     "ours": "9/3/7/4/0/1",
+     "warmind": "9/3/n/a/4/0/1"
+    },
+    {
+     "unit": "Bjorn the Fell-handed",
+     "weapon": "Assault Cannon",
+     "ours": "24/6/2/6/-2/1",
+     "warmind": "24/6/3/6/-2/1"
+    },
+    {
+     "unit": "Iron Priest",
+     "weapon": "Helfrost Pistol – dispersed",
+     "ours": "12/3/7/4/-1/1",
+     "warmind": "12/3/n/a/4/-1/1"
+    },
+    {
+     "unit": "Murderfang",
+     "weapon": "Heavy Flamer",
+     "ours": "12/3/7/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Wulfen Dreadnought",
+     "weapon": "Heavy Flamer",
+     "ours": "12/3/7/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    }
+   ],
+   "leads": [
+    {
+     "unit": "Adrax Agatone",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "command squad"
+     ]
+    },
+    {
+     "unit": "Ancient",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "devastator squad",
+      "tactical squad"
+     ]
+    },
+    {
+     "unit": "Ancient in Terminator Armour",
+     "onlyOurs": [
+      "wolf guard terminators"
+     ],
+     "onlyWarmind": [
+      "relic terminator squad"
+     ]
+    },
+    {
+     "unit": "Apothecary",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "devastator squad",
+      "tactical squad",
+      "vanguard veteran squad"
+     ]
+    },
+    {
+     "unit": "Apothecary Biologis",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "eradicator squad"
+     ]
+    },
+    {
+     "unit": "Caanok Var",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "relic terminator squad"
+     ]
+    },
+    {
+     "unit": "Captain",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "command squad"
+     ]
+    },
+    {
+     "unit": "Captain in Gravis Armour",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "eradicator squad"
+     ]
+    },
+    {
+     "unit": "Captain in Phobos Armour",
+     "onlyOurs": [
+      "wolf scouts"
+     ],
+     "onlyWarmind": []
+    },
+    {
+     "unit": "Captain in Terminator Armour",
+     "onlyOurs": [
+      "wolf guard terminators"
+     ],
+     "onlyWarmind": [
+      "relic terminator squad"
+     ]
+    },
+    {
+     "unit": "Captain on Bike",
+     "onlyOurs": [
+      "ravenwing black knights"
+     ],
+     "onlyWarmind": []
+    },
+    {
+     "unit": "Captain Titus",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "command squad"
+     ]
+    },
+    {
+     "unit": "Captain with Jump Pack",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad with jump packs"
+     ]
+    },
+    {
+     "unit": "Chaplain",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "death company marines with bolt rifles"
+     ]
+    },
+    {
+     "unit": "Chaplain in Terminator Armour",
+     "onlyOurs": [
+      "wolf guard terminators"
+     ],
+     "onlyWarmind": [
+      "relic terminator squad"
+     ]
+    },
+    {
+     "unit": "Chaplain on Bike",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "bike squad",
+      "company veterans on bikes"
+     ]
+    },
+    {
+     "unit": "Chaplain with Jump Pack",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad with jump packs"
+     ]
+    },
+    {
+     "unit": "Chief Librarian Tigurius",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad"
+     ]
+    },
+    {
+     "unit": "Darnath Lysander",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "relic terminator squad"
+     ]
+    },
+    {
+     "unit": "Iron Father Feirros",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "eradicator squad"
+     ]
+    },
+    {
+     "unit": "Judiciar",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "tactical squad"
+     ]
+    },
+    {
+     "unit": "Kayvaan Shrike",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad with jump packs"
+     ]
+    },
+    {
+     "unit": "Kor’sarro Khan",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "command squad"
+     ]
+    },
+    {
+     "unit": "Librarian",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad"
+     ]
+    },
+    {
+     "unit": "Librarian in Phobos Armour",
+     "onlyOurs": [
+      "wolf scouts"
+     ],
+     "onlyWarmind": []
+    },
+    {
+     "unit": "Librarian in Terminator Armour",
+     "onlyOurs": [
+      "wolf guard terminators"
+     ],
+     "onlyWarmind": [
+      "relic terminator squad"
+     ]
+    },
+    {
+     "unit": "Lieutenant",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "command squad",
+      "tactical squad"
+     ]
+    },
+    {
+     "unit": "Lieutenant in Phobos Armour",
+     "onlyOurs": [
+      "wolf scouts"
+     ],
+     "onlyWarmind": []
+    },
+    {
+     "unit": "Marneus Calgar",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "command squad",
+      "eradicator squad",
+      "relic terminator squad"
+     ]
+    },
+    {
+     "unit": "Suboden Khan",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "bike squad",
+      "company veterans on bikes"
+     ]
+    },
+    {
+     "unit": "Techmarine",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "vanguard veteran squad"
+     ]
+    },
+    {
+     "unit": "Tor Garadon",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "eradicator squad"
+     ]
+    },
+    {
+     "unit": "Vulkan He’stan",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "command squad"
+     ]
+    },
+    {
+     "unit": "Wardens of Ultramar",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad"
+     ]
+    },
+    {
+     "unit": "Castellan",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "vanguard veteran squad"
+     ]
+    },
+    {
+     "unit": "Chaplain Grimaldus",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "vanguard veteran squad"
+     ]
+    },
+    {
+     "unit": "Emperor's Champion",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "vanguard veteran squad"
+     ]
+    },
+    {
+     "unit": "Marshal",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault intercessor squad codex",
+      "bladeguard veteran squad codex",
+      "infernus squad codex",
+      "intercessor squad codex",
+      "sternguard veteran squad codex"
+     ]
+    },
+    {
+     "unit": "Astorath",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "death company marines with boltguns and jump packs"
+     ]
+    },
+    {
+     "unit": "Blood Angels Captain",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "command squad",
+      "tactical squad",
+      "vanguard veteran squad"
+     ]
+    },
+    {
+     "unit": "Death Company Captain",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "death company marines with boltguns"
+     ]
+    },
+    {
+     "unit": "Death Company Captain with Jump Pack",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "death company marines with boltguns and jump packs"
+     ]
+    },
+    {
+     "unit": "Lemartes",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "death company marines with boltguns and jump packs"
+     ]
+    },
+    {
+     "unit": "Sanguinary Priest",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "devastator squad",
+      "tactical squad",
+      "vanguard veteran squad"
+     ]
+    },
+    {
+     "unit": "Asmodai",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "tactical squad",
+      "vanguard veteran squad"
+     ]
+    },
+    {
+     "unit": "Belial",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "relic terminator squad"
+     ]
+    },
+    {
+     "unit": "Ezekiel",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "tactical squad",
+      "vanguard veteran squad"
+     ]
+    },
+    {
+     "unit": "Lazarus",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "assault squad",
+      "tactical squad",
+      "vanguard veteran squad"
+     ]
+    },
+    {
+     "unit": "Ravenwing Command Squad",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "outrider squad codex"
+     ]
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "TAU",
+   "matched": 62,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [
+    {
+     "unit": "Barracuda",
+     "profile": "Barracuda",
+     "ours": "M20 T10 Sv3+ W14 Ld7+ OC-",
+     "warmind": "M- T10 Sv3+ W14 Ld7+ OC-"
+    }
+   ],
+   "weapons": [],
+   "leads": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "TS",
+   "matched": 60,
+   "onlyOurs": [],
+   "points": [
+    {
+     "unit": "Sicaran Battle Tank",
+     "ours": {
+      "1": 160
+     },
+     "warmind": {
+      "1": 180
+     }
+    }
+   ],
+   "copies": [],
+   "stats": [
+    {
+     "unit": "Sorcerer",
+     "profile": "Sorcerer",
+     "ours": "M6 T4 Sv3+ W4 Ld6+ OC1",
+     "warmind": "M6 T5 Sv3+ W4 Ld6+ OC1"
+    },
+    {
+     "unit": "Sorcerer In Terminator Armour",
+     "profile": "Sorcerer In Terminator Armour",
+     "ours": "M5 T5 Sv2+ W5 Ld6+ OC1",
+     "warmind": "M5 T6 Sv2+ W5 Ld6+ OC1"
+    },
+    {
+     "unit": "Rubric Marines",
+     "profile": "Rubric Marine",
+     "ours": "M6 T4 Sv3+ W2 Ld7+ OC2",
+     "warmind": "M6 T5 Sv3+ W2 Ld7+ OC2"
+    },
+    {
+     "unit": "Rubric Marines",
+     "profile": "Aspiring Sorcerer",
+     "ours": "M6 T4 Sv3+ W3 Ld6+ OC2",
+     "warmind": "M6 T5 Sv3+ W3 Ld6+ OC2"
+    },
+    {
+     "unit": "Ahriman",
+     "profile": "Ahriman",
+     "ours": "M10 T4 Sv3+ W6 Ld6+ OC2",
+     "warmind": "M10 T5 Sv3+ W6 Ld6+ OC2"
+    },
+    {
+     "unit": "Exalted Sorcerer",
+     "profile": "Exalted Sorcerer",
+     "ours": "M6 T4 Sv3+ W5 Ld6+ OC1",
+     "warmind": "M6 T5 Sv3+ W5 Ld6+ OC1"
+    },
+    {
+     "unit": "Scarab Occult Terminators",
+     "profile": "Scarab Occult Terminator",
+     "ours": "M5 T5 Sv2+ W3 Ld7+ OC1",
+     "warmind": "M5 T6 Sv2+ W3 Ld7+ OC1"
+    },
+    {
+     "unit": "Scarab Occult Terminators",
+     "profile": "Scarab Occult Sorcerer",
+     "ours": "M5 T5 Sv2+ W4 Ld6+ OC1",
+     "warmind": "M5 T6 Sv2+ W4 Ld6+ OC1"
+    },
+    {
+     "unit": "Infernal Master",
+     "profile": "Infernal Master",
+     "ours": "M6 T4 Sv3+ W4 Ld6+ OC1",
+     "warmind": "M6 T5 Sv3+ W4 Ld6+ OC1"
+    },
+    {
+     "unit": "Exalted Sorcerer on Disc of Tzeentch",
+     "profile": "Exalted Sorcerer on Disc of Tzeentch",
+     "ours": "M10 T4 Sv3+ W6 Ld6+ OC2",
+     "warmind": "M10 T5 Sv3+ W6 Ld6+ OC2"
+    }
+   ],
+   "weapons": [
+    {
+     "unit": "Sorcerer",
+     "weapon": "Inferno bolt pistol",
+     "ours": "12/1/3/4/-1/1",
+     "warmind": "12/1/3/5/-2/1"
+    },
+    {
+     "unit": "Sorcerer In Terminator Armour",
+     "weapon": "Inferno combi-bolter",
+     "ours": "24/2/3/4/-2/1",
+     "warmind": "24/2/3/5/-2/1"
+    },
+    {
+     "unit": "Sorcerer In Terminator Armour",
+     "weapon": "Inferno combi-weapon",
+     "ours": "24/1/4/4/-2/1",
+     "warmind": "24/1/4/5/-2/1"
+    },
+    {
+     "unit": "Rubric Marines",
+     "weapon": "Inferno bolt pistol",
+     "ours": "12/1/3/4/-1/1",
+     "warmind": "12/1/3/5/-2/1"
+    },
+    {
+     "unit": "Rubric Marines",
+     "weapon": "Inferno boltgun",
+     "ours": "24/2/3/4/-2/1",
+     "warmind": "24/2/3/5/-2/1"
+    },
+    {
+     "unit": "Rubric Marines",
+     "weapon": "Close combat weapon",
+     "ours": "melee/2/3/4/0/1",
+     "warmind": "melee/2/3/5/0/1"
+    },
+    {
+     "unit": "Helbrute",
+     "weapon": "Inferno combi-bolter",
+     "ours": "24/2/3/4/-2/1",
+     "warmind": "24/2/3/5/-2/1"
+    },
+    {
+     "unit": "Chaos Rhino",
+     "weapon": "Inferno combi-bolter",
+     "ours": "24/2/3/4/-2/1",
+     "warmind": "24/2/3/5/-2/1"
+    },
+    {
+     "unit": "Chaos Rhino",
+     "weapon": "Inferno combi-weapon",
+     "ours": "24/1/4/4/-2/1",
+     "warmind": "24/1/4/5/-2/1"
+    },
+    {
+     "unit": "Chaos Land Raider",
+     "weapon": "Inferno combi-bolter",
+     "ours": "24/2/3/4/-2/1",
+     "warmind": "24/2/3/5/-2/1"
+    },
+    {
+     "unit": "Chaos Land Raider",
+     "weapon": "Inferno combi-weapon",
+     "ours": "24/1/4/4/-2/1",
+     "warmind": "24/1/4/5/-2/1"
+    },
+    {
+     "unit": "Chaos Predator Destructor",
+     "weapon": "Inferno combi-bolter",
+     "ours": "24/2/3/4/-2/1",
+     "warmind": "24/2/3/5/-2/1"
+    },
+    {
+     "unit": "Chaos Predator Destructor",
+     "weapon": "Inferno combi-weapon",
+     "ours": "24/1/4/4/-2/1",
+     "warmind": "24/1/4/5/-2/1"
+    },
+    {
+     "unit": "Chaos Vindicator",
+     "weapon": "Inferno combi-bolter",
+     "ours": "24/2/3/4/-2/1",
+     "warmind": "24/2/3/5/-2/1"
+    },
+    {
+     "unit": "Chaos Vindicator",
+     "weapon": "Inferno combi-weapon",
+     "ours": "24/1/4/4/-2/1",
+     "warmind": "24/1/4/5/-2/1"
+    },
+    {
+     "unit": "Ahriman",
+     "weapon": "Inferno bolt pistol",
+     "ours": "12/1/2/4/-1/1",
+     "warmind": "12/1/2/5/-2/1"
+    },
+    {
+     "unit": "Exalted Sorcerer",
+     "weapon": "Inferno bolt pistol",
+     "ours": "12/1/2/4/-1/1",
+     "warmind": "12/1/2/5/-2/1"
+    },
+    {
+     "unit": "Scarab Occult Terminators",
+     "weapon": "Inferno combi-bolter",
+     "ours": "24/2/3/4/-2/1",
+     "warmind": "24/2/3/5/-2/1"
+    },
+    {
+     "unit": "Infernal Master",
+     "weapon": "Inferno bolt pistol",
+     "ours": "12/1/2/4/-1/1",
+     "warmind": "12/1/2/5/-2/1"
+    },
+    {
+     "unit": "Chaos Predator Annihilator",
+     "weapon": "Inferno combi-bolter",
+     "ours": "24/2/3/4/-2/1",
+     "warmind": "24/2/3/5/-2/1"
+    },
+    {
+     "unit": "Chaos Predator Annihilator",
+     "weapon": "Inferno combi-weapon",
+     "ours": "24/1/4/4/-2/1",
+     "warmind": "24/1/4/5/-2/1"
+    },
+    {
+     "unit": "Exalted Sorcerer on Disc of Tzeentch",
+     "weapon": "Inferno bolt pistol",
+     "ours": "12/1/2/4/-1/1",
+     "warmind": "12/1/2/5/-2/1"
+    },
+    {
+     "unit": "Terrax-pattern Termite",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Terrax-pattern Termite",
+     "weapon": "Terrax melta cutter",
+     "ours": "12/5/3/9/-4/d6",
+     "warmind": "12/5/3/9/-3/d3+2"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Cerberus neutron pulse array",
+     "ours": "48/3/3/16/-4/d6+3",
+     "warmind": "48/3/3/16/-3/d3+6"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Storm bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Lascannon",
+     "ours": "48/1/3/12/-3/d6+1",
+     "warmind": "48/1/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Havoc launcher",
+     "ours": "48/d6/3/5/0/1",
+     "warmind": "48/3/3/5/-1/1"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Autocannon",
+     "ours": "48/2/3/9/-1/3",
+     "warmind": "48/4/3/9/-1/3"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Melta blast-gun",
+     "ours": "24/4/3/12/-4/d6",
+     "warmind": "24/4/3/12/-3/d3+2"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Twin boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Hunter-killer missile",
+     "ours": "48/1/2/14/-3/d6",
+     "warmind": "48/1/2/14/-3/d3+3"
+    },
+    {
+     "unit": "Mastodon",
+     "weapon": "Siege melta array",
+     "ours": "24/6/3/9/-4/d6",
+     "warmind": "24/6/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Mastodon",
+     "weapon": "Lascannon",
+     "ours": "48/1/3/12/-3/d6+1",
+     "warmind": "48/1/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Mastodon",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Fellblade",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/3/4/0/1"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/1/3/5/-1/1"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Graviton cannon",
+     "ours": "36/d6/3/6/-2/2",
+     "warmind": "36/3/3/6/-2/2"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Laser destroyer",
+     "ours": "36/3/3/14/-4/d6+1",
+     "warmind": "72/2/3/14/-3/d6+3"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Quad launcher – thunderfire shells",
+     "ours": "60/d6+4/3/5/0/1",
+     "warmind": "60/d3+6/3/5/0/1"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Dreadhammer siege cannon",
+     "ours": "24/d6+6/3/14/-3/d6",
+     "warmind": "24/d6+6/3/14/-3/d3+3"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Lascannon",
+     "ours": "48/1/3/12/-3/d6+1",
+     "warmind": "48/1/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Storm bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Quad lascannon",
+     "ours": "48/4/3/12/-3/d6+1",
+     "warmind": "48/4/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Twin Falchion volcano cannon",
+     "ours": "120/d3+1/3/24/-5/12",
+     "warmind": "120/d3+1/3/24/-4/12"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Storm bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Twin heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Laser destroyer",
+     "ours": "36/3/3/14/-4/d6+1",
+     "warmind": "72/2/3/14/-3/d6+3"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    }
+   ],
+   "leads": [
+    {
+     "unit": "Chaos Lord On Disc Of Tzeentch",
+     "onlyOurs": [],
+     "onlyWarmind": [
+      "rubric marines"
+     ]
+    }
+   ],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "TYR",
+   "matched": 57,
+   "onlyOurs": [],
+   "points": [],
+   "copies": [],
+   "stats": [],
+   "weapons": [
+    {
+     "unit": "The Red Terror",
+     "weapon": "Gaping maw",
+     "ours": "melee/1/2/5/0/d3+2",
+     "warmind": "melee/1/2/5/-/d3+2"
+    }
+   ],
+   "leads": [],
+   "detachments": [],
+   "enhancements": []
+  },
+  {
+   "army": "WE",
+   "matched": 58,
+   "onlyOurs": [],
+   "points": [
+    {
+     "unit": "Sicaran Battle Tank",
+     "ours": {
+      "1": 160
+     },
+     "warmind": {
+      "1": 180
+     }
+    }
+   ],
+   "copies": [],
+   "stats": [
+    {
+     "unit": "Khârn The Betrayer",
+     "profile": "Khârn The Betrayer",
+     "ours": "M8 T4 Sv3+ W5 Ld6+ OC1",
+     "warmind": "M8 T5 Sv3+ W5 Ld6+ OC1"
+    },
+    {
+     "unit": "Master of Executions",
+     "profile": "Master of Executions",
+     "ours": "M8 T4 Sv3+ W4 Ld6+ OC1",
+     "warmind": "M8 T5 Sv3+ W4 Ld6+ OC1"
+    },
+    {
+     "unit": "Khorne Berzerkers",
+     "profile": "Khorne Berzerkers",
+     "ours": "M8 T4 Sv3+ W2 Ld6+ OC2",
+     "warmind": "M8 T5 Sv3+ W2 Ld6+ OC2"
+    },
+    {
+     "unit": "Chaos Terminators",
+     "profile": "Chaos Terminators",
+     "ours": "M7 T5 Sv2+ W3 Ld6+ OC1",
+     "warmind": "M7 T6 Sv2+ W3 Ld6+ OC1"
+    }
+   ],
+   "weapons": [
+    {
+     "unit": "Lord Invocatus",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/4/5/-1/1"
+    },
+    {
+     "unit": "Master of Executions",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/3/4/0/1",
+     "warmind": "12/1/4/5/-1/1"
+    },
+    {
+     "unit": "Khorne Berzerkers",
+     "weapon": "Bolt pistol",
+     "ours": "12/1/4/4/0/1",
+     "warmind": "12/1/4/5/-1/1"
+    },
+    {
+     "unit": "Khorne Berzerkers",
+     "weapon": "Chainblade",
+     "ours": "melee/4/3/4/-1/1",
+     "warmind": "melee/4/3/5/-1/1"
+    },
+    {
+     "unit": "Chaos Terminators",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/4/4/0/1",
+     "warmind": "24/2/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Terminators",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Helbrute",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/4/4/0/1",
+     "warmind": "24/2/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Land Raider",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/4/4/0/1",
+     "warmind": "24/2/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Land Raider",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Predator Destructor",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/4/4/0/1",
+     "warmind": "24/2/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Predator Destructor",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Predator Annihilator",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/4/4/0/1",
+     "warmind": "24/2/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Predator Annihilator",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Rhino",
+     "weapon": "Combi-bolter",
+     "ours": "24/2/4/4/0/1",
+     "warmind": "24/2/4/5/-1/1"
+    },
+    {
+     "unit": "Chaos Rhino",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/4/5/-1/1"
+    },
+    {
+     "unit": "Terrax-pattern Termite",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Terrax-pattern Termite",
+     "weapon": "Terrax melta cutter",
+     "ours": "12/5/3/9/-4/d6",
+     "warmind": "12/5/3/9/-3/d3+2"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Storm bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Lascannon",
+     "ours": "48/1/3/12/-3/d6+1",
+     "warmind": "48/1/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Cerberus",
+     "weapon": "Cerberus neutron pulse array",
+     "ours": "48/3/3/16/-4/d6+3",
+     "warmind": "48/3/3/16/-3/d3+6"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Hunter-killer missile",
+     "ours": "48/1/2/14/-3/d6",
+     "warmind": "48/1/2/14/-3/d3+3"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Autocannon",
+     "ours": "48/2/3/9/-1/3",
+     "warmind": "48/4/3/9/-1/3"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Melta blast-gun",
+     "ours": "24/4/3/12/-4/d6",
+     "warmind": "24/4/3/12/-3/d3+2"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Twin boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Kratos",
+     "weapon": "Havoc launcher",
+     "ours": "48/d6/3/5/0/1",
+     "warmind": "48/3/3/5/-1/1"
+    },
+    {
+     "unit": "Mastodon",
+     "weapon": "Lascannon",
+     "ours": "48/1/3/12/-3/d6+1",
+     "warmind": "48/1/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Mastodon",
+     "weapon": "Siege melta array",
+     "ours": "24/6/3/9/-4/d6",
+     "warmind": "24/6/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Mastodon",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Fellblade",
+     "weapon": "Combi-weapon",
+     "ours": "24/1/4/4/0/1",
+     "warmind": "24/1/3/4/0/1"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Quad launcher – thunderfire shells",
+     "ours": "60/d6+4/3/5/0/1",
+     "warmind": "60/d3+6/3/5/0/1"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Graviton cannon",
+     "ours": "36/d6/3/6/-2/2",
+     "warmind": "36/3/3/6/-2/2"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Boltgun",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/1/3/5/-1/1"
+    },
+    {
+     "unit": "Rapier Carrier",
+     "weapon": "Laser destroyer",
+     "ours": "36/3/3/14/-4/d6+1",
+     "warmind": "72/2/3/14/-3/d6+3"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Dreadhammer siege cannon",
+     "ours": "24/d6+6/3/14/-3/d6",
+     "warmind": "24/d6+6/3/14/-3/d3+3"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Storm bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Lascannon",
+     "ours": "48/1/3/12/-3/d6+1",
+     "warmind": "48/1/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Typhon",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Quad lascannon",
+     "ours": "48/4/3/12/-3/d6+1",
+     "warmind": "48/4/3/12/-3/d3+3"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Multi-melta",
+     "ours": "18/2/3/9/-4/d6",
+     "warmind": "18/2/3/10/-3/d3+2"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Laser destroyer",
+     "ours": "36/3/3/14/-4/d6+1",
+     "warmind": "72/2/3/14/-3/d6+3"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Twin heavy flamer",
+     "ours": "12/d6/n/a/5/-1/1",
+     "warmind": "12/3/n/a/5/-1/1"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Twin Falchion volcano cannon",
+     "ours": "120/d3+1/3/24/-5/12",
+     "warmind": "120/d3+1/3/24/-4/12"
+    },
+    {
+     "unit": "Falchion",
+     "weapon": "Storm bolter",
+     "ours": "24/2/3/4/0/1",
+     "warmind": "24/2/3/5/-1/1"
+    }
+   ],
+   "leads": [],
+   "detachments": [],
+   "enhancements": []
+  }
+ ]
+}

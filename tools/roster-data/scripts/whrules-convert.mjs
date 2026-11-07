@@ -1021,6 +1021,21 @@ export function applyWhrulesFactionConvert(files, full, u) {
   const next = plain(r._file);
   next.migrations = [...list, { source: src, datasheets: {}, detachments: {}, enhancements: {}, options: r._optionsNew }];
   files[fname] = next;
+  // точечные исправления ошибок источника в профилях оружия (u.weaponFixes, 07.11.2026: сверка с Warmind и прежними
+  // данными) — { weapon, field, from, to, why }: у всех своих инфолистов, где профиль с этим названием имеет значение from
+  let fixed = 0;
+  for (const fx of u.weaponFixes ?? []) {
+    let n = 0;
+    for (const d of next.datasheets.filter((x) => x.group === 'own'))
+      for (const w of d.weapons ?? [])
+        for (const pr of w.profiles ?? [])
+          if ((pr.name ?? w.name).toLowerCase() === fx.weapon.toLowerCase() && String(pr[fx.field]) === String(fx.from)) {
+            pr[fx.field] = fx.to;
+            n++;
+          }
+    if (!n) throw new Error(`whrules-faction-convert: исправление «${fx.weapon}» ${fx.field} ${fx.from}→${fx.to} не нашло профиля`);
+    fixed += n;
+  }
   // копии инфолистов армии у союзников в других файлах (Chaos Knights — dreadblades у армий Хаоса, Aeldari — corsairs
   // у Drukhari; 07.11.2026, Task C): та же запись, что у армии, со своей группой; улучшения — как были (пусто — пусто);
   // правила, на которые ссылаются способности, добавляются в словарь файла
@@ -1050,6 +1065,7 @@ export function applyWhrulesFactionConvert(files, full, u) {
       `${A.name}: инфолистов ${s.datasheets.after} (сохранены id ${s.datasheets.kept + s.datasheets.renamed}, новых ${s.datasheets.added}), детачментов ${s.detachments.current} (+${s.detachments.outdated} устаревших), улучшений ${s.enhancements.current}, стратагем ${s.stratagems.current}; переводов снаряжения ${Object.keys(r._optionsNew).length}`,
       `проверки: ${r.checks.length} — все пройдены`,
       ...(copies ? [`копии у союзников обновлены: ${copies} (${copyFiles.join(', ')})`] : []),
+      ...(fixed ? [`исправлено профилей оружия: ${fixed}`] : []),
     ],
   };
 }
