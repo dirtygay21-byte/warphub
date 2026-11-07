@@ -23,6 +23,16 @@ export interface KtPlayer {
   rerollCard: boolean;
   initiativeCards: number[];
   bonusVp: number;
+  /** использованные уловки (07.11.2026): одна и та же уловка — не чаще раза за turning point */
+  ploys?: KtPloyUse[];
+}
+export type KtPloyType = 'strategy' | 'firefight';
+export interface KtPloyUse {
+  round: number;
+  type: KtPloyType;
+  ployId: string;
+  name: string;
+  cp: number;
 }
 
 export interface KtState {
@@ -74,6 +84,8 @@ export type KtEventBody =
   | { type: 'secret-revealed'; seat: Seat; tacOp: string; op: Op }
   | { type: 'phase-advanced' }
   | { type: 'cp-adjust'; seat: Seat; delta: number }
+  /** уловка команды: стратегическая — в Strategy phase, боевая — в Firefight; стоимость в CP называет игрок (в данных её нет) */
+  | { type: 'ploy-used'; seat: Seat; ployId: string; name: string; ployType: KtPloyType; cp: number }
   | { type: 'end-round'; controls: Record<string, Seat | null>; carrying?: Record<string, Seat>; claims?: Partial<Record<Seat, { marker: string; control: boolean; uncontested: boolean }>> }
   | { type: 'finish' }
   | { type: 'event-reverted' };
@@ -213,6 +225,18 @@ export function applyKtEvent(current: KtState | null, ev: KtEvent, data: KtGameD
       const p = s.players[ev.seat];
       p.tacOp = ev.tacOp;
       p.primaryOp = ev.op;
+      return { ok: true, state: s };
+    }
+    case 'ploy-used': {
+      if (s.stage !== 'battle' || !s.initiativeRolls) return fail(s, 'Сначала определите инициативу');
+      if (ev.ployType !== s.phase) return fail(s, ev.ployType === 'strategy' ? 'Стратегические уловки — в Strategy phase' : 'Боевые уловки — в Firefight phase');
+      if (!ev.ployId || !Number.isInteger(ev.cp) || ev.cp < 0 || ev.cp > 3) return fail(s, 'Укажите стоимость уловки: 0–3 CP');
+      const p = s.players[ev.seat];
+      const used = (p.ploys ??= []);
+      if (used.some((x) => x.round === s.round && x.ployId === ev.ployId)) return fail(s, `${ev.name}: уже использована в этом turning point`);
+      if (p.cp < ev.cp) return fail(s, `${p.name}: недостаточно CP (есть ${p.cp})`);
+      p.cp -= ev.cp;
+      used.push({ round: s.round, type: ev.ployType, ployId: ev.ployId, name: ev.name.slice(0, 80), cp: ev.cp });
       return { ok: true, state: s };
     }
     case 'cp-adjust': {

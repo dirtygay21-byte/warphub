@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { applyKtEvent, createKtState, KT_GAME_SCHEMA, ktUndoTarget, replayKt, totalKtVp, type KtEvent, type KtEventBody, type KtState, type Op, type Seat } from '../../ktgame';
+import { applyKtEvent, createKtState, KT_GAME_SCHEMA, ktUndoTarget, replayKt, totalKtVp, type KtEvent, type KtEventBody, type KtState, type KtPloyType, type Op, type Seat } from '../../ktgame';
 import { newSeed } from '../../game/rng';
 import { usePersistentGameData } from '../skirmish/useSkirmishData';
 import type { KtRoster } from '../../kt/roster';
 import { decodeKtRoster } from '../../kt/roster';
-import type { KtIndex } from '../../kt/types';
+import { loadKtTeam } from '../../data';
+import type { KtIndex, KtTeam } from '../../kt/types';
 import { haptic, openExternal, pushOverlay } from '../../telegram';
 import { KtEditor } from './KtEditor';
 import { Button, Icon, Segmented } from '../kit';
@@ -239,7 +240,7 @@ export function KtFullGameScreen({ onBack, rosters, index, initialRosterId }: { 
             })}
           </ScoreboardGrid>
           <div className="space-y-3">
-            {SEATS.map((seat) => <Player key={seat} state={state} seat={seat} rosterName={rosterName(state.players[seat].rosterId)} tacOpName={data.tacOps.find((t) => t.id === state.players[seat].tacOp)?.name ?? state.players[seat].tacOp} reveal={state.stage === 'finished' || !onlineGame.online || onlineGame.online.seat === seat} dispatch={dispatch} />)}
+            {SEATS.map((seat) => <Player key={seat} roster={rosters.find((r) => r.id === state.players[seat].rosterId)} state={state} seat={seat} rosterName={rosterName(state.players[seat].rosterId)} tacOpName={data.tacOps.find((t) => t.id === state.players[seat].tacOp)?.name ?? state.players[seat].tacOp} reveal={state.stage === 'finished' || !onlineGame.online || onlineGame.online.seat === seat} dispatch={dispatch} />)}
           </div>
           <div className="mt-3">
             <BattleMap state={state} data={data} />
@@ -542,7 +543,7 @@ function InitiativePanel({ state, onRoll }: { state: KtState; onRoll: (cards: Ca
   );
 }
 
-function Player({ state, seat, rosterName, tacOpName, reveal, dispatch }: { state: KtState; seat: Seat; rosterName: string; tacOpName: string; reveal: boolean; dispatch: (body: KtEventBody) => boolean }) {
+function Player({ state, seat, roster, rosterName, tacOpName, reveal, dispatch }: { state: KtState; seat: Seat; roster?: KtRoster; rosterName: string; tacOpName: string; reveal: boolean; dispatch: (body: KtEventBody) => boolean }) {
   const p = state.players[seat];
   return (
     <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
@@ -570,6 +571,7 @@ function Player({ state, seat, rosterName, tacOpName, reveal, dispatch }: { stat
           )}
         </>
       )}
+      {state.stage === 'battle' && state.initiativeRolls && <PloysPanel state={state} seat={seat} roster={roster} dispatch={dispatch} />}
     </article>
   );
 }
@@ -828,5 +830,100 @@ function FieldView({ data }: { data: KtData }) {
       <ChoiceField label="Карта" value={map} onChange={setMap} inlineMax={6} options={Array.from({ length: data.missionPack.mapsPerKillzone }, (_, i) => ({ value: i + 1, label: String(i + 1) }))} />
       {shown ? <KtMapPanel map={shown} /> : <p className="text-sm text-fg-3">Этой карты нет в данных.</p>}
     </section>
+  );
+}
+
+// ---------- уловки (07.11.2026) ----------
+
+/** Команда ростера с этого телефона (для уловок); нет ростера — null. */
+function useKtTeam(teamId: string | undefined) {
+  const [team, setTeam] = useState<{ id: string; team: KtTeam } | null>(null);
+  useEffect(() => {
+    if (!teamId) return;
+    let alive = true;
+    loadKtTeam(teamId).then(
+      (t) => alive && setTeam({ id: teamId, team: t }),
+      () => undefined,
+    );
+    return () => {
+      alive = false;
+    };
+  }, [teamId]);
+  return team && team.id === teamId ? team.team : null;
+}
+
+/**
+ * Уловки игрока в текущей фазе: стратегические — в Strategy phase, боевые — в Firefight. Текст раскрывается,
+ * «Использовать» — выбрать стоимость (в данных источника её нет: 0–3 CP по карте уловки) и списать CP.
+ * Одна и та же уловка — раз за turning point. Ростера нет на телефоне — список недоступен.
+ */
+function PloysPanel({ state, seat, roster, dispatch }: { state: KtState; seat: Seat; roster?: KtRoster; dispatch: (body: KtEventBody) => boolean }) {
+  const team = useKtTeam(roster?.teamId);
+  const [open, setOpen] = useState<string | null>(null);
+  const [cost, setCost] = useState<number | ''>('');
+  const type: KtPloyType = state.phase === 'strategy' ? 'strategy' : 'firefight';
+  const p = state.players[seat];
+  const usedNow = (p.ploys ?? []).filter((x) => x.round === state.round);
+  const title = type === 'strategy' ? 'Стратегические уловки' : 'Боевые уловки';
+  if (!roster)
+    return (
+      <p className="mt-2 text-[12px] text-fg-3">
+        {title}: ростер не сохранён на этом телефоне.{usedNow.length ? ` Использовано: ${usedNow.map((x) => x.name).join(', ')}.` : ''}
+      </p>
+    );
+  const list = team?.ploys.filter((x) => x.type === type) ?? [];
+  return (
+    <div className="mt-3 space-y-1.5 border-t border-white/[0.06] pt-2.5">
+      <GameLabel>
+        {title} · {state.phase === 'strategy' ? 'Strategy' : 'Firefight'} phase
+      </GameLabel>
+      {!team && <p className="text-[12px] text-fg-3">Загрузка уловок…</p>}
+      {team && !list.length && <p className="text-[12px] text-fg-3">В данных команды нет таких уловок.</p>}
+      {list.map((ploy) => {
+        const used = usedNow.find((x) => x.ployId === ploy.id);
+        const isOpen = open === ploy.id;
+        return (
+          <div key={ploy.id} className={cx('rounded-xl border', used ? 'border-accent/30 bg-accent/[0.05]' : 'border-white/10 bg-white/[0.02]')}>
+            <button
+              type="button"
+              aria-expanded={isOpen}
+              onClick={() => {
+                setOpen(isOpen ? null : ploy.id);
+                setCost('');
+              }}
+              className="flex min-h-11 w-full items-center gap-2 px-3 py-2 text-left"
+            >
+              <span className="min-w-0 flex-1 text-[13px] font-semibold text-white/90">{ploy.name}</span>
+              {used && <span className="shrink-0 rounded-md bg-accent/15 px-1.5 py-0.5 text-[12px] font-semibold text-accent">использована · {used.cp} CP</span>}
+              <Icon name="down" className={cx('size-4 shrink-0 text-fg-3 transition', isOpen && 'rotate-180')} />
+            </button>
+            {isOpen && (
+              <div className="space-y-2 border-t border-white/[0.06] px-3 pb-3 pt-2">
+                <p className="whitespace-pre-line text-[12.5px] leading-relaxed text-fg-2">{ploy.text}</p>
+                {!used && (
+                  <>
+                    <ChoiceField label="Стоимость по карте уловки" value={cost} onChange={setCost} inlineMax={4} options={[0, 1, 2, 3].map((n) => ({ value: n, label: `${n} CP` }))} />
+                    <Button
+                      variant="primary"
+                      className="w-full"
+                      disabled={cost === '' || cost > p.cp}
+                      onClick={() => {
+                        if (cost !== '' && dispatch({ type: 'ploy-used', seat, ployId: ploy.id, name: ploy.name, ployType: type, cp: cost })) {
+                          haptic.ok();
+                          setOpen(null);
+                          setCost('');
+                        }
+                      }}
+                    >
+                      {cost === '' ? 'Выберите стоимость' : cost > p.cp ? `Недостаточно CP (есть ${p.cp})` : `Использовать за ${cost} CP`}
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
   );
 }
