@@ -5,7 +5,7 @@
 import { describe, expect, test } from 'bun:test';
 import fs from 'node:fs';
 import path from 'node:path';
-import { checkEntry, checkTranslation, collectGaps, enHash, keywordsOf, mergeWarphub, numbersOf, readTranslation, WARPHUB_DIR } from '../scripts/ru-warphub-lib.mjs';
+import { checkEntry, checkTranslation, collectGaps, enHash, keywordsOf, lostNames, mergeWarphub, numbersOf, readTranslation, WARPHUB_DIR } from '../scripts/ru-warphub-lib.mjs';
 import { latestRuSnapshot, matchFaction } from '../scripts/whrules-ru.mjs';
 
 const faction = {
@@ -94,6 +94,16 @@ describe('проверка перевода', () => {
       'нет ключевых слов: INFANTRY',
     ]);
     expect(checkEntry(src, { text: 'Within 6" add 1 to INFANTRY' })).toContain('нет русского текста');
+  });
+});
+
+describe('названия в тексте — по-английски (решение 07.11.2026)', () => {
+  const names = ['Oath of Moment', 'Anathema Psykana', 'Deep Strike'];
+  test('название переведено вместо английского — замечание; в скобках после английского — порядок', () => {
+    const en = 'Each time a unit with Oath of Moment uses Deep Strike…';
+    expect(lostNames(names, en, 'Каждый раз, когда юнит с Клятвой момента использует Deep Strike…')).toEqual(['Oath of Moment']);
+    expect(lostNames(names, en, 'Каждый раз, когда юнит с Oath of Moment (Клятва момента) использует Deep Strike…')).toEqual([]);
+    expect(lostNames(names, 'An Anathema Psykana unit', 'Юнит ANATHEMA PSYKANA')).toEqual([]);
   });
 });
 
