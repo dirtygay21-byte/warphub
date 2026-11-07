@@ -75,6 +75,9 @@ function sizeLabel(p) {
 export function costsOf(points, { allied = false } = {}) {
   const bands = [];
   for (const p of points.filter((x) => ALLIED.test(x.note ?? '') === allied)) {
+    // запись без числа моделей и подписи — не размер отряда (Tidewall Shieldline, 995: «20» — Tidewall Defence Platform,
+    // она уже есть добавкой); размером «undefined models» не становится
+    if (p.models == null && !p.note) continue;
     const t = tierOf(p.note);
     let b = bands.find((x) => x.from === t.from && x.to === t.to);
     if (!b) bands.push((b = { from: t.from, to: t.to, options: [], addons: [], wargear: [] }));
@@ -677,7 +680,14 @@ export function convertFaction({ full: fullIn, slug, army, map, plan, keepOldLim
   const ourIdOf = new Map([...map.matched, ...map.renamed].map((x) => [`${slug}|${x.site.id}`, x.ours.id]));
   const ownOld = army.datasheets.filter((d) => d.group === 'own' && d.faction === army.id);
   const K = makeConverter({ full, olds: [army], ourIdOf, armyFactions: [slug], factionOf: () => army.id, sourceOf: () => site.name ?? army.name, keepOldLimits });
-  const ds = site.datasheets.map((s) => K.convertDs(slug, s, 'own'));
+  // новый инфолист без очков на сайте (Legends T'au «Tactical Drones», 995) не добавляется: без цены его нельзя взять в ростер,
+  // очки не придумываем — пробел записывается в unavailable
+  const priced = site.datasheets.filter((s) => {
+    if (ourIdOf.has(`${slug}|${s.id}`) || (s.points ?? []).length) return true;
+    K.unavailable.push({ id: newId(slug, s.id), name: s.name, field: 'datasheet', why: `новый инфолист${s.legends ? ' (Warhammer Legends)' : ''} без очков в снимке — не добавлен` });
+    return false;
+  });
+  const ds = priced.map((s) => K.convertDs(slug, s, 'own'));
   const outdatedIds = new Set(plan.outdated.map((o) => o.id));
   const retained = ownOld.filter((d) => outdatedIds.has(d.id)).map((d) => {
     const r = { ...d, outdated: plan.outdatedNote };
@@ -1035,6 +1045,29 @@ export function applyWhrulesFactionConvert(files, full, u) {
           }
     if (!n) throw new Error(`whrules-faction-convert: исправление «${fx.weapon}» ${fx.field} ${fx.from}→${fx.to} не нашло профиля`);
     fixed += n;
+  }
+  // то же для характеристик (u.statFixes) — { unit, field: 'M'|'T'|'Sv'|'W'|'Ld'|'OC', from, to, why }
+  for (const fx of u.statFixes ?? []) {
+    let n = 0;
+    for (const d of next.datasheets.filter((x) => x.group === 'own' && x.name.toLowerCase() === fx.unit.toLowerCase()))
+      for (const s of d.stats ?? [])
+        if (String(s[fx.field]) === String(fx.from)) {
+          s[fx.field] = fx.to;
+          n++;
+        }
+    if (!n) throw new Error(`whrules-faction-convert: исправление «${fx.unit}» ${fx.field} ${fx.from}→${fx.to} не нашло профиля`);
+    fixed += n;
+  }
+  // снаряжение (u.loadoutFixes) — { unit, from, to, why }: в тексте снаряжения название не совпадает с профилем оружия
+  // (Valkyrie: «Militarum multi-laser» при профиле «Multi-laser»); стандартное снаряжение разбирается заново
+  for (const fx of u.loadoutFixes ?? []) {
+    const list = next.datasheets.filter((x) => x.group === 'own' && x.name.toLowerCase() === fx.unit.toLowerCase() && x.loadout.includes(fx.from));
+    if (!list.length) throw new Error(`whrules-faction-convert: исправление снаряжения «${fx.unit}» «${fx.from}» не нашло текста`);
+    for (const d of list) {
+      d.loadout = d.loadout.replace(fx.from, fx.to);
+      d.defaultLoadout = parseLoadout(d.loadout, [...d.weapons, ...d.abilities.filter((a) => a.type === 'wargear' && !d.weapons.some((w) => w.name === a.name)).map((a) => ({ name: a.name }))]);
+    }
+    fixed += list.length;
   }
   // копии инфолистов армии у союзников в других файлах (Chaos Knights — dreadblades у армий Хаоса, Aeldari — corsairs
   // у Drukhari; 07.11.2026, Task C): та же запись, что у армии, со своей группой; улучшения — как были (пусто — пусто);

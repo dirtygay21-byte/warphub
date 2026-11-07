@@ -162,6 +162,11 @@ id сопоставленных и переименованных (по табл
 сайта их нет (раздела «KEYWORDS» у сайта нет), запись в legacy; `syncCopies` — копии инфолистов армии у союзников в других файлах
 (Chaos Knights — dreadblades, Aeldari — corsairs) обновляются вместе с армией. После обновления фракции — `node scripts/ru-warphub.mjs
 --prune` (убрать переводы WarpHub, ставшие ненужными: текст есть на сайте или английский изменился), `--prefill`, `--check`.
+Партия 2 — CD, DG, DRU, TS, WE; партия 3 — AM (копии в GC — `syncCopies`), NEC, TAU. Точечные исправления ошибок сайта (сверка с
+Warmind, у каждого — `why`): `weaponFixes` (профиль оружия), `statFixes` (характеристика: Avenger Strike Fighter M/OC «-», как у
+остальных Aircraft 11-й редакции), `loadoutFixes` (текст снаряжения: Valkyrie «Militarum multi-laser» → «multi-laser»). Новый
+инфолист без очков на сайте (Legends T'au Tactical Drones) не добавляется — пробел в unavailable; запись очков без числа моделей и
+подписи (Tidewall Shieldline «20» — это добавка Tidewall Defence Platform) размером отряда не считается.
 
 **Обновление значений по wh-rules.ru** (`40k/curated.json → updates`, kind `whrules-points`, `scripts/whrules-points.mjs`;
 сейчас `whrules-995-points`, задача P1-T3). У сопоставленных записей (та же функция сопоставления, что и отчёт свежести)

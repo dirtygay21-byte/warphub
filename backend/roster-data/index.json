@@ -425,6 +425,54 @@
    }
   },
   {
+   "id": "whrules-995-astra-militarum",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "AM"
+   ],
+   "note": "Полная конвертация AM из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 3).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-necrons",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "NEC"
+   ],
+   "note": "Полная конвертация NEC из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 3).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
+   "id": "whrules-995-tau-empire",
+   "kind": "whrules-faction-convert",
+   "scope": [
+    "TAU"
+   ],
+   "note": "Полная конвертация TAU из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 3).",
+   "source": {
+    "site": "https://wh-rules.ru",
+    "dataVersion": 995,
+    "mfm": "1.6",
+    "date": "2026-10-16",
+    "snapshot": "whrules-995-full-25-factions.json",
+    "fingerprint": "0d9e9051357cc5769c2d243db7ae25518ddb99f545d9d7d2429dde91de0f56ff"
+   }
+  },
+  {
    "id": "whrules-995-points",
    "kind": "whrules-points",
    "scope": [
@@ -508,7 +556,10 @@
     "DG",
     "DRU",
     "TS",
-    "WE"
+    "WE",
+    "AM",
+    "NEC",
+    "TAU"
    ],
    "note": "Leader по Warmind (решение владельца 2026-11-07): к своим связям добавлены юниты из списка Warmind («attachTo»), если такой инфолист есть в файле армии; наши связи не убираются. Армии — полностью сконвертированные из wh-rules 995; остальные добавятся после своих партий.",
    "source": {

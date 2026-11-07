@@ -132,62 +132,9 @@
    "onlyOurs": [],
    "points": [],
    "copies": [],
-   "stats": [
-    {
-     "unit": "Avenger Strike Fighter",
-     "profile": "Avenger Strike Fighter",
-     "ours": "M20+ T9 Sv3+ W14 Ld7+ OC0",
-     "warmind": "M- T9 Sv3+ W14 Ld7+ OC-"
-    }
-   ],
-   "weapons": [
-    {
-     "unit": "Cadian Castellan",
-     "weapon": "Close combat weapon",
-     "ours": "melee/3/4/3/0/1",
-     "warmind": "melee/3/3/3/0/1"
-    },
-    {
-     "unit": "Kasrkin",
-     "weapon": "Bolt pistol",
-     "ours": "12/1/4/4/0/1",
-     "warmind": "12/1/3/4/0/1"
-    },
-    {
-     "unit": "Kasrkin",
-     "weapon": "Plasma pistol – standard",
-     "ours": "12/1/4/7/-2/1",
-     "warmind": "12/1/3/7/-2/1"
-    },
-    {
-     "unit": "Kasrkin",
-     "weapon": "Plasma pistol – supercharge",
-     "ours": "12/1/4/8/-3/2",
-     "warmind": "12/1/3/8/-3/2"
-    },
-    {
-     "unit": "Tempestus Scions",
-     "weapon": "Bolt pistol",
-     "ours": "12/1/4/4/0/1",
-     "warmind": "12/1/3/4/0/1"
-    },
-    {
-     "unit": "Tempestus Aquilons",
-     "weapon": "Bolt pistol",
-     "ours": "12/1/4/4/0/1",
-     "warmind": "12/1/3/4/0/1"
-    }
-   ],
-   "leads": [
-    {
-     "unit": "Death Rider Commissar",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "lord marshal dreir",
-      "lord solar leontus"
-     ]
-    }
-   ],
+   "stats": [],
+   "weapons": [],
+   "leads": [],
    "detachments": [],
    "enhancements": []
   },
@@ -1314,24 +1261,9 @@
    ],
    "points": [],
    "copies": [],
-   "stats": [
-    {
-     "unit": "Canoptek Reanimator",
-     "profile": "Canoptek Reanimator",
-     "ours": "M8 T6 Sv3+ W6 Ld7+ OC3",
-     "warmind": "M8 T6 Sv3+ W6 Ld8+ OC3"
-    }
-   ],
+   "stats": [],
    "weapons": [],
-   "leads": [
-    {
-     "unit": "Vargard Obyron",
-     "onlyOurs": [],
-     "onlyWarmind": [
-      "nemesor zahndrekh"
-     ]
-    }
-   ],
+   "leads": [],
    "detachments": [],
    "enhancements": []
   },
@@ -2012,14 +1944,7 @@
    "onlyOurs": [],
    "points": [],
    "copies": [],
-   "stats": [
-    {
-     "unit": "Barracuda",
-     "profile": "Barracuda",
-     "ours": "M20 T10 Sv3+ W14 Ld7+ OC-",
-     "warmind": "M- T10 Sv3+ W14 Ld7+ OC-"
-    }
-   ],
+   "stats": [],
    "weapons": [],
    "leads": [],
    "detachments": [],

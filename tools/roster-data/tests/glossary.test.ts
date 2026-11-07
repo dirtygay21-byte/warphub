@@ -10,7 +10,7 @@ const DATA = path.join(import.meta.dirname, '..', '..', '..', 'backend', 'roster
 const g: Glossary = JSON.parse(fs.readFileSync(path.join(DATA, 'glossary.json'), 'utf8'));
 const index = JSON.parse(fs.readFileSync(path.join(DATA, 'index.json'), 'utf8'));
 /** Пробелы источника: на wh-rules.ru нет текста (01.11.2026 — версия данных 995). Показываются «нет данных». */
-const KNOWN_GAPS = { weapon: ["c'tan power"], terms: ['other', 'you'] };
+const KNOWN_GAPS = { weapon: [] as string[], terms: ['other', 'you'] };
 const factions = index.factions.map((f: { id: string }) => JSON.parse(fs.readFileSync(path.join(DATA, 'f', `${f.id}.json`), 'utf8')));
 
 describe('glossary.json', () => {

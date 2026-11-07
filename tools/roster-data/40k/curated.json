@@ -241,6 +241,73 @@
         "note": "Полная конвертация WE из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 2)."
       },
       {
+        "id": "whrules-995-astra-militarum",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "astra-militarum",
+        "army": "AM",
+        "keepOldLimits": true,
+        "syncCopies": true,
+        "statFixes": [
+          {
+            "unit": "Avenger Strike Fighter",
+            "field": "M",
+            "from": "20+\"",
+            "to": "-",
+            "why": "У wh-rules 995 у Avenger Strike Fighter прежний профиль (M 20+\", OC 0); у всех остальных Aircraft 11-й редакции на сайте и у Warmind (BSData wh40k-11e-mfm) — «-». Взято значение Warmind (сверка 07.11.2026)."
+          },
+          {
+            "unit": "Avenger Strike Fighter",
+            "field": "OC",
+            "from": "0",
+            "to": "-",
+            "why": "У wh-rules 995 у Avenger Strike Fighter прежний профиль (M 20+\", OC 0); у всех остальных Aircraft 11-й редакции на сайте и у Warmind (BSData wh40k-11e-mfm) — «-». Взято значение Warmind (сверка 07.11.2026)."
+          }
+        ],
+        "loadoutFixes": [
+          {
+            "unit": "Valkyrie",
+            "from": "Militarum multi-laser",
+            "to": "multi-laser",
+            "why": "У wh-rules 995 в снаряжении Valkyrie «Militarum multi-laser», а профиль оружия и вариант замены — «multi-laser»; без исправления стандартное снаряжение теряет мульти-лазер, и вариант замены не срабатывает."
+          }
+        ],
+        "enabled": true,
+        "scope": [
+          "AM"
+        ],
+        "note": "Полная конвертация AM из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 3)."
+      },
+      {
+        "id": "whrules-995-necrons",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "necrons",
+        "army": "NEC",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "NEC"
+        ],
+        "note": "Полная конвертация NEC из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 3)."
+      },
+      {
+        "id": "whrules-995-tau-empire",
+        "kind": "whrules-faction-convert",
+        "snapshot": "whrules-995-full-25-factions.json",
+        "points": "whrules-995.json",
+        "faction": "tau-empire",
+        "army": "TAU",
+        "keepOldLimits": true,
+        "enabled": true,
+        "scope": [
+          "TAU"
+        ],
+        "note": "Полная конвертация TAU из wh-rules.ru 995 (MFM 1.6), как партия 1. Инфолисты, которых на сайте нет (Legends / Forge World, перенесённые в другую фракцию), остаются доступными с пометкой «*». Одобрено владельцем 2026-11-07 (Task C, партия 3)."
+      },
+      {
         "id": "whrules-995-points",
         "kind": "whrules-points",
         "snapshot": "whrules-995.json",
@@ -428,7 +495,10 @@
           "DG",
           "DRU",
           "TS",
-          "WE"
+          "WE",
+          "AM",
+          "NEC",
+          "TAU"
         ],
         "note": "Leader по Warmind (решение владельца 2026-11-07): к своим связям добавлены юниты из списка Warmind («attachTo»), если такой инфолист есть в файле армии; наши связи не убираются. Армии — полностью сконвертированные из wh-rules 995; остальные добавятся после своих партий."
       }
