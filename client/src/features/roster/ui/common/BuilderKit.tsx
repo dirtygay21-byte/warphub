@@ -392,3 +392,188 @@ export function CostBadge({ children, tone = 'accent' }: { children: ReactNode; 
     </span>
   );
 }
+
+// ---------- блоки редактора как у AoS / 40K (07.11.2026: Kill Team и Warcry собраны из тех же блоков) ----------
+
+/** Блок армии (как у AoS): подпись, название, строка-итог; раскрытый — содержимое. */
+export function ArmyBlock({ kicker, title, line, extra, open, onToggle, children }: { kicker: string; title: string; line?: ReactNode; extra?: ReactNode; open: boolean; onToggle: () => void; children: ReactNode }) {
+  return (
+    <section className="rounded-2xl border border-white/10 bg-app-elevated">
+      <button type="button" onClick={() => (haptic.tap(), onToggle())} aria-expanded={open} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-wider text-fg-3">{kicker}</p>
+          <p className="mt-0.5 truncate text-[15px] font-semibold">{title}</p>
+          {line && <p className="mt-0.5 truncate text-sm text-fg-3">{line}</p>}
+          {extra && <div className="mt-1.5 flex flex-wrap gap-1">{extra}</div>}
+        </div>
+        <Icon name="down" className={cx('size-5 shrink-0 text-fg-3 transition', open && 'rotate-180')} />
+      </button>
+      {open && <div className="space-y-4 border-t border-white/[0.06] px-4 pb-4 pt-4">{children}</div>}
+    </section>
+  );
+}
+
+/** Строка выбора в блоке армии (как «Боевое построение» у AoS): подпись, значение, стрелка. */
+export function PickRow({ label, value, empty, warn, right, onClick }: { label: string; value?: string | null; empty: string; warn?: boolean; right?: ReactNode; onClick?: () => void }) {
+  return (
+    <button
+      type="button"
+      disabled={!onClick}
+      onClick={() => (haptic.tap(), onClick?.())}
+      className={cx('flex w-full items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition active:bg-white/5', warn ? 'border-accent/40' : 'border-white/10', !onClick && 'opacity-50')}
+    >
+      <span className="min-w-0 flex-1">
+        <span className="block text-[12px] font-semibold uppercase tracking-wider text-fg-3">{label}</span>
+        <span className={cx('block truncate text-[14px] font-semibold', value ? 'text-white/90' : warn ? 'text-accent' : 'text-fg-3')}>{value || empty}</span>
+      </span>
+      {right}
+      {onClick && <Icon name="chevron" className="size-4 shrink-0 text-fg-3" />}
+    </button>
+  );
+}
+
+/** Панель правил (как «Заклинания и молитвы» у AoS): подпись с числом, строка-итог, кнопка «Показать / Скрыть». */
+export function RulesPanel({ label, line, open, onToggle, children }: { label: string; line?: string; open: boolean; onToggle: () => void; children: ReactNode }) {
+  return (
+    <section className="rounded-2xl border border-white/10 bg-app-elevated" aria-label={label}>
+      <div className="flex items-center gap-2 px-4 py-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-wider text-fg-3">{label}</p>
+          {line && <p className="mt-0.5 truncate text-[13px] text-fg-2">{line}</p>}
+        </div>
+        <button
+          type="button"
+          onClick={() => (haptic.tap(), onToggle())}
+          aria-expanded={open}
+          className="flex shrink-0 items-center gap-1 rounded-lg bg-white/[0.06] px-2.5 py-1.5 text-[12px] font-semibold text-fg-2 active:bg-white/10"
+        >
+          {open ? 'Скрыть' : 'Показать'}
+          <Icon name="down" className={cx('size-3.5 transition', open && 'rotate-180')} />
+        </button>
+      </div>
+      {open && <div className="space-y-4 border-t border-white/[0.06] px-4 pb-4 pt-3">{children}</div>}
+    </section>
+  );
+}
+
+/** Заголовок группы юнитов (как «Полк генерала 2/4 · 340» у AoS). */
+export function GroupHeading({ title, count, right }: { title: string; count?: ReactNode; right?: ReactNode }) {
+  return (
+    <div className="mb-2 flex items-baseline justify-between gap-2 px-1">
+      <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-fg-2">
+        {title}
+        {count != null && <span className="ml-2 font-sans text-xs font-semibold text-fg-3">{count}</span>}
+      </h2>
+      {right}
+    </div>
+  );
+}
+
+/** Пунктирная кнопка «добавить в группу» (как «В полк» у AoS). */
+export function AddRow({ children, onClick }: { children: ReactNode; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => (haptic.tap(), onClick())}
+      className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-3 py-2.5 text-[13px] font-semibold text-fg-2 active:bg-white/5"
+    >
+      <Icon name="plus" className="size-4" /> {children}
+    </button>
+  );
+}
+
+/**
+ * Карточка юнита (как у AoS): название, строка подробностей, выделенная строка (выбранное), число справа.
+ * Раскрытая — замечания, управление, датакарта (children).
+ */
+export function UnitRowCard({
+  id,
+  title,
+  crown,
+  meta,
+  accentLine,
+  value,
+  valueLabel,
+  issues = [],
+  open,
+  onToggle,
+  children,
+}: {
+  id?: string;
+  title: string;
+  crown?: boolean;
+  meta?: (string | null | undefined | false)[];
+  accentLine?: string | null;
+  value?: ReactNode;
+  valueLabel?: string;
+  issues?: BuilderIssue[];
+  open: boolean;
+  onToggle: () => void;
+  children?: ReactNode;
+}) {
+  const errors = issues.filter((i) => i.level === 'error').length;
+  const line = (meta ?? []).filter(Boolean).join(' · ');
+  return (
+    <div id={id} className={cx('overflow-hidden rounded-2xl border bg-app-elevated transition', errors ? 'border-danger/40' : open ? 'border-white/20' : 'border-white/10')}>
+      <button type="button" onClick={() => (haptic.tap(), onToggle())} aria-expanded={open} className="flex w-full items-center gap-3 px-3.5 py-3 text-left">
+        <div className="min-w-0 flex-1">
+          <p className="flex items-center gap-1.5 text-[15px] font-semibold leading-snug">
+            {crown && <Icon name="crown" className="size-4 shrink-0 text-accent" />}
+            <span className="min-w-0 break-words">{title}</span>
+          </p>
+          {line && <p className="mt-0.5 text-[12px] leading-snug text-fg-3">{line}</p>}
+          {accentLine && <p className="mt-1 text-[12px] font-semibold leading-snug text-accent/90">{accentLine}</p>}
+        </div>
+        {errors > 0 && <Icon name="alert" className="size-4 shrink-0 text-danger" />}
+        {value != null && (
+          <span className="shrink-0 text-right">
+            <span className="font-display block text-[19px] font-semibold leading-none tabular-nums">{value}</span>
+            {valueLabel && <span className="text-[12px] uppercase text-fg-3">{valueLabel}</span>}
+          </span>
+        )}
+        <Icon name="down" className={cx('size-4 shrink-0 text-fg-3 transition', open && 'rotate-180')} />
+      </button>
+      {open && (
+        <div className="space-y-3 border-t border-white/[0.06] px-3.5 pb-3.5 pt-3">
+          {issues.map((i, n) => (
+            <p key={n} className={cx('rounded-lg px-2.5 py-2 text-[12.5px] leading-snug', i.level === 'error' ? 'bg-danger/10 text-red-100' : 'bg-warn/10 text-amber-100')}>
+              {i.message}
+            </p>
+          ))}
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Строка управления в карточке юнита (как «Генерал», «Усиление» у AoS). */
+export function ControlRow({ label, value, action, reason, children }: { label: string; value?: ReactNode; action?: ReactNode; reason?: string; children?: ReactNode }) {
+  return (
+    <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] px-3 py-2">
+      <div className="flex items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{label}</p>
+          {value != null && <p className="truncate text-[13px] font-semibold text-white/85">{value}</p>}
+        </div>
+        {action}
+      </div>
+      {children && <div className="mt-2">{children}</div>}
+      {reason && <p className="mt-1 text-[12px] leading-snug text-fg-3">{reason}</p>}
+    </div>
+  );
+}
+
+/** Датакарта внутри карточки юнита (как «Варскролл» у AoS): раскрывается отдельно; в просмотре — сразу открыта. */
+export function DatasheetBlock({ label = 'Датакарта', defaultOpen = false, children }: { label?: string; defaultOpen?: boolean; children: ReactNode }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.02]">
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="flex w-full items-center justify-between px-3 py-2.5 text-sm font-semibold text-fg-2">
+        {label}
+        <Icon name="down" className={cx('size-4 text-fg-3 transition', open && 'rotate-180')} />
+      </button>
+      {open && <div className="space-y-3 border-t border-white/[0.06] px-3 pb-3 pt-3">{children}</div>}
+    </div>
+  );
+}

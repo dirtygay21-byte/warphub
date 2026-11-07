@@ -4,16 +4,15 @@ import { uid } from '../../engine/roster';
 import { addOperative, checkKtRoster, compositionTotal, encodeKtRoster, ktTeamGroup, removeOperative, toggleEquipment, touchKt, updateOperative, type KtRoster, type KtRosterOp } from '../../kt/roster';
 import type { KtIndex, KtOperative, KtTeam, KtWeapon } from '../../kt/types';
 import { confirmAsk, haptic, openExternal, shareText } from '../../telegram';
-import { Button, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
+import { Button, Empty, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
 import { cx } from '../util';
-import { CostBadge, DataCard, EditorHeader, HeaderStat, RuleCard, SectionTitle } from '../common/BuilderKit';
+import { AddRow, ArmyBlock, ControlRow, CostBadge, DatasheetBlock, EditorHeader, GroupHeading, HeaderStat, PickRow, RuleCard, RulesPanel, SectionTitle, StatTiles, UnitRowCard, type BuilderIssue } from '../common/BuilderKit';
 import { Md } from './Md';
 
-type Tab = 'ops' | 'rules' | 'ploys' | 'equip';
 
 /**
- * Редактор команды Kill Team (W3, вид R1 30.10.2026 — как AoS и датакарты Wahapedia): шапка со счётом и проверкой,
- * блок команды, датакарты оперативников, правила фракции (один раз, а не в каждой карточке), уловки, снаряжение.
+ * Редактор команды Kill Team (W3; вид 07.11.2026 — из тех же блоков, что AoS и 40K): шапка со счётом и проверкой,
+ * блок команды (снаряжение — строкой выбора), панели правил и уловок, оперативники одной группой — карточки как у юнитов AoS.
  */
 export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onChange, onDuplicate, onDelete }: { roster: KtRoster; index: KtIndex; onBack: () => void; onStartGame: () => void; onTestArmy: () => void; onChange: (r: KtRoster) => void; onDuplicate: (r: KtRoster) => void; onDelete: () => void }) {
   const [team, setTeam] = useState<KtTeam | null>(null);
@@ -29,11 +28,13 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
     const o = roster.summary;
     if (!o || o.operatives !== s.operatives || o.errors !== s.errors || o.warnings !== s.warnings) onChange({ ...roster, summary: s });
   }, [team, issues, roster, onChange]);
-  const [tab, setTab] = useState<Tab>('ops');
   const [adding, setAdding] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [menu, setMenu] = useState(false);
-  const [teamOpen, setTeamOpen] = useState(false);
+  const [teamOpen, setTeamOpen] = useState(roster.operatives.length === 0);
+  const [rulesOpen, setRulesOpen] = useState(false);
+  const [ploysOpen, setPloysOpen] = useState(false);
+  const [equipOpen, setEquipOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [view, setView] = useState(false);
 
@@ -63,7 +64,6 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
   const ploys = team.ploys.filter((p) => p.type !== 'rule');
   const teamRules = team.ploys.filter((p) => p.type === 'rule');
   const scrollToOperative = (id: string) => {
-    setTab('ops');
     setExpanded(id);
     window.setTimeout(() => document.getElementById(`u-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60);
   };
@@ -104,146 +104,113 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
         onOpenIssue={(issue) => issue.uids?.[0] && scrollToOperative(issue.uids[0])}
       />
 
-      <div className="space-y-4 px-4 pt-4">
-        {/* ---- команда ---- */}
-        <section className="rounded-2xl border border-white/10 bg-app-elevated">
-          <button type="button" onClick={() => setTeamOpen((o) => !o)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-fg-3">Kill Team · {meta ? ktTeamGroup(index, meta) : team.factionId}</p>
-              <p className="mt-0.5 truncate text-[15px] font-semibold">{team.name}</p>
-              {team.archetypes.length > 0 && (
-                <div className="mt-1.5 flex flex-wrap gap-1">
-                  {team.archetypes.map((a) => (
-                    <Tag key={a}>{a}</Tag>
-                  ))}
-                </div>
-              )}
-            </div>
-            <Icon name="down" className={cx('size-5 shrink-0 text-fg-3 transition', teamOpen && 'rotate-180')} />
-          </button>
-          {teamOpen && (
-            <div className="space-y-3 border-t border-white/[0.06] px-4 pb-4 pt-3">
-              {team.description && <Md text={team.description} className="text-[12.5px] italic leading-snug text-fg-2" />}
-              <div>
-                <SectionTitle>Состав команды</SectionTitle>
-                {team.composition ? <Md text={team.composition} className="text-[12.5px] leading-snug text-fg-2" /> : <p className="text-sm text-fg-3">Нет данных о составе.</p>}
-              </div>
-              <p className="text-[12px] text-fg-3">
-                Данные: {index.source.name}, {index.source.date} ({index.source.commit}).
-              </p>
-            </div>
-          )}
-        </section>
+      <div className="space-y-5 px-4 pt-4">
+        {/* ---- команда (как блок армии AoS) ---- */}
+        <ArmyBlock
+          kicker={`Kill Team · ${meta ? ktTeamGroup(index, meta) : team.factionId}`}
+          title={team.name}
+          line={team.archetypes.join(' · ') || undefined}
+          open={teamOpen}
+          onToggle={() => setTeamOpen((o) => !o)}
+        >
+          {team.description && <Md text={team.description} className="text-[12.5px] italic leading-snug text-fg-2" />}
+          <div>
+            <SectionTitle>Состав команды</SectionTitle>
+            {team.composition ? <Md text={team.composition} className="text-[12.5px] leading-snug text-fg-2" /> : <p className="text-sm text-fg-3">Нет данных о составе.</p>}
+          </div>
+          <PickRow
+            label="Снаряжение команды"
+            value={team.equipment.filter((e) => roster.equipment.includes(e.id)).map((e) => e.name).join(', ')}
+            empty={team.equipment.length ? (view ? 'Не выбрано' : 'Выбрать') : 'Нет в данных'}
+            right={roster.equipment.length > 0 ? <Tag>{roster.equipment.length}</Tag> : undefined}
+            onClick={team.equipment.length ? () => setEquipOpen(true) : undefined}
+          />
+          <p className="text-[12px] text-fg-3">
+            Данные: {index.source.name}, {index.source.date} ({index.source.commit}).
+          </p>
+        </ArmyBlock>
 
-        <Segmented
-          value={tab}
-          onChange={setTab}
-          options={[
-            { value: 'ops', label: 'Оперативники' },
-            { value: 'rules', label: 'Правила' },
-            { value: 'ploys', label: 'Уловки' },
-            { value: 'equip', label: 'Снаряж.' },
-          ]}
-        />
-
-        {tab === 'ops' && (
-          <section className="space-y-2.5">
-            {!roster.operatives.length && <p className="rounded-xl border border-dashed border-white/15 px-3 py-6 text-center text-sm text-fg-3">Добавьте оперативников — первым обычно идёт лидер.</p>}
-            {roster.operatives.map((x, n) => {
-              const o = opOf(x);
-              return o ? (
-                <div key={x.uid} id={`u-${x.uid}`}>
-                  <OpCard
-                    n={n + 1}
-                    x={x}
-                    o={o}
-                    open={expanded === x.uid}
-                    onToggle={() => setExpanded((e) => (e === x.uid ? null : x.uid))}
-                    onChange={(p) => onChange(updateOperative(roster, x.uid, p))}
-                    onRemove={() => onChange(removeOperative(roster, x.uid))}
-                    readOnly={view}
-                  />
-                </div>
-              ) : (
-                <div key={x.uid} className="flex items-center justify-between rounded-2xl border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-danger">
-                  Нет в данных: {x.opTypeId}
-                  <Button variant="danger" className="text-xs" onClick={() => onChange(removeOperative(roster, x.uid))}>
-                    Убрать
-                  </Button>
-                </div>
-              );
-            })}
-
-          </section>
-        )}
-
-        {tab === 'rules' && (
-          <section className="space-y-4">
-            <div>
-              <SectionTitle>Правила фракции</SectionTitle>
-              <div className="space-y-1.5">
-                {factionRules.map((a) => (
-                  <RuleCard key={a.id} name={a.name} badge={a.ap != null ? <CostBadge>{a.ap} AP</CostBadge> : undefined}>
-                    <Md text={a.text} className="text-[12.5px] leading-relaxed text-fg-2" />
-                  </RuleCard>
-                ))}
-                {teamRules.map((p) => (
-                  <RuleCard key={p.id} name={p.name}>
-                    <Md text={p.text} className="text-[12.5px] leading-relaxed text-fg-2" />
-                  </RuleCard>
-                ))}
-                {!factionRules.length && !teamRules.length && <p className="text-sm text-fg-3">В данных нет правил фракции.</p>}
-              </div>
-            </div>
-            <WeaponRules index={index} />
-          </section>
-        )}
-
-        {tab === 'ploys' && (
-          <section className="space-y-4">
+        {/* ---- правила и уловки (как панели лоров AoS) ---- */}
+        <RulesPanel
+          label={`Правила команды · ${factionRules.length + teamRules.length}`}
+          line={[...factionRules.map((a) => a.name), ...teamRules.map((p) => p.name)].join(' · ') || 'Нет в данных'}
+          open={rulesOpen}
+          onToggle={() => setRulesOpen((o) => !o)}
+        >
+          <div className="space-y-1.5">
+            {factionRules.map((a) => (
+              <RuleCard key={a.id} name={a.name} badge={a.ap != null ? <CostBadge>{a.ap} AP</CostBadge> : undefined}>
+                <Md text={a.text} className="text-[12.5px] leading-relaxed text-fg-2" />
+              </RuleCard>
+            ))}
+            {teamRules.map((p) => (
+              <RuleCard key={p.id} name={p.name}>
+                <Md text={p.text} className="text-[12.5px] leading-relaxed text-fg-2" />
+              </RuleCard>
+            ))}
+            {!factionRules.length && !teamRules.length && <p className="text-sm text-fg-3">В данных нет правил фракции.</p>}
+          </div>
+          <WeaponRules index={index} />
+        </RulesPanel>
+        {ploys.length > 0 && (
+          <RulesPanel label={`Уловки · ${ploys.length}`} line={ploys.map((p) => p.name).join(' · ')} open={ploysOpen} onToggle={() => setPloysOpen((o) => !o)}>
             {(['strategy', 'firefight'] as const).map((type) => {
               const list = ploys.filter((p) => p.type === type);
               if (!list.length) return null;
               return (
-                <div key={type}>
+                <div key={type} className="space-y-1.5">
                   <SectionTitle>{type === 'strategy' ? 'Стратегические уловки' : 'Боевые уловки'}</SectionTitle>
-                  <div className="space-y-1.5">
-                    {list.map((p) => (
-                      <RuleCard key={p.id} name={p.name} badge={<CostBadge tone={type === 'strategy' ? 'accent' : 'warn'}>{type === 'strategy' ? 'Strategy' : 'Firefight'}</CostBadge>}>
-                        <Md text={p.text} className="text-[12.5px] leading-relaxed text-fg-2" />
-                      </RuleCard>
-                    ))}
-                  </div>
+                  {list.map((p) => (
+                    <RuleCard key={p.id} name={p.name} badge={<CostBadge tone={type === 'strategy' ? 'accent' : 'warn'}>{type === 'strategy' ? 'Strategy' : 'Firefight'}</CostBadge>}>
+                      <Md text={p.text} className="text-[12.5px] leading-relaxed text-fg-2" />
+                    </RuleCard>
+                  ))}
                 </div>
               );
             })}
             <p className="text-[12px] text-fg-3">Стоимость уловок в CP в данных источника не записана — смотрите правила редакции.</p>
-          </section>
+          </RulesPanel>
         )}
 
-        {tab === 'equip' && (
-          <section className="space-y-2">
-            {!team.equipment.length && <p className="text-sm text-fg-3">В данных нет снаряжения этой команды.</p>}
-            {team.equipment.map((e) => {
-              const on = roster.equipment.includes(e.id);
-              return (
-                <div key={e.id} className={cx('overflow-hidden rounded-2xl border', on ? 'border-accent/50 bg-accent/[0.06]' : 'border-white/10 bg-app-elevated')}>
-                  <button type="button" disabled={view} onClick={() => (haptic.select(), onChange(toggleEquipment(roster, e.id)))} className="flex w-full items-center gap-3 px-3.5 py-3 text-left disabled:cursor-default disabled:opacity-70">
-                    <span className={cx('flex size-5 shrink-0 items-center justify-center rounded-md border', on ? 'border-accent bg-accent text-black' : 'border-white/30')}>{on && <Icon name="check" className="size-3.5" />}</span>
-                    <span className="min-w-0 flex-1 text-[14px] font-semibold">{e.name}</span>
-                    {on && <Tag tone="accent">Взято</Tag>}
-                  </button>
-                  <div className="border-t border-white/[0.06] px-3.5 py-2">
-                    <Md text={e.text} className="text-[12.5px] leading-relaxed text-fg-2" />
-                  </div>
+        {/* ---- оперативники (как полк AoS) ---- */}
+        <section>
+          <GroupHeading
+            title="Оперативники"
+            count={total == null ? roster.operatives.length : `${roster.operatives.length}/${total}`}
+            right={<span className={cx('text-xs font-semibold', leader ? 'text-fg-3' : 'text-warn')}>{leader ? 'лидер есть' : roster.operatives.length ? 'нет лидера' : ''}</span>}
+          />
+          <div className="space-y-2">
+            {!roster.operatives.length && <Empty title="Нет оперативников">Добавьте оперативников — первым обычно берут лидера команды.</Empty>}
+            {roster.operatives.map((x, n) => {
+              const o = opOf(x);
+              return o ? (
+                <OpCard
+                  key={x.uid}
+                  n={n + 1}
+                  x={x}
+                  o={o}
+                  issues={issues.filter((i) => i.uids?.includes(x.uid))}
+                  open={expanded === x.uid}
+                  onToggle={() => setExpanded((e) => (e === x.uid ? null : x.uid))}
+                  onChange={(p) => onChange(updateOperative(roster, x.uid, p))}
+                  onRemove={() => onChange(removeOperative(roster, x.uid))}
+                  readOnly={view}
+                />
+              ) : (
+                <div key={x.uid} className="flex items-center justify-between rounded-2xl border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-danger">
+                  Нет в данных: {x.opTypeId}
+                  {!view && (
+                    <Button variant="danger" className="text-xs" onClick={() => onChange(removeOperative(roster, x.uid))}>
+                      Убрать
+                    </Button>
+                  )}
                 </div>
               );
             })}
-            <p className="text-[12px] text-fg-3">Лимит снаряжения в данных источника не записан — смотрите правила редакции.</p>
-          </section>
-        )}
+            {!view && roster.operatives.length > 0 && <AddRow onClick={() => setAdding(true)}>Оперативник{total != null ? ` · ${roster.operatives.length}/${total}` : ''}</AddRow>}
+          </div>
+        </section>
       </div>
-
       <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
         <div className="mx-auto flex max-w-lg gap-2 lg:max-w-3xl lg:px-4">
           {view ? (
@@ -251,7 +218,7 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
               <Icon name="edit" /> <span className="whitespace-nowrap">Редактировать</span>
             </Button>
           ) : (
-            <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => (setTab('ops'), setAdding(true))}>
+            <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => setAdding(true)}>
               <Icon name="plus" /> <span className="whitespace-nowrap">Добавить оперативника</span>
             </Button>
           )}
@@ -263,6 +230,26 @@ export function KtEditor({ roster, index, onBack, onStartGame, onTestArmy, onCha
 
       <AddSheet open={adding} team={team} roster={roster} onClose={() => setAdding(false)} onAdd={(o) => (haptic.tap(), onChange(addOperative(roster, o)), setAdding(false))} />
       <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} team={team} />
+      <Sheet open={equipOpen} onClose={() => setEquipOpen(false)} title={`Снаряжение · выбрано ${roster.equipment.length}`} tall>
+        <div className="space-y-2 pb-2">
+          {team.equipment.map((e) => {
+            const on = roster.equipment.includes(e.id);
+            return (
+              <div key={e.id} className={cx('overflow-hidden rounded-2xl border', on ? 'border-accent/50 bg-accent/[0.06]' : 'border-white/10 bg-app-elevated')}>
+                <button type="button" disabled={view} onClick={() => (haptic.select(), onChange(toggleEquipment(roster, e.id)))} className="flex min-h-11 w-full items-center gap-3 px-3.5 py-3 text-left disabled:cursor-default">
+                  <span className={cx('flex size-5 shrink-0 items-center justify-center rounded-md border', on ? 'border-accent bg-accent text-black' : 'border-white/30')}>{on && <Icon name="check" className="size-3.5" />}</span>
+                  <span className="min-w-0 flex-1 text-[14px] font-semibold">{e.name}</span>
+                  {on && <Tag tone="accent">Взято</Tag>}
+                </button>
+                <div className="border-t border-white/[0.06] px-3.5 py-2">
+                  <Md text={e.text} className="text-[12.5px] leading-relaxed text-fg-2" />
+                </div>
+              </div>
+            );
+          })}
+          <p className="text-[12px] text-fg-3">Лимит снаряжения в данных источника не записан — смотрите правила редакции.</p>
+        </div>
+      </Sheet>
       <Sheet open={menu} onClose={() => setMenu(false)} title="Команда">
         <div className="space-y-2 pb-2">
           <Button className="w-full justify-start" onClick={() => (setMenu(false), onStartGame())}>
@@ -302,11 +289,12 @@ const OP_STATS = (o: KtOperative) => [
   { label: 'Wounds', value: o.stats.wounds },
 ];
 
-/** Датакарта оперативника: характеристики, выбранное оружие таблицей; раскрытая — всё оружие, способности, имя. */
+/** Оперативник (как юнит AoS): имя, характеристики строкой, выбранное оружие; раскрытый — оружие и имя, затем датакарта. */
 function OpCard({
   n,
   x,
   o,
+  issues,
   open,
   onToggle,
   onChange,
@@ -316,6 +304,7 @@ function OpCard({
   n: number;
   x: KtRosterOp;
   o: KtOperative;
+  issues: BuilderIssue[];
   open: boolean;
   onToggle: () => void;
   onChange: (p: Partial<KtRosterOp>) => void;
@@ -327,72 +316,76 @@ function OpCard({
   const leader = o.keywords.includes('LEADER');
   const own = o.abilities.filter((a) => !a.factionRule);
   return (
-    <DataCard
+    <UnitRowCard
+      id={`u-${x.uid}`}
       title={x.name || o.name}
-      subtitle={x.name ? o.name : o.keywords.filter((k) => k !== 'LEADER').join(' · ')}
-      highlight={leader}
-      right={<span className="font-display text-lg font-semibold leading-none text-fg-3">#{n}</span>}
-      badges={
-        <>
-          {leader && <Tag tone="accent">Лидер</Tag>}
-          {own.length > 0 && <Tag>{own.length} способн.</Tag>}
-        </>
-      }
-      stats={OP_STATS(o)}
+      crown={leader}
+      meta={[leader ? 'Лидер' : null, x.name ? o.name : null, `APL ${o.stats.apl}`, `${o.stats.wounds} W`, `Sv ${o.stats.save}`]}
+      accentLine={chosen.map((w) => w.name).join(' · ') || 'Оружие не выбрано'}
+      value={n}
+      valueLabel="№"
+      issues={issues}
       open={open}
       onToggle={onToggle}
-      summary={!open && <WeaponTable list={chosen} empty="Оружие не выбрано — раскройте карточку" />}
     >
-      <div>
-        <SectionTitle>{readOnly ? 'Оружие' : 'Оружие · отметьте выбранное'}</SectionTitle>
-        <WeaponTable list={o.weapons} chosen={x.weapons} onToggle={readOnly ? undefined : toggle} />
-      </div>
-      {own.length > 0 && (
-        <div>
-          <SectionTitle>Способности</SectionTitle>
-          <div className="space-y-1.5">
-            {own.map((a) => (
-              <RuleCard key={a.id} name={a.name} badge={a.ap != null ? <CostBadge>{a.ap} AP</CostBadge> : undefined}>
-                <Md text={a.text} className="text-[12.5px] leading-relaxed text-fg-2" />
-              </RuleCard>
-            ))}
-          </div>
-        </div>
-      )}
-      {o.options.length > 0 && (
-        <div>
-          <SectionTitle>Опции</SectionTitle>
-          <div className="space-y-1.5">
-            {o.options.map((a) => (
-              <RuleCard key={a.id} name={a.name}>
-                <Md text={a.text} className="text-[12.5px] leading-relaxed text-fg-2" />
-              </RuleCard>
-            ))}
-          </div>
-        </div>
-      )}
-      <div className="flex flex-wrap gap-1">
-        {o.keywords.map((k) => (
-          <Tag key={k}>{k}</Tag>
-        ))}
-      </div>
       {!readOnly && (
-        <input
-          value={x.name}
-          onChange={(e) => onChange({ name: e.target.value.slice(0, 40) })}
-          placeholder="Своё имя оперативника"
-          className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none placeholder:text-fg-3 focus:border-accent"
-        />
+        <div className="space-y-2">
+          <ControlRow label="Оружие · отметьте выбранное" value={`${chosen.length} из ${o.weapons.length}`}>
+            <WeaponTable list={o.weapons} chosen={x.weapons} onToggle={readOnly ? undefined : toggle} />
+          </ControlRow>
+          <ControlRow label="Своё имя">
+            <input
+              value={x.name}
+              onChange={(e) => onChange({ name: e.target.value.slice(0, 40) })}
+              placeholder={o.name}
+              className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none placeholder:text-fg-3 focus:border-accent"
+            />
+          </ControlRow>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Button variant="danger" className="h-9 px-3 text-xs" onClick={onRemove}>
+              <Icon name="trash" className="size-4" /> Удалить
+            </Button>
+          </div>
+        </div>
       )}
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-[12px] text-fg-3">Подставка: {o.baseMm ? `${o.baseMm} мм` : 'нет данных'}</span>
-        {!readOnly && (
-          <Button variant="danger" className="text-xs" onClick={onRemove}>
-            <Icon name="trash" /> Убрать
-          </Button>
+      <DatasheetBlock defaultOpen={readOnly}>
+        <StatTiles stats={OP_STATS(o)} />
+        <div>
+          <SectionTitle>Оружие</SectionTitle>
+          <WeaponTable list={readOnly ? chosen : o.weapons} chosen={readOnly ? undefined : x.weapons} empty="Оружие не выбрано" />
+        </div>
+        {own.length > 0 && (
+          <div>
+            <SectionTitle>Способности</SectionTitle>
+            <div className="space-y-1.5">
+              {own.map((a) => (
+                <RuleCard key={a.id} name={a.name} badge={a.ap != null ? <CostBadge>{a.ap} AP</CostBadge> : undefined}>
+                  <Md text={a.text} className="text-[12.5px] leading-relaxed text-fg-2" />
+                </RuleCard>
+              ))}
+            </div>
+          </div>
         )}
-      </div>
-    </DataCard>
+        {o.options.length > 0 && (
+          <div>
+            <SectionTitle>Опции</SectionTitle>
+            <div className="space-y-1.5">
+              {o.options.map((a) => (
+                <RuleCard key={a.id} name={a.name}>
+                  <Md text={a.text} className="text-[12.5px] leading-relaxed text-fg-2" />
+                </RuleCard>
+              ))}
+            </div>
+          </div>
+        )}
+        <div className="flex flex-wrap gap-1">
+          {o.keywords.map((k) => (
+            <Tag key={k}>{k}</Tag>
+          ))}
+        </div>
+        <p className="text-[12px] text-fg-3">Подставка: {o.baseMm ? `${o.baseMm} мм` : 'нет данных'}</p>
+      </DatasheetBlock>
+    </UnitRowCard>
   );
 }
 
