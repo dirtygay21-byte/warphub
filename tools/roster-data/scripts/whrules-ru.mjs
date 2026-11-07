@@ -41,6 +41,34 @@ export function readRuSnapshot(file) {
   return r;
 }
 
+/**
+ * Основные (базовые) стратагемы — раздел 15 основных правил на wh-rules.ru (/ru/stratagems), снимок
+ * 40k/whrules-<версия>-core-stratagems.json (снят в браузере 07.11.2026; contentSha256 — отпечаток названий и текстов).
+ * Возвращает Map: английское название → { name, text } (текст сайта как есть, подписи КОГДА / ЦЕЛЬ / ЭФФЕКТ / ОГРАНИЧЕНИЯ).
+ */
+let coreCache;
+export function coreStratagems() {
+  if (coreCache !== undefined) return coreCache;
+  const files = fs.readdirSync(DIR).filter((f) => /^whrules-\d+-core-stratagems\.json$/.test(f));
+  if (!files.length) return (coreCache = new Map());
+  const file = files.sort((a, b) => Number(a.split('-')[1]) - Number(b.split('-')[1])).at(-1);
+  const r = JSON.parse(fs.readFileSync(path.join(DIR, file), 'utf8'));
+  if (r.schema !== 'whrules-core-stratagems/1') throw new Error(`основные стратагемы: схема ${r.schema}`);
+  const canon = JSON.stringify(
+    r.stratagems.map((x) => [x.en, x.name, x.when, x.target, x.effect, x.restrictions, (x.subRule?.fields ?? []).map((f) => [f.label, f.text]), x.subRule?.name ?? null, (x.extraCost ?? []).map((e) => [e.cp, e.en, e.name, e.body])]),
+  );
+  if (sha256(canon) !== r.source.contentSha256) throw new Error(`основные стратагемы: отпечаток содержимого не совпадает (${file})`);
+  coreCache = new Map(
+    r.stratagems.map((x) => {
+      const parts = [stratagemText(x)];
+      for (const e of x.extraCost ?? []) parts.push(`**${e.cp} — ${e.en} (${e.name}):** ${e.body}`);
+      if (x.subRule) parts.push([`**${x.subRule.num} ${x.subRule.en} (${x.subRule.name})**`, ...x.subRule.fields.map((f) => `${f.label}:${f.text.startsWith('▪') ? '\n' : ' '}${f.text}`)].join('\n\n'));
+      return [norm(x.en), { name: x.name, text: parts.join('\n\n') }];
+    }),
+  );
+  return coreCache;
+}
+
 export function latestRuSnapshot() {
   const files = fs.readdirSync(DIR).filter((f) => /^whrules-\d+-ru\.json$/.test(f));
   if (!files.length) throw new Error('нет снимка 40k/whrules-<версия>-ru.json — сначала --save');
@@ -87,6 +115,20 @@ export function splitArmyRule(body) {
   return { main: parts[0].trim(), sections };
 }
 
+/**
+ * Пояснение «Лидер» инфолиста по-русски (07.11.2026). Сайт отдаёт заголовок («Эту модель можно присоединить к следующим юнитам:»),
+ * список юнитов показывает отдельно, а исключения — в footer. Английское пояснение приложения — либо тот же список
+ * («This model can be attached to the following units: …» → заголовок сайта + названия юнитов, они по-английски),
+ * либо исключение (→ footer сайта). Иначе — null (пробел для перевода WarpHub).
+ */
+export function leaderNoteRu(en, site) {
+  if (!en?.trim() || !site) return null;
+  const m = en.match(/^This (?:model|unit) can be attached to the following units?:\s*(.+)$/s);
+  if (m && site.text?.trim().endsWith(':')) return `${site.text.trim()} ${m[1].trim()}`;
+  if (!m && site.footer?.trim()) return site.footer.trim();
+  return null;
+}
+
 /** Русская подпись стратагемы как на wh-rules.ru (подписи КОГДА / ЦЕЛЬ / ЭФФЕКТ / ОГРАНИЧЕНИЯ — из интерфейса сайта). */
 export function stratagemText(s) {
   return [
@@ -109,7 +151,7 @@ export function matchFaction(snap, faction) {
   const site = (slug) => snap.factions[slug] ?? null;
   const own = site(slugify(faction.name));
   const ru = { rules: {}, datasheets: {}, detachments: {}, stratagems: {}, enhancements: {} };
-  const out = { ru, missing: { factions: [], datasheets: [], abilities: [], detachments: [], detRules: [], stratagems: [], enhancements: [], armyRules: [] }, counts: {} };
+  const out = { ru, missing: { factions: [], datasheets: [], abilities: [], detachments: [], detRules: [], stratagems: [], coreStratagems: [], enhancements: [], armyRules: [] }, counts: {} };
   const count = (k, ok) => {
     const c = (out.counts[k] ??= { total: 0, ru: 0 });
     c.total++;
@@ -172,6 +214,7 @@ export function matchFaction(snap, faction) {
       ...(hit.loadout ? { loadout: hit.loadout } : {}),
       ...(hit.options?.length ? { options: hit.options } : {}),
       ...(hit.leader?.text ? { leader: hit.leader.text } : {}),
+      ...(leaderNoteRu(ds.leaderNote, hit.leader) ? { leaderNote: leaderNoteRu(ds.leaderNote, hit.leader) } : {}),
       ...(hit.transport ? { transport: hit.transport } : {}),
       ...(ds.damaged && hit.damaged?.text ? { damaged: hit.damaged.text } : {}),
     };
@@ -207,7 +250,15 @@ export function matchFaction(snap, faction) {
     if (Object.keys(det).length) ru.detachments[d.id] = det;
   }
   for (const s of faction.stratagems) {
-    if (!s.detachment) continue; // общие стратагемы основных правил — отдельно
+    if (!s.detachment) {
+      // основные стратагемы — раздел 15 основных правил (снимок core-stratagems); манёвры армейского правила
+      // (Battle Focus у Aeldari: army: true) — разделы армейского правила сайта
+      const c = s.army ? armyRules.get(norm(s.name)) : coreStratagems().get(norm(s.name));
+      count('coreStratagems', !!c);
+      if (c) ru.stratagems[s.id] = { ...(c.name ? { name: c.name } : {}), text: c.text };
+      else out.missing.coreStratagems.push(s.name);
+      continue;
+    }
     const sd = detOf.get(s.detachment);
     const i = sd ? sd.en.stratagems.findIndex((n) => norm(n) === norm(s.name)) : -1;
     const st = i >= 0 ? sd.ru?.stratagems?.[i] : null;
@@ -231,7 +282,7 @@ export function matchFaction(snap, faction) {
   return out;
 }
 
-const LABELS = { datasheets: 'Инфолисты', abilities: 'Способности инфолистов', factionAbilities: 'Ссылки на армейское правило', armyRules: 'Армейские правила', detachments: 'Детачменты', detRules: 'Правила детачментов', stratagems: 'Стратагемы детачментов', enhancements: 'Улучшения' };
+const LABELS = { datasheets: 'Инфолисты', abilities: 'Способности инфолистов', factionAbilities: 'Ссылки на армейское правило', armyRules: 'Армейские правила', detachments: 'Детачменты', detRules: 'Правила детачментов', stratagems: 'Стратагемы детачментов', coreStratagems: 'Основные стратагемы', enhancements: 'Улучшения' };
 
 function report() {
   const { file, snap } = latestRuSnapshot();

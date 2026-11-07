@@ -13,7 +13,7 @@ import { RuleTrigger, WeaponAbilityTag } from './common/RulePopover';
 import { useGlossary } from './common/useGlossary';
 import { useRu } from './common/useRu';
 import { RuleRichText } from './common/RulePopover';
-import { isWarphub, ruAbility, ruDatasheet, ruDetachmentRuleById, ruEnhancement, ruName, ruRule, ruStratagem, WARPHUB_LABEL, type RuOverlay, type RuText } from '../ru';
+import { isWarphub, ruAbility, ruDatasheet, ruDetachmentRuleById, ruEnhancement, ruName, ruPlain, ruRule, ruStratagem, WARPHUB_LABEL, type RuOverlay, type RuText } from '../ru';
 import type { Glossary } from '../glossary';
 import { findKeyword, splitWeaponKeywords } from '../glossary';
 
@@ -56,6 +56,7 @@ export function UnitCard({
   const hasErr = issues.some((i) => i.level === 'error');
   const hasWarn = !hasErr && issues.length > 0;
   const ru = useRu(L.faction.id);
+  const g = useGlossary();
 
   if (!ds) {
     return (
@@ -202,7 +203,7 @@ export function UnitCard({
             </Field>
           )}
 
-          {ds.weapons.length > 0 && <LoadoutEditor c={c} onPatch={onPatch} />}
+          {ds.weapons.length > 0 && <LoadoutEditor c={c} onPatch={onPatch} ru={ru} />}
 
           {!!c.band?.wargear.length && (
             <Field label="Платное снаряжение" hint={`цены для копии №${c.copy}`}>
@@ -259,17 +260,18 @@ export function UnitCard({
                   <Choice active={!c.unit.enhancementId} onClick={() => onPatch({ enhancementId: null })} title="Без улучшения" />
                   {enhOptions.map((e) => {
                     const used = usedBy.get(e.id) ?? 0;
+                    const re = ruEnhancement(ru, e.id);
                     const taken = !e.upgrade && used > 0;
                     return (
                       <Choice
                         key={e.id}
                         active={c.unit.enhancementId === e.id}
                         onClick={() => onPatch({ enhancementId: e.id })}
-                        title={ruleLabel(e)}
+                        title={re ? ruName(re.name, ruleLabel(e)) : ruleLabel(e)}
                         right={`${e.cost} очк.`}
                         sub={[e.upgrade ? `Upgrade · до 3 юнитов${used ? ` (занято ${used})` : ''}` : taken ? 'уже взято другим юнитом' : '', e.restriction].filter(Boolean).join(' · ')}
                         dim={taken}
-                        detail={e.text}
+                        detail={re ? ruPlain(re.text) + (isWarphub(re) ? `\n\n${WARPHUB_LABEL}` : '') : e.text}
                       />
                     );
                   })}
@@ -299,7 +301,15 @@ export function UnitCard({
                   ))}
                 </div>
               )}
-              {ds.leaderNote && <p className="whitespace-pre-line text-xs text-fg-3">{cleanRuleText(ds.leaderNote)}</p>}
+              {ds.leaderNote &&
+                (ruDatasheet(ru, ds.id)?.leaderNote ? (
+                  <div className="text-xs text-fg-3">
+                    <RuleRichText text={ruDatasheet(ru, ds.id)!.leaderNote!} g={g} className="leading-relaxed" />
+                    {ruDatasheet(ru, ds.id)?.warphub?.includes('leaderNote') && <p className="mt-0.5 text-[12px]">{WARPHUB_LABEL}</p>}
+                  </div>
+                ) : (
+                  <p className="whitespace-pre-line text-xs text-fg-3">{cleanRuleText(ds.leaderNote)}</p>
+                ))}
             </Field>
           )}
 
@@ -549,6 +559,19 @@ function Txt({ title, text, ru, g, warphub }: { title: string; text: string; ru?
 const ruOf = (ru: RuOverlay | null, dsId: string, a: Datasheet['abilities'][number]): RuText | null =>
   a.type === 'core' ? null : a.type === 'faction' ? ruRule(ru, a.ref) : ruAbility(ru, dsId, a.name);
 
+/**
+ * Русские тексты вариантов снаряжения по индексу ds.options. Сайт отдаёт варианты без «None» и пустых строк, в том же порядке;
+ * число не совпало — не сопоставлять (показывается английский).
+ */
+function optionTextsRu(ds: Datasheet, ru: string[] | undefined): (string | undefined)[] | null {
+  if (!ru?.length) return null;
+  const idx = ds.options.map((o, i) => ({ t: (o.text ?? '').trim(), i })).filter((x) => x.t && x.t.toLowerCase() !== 'none');
+  if (idx.length !== ru.length) return null;
+  const out: (string | undefined)[] = [];
+  idx.forEach((x, k) => (out[x.i] = ru[k]));
+  return out;
+}
+
 /** Сколько штук оружия в снаряжении (без учёта регистра и апострофов). */
 function countIn(loadout: Record<string, number>) {
   const k = (s: string) => s.toLowerCase().replace(/[’']/g, "'");
@@ -623,8 +646,9 @@ const wkey = (s: string) => s.toLowerCase().replace(/[’']/g, "'").replace(/e?s
  * Снаряжение: стандартное по инфолисту + замены из вариантов инфолиста. Счётчики не дают выйти за лимиты
  * («1 на каждые 10 моделей», «только Nob») и заменить оружие, которого в отряде уже нет.
  */
-function LoadoutEditor({ c, onPatch }: { c: ComputedUnit; onPatch: (p: Partial<RosterUnit>) => void }) {
+function LoadoutEditor({ c, onPatch, ru }: { c: ComputedUnit; onPatch: (p: Partial<RosterUnit>) => void; ru: RuOverlay | null }) {
   const ds = c.ds!;
+  const ruOpts = optionTextsRu(ds, ruDatasheet(ru, ds.id)?.options);
   const info = optionsOf(ds);
   const [open, setOpen] = useState(false);
   const picks = c.unit.picks ?? {};
@@ -669,7 +693,7 @@ function LoadoutEditor({ c, onPatch }: { c: ComputedUnit; onPatch: (p: Partial<R
                 {notes.map((i) => (
                   <li key={i} className="whitespace-pre-line text-[12px] leading-relaxed text-fg-2">
                     {ds.options[i]!.star ? '* ' : '• '}
-                    {ds.options[i]!.text}
+                    {ruOpts?.[i] ? ruPlain(ruOpts[i]!) : ds.options[i]!.text}
                   </li>
                 ))}
               </ul>

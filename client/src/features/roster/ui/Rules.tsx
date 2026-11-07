@@ -6,6 +6,11 @@ import { IconButton, Segmented, Tag } from './kit';
 import { cx } from './util';
 import { cleanRuleText } from '../text';
 import { factionCredit, ruleLabel, visibleStratagem } from '../engine/source';
+import { isWarphub, ruDetachmentName, ruName, ruStratagem, WARPHUB_LABEL, type RuText } from '../ru';
+import type { Glossary } from '../glossary';
+import { RuleRichText } from './common/RulePopover';
+import { useGlossary } from './common/useGlossary';
+import { useRu } from './common/useRu';
 
 const CORE_URL = 'https://wahapedia.ru/wh40k11ed/the-rules/core-rules/';
 
@@ -93,6 +98,8 @@ export function Rules({
   const [loaded, setLoaded] = useState<{ id: string; faction?: FactionData; error?: string } | null>(null);
   const [det, setDet] = useState<string>(detachmentIds?.length ? 'mine' : 'all');
   const [phase, setPhase] = useState<Phase>('all');
+  // переключатель RU/EN (07.11.2026): русские тексты — те же оверлеи, что в редакторе
+  const g = useGlossary();
 
   // основные стратагемы есть в файле любой фракции — без выбранной армии грузим первую
   const loadId = fid || index.factions[0]?.id || '';
@@ -110,6 +117,7 @@ export function Rules({
   // показываем только результат для текущей фракции: старый ответ или старая ошибка не «прилипают»
   const faction = loaded?.id === loadId ? (loaded.faction ?? null) : null;
   const error = loaded?.id === loadId ? (loaded.error ?? null) : null;
+  const ru = useRu(faction ? loadId : null);
 
   const groups = useMemo(() => {
     if (!faction) return [];
@@ -123,11 +131,11 @@ export function Rules({
       const byId = new Map<string, Detachment>(faction.detachments.map((d: Detachment) => [d.id, d]));
       for (const d of dets) {
         const items = list.filter((s) => s.detachment === d.id && visibleStratagem(s, byId));
-        if (items.length) out.push({ title: ruleLabel(d), sub: 'Детачмент', items });
+        if (items.length) out.push({ title: ruName(ruDetachmentName(ru, d.id), ruleLabel(d)), sub: 'Детачмент', items });
       }
     }
     return out.filter((g) => g.items.length);
-  }, [faction, phase, fid, det, detachmentIds]);
+  }, [faction, phase, fid, det, detachmentIds, ru]);
 
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-10 pt-5 lg:max-w-3xl lg:pt-8">
@@ -239,7 +247,7 @@ export function Rules({
                   </div>
                   <ul className="space-y-1.5">
                     {g.items.map((s) => (
-                      <StratCard key={s.id} s={s} />
+                      <StratCard key={s.id} s={s} ru={ruStratagem(ru, s.id)} g={g} />
                     ))}
                   </ul>
                 </section>
@@ -253,15 +261,15 @@ export function Rules({
   );
 }
 
-function StratCard({ s }: { s: Stratagem }) {
+function StratCard({ s, ru, g }: { s: Stratagem; ru: RuText | null; g: Glossary | null }) {
   const [open, setOpen] = useState(false);
   return (
     <li className="rounded-2xl border border-white/10 bg-white/[0.03]">
       <button type="button" onClick={() => setOpen((v) => !v)} className="flex w-full items-start gap-3 px-3.5 py-3 text-left">
         <span className="min-w-0 flex-1">
-          <span className="block text-[15px] font-semibold leading-tight text-white/90">{s.name}</span>
+          <span className="block text-[15px] font-semibold leading-tight text-white/90">{ru ? ruName(ru.name, s.name) : s.name}</span>
           <span className="mt-0.5 block text-[12px] text-fg-3">
-            {TURN_RU[s.turn] ?? s.turn} · {s.phase}
+            {[TURN_RU[s.turn] ?? s.turn, s.phase, isWarphub(ru) ? WARPHUB_LABEL : ''].filter(Boolean).join(' · ')}
           </span>
         </span>
         <Tag tone={s.detachment ? 'accent' : 'muted'}>{s.cp} CP</Tag>
@@ -269,7 +277,11 @@ function StratCard({ s }: { s: Stratagem }) {
       {open && (
         <div className="border-t border-white/[0.06] px-3.5 pb-3 pt-2.5">
           <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{s.type}</p>
-          <p className="mt-1.5 whitespace-pre-line text-[13.5px] leading-relaxed text-fg-2">{cleanRuleText(s.text)}</p>
+          {ru ? (
+            <RuleRichText text={ru.text} g={g} className="mt-1.5 text-[13.5px] leading-relaxed text-fg-2" />
+          ) : (
+            <p className="mt-1.5 whitespace-pre-line text-[13.5px] leading-relaxed text-fg-2">{cleanRuleText(s.text)}</p>
+          )}
         </div>
       )}
     </li>

@@ -21,7 +21,7 @@ export interface RuOverlay {
   /** армейские правила и ссылки на них (id правила фракции) */
   rules?: Record<string, RuText>;
   /** warphub — поля инфолиста (loadout, options…), переведённые WarpHub */
-  datasheets?: Record<string, { abilities?: Record<string, RuText>; loadout?: string; options?: string[]; leader?: string; transport?: string; damaged?: string; warphub?: string[] }>;
+  datasheets?: Record<string, { abilities?: Record<string, RuText>; loadout?: string; options?: string[]; leader?: string; leaderNote?: string; transport?: string; damaged?: string; warphub?: string[] }>;
   /** nameSrc: 'warphub' — название детачмента переведено WarpHub */
   detachments?: Record<string, { name?: string; nameSrc?: 'warphub'; rules?: Record<string, RuText> }>;
   stratagems?: Record<string, RuText>;
@@ -33,6 +33,13 @@ export interface RuOverlay {
  * («Oath of Moment (Клятва момента)»; решение владельца 07.11.2026). Перевода нет или он совпадает — только английское.
  */
 export const ruName = (ru: string | null | undefined, en: string): string => (ru && ru.trim() && ru.trim().toLowerCase() !== en.trim().toLowerCase() ? `${en} (${ru.trim()})` : en);
+
+/** Текст сайта (разметка **, __, [gloss:…], [core:…]) — простым текстом: для мест, где нельзя вложить кнопки терминов. */
+export const ruPlain = (text: string): string =>
+  text
+    .replace(/\[(?:gloss:[^:\]]+|core):?([^\]]*)\]/g, (_m, s: string) => s)
+    .replace(/\*\*([^*]+?)\*\*/g, '$1')
+    .replace(/__([^_\n]+?)__/g, '$1');
 
 export const ruRule = (o: RuOverlay | null, id: string | null | undefined) => (o && id ? (o.rules?.[id] ?? null) : null);
 export const ruAbility = (o: RuOverlay | null, dsId: string, name: string) => o?.datasheets?.[dsId]?.abilities?.[name] ?? null;

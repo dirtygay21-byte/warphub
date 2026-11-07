@@ -30,7 +30,9 @@ export const enHash = (...parts) =>
     .slice(0, 10);
 
 /** Поля инфолиста, которые переводятся целиком (у инфолистов, которых нет на сайте). */
-export const DS_FIELDS = ['loadout', 'leader', 'transport', 'damaged'];
+export const DS_FIELDS = ['loadout', 'leaderNote', 'transport', 'damaged'];
+/** Поля, которые переводятся и у инфолистов с сайта, если сайт их не даёт (07.11.2026: пояснение «Лидер», снаряжение). */
+const DS_FIELDS_SITE = ['loadout', 'leaderNote'];
 
 const dsField = (ds, k) => {
   const v = ds[k];
@@ -74,6 +76,11 @@ export function collectGaps(faction, ru) {
       }
       const opts = dsOptions(ds);
       if (opts.length) entry.options = { en: enHash(opts), source: { items: opts } };
+    } else {
+      for (const k of DS_FIELDS_SITE) {
+        const t = dsField(ds, k);
+        if (t.trim() && !have[k]) entry[k] = { en: enHash(t), source: { text: t } };
+      }
     }
     if (Object.keys(entry).length) gaps.datasheets[ds.id] = { name: ds.name, ...entry };
   }
