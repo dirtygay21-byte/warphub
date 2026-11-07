@@ -4,11 +4,12 @@ import { useRegistrationStageStore } from "@/stores/useRegistrationStageStore";
 import { useReservationStore } from "@/stores/useReservationStore";
 import { haptic } from "@/utils/haptic";
 import clsx from "clsx";
-import { ChevronLeft, ChevronRight, List, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, List, RotateCcw, X } from "lucide-react";
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { Navigate, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { TUTORIAL_GAMES, TUTORIAL_SOON, tutorialOf, type TutorialStep } from "./content";
 import TutorialDiagramView from "./TutorialDiagram";
+import { TUTORIAL_WALKS, type WalkStep } from "./walkthrough";
 
 /** Назад: на прошлый экран, если он в истории приложения; иначе — на запасной адрес. */
 function useBack(fallback: string) {
@@ -86,6 +87,28 @@ export function TutorialHub() {
             ))}
           </div>
         </section>
+        {TUTORIAL_GAMES.some((g) => TUTORIAL_WALKS[g.id]) && (
+          <section>
+            <SectionLabel>Учебный раунд</SectionLabel>
+            <div className="overflow-hidden rounded-[18px] border border-accent/30 bg-app-elevated">
+              {TUTORIAL_GAMES.filter((g) => TUTORIAL_WALKS[g.id]).map((game, i) => (
+                <button
+                  key={game.id}
+                  type="button"
+                  onClick={() => (haptic.tap(), navigate(`/learn/${game.id}/round`))}
+                  className={clsx("flex min-h-[72px] w-full items-center gap-3.5 px-4 py-3 text-left active:bg-white/[0.06]", i > 0 && "border-t border-white/[0.06]")}
+                >
+                  <span className="font-display flex size-11 shrink-0 items-center justify-center rounded-xl border border-accent/50 text-base font-bold text-accent">{game.code}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-base font-bold">{game.title}: сыграть раунд</span>
+                    <span className="block text-[13px] text-fg-2">По шагам за столом · {TUTORIAL_WALKS[game.id]!.steps.length} шагов</span>
+                  </span>
+                  <ChevronRight className="size-5 shrink-0 text-accent" />
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
         <p className="text-[13px] leading-snug text-fg-3">Правила пересказаны кратко. Источник и редакция — на последней карточке.</p>
       </div>
     </div>
@@ -235,7 +258,12 @@ export function TutorialViewer() {
         <StepCard step={current} />
         {last && (
           <div className="mt-5 flex flex-col gap-2.5">
-            <DsButton variant="primary" size="lg" className="w-full" onClick={bookTraining}>
+            {TUTORIAL_WALKS[game.id] && (
+              <DsButton variant="primary" size="lg" className="w-full" onClick={() => (haptic.tap(), navigate(`/learn/${game.id}/round`))}>
+                Учебный раунд: сыграть по шагам
+              </DsButton>
+            )}
+            <DsButton variant={TUTORIAL_WALKS[game.id] ? "secondary" : "primary"} size="lg" className="w-full" onClick={bookTraining}>
               Записаться на тренировку
             </DsButton>
             <p className="text-[13px] leading-snug text-fg-3">{game.source}</p>
@@ -302,6 +330,230 @@ export function TutorialViewer() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ---------- «Учебный раунд» (07.11.2026) ----------
+
+const ROUND_KEY = (game: string) => `warphub:learn-round:${game}`;
+const readDone = (game: string): number[] => {
+  try {
+    const v = JSON.parse(localStorage.getItem(ROUND_KEY(game)) ?? "[]");
+    return Array.isArray(v) ? v.filter((x) => Number.isInteger(x)) : [];
+  } catch {
+    return [];
+  }
+};
+const writeDone = (game: string, done: number[]) => {
+  try {
+    localStorage.setItem(ROUND_KEY(game), JSON.stringify(done));
+  } catch {
+    // приватный режим — отметки живут до закрытия
+  }
+};
+
+function WalkCard({ step, n }: { step: WalkStep; n: number }) {
+  return (
+    <article className="flex flex-col gap-4">
+      <header>
+        <div className="flex items-center gap-3">
+          <h1 className="font-display text-[28px] font-semibold uppercase leading-[1.05]">{step.title}</h1>
+          {step.phase && <Diamond tone="accent">{step.phase}</Diamond>}
+        </div>
+        <p className="mt-0.5 text-sm text-fg-3">
+          Шаг {n} · {step.en}
+        </p>
+      </header>
+      {step.diagram && <TutorialDiagramView diagram={step.diagram} />}
+      <section>
+        <SectionLabel>Сделайте на столе</SectionLabel>
+        <ol className="flex flex-col gap-2.5">
+          {step.doIt.map((line, i) => (
+            <li key={line} className="flex gap-3 text-[15px] leading-snug text-fg-2">
+              <span className="font-display flex size-6 shrink-0 items-center justify-center rounded-md bg-accent/15 text-[13px] font-semibold text-accent">{i + 1}</span>
+              <span className="pt-0.5">
+                <Rich text={line} />
+              </span>
+            </li>
+          ))}
+        </ol>
+      </section>
+      {step.example && (
+        <div className="rounded-[14px] border border-white/10 bg-field px-4 py-3">
+          <p className="text-[12px] font-bold uppercase tracking-[0.08em] text-accent">{step.example.title}</p>
+          <ul className="mt-1.5 flex flex-col gap-1.5">
+            {step.example.lines.map((line) => (
+              <li key={line} className="text-[14px] leading-snug text-fg-2">
+                <Rich text={line} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {step.mistake && (
+        <div className="flex items-start gap-3 rounded-[14px] border border-danger/35 bg-danger/10 px-4 py-3">
+          <Diamond tone="danger">!</Diamond>
+          <p className="text-[14px] leading-snug text-fg">
+            <span className="font-semibold">Частая ошибка. </span>
+            {step.mistake}
+          </p>
+        </div>
+      )}
+      {step.app && <p className="text-[13px] leading-snug text-fg-3">В приложении: {step.app}</p>}
+    </article>
+  );
+}
+
+/**
+ * Учебный раунд: подготовка и один раунд игры по шагам (что сделать на столе, пример с кубиками, частая ошибка).
+ * «Сделано» отмечает шаг (запоминается на телефоне); в конце — что меняется в следующем раунде и «Повторить раунд».
+ */
+export function TutorialRound() {
+  const { game: gameId } = useParams();
+  const game = tutorialOf(gameId);
+  const walk = game ? TUTORIAL_WALKS[game.id] : undefined;
+  const [params, setParams] = useSearchParams();
+  const back = useBack(game ? `/learn/${game.id}` : "/learn");
+  const [done, setDone] = useState<number[]>(() => (game ? readDone(game.id) : []));
+  const pageParam = params.get("p");
+  useEffect(() => {
+    document.querySelector<HTMLElement>("[data-tutorial-top]")?.scrollIntoView({ block: "start" });
+  }, [pageParam]);
+  if (!game || !walk) return <Navigate to="/learn" replace />;
+  // 0 — вступление (примеры отрядов), 1..N — шаги, N+1 — следующий раунд
+  const total = walk.steps.length + 2;
+  const page = Math.min(Math.max(Number(params.get("p") ?? 0) || 0, 0), total - 1);
+  const go = (p: number) => {
+    if (p < 0 || p >= total) return;
+    haptic.select();
+    setParams({ p: String(p) }, { replace: true });
+  };
+  const mark = (i: number, on: boolean) => {
+    const next = on ? [...new Set([...done, i])] : done.filter((x) => x !== i);
+    setDone(next);
+    writeDone(game.id, next);
+  };
+  const stepIndex = page - 1;
+  const isStep = page >= 1 && page <= walk.steps.length;
+  const last = page === total - 1;
+  const restart = () => {
+    haptic.ok();
+    setDone([]);
+    writeDone(game.id, []);
+    setParams({ p: "1" }, { replace: true });
+  };
+
+  return (
+    <div className="pb-[calc(96px+env(safe-area-inset-bottom))] text-fg" data-tutorial-top>
+      <TopBar onBack={back} kicker={`Учебный раунд · ${game.code}`} title={page === 0 ? game.title : last ? "Следующий раунд" : `Шаг ${page} из ${walk.steps.length}`} />
+      <div className="flex gap-1 px-4 pb-3" role="progressbar" aria-valuemin={0} aria-valuemax={walk.steps.length} aria-valuenow={done.length}>
+        {walk.steps.map((s, i) => (
+          <span key={s.title} className={clsx("h-1 flex-1 rounded-full transition-colors", done.includes(i) ? "bg-accent" : i === stepIndex ? "bg-accent/50" : "bg-white/[0.14]")} />
+        ))}
+      </div>
+      <div key={page} className="ds-enter flex flex-col gap-4 px-5 pt-1">
+        {page === 0 && (
+          <>
+            <h1 className="font-display text-[30px] font-semibold uppercase leading-[1.05]">Сыграем раунд</h1>
+            <p className="text-[15px] leading-snug text-fg-2">{walk.intro}</p>
+            <div className="rounded-[14px] border border-white/10 bg-field px-4 py-3">
+              <p className="text-[12px] font-bold uppercase tracking-[0.08em] text-accent">{walk.sample.title}</p>
+              <ul className="mt-1.5 flex flex-col gap-1.5">
+                {walk.sample.lines.map((line) => (
+                  <li key={line} className="text-[14px] leading-snug text-fg-2">
+                    <Rich text={line} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <section>
+              <SectionLabel>Шаги</SectionLabel>
+              <div className="overflow-hidden rounded-[14px] bg-field">
+                {walk.steps.map((s, i) => (
+                  <button
+                    key={s.title}
+                    type="button"
+                    onClick={() => go(i + 1)}
+                    className="flex min-h-[52px] w-full items-center gap-3 border-t border-white/[0.05] px-3.5 py-2 text-left first:border-t-0 active:bg-white/[0.06]"
+                  >
+                    <span className={clsx("flex size-6 shrink-0 items-center justify-center rounded-md text-[13px] font-bold", done.includes(i) ? "bg-accent text-accent-foreground" : "text-fg-3")}>
+                      {done.includes(i) ? <Check className="size-4" /> : i + 1}
+                    </span>
+                    <span className="min-w-0 flex-1 text-[15px] font-semibold">{s.title}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+        {isStep && (
+          <>
+            <WalkCard step={walk.steps[stepIndex]!} n={page} />
+            <button
+              type="button"
+              role="switch"
+              aria-checked={done.includes(stepIndex)}
+              onClick={() => (haptic.select(), mark(stepIndex, !done.includes(stepIndex)))}
+              className={clsx(
+                "flex min-h-[52px] items-center gap-3 rounded-[14px] border px-4 text-left text-[15px] font-semibold",
+                done.includes(stepIndex) ? "border-accent bg-accent/10 text-accent" : "border-white/[0.14] text-fg-2",
+              )}
+            >
+              <span className={clsx("flex size-6 items-center justify-center rounded-md border", done.includes(stepIndex) ? "border-accent bg-accent text-accent-foreground" : "border-white/30")}>
+                {done.includes(stepIndex) && <Check className="size-4" />}
+              </span>
+              Сделано на столе
+            </button>
+          </>
+        )}
+        {last && (
+          <>
+            <h1 className="font-display text-[30px] font-semibold uppercase leading-[1.05]">Следующий раунд</h1>
+            <p className="text-[15px] leading-snug text-fg-2">
+              Пройдено шагов: {done.length} из {walk.steps.length}. Дальше играйте так же — вот что меняется:
+            </p>
+            <ul className="flex flex-col gap-2.5">
+              {walk.repeat.map((line) => (
+                <li key={line} className="flex gap-2.5 text-[15px] leading-snug text-fg-2">
+                  <span aria-hidden="true" className="mt-[7px] size-1.5 shrink-0 rounded-[2px] bg-accent" />
+                  <span>
+                    <Rich text={line} />
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <DsButton size="lg" className="w-full" onClick={restart}>
+              <RotateCcw className="size-4" /> Повторить раунд
+            </DsButton>
+            <p className="text-[13px] leading-snug text-fg-3">{walk.source}</p>
+          </>
+        )}
+      </div>
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-white/[0.08] bg-app-bg/95 px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
+        <div className="mx-auto flex max-w-xl gap-2.5">
+          <DsButton size="lg" className="flex-1" disabled={page === 0} onClick={() => go(page - 1)}>
+            Назад
+          </DsButton>
+          {last ? (
+            <DsButton size="lg" className="flex-[2]" onClick={() => (haptic.ok(), back())}>
+              Готово
+            </DsButton>
+          ) : (
+            <DsButton
+              variant="primary"
+              size="lg"
+              className="flex-[2]"
+              onClick={() => {
+                if (isStep && !done.includes(stepIndex)) mark(stepIndex, true);
+                go(page + 1);
+              }}
+            >
+              {page === 0 ? "Начать" : "Сделано · далее"}
+            </DsButton>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
