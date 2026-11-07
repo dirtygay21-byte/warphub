@@ -662,7 +662,7 @@ function Rules({ state, data, onlineSeat }: { state: KtState; data: KtData; onli
 
 function Shell({ onBack, undo, children }: { onBack: () => void; undo?: () => void; children: ReactNode }) {
   return (
-    <GameShell onBack={onBack} undo={undo} kicker="Kill Team · Approved Ops 2025" title="Полная игра" className="pb-24">
+    <GameShell onBack={onBack} undo={undo} kicker="Kill Team · Approved Ops" title="Полная игра" className="pb-24">
       {children}
     </GameShell>
   );
