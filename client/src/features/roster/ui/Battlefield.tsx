@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { loadBattlefield, type BattlefieldData, type BfDeployment, type BfLayout, type Pt } from '../data';
+import { loadBattlefield, loadMissions, type BattlefieldData, type BfDeployment, type BfLayout, type MissionsData, type Pt } from '../data';
+import { matchupMission } from '../game';
+import { CapsNote, MissionCardView, SecondaryList } from './MissionCard';
 import { openExternal, pushOverlay } from '../telegram';
 import { IconButton } from './kit';
 import { cx } from './util';
@@ -218,6 +220,14 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
   const [you, setYou] = useState<string | null>(null);
   const [foe, setFoe] = useState<string | null>(null);
   const [variant, setVariant] = useState(1);
+  // миссии (07.11.2026): основная миссия пары типов армий и вторичные карты; без них карта всё равно показывается
+  const [missions, setMissions] = useState<MissionsData | null>(null);
+  const [missionsError, setMissionsError] = useState(false);
+  const [side, setSide] = useState<'you' | 'foe'>('you');
+
+  useEffect(() => {
+    loadMissions().then(setMissions, () => setMissionsError(true));
+  }, []);
 
   useEffect(() => {
     loadBattlefield().then((d) => {
@@ -303,6 +313,8 @@ export function Battlefield({ onBack, initialDisposition }: { onBack: () => void
       </div>
 
       {layout && dep && <MapPanel key={layout.id} layout={layout} dep={dep} letter={LETTERS[pairLayouts.indexOf(layout)] ?? ''} className="mt-3" />}
+
+      <MissionsBlock data={data} missions={missions} failed={missionsError} you={you} foe={foe} side={side} onSide={setSide} />
 
       <MapCredit data={data} />
     </Shell>
@@ -445,6 +457,44 @@ export function Legend() {
         'Цель (жёлтая — центр)',
       )}
     </div>
+  );
+}
+
+/** Основная миссия каждой стороны для выбранной пары типов армий и вторичные карты колоды Chapter Approved. */
+function MissionsBlock({ data, missions, failed, you, foe, side, onSide }: { data: BattlefieldData; missions: MissionsData | null; failed: boolean; you: string; foe: string; side: 'you' | 'foe'; onSide: (s: 'you' | 'foe') => void }) {
+  if (failed) return <p className="mt-4 text-center text-sm text-fg-3">Миссии не загрузились — проверьте связь.</p>;
+  if (!missions) return <div className="mx-auto mt-6 size-6 animate-spin rounded-full border-2 border-white/15 border-t-accent" />;
+  const dName = (id: string) => data.dispositions.find((d) => d.id === id)?.nameRu ?? id;
+  const card = (a: string, b: string) => missions.cards.find((c) => c.id === matchupMission(data.matchups, a, b));
+  const mine = card(you, foe);
+  const theirs = card(foe, you);
+  const shown = side === 'you' ? mine : theirs;
+  const secondary = missions.cards.filter((c) => c.type === 'secondary');
+  return (
+    <section className="mt-5 space-y-3">
+      <div>
+        <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Основная миссия</p>
+        <div className="grid grid-cols-2 gap-1.5">
+          {(['you', 'foe'] as const).map((s) => {
+            const c = s === 'you' ? mine : theirs;
+            return (
+              <Chip key={s} active={side === s} onClick={() => onSide(s)}>
+                <span className="block text-[12px] font-normal text-fg-3">{s === 'you' ? 'Вы' : 'Противник'} · {dName(s === 'you' ? you : foe)}</span>
+                {c?.name ?? 'нет данных'}
+              </Chip>
+            );
+          })}
+        </div>
+      </div>
+      {shown ? <MissionCardView key={shown.id} card={shown} foeName={dName(side === 'you' ? foe : you)} /> : <p className="text-sm text-fg-3">Для этой пары типов армий основной миссии в данных нет.</p>}
+      <CapsNote caps={missions.caps} />
+      <details className="rounded-xl border border-white/10 bg-white/[0.03]">
+        <summary className="cursor-pointer list-none px-3 py-2.5 text-sm font-semibold">Вторичные карты ({secondary.length})</summary>
+        <div className="px-3 pb-3">
+          <SecondaryList cards={secondary} />
+        </div>
+      </details>
+    </section>
   );
 }
 
