@@ -55,6 +55,6 @@ export function ktWeaponRuleTokens(rules: string, find: ReturnType<typeof ktRule
     if (!hit) return { label, rule: null };
     const name = hit.param ? hit.rule.name.replace(/\s*_/, ' ' + hit.param).trim() : hit.rule.name.replace(/\s*_/, '').trim();
     const text = hit.param ? hit.rule.text.replace(/_/g, hit.param) : hit.rule.text;
-    return { label, rule: { name, text, sub: `Правило оружия · ${hit.rule.code}` } };
+    return { label, rule: { name, text, sub: 'Правило оружия (WR) · Kill Team' } };
   });
 }
