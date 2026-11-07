@@ -215,7 +215,6 @@ export function KtFullGameScreen({ onBack, rosters, index, initialRosterId }: { 
         <>
           <RoundDots round={state.round} rounds={data.game.turningPoints} finished={state.stage === 'finished'} />
           {onlineGame.online && state.stage === 'battle' && state.round === 1 && !state.initiativeRolls && <OnlinePlayerSetup rosters={rosters} index={index} data={data} onlineSeat={onlineGame.online.seat} onRoster={(rosterId, operatives) => dispatch({ type: 'player-set', seat: onlineGame.online!.seat, rosterId, operatives })} onTac={(tacOp) => dispatch({ type: 'tac-set', seat: onlineGame.online!.seat, tacOp })} />}
-          <BattleMap state={state} data={data} />
           <BattleHeader state={state} data={data} onInitiative={(cards, manual) => dispatch({ type: 'initiative', round: state.round, attempt: 0, cards, ...(manual ? { manual } : {}) })} onPhase={() => dispatch({ type: 'phase-advanced' })} />
           <ScoreboardGrid className="mb-3 text-center">
             {SEATS.map((seat) => {
@@ -241,6 +240,9 @@ export function KtFullGameScreen({ onBack, rosters, index, initialRosterId }: { 
           </ScoreboardGrid>
           <div className="space-y-3">
             {SEATS.map((seat) => <Player key={seat} state={state} seat={seat} rosterName={rosterName(state.players[seat].rosterId)} tacOpName={data.tacOps.find((t) => t.id === state.players[seat].tacOp)?.name ?? state.players[seat].tacOp} reveal={state.stage === 'finished' || !onlineGame.online || onlineGame.online.seat === seat} dispatch={dispatch} />)}
+          </div>
+          <div className="mt-3">
+            <BattleMap state={state} data={data} />
           </div>
           {state.stage === 'battle' && (
             <>
