@@ -56,16 +56,60 @@ const wc = {
   updatedAt: now,
 };
 
+// 40K: Necrons — Overlord, Necron Warriors, Immortals (первый размер отряда)
+const nec = read('f/NEC.json');
+const necUnits = ['Overlord', 'Necron Warriors', 'Immortals'].map((n) => nec.datasheets.find((d) => d.name === n)).filter(Boolean);
+const w40 = {
+  id: 'shot-40k',
+  name: 'Демо: Necrons',
+  factionId: 'NEC',
+  battleSize: 'strike',
+  detachmentIds: [nec.detachments[0].id],
+  forceDisposition: null,
+  chapter: null,
+  units: necUnits.map((d, i) => ({ uid: `n${i}`, datasheetId: d.id, size: d.costs[0].options[0].label, addons: {}, wargear: {}, enhancementId: null, attachedTo: null })),
+  warlordUid: 'n0',
+  showLegends: false,
+  dataVersion: null,
+  createdAt: now,
+  updatedAt: now,
+};
+// AoS: первая фракция с героем и обычными отрядами — полк из героя и двух отрядов
+const aIndex = read('aos/index.json');
+const aFaction = aIndex.factions.filter((f) => !f.legendsOnly).map((f) => read(`aos/f/${f.id}.json`)).find((f) => f.warscrolls.some((w) => w.hero && !w.legends) && f.warscrolls.filter((w) => !w.hero && !w.legends && w.kind !== 'manifestation').length >= 2);
+const aHero = aFaction.warscrolls.find((w) => w.hero && !w.legends);
+const aRest = aFaction.warscrolls.filter((w) => !w.hero && !w.legends && w.kind !== 'manifestation').slice(0, 2);
+const aos = {
+  system: 'aos',
+  id: 'shot-aos',
+  name: `Демо: ${aFaction.name}`,
+  factionId: aFaction.id,
+  pointsLimit: 2000,
+  formationId: aFaction.formations[0]?.id ?? null,
+  regiments: [{ uid: 'g0', leader: { uid: 'a0', warscrollId: aHero.id, reinforced: false, enhancements: {} }, units: aRest.map((w, i) => ({ uid: `a${i + 1}`, warscrollId: w.id, reinforced: false, enhancements: {} })) }],
+  auxiliaries: [],
+  generalUid: 'a0',
+  ror: null,
+  lores: { spell: null, prayer: null, manifestation: null },
+  terrainId: null,
+  showLegends: false,
+  dataVersion: null,
+  createdAt: now,
+  updatedAt: now,
+};
+
 const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, locale: 'ru-RU' });
 await ctx.addInitScript(
-  ([k, w]) => {
+  ([k, w, r40, ra]) => {
     for (const s of ['', '.1001']) {
       localStorage.setItem('warphub.kt-rosters.v1' + s, JSON.stringify([k]));
       localStorage.setItem('warphub.warcry-rosters.v1' + s, JSON.stringify([w]));
+      localStorage.setItem('warphub.rosters.v1' + s, JSON.stringify([r40]));
+      localStorage.setItem('warphub.aos-rosters.v1' + s, JSON.stringify([ra]));
     }
   },
-  [kt, wc],
+  [kt, wc, w40, aos],
 );
 const page = await ctx.newPage();
 const log = [];
@@ -120,6 +164,15 @@ for (const [label, name] of [
     await page.getByRole('button', { name: 'Датакарта' }).first().click({ timeout: 5000 });
     await page.locator('[id^="u-"] [aria-expanded="true"]').first().scrollIntoViewIfNeeded();
     await shot(`${label}-card-datasheet`, true);
+    if (label === 'kt') {
+      // правило оружия (Lethal, Piercing…) — нажатие открывает текст
+      const rule = page.locator('[id^="u-"] button.underline').first();
+      await rule.scrollIntoViewIfNeeded();
+      await rule.click({ timeout: 5000 });
+      await page.waitForTimeout(400);
+      await shot('kt-weapon-rule');
+      await page.keyboard.press('Escape');
+    }
   });
   await step(`${label}-view-mode`, async () => {
     await page.getByRole('button', { name: 'Режим просмотра' }).first().click({ timeout: 5000 });
@@ -213,6 +266,63 @@ await step('learn-kt-round', async () => {
     await shot(`learn-40k-round-${p}`, true);
   }
 });
+
+// Вёрстка (07.11.2026): списки и редакторы всех игр, раскрытая карточка юнита; затем узкий экран 360 px
+const SYSTEMS = [
+  ['40k', /40,000|40K/i, w40.name, necUnits[1]?.name],
+  ['aos', /Sigmar|AoS/i, aos.name, aRest[0]?.name],
+  ['kt', /Kill Team/, kt.name, null],
+  ['warcry', /Warcry/, wc.name, null],
+];
+for (const width of [390, 360]) {
+  await page.setViewportSize({ width, height: 844 });
+  for (const [label, sw, name, unit] of SYSTEMS) {
+    await step(`layout-${width}-${label}`, async () => {
+      await page.goto(BASE + '/roster', { waitUntil: 'networkidle' });
+      await page.getByRole('button', { name: sw }).first().click({ timeout: 5000 }).catch(() => {});
+      await page.waitForTimeout(800);
+      await shot(`layout-${width}-${label}-list`, true);
+      if (width === 390)
+        for (const [k, t] of [['rules', /^Правила/], ['game', /^Игра/]]) {
+          await page.getByRole('button', { name: t }).first().click({ timeout: 5000 });
+          await page.waitForTimeout(500);
+          await shot(`layout-${label}-menu-${k}`);
+          await page.keyboard.press('Escape');
+          await page.waitForTimeout(400);
+        }
+      await clickText(name);
+      await page.waitForTimeout(1500);
+      await shot(`layout-${width}-${label}-editor`, true);
+      if (label === 'warcry' && width === 390) {
+        // рунмарка бойца: какие способности она открывает
+        await page.locator('[id^="u-"] > button[aria-expanded]').first().click({ timeout: 5000 });
+        await page.getByRole('button', { name: 'Датакарта' }).first().click({ timeout: 5000 });
+        const rm = page.locator('[id^="u-"] div.flex-wrap > button').last();
+        await rm.scrollIntoViewIfNeeded();
+        await rm.click({ timeout: 5000 });
+        await page.waitForTimeout(400);
+        await shot('warcry-runemark');
+        await page.keyboard.press('Escape');
+      }
+      if (unit) {
+        await page.getByText(unit, { exact: false }).first().click({ timeout: 5000 });
+        await page.waitForTimeout(1000);
+        await shot(`layout-${width}-${label}-unit`, true);
+        if (label === 'aos' && width === 390) {
+          // варскролл: способность оружия и ключевое слово нажимаются и открывают текст
+          await page.getByRole('button', { name: 'Варскролл' }).first().click({ timeout: 5000 });
+          await page.waitForTimeout(500);
+          const chip = page.locator('td button').first();
+          await chip.scrollIntoViewIfNeeded();
+          await chip.click({ timeout: 5000 });
+          await page.waitForTimeout(400);
+          await shot('aos-weapon-ability');
+          await page.keyboard.press('Escape');
+        }
+      }
+    });
+  }
+}
 
 fs.writeFileSync(path.join(OUT, 'log.txt'), log.join('\n') + '\n');
 console.log(log.length ? `замечания:\n${log.join('\n')}` : 'без замечаний');

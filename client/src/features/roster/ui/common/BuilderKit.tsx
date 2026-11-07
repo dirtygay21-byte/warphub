@@ -64,16 +64,53 @@ export function ToolTile({ icon, title, sub, onClick }: { icon: string; title: s
     <button
       type="button"
       onClick={() => (haptic.tap(), onClick())}
-      className="ds-press flex min-h-16 items-center gap-3 rounded-2xl border border-white/10 bg-app-elevated px-3 py-3 text-left"
+      className="ds-press flex min-h-16 w-full min-w-0 items-center gap-3 rounded-2xl border border-white/10 bg-app-elevated px-3 py-3 text-left"
     >
       <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent">
         <Icon name={icon} />
       </span>
-      <span className="min-w-0">
+      <span className="min-w-0 flex-1">
         <span className="font-display block text-base font-semibold uppercase leading-none">{title}</span>
         <span className="mt-1 block truncate text-[13px] text-fg-2">{sub}</span>
       </span>
     </button>
+  );
+}
+
+export type ToolItem = { icon: string; title: string; sub: string; onClick: () => void };
+
+/**
+ * Плитки списка игры (07.11.2026, решение владельца): две плитки в ряд — «Правила» и «Игра»; нажатие открывает лист
+ * с выбором пунктов (правила, обучение, начало игры, Test Army). Одинаково во всех играх.
+ */
+export function ToolMenus({ rules, game }: { rules: ToolItem[]; game: ToolItem[] }) {
+  const [open, setOpen] = useState<'rules' | 'game' | null>(null);
+  const groups = { rules: { icon: 'book', title: 'Правила', items: rules }, game: { icon: 'map', title: 'Игра', items: game } } as const;
+  const shown = open ? groups[open] : null;
+  return (
+    <>
+      <div className="mb-5 grid grid-cols-2 gap-2">
+        {(['rules', 'game'] as const).map((k) => (
+          <ToolTile key={k} icon={groups[k].icon} title={groups[k].title} sub={groups[k].items.map((x) => x.title).join(' · ')} onClick={() => setOpen(k)} />
+        ))}
+      </div>
+      <Sheet open={!!shown} onClose={() => setOpen(null)} title={shown?.title ?? ''}>
+        <div className="space-y-2 pb-2">
+          {shown?.items.map((x) => (
+            <ToolTile
+              key={x.title}
+              icon={x.icon}
+              title={x.title}
+              sub={x.sub}
+              onClick={() => {
+                setOpen(null);
+                x.onClick();
+              }}
+            />
+          ))}
+        </div>
+      </Sheet>
+    </>
   );
 }
 

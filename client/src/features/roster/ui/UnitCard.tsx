@@ -434,36 +434,40 @@ function Profile({ c, cr, L, detachmentIds }: { c: ComputedUnit; cr: ComputedRos
     <>
       <div className="space-y-3 rounded-xl border border-white/10 bg-white/[0.02] px-3 pb-3 pt-3">
         {ds.stats.length > 0 && (
-          <div className="no-scrollbar -mx-1 overflow-x-auto px-1">
-            <table className="stat-grid w-full min-w-[320px] text-center text-[13px]">
-              <thead>
-                <tr className="text-[12px] uppercase text-fg-3">
-                  <th className="pb-1 text-left font-semibold"> </th>
-                  {['M', 'T', 'Sv', 'W', 'Ld', 'OC'].map((h) => (
-                    <th key={h} className="pb-1 font-semibold">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {ds.stats.map((m, i) => (
-                  <tr key={i} className="border-t border-white/[0.05]">
-                    <td className="max-w-[9rem] truncate py-1.5 pr-2 text-left text-xs text-fg-2">{m.name}</td>
-                    <td>{m.M}</td>
-                    <td>{m.T}</td>
-                    <td>
-                      {m.Sv}
-                      {m.inv && <span className="text-accent/80">/{m.inv}++</span>}
-                    </td>
-                    <td>{m.W}</td>
-                    <td>{m.Ld}</td>
-                    <td>{m.OC}</td>
-                  </tr>
+          // 07.11.2026: таблица помещается в ширину экрана — имя модели строкой над значениями (если моделей несколько)
+          <table className="stat-grid w-full table-fixed text-center text-[13px]">
+            <thead>
+              <tr className="text-[12px] uppercase text-fg-3">
+                {['M', 'T', 'Sv', 'W', 'Ld', 'OC'].map((h) => (
+                  <th key={h} className="pb-1 font-semibold">
+                    {h}
+                  </th>
                 ))}
+              </tr>
+            </thead>
+            {ds.stats.map((m, i) => (
+              <tbody key={i} className="border-t border-white/[0.05]">
+                {ds.stats.length > 1 && (
+                  <tr>
+                    <td colSpan={6} className="truncate pt-1.5 text-left text-xs text-fg-2">
+                      {m.name}
+                    </td>
+                  </tr>
+                )}
+                <tr>
+                  <td className="py-1.5">{m.M}</td>
+                  <td>{m.T}</td>
+                  <td className="whitespace-nowrap">
+                    {m.Sv}
+                    {m.inv && <span className="text-accent/80">/{m.inv}++</span>}
+                  </td>
+                  <td>{m.W}</td>
+                  <td>{m.Ld}</td>
+                  <td>{m.OC}</td>
+                </tr>
               </tbody>
-            </table>
-          </div>
+            ))}
+          </table>
         )}
         {ds.invulnNote && <p className="text-xs text-fg-3">{ds.invulnNote}</p>}
         {ranged.length > 0 && <WeaponTable title="Дальнобойное оружие" skill="BS" weapons={ranged} count={count} />}
@@ -583,47 +587,47 @@ function WeaponTable({ title, skill, weapons, count }: { title: string; skill: s
   return (
     <div>
       <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{title}</p>
-      <div className="no-scrollbar -mx-1 mt-1 overflow-x-auto px-1">
-        <table className="stat-grid w-full min-w-[340px] text-center text-[12px]">
-          <thead>
-            <tr className="text-[12px] uppercase text-fg-3">
-              <th className="pb-1 text-left font-semibold"> </th>
-              {['Range', 'A', skill, 'S', 'AP', 'D'].map((h) => (
-                <th key={h} className="px-1 pb-1 font-semibold">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {weapons.flatMap((w) =>
-              w.profiles.map((p, i) => (
-                <tr key={w.name + i} className={cx('align-top', i === 0 && 'border-t border-white/[0.05]', count(w.name) ? 'text-white' : 'text-fg-3')}>
-                  <td className="max-w-[11rem] py-1.5 pr-2 text-left">
-                    <span className="block text-[12px] font-semibold leading-tight">
-                      {w.profiles.length > 1 ? p.name : w.name}
-                      {i === 0 && count(w.name) ? <span className="ml-1 text-accent">×{count(w.name)}</span> : null}
+      {/* 07.11.2026: название и способности оружия — строкой над значениями, таблица помещается в ширину экрана */}
+      <table className="stat-grid mt-1 w-full table-fixed text-center text-[12px]">
+        <thead>
+          <tr className="text-[12px] uppercase text-fg-3">
+            {['Range', 'A', skill, 'S', 'AP', 'D'].map((h) => (
+              <th key={h} className="px-0.5 pb-1 font-semibold">
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        {weapons.flatMap((w) =>
+          w.profiles.map((p, i) => (
+            <tbody key={w.name + i} className={cx(i === 0 && 'border-t border-white/[0.05]', count(w.name) ? 'text-white' : 'text-fg-3')}>
+              <tr>
+                <td colSpan={6} className="pt-1.5 text-left">
+                  <span className="block text-[12px] font-semibold leading-tight">
+                    {w.profiles.length > 1 ? p.name : w.name}
+                    {i === 0 && count(w.name) ? <span className="ml-1 text-accent">×{count(w.name)}</span> : null}
+                  </span>
+                  {p.keywords && (
+                    <span className="mt-1 flex flex-wrap gap-1">
+                      {splitWeaponKeywords(p.keywords).map((k) => (
+                        <WeaponAbilityTag key={k} label={k} />
+                      ))}
                     </span>
-                    {p.keywords && (
-                      <span className="mt-1 flex flex-wrap gap-1">
-                        {splitWeaponKeywords(p.keywords).map((k) => (
-                          <WeaponAbilityTag key={k} label={k} />
-                        ))}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-1 py-1.5">{p.type === 'Melee' ? '—' : fmtRange(p.range)}</td>
-                  <td className="px-1 py-1.5">{p.A}</td>
-                  <td className="px-1 py-1.5">{fmtSkill(p.skill)}</td>
-                  <td className="px-1 py-1.5">{p.S}</td>
-                  <td className="px-1 py-1.5">{p.AP}</td>
-                  <td className="px-1 py-1.5">{p.D}</td>
-                </tr>
-              )),
-            )}
-          </tbody>
-        </table>
-      </div>
+                  )}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-0.5 py-1">{p.type === 'Melee' ? '—' : fmtRange(p.range)}</td>
+                <td className="px-0.5 py-1">{p.A}</td>
+                <td className="px-0.5 py-1">{fmtSkill(p.skill)}</td>
+                <td className="px-0.5 py-1">{p.S}</td>
+                <td className="px-0.5 py-1">{p.AP}</td>
+                <td className="px-0.5 py-1">{p.D}</td>
+              </tr>
+            </tbody>
+          )),
+        )}
+      </table>
     </div>
   );
 }

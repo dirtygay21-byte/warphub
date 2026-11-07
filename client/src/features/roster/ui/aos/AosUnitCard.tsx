@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { eligibleFor, enhancementFit, generalFit, reinforceFit, unitBaseCost, unitTotal, type AosComputed, type AosIssue, type AosLookup } from '../../aos/engine';
-import type { AosRegiment, AosRoster, AosUnit, AosWarscroll, AosWeapon } from '../../aos/types';
+import type { AosRegiment, AosRoster, AosRule, AosUnit, AosWarscroll, AosWeapon } from '../../aos/types';
 import { haptic, openExternal } from '../../telegram';
 import { Button, Icon, Tag } from '../kit';
 import { cx } from '../util';
 import { cleanRuleText } from '../../text';
 import { seasonLabel } from '../../aos/rules';
 import { AosRuleCard } from './AosPanels';
+import { RuleTrigger } from '../common/RulePopover';
+import { aosKeywordHint, aosWeaponHint, splitAosAbilities } from '../../aos/coreRules';
 
 export interface UnitActions {
   onToggle: () => void;
@@ -191,17 +193,18 @@ function Controls({
         );
       })}
       {ws.unique && types.length === 0 && ws.hero && <p className="text-[12px] text-fg-3">UNIQUE — улучшения недоступны.</p>}
-      <div className="flex flex-wrap gap-2 pt-1">
+      {/* 07.11.2026: действия — одной строкой равной ширины (на узком экране «Удалить» не уходит на отдельную строку) */}
+      <div className={cx('grid gap-1.5 pt-1', leader ? 'grid-cols-2' : 'grid-cols-3')}>
         {!leader && (
-          <Button className="h-9 px-3 text-xs" onClick={actions.onMove}>
-            <Icon name="chevron" className="size-4" /> Перенести
+          <Button className="h-9 px-2 text-xs" onClick={actions.onMove}>
+            <Icon name="chevron" className="size-4 shrink-0" /> Перенести
           </Button>
         )}
-        <Button className="h-9 px-3 text-xs" onClick={actions.onDuplicate}>
-          <Icon name="copy" className="size-4" /> {leader ? 'Ещё такой полк' : 'Копия'}
+        <Button className="h-9 px-2 text-xs" onClick={actions.onDuplicate}>
+          <Icon name="copy" className="size-4 shrink-0" /> {leader ? 'Ещё такой полк' : 'Копия'}
         </Button>
-        <Button variant="danger" className="h-9 px-3 text-xs" onClick={actions.onRemove}>
-          <Icon name="trash" className="size-4" /> {leader ? 'Удалить полк' : 'Удалить'}
+        <Button variant="danger" className="h-9 px-2 text-xs" onClick={actions.onRemove}>
+          <Icon name="trash" className="size-4 shrink-0" /> {leader ? 'Удалить полк' : 'Удалить'}
         </Button>
       </div>
       <p className="text-[12px] text-fg-3">
@@ -243,6 +246,8 @@ export function Warscroll({ ws, unit, L, defaultOpen = false, embedded = false }
   const open = embedded || toggled;
   const ranged = ws.weapons.filter((w) => w.type === 'ranged');
   const melee = ws.weapons.filter((w) => w.type === 'melee');
+  // способности оружия фракции («Blood-hungry»…) — правило варскролла или боевая черта фракции с тем же названием
+  const extraRules = [...ws.abilities, ...(L?.faction.battleTraits ?? [])];
   const stat = (label: string, v: string) => (
     <div className="rounded-lg bg-white/[0.04] px-1 py-1.5 text-center">
       <p className="text-[12px] font-semibold uppercase text-fg-3">{label}</p>
@@ -266,8 +271,8 @@ export function Warscroll({ ws, unit, L, defaultOpen = false, embedded = false }
             {stat('Health', ws.stats.health)}
             {ws.stats.ward && stat('Ward', ws.stats.ward)}
           </div>
-          {ranged.length > 0 && <Weapons title="Дальнобойное оружие" list={ranged} ranged />}
-          {melee.length > 0 && <Weapons title="Ближний бой" list={melee} />}
+          {ranged.length > 0 && <Weapons title="Дальнобойное оружие" list={ranged} ranged extra={extraRules} />}
+          {melee.length > 0 && <Weapons title="Ближний бой" list={melee} extra={extraRules} />}
           {ws.abilities.length > 0 && (
             <div className="space-y-1.5">
               <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Способности</p>
@@ -288,9 +293,18 @@ export function Warscroll({ ws, unit, L, defaultOpen = false, embedded = false }
                 {k}
               </Tag>
             ))}
-            {ws.keywords.map((k) => (
-              <Tag key={k}>{k + (ws.params[k] ? ` (${ws.params[k]})` : '')}</Tag>
-            ))}
+            {ws.keywords.map((k) => {
+              const label = k + (ws.params[k] ? ` (${ws.params[k]})` : '');
+              const hint = aosKeywordHint(k, ws.params[k]);
+              // основные ключевые слова (FLY, WARD, CHAMPION…) нажимаются и открывают правило
+              return hint ? (
+                <RuleTrigger key={k} source={{ title: hint.name, text: hint.text, sub: hint.sub }} className="inline-flex">
+                  <Tag tone="accent">{label}</Tag>
+                </RuleTrigger>
+              ) : (
+                <Tag key={k}>{label}</Tag>
+              );
+            })}
           </div>
           <div className="space-y-0.5 text-[12px] text-fg-3">
             {!embedded && (
@@ -312,7 +326,7 @@ export function Warscroll({ ws, unit, L, defaultOpen = false, embedded = false }
   );
 }
 
-function Weapons({ title, list, ranged }: { title: string; list: AosWeapon[]; ranged?: boolean }) {
+function Weapons({ title, list, ranged, extra }: { title: string; list: AosWeapon[]; ranged?: boolean; extra: AosRule[] }) {
   return (
     <div>
       <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{title}</p>
@@ -333,7 +347,26 @@ function Weapons({ title, list, ranged }: { title: string; list: AosWeapon[]; ra
               <tr key={i} className="border-t border-white/[0.05] align-top">
                 <td className="max-w-[9rem] py-1.5 pr-1.5 text-left">
                   <span className="block break-words text-[12px] font-semibold leading-tight">{w.name}</span>
-                  {w.abilities && w.abilities !== '-' && <span className="block text-[12px] uppercase leading-tight text-accent/70">{w.abilities}</span>}
+                  {splitAosAbilities(w.abilities).length > 0 && (
+                    <span className="mt-1 flex flex-wrap gap-1">
+                      {splitAosAbilities(w.abilities).map((a) => {
+                        const hint = aosWeaponHint(a, extra);
+                        return hint ? (
+                          <RuleTrigger
+                            key={a}
+                            source={{ title: hint.name, text: hint.text, sub: hint.sub }}
+                            className="-my-0.5 inline-flex min-h-6 items-center rounded border border-accent/40 bg-accent/[0.06] px-1.5 text-left text-[11px] font-semibold uppercase leading-tight tracking-wide text-accent/90 active:bg-accent/20"
+                          >
+                            {a}
+                          </RuleTrigger>
+                        ) : (
+                          <span key={a} className="text-[11px] font-semibold uppercase leading-tight text-accent/70">
+                            {a}
+                          </span>
+                        );
+                      })}
+                    </span>
+                  )}
                 </td>
                 {ranged && <td className="px-0.5 py-1.5">{w.range}</td>}
                 <td className="px-0.5 py-1.5">{w.attacks}</td>
