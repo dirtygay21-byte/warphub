@@ -425,7 +425,6 @@ export function CardCollection() {
   const [visibleCount, setVisibleCount] = useState(60);
   const [modal, setModal] = useState<CardDef | null>(null);
   const state = cards.data;
-  useEffect(() => setVisibleCount(60), [filter]);
 
   const list = useMemo(() => {
     if (!state) return [];
@@ -491,7 +490,10 @@ export function CardCollection() {
                   <button
                     key={id}
                     type="button"
-                    onClick={() => setFilter(id)}
+                    onClick={() => {
+                      setFilter(id);
+                      setVisibleCount(60);
+                    }}
                     className={clsx(
                       "ds-press min-h-11 shrink-0 rounded-xl px-3.5 text-sm font-semibold",
                       filter === id ? "bg-accent text-accent-foreground" : "border border-white/[0.14] bg-app-elevated text-fg-2",
