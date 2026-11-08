@@ -1,6 +1,7 @@
 import { Elysia, status, t } from 'elysia';
 import { apiModels } from '../../lib/api-schemas';
 import {
+  adminFindPointPromos,
   adminFindRewards,
   adminMinigameStats,
   getMinigameSettings,
@@ -1155,6 +1156,13 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       }),
     },
   )
+  .get('/point-promos', async ({ query }) => adminFindPointPromos({ code: query.code, status: query.status }), {
+    query: t.Object({
+      code: t.Optional(t.String()),
+      status: t.Optional(t.Union([t.Literal('active'), t.Literal('used'), t.Literal('expired')])),
+    }),
+    detail: { tags: ['Mini-games'], summary: 'Одноразовые промокоды за каждые 25 000 накопленных очков' },
+  })
   .get(
     '/minigames/rewards',
     async ({ query }) => adminFindRewards({ code: query.code, status: query.status }),

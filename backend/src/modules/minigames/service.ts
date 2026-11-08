@@ -16,6 +16,7 @@ import {
   minigameRewardsTable,
   minigameSessionsTable,
   minigameSettingsTable,
+  pointPromoCodesTable,
   usersTable,
 } from '../../db/schema';
 import { localDateTimeToUtc, toLocalDateParts } from '../booking/rules';
@@ -32,7 +33,8 @@ import {
   isEggScorePlausible,
   isRunnerScorePlausible,
   normalizeRewardCode,
-  playDiceExchange,
+  playDiceTurn,
+  resolveDiceInitiative,
   rewardLabel,
   rewardTierFor,
   secureRandom,
@@ -153,7 +155,7 @@ export type RewardView = {
   usedAt: string | null;
 };
 
-function rewardStatus(row: RewardRow, now = Date.now()): RewardView['status'] {
+function rewardStatus(row: Pick<RewardRow, 'usedAt' | 'expiresAt'>, now = Date.now()): RewardView['status'] {
   if (row.usedAt) return 'used';
   if (row.expiresAt.getTime() <= now) return 'expired';
   return 'active';
@@ -315,13 +317,25 @@ async function notifyReward(
 }
 
 export async function listUserRewards(userId: string): Promise<RewardView[]> {
-  const rows = await db
-    .select()
-    .from(minigameRewardsTable)
-    .where(eq(minigameRewardsTable.userId, userId))
-    .orderBy(desc(minigameRewardsTable.createdAt))
-    .limit(50);
-  return rows.map(toRewardView);
+  const [rows, promos] = await Promise.all([
+    db.select().from(minigameRewardsTable).where(eq(minigameRewardsTable.userId, userId)).orderBy(desc(minigameRewardsTable.createdAt)).limit(50),
+    db.select().from(pointPromoCodesTable).where(eq(pointPromoCodesTable.userId, userId)).orderBy(desc(pointPromoCodesTable.createdAt)).limit(50),
+  ]);
+  const promoViews: RewardView[] = promos.map((promo) => ({
+    id: promo.id,
+    game: 'cards',
+    gameTitle: 'Промокод 25K',
+    label: promo.label,
+    rewardType: 'percent_discount',
+    rewardValue: promo.percent,
+    code: promo.code,
+    score: promo.milestone,
+    status: rewardStatus(promo),
+    createdAt: promo.createdAt.toISOString(),
+    expiresAt: promo.expiresAt.toISOString(),
+    usedAt: promo.usedAt?.toISOString() ?? null,
+  }));
+  return [...rows.map(toRewardView), ...promoViews].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 // ---------------------------------------------------------------------------
@@ -430,6 +444,10 @@ function battleView(state: DiceBattleState, settings: MinigameSettings) {
     round: state.round,
     finished: state.finished,
     lost: state.lost,
+    initiativeRoll: state.initiativeRoll ?? null,
+    playerStarts: state.playerStarts ?? null,
+    turn: state.turn ?? 'player',
+    usedUlt: state.usedUlt ?? false,
   };
 }
 
@@ -640,7 +658,7 @@ export async function finishScoreSession(
 export async function diceAction(
   userId: string,
   sessionId: string,
-  action: 'roll' | 'stop',
+  action: 'initiative_even' | 'initiative_odd' | 'attack' | 'defend' | 'risk' | 'ult' | 'roll' | 'stop',
 ): Promise<{
   exchange: DiceExchange | null;
   battle: ReturnType<typeof battleView>;
@@ -654,12 +672,43 @@ export async function diceAction(
     let state = JSON.parse(session.state ?? 'null') as DiceBattleState;
     let exchange: DiceExchange | null = null;
 
-    if (action === 'roll') {
-      const played = playDiceExchange(state, PLAYER_FIGHTERS, ENEMY_FIGHTERS, params, secureRandom);
+    if (action === 'roll' && state.initiativeRoll == null) {
+      const legacyInitiative = resolveDiceInitiative(state, 'even', secureRandom);
+      state = legacyInitiative.state;
+      exchange = legacyInitiative.exchange;
+    }
+
+    if (action === 'initiative_even' || action === 'initiative_odd') {
+      const played = resolveDiceInitiative(state, action === 'initiative_even' ? 'even' : 'odd', secureRandom);
+      state = played.state;
+      exchange = played.exchange;
+    } else if (action !== 'stop') {
+      const played = playDiceTurn(state, action === 'roll' ? 'attack' : action, PLAYER_FIGHTERS, ENEMY_FIGHTERS, params, secureRandom);
       state = played.state;
       exchange = played.exchange;
     } else {
       state = { ...state, finished: true };
+    }
+
+    if (action !== 'stop' && !state.finished && state.turn === 'enemy') {
+      const enemyTurn = playDiceTurn(state, 'attack', PLAYER_FIGHTERS, ENEMY_FIGHTERS, params, secureRandom);
+      state = enemyTurn.state;
+      if (exchange) {
+        exchange = {
+          ...enemyTurn.exchange,
+          action: exchange.action,
+          initiativeRoll: exchange.initiativeRoll ?? enemyTurn.exchange.initiativeRoll,
+          playerStarts: exchange.playerStarts ?? enemyTurn.exchange.playerStarts,
+          playerAttack: exchange.playerAttack ?? enemyTurn.exchange.playerAttack,
+          enemyAttack: enemyTurn.exchange.enemyAttack ?? exchange.enemyAttack,
+          opponentDefeated: exchange.opponentDefeated || enemyTurn.exchange.opponentDefeated,
+          playerDefeated: exchange.playerDefeated || enemyTurn.exchange.playerDefeated,
+          clutch: exchange.clutch || enemyTurn.exchange.clutch,
+          nextOpponentId: enemyTurn.exchange.nextOpponentId ?? exchange.nextOpponentId,
+          healed: exchange.healed + enemyTurn.exchange.healed,
+          selfDamage: (exchange.selfDamage ?? 0) + (enemyTurn.exchange.selfDamage ?? 0),
+        };
+      }
     }
 
     if (!state.finished) {
@@ -776,6 +825,43 @@ export async function adminFindRewards(filters: {
     conditions.push(isNull(minigameRewardsTable.usedAt), lt(minigameRewardsTable.expiresAt, now));
   }
   return adminRewardRows(conditions.length ? and(...conditions) : undefined);
+}
+
+export async function adminFindPointPromos(filters: { code?: string; status?: 'active' | 'used' | 'expired' }) {
+  const now = new Date();
+  const conditions: SQL[] = [];
+  if (filters.code) conditions.push(eq(pointPromoCodesTable.code, normalizeRewardCode(filters.code)));
+  if (filters.status === 'used') conditions.push(isNotNull(pointPromoCodesTable.usedAt));
+  if (filters.status === 'active') conditions.push(isNull(pointPromoCodesTable.usedAt), gte(pointPromoCodesTable.expiresAt, now));
+  if (filters.status === 'expired') conditions.push(isNull(pointPromoCodesTable.usedAt), lt(pointPromoCodesTable.expiresAt, now));
+  const rows = await db
+    .select({ promo: pointPromoCodesTable, user: usersTable })
+    .from(pointPromoCodesTable)
+    .innerJoin(usersTable, eq(pointPromoCodesTable.userId, usersTable.id))
+    .where(conditions.length ? and(...conditions) : undefined)
+    .orderBy(desc(pointPromoCodesTable.createdAt))
+    .limit(100);
+  return rows.map((row): AdminRewardView => ({
+    id: row.promo.id,
+    game: 'cards',
+    gameTitle: 'Промокод 25K',
+    label: row.promo.label,
+    rewardType: 'percent_discount',
+    rewardValue: row.promo.percent,
+    code: row.promo.code,
+    score: row.promo.milestone,
+    status: rewardStatus(row.promo),
+    createdAt: row.promo.createdAt.toISOString(),
+    expiresAt: row.promo.expiresAt.toISOString(),
+    usedAt: row.promo.usedAt?.toISOString() ?? null,
+    user: {
+      id: row.user.id,
+      telegramId: row.user.telegramId,
+      firstName: row.user.firstName,
+      lastName: row.user.lastName,
+      username: row.user.username,
+    },
+  }));
 }
 
 export async function redeemReward(rewardId: string, adminUserId: string) {

@@ -81,8 +81,19 @@ export type CardsState = {
   packsLeft: number;
   nextPackAt: string | null;
   balance: number;
+  lifetimePoints: number;
+  nextPromoMilestone: number;
   packsOpened: number;
   lastPack: { id: string; openedAt: string; points: number; cards: PackCard[] } | null;
+};
+
+export type MilestonePromo = {
+  id: string;
+  milestone: number;
+  code: string;
+  percent: number;
+  label: string;
+  expiresAt: string;
 };
 
 export type OpenedPack = {
@@ -92,6 +103,7 @@ export type OpenedPack = {
   packsLeft: number;
   balance: number;
   nextPackAt: string | null;
+  promos: MilestonePromo[];
 };
 
 export type PointsHistory = {
@@ -149,6 +161,10 @@ export type BattleView = {
   round: number;
   finished: boolean;
   lost: boolean;
+  initiativeRoll: number | null;
+  playerStarts: boolean | null;
+  turn: "player" | "enemy";
+  usedUlt: boolean;
 };
 
 export type SwarmCreature = {
@@ -192,17 +208,25 @@ export type AttackResult = {
   unsaved: number;
   damage: number;
   defenderWoundsLeft: number;
+  blocked?: boolean;
+  guaranteed?: boolean;
+  selfDamage?: number;
 };
 
 export type DiceExchange = {
   round: number;
-  playerAttack: AttackResult;
+  playerAttack: AttackResult | null;
   enemyAttack: AttackResult | null;
   opponentDefeated: boolean;
   playerDefeated: boolean;
   clutch: boolean;
   nextOpponentId: string | null;
   healed: number;
+  action?: "initiative" | "attack" | "defend" | "risk" | "ult";
+  blocked?: boolean;
+  selfDamage?: number;
+  initiativeRoll?: number;
+  playerStarts?: boolean;
 };
 
 export type DiceActionResult = {
@@ -226,7 +250,10 @@ export const finishMinigame = (sessionId: string, score: number) =>
     body: JSON.stringify({ score }),
   });
 
-export const diceAction = (sessionId: string, action: "roll" | "stop") =>
+export const diceAction = (
+  sessionId: string,
+  action: "initiative_even" | "initiative_odd" | "attack" | "defend" | "risk" | "ult" | "roll" | "stop",
+) =>
   apiRequest<DiceActionResult>(
     `/minigames/sessions/${sessionId}/dice/${action}`,
     { method: "POST" },
@@ -296,6 +323,14 @@ export const findAdminRewards = (filters: {
   return apiRequest<AdminReward[]>(
     `/admin/minigames/rewards${query ? `?${query}` : ""}`,
   );
+};
+
+export const findPointPromos = (filters: { code?: string; status?: RewardStatus }) => {
+  const params = new URLSearchParams();
+  if (filters.code) params.set("code", filters.code);
+  if (filters.status) params.set("status", filters.status);
+  const query = params.toString();
+  return apiRequest<AdminReward[]>(`/admin/point-promos${query ? `?${query}` : ""}`);
 };
 
 export const redeemAdminReward = (id: string) =>

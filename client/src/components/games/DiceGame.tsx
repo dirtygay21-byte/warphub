@@ -106,7 +106,9 @@ function AttackSteps({
         {title} · <span className="text-white">{attackerName}</span>
       </p>
       <div className="space-y-2">
-        {rows.map((row, index) =>
+        {attack.blocked && <p className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-sm text-fg-2">Атака заблокирована</p>}
+        {attack.selfDamage ? <p className="text-sm text-[#ff5a4a]">Риск: атакующий получает −{attack.selfDamage} раны</p> : null}
+        {!attack.blocked && rows.map((row, index) =>
           index < shown ? (
             <div key={row.label}>
               <div className="flex items-center justify-between text-[12px] text-fg-3">
@@ -131,7 +133,7 @@ function AttackSteps({
             </div>
           ) : null,
         )}
-        {shown >= 4 && (
+        {!attack.blocked && shown >= 4 && (
           <p
             className={clsx(
               `pt-1 text-lg font-semibold ${oswald}`,
@@ -187,7 +189,7 @@ function rewardForWins(game: MinigameInfo | undefined, wins: number) {
 
 // ---------------------------------------------------------------------------
 
-type Phase = "intro" | "starting" | "battle" | "animating" | "sending" | "result" | "error";
+type Phase = "intro" | "starting" | "initiative" | "battle" | "animating" | "sending" | "result" | "error";
 
 export default function DiceGame() {
   const game = useGameInfo("dice");
@@ -224,9 +226,9 @@ export default function DiceGame() {
     const ea = exchange.enemyAttack;
 
     later(() => {
-      if (step === 0) emit("pa", { type: "attack", side: "player" });
-      if (step === 4) emit("ph", pa.damage > 0 ? { type: "hurt", side: "enemy", damage: pa.damage } : { type: "miss", side: "enemy" });
-      if (ea && step === 5) emit("ea", { type: "attack", side: "enemy" });
+      if (pa && step === 0) emit("pa", { type: "attack", side: "player" });
+      if (pa && step === 4) emit("ph", pa.damage > 0 ? { type: "hurt", side: "enemy", damage: pa.damage } : { type: "miss", side: "enemy" });
+      if (ea && step === (pa ? 4 : 0)) emit("ea", { type: "attack", side: "enemy" });
 
       if (step < totalSteps) {
         later(() => setStep((s) => s + 1), 430);
@@ -268,16 +270,39 @@ export default function DiceGame() {
     setBanner(null);
     try {
       const session = await startMinigame("dice");
+      if (!session.battle) throw new Error("Сервер не вернул состояние боя");
       setSessionId(session.sessionId);
       setBattle(session.battle);
-      setPhase("battle");
+      setPhase(session.battle.playerStarts === null ? "initiative" : "battle");
     } catch (e) {
       setError(errorText(e));
       setPhase("error");
     }
   };
 
-  const act = async (action: "roll" | "stop") => {
+  const chooseInitiative = async (guess: "even" | "odd") => {
+    if (!sessionId) return;
+    setPhase("sending");
+    setError("");
+    try {
+      const res = await diceAction(sessionId, guess === "even" ? "initiative_even" : "initiative_odd");
+      setBattle(res.battle);
+      if (res.exchange?.enemyAttack) {
+        pendingRef.current = { battle: res.battle, result: res.result };
+        emitted.current = new Set();
+        setExchange(res.exchange);
+        setStep(0);
+        setPhase("animating");
+      } else {
+        setPhase("battle");
+      }
+    } catch (e) {
+      setError(errorText(e));
+      setPhase("error");
+    }
+  };
+
+  const act = async (action: "attack" | "defend" | "risk" | "ult" | "roll" | "stop") => {
     if (!sessionId) return;
     setPhase("sending");
     setBanner(null);
@@ -338,7 +363,26 @@ export default function DiceGame() {
     <div className="min-h-full pb-10 text-white" onClick={skipAnimation}>
       <GameTopBar title={game?.title ?? "Кости войны"} />
 
-      {!inBattle && (
+      {phase === "initiative" && battle && (
+        <div className="px-4">
+          <div className="rounded-2xl border border-accent/30 bg-app-elevated p-5 text-center">
+            <p className={`text-xl uppercase text-accent ${oswald}`}>Инициатива</p>
+            <p className="mt-2 text-sm text-fg-2">Выберите чётность кубика D6. Если угадаете — первый удар ваш, иначе противник начнёт сам.</p>
+            <div className="mt-4 flex justify-center">
+              <Die value={battle.initiativeRoll ?? 6} state="rolling" />
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <PixelButton onClick={() => chooseInitiative("even")}>Чёт</PixelButton>
+              <PixelButton variant="dark" onClick={() => chooseInitiative("odd")}>Нечет</PixelButton>
+            </div>
+            {battle.initiativeRoll !== null && (
+              <p className="mt-3 text-sm text-fg-2">Кубик: {battle.initiativeRoll} · {battle.playerStarts ? "ваш первый удар" : "первый удар противника"}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {!inBattle && phase !== "initiative" && (
         <div className="px-4">
           <div className={stageFrame}>
             <BattleArena playerId="iron_captain" enemyId="hive_reaper" event={null} />
@@ -375,7 +419,7 @@ export default function DiceGame() {
       {inBattle && battle && (
         <div className="px-4">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs text-fg-3">Раунд {battle.round + 1}</span>
+            <span className="text-xs text-fg-3">Раунд {battle.round + 1}{battle.initiativeRoll !== null ? ` · D6 ${battle.initiativeRoll}` : ""}</span>
             <span className={`text-lg font-semibold text-accent ${oswald}`}>
               {battle.wins} {pluralWins(battle.wins)}
             </span>
@@ -403,9 +447,20 @@ export default function DiceGame() {
               </PixelButton>
             ) : (
               <div className="space-y-2">
-                <PixelButton className="w-full" onClick={() => act("roll")} disabled={phase === "sending"}>
+                <PixelButton className="w-full" onClick={() => act("attack")} disabled={phase === "sending"}>
                   {phase === "sending" ? <LoaderCircle className="size-5 animate-spin" /> : <Swords className="size-5" />}
                   {battle.wins > 0 && exchange?.opponentDefeated ? "Сражаться дальше" : "Атаковать"}
+                </PixelButton>
+                <div className="grid grid-cols-2 gap-2">
+                  <PixelButton variant="dark" onClick={() => act("defend")} disabled={phase === "sending"}>
+                    Защита
+                  </PixelButton>
+                  <PixelButton variant="dark" onClick={() => act("risk")} disabled={phase === "sending"}>
+                    Риск +1 атака
+                  </PixelButton>
+                </div>
+                <PixelButton variant="dark" className="w-full" onClick={() => act("ult")} disabled={phase === "sending" || battle.usedUlt}>
+                  {battle.usedUlt ? "Ульта использована" : "Ульта · гарантированный удар"}
                 </PixelButton>
                 {battle.wins > 0 && current ? (
                   <PixelButton variant="dark" className="w-full" onClick={() => act("stop")} disabled={phase === "sending"}>

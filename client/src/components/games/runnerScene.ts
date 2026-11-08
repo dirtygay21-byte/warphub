@@ -3,7 +3,8 @@
  * Виртуальный экран 200×150, рисуется пикселями и растягивается без размытия.
  */
 import { drawPuddle, drawSprite, seeded, type Sprite } from "./pixel/pixel";
-import { OBSTACLE_SPRITES, runnerFrame } from "./pixel/factions";
+import { OBSTACLE_SPRITES } from "./pixel/factions";
+import { drawGameImage } from "./pixel/assets";
 
 export const W = 168;
 export const H = 126;
@@ -13,10 +14,11 @@ const HERO_H = 26;
 const PX_PER_M = 8;
 const GRAVITY = 900;
 const JUMP_V = -265;
-/** Скорость в м/с: старт 10, разгон 0.18 м/с², предел 24 (сервер допускает до 32) */
-export const speedAt = (t: number) => Math.min(24, 10 + 0.18 * t);
+/** Скорость в м/с: старт 10, разгон 0.24 м/с², предел 28 (сервер допускает до 32) */
+export const speedAt = (t: number) => Math.min(28, 10 + 0.24 * t);
 
-type ObstacleKind = "trap" | "bags" | "skulls" | "barrel" | "pillar";
+type ImageObstacleKind = "enemy_marine" | "enemy_eldar" | "enemy_warboss" | "enemy_tyranid" | "enemy_commissar" | "enemy_black_marine";
+type ObstacleKind = "trap" | "bags" | "skulls" | "barrel" | "pillar" | "air_bat" | "air_mine" | ImageObstacleKind;
 type Obstacle = { x: number; kind: ObstacleKind };
 type Particle = { x: number; y: number; vx: number; vy: number; life: number; max: number; color: string; size: number };
 
@@ -58,8 +60,28 @@ export const newWorld = (): World => ({
   rng: seeded(Date.now()),
 });
 
-const obstacleSprite = (o: Obstacle, t: number): Sprite =>
-  o.kind === "barrel" ? OBSTACLE_SPRITES.barrel[Math.floor(t * 8) % 2]! : OBSTACLE_SPRITES[o.kind];
+const IMAGE_OBSTACLES: Record<ImageObstacleKind, { src: string; w: number; h: number }> = {
+  enemy_marine: { src: "/games/runner/space-marine.png", w: 28, h: 30 },
+  enemy_eldar: { src: "/games/runner/eldar.png", w: 28, h: 30 },
+  enemy_warboss: { src: "/games/runner/warboss.png", w: 28, h: 30 },
+  enemy_tyranid: { src: "/games/runner/tyranid.png", w: 28, h: 30 },
+  enemy_commissar: { src: "/games/runner/commissar.png", w: 28, h: 30 },
+  enemy_black_marine: { src: "/games/runner/black-marine.png", w: 28, h: 30 },
+};
+const isImageObstacle = (kind: ObstacleKind): kind is ImageObstacleKind => kind.startsWith("enemy_");
+
+type ObstacleVisual = { sprite: Sprite | null; image: string | null; w: number; h: number };
+const obstacleVisual = (o: Obstacle, t: number): ObstacleVisual => {
+  if (isImageObstacle(o.kind)) {
+    const image = IMAGE_OBSTACLES[o.kind];
+    return { sprite: null, image: image.src, w: image.w, h: image.h };
+  }
+  const sprite = o.kind === "barrel" ? OBSTACLE_SPRITES.barrel[Math.floor(t * 8) % 2]! : OBSTACLE_SPRITES[o.kind];
+  return { sprite, image: null, w: sprite.w, h: sprite.h };
+};
+
+const obstacleY = (o: Obstacle, visual: ObstacleVisual) =>
+  o.kind === "air_bat" ? GROUND - 26 : o.kind === "air_mine" ? GROUND - 62 : GROUND - visual.h + 1;
 
 function dust(world: World, x: number, y: number, n: number, color = "#3a342b") {
   for (let i = 0; i < n; i++) {
@@ -105,7 +127,11 @@ export function step(world: World, dt: number) {
   world.obstacles = world.obstacles.filter((o) => o.x > -30);
   world.sinceLast += speedPx * dt;
   if (!world.dead && world.sinceLast >= world.nextGap) {
-    const kinds: ObstacleKind[] = world.meters < 150 ? ["bags", "skulls", "trap"] : ["trap", "bags", "skulls", "barrel", "pillar"];
+    const kinds: ObstacleKind[] = world.meters < 150
+      ? ["bags", "skulls", "trap"]
+      : world.meters < 400
+        ? ["trap", "bags", "skulls", "barrel", "pillar", "air_bat", "enemy_marine", "enemy_eldar"]
+        : ["trap", "bags", "skulls", "barrel", "pillar", "air_bat", "air_mine", "enemy_marine", "enemy_eldar", "enemy_warboss", "enemy_tyranid", "enemy_commissar", "enemy_black_marine"];
     world.obstacles.push({ x: W + 4, kind: kinds[Math.floor(world.rng() * kinds.length)]! });
     world.sinceLast = 0;
     world.nextGap = speedPx * (0.75 + world.rng() * 0.95) + 46;
@@ -132,9 +158,11 @@ export function step(world: World, dt: number) {
   const hx2 = HERO_X + 20;
   const hy2 = world.heroY + HERO_H - 3;
   for (const o of world.obstacles) {
-    const s = obstacleSprite(o, world.t);
-    const top = GROUND - s.h + 3 + (o.kind === "barrel" ? 4 : 0);
-    if (hx2 > o.x + 2 && hx1 < o.x + s.w - 2 && hy2 > top) {
+    const visual = obstacleVisual(o, world.t);
+    const top = obstacleY(o, visual) + (o.kind === "barrel" ? 4 : 0);
+    const bottom = top + visual.h;
+    const heroTop = world.heroY + 3;
+    if (hx2 > o.x + 2 && hx1 < o.x + visual.w - 2 && hy2 > top && heroTop < bottom) {
       world.dead = true;
       for (let i = 0; i < 18; i++) {
         world.particles.push({
@@ -328,23 +356,25 @@ export function drawScene(ctx: CanvasRenderingContext2D, world: World) {
   for (let x = -pOff; x < W + 160; x += 160) drawPuddle(ctx, x + 60, GROUND + 8, 24, t);
 
   for (const o of world.obstacles) {
-    const s = obstacleSprite(o, t);
-    drawSprite(ctx, s, o.x, GROUND - s.h + 1, { glowAlpha: 0.3 });
+    const visual = obstacleVisual(o, t);
+    const y = obstacleY(o, visual);
+    if (visual.image) drawGameImage(ctx, visual.image, o.x, y, { width: visual.w, height: visual.h });
+    else if (visual.sprite) drawSprite(ctx, visual.sprite, o.x, y, { glowAlpha: 0.3 });
   }
 
   // герой
-  let frame: Parameters<typeof runnerFrame>[0];
+  let frame: 0 | 1 | 2 | 3 | "jump" | "dead";
   if (world.dead && world.deadFor > 0.12) frame = "dead";
   else if (!world.onGround) frame = "jump";
   else frame = (Math.floor(world.scroll / 9) % 4) as 0 | 1 | 2 | 3;
-  const hero = runnerFrame(frame);
   const flash = world.dead && world.deadFor < 0.12;
   // тень
   ctx.globalAlpha = 0.35;
   ctx.fillStyle = "#000";
   ctx.fillRect(HERO_X + 6, GROUND, 16 - Math.round((FEET - world.heroY) / 6), 2);
   ctx.globalAlpha = 1;
-  drawSprite(ctx, hero, HERO_X, frame === "dead" ? GROUND - hero.h + 2 : world.heroY, flash ? { tint: "#ffffff" } : {});
+  const heroSpriteY = world.dead ? GROUND - 27 : world.heroY + HERO_H - 28 + (frame === 1 || frame === 3 ? -1 : 0);
+  drawGameImage(ctx, "/games/ork-runner.png", HERO_X, heroSpriteY, { tint: flash ? "#ffffff" : undefined });
 
   for (const p of world.particles) {
     ctx.globalAlpha = Math.min(1, p.life / (p.max * 0.5));

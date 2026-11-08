@@ -713,7 +713,16 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
     {
       params: t.Object({
         id: t.String({ format: 'uuid' }),
-        action: t.Union([t.Literal('roll'), t.Literal('stop')]),
+        action: t.Union([
+          t.Literal('initiative_even'),
+          t.Literal('initiative_odd'),
+          t.Literal('attack'),
+          t.Literal('defend'),
+          t.Literal('risk'),
+          t.Literal('ult'),
+          t.Literal('roll'),
+          t.Literal('stop'),
+        ]),
       }),
       detail: {
         tags: ['Mini-games'],

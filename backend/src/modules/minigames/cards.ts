@@ -18,10 +18,11 @@ import {
   cardPacksTable,
   pointsLedgerTable,
   usersTable,
+  pointPromoCodesTable,
 } from '../../db/schema';
 import { localDateTimeToUtc, toLocalDateParts } from '../booking/rules';
 import { escapeHtml, notifyUser } from '../notifications/service';
-import { rollPack, secureRandom, type PackCard } from './rules';
+import { generateRewardCode, rollPack, secureRandom, type PackCard } from './rules';
 import { getMinigameSettings, MinigameError } from './service';
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
@@ -55,6 +56,57 @@ async function balanceOf(executor: Tx | typeof db, userId: string) {
 }
 
 export const getPointsBalance = (userId: string) => balanceOf(db, userId);
+
+const MILESTONE = 25_000;
+
+async function positivePointsOf(executor: Tx | typeof db, userId: string) {
+  const [row] = await executor
+    .select({ total: sum(pointsLedgerTable.delta) })
+    .from(pointsLedgerTable)
+    .where(and(eq(pointsLedgerTable.userId, userId), sql`${pointsLedgerTable.delta} > 0`));
+  return Number(row?.total ?? 0);
+}
+
+async function issueMilestonePromos(tx: Tx, userId: string, rewardValidDays: number) {
+  const earned = await positivePointsOf(tx, userId);
+  const highestMilestone = Math.floor(earned / MILESTONE) * MILESTONE;
+  if (highestMilestone < MILESTONE) return [];
+
+  const milestones = Array.from(
+    { length: highestMilestone / MILESTONE },
+    (_, index) => (index + 1) * MILESTONE,
+  );
+  const existingRows = await tx
+    .select({ milestone: pointPromoCodesTable.milestone })
+    .from(pointPromoCodesTable)
+    .where(and(eq(pointPromoCodesTable.userId, userId), inArray(pointPromoCodesTable.milestone, milestones)));
+  const existing = new Set(existingRows.map((row) => row.milestone));
+  const issued: Array<typeof pointPromoCodesTable.$inferSelect> = [];
+
+  // Один большой приход очков может пройти сразу несколько порогов.
+  for (const milestone of milestones) {
+    if (existing.has(milestone)) continue;
+    let createdPromo: typeof pointPromoCodesTable.$inferSelect | undefined;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const code = generateRewardCode();
+      const [codeExists] = await tx.select({ id: pointPromoCodesTable.id }).from(pointPromoCodesTable).where(eq(pointPromoCodesTable.code, code)).limit(1);
+      if (codeExists) continue;
+      const [created] = await tx.insert(pointPromoCodesTable).values({
+        userId,
+        milestone,
+        code,
+        percent: 25,
+        label: `Промокод ${milestone.toLocaleString('ru-RU')} очков: скидка 25%`,
+        expiresAt: new Date(Date.now() + rewardValidDays * 86_400_000),
+      }).returning();
+      createdPromo = created;
+      break;
+    }
+    if (!createdPromo) throw new MinigameError('INVALID_INPUT', 'Could not generate a unique milestone promo code');
+    issued.push(createdPromo);
+  }
+  return issued;
+}
 
 async function packsOpenedToday(executor: Tx | typeof db, userId: string, dayKey: string) {
   const [row] = await executor
@@ -97,6 +149,10 @@ export async function getCardsState(userId: string) {
     .select({ value: count() })
     .from(cardPacksTable)
     .where(eq(cardPacksTable.userId, userId));
+  const [balance, lifetimePoints] = await Promise.all([
+    getPointsBalance(userId),
+    positivePointsOf(db, userId),
+  ]);
 
   return {
     enabled: settings.games.cards.enabled,
@@ -107,7 +163,9 @@ export async function getCardsState(userId: string) {
     packsPerDay: params.packsPerDay,
     packsLeft,
     nextPackAt: packsLeft > 0 ? null : nextClubMidnight().toISOString(),
-    balance: await getPointsBalance(userId),
+    balance,
+    lifetimePoints,
+    nextPromoMilestone: (Math.floor(lifetimePoints / MILESTONE) + 1) * MILESTONE,
     packsOpened: Number(packsTotal?.value ?? 0),
     lastPack: lastPack
       ? {
@@ -176,6 +234,8 @@ export async function openPack(userId: string) {
       note: `Пакет карт: ${cards.length} шт.`,
     });
 
+    const promos = await issueMilestonePromos(tx, userId, settings.rewardValidDays);
+
     const seen = new Set<string>();
     return {
       packId: pack!.id,
@@ -187,6 +247,7 @@ export async function openPack(userId: string) {
       }),
       packsLeft: params.packsPerDay - opened - 1,
       balance: await balanceOf(tx, userId),
+      promos,
     };
   });
 
@@ -204,6 +265,16 @@ export async function openPack(userId: string) {
         `🌟 <b>Легендарная карта!</b>\n${legendary.map((c) => escapeHtml(c.name)).join(', ')} — +${legendary.length * legendary[0]!.points} очков.\nВаш счёт: ${result.balance} очков.`,
       );
     })().catch((error) => console.warn('[notify] legendary card notification failed', error));
+  }
+
+  for (const promo of result.promos) {
+    void (async () => {
+      const [user] = await db.select({ telegramId: usersTable.telegramId }).from(usersTable).where(eq(usersTable.id, userId)).limit(1);
+      notifyUser(
+        user?.telegramId,
+        `🎁 <b>Накоплено ${promo.milestone.toLocaleString('ru-RU')} очков!</b>\nВаш промокод на скидку 25%: <b>${escapeHtml(promo.code)}</b>\nПокажите его администратору при записи. Действует до ${promo.expiresAt.toLocaleDateString('ru-RU')}.`,
+      );
+    })().catch((error) => console.warn('[notify] milestone promo notification failed', error));
   }
 
   return {
@@ -275,8 +346,9 @@ export async function adminAdjustPoints(
     throw new MinigameError('INVALID_INPUT', 'Enter a whole number of points');
   }
   const note = typeof rawNote === 'string' ? rawNote.trim().slice(0, 200) : '';
+  const settings = await getMinigameSettings();
 
-  const balance = await db.transaction(async (tx) => {
+  const { balance, promos } = await db.transaction(async (tx) => {
     const [user] = await tx
       .select({ id: usersTable.id })
       .from(usersTable)
@@ -294,7 +366,8 @@ export async function adminAdjustPoints(
       note: note || null,
       createdBy: adminUserId,
     });
-    return current + delta;
+    const promos = await issueMilestonePromos(tx, userId, settings.rewardValidDays);
+    return { balance: current + delta, promos };
   });
 
   void (async () => {
@@ -311,7 +384,14 @@ export async function adminAdjustPoints(
     );
   })().catch((error) => console.warn('[notify] points notification failed', error));
 
-  return { userId, balance };
+  for (const promo of promos) {
+    void (async () => {
+      const [user] = await db.select({ telegramId: usersTable.telegramId }).from(usersTable).where(eq(usersTable.id, userId)).limit(1);
+      notifyUser(user?.telegramId, `🎁 Накоплено ${promo.milestone.toLocaleString('ru-RU')} очков! Промокод на скидку 25%: <b>${escapeHtml(promo.code)}</b>`);
+    })().catch((error) => console.warn('[notify] milestone promo notification failed', error));
+  }
+
+  return { userId, balance, promos };
 }
 
 export async function cardStatsLast7Days() {
