@@ -1,5 +1,6 @@
 import {
   findAdminRewards,
+  findPointPromos,
   GAME_TITLES,
   getMinigameSettings,
   getMinigameStats,
@@ -28,6 +29,7 @@ import { useState } from "react";
 const TABS = [
   { id: "check", label: "Проверить код" },
   { id: "list", label: "Все награды" },
+  { id: "promos", label: "Промокоды 25K" },
   { id: "points", label: "Очки игроков" },
   { id: "settings", label: "Настройки" },
 ] as const;
@@ -65,6 +67,7 @@ export default function AdminRewards() {
       </div>
       {tab === "check" && <CheckTab />}
       {tab === "list" && <ListTab />}
+      {tab === "promos" && <PromoTab />}
       {tab === "points" && <PointsTab />}
       {tab === "settings" && <SettingsTab />}
     </div>
@@ -240,6 +243,51 @@ function ListTab() {
       {query.isLoading && <LoaderCircle className="size-6 animate-spin text-accent" />}
       {query.data?.length === 0 && <p className="text-sm text-fg-3">Пусто.</p>}
       {query.data?.map((reward) => <RewardRow key={reward.id} reward={reward} />)}
+    </div>
+  );
+}
+
+function PromoRow({ reward }: { reward: AdminReward }) {
+  return (
+    <div className="rounded-xl border border-accent/25 bg-app-elevated p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-mono text-lg font-bold tracking-widest text-accent">{reward.code}</p>
+          <p className="mt-1 text-base font-semibold">{reward.label}</p>
+          <p className="text-xs text-fg-3">Порог: {reward.score.toLocaleString("ru-RU")} очков · скидка {reward.rewardValue}%</p>
+        </div>
+        <span className={clsx("shrink-0 rounded-md px-2 py-1 text-[12px] font-semibold", STATUS_STYLE[reward.status])}>
+          {REWARD_STATUS_LABELS[reward.status]}
+        </span>
+      </div>
+      <p className="mt-2 text-sm text-white/80">{userLabel(reward.user)}</p>
+      <p className="mt-1 text-xs text-fg-3">
+        Выдан {formatClub(reward.createdAt, { day: "numeric", month: "short" })} · действует до {formatClub(reward.expiresAt, { day: "numeric", month: "short" })}
+        {reward.usedAt && ` · использован ${formatClub(reward.usedAt, { day: "numeric", month: "short" })}`}
+      </p>
+    </div>
+  );
+}
+
+function PromoTab() {
+  const [status, setStatus] = useState<RewardStatus | "all">("active");
+  const query = useQuery({
+    queryKey: ["admin", "point-promos", status],
+    queryFn: () => findPointPromos({ status: status === "all" ? undefined : status }),
+  });
+  const filters: Array<[RewardStatus | "all", string]> = [["active", "Активные"], ["used", "Использованные"], ["expired", "Истёкшие"], ["all", "Все"]];
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-fg-3">Одноразовые коды на скидку 25% выдаются автоматически за каждые 25 000 накопленных очков. Применение — в счёте записи.</p>
+      <div className="flex flex-wrap gap-2">
+        {filters.map(([id, label]) => (
+          <button key={id} type="button" onClick={() => setStatus(id)} className={clsx("rounded-md px-2.5 py-1.5 text-xs", status === id ? "bg-white/15 text-white" : "text-fg-3")}>{label}</button>
+        ))}
+      </div>
+      {query.isLoading && <LoaderCircle className="size-6 animate-spin text-accent" />}
+      {query.isError && <p className="text-sm text-[#ff9db0]">{query.error.message}</p>}
+      {query.data?.length === 0 && <p className="text-sm text-fg-3">Промокодов нет.</p>}
+      {query.data?.map((reward) => <PromoRow key={reward.id} reward={reward} />)}
     </div>
   );
 }

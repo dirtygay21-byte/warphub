@@ -3,8 +3,8 @@ import { s3Url } from "@/utils/s3utils";
 import clsx from "clsx";
 import { useEffect, useRef } from "react";
 import { oswald } from "../helpers";
-import { drawSprite } from "../pixel/pixel";
-import { ART_H, ART_W, cardArt } from "../pixel/fantasy";
+import { drawGameImage, gameImage } from "../pixel/assets";
+import { ART_H, ART_W } from "../pixel/fantasy";
 import { RARITY_STYLE } from "./rarity";
 
 // ---------------------------------------------------------------------------
@@ -123,9 +123,25 @@ export function CardArt({ card, className, locked }: { card: CardDef; className?
   useEffect(() => {
     const ctx = ref.current?.getContext("2d");
     if (!ctx) return;
-    ctx.imageSmoothingEnabled = false;
-    (BACKDROPS[card.faction] ?? BACKDROPS.wild!)(ctx);
-    drawSprite(ctx, cardArt(card.id), 0, 0, locked ? { tint: "#050505" } : { glowAlpha: 0.3 });
+    const src = `/games/aos/${card.id}.png`;
+    const image = gameImage(src);
+    const render = () => {
+      if (!image.complete || image.naturalWidth === 0) return;
+      ctx.clearRect(0, 0, ART_W, ART_H);
+      ctx.imageSmoothingEnabled = false;
+      (BACKDROPS[card.faction] ?? BACKDROPS.wild!)(ctx);
+      const scale = Math.min((ART_W - 4) / image.naturalWidth, (ART_H - 6) / image.naturalHeight);
+      const width = Math.max(1, Math.round(image.naturalWidth * scale));
+      const height = Math.max(1, Math.round(image.naturalHeight * scale));
+      drawGameImage(ctx, src, Math.round((ART_W - width) / 2), ART_H - 2 - height, {
+        width,
+        height,
+        tint: locked ? "#050505" : undefined,
+      });
+    };
+    render();
+    image.addEventListener("load", render);
+    return () => image.removeEventListener("load", render);
   }, [card, locked]);
   return (
     <canvas

@@ -10,6 +10,7 @@ import {
 import { reservationsTable } from '../../db/schema/reservations';
 import { servicesTable } from '../../db/schema/services';
 import { minigameRewardsTable } from '../../db/schema/minigames';
+import { pointPromoCodesTable } from '../../db/schema/point-promos';
 import { normalizeRewardCode } from '../minigames/rules';
 import { armyRentalPriceFor, basePriceFor, paymentStatus, roundMoney, servicePricingDefaults, totalWithDiscounts, validateManualDiscount, type PricingDiscountInput } from './rules';
 
@@ -291,6 +292,31 @@ export async function applyRewardDiscount(reservationId: string, rawCode: string
   const code = normalizeRewardCode(rawCode);
   return db.transaction(async (tx) => {
     const reservation = await lockReservation(tx, reservationId);
+    const [promo] = await tx.select().from(pointPromoCodesTable).where(and(
+      eq(pointPromoCodesTable.code, code),
+      eq(pointPromoCodesTable.userId, reservation.userId),
+    )).limit(1).for('update');
+    if (promo) {
+      if (promo.usedAt) throw new PricingError('REWARD_USED', 'Промокод уже использован');
+      if (promo.expiresAt.getTime() <= Date.now()) throw new PricingError('REWARD_EXPIRED', 'Срок действия промокода истёк');
+      await createReservationPricingIfMissing(tx, reservation);
+      await tx.insert(reservationDiscountsTable).values({
+        reservationId,
+        kind: 'reward',
+        percent: promo.percent,
+        amount: null,
+        rewardId: null,
+        note: promo.label,
+        createdBy: adminUserId,
+      });
+      const [used] = await tx.update(pointPromoCodesTable).set({ usedAt: new Date(), usedBy: adminUserId }).where(and(
+        eq(pointPromoCodesTable.id, promo.id),
+        isNull(pointPromoCodesTable.usedAt),
+      )).returning();
+      if (!used) throw new PricingError('REWARD_USED', 'Промокод уже использован');
+      await recalculateReservationTotal(tx, reservationId);
+      return getReservationPricing(reservationId, tx);
+    }
     const [reward] = await tx.select().from(minigameRewardsTable).where(and(
       eq(minigameRewardsTable.code, code),
       eq(minigameRewardsTable.userId, reservation.userId),

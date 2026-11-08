@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
-import { fighterFaction, fighterFrame, type Pose } from "./pixel/factions";
-import { drawPuddle, drawSprite, seeded } from "./pixel/pixel";
+import { fighterFaction, fighterFrame, type Faction } from "./pixel/factions";
+import { drawPuddle, seeded } from "./pixel/pixel";
+import { drawGameImage } from "./pixel/assets";
 
 /** Виртуальный размер арены (пиксели рисунка) */
 const W = 132;
@@ -39,6 +40,25 @@ const EFFECT: Record<string, { color: string; core: string }> = {
 };
 
 const FIRE_RANGED = new Set(["storm_huntress", "gear_sage", "ember_witch", "ash_cultist"]);
+const FACTION_IMAGE: Record<Faction, string> = {
+  order: "/games/space-marine.png",
+  horde: "/games/ork-horde.png",
+  swarm: "/games/tyranid-warrior.png",
+};
+const FIGHTER_IMAGE: Record<string, string> = {
+  iron_captain: "/games/fighters/iron_captain.png",
+  storm_huntress: "/games/fighters/storm_huntress.png",
+  scrap_brute: "/games/fighters/scrap_brute.png",
+  gear_sage: "/games/fighters/gear_sage.png",
+  ember_witch: "/games/fighters/ember_witch.png",
+  gate_warden: "/games/fighters/gate_warden.png",
+  hive_reaper: "/games/fighters/hive_reaper.png",
+  fallen_knight: "/games/fighters/fallen_knight.png",
+  war_drone: "/games/fighters/war_drone.png",
+  fang_chief: "/games/fighters/fang_chief.png",
+  ash_cultist: "/games/fighters/ash_cultist.png",
+  plague_hulk: "/games/fighters/plague_hulk.png",
+};
 
 export function BattleArena({
   playerId,
@@ -175,27 +195,22 @@ export function BattleArena({
         a.lungeT = Math.max(0, a.lungeT - dt * 2.2);
         a.hurtT = Math.max(0, a.hurtT - dt * 3);
         a.enterT = Math.max(0, a.enterT - dt * 1.6);
-        let pose: Pose = Math.floor(t * 1.6) % 2 === 0 ? "idle" : "idle2";
         let offset = 0;
         if (a.lungeT > 0) {
-          pose = a.lungeT > 0.35 ? "attack" : pose;
           offset = Math.sin(a.lungeT * Math.PI) * 10;
         }
         if (a.hurtT > 0) {
-          pose = "hurt";
           offset = -Math.sin(a.hurtT * Math.PI) * 4 + (Math.floor(t * 40) % 2 ? 1 : -1);
         }
         offset += a.enterT * 70;
-        const s = fighterFrame(a.id, pose);
         const x = flip ? baseX - offset : baseX + offset;
         ctx.globalAlpha = 0.4;
         ctx.fillStyle = "#000";
         ctx.fillRect(Math.round(x + 8), GROUND, 20, 1);
         ctx.globalAlpha = 1;
-        drawSprite(ctx, s, x, GROUND - s.h + 1, {
+        drawGameImage(ctx, FIGHTER_IMAGE[a.id] ?? FACTION_IMAGE[fighterFaction(a.id)], x, GROUND - 48, {
           flip,
           tint: a.hurtT > 0.82 ? "#ffffff" : undefined,
-          glowAlpha: 0.28,
         });
       };
       drawActor(player.current, PLAYER_X, false);

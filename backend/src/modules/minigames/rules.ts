@@ -141,6 +141,9 @@ export type AttackResult = {
   unsaved: number;
   damage: number;
   defenderWoundsLeft: number;
+  blocked?: boolean;
+  guaranteed?: boolean;
+  selfDamage?: number;
 };
 
 export function resolveAttack(
@@ -148,22 +151,23 @@ export function resolveAttack(
   defender: Fighter,
   defenderWounds: number,
   rng: Rng,
+  options: { guaranteed?: boolean; blocked?: boolean } = {},
 ): AttackResult {
-  const hitRolls = Array.from({ length: attacker.attacks }, () => rollD6(rng));
-  const hits = hitRolls.filter((roll) => success(roll, attacker.skill)).length;
+  const guaranteed = options.guaranteed ?? false;
+  const blocked = options.blocked ?? false;
+  const hitRolls = blocked ? [] : Array.from({ length: attacker.attacks }, () => rollD6(rng));
+  const hits = blocked ? 0 : guaranteed ? attacker.attacks : hitRolls.filter((roll) => success(roll, attacker.skill)).length;
 
   const wTarget = woundTarget(attacker.strength, defender.toughness);
-  const woundRolls = Array.from({ length: hits }, () => rollD6(rng));
-  const wounds = woundRolls.filter((roll) => success(roll, wTarget)).length;
+  const woundRolls = blocked ? [] : Array.from({ length: hits }, () => rollD6(rng));
+  const wounds = blocked ? 0 : guaranteed ? hits : woundRolls.filter((roll) => success(roll, wTarget)).length;
 
   const sTarget = saveTarget(defender.save, attacker.ap);
-  const saveRolls =
-    sTarget === null ? [] : Array.from({ length: wounds }, () => rollD6(rng));
-  const saved =
-    sTarget === null
-      ? 0
-      : saveRolls.filter((roll) => roll !== 1 && roll >= sTarget).length;
-  const unsaved = wounds - saved;
+  const saveRolls = blocked || guaranteed || sTarget === null ? [] : Array.from({ length: wounds }, () => rollD6(rng));
+  const saved = blocked || guaranteed || sTarget === null
+    ? 0
+    : saveRolls.filter((roll) => roll !== 1 && roll >= sTarget).length;
+  const unsaved = blocked ? 0 : wounds - saved;
   const damage = Math.min(defenderWounds, unsaved * attacker.damage);
 
   return {
@@ -180,6 +184,8 @@ export function resolveAttack(
     unsaved,
     damage,
     defenderWoundsLeft: defenderWounds - damage,
+    blocked,
+    guaranteed,
   };
 }
 
@@ -197,11 +203,21 @@ export type DiceBattleState = {
   finished: boolean;
   /** Игрок погиб */
   lost: boolean;
+  /** D6 инициативы; null — выбор ещё не сделан */
+  initiativeRoll?: number | null;
+  /** true — игрок угадал чётность и ходит первым */
+  playerStarts?: boolean | null;
+  /** Кто выполняет следующее действие */
+  turn?: 'player' | 'enemy';
+  /** Ультимативная атака уже использована */
+  usedUlt?: boolean;
+  /** Сторона, выбравшая защиту до следующей атаки */
+  defense?: 'player' | 'enemy' | null;
 };
 
 export type DiceExchange = {
   round: number;
-  playerAttack: AttackResult;
+  playerAttack: AttackResult | null;
   enemyAttack: AttackResult | null;
   opponentDefeated: boolean;
   playerDefeated: boolean;
@@ -210,6 +226,11 @@ export type DiceExchange = {
   /** Следующий противник, если текущий побеждён */
   nextOpponentId: string | null;
   healed: number;
+  action?: 'initiative' | 'attack' | 'defend' | 'risk' | 'ult';
+  blocked?: boolean;
+  selfDamage?: number;
+  initiativeRoll?: number;
+  playerStarts?: boolean;
 };
 
 /** Противник с учётом усиления: +ран и +атак за каждые одержанные победы */
@@ -244,6 +265,11 @@ export function startDiceBattle(
     escalation: 0,
     finished: false,
     lost: false,
+    initiativeRoll: null,
+    playerStarts: null,
+    turn: 'player',
+    usedUlt: false,
+    defense: null,
   };
 }
 
@@ -308,6 +334,149 @@ export function playDiceExchange(
       round: next.round,
       playerAttack,
       enemyAttack,
+      opponentDefeated,
+      playerDefeated,
+      clutch,
+      nextOpponentId,
+      healed,
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Пошаговый бой: инициатива, защита, риск и ультимативная атака
+// ---------------------------------------------------------------------------
+
+export function resolveDiceInitiative(
+  state: DiceBattleState,
+  guess: 'even' | 'odd',
+  rng: Rng,
+): { state: DiceBattleState; exchange: DiceExchange } {
+  if (state.initiativeRoll != null) throw new Error('Initiative is already rolled');
+  const roll = rollD6(rng);
+  const playerStarts = (roll % 2 === 0) === (guess === 'even');
+  const next: DiceBattleState = {
+    ...state,
+    initiativeRoll: roll,
+    playerStarts,
+    turn: playerStarts ? 'player' : 'enemy',
+    defense: null,
+  };
+  return {
+    state: next,
+    exchange: {
+      round: next.round,
+      action: 'initiative',
+      initiativeRoll: roll,
+      playerStarts,
+      playerAttack: null,
+      enemyAttack: null,
+      opponentDefeated: false,
+      playerDefeated: false,
+      clutch: false,
+      nextOpponentId: null,
+      healed: 0,
+    },
+  };
+}
+
+export function playDiceTurn(
+  state: DiceBattleState,
+  action: 'attack' | 'defend' | 'risk' | 'ult',
+  players: Fighter[],
+  enemies: Fighter[],
+  params: DiceParams,
+  rng: Rng,
+): { state: DiceBattleState; exchange: DiceExchange } {
+  if (state.finished) throw new Error('Battle is finished');
+  if (state.initiativeRoll == null) throw new Error('Roll initiative first');
+  if (action === 'ult' && state.usedUlt) throw new Error('Ultimate attack is already used');
+
+  const actor = state.turn ?? 'player';
+  const player = players.find((f) => f.id === state.playerId)!;
+  const opponent = boostedEnemy(enemies.find((f) => f.id === state.opponentId)!, state.escalation, params);
+  const attacker = actor === 'player' ? player : opponent;
+  const defender = actor === 'player' ? opponent : player;
+  const defenderSide = actor === 'player' ? 'enemy' : 'player';
+  const next: DiceBattleState = { ...state, defeated: [...state.defeated], round: state.round + 1 };
+
+  if (action === 'defend') {
+    next.defense = actor;
+    next.turn = defenderSide;
+    return {
+      state: next,
+      exchange: {
+        round: next.round,
+        action,
+        playerAttack: null,
+        enemyAttack: null,
+        opponentDefeated: false,
+        playerDefeated: false,
+        clutch: false,
+        nextOpponentId: null,
+        healed: 0,
+      },
+    };
+  }
+
+  const guaranteed = state.round === 0 || action === 'ult';
+  const blocked = state.defense === defenderSide && !guaranteed;
+  const attack = resolveAttack(attacker, defender, actor === 'player' ? next.opponentWounds : next.playerWounds, rng, {
+    guaranteed,
+    blocked,
+  });
+  const selfDamage = action === 'risk' && !blocked && attack.hitRolls.includes(1) ? 1 : 0;
+  attack.selfDamage = selfDamage;
+
+  if (actor === 'player') {
+    next.opponentWounds = attack.defenderWoundsLeft;
+    next.playerWounds = Math.max(0, next.playerWounds - selfDamage);
+  } else {
+    next.playerWounds = attack.defenderWoundsLeft;
+    next.opponentWounds = Math.max(0, next.opponentWounds - selfDamage);
+  }
+  next.defense = null;
+  next.turn = defenderSide;
+  if (action === 'ult') next.usedUlt = true;
+
+  const opponentDefeated = next.opponentWounds <= 0;
+  const playerDefeated = next.playerWounds <= 0;
+  let clutch = false;
+  let nextOpponentId: string | null = null;
+  let healed = 0;
+
+  if (opponentDefeated) {
+    next.wins += 1;
+    next.defeated.push(opponent.id);
+    clutch = next.playerWounds <= Math.ceil(player.wounds * params.clutchThreshold);
+    if (clutch) next.clutchWins += 1;
+
+    const remaining = enemies.filter((f) => !next.defeated.includes(f.id));
+    const pool = remaining.length > 0 ? remaining : enemies;
+    const nextOpponent = pickRandom(pool, rng);
+    next.escalation = next.wins;
+    nextOpponentId = nextOpponent.id;
+    next.opponentId = nextOpponent.id;
+    next.opponentWounds = boostedEnemy(nextOpponent, next.escalation, params).wounds;
+
+    healed = Math.min(params.healAfterWin, player.wounds - next.playerWounds);
+    next.playerWounds += healed;
+  }
+
+  if (playerDefeated) {
+    next.finished = true;
+    next.lost = true;
+  }
+
+  return {
+    state: next,
+    exchange: {
+      round: next.round,
+      action,
+      blocked,
+      selfDamage,
+      playerAttack: actor === 'player' ? attack : null,
+      enemyAttack: actor === 'enemy' ? attack : null,
       opponentDefeated,
       playerDefeated,
       clutch,

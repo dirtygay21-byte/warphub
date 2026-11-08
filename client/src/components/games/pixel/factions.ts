@@ -609,12 +609,34 @@ function brokenPillar() {
   return p.finish();
 }
 
+function airBat() {
+  const p = new Painter(14, 10);
+  p.poly([[6, 4], [3, 1], [1, 1], [3, 5], [6, 7], [8, 7], [11, 5], [13, 1], [11, 1], [8, 4]], "chitin", 1);
+  p.ellipse(7, 5, 2, 2, "bone", 1);
+  p.px(8, 5, "bio").px(6, 5, "bio");
+  p.line(5, 7, 3, 9, "chitin", 1);
+  p.line(9, 7, 11, 9, "chitin", 1);
+  return p.finish();
+}
+
+function airMine() {
+  const p = new Painter(11, 13);
+  p.ellipse(5, 5, 4, 4, "chitin", 1);
+  p.ellipse(5, 5, 2, 2, "bio", 1);
+  for (const [x, y] of [[5, 0], [1, 3], [9, 3], [1, 8], [9, 8]] as const) p.line(x, y, 5, 5, "bone", 2);
+  p.line(3, 9, 1, 12, "chitin", 1);
+  p.line(7, 9, 9, 12, "chitin", 1);
+  return p.finish();
+}
+
 export const OBSTACLE_SPRITES = {
   trap: tankTrap(),
   bags: sandbags(),
   skulls: skullPile(),
   barrel: [fuelBarrel(0), fuelBarrel(1)] as const,
   pillar: brokenPillar(),
+  air_bat: airBat(),
+  air_mine: airMine(),
 };
 
 // ---------------------------------------------------------------------------

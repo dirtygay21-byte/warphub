@@ -47,8 +47,8 @@ function PointsChip({ value }: { value: number }) {
 function CardModal({ card, points, onClose }: { card: CardDef | null; points?: number; onClose: () => void }) {
   if (!card) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-[290px]" style={{ animation: "float-up 0.25s ease-out" }} onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-3 backdrop-blur-sm sm:p-6" onClick={onClose}>
+      <div className="w-full max-w-[580px]" style={{ animation: "float-up 0.25s ease-out" }} onClick={(e) => e.stopPropagation()}>
         <CardFace card={card} points={points} />
         <button
           type="button"
@@ -227,6 +227,8 @@ export default function CardsGame() {
   const balance = pack?.balance ?? state?.balance ?? 0;
   const packsLeft = pack ? pack.packsLeft : (state?.packsLeft ?? 0);
   const newCount = pack?.cards.filter((c) => c.isNew).length ?? 0;
+  const promoRemaining = state ? Math.max(0, state.nextPromoMilestone - state.lifetimePoints) : 0;
+  const promoProgress = state ? ((state.lifetimePoints % 25_000) / 25_000) * 100 : 0;
 
   return (
     <div className="min-h-full pb-10 text-white">
@@ -267,6 +269,21 @@ export default function CardsGame() {
               </span>
             </button>
 
+            <div className="mb-4 rounded-2xl border border-accent/25 bg-accent/5 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className={`uppercase text-accent ${oswald}`}>Промокод 25% за 25K</p>
+                <span className="shrink-0 text-xs text-fg-2">до {state.nextPromoMilestone.toLocaleString("ru-RU")}</span>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+                <div className="h-full rounded-full bg-accent" style={{ width: `${promoProgress}%` }} />
+              </div>
+              <p className="mt-2 text-xs text-fg-2">
+                {promoRemaining > 0
+                  ? `Ещё ${promoRemaining.toLocaleString("ru-RU")} очков до нового промокода. Считаются все заработанные очки, даже уже потраченные.`
+                  : "Новый промокод уже выдан и доступен в ваших наградах."}
+              </p>
+            </div>
+
             {(phase === "idle" || phase === "opening" || phase === "tearing") && (
               <div className="py-4">
                 {packsLeft > 0 ? (
@@ -303,9 +320,9 @@ export default function CardsGame() {
 
             {phase === "reveal" && pack && (
               <div>
-                <div className="grid grid-cols-6 gap-2.5">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
                   {pack.cards.map((card, i) => (
-                    <div key={i} className={clsx("col-span-2", pack.cards.length === 5 && i === 3 && "col-start-2")}>
+                    <div key={i} className={clsx(pack.cards.length % 2 === 1 && i === pack.cards.length - 1 && "col-span-2 mx-auto w-1/2")}>
                       <FlipCard
                         card={card}
                         index={i}
@@ -332,6 +349,17 @@ export default function CardsGame() {
                       очков · на счёте {pack.balance.toLocaleString("ru-RU")}
                       {newCount > 0 ? ` · новых карт: ${newCount}` : ""}
                     </p>
+                    {pack.promos.length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        {pack.promos.map((promo) => (
+                          <div key={promo.id} className="rounded-xl border border-accent/40 bg-black/30 p-3">
+                            <p className="text-xs uppercase tracking-widest text-accent">Промокод за {promo.milestone.toLocaleString("ru-RU")} очков</p>
+                            <p className={`mt-1 select-all text-2xl tracking-wider text-white ${oswald}`}>{promo.code}</p>
+                            <p className="text-xs text-fg-2">Скидка {promo.percent}% на счёт записи · одно применение</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     <div className="mt-4 grid grid-cols-2 gap-3">
                       {pack.packsLeft > 0 ? (
                         <PixelButton
@@ -394,6 +422,7 @@ export default function CardsGame() {
 export function CardCollection() {
   const cards = useCards();
   const [filter, setFilter] = useState<CardRarity | "all" | "owned">("all");
+  const [visibleCount, setVisibleCount] = useState(60);
   const [modal, setModal] = useState<CardDef | null>(null);
   const state = cards.data;
 
@@ -411,6 +440,7 @@ export function CardCollection() {
       );
   }, [state, filter]);
 
+  const visibleList = useMemo(() => list.slice(0, visibleCount), [list, visibleCount]);
   const owned = state ? Object.keys(state.collection).length : 0;
   const pointsOf = (r: CardRarity) => state?.rarities.find((x) => x.rarity === r)?.points;
 
@@ -419,7 +449,7 @@ export function CardCollection() {
       <GameTopBar title="Коллекция" back="/games/cards" right={state ? <div className="pr-2"><PointsChip value={state.balance} /></div> : undefined} />
       <div className="px-4">
         {cards.isLoading && (
-          <div className="grid grid-cols-3 gap-3 pt-4" aria-busy="true" aria-label="Загружаем коллекцию">
+          <div className="grid grid-cols-2 gap-3 pt-4 sm:grid-cols-3" aria-busy="true" aria-label="Загружаем коллекцию">
             {[0, 1, 2, 3, 4, 5].map((i) => (
               <Skeleton key={i} className="aspect-[3/4] rounded-xl" />
             ))}
@@ -460,7 +490,10 @@ export function CardCollection() {
                   <button
                     key={id}
                     type="button"
-                    onClick={() => setFilter(id)}
+                    onClick={() => {
+                      setFilter(id);
+                      setVisibleCount(60);
+                    }}
                     className={clsx(
                       "ds-press min-h-11 shrink-0 rounded-xl px-3.5 text-sm font-semibold",
                       filter === id ? "bg-accent text-accent-foreground" : "border border-white/[0.14] bg-app-elevated text-fg-2",
@@ -472,8 +505,8 @@ export function CardCollection() {
               )}
             </div>
 
-            <div className="mt-4 grid grid-cols-3 gap-2.5">
-              {list.map((card) => {
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {visibleList.map((card) => {
                 const count = state.collection[card.id];
                 return count ? (
                   <button key={card.id} type="button" onClick={() => setModal(card)} className="text-left">
@@ -494,6 +527,20 @@ export function CardCollection() {
                 );
               })}
             </div>
+            {list.length > 0 && (
+              <div className="mt-4 text-center">
+                <p className="text-xs text-fg-3">Показано {visibleList.length} из {list.length}</p>
+                {visibleCount < list.length && (
+                  <button
+                    type="button"
+                    onClick={() => setVisibleCount((count) => count + 60)}
+                    className="mt-2 min-h-11 w-full rounded-xl border border-white/15 bg-app-elevated px-4 text-sm font-semibold text-white"
+                  >
+                    Показать ещё {Math.min(60, list.length - visibleCount)}
+                  </button>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>
