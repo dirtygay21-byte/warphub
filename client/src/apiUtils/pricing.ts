@@ -9,8 +9,16 @@ export type ServicePrice = {
   title: string | null;
   billingMode: BillingMode;
   unitPrice: number;
+  armyRentalPricePer1000: number;
   thirdGameDiscountPercent: number;
   effectiveFrom: string | null;
+};
+
+export type PublicServicePricing = {
+  serviceId: number;
+  billingMode: BillingMode;
+  unitPrice: number;
+  armyRentalPricePer1000: number;
 };
 
 export type ReservationDiscount = {
@@ -38,6 +46,9 @@ export type ReservationPricing = {
   billingMode: BillingMode;
   unitPrice: number;
   baseAmount: number;
+  armyRentalPoints: number;
+  armyRentalPricePer1000: number;
+  armyRentalAmount: number;
   totalAmount: number;
   paidAmount: number;
   remainingAmount: number;
@@ -59,6 +70,9 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   other: "Другое",
 };
 
+export const getServicePricing = (serviceId: number) =>
+  apiRequest<PublicServicePricing>(`/services/${serviceId}/pricing`);
+
 export const getAdminServicePrices = () =>
   apiRequest<ServicePrice[]>("/admin/pricing/services");
 
@@ -67,6 +81,7 @@ export const saveAdminServicePrice = (
   payload: {
     billingMode: BillingMode;
     unitPrice: number;
+    armyRentalPricePer1000?: number;
     thirdGameDiscountPercent?: number;
   },
 ) =>

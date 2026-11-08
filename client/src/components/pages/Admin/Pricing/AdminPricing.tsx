@@ -13,12 +13,15 @@ const inputClass =
   "mt-1.5 min-h-11 w-full rounded-xl border border-white/10 bg-field px-3 py-2.5 text-sm text-white outline-none transition-colors focus:border-accent/60";
 
 const TRAINING_SLUGS = new Set(["wh_group_training", "wh_solo_training"]);
+const WARHAMMER_SLUGS = new Set(["wh_game", ...TRAINING_SLUGS]);
 
 function ServicePriceCard({ service }: { service: ServicePrice }) {
   const queryClient = useQueryClient();
   const isTraining = TRAINING_SLUGS.has(service.slug);
+  const isWarhammer = WARHAMMER_SLUGS.has(service.slug);
   const [billingMode, setBillingMode] = useState<BillingMode>(service.billingMode);
   const [unitPrice, setUnitPrice] = useState(String(service.unitPrice));
+  const [armyRentalPrice, setArmyRentalPrice] = useState(String(service.armyRentalPricePer1000));
   const [thirdDiscount, setThirdDiscount] = useState(String(service.thirdGameDiscountPercent));
 
   const save = useMutation({
@@ -27,20 +30,24 @@ function ServicePriceCard({ service }: { service: ServicePrice }) {
       saveAdminServicePrice(service.id, {
         billingMode,
         unitPrice: Number(unitPrice),
+        ...(isWarhammer ? { armyRentalPricePer1000: Number(armyRentalPrice) } : {}),
         ...(isTraining ? { thirdGameDiscountPercent: Number(thirdDiscount) } : {}),
       }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-service-prices"] }),
   });
 
   const price = Number(unitPrice);
+  const rentalPrice = Number(armyRentalPrice);
   const third = Number(thirdDiscount);
   const invalid =
     !Number.isFinite(price) ||
     price < 0 ||
+    (isWarhammer && (!Number.isFinite(rentalPrice) || rentalPrice < 0)) ||
     (isTraining && (!Number.isFinite(third) || third < 0 || third > 100));
   const unchanged =
     price === service.unitPrice &&
     billingMode === service.billingMode &&
+    (!isWarhammer || rentalPrice === service.armyRentalPricePer1000) &&
     (!isTraining || third === service.thirdGameDiscountPercent);
 
   const submit = (event: FormEvent) => {
@@ -63,7 +70,7 @@ function ServicePriceCard({ service }: { service: ServicePrice }) {
         </span>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         <label className="text-xs font-medium text-fg-2">
           Модель расчёта
           <select
@@ -89,6 +96,21 @@ function ServicePriceCard({ service }: { service: ServicePrice }) {
             required
           />
         </label>
+        {isWarhammer && (
+          <label className="text-xs font-medium text-fg-2">
+            Аренда армии, ₽ / 1000 очков
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              inputMode="decimal"
+              value={armyRentalPrice}
+              onChange={(event) => setArmyRentalPrice(event.target.value)}
+              className={inputClass}
+              required
+            />
+          </label>
+        )}
         {isTraining ? (
           <label className="text-xs font-medium text-fg-2">
             Скидка на каждую третью, %
@@ -104,11 +126,11 @@ function ServicePriceCard({ service }: { service: ServicePrice }) {
               required
             />
           </label>
-        ) : (
+        ) : !isWarhammer ? (
           <p className="self-end pb-2 text-xs leading-5 text-fg-3">
             Скидки за членство и мини‑игры добавляются в счёте записи.
           </p>
-        )}
+        ) : null}
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
@@ -116,6 +138,7 @@ function ServicePriceCard({ service }: { service: ServicePrice }) {
           {billingMode === "per_guest" && "Итог = цена × число гостей."}
           {billingMode === "per_table" && "Итог = фиксированная цена за бронирование."}
           {billingMode === "per_pair" && "Итог = цена × число пар; нечётный гость считается как пара."}
+          {isWarhammer && ` Аренда = очки × ${armyRentalPrice || "0"} / 1000.`}
         </p>
         <button
           type="submit"
@@ -170,7 +193,7 @@ export default function AdminPricing() {
       <div className="grid gap-4 xl:grid-cols-2">
         {query.data?.map((service) => (
           <ServicePriceCard
-            key={`${service.id}:${service.billingMode}:${service.unitPrice}:${service.thirdGameDiscountPercent}`}
+            key={`${service.id}:${service.billingMode}:${service.unitPrice}:${service.armyRentalPricePer1000}:${service.thirdGameDiscountPercent}`}
             service={service}
           />
         ))}

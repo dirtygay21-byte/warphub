@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import {
+  armyRentalPriceFor,
   basePriceFor,
   paymentStatus,
   roundMoney,
@@ -21,6 +22,20 @@ describe('pricing: базовая стоимость', () => {
     expect(basePriceFor('per_guest', 99.99, 3)).toBe(299.97);
     expect(basePriceFor('per_pair', 0, 0)).toBe(0);
     expect(roundMoney(1.005)).toBe(1.01);
+  });
+});
+
+describe('pricing: аренда армии', () => {
+  test('1000 очков = 1000 ₽ по стандарту, произвольные очки считаются линейно', () => {
+    expect(armyRentalPriceFor(1000, 1000)).toBe(1000);
+    expect(armyRentalPriceFor(1500, 1000)).toBe(1500);
+    expect(armyRentalPriceFor(500, 1000)).toBe(500);
+    expect(armyRentalPriceFor(0, 1000)).toBe(0);
+  });
+
+  test('тариф редактируется за 1000 очков, включая дробные значения', () => {
+    expect(armyRentalPriceFor(1500, 500)).toBe(750);
+    expect(armyRentalPriceFor(333, 1000.5)).toBe(333.17);
   });
 });
 

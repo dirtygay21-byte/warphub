@@ -278,6 +278,7 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
         serviceId: params.serviceId,
         billingMode: body.billingMode,
         unitPrice: body.unitPrice,
+        armyRentalPricePer1000: body.armyRentalPricePer1000,
         thirdGameDiscountPercent: body.thirdGameDiscountPercent,
         createdBy: user.id,
       });
@@ -294,6 +295,7 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
         t.Literal(pricingBillingModes[2]),
       ]),
       unitPrice: t.Number({ minimum: 0 }),
+      armyRentalPricePer1000: t.Optional(t.Number({ minimum: 0 })),
       thirdGameDiscountPercent: t.Optional(t.Number({ minimum: 0, maximum: 100 })),
     }),
     detail: { tags: ['Admin'], summary: 'Сохранить новый тариф услуги; старые записи не пересчитываются' },

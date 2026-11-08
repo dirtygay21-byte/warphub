@@ -17,6 +17,10 @@ export function basePriceFor(mode: PricingBillingMode, unitPrice: number, partyS
   return roundMoney(unitPrice * guests);
 }
 
+export function armyRentalPriceFor(points: number, pricePer1000: number): number {
+  return roundMoney(Math.max(0, points) * Math.max(0, pricePer1000) / 1000);
+}
+
 /** Percent discounts are sequential; fixed discounts are subtracted afterwards in the same order. */
 export function totalWithDiscounts(baseAmount: number, discounts: PricingDiscountInput[]): number {
   return roundMoney(discounts.reduce((total, discount) => {

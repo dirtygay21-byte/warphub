@@ -41,7 +41,7 @@ const paintDetails = { faction: 'Orks', model: 'Boyz', paintSource: 'own', needs
 const trainingDetails = { game: 'kt', army: 'Pathfinders', experienceLevel: 'player' };
 
 const T: Record<string, string> = {};
-const IDS = { admin: 777, player: 8801, other: 8802, raceTraining: 8803 };
+const IDS = { admin: 777, player: 8801, other: 8802, raceTraining: 8803, rent40: 8804, rentKt: 8805, rentCustom: 8806 };
 let trainingServiceId = 0;
 let paintingServiceId = 0;
 let tableId = 0;
@@ -109,6 +109,9 @@ describe('pricing: тарифы и создание записей', () => {
     const services = await api('GET', '/services');
     expect(services.status).toBe(200);
     expect(services.json.some((item: any) => item.id === trainingServiceId)).toBe(true);
+    const publicPrice = await api('GET', `/services/${trainingServiceId}/pricing`);
+    expect(publicPrice.status).toBe(200);
+    expect(publicPrice.json).toMatchObject({ serviceId: trainingServiceId, billingMode: 'per_table', unitPrice: 1000, armyRentalPricePer1000: 1000 });
   });
 
   test('pool: цена за гостя сохраняется в записи', async () => {
@@ -165,6 +168,72 @@ describe('pricing: тарифы и создание записей', () => {
     const pricing = await Promise.all(responses.map((item) => api('GET', `/admin/reservations/${item.json.id}/pricing`, T.admin)));
     expect(pricing.map((item) => item.json.totalAmount).sort((a, b) => a - b)).toEqual([500, 1000, 1000]);
     expect(pricing.flatMap((item) => item.json.discounts).filter((item) => item.kind === 'training')).toHaveLength(1);
+  });
+
+  test('аренда 1500 очков добавляет 1500 ₽ и входит в сумму до скидок', async () => {
+    const rentalTable = Number(sql(`insert into tables (name, category) values ('E2E аренда 1500', 'wh') returning id`));
+    const created = await api('POST', '/reservations', T.rent40, {
+      serviceId: trainingServiceId,
+      tableId: rentalTable,
+      startsAt: local('15:00'),
+      partySize: 1,
+      seatClubArmyOptions: [true],
+      details: { game: '40k', army: 'Orks', points: 1500, experienceLevel: 'player' },
+    });
+    expect(created.status).toBe(200);
+    reservation.rent40 = created.json.id;
+    const priced = await api('GET', `/admin/reservations/${reservation.rent40}/pricing`, T.admin);
+    expect(priced.json).toMatchObject({
+      baseAmount: 1000,
+      armyRentalPoints: 1500,
+      armyRentalPricePer1000: 1000,
+      armyRentalAmount: 1500,
+      totalAmount: 2500,
+    });
+    const discounted = await api('POST', `/admin/reservations/${reservation.rent40}/discounts`, T.admin, {
+      kind: 'membership', percent: 10, note: 'Членство с арендой',
+    });
+    expect(discounted.json.totalAmount).toBe(2250);
+  });
+
+  test('Kill Team использует базовые 1000 очков аренды', async () => {
+    const rentalTable = Number(sql(`insert into tables (name, category) values ('E2E аренда KT', 'small') returning id`));
+    const created = await api('POST', '/reservations', T.rentKt, {
+      serviceId: trainingServiceId,
+      tableId: rentalTable,
+      startsAt: local('15:00'),
+      partySize: 1,
+      seatClubArmyOptions: [true],
+      details: { game: 'kt', army: 'Pathfinders', experienceLevel: 'player' },
+    });
+    expect(created.status).toBe(200);
+    const priced = await api('GET', `/admin/reservations/${created.json.id}/pricing`, T.admin);
+    expect(priced.json).toMatchObject({ baseAmount: 1000, armyRentalPoints: 1000, armyRentalAmount: 1000, totalAmount: 2000 });
+  });
+
+  test('редактируемый тариф аренды применяется к новым записям и не меняет старые', async () => {
+    expect((await api('PUT', `/admin/pricing/services/${trainingServiceId}`, T.admin, {
+      billingMode: 'per_table', unitPrice: 1000, thirdGameDiscountPercent: 50, armyRentalPricePer1000: 500,
+    })).status).toBe(200);
+    const publicPrice = await api('GET', `/services/${trainingServiceId}/pricing`);
+    expect(publicPrice.json.armyRentalPricePer1000).toBe(500);
+
+    const rentalTable = Number(sql(`insert into tables (name, category) values ('E2E аренда по тарифу 500', 'wh') returning id`));
+    const created = await api('POST', '/reservations', T.rentCustom, {
+      serviceId: trainingServiceId,
+      tableId: rentalTable,
+      startsAt: local('16:00'),
+      partySize: 1,
+      seatClubArmyOptions: [true],
+      details: { game: '40k', army: 'Orks', points: 1500, experienceLevel: 'player' },
+    });
+    expect(created.status).toBe(200);
+    const priced = await api('GET', `/admin/reservations/${created.json.id}/pricing`, T.admin);
+    expect(priced.json).toMatchObject({ armyRentalPoints: 1500, armyRentalPricePer1000: 500, armyRentalAmount: 750, totalAmount: 1750 });
+    const old = await api('GET', `/admin/reservations/${reservation.rent40}/pricing`, T.admin);
+    expect(old.json.armyRentalPricePer1000).toBe(1000);
+    expect(old.json.armyRentalAmount).toBe(1500);
+    expect(old.json.totalAmount).toBe(2250);
   });
 });
 

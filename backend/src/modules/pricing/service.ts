@@ -11,7 +11,7 @@ import { reservationsTable } from '../../db/schema/reservations';
 import { servicesTable } from '../../db/schema/services';
 import { minigameRewardsTable } from '../../db/schema/minigames';
 import { normalizeRewardCode } from '../minigames/rules';
-import { basePriceFor, paymentStatus, roundMoney, totalWithDiscounts, validateManualDiscount, type PricingDiscountInput } from './rules';
+import { armyRentalPriceFor, basePriceFor, paymentStatus, roundMoney, totalWithDiscounts, validateManualDiscount, type PricingDiscountInput } from './rules';
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 type Executor = typeof db | Tx;
@@ -19,6 +19,8 @@ type ReservationRow = typeof reservationsTable.$inferSelect;
 
 const TRAINING_SERVICE_SLUGS = new Set(['wh_group_training', 'wh_solo_training']);
 const DEFAULT_THIRD_TRAINING_DISCOUNT = 50;
+export const DEFAULT_ARMY_RENTAL_PRICE_PER_1000 = 1000;
+const DEFAULT_KILL_TEAM_RENTAL_POINTS = 1000;
 const ACTIVE_RESERVATION_STATUSES = ['pending', 'confirmed'] as const;
 
 export class PricingError extends Error {
@@ -51,6 +53,7 @@ export async function listServicePrices() {
       title: service.title,
       billingMode: (price?.billingMode ?? 'per_guest') as PricingBillingMode,
       unitPrice: price?.unitPrice ?? 0,
+      armyRentalPricePer1000: price?.armyRentalPricePer1000 ?? DEFAULT_ARMY_RENTAL_PRICE_PER_1000,
       thirdGameDiscountPercent: price?.thirdGameDiscountPercent ?? (isTraining ? DEFAULT_THIRD_TRAINING_DISCOUNT : 0),
       effectiveFrom: price?.effectiveFrom?.toISOString() ?? null,
     };
@@ -61,12 +64,17 @@ export async function upsertServicePrice(input: {
   serviceId: number;
   billingMode: PricingBillingMode;
   unitPrice: number;
+  armyRentalPricePer1000?: number;
   thirdGameDiscountPercent?: number;
   effectiveFrom?: Date;
   createdBy: string;
 }) {
   if (!Number.isFinite(input.unitPrice) || input.unitPrice < 0) {
     throw new PricingError('INVALID_PRICE', 'Цена должна быть неотрицательным числом');
+  }
+  const armyRentalPricePer1000 = input.armyRentalPricePer1000 ?? DEFAULT_ARMY_RENTAL_PRICE_PER_1000;
+  if (!Number.isFinite(armyRentalPricePer1000) || armyRentalPricePer1000 < 0) {
+    throw new PricingError('INVALID_ARMY_RENTAL_PRICE', 'Цена аренды армии за 1000 очков должна быть неотрицательным числом');
   }
   const [service] = await db.select({ id: servicesTable.id, slug: servicesTable.slug }).from(servicesTable).where(eq(servicesTable.id, input.serviceId)).limit(1);
   if (!service) throw new PricingError('SERVICE_NOT_FOUND', 'Услуга не найдена');
@@ -78,11 +86,19 @@ export async function upsertServicePrice(input: {
     serviceId: input.serviceId,
     billingMode: input.billingMode,
     unitPrice: roundMoney(input.unitPrice),
+    armyRentalPricePer1000: roundMoney(armyRentalPricePer1000),
     thirdGameDiscountPercent: third,
     effectiveFrom: input.effectiveFrom ?? new Date(),
     createdBy: input.createdBy,
   }).returning();
   return created!;
+}
+
+function rentedArmyPoints(reservation: ReservationRow): number {
+  const rentedSeats = reservation.seatClubArmyOptions?.filter(Boolean).length ?? 0;
+  if (rentedSeats === 0 || reservation.details?.kind !== 'wh_player') return 0;
+  const pointsPerArmy = reservation.details.points ?? DEFAULT_KILL_TEAM_RENTAL_POINTS;
+  return pointsPerArmy * rentedSeats;
 }
 
 export async function createReservationPricing(
@@ -97,12 +113,18 @@ export async function createReservationPricing(
   const billingMode = (price?.billingMode ?? 'per_guest') as PricingBillingMode;
   const unitPrice = price?.unitPrice ?? 0;
   const baseAmount = basePriceFor(billingMode, unitPrice, reservation.partySize ?? 1);
+  const armyRentalPoints = rentedArmyPoints(reservation);
+  const armyRentalPricePer1000 = price?.armyRentalPricePer1000 ?? DEFAULT_ARMY_RENTAL_PRICE_PER_1000;
+  const armyRentalAmount = armyRentalPriceFor(armyRentalPoints, armyRentalPricePer1000);
   await tx.insert(reservationPricingTable).values({
     reservationId: reservation.id,
     billingMode,
     unitPrice,
     baseAmount,
-    totalAmount: baseAmount,
+    armyRentalPoints,
+    armyRentalPricePer1000,
+    armyRentalAmount,
+    totalAmount: roundMoney(baseAmount + armyRentalAmount),
   });
 
   const isTraining = TRAINING_SERVICE_SLUGS.has(service?.slug ?? '');
@@ -161,7 +183,7 @@ async function recalculateReservationTotal(tx: Tx, reservationId: string) {
   const [pricing] = await tx.select().from(reservationPricingTable).where(eq(reservationPricingTable.reservationId, reservationId)).limit(1).for('update');
   if (!pricing) throw new PricingError('PRICING_NOT_FOUND', 'Цена записи не найдена');
   const discounts = await tx.select().from(reservationDiscountsTable).where(eq(reservationDiscountsTable.reservationId, reservationId)).orderBy(asc(reservationDiscountsTable.createdAt), asc(reservationDiscountsTable.id));
-  const totalAmount = totalWithDiscounts(pricing.baseAmount, discounts);
+  const totalAmount = totalWithDiscounts(roundMoney(pricing.baseAmount + pricing.armyRentalAmount), discounts);
   if (totalAmount + 0.0001 < pricing.paidAmount) {
     throw new PricingError('DISCOUNT_BELOW_PAID', 'Скидка не может уменьшить сумму ниже уже внесённой оплаты');
   }

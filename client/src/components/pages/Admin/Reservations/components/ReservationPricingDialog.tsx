@@ -223,17 +223,23 @@ export function ReservationPricingDialog({
                     {STATUS_LABELS[pricing.status]}
                   </span>
                 </div>
+                {pricing.armyRentalPoints > 0 && (
+                  <p className="mb-3 rounded-xl bg-accent/5 px-3 py-2 text-xs leading-5 text-fg-2">
+                    Аренда армии: {pricing.armyRentalPoints} очков × {money.format(pricing.armyRentalPricePer1000)} / 1000 = {money.format(pricing.armyRentalAmount)}
+                  </p>
+                )}
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {[
-                    ["База", pricing.baseAmount],
-                    ["Итого", pricing.totalAmount],
-                    ["Оплачено", pricing.paidAmount],
-                    ["Остаток", pricing.remainingAmount],
-                  ].map(([label, value], index) => (
-                    <div key={String(label)} className={clsx("rounded-xl bg-field p-3", index === 3 && "bg-accent/10")}>
-                      <p className="text-xs text-fg-3">{label}</p>
-                      <p className={clsx("mt-1 text-lg font-semibold", index === 3 ? "text-accent" : "text-white")}>
-                        {money.format(Number(value))}
+                    { label: "Услуга", value: pricing.baseAmount },
+                    ...(pricing.armyRentalPoints > 0 ? [{ label: `Аренда · ${pricing.armyRentalPoints} оч.`, value: pricing.armyRentalAmount }] : []),
+                    { label: "Итого", value: pricing.totalAmount },
+                    { label: "Оплачено", value: pricing.paidAmount },
+                    { label: "Остаток", value: pricing.remainingAmount, highlight: true },
+                  ].map((item) => (
+                    <div key={item.label} className={clsx("rounded-xl bg-field p-3", item.highlight && "bg-accent/10")}>
+                      <p className="text-xs text-fg-3">{item.label}</p>
+                      <p className={clsx("mt-1 text-lg font-semibold", item.highlight ? "text-accent" : "text-white")}>
+                        {money.format(item.value)}
                       </p>
                     </div>
                   ))}
