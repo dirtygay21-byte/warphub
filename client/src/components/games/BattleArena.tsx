@@ -34,16 +34,16 @@ const newActor = (id: string, enter = false): Actor => ({
 });
 
 const EFFECT: Record<string, { color: string; core: string }> = {
-  order: { color: "#ecfe46", core: "#fbffc4" },
-  horde: { color: "#ff8a1f", core: "#ffd27a" },
-  swarm: { color: "#ff3d9a", core: "#ffc4e1" },
+  imperium: { color: "#ecfe46", core: "#fbffc4" },
+  xenos: { color: "#ff8a1f", core: "#ffd27a" },
+  chaos: { color: "#ff3d9a", core: "#ffc4e1" },
 };
 
 const FIRE_RANGED = new Set(["storm_huntress", "gear_sage", "ember_witch", "ash_cultist"]);
 const FACTION_IMAGE: Record<Faction, string> = {
-  order: "/games/space-marine.png",
-  horde: "/games/ork-horde.png",
-  swarm: "/games/tyranid-warrior.png",
+  imperium: "/games/space-marine.png",
+  xenos: "/games/ork-horde.png",
+  chaos: "/games/tyranid-warrior.png",
 };
 const FIGHTER_IMAGE: Record<string, string> = {
   iron_captain: "/games/fighters/iron_captain.png",
@@ -102,7 +102,7 @@ export function BattleArena({
         for (let i = 0; i < 10; i++) {
           particles.current.push({
             x, y: GROUND - 22, vx: (Math.random() - 0.5) * 70, vy: -Math.random() * 60, life: 0.6,
-            color: fighterFaction(actor.id) === "swarm" ? "#ff3d9a" : fighterFaction(actor.id) === "horde" ? "#506b31" : "#b4c1cb",
+            color: fighterFaction(actor.id) === "chaos" ? "#ff3d9a" : fighterFaction(actor.id) === "xenos" ? "#506b31" : "#b4c1cb",
           });
         }
         break;

@@ -1,9 +1,10 @@
 import {
   diceAction,
   startMinigame,
-  type AttackResult,
   type BattleView,
+  type DiceActionResolution,
   type DiceExchange,
+  type DicePools,
   type Fighter,
   type FinishResult,
   type MinigameInfo,
@@ -30,13 +31,16 @@ const PIPS: Record<number, number[]> = {
   6: [0, 2, 3, 5, 6, 8],
 };
 
-function Die({ value, state }: { value: number; state: "ok" | "fail" | "rolling" }) {
+function Die({ value, state }: { value: number; state: "ok" | "fail" | "rolling" | "crit" | "used" | "blocked" }) {
   return (
     <div
       className={clsx(
-        "grid size-7 grid-cols-3 grid-rows-3 gap-[2px] rounded-md p-[4px] transition-colors",
+        "grid size-8 grid-cols-3 grid-rows-3 gap-[2px] rounded-md p-[4px] transition-colors",
         state === "ok" && "bg-accent shadow-[0_0_10px_rgb(236_254_70/0.55)]",
+        state === "crit" && "bg-[#ff8a1f] shadow-[0_0_12px_rgb(255_138_31/0.55)]",
         state === "fail" && "border border-white/10 bg-white/5",
+        state === "used" && "border border-white/10 bg-white/5 opacity-35",
+        state === "blocked" && "border border-sky-300 bg-sky-400/30 shadow-[0_0_12px_rgb(56_189_248/0.45)]",
         state === "rolling" && "animate-[dice-tumble_0.35s_linear_infinite] bg-[#ebe2c8]",
       )}
       aria-label={`Кубик ${value}`}
@@ -46,7 +50,7 @@ function Die({ value, state }: { value: number; state: "ok" | "fail" | "rolling"
           key={i}
           className={clsx(
             "rounded-[1px]",
-            PIPS[value]?.includes(i) && (state === "fail" ? "bg-white/35" : "bg-[#111110]"),
+            PIPS[value]?.includes(i) && ((state === "fail" || state === "used") ? "bg-white/35" : "bg-[#111110]"),
           )}
         />
       ))}
@@ -55,113 +59,91 @@ function Die({ value, state }: { value: number; state: "ok" | "fail" | "rolling"
 }
 
 const ok = (roll: number, target: number) => roll !== 1 && (roll === 6 || roll >= target);
-const saved = (roll: number, target: number) => roll !== 1 && roll >= target;
 
 // ---------------------------------------------------------------------------
-// Разбор атаки по шагам: Попадание → Ранение → Спасбросок → Урон
+// Видимые пулы кубов обеих сторон
 // ---------------------------------------------------------------------------
 
-function AttackSteps({
-  title,
-  attack,
-  shown,
-  attackerName,
-  defenderName,
-  faction,
+function actionCaption(action: DiceActionResolution) {
+  if (action.action === "defend") {
+    if (action.blockedByRoll === null) return `Защита ${action.roll ?? "—"} · без блока`;
+    return `Защита ${action.roll} · ${action.roll === 6 ? "2 обычных блока или 1 критический" : "1 обычный блок"}`;
+  }
+  const kind = action.action === "ult" ? "Ульта" : action.critical ? "Критическая атака" : action.action === "risk" ? "Риск-атака" : "Атака";
+  const result = action.blocked ? `блок защитой ${action.blockedByRoll}` : `урон −${action.damage}`;
+  return `${kind} ${action.roll ?? "—"} · ${result}${action.guaranteed ? " · гарантированно" : ""}${action.selfDamage ? ` · себе −${action.selfDamage}` : ""}`;
+}
+
+function PoolSide({
+  pool,
+  fighter,
+  action,
 }: {
-  title: string;
-  attack: AttackResult;
-  shown: number;
-  attackerName: string;
-  defenderName: string;
-  faction: Faction;
+  pool: DicePools["player"];
+  fighter: Fighter;
+  action: DiceActionResolution | null | undefined;
 }) {
-  const rows = [
-    {
-      label: `Попадание ${attack.hitTarget}+`,
-      rolls: attack.hitRolls,
-      good: (r: number) => ok(r, attack.hitTarget),
-      summary: `${attack.hits} из ${attack.hitRolls.length}`,
-    },
-    {
-      label: `Ранение ${attack.woundTarget}+`,
-      rolls: attack.woundRolls,
-      good: (r: number) => ok(r, attack.woundTarget),
-      summary: `${attack.wounds} из ${attack.woundRolls.length}`,
-    },
-    {
-      label:
-        attack.saveTarget === null
-          ? `Спасбросок: нет — броня пробита`
-          : `Спасбросок ${attack.saveTarget}+ · ${defenderName}`,
-      rolls: attack.saveRolls,
-      good: (r: number) => attack.saveTarget === null || !saved(r, attack.saveTarget),
-      summary: `не спасено ${attack.unsaved}`,
-    },
-  ];
-
   return (
-    <div className={clsx("rounded-2xl border bg-app-elevated p-3", FACTION_BORDER[faction])}>
-      <p className={`mb-2 text-sm uppercase tracking-wide text-fg-2 ${oswald}`}>
-        {title} · <span className="text-white">{attackerName}</span>
-      </p>
-      <div className="space-y-2">
-        {attack.blocked && <p className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-sm text-fg-2">Атака заблокирована</p>}
-        {attack.selfDamage ? <p className="text-sm text-[#ff5a4a]">Риск: атакующий получает −{attack.selfDamage} раны</p> : null}
-        {!attack.blocked && rows.map((row, index) =>
-          index < shown ? (
-            <div key={row.label}>
-              <div className="flex items-center justify-between text-[12px] text-fg-3">
-                <span>{row.label}</span>
-                <span>{row.summary}</span>
-              </div>
-              <div className="mt-1 flex flex-wrap gap-1">
-                {row.rolls.length === 0 ? (
-                  <span className="text-[12px] text-fg-3">—</span>
-                ) : (
-                  row.rolls.map((roll, i) => (
-                    <Die key={i} value={roll} state={row.good(roll) ? "ok" : "fail"} />
-                  ))
-                )}
-              </div>
-            </div>
-          ) : index === shown ? (
-            <div key={row.label} className="flex gap-1">
-              {Array.from({ length: Math.max(1, Math.min(row.rolls.length, 6)) }, (_, i) => (
-                <Die key={i} value={((i * 5 + shown) % 6) + 1} state="rolling" />
-              ))}
-            </div>
-          ) : null,
-        )}
-        {!attack.blocked && shown >= 4 && (
-          <p
-            className={clsx(
-              `pt-1 text-lg font-semibold ${oswald}`,
-              attack.damage > 0 ? "text-[#ff5a4a]" : "text-fg-3",
-            )}
-          >
-            {attack.damage > 0 ? `Урон −${attack.damage}` : "Без урона"}
-          </p>
-        )}
+    <div className="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/20 p-2">
+      <div className="flex items-center justify-between gap-2">
+        <p className={`truncate text-sm uppercase text-white ${oswald}`}>{fighter.name}</p>
+        <span className="shrink-0 text-[11px] text-fg-3">А{fighter.skill}+ · З{fighter.save}+</span>
       </div>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {pool.length === 0 && <span className="text-xs text-fg-3">Новый пул…</span>}
+        {pool.map((entry, index) => {
+          const selected = action?.rollIndex === index;
+          const state = selected
+            ? action?.blocked
+              ? "blocked"
+              : action?.critical
+                ? "crit"
+                : "ok"
+            : entry.used
+              ? "used"
+              : entry.value === 6
+                ? "crit"
+                : ok(entry.value, fighter.skill)
+                  ? "ok"
+                  : "fail";
+          return <Die key={index} value={entry.value} state={state} />;
+        })}
+      </div>
+      {action && <p className="mt-2 text-[12px] leading-snug text-fg-2">{actionCaption(action)}</p>}
     </div>
   );
 }
 
-const FACTION_BORDER: Record<Faction, string> = {
-  order: "border-accent/25",
-  horde: "border-[#c97a3a]/30",
-  swarm: "border-[#ff3d9a]/30",
-};
+function DicePoolPanel({
+  pools,
+  player,
+  opponent,
+  playerAction,
+  enemyAction,
+}: {
+  pools: DicePools;
+  player: Fighter;
+  opponent: Fighter;
+  playerAction?: DiceActionResolution | null;
+  enemyAction?: DiceActionResolution | null;
+}) {
+  return (
+    <div className="flex gap-2">
+      <PoolSide pool={pools.player} fighter={player} action={playerAction} />
+      <PoolSide pool={pools.enemy} fighter={opponent} action={enemyAction} />
+    </div>
+  );
+}
+
 const FACTION_TEXT: Record<Faction, string> = {
-  order: "text-accent",
-  horde: "text-[#e0954f]",
-  swarm: "text-[#ff6fb3]",
+  imperium: "text-accent",
+  xenos: "text-[#e0954f]",
+  chaos: "text-[#ff6fb3]",
 };
 const FACTION_PIP: Record<Faction, string> = {
-  order: "bg-accent",
-  horde: "bg-[#e0954f]",
-  swarm: "bg-[#ff3d9a]",
+  imperium: "bg-accent",
+  xenos: "bg-[#e0954f]",
+  chaos: "bg-[#ff3d9a]",
 };
 
 function FighterPanel({ fighter, wounds, align }: { fighter: Fighter; wounds: number; align: "left" | "right" }) {
@@ -176,7 +158,7 @@ function FighterPanel({ fighter, wounds, align }: { fighter: Fighter; wounds: nu
         ))}
       </div>
       <p className="mt-1 text-[12px] leading-relaxed text-fg-3">
-        А{fighter.attacks} · П{fighter.skill}+ · С{fighter.strength} · Ст{fighter.toughness} · ПБ{fighter.ap} · У{fighter.damage} · Сп{fighter.save}+
+        Кубы {fighter.attacks} · Урон {fighter.damage} · Крит {fighter.critDamage ?? fighter.damage + 1} · Навык {fighter.skill}+ · Защита {fighter.save}+
       </p>
     </div>
   );
@@ -215,26 +197,31 @@ export default function DiceGame() {
     setArenaEvent({ ...e, id: eventId.current } as ArenaEvent);
   };
 
-  const totalSteps = exchange ? 4 + (exchange.enemyAttack ? 4 : 0) : 0;
+  const actionSequence = exchange
+    ? ([exchange.playerAction, exchange.enemyAction].filter(Boolean) as DiceActionResolution[])
+    : [];
+  const totalSteps = actionSequence.length * 2;
 
-  // пошаговое раскрытие бросков + анимации на арене
+  // Выбранный куб и результат каждого действия подсвечиваются по очереди.
   useEffect(() => {
     if (phase !== "animating" || !exchange) return;
     const timers: number[] = [];
     const later = (fn: () => void, ms: number) => timers.push(window.setTimeout(fn, ms));
-    const pa = exchange.playerAttack;
-    const ea = exchange.enemyAttack;
+    const action = actionSequence[Math.floor(step / 2)];
 
     later(() => {
-      if (pa && step === 0) emit("pa", { type: "attack", side: "player" });
-      if (pa && step === 4) emit("ph", pa.damage > 0 ? { type: "hurt", side: "enemy", damage: pa.damage } : { type: "miss", side: "enemy" });
-      if (ea && step === (pa ? 4 : 0)) emit("ea", { type: "attack", side: "enemy" });
+      if (action && action.action !== "defend") {
+        if (step % 2 === 0) emit(`${action.side}-attack-${step}`, { type: "attack", side: action.side });
+        if (step % 2 === 1) {
+          const side = action.side === "player" ? "enemy" : "player";
+          emit(`${action.side}-result-${step}`, action.damage > 0 ? { type: "hurt", side, damage: action.damage } : { type: "miss", side });
+        }
+      }
 
       if (step < totalSteps) {
         later(() => setStep((s) => s + 1), 430);
         return;
       }
-      if (ea) emit("eh", ea.damage > 0 ? { type: "hurt", side: "player", damage: ea.damage } : { type: "miss", side: "player" });
       const pending = pendingRef.current;
       if (!pending) return;
       let delay = 500;
@@ -287,7 +274,7 @@ export default function DiceGame() {
     try {
       const res = await diceAction(sessionId, guess === "even" ? "initiative_even" : "initiative_odd");
       setBattle(res.battle);
-      if (res.exchange?.enemyAttack) {
+      if (res.exchange?.enemyAction) {
         pendingRef.current = { battle: res.battle, result: res.result };
         emitted.current = new Set();
         setExchange(res.exchange);
@@ -302,7 +289,7 @@ export default function DiceGame() {
     }
   };
 
-  const act = async (action: "attack" | "defend" | "risk" | "ult" | "roll" | "stop") => {
+  const act = async (action: "attack" | "critical" | "defend" | "risk" | "ult" | "roll" | "stop") => {
     if (!sessionId) return;
     setPhase("sending");
     setBanner(null);
@@ -356,8 +343,12 @@ export default function DiceGame() {
   }
 
   const inBattle = battle && (phase === "battle" || phase === "animating" || phase === "sending");
-  const playerAttack = exchange?.playerAttack;
-  const enemyAttack = exchange?.enemyAttack;
+  const playerAction = exchange?.playerAction;
+  const enemyAction = exchange?.enemyAction;
+  const displayPools = phase === "animating" && exchange?.pools ? exchange.pools : battle?.pools;
+  const canNormal = !!battle && (!battle.firstStrikeDone || !!battle.pools?.player.some((entry) => !entry.used && entry.value !== 6 && ok(entry.value, battle.player.skill)));
+  const canCritical = !!battle?.pools?.player.some((entry) => !entry.used && entry.value === 6);
+  const canDefend = !!battle?.pools?.player.some((entry) => !entry.used);
 
   return (
     <div className="min-h-full pb-10 text-white" onClick={skipAnimation}>
@@ -401,14 +392,11 @@ export default function DiceGame() {
             <div className="mt-5">
               <p className="text-sm text-fg-2">{game.description}</p>
               <ol className="mt-3 list-decimal space-y-1 pl-5 text-xs text-fg-3">
-                <li>Попадание: каждая атака — кубик, нужен навык бойца или больше.</li>
-                <li>Ранение: сила против стойкости определяет нужное значение.</li>
-                <li>Спасбросок: враг защищается бронёй; пробитие её ухудшает.</li>
-                <li>Урон: каждое неспасённое ранение снимает раны.</li>
+                <li>Обычная атака расходует успех по навыку; критическая — шестёрку и наносит больше урона.</li>
+                <li>Защита снимает один обычный успех. Защита на 6 снимает два обычных или один критический.</li>
+                <li>Риск добавляет куб, но единица на нём ранит атакующего. Ульта доступна один раз за попытку.</li>
+                <li>Оба пула всегда видимы, все броски и выбор кубов делает сервер.</li>
               </ol>
-              <p className="mt-2 text-xs text-fg-3">
-                Единица — всегда промах, шестёрка — всегда успех. Все броски делает сервер.
-              </p>
               <p className={`mb-2 mt-5 text-sm uppercase tracking-widest text-fg-3 ${oswald}`}>Награды</p>
               <TierList game={game} />
             </div>
@@ -447,20 +435,23 @@ export default function DiceGame() {
               </PixelButton>
             ) : (
               <div className="space-y-2">
-                <PixelButton className="w-full" onClick={() => act("attack")} disabled={phase === "sending"}>
+                <PixelButton className="w-full" onClick={() => act("attack")} disabled={phase === "sending" || !canNormal}>
                   {phase === "sending" ? <LoaderCircle className="size-5 animate-spin" /> : <Swords className="size-5" />}
-                  {battle.wins > 0 && exchange?.opponentDefeated ? "Сражаться дальше" : "Атаковать"}
+                  {battle.wins > 0 && exchange?.opponentDefeated ? "Сражаться дальше" : "Атака · обычная"}
                 </PixelButton>
                 <div className="grid grid-cols-2 gap-2">
-                  <PixelButton variant="dark" onClick={() => act("defend")} disabled={phase === "sending"}>
+                  <PixelButton variant="dark" onClick={() => act("critical")} disabled={phase === "sending" || !canCritical}>
+                    Критическая
+                  </PixelButton>
+                  <PixelButton variant="dark" onClick={() => act("defend")} disabled={phase === "sending" || !canDefend}>
                     Защита
                   </PixelButton>
-                  <PixelButton variant="dark" onClick={() => act("risk")} disabled={phase === "sending"}>
-                    Риск +1 атака
-                  </PixelButton>
                 </div>
+                <PixelButton variant="dark" className="w-full" onClick={() => act("risk")} disabled={phase === "sending" || !canDefend}>
+                  Риск +1 куб
+                </PixelButton>
                 <PixelButton variant="dark" className="w-full" onClick={() => act("ult")} disabled={phase === "sending" || battle.usedUlt}>
-                  {battle.usedUlt ? "Ульта использована" : "Ульта · гарантированный удар"}
+                  {battle.usedUlt ? "Ульта использована" : "Ульта · 1 раз за попытку"}
                 </PixelButton>
                 {battle.wins > 0 && current ? (
                   <PixelButton variant="dark" className="w-full" onClick={() => act("stop")} disabled={phase === "sending"}>
@@ -486,26 +477,15 @@ export default function DiceGame() {
             При поражении награда за эту попытку сгорает.
           </p>
 
-          {exchange && playerAttack && (
-            <div className="mt-4 space-y-2">
-              <AttackSteps
-                title="Ваш ход"
-                attack={playerAttack}
-                shown={phase === "animating" ? Math.min(step, 4) : 4}
-                attackerName={battle.player.name}
-                defenderName="враг"
-                faction={fighterFaction(battle.player.sprite)}
+          {displayPools && (
+            <div className="mt-4">
+              <DicePoolPanel
+                pools={displayPools}
+                player={battle.player}
+                opponent={battle.opponent}
+                playerAction={phase === "animating" ? playerAction : null}
+                enemyAction={phase === "animating" ? enemyAction : null}
               />
-              {enemyAttack && (phase !== "animating" || step > 4) && (
-                <AttackSteps
-                  title="Ответ врага"
-                  attack={enemyAttack}
-                  shown={phase === "animating" ? Math.min(step - 4, 4) : 4}
-                  attackerName={exchange.opponentDefeated ? "враг" : battle.opponent.name}
-                  defenderName={battle.player.name}
-                  faction={fighterFaction(enemyAttack.attacker)}
-                />
-              )}
             </div>
           )}
 

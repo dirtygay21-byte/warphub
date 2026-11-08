@@ -717,6 +717,7 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
           t.Literal('initiative_even'),
           t.Literal('initiative_odd'),
           t.Literal('attack'),
+          t.Literal('critical'),
           t.Literal('defend'),
           t.Literal('risk'),
           t.Literal('ult'),

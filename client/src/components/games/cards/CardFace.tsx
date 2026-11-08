@@ -4,119 +4,32 @@ import clsx from "clsx";
 import { useEffect, useRef } from "react";
 import { oswald } from "../helpers";
 import { drawGameImage, gameImage } from "../pixel/assets";
-import { ART_H, ART_W } from "../pixel/fantasy";
 import { RARITY_STYLE } from "./rarity";
 
 // ---------------------------------------------------------------------------
-// Фон иллюстрации по фракции (пиксельный, 44×40)
+// Иллюстрация в исходном разрешении с контрастным нейтральным фоном
 // ---------------------------------------------------------------------------
 
-function bands(ctx: CanvasRenderingContext2D, colors: string[], to: number) {
-  const h = Math.ceil(to / colors.length);
-  colors.forEach((c, i) => {
-    ctx.fillStyle = c;
-    ctx.fillRect(0, i * h, ART_W, h);
-  });
-}
+const ART_W = 96;
+const ART_H = 88;
 
-const BACKDROPS: Record<string, (ctx: CanvasRenderingContext2D) => void> = {
-  dawn: (ctx) => {
-    bands(ctx, ["#2a1430", "#4a1c34", "#7a2a2a", "#b2481f", "#e0822a", "#f0b44a"], 34);
-    ctx.fillStyle = "#ffe48a";
-    for (let y = -6; y <= 6; y++) {
-      const half = Math.round(Math.sqrt(36 - y * y));
-      ctx.fillRect(22 - half, 26 + y, half * 2, 1);
-    }
-    ctx.globalAlpha = 0.25;
-    for (const [x0, x1] of [[2, 10], [14, 18], [26, 30], [34, 42]]) ctx.fillRect(x0, 0, x1 - x0, 34);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = "#3a2618";
-    ctx.fillRect(0, 34, ART_W, 6);
-  },
-  clans: (ctx) => {
-    bands(ctx, ["#101012", "#16161a", "#1e1e23", "#26262c"], 34);
-    ctx.fillStyle = "#2f2f36";
-    for (let i = 0; i < 22; i++) ctx.fillRect(i, 34 - i, 1, i);
-    for (let i = 0; i < 16; i++) ctx.fillRect(43 - i, 34 - i * 1.2, 1, i * 1.2);
-    ctx.fillStyle = "#ff8a1f";
-    ctx.globalAlpha = 0.35;
-    ctx.fillRect(0, 30, ART_W, 4);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = "#3a3a42";
-    ctx.fillRect(0, 34, ART_W, 6);
-    ctx.fillStyle = "#ffcf4a";
-    for (const [x, y] of [[6, 12], [37, 9], [30, 18]]) ctx.fillRect(x, y, 1, 1);
-  },
-  grove: (ctx) => {
-    bands(ctx, ["#07130b", "#0b1d10", "#102716", "#16321b"], 34);
-    ctx.fillStyle = "#0a1a0d";
-    for (const x of [3, 12, 33, 40]) ctx.fillRect(x, 0, 3, 34);
-    ctx.fillStyle = "#c4ff8a";
-    for (const [x, y] of [[8, 9], [30, 6], [38, 20], [17, 15], [5, 25]]) ctx.fillRect(x, y, 1, 1);
-    ctx.fillStyle = "#1d2a14";
-    ctx.fillRect(0, 34, ART_W, 6);
-  },
-  restless: (ctx) => {
-    bands(ctx, ["#0b0f1a", "#111727", "#161d30", "#1c2333"], 34);
-    ctx.fillStyle = "#d8d4c4";
-    for (let y = -4; y <= 4; y++) {
-      const half = Math.round(Math.sqrt(16 - y * y));
-      ctx.fillRect(35 - half, 8 + y, half * 2, 1);
-    }
-    ctx.fillStyle = "#0b0f1a";
-    ctx.fillRect(36, 5, 3, 3);
-    ctx.fillStyle = "#262c3d";
-    for (const [x, h] of [[3, 7], [9, 5], [36, 6]]) {
-      ctx.fillRect(x, 34 - h, 4, h);
-      ctx.fillRect(x + 1, 33 - h, 2, 1);
-    }
-    ctx.globalAlpha = 0.2;
-    ctx.fillStyle = "#7af0dc";
-    ctx.fillRect(0, 31, ART_W, 3);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = "#151820";
-    ctx.fillRect(0, 34, ART_W, 6);
-  },
-  bog: (ctx) => {
-    bands(ctx, ["#10140c", "#161c10", "#1d2414", "#26301a"], 34);
-    ctx.fillStyle = "#33401f";
-    for (const x of [2, 5, 38, 41]) ctx.fillRect(x, 22 + (x % 3), 1, 12);
-    ctx.globalAlpha = 0.18;
-    ctx.fillStyle = "#a7c96a";
-    ctx.fillRect(0, 26, ART_W, 3);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = "#1d2414";
-    ctx.fillRect(0, 34, ART_W, 6);
-    ctx.fillStyle = "#33401f";
-    ctx.fillRect(4, 36, 10, 1);
-    ctx.fillRect(28, 37, 12, 1);
-  },
-  ash: (ctx) => {
-    bands(ctx, ["#120706", "#1f0b08", "#3a120a", "#5c1d0c"], 34);
-    ctx.fillStyle = "#ff8a1f";
-    for (const [x, y] of [[5, 20], [12, 8], [33, 14], [39, 26], [24, 4]]) ctx.fillRect(x, y, 1, 1);
-    ctx.globalAlpha = 0.25;
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, ART_W, 10);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = "#1b1414";
-    ctx.fillRect(0, 34, ART_W, 6);
-  },
-  wild: (ctx) => {
-    bands(ctx, ["#0d0b1a", "#15112a", "#1d1733", "#241d3a"], 34);
-    // молния варпа — лайм WarpHub
-    ctx.fillStyle = "#ecfe46";
-    const bolt = [[38, 0], [36, 4], [39, 6], [35, 12], [37, 13], [33, 19]];
-    for (let i = 0; i + 1 < bolt.length; i++) {
-      const [x0, y0] = bolt[i]!;
-      const [x1, y1] = bolt[i + 1]!;
-      const steps = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
-      for (let s = 0; s <= steps; s++) ctx.fillRect(Math.round(x0 + ((x1 - x0) * s) / steps), Math.round(y0 + ((y1 - y0) * s) / steps), 1, 1);
-    }
-    ctx.fillStyle = "#1a1820";
-    ctx.fillRect(0, 34, ART_W, 6);
-  },
-};
+function imageLuminance(image: HTMLImageElement) {
+  const sample = document.createElement("canvas");
+  sample.width = 32;
+  sample.height = 32;
+  const ctx = sample.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return 255;
+  ctx.drawImage(image, 0, 0, 32, 32);
+  const data = ctx.getImageData(0, 0, 32, 32).data;
+  let total = 0;
+  let count = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    if ((data[i + 3] ?? 0) < 40) continue;
+    total += ((data[i] ?? 0) + (data[i + 1] ?? 0) + (data[i + 2] ?? 0)) / 3;
+    count += 1;
+  }
+  return count ? total / count : 255;
+}
 
 export function CardArt({ card, className, locked }: { card: CardDef; className?: string; locked?: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -127,9 +40,13 @@ export function CardArt({ card, className, locked }: { card: CardDef; className?
     const image = gameImage(src);
     const render = () => {
       if (!image.complete || image.naturalWidth === 0) return;
+      const darkSprite = imageLuminance(image) < 105;
       ctx.clearRect(0, 0, ART_W, ART_H);
       ctx.imageSmoothingEnabled = false;
-      (BACKDROPS[card.faction] ?? BACKDROPS.wild!)(ctx);
+      ctx.fillStyle = darkSprite ? "#c9c2b2" : "#171a12";
+      ctx.fillRect(0, 0, ART_W, ART_H);
+      ctx.fillStyle = darkSprite ? "rgba(0,0,0,0.055)" : "rgba(236,254,70,0.055)";
+      for (let y = 0; y < ART_H; y += 8) ctx.fillRect(0, y, ART_W, 1);
       const scale = Math.min((ART_W - 4) / image.naturalWidth, (ART_H - 6) / image.naturalHeight);
       const width = Math.max(1, Math.round(image.naturalWidth * scale));
       const height = Math.max(1, Math.round(image.naturalHeight * scale));
