@@ -235,7 +235,7 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
     async ({ query: { disciplineId } }) => {
       try {
         return await db.query.servicesTable.findMany({
-          where: eq(servicesTable.disciplineId, disciplineId),
+          where: disciplineId === undefined ? undefined : eq(servicesTable.disciplineId, disciplineId),
           orderBy: asc(servicesTable.sortOrder),
         });
       } catch (error) {
@@ -245,7 +245,7 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
     },
     {
       query: t.Object({
-        disciplineId: t.Number({ description: 'ID дисциплины' }),
+        disciplineId: t.Optional(t.Number({ description: 'ID дисциплины; без него — все услуги' })),
       }),
     },
   )
