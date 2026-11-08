@@ -1,22 +1,17 @@
 import { getMyPoints, getMyRewards, type MinigameKey } from "@/apiUtils/minigames";
 import { RARITY_STYLE } from "./cards/rarity";
-import { cardArt } from "./pixel/fantasy";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Gift, Sparkles, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ErrorNote, GameTopBar, RewardCodeCard, TierStrip } from "./common";
 import { DsButton, Skeleton } from "@/components/ui/ds";
 import { errorText, useMinigames, oswald } from "./helpers";
-import { PixelSprite } from "./pixel/PixelSprite";
-import { eggSprite } from "./eggScene";
-import { fighterFrame, runnerFrame } from "./pixel/factions";
-import type { Sprite } from "./pixel/pixel";
 
-const ICONS: Record<MinigameKey, Sprite> = {
-  runner: runnerFrame(0),
-  dice: fighterFrame("iron_captain"),
-  egg: eggSprite(3, 1),
-  cards: cardArt("wild_ignarr"),
+const PREVIEW: Record<MinigameKey, { src: string; background: string; tag: string }> = {
+  runner: { src: "/games/ork-runner.png", background: "bg-[#c9c2b2]", tag: "Орки · Warhammer 40,000" },
+  dice: { src: "/games/fighters/iron_captain.png", background: "bg-[#171a12]", tag: "Империум · Ксеносы · Хаос" },
+  egg: { src: "/games/tyranid-warrior.png", background: "bg-[#c9c2b2]", tag: "Тираниды · Warhammer 40,000" },
+  cards: { src: "/games/aos/wild_ignarr.png", background: "bg-[#171a12]", tag: "Age of Sigmar · 261 карта" },
 };
 
 /** Цвет фракции в карточке игры */
@@ -25,13 +20,6 @@ const ACCENTS: Record<MinigameKey, string> = {
   dice: "from-[#ecfe46]/15",
   egg: "from-[#a3186a]/30",
   cards: "from-[#f5c542]/20",
-};
-
-const FACTION_TAG: Record<MinigameKey, string> = {
-  runner: "Ржавая Орда",
-  dice: "Орден против Орды и Роя",
-  egg: "Рой",
-  cards: "Коллекционные карты · фэнтези",
 };
 
 export default function GamesHub() {
@@ -57,8 +45,7 @@ export default function GamesHub() {
 
       <div className="px-4">
         <p className="text-sm text-fg-2">
-          Играйте и получайте скидки в клубе. За каждую игру — одна награда в неделю:
-          засчитывается лучший результат недели.
+          Получайте скидки в клубе: лучший результат недели даёт награду, а за каждые 25 000 накопленных очков карт — одноразовый промокод 25%.
         </p>
 
         <button
@@ -106,11 +93,11 @@ export default function GamesHub() {
                 onClick={() => navigate(`/games/${game.key}`)}
                 className="ds-press flex w-full items-center gap-4 p-4 text-left"
               >
-                <div className="flex size-20 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-black">
-                  <PixelSprite sprite={ICONS[game.key]} scale={game.key === "egg" ? 1.5 : 2.5} title={game.title} />
+                <div className={`flex size-20 shrink-0 items-center justify-center rounded-xl border border-white/10 p-1.5 ${PREVIEW[game.key].background}`}>
+                  <img src={PREVIEW[game.key].src} alt={game.title} className="size-full object-contain [image-rendering:pixelated]" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[12px] uppercase tracking-wider text-fg-3">{FACTION_TAG[game.key]}</p>
+                  <p className="text-[12px] uppercase tracking-wider text-fg-3">{PREVIEW[game.key].tag}</p>
                   <h2 className={`text-xl font-medium uppercase leading-tight ${oswald}`}>
                     {game.title}
                   </h2>
@@ -173,7 +160,7 @@ export function MyRewards() {
             <p className="text-xs uppercase tracking-widest text-fg-3">Очки на счёте</p>
             <p className={`text-4xl text-accent ${oswald}`}>{points.data.balance.toLocaleString("ru-RU")}</p>
             <p className="mt-1 text-xs text-fg-3">
-              Очки дают карты «Легенд Warp Hub». Администратор может списать их в счёт скидок и призов.
+              Очки начисляются за карты «Легенд Warp Hub». За каждые 25 000 накопленных очков выдаётся одноразовый промокод 25% на счёт записи.
             </p>
             {points.data.history.length > 0 && (
               <ul className="mt-3 space-y-1 text-xs text-fg-2">

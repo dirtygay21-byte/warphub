@@ -45,6 +45,8 @@ const FACTION_IMAGE: Record<Faction, string> = {
   xenos: "/games/ork-horde.png",
   chaos: "/games/tyranid-warrior.png",
 };
+// Эти исходники смотрят вправо; остальные — влево. По стороне арены это может требовать отражения.
+const RIGHT_FACING = new Set(["iron_captain", "ember_witch", "gate_warden"]);
 const FIGHTER_IMAGE: Record<string, string> = {
   iron_captain: "/games/fighters/iron_captain.png",
   storm_huntress: "/games/fighters/storm_huntress.png",
@@ -208,8 +210,10 @@ export function BattleArena({
         ctx.fillStyle = "#000";
         ctx.fillRect(Math.round(x + 8), GROUND, 20, 1);
         ctx.globalAlpha = 1;
+        const sourceFacesRight = RIGHT_FACING.has(a.id);
+        const shouldFlip = flip ? sourceFacesRight : !sourceFacesRight;
         drawGameImage(ctx, FIGHTER_IMAGE[a.id] ?? FACTION_IMAGE[fighterFaction(a.id)], x, GROUND - 48, {
-          flip,
+          flip: shouldFlip,
           tint: a.hurtT > 0.82 ? "#ffffff" : undefined,
         });
       };
