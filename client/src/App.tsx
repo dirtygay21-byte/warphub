@@ -11,6 +11,7 @@ import ContentManagment from "@/components/pages/Admin/ContentManagment";
 import AdminWarhammer from "@/components/pages/Admin/Warhammer/AdminWarhammer";
 import AdminDnd from "@/components/pages/Admin/Dnd/AdminDnd";
 import AdminRewards from "@/components/pages/Admin/Rewards/AdminRewards";
+import AdminPricing from "@/components/pages/Admin/Pricing/AdminPricing";
 import GamesHub, { MyRewards } from "@/components/games/GamesHub";
 import RunnerGame from "@/components/games/RunnerGame";
 import DiceGame from "@/components/games/DiceGame";
@@ -69,6 +70,7 @@ export default function App() {
               }
             >
               <Route index element={<AdminReservations />} />
+              <Route path="pricing" element={<AdminPricing />} />
               <Route path="content" element={<ContentManagment />} />
               <Route path="warhammer" element={<AdminWarhammer />} />
               <Route path="dnd" element={<AdminDnd />} />

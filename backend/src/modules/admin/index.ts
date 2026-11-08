@@ -62,6 +62,17 @@ import { findPlayers, listSupporters, setSupporter, SupporterError } from '../su
 import { createTableHold, deleteTableHold, HoldError, listTableHolds } from '../table-holds/service';
 import { createPartnerCard, deletePartnerCard, getPartnerShowcase, PartnerError, updatePartnerCard, updatePartnerSettings } from '../partners/service';
 import { fetchPartnerMetadata } from '../partners/metadata';
+import {
+  addReservationPayment,
+  applyManualDiscount,
+  applyRewardDiscount,
+  ensureReservationPricing,
+  listServicePrices,
+  PricingError,
+  removeManualDiscount,
+  upsertServicePrice,
+} from '../pricing/service';
+import { pricingBillingModes } from '../../db/schema/pricing';
 
 const dndGameBody = t.Object({
   title: t.Optional(t.String({ description: 'Название' })),
@@ -166,6 +177,13 @@ function mapPartnerError(error: PartnerError) {
   return status(error.code === 'NOT_FOUND' ? 404 : 400, { error: error.message, code: error.code });
 }
 
+function mapPricingError(error: PricingError) {
+  const notFound = ['SERVICE_NOT_FOUND', 'RESERVATION_NOT_FOUND', 'PRICING_NOT_FOUND', 'DISCOUNT_NOT_FOUND', 'REWARD_NOT_FOUND'];
+  const conflict = ['REWARD_USED', 'PAYMENT_EXCEEDED', 'DISCOUNT_BELOW_PAID', 'DISCOUNT_FORBIDDEN'];
+  const code = notFound.includes(error.code) ? 404 : conflict.includes(error.code) ? 409 : 400;
+  return status(code, { error: error.message, code: error.code });
+}
+
 function mapEventError(error: EventError) {
   switch (error.code) {
     case 'EVENT_NOT_FOUND':
@@ -251,6 +269,110 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       },
     },
   )
+  .get('/pricing/services', async () => listServicePrices(), {
+    detail: { tags: ['Admin'], summary: 'Тарифы всех услуг' },
+  })
+  .put('/pricing/services/:serviceId', async ({ params, body, user }) => {
+    try {
+      return await upsertServicePrice({
+        serviceId: params.serviceId,
+        billingMode: body.billingMode,
+        unitPrice: body.unitPrice,
+        armyRentalPricePer1000: body.armyRentalPricePer1000,
+        thirdGameDiscountPercent: body.thirdGameDiscountPercent,
+        createdBy: user.id,
+      });
+    } catch (error) {
+      if (error instanceof PricingError) return mapPricingError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    params: t.Object({ serviceId: t.Number() }),
+    body: t.Object({
+      billingMode: t.Union([
+        t.Literal(pricingBillingModes[0]),
+        t.Literal(pricingBillingModes[1]),
+        t.Literal(pricingBillingModes[2]),
+      ]),
+      unitPrice: t.Number({ minimum: 0 }),
+      armyRentalPricePer1000: t.Optional(t.Number({ minimum: 0 })),
+      thirdGameDiscountPercent: t.Optional(t.Number({ minimum: 0, maximum: 100 })),
+    }),
+    detail: { tags: ['Admin'], summary: 'Сохранить новый тариф услуги; старые записи не пересчитываются' },
+  })
+  .get('/reservations/:id/pricing', async ({ params }) => {
+    try {
+      return await ensureReservationPricing(params.id);
+    } catch (error) {
+      if (error instanceof PricingError) return mapPricingError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    detail: { tags: ['Admin'], summary: 'Стоимость записи, скидки, оплаты и остаток' },
+  })
+  .post('/reservations/:id/discounts', async ({ params, body, user }) => {
+    try {
+      return await applyManualDiscount(params.id, { ...body, createdBy: user.id });
+    } catch (error) {
+      if (error instanceof PricingError) return mapPricingError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    body: t.Object({
+      kind: t.Union([t.Literal('membership'), t.Literal('manual')]),
+      percent: t.Optional(t.Number({ minimum: 0, maximum: 100 })),
+      amount: t.Optional(t.Number({ minimum: 0 })),
+      note: t.String({ minLength: 1 }),
+    }),
+    detail: { tags: ['Admin'], summary: 'Добавить последовательную скидку за членство или ручную скидку' },
+  })
+  .post('/reservations/:id/reward', async ({ params, body, user }) => {
+    try {
+      return await applyRewardDiscount(params.id, body.code, user.id);
+    } catch (error) {
+      if (error instanceof PricingError) return mapPricingError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    body: t.Object({ code: t.String({ minLength: 1 }) }),
+    detail: { tags: ['Admin'], summary: 'Применить одноразовый код скидки за мини-игру владельца записи' },
+  })
+  .delete('/reservations/discounts/:discountId', async ({ params }) => {
+    try {
+      return await removeManualDiscount(params.discountId);
+    } catch (error) {
+      if (error instanceof PricingError) return mapPricingError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    params: t.Object({ discountId: t.String({ format: 'uuid' }) }),
+    detail: { tags: ['Admin'], summary: 'Удалить ручную скидку или скидку за членство' },
+  })
+  .post('/reservations/:id/payments', async ({ params, body, user }) => {
+    try {
+      return await addReservationPayment({
+        reservationId: params.id,
+        amount: body.amount,
+        method: body.method,
+        note: body.note,
+        createdBy: user.id,
+      });
+    } catch (error) {
+      if (error instanceof PricingError) return mapPricingError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    body: t.Object({
+      amount: t.Number({ exclusiveMinimum: 0 }),
+      method: t.Union([t.Literal('cash'), t.Literal('card'), t.Literal('transfer'), t.Literal('other')]),
+      note: t.Optional(t.String()),
+    }),
+    detail: { tags: ['Admin'], summary: 'Зафиксировать ручную оплату без превышения остатка' },
+  })
   .patch(
     '/reservations/:id/confirm',
     async ({ params }) => {

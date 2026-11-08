@@ -71,6 +71,7 @@ import {
 
 export { parseDateParam } from './rules';
 import { bookingNoticeText } from './notify-text';
+import { createReservationPricing } from '../pricing/service';
 
 const ACTIVE_RESERVATION_STATUSES = ['pending', 'confirmed'] as const;
 const CLUB_VISIT_SLUG = 'club_visit';
@@ -958,6 +959,7 @@ export async function createReservation(
         })
         .returning();
 
+      await createReservationPricing(tx, created!);
       return created!;
     });
 
@@ -1066,6 +1068,7 @@ export async function createReservation(
       })
       .returning();
 
+    await createReservationPricing(tx, created!);
     return {
       reservation: created!,
       joined: check.isJoin,

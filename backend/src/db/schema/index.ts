@@ -14,3 +14,4 @@ export * from './table-holds';
 export * from './supporters';
 export * from './dominatus';
 export * from './partners';
+export * from './pricing';

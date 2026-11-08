@@ -31,6 +31,7 @@ import { NotificationCheck } from "./components/NotificationCheck";
 import { ReservationsFilters } from "./components/ReservationsFilters";
 import { ReservationsPagination } from "./components/ReservationsPagination";
 import { ReservationsTable } from "./components/ReservationsTable";
+import { ReservationPricingDialog } from "./components/ReservationPricingDialog";
 import { StatusConfirmDialog } from "./components/StatusConfirmDialog";
 import {
   DEFAULT_PAGE_SIZE,
@@ -56,6 +57,8 @@ export default function AdminReservations() {
   // Изменения статусов
   const [pendingStatusAction, setPendingStatusAction] =
     useState<PendingStatusAction | null>(null);
+  const [pricingReservation, setPricingReservation] =
+    useState<AdminReservationRow | null>(null);
   const [extendHours, setExtendHours] = useState<number>(
     EXTEND_HOUR_OPTIONS[0]
   );
@@ -370,6 +373,7 @@ export default function AdminReservations() {
         <ReservationsTable
           data={rows}
           onStatusActionSelect={handleStatusActionSelect}
+          onPricingSelect={setPricingReservation}
         />
       </div>
 
@@ -442,6 +446,15 @@ export default function AdminReservations() {
               }
             />
           )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {pricingReservation && (
+          <ReservationPricingDialog
+            reservation={pricingReservation}
+            onClose={() => setPricingReservation(null)}
+          />
+        )}
       </AnimatePresence>
     </div>
   );

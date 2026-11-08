@@ -8,6 +8,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import clsx from "clsx";
+import { WalletCards } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { AdminReservationRow, StatusAction } from "../types";
 import { CopyUserId } from "./CopyUserId";
@@ -19,11 +20,13 @@ type ReservationsTableProps = {
     reservation: AdminReservationRow,
     action: StatusAction
   ) => void;
+  onPricingSelect: (reservation: AdminReservationRow) => void;
 };
 
 export function ReservationsTable({
   data,
   onStatusActionSelect,
+  onPricingSelect,
 }: ReservationsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([
     { id: "createdAt", desc: true },
@@ -114,12 +117,27 @@ export function ReservationsTable({
         },
       },
       {
+        id: "pricing",
+        header: "Счёт",
+        enableSorting: false,
+        cell: ({ row }) => (
+          <button
+            type="button"
+            onClick={() => onPricingSelect(row.original)}
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-3 py-2 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
+          >
+            <WalletCards className="size-4" />
+            Счёт
+          </button>
+        ),
+      },
+      {
         accessorKey: "createdAt",
         header: "Создана",
         cell: ({ getValue }) => formatReservationDateTime(getValue<string>()),
       },
     ],
-    [onStatusActionSelect]
+    [onPricingSelect, onStatusActionSelect]
   );
 
   const table = useReactTable({

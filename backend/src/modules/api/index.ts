@@ -43,6 +43,7 @@ import { getPlayerProgress } from '../progress/service';
 import { getCardsState, getPointsHistory, openPack } from '../minigames/cards';
 import { getNewsById, listPublishedNews } from '../news/service';
 import { getPartnerShowcase } from '../partners/service';
+import { currentServicePrice, DEFAULT_ARMY_RENTAL_PRICE_PER_1000 } from '../pricing/service';
 import { jwtPlugin } from '../../plugins/jwt-plugin';
 import { authMiddleware, findUserFromBearer } from '../../plugins/auth-middleware';
 import { db } from '../../db';
@@ -235,7 +236,7 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
     async ({ query: { disciplineId } }) => {
       try {
         return await db.query.servicesTable.findMany({
-          where: eq(servicesTable.disciplineId, disciplineId),
+          where: disciplineId === undefined ? undefined : eq(servicesTable.disciplineId, disciplineId),
           orderBy: asc(servicesTable.sortOrder),
         });
       } catch (error) {
@@ -245,10 +246,28 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
     },
     {
       query: t.Object({
-        disciplineId: t.Number({ description: 'ID дисциплины' }),
+        disciplineId: t.Optional(t.Number({ description: 'ID дисциплины; без него — все услуги' })),
       }),
     },
   )
+  .get('/services/:serviceId/pricing', async ({ params: { serviceId } }) => {
+    try {
+      const [service] = await db.select({ id: servicesTable.id }).from(servicesTable).where(eq(servicesTable.id, serviceId)).limit(1);
+      if (!service) return status(404, { error: 'Service not found' });
+      const price = await currentServicePrice(serviceId);
+      return {
+        serviceId,
+        billingMode: price?.billingMode ?? 'per_guest',
+        unitPrice: price?.unitPrice ?? 0,
+        armyRentalPricePer1000: price?.armyRentalPricePer1000 ?? DEFAULT_ARMY_RENTAL_PRICE_PER_1000,
+      };
+    } catch (error) {
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    params: t.Object({ serviceId: t.Number({ description: 'ID услуги' }) }),
+    detail: { tags: ['Booking'], summary: 'Публичный тариф услуги и аренды армии за 1000 очков' },
+  })
   .get(
     '/services/:serviceId',
     async ({ params: { serviceId } }) => {

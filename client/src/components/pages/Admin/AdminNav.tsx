@@ -10,6 +10,7 @@ import {
   KeyRound,
   Map as MapIcon,
   Newspaper,
+  RussianRuble,
   ShieldCheck,
   Swords,
   type LucideIcon,
@@ -25,6 +26,7 @@ const GROUPS: { title: string; items: Section[] }[] = [
     title: "Записи",
     items: [
       { path: "/admin", label: "Все записи", sub: "Игры, тренировки, покраска, клуб", icon: CalendarDays },
+      { path: "/admin/pricing", label: "Цены", sub: "Тарифы услуг и третья тренировка", icon: RussianRuble },
       { path: "/admin/warhammer", label: "Столы Warhammer", sub: "Расписание столов на день", icon: Swords },
       { path: "/admin/dnd", label: "D&D", sub: "Игры, заявки и мастера", icon: Dice5 },
     ],
