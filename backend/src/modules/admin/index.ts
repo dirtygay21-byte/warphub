@@ -66,6 +66,7 @@ import {
   addReservationPayment,
   applyManualDiscount,
   applyRewardDiscount,
+  applyTrainingDiscount,
   ensureReservationPricing,
   listServicePrices,
   PricingError,
@@ -179,7 +180,7 @@ function mapPartnerError(error: PartnerError) {
 
 function mapPricingError(error: PricingError) {
   const notFound = ['SERVICE_NOT_FOUND', 'RESERVATION_NOT_FOUND', 'PRICING_NOT_FOUND', 'DISCOUNT_NOT_FOUND', 'REWARD_NOT_FOUND'];
-  const conflict = ['REWARD_USED', 'PAYMENT_EXCEEDED', 'DISCOUNT_BELOW_PAID', 'DISCOUNT_FORBIDDEN'];
+  const conflict = ['REWARD_USED', 'PAYMENT_EXCEEDED', 'DISCOUNT_BELOW_PAID', 'DISCOUNT_FORBIDDEN', 'TRAINING_DISCOUNT_EXISTS', 'TRAINING_LIMIT_REACHED'];
   const code = notFound.includes(error.code) ? 404 : conflict.includes(error.code) ? 409 : 400;
   return status(code, { error: error.message, code: error.code });
 }
@@ -279,6 +280,8 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
         billingMode: body.billingMode,
         unitPrice: body.unitPrice,
         armyRentalPricePer1000: body.armyRentalPricePer1000,
+        ownMaterialsPrice: body.ownMaterialsPrice,
+        clubMaterialsPrice: body.clubMaterialsPrice,
         thirdGameDiscountPercent: body.thirdGameDiscountPercent,
         createdBy: user.id,
       });
@@ -296,6 +299,8 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       ]),
       unitPrice: t.Number({ minimum: 0 }),
       armyRentalPricePer1000: t.Optional(t.Number({ minimum: 0 })),
+      ownMaterialsPrice: t.Optional(t.Number({ minimum: 0 })),
+      clubMaterialsPrice: t.Optional(t.Number({ minimum: 0 })),
       thirdGameDiscountPercent: t.Optional(t.Number({ minimum: 0, maximum: 100 })),
     }),
     detail: { tags: ['Admin'], summary: 'Сохранить новый тариф услуги; старые записи не пересчитываются' },
@@ -327,6 +332,17 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       note: t.String({ minLength: 1 }),
     }),
     detail: { tags: ['Admin'], summary: 'Добавить последовательную скидку за членство или ручную скидку' },
+  })
+  .post('/reservations/:id/training-game', async ({ params, user }) => {
+    try {
+      return await applyTrainingDiscount(params.id, user.id);
+    } catch (error) {
+      if (error instanceof PricingError) return mapPricingError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    detail: { tags: ['Admin'], summary: 'Применить скидку 50% на обучающую игру; не больше трёх на игрока' },
   })
   .post('/reservations/:id/reward', async ({ params, body, user }) => {
     try {

@@ -7,6 +7,8 @@ import { minigameRewardsTable } from './minigames';
 
 export const pricingBillingModes = ['per_guest', 'per_table', 'per_pair'] as const;
 export type PricingBillingMode = (typeof pricingBillingModes)[number];
+export const pricingPriceVariants = ['standard', 'own_materials', 'club_materials'] as const;
+export type PricingPriceVariant = (typeof pricingPriceVariants)[number];
 
 export const servicePricesTable = pgTable(
   'service_prices',
@@ -18,6 +20,8 @@ export const servicePricesTable = pgTable(
     billingMode: varchar('billing_mode', { enum: pricingBillingModes }).notNull(),
     unitPrice: doublePrecision('unit_price').notNull(),
     armyRentalPricePer1000: doublePrecision('army_rental_price_per_1000').notNull().default(1000),
+    ownMaterialsPrice: doublePrecision('own_materials_price').notNull().default(0),
+    clubMaterialsPrice: doublePrecision('club_materials_price').notNull().default(0),
     thirdGameDiscountPercent: doublePrecision('third_game_discount_percent').notNull().default(0),
     effectiveFrom: timestamp('effective_from', { withTimezone: true }).notNull(),
     createdBy: uuid('created_by').references(() => usersTable.id, { onDelete: 'set null' }),
@@ -31,6 +35,7 @@ export const reservationPricingTable = pgTable('reservation_pricing', {
     .primaryKey()
     .references(() => reservationsTable.id, { onDelete: 'cascade' }),
   billingMode: varchar('billing_mode', { enum: pricingBillingModes }).notNull(),
+  priceVariant: varchar('price_variant', { enum: pricingPriceVariants }).notNull().default('standard'),
   unitPrice: doublePrecision('unit_price').notNull(),
   baseAmount: doublePrecision('base_amount').notNull(),
   armyRentalPoints: integer('army_rental_points').notNull().default(0),

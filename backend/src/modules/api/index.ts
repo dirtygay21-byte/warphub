@@ -43,7 +43,8 @@ import { getPlayerProgress } from '../progress/service';
 import { getCardsState, getPointsHistory, openPack } from '../minigames/cards';
 import { getNewsById, listPublishedNews } from '../news/service';
 import { getPartnerShowcase } from '../partners/service';
-import { currentServicePrice, DEFAULT_ARMY_RENTAL_PRICE_PER_1000 } from '../pricing/service';
+import { currentServicePrice } from '../pricing/service';
+import { servicePricingDefaults } from '../pricing/rules';
 import { jwtPlugin } from '../../plugins/jwt-plugin';
 import { authMiddleware, findUserFromBearer } from '../../plugins/auth-middleware';
 import { db } from '../../db';
@@ -252,14 +253,17 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
   )
   .get('/services/:serviceId/pricing', async ({ params: { serviceId } }) => {
     try {
-      const [service] = await db.select({ id: servicesTable.id }).from(servicesTable).where(eq(servicesTable.id, serviceId)).limit(1);
+      const [service] = await db.select({ id: servicesTable.id, slug: servicesTable.slug }).from(servicesTable).where(eq(servicesTable.id, serviceId)).limit(1);
       if (!service) return status(404, { error: 'Service not found' });
-      const price = await currentServicePrice(serviceId);
+      const [price, defaults] = await Promise.all([currentServicePrice(serviceId), Promise.resolve(servicePricingDefaults(service.slug))]);
       return {
         serviceId,
-        billingMode: price?.billingMode ?? 'per_guest',
-        unitPrice: price?.unitPrice ?? 0,
-        armyRentalPricePer1000: price?.armyRentalPricePer1000 ?? DEFAULT_ARMY_RENTAL_PRICE_PER_1000,
+        billingMode: price?.billingMode ?? defaults.billingMode,
+        unitPrice: price?.unitPrice ?? defaults.unitPrice,
+        armyRentalPricePer1000: price?.armyRentalPricePer1000 ?? defaults.armyRentalPricePer1000,
+        ownMaterialsPrice: price?.ownMaterialsPrice ?? defaults.ownMaterialsPrice,
+        clubMaterialsPrice: price?.clubMaterialsPrice ?? defaults.clubMaterialsPrice,
+        thirdGameDiscountPercent: price?.thirdGameDiscountPercent ?? defaults.thirdGameDiscountPercent,
       };
     } catch (error) {
       return status(500, { error: (error as Error).message });

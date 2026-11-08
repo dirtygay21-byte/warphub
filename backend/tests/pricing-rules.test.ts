@@ -4,6 +4,7 @@ import {
   basePriceFor,
   paymentStatus,
   roundMoney,
+  servicePricingDefaults,
   totalWithDiscounts,
   validateManualDiscount,
   type PricingDiscountInput,
@@ -36,6 +37,20 @@ describe('pricing: аренда армии', () => {
   test('тариф редактируется за 1000 очков, включая дробные значения', () => {
     expect(armyRentalPriceFor(1500, 500)).toBe(750);
     expect(armyRentalPriceFor(333, 1000.5)).toBe(333.17);
+  });
+});
+
+describe('pricing: тарифы по умолчанию из записи', () => {
+  test('стол целиком, группа за пару, индивидуальная и посещение', () => {
+    expect(servicePricingDefaults('wh_game')).toMatchObject({ billingMode: 'per_table', unitPrice: 1000 });
+    expect(servicePricingDefaults('wh_group_training')).toMatchObject({ billingMode: 'per_pair', unitPrice: 1500, thirdGameDiscountPercent: 50 });
+    expect(servicePricingDefaults('wh_solo_training')).toMatchObject({ billingMode: 'per_guest', unitPrice: 800, thirdGameDiscountPercent: 0 });
+    expect(servicePricingDefaults('club_visit')).toMatchObject({ billingMode: 'per_guest', unitPrice: 500 });
+  });
+
+  test('материалы для покраски и армия 1 ₽/очко', () => {
+    expect(servicePricingDefaults('wh_painting')).toMatchObject({ ownMaterialsPrice: 500, clubMaterialsPrice: 1000 });
+    expect(servicePricingDefaults('wh_game').armyRentalPricePer1000).toBe(1000);
   });
 });
 
