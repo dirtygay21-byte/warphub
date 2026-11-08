@@ -19,6 +19,8 @@ import { errorText, oswald } from "./helpers";
 import { Skeleton } from "@/components/ui/ds";
 
 const useCards = () => useQuery({ queryKey: ["minigames", "cards"], queryFn: getCardsState });
+const CARD_MODAL_ENABLED = false;
+const ART_REWORK_NOTE = "Изображения карт скоро будут обновлены — увеличенный предпросмотр временно отключён.";
 
 function useCountdown(target: string | null) {
   const [now, setNow] = useState(() => Date.now());
@@ -142,10 +144,11 @@ function FlipCard({
   return (
     <button
       type="button"
-      onClick={revealed ? onOpen : onReveal}
-      className="relative aspect-[5/7] w-full [perspective:900px]"
+      onClick={revealed ? (CARD_MODAL_ENABLED ? onOpen : undefined) : onReveal}
+      disabled={revealed && !CARD_MODAL_ENABLED}
+      className="relative aspect-[5/7] w-full [perspective:900px] disabled:cursor-default"
       style={{ animation: `card-deal 0.45s ${index * 0.09}s ease-out both` }}
-      aria-label={revealed ? card.name : "Перевернуть карту"}
+      aria-label={revealed ? (CARD_MODAL_ENABLED ? card.name : ART_REWORK_NOTE) : "Перевернуть карту"}
     >
       <div
         className="relative size-full transition-transform duration-700 [transform-style:preserve-3d]"
@@ -320,6 +323,7 @@ export default function CardsGame() {
 
             {phase === "reveal" && pack && (
               <div>
+                <p className="mb-3 rounded-xl border border-white/10 bg-white/3 px-3 py-2 text-center text-xs text-fg-3">{ART_REWORK_NOTE}</p>
                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
                   {pack.cards.map((card, i) => (
                     <div key={i} className={clsx(pack.cards.length % 2 === 1 && i === pack.cards.length - 1 && "col-span-2 mx-auto w-1/2")}>
@@ -505,11 +509,12 @@ export function CardCollection() {
               )}
             </div>
 
+            <p className="mt-4 rounded-xl border border-white/10 bg-white/3 px-3 py-2 text-center text-xs text-fg-3">{ART_REWORK_NOTE}</p>
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {visibleList.map((card) => {
                 const count = state.collection[card.id];
                 return count ? (
-                  <button key={card.id} type="button" onClick={() => setModal(card)} className="text-left">
+                  <button key={card.id} type="button" disabled={!CARD_MODAL_ENABLED} aria-disabled={!CARD_MODAL_ENABLED} onClick={CARD_MODAL_ENABLED ? () => setModal(card) : undefined} className="text-left disabled:cursor-default">
                     <CardFace card={card} size="sm" count={count} points={pointsOf(card.rarity)} />
                   </button>
                 ) : (
