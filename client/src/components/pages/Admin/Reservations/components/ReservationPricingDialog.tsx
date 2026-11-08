@@ -2,6 +2,7 @@ import {
   addAdminReservationDiscount,
   addAdminReservationPayment,
   applyAdminReservationReward,
+  applyAdminTrainingGame,
   BILLING_MODE_LABELS,
   getAdminReservationPricing,
   PAYMENT_METHOD_LABELS,
@@ -13,7 +14,7 @@ import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 import { formatClub } from "@/utils/clubTime";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
-import { Gift, LoaderCircle, Plus, ReceiptRussianRuble, Trash2, WalletCards, X } from "lucide-react";
+import { Gift, GraduationCap, LoaderCircle, Plus, ReceiptRussianRuble, Trash2, WalletCards, X } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { AdminReservationRow } from "../types";
 
@@ -38,11 +39,19 @@ const STATUS_STYLES: Record<ReservationPricing["status"], string> = {
 };
 
 const DISCOUNT_KIND_LABELS = {
-  training: "Третья тренировка",
+  training: "Обучающие игры",
   membership: "Членство",
   reward: "Мини‑игра",
   manual: "Ручная скидка",
 } as const;
+
+const PRICE_VARIANT_LABELS = {
+  standard: "Стандартный тариф",
+  own_materials: "Со своими красками",
+  club_materials: "С красками клуба",
+} as const;
+
+const WH_SERVICE_SLUGS = new Set(["wh_game", "wh_group_training", "wh_solo_training"]);
 
 const fieldClass =
   "mt-1.5 min-h-11 w-full rounded-xl border border-white/10 bg-field px-3 py-2.5 text-sm text-white outline-none transition-colors focus:border-accent/60";
@@ -50,6 +59,7 @@ const fieldClass =
 type PricingAction =
   | { type: "discount" }
   | { type: "reward" }
+  | { type: "training" }
   | { type: "payment" }
   | { type: "remove"; discountId: string };
 
@@ -87,6 +97,7 @@ export function ReservationPricingDialog({
         });
       }
       if (action.type === "reward") return applyAdminReservationReward(reservation.id, rewardCode.trim());
+      if (action.type === "training") return applyAdminTrainingGame(reservation.id);
       if (action.type === "payment") {
         return addAdminReservationPayment(reservation.id, {
           amount: Number(paymentAmount),
@@ -217,7 +228,9 @@ export function ReservationPricingDialog({
               <section aria-label="Сумма счёта">
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm text-fg-2">
-                    {BILLING_MODE_LABELS[pricing.billingMode]} · {money.format(pricing.unitPrice)}
+                    {BILLING_MODE_LABELS[pricing.billingMode]}
+                    {pricing.priceVariant !== "standard" ? ` · ${PRICE_VARIANT_LABELS[pricing.priceVariant]}` : ""}
+                    {` · ${money.format(pricing.unitPrice)}`}
                   </p>
                   <span className={clsx("rounded-lg px-2.5 py-1 text-xs font-semibold", STATUS_STYLES[pricing.status])}>
                     {STATUS_LABELS[pricing.status]}
@@ -246,6 +259,26 @@ export function ReservationPricingDialog({
                 </div>
               </section>
 
+              {WH_SERVICE_SLUGS.has(pricing.serviceSlug) && (
+                <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-accent/20 bg-accent/5 p-4">
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-semibold text-white">Обучающие игры</h3>
+                    <p className="mt-1 text-xs leading-5 text-fg-2">
+                      Скидка 50% на выбранную запись. Осталось {pricing.trainingGamesRemaining} из 3 на игрока.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => mutation.mutate({ type: "training" })}
+                    disabled={mutation.isPending || pricing.trainingGamesRemaining === 0 || pricing.discounts.some((discount) => discount.kind === "training")}
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground disabled:opacity-40"
+                  >
+                    <GraduationCap className="size-4" />
+                    {pricing.discounts.some((discount) => discount.kind === "training") ? "Скидка применена" : "Применить 50%"}
+                  </button>
+                </section>
+              )}
+
               <section className="overflow-hidden rounded-xl border border-white/10" aria-label="Применённые скидки">
                 <div className="border-b border-white/10 bg-white/3 px-4 py-3">
                   <h3 className="text-sm font-semibold">Скидки ({pricing.discounts.length})</h3>
@@ -267,7 +300,7 @@ export function ReservationPricingDialog({
                             {discount.kind === "reward" ? " · использованный код не восстанавливается" : ""}
                           </p>
                         </div>
-                        {(discount.kind === "membership" || discount.kind === "manual") && (
+                        {discount.kind !== "reward" && (
                           <button
                             type="button"
                             onClick={() => mutation.mutate({ type: "remove", discountId: discount.id })}

@@ -1,6 +1,7 @@
 import { apiRequest } from "@/apiUtils/general";
 
 export type BillingMode = "per_guest" | "per_table" | "per_pair";
+export type PriceVariant = "standard" | "own_materials" | "club_materials";
 export type PaymentMethod = "cash" | "card" | "transfer" | "other";
 
 export type ServicePrice = {
@@ -10,6 +11,8 @@ export type ServicePrice = {
   billingMode: BillingMode;
   unitPrice: number;
   armyRentalPricePer1000: number;
+  ownMaterialsPrice: number;
+  clubMaterialsPrice: number;
   thirdGameDiscountPercent: number;
   effectiveFrom: string | null;
 };
@@ -19,6 +22,9 @@ export type PublicServicePricing = {
   billingMode: BillingMode;
   unitPrice: number;
   armyRentalPricePer1000: number;
+  ownMaterialsPrice: number;
+  clubMaterialsPrice: number;
+  thirdGameDiscountPercent: number;
 };
 
 export type ReservationDiscount = {
@@ -43,7 +49,9 @@ export type ReservationPayment = {
 
 export type ReservationPricing = {
   reservationId: string;
+  serviceSlug: string;
   billingMode: BillingMode;
+  priceVariant: PriceVariant;
   unitPrice: number;
   baseAmount: number;
   armyRentalPoints: number;
@@ -52,6 +60,8 @@ export type ReservationPricing = {
   totalAmount: number;
   paidAmount: number;
   remainingAmount: number;
+  trainingGamesUsed: number;
+  trainingGamesRemaining: number;
   status: "free" | "unpaid" | "partial" | "paid";
   discounts: ReservationDiscount[];
   payments: ReservationPayment[];
@@ -82,6 +92,8 @@ export const saveAdminServicePrice = (
     billingMode: BillingMode;
     unitPrice: number;
     armyRentalPricePer1000?: number;
+    ownMaterialsPrice?: number;
+    clubMaterialsPrice?: number;
     thirdGameDiscountPercent?: number;
   },
 ) =>
@@ -105,6 +117,11 @@ export const addAdminReservationDiscount = (
   apiRequest<ReservationPricing>(`/admin/reservations/${reservationId}/discounts`, {
     method: "POST",
     body: JSON.stringify(payload),
+  });
+
+export const applyAdminTrainingGame = (reservationId: string) =>
+  apiRequest<ReservationPricing>(`/admin/reservations/${reservationId}/training-game`, {
+    method: "POST",
   });
 
 export const applyAdminReservationReward = (reservationId: string, code: string) =>

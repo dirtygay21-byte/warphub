@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, inArray, isNull, lt, lte, or, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, lte, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import {
   reservationDiscountsTable,
@@ -11,14 +11,15 @@ import { reservationsTable } from '../../db/schema/reservations';
 import { servicesTable } from '../../db/schema/services';
 import { minigameRewardsTable } from '../../db/schema/minigames';
 import { normalizeRewardCode } from '../minigames/rules';
-import { armyRentalPriceFor, basePriceFor, paymentStatus, roundMoney, totalWithDiscounts, validateManualDiscount, type PricingDiscountInput } from './rules';
+import { armyRentalPriceFor, basePriceFor, paymentStatus, roundMoney, servicePricingDefaults, totalWithDiscounts, validateManualDiscount, type PricingDiscountInput } from './rules';
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 type Executor = typeof db | Tx;
 type ReservationRow = typeof reservationsTable.$inferSelect;
 
-const TRAINING_SERVICE_SLUGS = new Set(['wh_group_training', 'wh_solo_training']);
-const DEFAULT_THIRD_TRAINING_DISCOUNT = 50;
+const GROUP_TRAINING_SLUG = 'wh_group_training';
+const WH_SERVICE_SLUGS = new Set(['wh_game', 'wh_group_training', 'wh_solo_training']);
+export const TRAINING_GAMES_LIMIT = 3;
 export const DEFAULT_ARMY_RENTAL_PRICE_PER_1000 = 1000;
 const DEFAULT_KILL_TEAM_RENTAL_POINTS = 1000;
 const ACTIVE_RESERVATION_STATUSES = ['pending', 'confirmed'] as const;
@@ -46,15 +47,17 @@ export async function listServicePrices() {
   const services = await db.select().from(servicesTable).orderBy(asc(servicesTable.sortOrder), asc(servicesTable.id));
   return Promise.all(services.map(async (service) => {
     const price = await currentServicePrice(service.id);
-    const isTraining = TRAINING_SERVICE_SLUGS.has(service.slug);
+    const defaults = servicePricingDefaults(service.slug);
     return {
       id: service.id,
       slug: service.slug,
       title: service.title,
-      billingMode: (price?.billingMode ?? 'per_guest') as PricingBillingMode,
-      unitPrice: price?.unitPrice ?? 0,
-      armyRentalPricePer1000: price?.armyRentalPricePer1000 ?? DEFAULT_ARMY_RENTAL_PRICE_PER_1000,
-      thirdGameDiscountPercent: price?.thirdGameDiscountPercent ?? (isTraining ? DEFAULT_THIRD_TRAINING_DISCOUNT : 0),
+      billingMode: (price?.billingMode ?? defaults.billingMode) as PricingBillingMode,
+      unitPrice: price?.unitPrice ?? defaults.unitPrice,
+      armyRentalPricePer1000: price?.armyRentalPricePer1000 ?? defaults.armyRentalPricePer1000,
+      ownMaterialsPrice: price?.ownMaterialsPrice ?? defaults.ownMaterialsPrice,
+      clubMaterialsPrice: price?.clubMaterialsPrice ?? defaults.clubMaterialsPrice,
+      thirdGameDiscountPercent: price?.thirdGameDiscountPercent ?? defaults.thirdGameDiscountPercent,
       effectiveFrom: price?.effectiveFrom?.toISOString() ?? null,
     };
   }));
@@ -65,6 +68,8 @@ export async function upsertServicePrice(input: {
   billingMode: PricingBillingMode;
   unitPrice: number;
   armyRentalPricePer1000?: number;
+  ownMaterialsPrice?: number;
+  clubMaterialsPrice?: number;
   thirdGameDiscountPercent?: number;
   effectiveFrom?: Date;
   createdBy: string;
@@ -72,21 +77,30 @@ export async function upsertServicePrice(input: {
   if (!Number.isFinite(input.unitPrice) || input.unitPrice < 0) {
     throw new PricingError('INVALID_PRICE', 'Цена должна быть неотрицательным числом');
   }
-  const armyRentalPricePer1000 = input.armyRentalPricePer1000 ?? DEFAULT_ARMY_RENTAL_PRICE_PER_1000;
-  if (!Number.isFinite(armyRentalPricePer1000) || armyRentalPricePer1000 < 0) {
-    throw new PricingError('INVALID_ARMY_RENTAL_PRICE', 'Цена аренды армии за 1000 очков должна быть неотрицательным числом');
-  }
   const [service] = await db.select({ id: servicesTable.id, slug: servicesTable.slug }).from(servicesTable).where(eq(servicesTable.id, input.serviceId)).limit(1);
   if (!service) throw new PricingError('SERVICE_NOT_FOUND', 'Услуга не найдена');
-  const third = input.thirdGameDiscountPercent ?? (TRAINING_SERVICE_SLUGS.has(service.slug) ? DEFAULT_THIRD_TRAINING_DISCOUNT : 0);
+  const defaults = servicePricingDefaults(service.slug);
+  const armyRentalPricePer1000 = input.armyRentalPricePer1000 ?? defaults.armyRentalPricePer1000;
+  const ownMaterialsPrice = input.ownMaterialsPrice ?? defaults.ownMaterialsPrice;
+  const clubMaterialsPrice = input.clubMaterialsPrice ?? defaults.clubMaterialsPrice;
+  for (const [code, value, message] of [
+    ['INVALID_ARMY_RENTAL_PRICE', armyRentalPricePer1000, 'Цена аренды армии за 1000 очков должна быть неотрицательным числом'],
+    ['INVALID_MATERIALS_PRICE', ownMaterialsPrice, 'Цена со своими материалами должна быть неотрицательным числом'],
+    ['INVALID_MATERIALS_PRICE', clubMaterialsPrice, 'Цена с материалами клуба должна быть неотрицательным числом'],
+  ] as const) {
+    if (!Number.isFinite(value) || value < 0) throw new PricingError(code, message);
+  }
+  const third = input.thirdGameDiscountPercent ?? defaults.thirdGameDiscountPercent;
   if (!Number.isFinite(third) || third < 0 || third > 100) {
-    throw new PricingError('INVALID_DISCOUNT', 'Скидка третьей тренировки должна быть от 0 до 100%');
+    throw new PricingError('INVALID_DISCOUNT', 'Скидка на первые игры должна быть от 0 до 100%');
   }
   const [created] = await db.insert(servicePricesTable).values({
     serviceId: input.serviceId,
     billingMode: input.billingMode,
     unitPrice: roundMoney(input.unitPrice),
     armyRentalPricePer1000: roundMoney(armyRentalPricePer1000),
+    ownMaterialsPrice: roundMoney(ownMaterialsPrice),
+    clubMaterialsPrice: roundMoney(clubMaterialsPrice),
     thirdGameDiscountPercent: third,
     effectiveFrom: input.effectiveFrom ?? new Date(),
     createdBy: input.createdBy,
@@ -101,24 +115,41 @@ function rentedArmyPoints(reservation: ReservationRow): number {
   return pointsPerArmy * rentedSeats;
 }
 
-export async function createReservationPricing(
-  tx: Tx,
-  reservation: ReservationRow,
-  options: { trainingOrdinal?: 'latest' | 'historical' } = {},
-) {
+async function countTrainingGames(executor: Executor, userId: string): Promise<number> {
+  const [row] = await executor.select({ value: count() })
+    .from(reservationDiscountsTable)
+    .innerJoin(reservationsTable, eq(reservationDiscountsTable.reservationId, reservationsTable.id))
+    .where(and(
+      eq(reservationsTable.userId, userId),
+      eq(reservationDiscountsTable.kind, 'training'),
+      inArray(reservationsTable.status, ACTIVE_RESERVATION_STATUSES),
+    ));
+  return Number(row?.value ?? 0);
+}
+
+export async function createReservationPricing(tx: Tx, reservation: ReservationRow) {
   const [price, service] = await Promise.all([
     currentServicePrice(reservation.serviceId, tx),
     tx.select({ slug: servicesTable.slug }).from(servicesTable).where(eq(servicesTable.id, reservation.serviceId)).limit(1).then((rows) => rows[0]),
   ]);
-  const billingMode = (price?.billingMode ?? 'per_guest') as PricingBillingMode;
-  const unitPrice = price?.unitPrice ?? 0;
+  const defaults = servicePricingDefaults(service?.slug ?? '');
+  const billingMode = (price?.billingMode ?? defaults.billingMode) as PricingBillingMode;
+  const priceVariant = reservation.details?.kind === 'painting'
+    ? reservation.details.paintSource === 'club' ? 'club_materials' as const : 'own_materials' as const
+    : 'standard' as const;
+  const unitPrice = priceVariant === 'club_materials'
+    ? price?.clubMaterialsPrice ?? defaults.clubMaterialsPrice
+    : priceVariant === 'own_materials'
+      ? price?.ownMaterialsPrice ?? defaults.ownMaterialsPrice
+      : price?.unitPrice ?? defaults.unitPrice;
   const baseAmount = basePriceFor(billingMode, unitPrice, reservation.partySize ?? 1);
   const armyRentalPoints = rentedArmyPoints(reservation);
-  const armyRentalPricePer1000 = price?.armyRentalPricePer1000 ?? DEFAULT_ARMY_RENTAL_PRICE_PER_1000;
+  const armyRentalPricePer1000 = price?.armyRentalPricePer1000 ?? defaults.armyRentalPricePer1000;
   const armyRentalAmount = armyRentalPriceFor(armyRentalPoints, armyRentalPricePer1000);
   await tx.insert(reservationPricingTable).values({
     reservationId: reservation.id,
     billingMode,
+    priceVariant,
     unitPrice,
     baseAmount,
     armyRentalPoints,
@@ -127,33 +158,17 @@ export async function createReservationPricing(
     totalAmount: roundMoney(baseAmount + armyRentalAmount),
   });
 
-  const isTraining = TRAINING_SERVICE_SLUGS.has(service?.slug ?? '');
-  const thirdPercent = price?.thirdGameDiscountPercent ?? 0;
-  if (price && isTraining && thirdPercent > 0) {
-    // Одновременные записи одного игрока на одну услугу получают порядковые номера последовательно.
-    const sequenceLock = `${reservation.userId}:${reservation.serviceId}`;
-    await tx.execute(sql`select pg_advisory_xact_lock(25011, hashtext(${sequenceLock}))`);
-    const trainingOrdinal = options.trainingOrdinal ?? 'latest';
-    const [row] = await tx.select({ value: count() }).from(reservationsTable).where(and(
-      eq(reservationsTable.userId, reservation.userId),
-      eq(reservationsTable.serviceId, reservation.serviceId),
-      inArray(reservationsTable.status, ACTIVE_RESERVATION_STATUSES),
-      trainingOrdinal === 'historical'
-        ? or(
-            lt(reservationsTable.createdAt, reservation.createdAt),
-            and(eq(reservationsTable.createdAt, reservation.createdAt), lt(reservationsTable.id, reservation.id)),
-          )
-        : undefined,
-    ));
-    // Для новой записи после блокировки считаем её вместе со всеми уже завершёнными транзакциями соседей.
-    // Для старой записи без счёта восстанавливаем её исторический номер по времени создания.
-    const ordinal = Number(row?.value ?? 0) + (trainingOrdinal === 'historical' ? 1 : 0);
-    if (ordinal % 3 === 0) {
+  const thirdPercent = price?.thirdGameDiscountPercent ?? defaults.thirdGameDiscountPercent;
+  if (price && service?.slug === GROUP_TRAINING_SLUG && thirdPercent > 0) {
+    // Скидки на обучающие игры имеют общий лимит на игрока, поэтому блокировка тоже общая.
+    await tx.execute(sql`select pg_advisory_xact_lock(25011, hashtext(${reservation.userId}))`);
+    const trainingGamesUsed = await countTrainingGames(tx, reservation.userId);
+    if (trainingGamesUsed < TRAINING_GAMES_LIMIT) {
       await tx.insert(reservationDiscountsTable).values({
         reservationId: reservation.id,
         kind: 'training',
         percent: thirdPercent,
-        note: `Каждая третья тренировка: скидка ${thirdPercent}%`,
+        note: `Обучающие игры: скидка ${thirdPercent}%`,
       });
     }
   }
@@ -168,7 +183,7 @@ async function lockReservation(tx: Tx, reservationId: string) {
 
 async function createReservationPricingIfMissing(tx: Tx, reservation: ReservationRow) {
   const [existing] = await tx.select({ id: reservationPricingTable.reservationId }).from(reservationPricingTable).where(eq(reservationPricingTable.reservationId, reservation.id)).limit(1);
-  if (!existing) await createReservationPricing(tx, reservation, { trainingOrdinal: 'historical' });
+  if (!existing) await createReservationPricing(tx, reservation);
 }
 
 export async function ensureReservationPricing(reservationId: string) {
@@ -194,14 +209,24 @@ async function recalculateReservationTotal(tx: Tx, reservationId: string) {
 export async function getReservationPricing(reservationId: string, executor: Executor = db) {
   const [pricing] = await executor.select().from(reservationPricingTable).where(eq(reservationPricingTable.reservationId, reservationId)).limit(1);
   if (!pricing) return null;
-  const [discounts, payments] = await Promise.all([
+  const [reservation] = await executor.select({ userId: reservationsTable.userId, serviceSlug: servicesTable.slug })
+    .from(reservationsTable)
+    .innerJoin(servicesTable, eq(reservationsTable.serviceId, servicesTable.id))
+    .where(eq(reservationsTable.id, reservationId))
+    .limit(1);
+  if (!reservation) throw new PricingError('RESERVATION_NOT_FOUND', 'Запись не найдена');
+  const [discounts, payments, trainingGamesUsed] = await Promise.all([
     executor.select().from(reservationDiscountsTable).where(eq(reservationDiscountsTable.reservationId, reservationId)).orderBy(asc(reservationDiscountsTable.createdAt), asc(reservationDiscountsTable.id)),
     executor.select().from(reservationPaymentsTable).where(eq(reservationPaymentsTable.reservationId, reservationId)).orderBy(asc(reservationPaymentsTable.createdAt), asc(reservationPaymentsTable.id)),
+    countTrainingGames(executor, reservation.userId),
   ]);
   return {
     ...pricing,
+    serviceSlug: reservation.serviceSlug,
     status: paymentStatus(pricing.totalAmount, pricing.paidAmount),
     remainingAmount: roundMoney(Math.max(0, pricing.totalAmount - pricing.paidAmount)),
+    trainingGamesUsed,
+    trainingGamesRemaining: Math.max(0, TRAINING_GAMES_LIMIT - trainingGamesUsed),
     discounts,
     payments,
   };
@@ -226,6 +251,36 @@ export async function applyManualDiscount(reservationId: string, input: PricingD
       amount: input.amount ?? null,
       note: input.note.trim(),
       createdBy: input.createdBy,
+    });
+    await recalculateReservationTotal(tx, reservationId);
+    return getReservationPricing(reservationId, tx);
+  });
+}
+
+export async function applyTrainingDiscount(reservationId: string, createdBy: string) {
+  return db.transaction(async (tx) => {
+    const reservation = await lockReservation(tx, reservationId);
+    const [service] = await tx.select({ slug: servicesTable.slug }).from(servicesTable).where(eq(servicesTable.id, reservation.serviceId)).limit(1);
+    if (!service || !WH_SERVICE_SLUGS.has(service.slug)) {
+      throw new PricingError('TRAINING_SERVICE', 'Обучающие игры доступны только для Warhammer-записей');
+    }
+    await createReservationPricingIfMissing(tx, reservation);
+    await tx.execute(sql`select pg_advisory_xact_lock(25011, hashtext(${reservation.userId}))`);
+    const [existing] = await tx.select({ id: reservationDiscountsTable.id }).from(reservationDiscountsTable).where(and(
+      eq(reservationDiscountsTable.reservationId, reservationId),
+      eq(reservationDiscountsTable.kind, 'training'),
+    )).limit(1);
+    if (existing) throw new PricingError('TRAINING_DISCOUNT_EXISTS', 'Скидка на обучающую игру уже применена к этой записи');
+    const trainingGamesUsed = await countTrainingGames(tx, reservation.userId);
+    if (trainingGamesUsed >= TRAINING_GAMES_LIMIT) {
+      throw new PricingError('TRAINING_LIMIT_REACHED', 'У игрока уже есть три обучающие игры со скидкой');
+    }
+    await tx.insert(reservationDiscountsTable).values({
+      reservationId,
+      kind: 'training',
+      percent: 50,
+      note: 'Обучающие игры: скидка 50%',
+      createdBy,
     });
     await recalculateReservationTotal(tx, reservationId);
     return getReservationPricing(reservationId, tx);
@@ -277,7 +332,6 @@ export async function removeManualDiscount(discountId: string) {
     const [discount] = await tx.select().from(reservationDiscountsTable).where(eq(reservationDiscountsTable.id, discountId)).limit(1);
     if (!discount) throw new PricingError('DISCOUNT_NOT_FOUND', 'Скидка не найдена');
     if (discount.kind === 'reward') throw new PricingError('REWARD_USED', 'Использованная награда не восстанавливается');
-    if (discount.kind === 'training') throw new PricingError('DISCOUNT_FORBIDDEN', 'Автоматическую скидку за третью тренировку удалить нельзя');
     await tx.delete(reservationDiscountsTable).where(eq(reservationDiscountsTable.id, discountId));
     await recalculateReservationTotal(tx, discount.reservationId);
     return getReservationPricing(discount.reservationId, tx);

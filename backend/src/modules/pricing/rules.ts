@@ -21,6 +21,36 @@ export function armyRentalPriceFor(points: number, pricePer1000: number): number
   return roundMoney(Math.max(0, points) * Math.max(0, pricePer1000) / 1000);
 }
 
+export type ServicePricingDefaults = {
+  billingMode: PricingBillingMode;
+  unitPrice: number;
+  armyRentalPricePer1000: number;
+  thirdGameDiscountPercent: number;
+  ownMaterialsPrice: number;
+  clubMaterialsPrice: number;
+};
+
+export function servicePricingDefaults(slug: string): ServicePricingDefaults {
+  const base: ServicePricingDefaults = {
+    billingMode: 'per_guest',
+    unitPrice: 0,
+    armyRentalPricePer1000: 1000,
+    thirdGameDiscountPercent: 0,
+    ownMaterialsPrice: 0,
+    clubMaterialsPrice: 0,
+  };
+  if (slug === 'wh_game') return { ...base, billingMode: 'per_table', unitPrice: 1000 };
+  if (slug === 'wh_group_training') {
+    return { ...base, billingMode: 'per_pair', unitPrice: 1500, thirdGameDiscountPercent: 50 };
+  }
+  if (slug === 'wh_solo_training') return { ...base, unitPrice: 800 };
+  if (slug === 'wh_painting') {
+    return { ...base, unitPrice: 500, ownMaterialsPrice: 500, clubMaterialsPrice: 1000 };
+  }
+  if (slug === 'club_visit') return { ...base, unitPrice: 500 };
+  return base;
+}
+
 /** Percent discounts are sequential; fixed discounts are subtracted afterwards in the same order. */
 export function totalWithDiscounts(baseAmount: number, discounts: PricingDiscountInput[]): number {
   return roundMoney(discounts.reduce((total, discount) => {

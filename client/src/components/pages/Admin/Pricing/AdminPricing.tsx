@@ -12,15 +12,19 @@ import { useState, type FormEvent } from "react";
 const inputClass =
   "mt-1.5 min-h-11 w-full rounded-xl border border-white/10 bg-field px-3 py-2.5 text-sm text-white outline-none transition-colors focus:border-accent/60";
 
-const TRAINING_SLUGS = new Set(["wh_group_training", "wh_solo_training"]);
-const WARHAMMER_SLUGS = new Set(["wh_game", ...TRAINING_SLUGS]);
+const GROUP_TRAINING_SLUG = "wh_group_training";
+const WARHAMMER_SLUGS = new Set(["wh_game", "wh_group_training", "wh_solo_training"]);
+const PAINTING_SLUG = "wh_painting";
 
 function ServicePriceCard({ service }: { service: ServicePrice }) {
   const queryClient = useQueryClient();
-  const isTraining = TRAINING_SLUGS.has(service.slug);
+  const isGroupTraining = service.slug === GROUP_TRAINING_SLUG;
+  const isPainting = service.slug === PAINTING_SLUG;
   const isWarhammer = WARHAMMER_SLUGS.has(service.slug);
   const [billingMode, setBillingMode] = useState<BillingMode>(service.billingMode);
   const [unitPrice, setUnitPrice] = useState(String(service.unitPrice));
+  const [ownMaterialsPrice, setOwnMaterialsPrice] = useState(String(service.ownMaterialsPrice));
+  const [clubMaterialsPrice, setClubMaterialsPrice] = useState(String(service.clubMaterialsPrice));
   const [armyRentalPrice, setArmyRentalPrice] = useState(String(service.armyRentalPricePer1000));
   const [thirdDiscount, setThirdDiscount] = useState(String(service.thirdGameDiscountPercent));
 
@@ -29,26 +33,33 @@ function ServicePriceCard({ service }: { service: ServicePrice }) {
     mutationFn: () =>
       saveAdminServicePrice(service.id, {
         billingMode,
-        unitPrice: Number(unitPrice),
+        unitPrice: isPainting ? Number(ownMaterialsPrice) : Number(unitPrice),
+        ...(isPainting ? {
+          ownMaterialsPrice: Number(ownMaterialsPrice),
+          clubMaterialsPrice: Number(clubMaterialsPrice),
+        } : {}),
         ...(isWarhammer ? { armyRentalPricePer1000: Number(armyRentalPrice) } : {}),
-        ...(isTraining ? { thirdGameDiscountPercent: Number(thirdDiscount) } : {}),
+        ...(isGroupTraining ? { thirdGameDiscountPercent: Number(thirdDiscount) } : {}),
       }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-service-prices"] }),
   });
 
-  const price = Number(unitPrice);
+  const price = isPainting ? Number(ownMaterialsPrice) : Number(unitPrice);
+  const clubPrice = Number(clubMaterialsPrice);
   const rentalPrice = Number(armyRentalPrice);
   const third = Number(thirdDiscount);
   const invalid =
     !Number.isFinite(price) ||
     price < 0 ||
+    (isPainting && (!Number.isFinite(clubPrice) || clubPrice < 0)) ||
     (isWarhammer && (!Number.isFinite(rentalPrice) || rentalPrice < 0)) ||
-    (isTraining && (!Number.isFinite(third) || third < 0 || third > 100));
+    (isGroupTraining && (!Number.isFinite(third) || third < 0 || third > 100));
   const unchanged =
-    price === service.unitPrice &&
+    price === (isPainting ? service.ownMaterialsPrice : service.unitPrice) &&
     billingMode === service.billingMode &&
+    (!isPainting || clubPrice === service.clubMaterialsPrice) &&
     (!isWarhammer || rentalPrice === service.armyRentalPricePer1000) &&
-    (!isTraining || third === service.thirdGameDiscountPercent);
+    (!isGroupTraining || third === service.thirdGameDiscountPercent);
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -83,19 +94,51 @@ function ServicePriceCard({ service }: { service: ServicePrice }) {
             ))}
           </select>
         </label>
-        <label className="text-xs font-medium text-fg-2">
-          Цена, ₽
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            inputMode="decimal"
-            value={unitPrice}
-            onChange={(event) => setUnitPrice(event.target.value)}
-            className={inputClass}
-            required
-          />
-        </label>
+        {!isPainting && (
+          <label className="text-xs font-medium text-fg-2">
+            Цена, ₽
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              inputMode="decimal"
+              value={unitPrice}
+              onChange={(event) => setUnitPrice(event.target.value)}
+              className={inputClass}
+              required
+            />
+          </label>
+        )}
+        {isPainting && (
+          <>
+            <label className="text-xs font-medium text-fg-2">
+              Со своими красками, ₽ / человек
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                inputMode="decimal"
+                value={ownMaterialsPrice}
+                onChange={(event) => setOwnMaterialsPrice(event.target.value)}
+                className={inputClass}
+                required
+              />
+            </label>
+            <label className="text-xs font-medium text-fg-2">
+              С красками клуба, ₽ / человек
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                inputMode="decimal"
+                value={clubMaterialsPrice}
+                onChange={(event) => setClubMaterialsPrice(event.target.value)}
+                className={inputClass}
+                required
+              />
+            </label>
+          </>
+        )}
         {isWarhammer && (
           <label className="text-xs font-medium text-fg-2">
             Аренда армии, ₽ / 1000 очков
@@ -111,9 +154,9 @@ function ServicePriceCard({ service }: { service: ServicePrice }) {
             />
           </label>
         )}
-        {isTraining ? (
+        {isGroupTraining ? (
           <label className="text-xs font-medium text-fg-2">
-            Скидка на каждую третью, %
+            Скидка на первые три игры, %
             <input
               type="number"
               min="0"
@@ -193,7 +236,7 @@ export default function AdminPricing() {
       <div className="grid gap-4 xl:grid-cols-2">
         {query.data?.map((service) => (
           <ServicePriceCard
-            key={`${service.id}:${service.billingMode}:${service.unitPrice}:${service.armyRentalPricePer1000}:${service.thirdGameDiscountPercent}`}
+            key={`${service.id}:${service.billingMode}:${service.unitPrice}:${service.ownMaterialsPrice}:${service.clubMaterialsPrice}:${service.armyRentalPricePer1000}:${service.thirdGameDiscountPercent}`}
             service={service}
           />
         ))}

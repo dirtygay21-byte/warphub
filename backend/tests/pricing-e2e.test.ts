@@ -41,8 +41,9 @@ const paintDetails = { faction: 'Orks', model: 'Boyz', paintSource: 'own', needs
 const trainingDetails = { game: 'kt', army: 'Pathfinders', experienceLevel: 'player' };
 
 const T: Record<string, string> = {};
-const IDS = { admin: 777, player: 8801, other: 8802, raceTraining: 8803, rent40: 8804, rentKt: 8805, rentCustom: 8806 };
+const IDS = { admin: 777, player: 8801, other: 8802, raceTraining: 8803, rent40: 8804, rentKt: 8805, rentCustom: 8806, manualTraining: 8807, paintClub: 8808 };
 let trainingServiceId = 0;
+let gameServiceId = 0;
 let paintingServiceId = 0;
 let tableId = 0;
 const reservation: Record<string, string> = {};
@@ -88,15 +89,20 @@ beforeAll(async () => {
   const discipline = sql(`select id from disciplines where slug = 'wh' order by id limit 1`) || sql(`insert into disciplines (slug, title) values ('wh', 'E2E pricing') returning id`);
   trainingServiceId = Number(sql(`insert into services (discipline_id, slug, title, duration, seats_per_table, has_trainer)
     values (${discipline}, 'wh_group_training', 'E2E тренировка с ценой', 60, 2, true) returning id`));
+  gameServiceId = Number(sql(`insert into services (discipline_id, slug, title, duration, seats_per_table)
+    values (${discipline}, 'wh_game', 'E2E игра с ценой', 60, 2) returning id`));
   paintingServiceId = Number(sql(`insert into services (discipline_id, slug, title, duration, visitors_capacity, pool_capacity)
     values (${discipline}, 'wh_painting', 'E2E покраска с ценой', 120, 10, 10) returning id`));
   tableId = Number(sql(`insert into tables (name, category) values ('E2E стол цен', 'small') returning id`));
 
+  expect((await api('PUT', `/admin/pricing/services/${gameServiceId}`, T.admin, {
+    billingMode: 'per_table', unitPrice: 1000,
+  })).status).toBe(200);
   expect((await api('PUT', `/admin/pricing/services/${trainingServiceId}`, T.admin, {
     billingMode: 'per_table', unitPrice: 1000, thirdGameDiscountPercent: 50,
   })).status).toBe(200);
   expect((await api('PUT', `/admin/pricing/services/${paintingServiceId}`, T.admin, {
-    billingMode: 'per_guest', unitPrice: 100,
+    billingMode: 'per_guest', unitPrice: 100, ownMaterialsPrice: 100, clubMaterialsPrice: 1000,
   })).status).toBe(200);
 });
 
@@ -123,14 +129,14 @@ describe('pricing: тарифы и создание записей', () => {
 
   test('смена тарифа: за пару и за стол; старый счёт не пересчитывается', async () => {
     expect((await api('PUT', `/admin/pricing/services/${paintingServiceId}`, T.admin, {
-      billingMode: 'per_pair', unitPrice: 100,
+      billingMode: 'per_pair', unitPrice: 100, ownMaterialsPrice: 100, clubMaterialsPrice: 1000,
     })).status).toBe(200);
     await createPainting('18:00', 3, 'pair');
     const pair = await api('GET', `/admin/reservations/${reservation.pair}/pricing`, T.admin);
     expect(pair.json).toMatchObject({ billingMode: 'per_pair', baseAmount: 200, totalAmount: 200 });
 
     expect((await api('PUT', `/admin/pricing/services/${paintingServiceId}`, T.admin, {
-      billingMode: 'per_table', unitPrice: 750,
+      billingMode: 'per_table', unitPrice: 750, ownMaterialsPrice: 750, clubMaterialsPrice: 1000,
     })).status).toBe(200);
     await createPainting('20:00', 4, 'table');
     const table = await api('GET', `/admin/reservations/${reservation.table}/pricing`, T.admin);
@@ -139,22 +145,28 @@ describe('pricing: тарифы и создание записей', () => {
     expect(old.json.totalAmount).toBe(300);
   });
 
-  test('каждая третья активная тренировка получает 50%', async () => {
+  test('первые три групповые игры получают 50%, четвёртая — без скидки', async () => {
     await createTraining('12:00', 'training1');
     await createTraining('13:00', 'training2');
     await createTraining('14:00', 'training3');
+    await createTraining('15:00', 'training4');
     const first = await api('GET', `/admin/reservations/${reservation.training1}/pricing`, T.admin);
     const second = await api('GET', `/admin/reservations/${reservation.training2}/pricing`, T.admin);
     const third = await api('GET', `/admin/reservations/${reservation.training3}/pricing`, T.admin);
-    expect(first.json.totalAmount).toBe(1000);
-    expect(second.json.totalAmount).toBe(1000);
-    expect(third.json.baseAmount).toBe(1000);
-    expect(third.json.totalAmount).toBe(500);
-    expect(third.json.discounts).toHaveLength(1);
-    expect(third.json.discounts[0]).toMatchObject({ kind: 'training', percent: 50 });
+    const fourth = await api('GET', `/admin/reservations/${reservation.training4}/pricing`, T.admin);
+    for (const priced of [first, second, third]) {
+      expect(priced.json.baseAmount).toBe(1000);
+      expect(priced.json.totalAmount).toBe(500);
+      expect(priced.json.discounts).toHaveLength(1);
+      expect(priced.json.discounts[0]).toMatchObject({ kind: 'training', percent: 50 });
+    }
+    expect(third.json.trainingGamesUsed).toBe(3);
+    expect(third.json.trainingGamesRemaining).toBe(0);
+    expect(fourth.json.totalAmount).toBe(1000);
+    expect(fourth.json.discounts).toHaveLength(0);
   });
 
-  test('три одновременные тренировки на разных столах получают ровно одну скидку', async () => {
+  test('три одновременные групповые игры получают каждая свою скидку', async () => {
     const tableIds = [1, 2, 3].map((index) => Number(sql(`insert into tables (name, category) values ('E2E параллельная тренировка ${index}', 'wh') returning id`)));
     const responses = await Promise.all(tableIds.map((id) => api('POST', '/reservations', T.raceTraining, {
       serviceId: trainingServiceId,
@@ -166,11 +178,14 @@ describe('pricing: тарифы и создание записей', () => {
     })));
     expect(responses.map((item) => item.status)).toEqual([200, 200, 200]);
     const pricing = await Promise.all(responses.map((item) => api('GET', `/admin/reservations/${item.json.id}/pricing`, T.admin)));
-    expect(pricing.map((item) => item.json.totalAmount).sort((a, b) => a - b)).toEqual([500, 1000, 1000]);
-    expect(pricing.flatMap((item) => item.json.discounts).filter((item) => item.kind === 'training')).toHaveLength(1);
+    expect(pricing.map((item) => item.json.totalAmount).sort((a, b) => a - b)).toEqual([500, 500, 500]);
+    expect(pricing.flatMap((item) => item.json.discounts).filter((item) => item.kind === 'training')).toHaveLength(3);
   });
 
   test('аренда 1500 очков добавляет 1500 ₽ и входит в сумму до скидок', async () => {
+    expect((await api('PUT', `/admin/pricing/services/${trainingServiceId}`, T.admin, {
+      billingMode: 'per_table', unitPrice: 1000, thirdGameDiscountPercent: 0,
+    })).status).toBe(200);
     const rentalTable = Number(sql(`insert into tables (name, category) values ('E2E аренда 1500', 'wh') returning id`));
     const created = await api('POST', '/reservations', T.rent40, {
       serviceId: trainingServiceId,
@@ -213,7 +228,7 @@ describe('pricing: тарифы и создание записей', () => {
 
   test('редактируемый тариф аренды применяется к новым записям и не меняет старые', async () => {
     expect((await api('PUT', `/admin/pricing/services/${trainingServiceId}`, T.admin, {
-      billingMode: 'per_table', unitPrice: 1000, thirdGameDiscountPercent: 50, armyRentalPricePer1000: 500,
+      billingMode: 'per_table', unitPrice: 1000, thirdGameDiscountPercent: 0, armyRentalPricePer1000: 500,
     })).status).toBe(200);
     const publicPrice = await api('GET', `/services/${trainingServiceId}/pricing`);
     expect(publicPrice.json.armyRentalPricePer1000).toBe(500);
@@ -320,6 +335,46 @@ describe('pricing: скидки, награды и оплата', () => {
     expect(Number(sql(`select count(*) from minigame_rewards where id = '${rewardId}' and used_at is not null`))).toBe(1);
   });
 
+  test('кнопка обучающих игр: 50%, общий лимит три и освобождение после удаления', async () => {
+    const ids: string[] = [];
+    for (const [index, hh] of ['12:00', '13:00', '14:00', '15:00'].entries()) {
+      const gameTable = Number(sql(`insert into tables (name, category) values ('E2E обучающая игра ${index + 1}', 'wh') returning id`));
+      const created = await api('POST', '/reservations', T.manualTraining, {
+        serviceId: gameServiceId,
+        tableId: gameTable,
+        startsAt: local(hh),
+        partySize: 1,
+        seatClubArmyOptions: [false],
+        details: { game: '40k', army: 'Orks', points: 1000, experienceLevel: 'player' },
+      });
+      expect(created.status).toBe(200);
+      ids.push(created.json.id);
+    }
+    const [first, second, third, fourth] = ids;
+    const applied = await api('POST', `/admin/reservations/${first}/training-game`, T.admin);
+    expect(applied.status).toBe(200);
+    expect(applied.json).toMatchObject({ totalAmount: 500, trainingGamesUsed: 1, trainingGamesRemaining: 2 });
+    const duplicate = await api('POST', `/admin/reservations/${first}/training-game`, T.admin);
+    expect(duplicate.status).toBe(409);
+    expect(duplicate.json.code).toBe('TRAINING_DISCOUNT_EXISTS');
+    expect((await api('POST', `/admin/reservations/${second}/training-game`, T.admin)).status).toBe(200);
+    expect((await api('POST', `/admin/reservations/${third}/training-game`, T.admin)).status).toBe(200);
+    const limited = await api('POST', `/admin/reservations/${fourth}/training-game`, T.admin);
+    expect(limited.status).toBe(409);
+    expect(limited.json.code).toBe('TRAINING_LIMIT_REACHED');
+
+    const firstPricing = await api('GET', `/admin/reservations/${first}/pricing`, T.admin);
+    const trainingDiscount = firstPricing.json.discounts.find((item: any) => item.kind === 'training');
+    const removed = await api('DELETE', `/admin/reservations/discounts/${trainingDiscount.id}`, T.admin);
+    expect(removed.status).toBe(200);
+    expect(removed.json.totalAmount).toBe(1000);
+    expect(removed.json.trainingGamesRemaining).toBe(1);
+    const reopened = await api('POST', `/admin/reservations/${fourth}/training-game`, T.admin);
+    expect(reopened.status).toBe(200);
+    expect(reopened.json.totalAmount).toBe(500);
+    expect(reopened.json.trainingGamesRemaining).toBe(0);
+  });
+
   test('ручная скидка удаляется с пересчётом; автоматическая и награда защищены', async () => {
     const added = await api('POST', `/admin/reservations/${reservation.table}/discounts`, T.admin, {
       kind: 'manual', amount: 50, note: 'Проверка удаления',
@@ -334,7 +389,34 @@ describe('pricing: скидки, награды и оплата', () => {
     const third = await api('GET', `/admin/reservations/${reservation.training3}/pricing`, T.admin);
     const training = third.json.discounts.find((item: any) => item.kind === 'training');
     const reward = third.json.discounts.find((item: any) => item.kind === 'reward');
-    expect((await api('DELETE', `/admin/reservations/discounts/${training.id}`, T.admin)).status).toBe(409);
+    const removedTraining = await api('DELETE', `/admin/reservations/discounts/${training.id}`, T.admin);
+    expect(removedTraining.status).toBe(200);
+    expect(removedTraining.json.totalAmount).toBe(850);
     expect((await api('DELETE', `/admin/reservations/discounts/${reward.id}`, T.admin)).status).toBe(409);
+  });
+
+  test('краски клуба: вариант и цена сохраняются в счёте', async () => {
+    expect((await api('PUT', `/admin/pricing/services/${paintingServiceId}`, T.admin, {
+      billingMode: 'per_guest', unitPrice: 500, ownMaterialsPrice: 500, clubMaterialsPrice: 1000,
+    })).status).toBe(200);
+    const created = await api('POST', '/reservations', T.paintClub, {
+      serviceId: paintingServiceId,
+      startsAt: local('17:00'),
+      partySize: 2,
+      details: { ...paintDetails, paintSource: 'club' },
+    });
+    expect(created.status).toBe(200);
+    const priced = await api('GET', `/admin/reservations/${created.json.id}/pricing`, T.admin);
+    expect(priced.json).toMatchObject({
+      billingMode: 'per_guest',
+      priceVariant: 'club_materials',
+      unitPrice: 1000,
+      baseAmount: 2000,
+      totalAmount: 2000,
+    });
+    const old = await api('GET', `/admin/reservations/${reservation.guest}/pricing`, T.admin);
+    expect(old.json.priceVariant).toBe('own_materials');
+    expect(old.json.unitPrice).toBe(100);
+    expect(old.json.totalAmount).toBe(300);
   });
 });
