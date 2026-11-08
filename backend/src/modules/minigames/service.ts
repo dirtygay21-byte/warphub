@@ -33,7 +33,9 @@ import {
   isEggScorePlausible,
   isRunnerScorePlausible,
   normalizeRewardCode,
-  playDiceTurn,
+  createDicePools,
+  chooseEnemyPoolAction,
+  playDicePoolTurn,
   resolveDiceInitiative,
   rewardLabel,
   rewardTierFor,
@@ -448,6 +450,8 @@ function battleView(state: DiceBattleState, settings: MinigameSettings) {
     playerStarts: state.playerStarts ?? null,
     turn: state.turn ?? 'player',
     usedUlt: state.usedUlt ?? false,
+    firstStrikeDone: state.firstStrikeDone ?? false,
+    pools: state.pools ?? null,
   };
 }
 
@@ -658,7 +662,7 @@ export async function finishScoreSession(
 export async function diceAction(
   userId: string,
   sessionId: string,
-  action: 'initiative_even' | 'initiative_odd' | 'attack' | 'defend' | 'risk' | 'ult' | 'roll' | 'stop',
+  action: 'initiative_even' | 'initiative_odd' | 'attack' | 'critical' | 'defend' | 'risk' | 'ult' | 'roll' | 'stop',
 ): Promise<{
   exchange: DiceExchange | null;
   battle: ReturnType<typeof battleView>;
@@ -675,15 +679,17 @@ export async function diceAction(
     if (action === 'roll' && state.initiativeRoll == null) {
       const legacyInitiative = resolveDiceInitiative(state, 'even', secureRandom);
       state = legacyInitiative.state;
+      state.pools = createDicePools(state, PLAYER_FIGHTERS, ENEMY_FIGHTERS, params, secureRandom);
       exchange = legacyInitiative.exchange;
     }
 
     if (action === 'initiative_even' || action === 'initiative_odd') {
       const played = resolveDiceInitiative(state, action === 'initiative_even' ? 'even' : 'odd', secureRandom);
       state = played.state;
+      state.pools = createDicePools(state, PLAYER_FIGHTERS, ENEMY_FIGHTERS, params, secureRandom);
       exchange = played.exchange;
     } else if (action !== 'stop') {
-      const played = playDiceTurn(state, action === 'roll' ? 'attack' : action, PLAYER_FIGHTERS, ENEMY_FIGHTERS, params, secureRandom);
+      const played = playDicePoolTurn(state, action === 'roll' ? 'attack' : action, PLAYER_FIGHTERS, ENEMY_FIGHTERS, params, secureRandom);
       state = played.state;
       exchange = played.exchange;
     } else {
@@ -691,7 +697,8 @@ export async function diceAction(
     }
 
     if (action !== 'stop' && !state.finished && state.turn === 'enemy') {
-      const enemyTurn = playDiceTurn(state, 'attack', PLAYER_FIGHTERS, ENEMY_FIGHTERS, params, secureRandom);
+      const enemyAction = chooseEnemyPoolAction(state, PLAYER_FIGHTERS, ENEMY_FIGHTERS, params);
+      const enemyTurn = playDicePoolTurn(state, enemyAction, PLAYER_FIGHTERS, ENEMY_FIGHTERS, params, secureRandom);
       state = enemyTurn.state;
       if (exchange) {
         exchange = {
@@ -699,8 +706,9 @@ export async function diceAction(
           action: exchange.action,
           initiativeRoll: exchange.initiativeRoll ?? enemyTurn.exchange.initiativeRoll,
           playerStarts: exchange.playerStarts ?? enemyTurn.exchange.playerStarts,
-          playerAttack: exchange.playerAttack ?? enemyTurn.exchange.playerAttack,
-          enemyAttack: enemyTurn.exchange.enemyAttack ?? exchange.enemyAttack,
+          playerAction: exchange.playerAction ?? enemyTurn.exchange.playerAction,
+          enemyAction: enemyTurn.exchange.enemyAction ?? exchange.enemyAction,
+          pools: enemyTurn.exchange.pools ?? exchange.pools ?? null,
           opponentDefeated: exchange.opponentDefeated || enemyTurn.exchange.opponentDefeated,
           playerDefeated: exchange.playerDefeated || enemyTurn.exchange.playerDefeated,
           clutch: exchange.clutch || enemyTurn.exchange.clutch,
@@ -709,6 +717,9 @@ export async function diceAction(
           selfDamage: (exchange.selfDamage ?? 0) + (enemyTurn.exchange.selfDamage ?? 0),
         };
       }
+    }
+    if (!state.finished && state.pools === null) {
+      state.pools = createDicePools(state, PLAYER_FIGHTERS, ENEMY_FIGHTERS, params, secureRandom);
     }
 
     if (!state.finished) {

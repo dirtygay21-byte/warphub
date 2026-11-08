@@ -189,6 +189,23 @@ export function resolveAttack(
   };
 }
 
+export type DicePoolEntry = { value: number; used: boolean };
+export type DicePools = { player: DicePoolEntry[]; enemy: DicePoolEntry[] };
+export type DicePoolAction = 'attack' | 'critical' | 'defend' | 'risk' | 'ult';
+export type DiceActionResolution = {
+  side: 'player' | 'enemy';
+  action: DicePoolAction;
+  rollIndex: number | null;
+  roll: number | null;
+  critical: boolean;
+  guaranteed: boolean;
+  blocked: boolean;
+  blockedByRoll: number | null;
+  damage: number;
+  selfDamage: number;
+  defenderWoundsLeft: number;
+};
+
 export type DiceBattleState = {
   playerId: string;
   playerWounds: number;
@@ -211,8 +228,14 @@ export type DiceBattleState = {
   turn?: 'player' | 'enemy';
   /** Ультимативная атака уже использована */
   usedUlt?: boolean;
-  /** Сторона, выбравшая защиту до следующей атаки */
+  /** Сторона, выбравшая защиту до следующей атаки (старый движок) */
   defense?: 'player' | 'enemy' | null;
+  /** Первая гарантированная атака уже выполнена */
+  firstStrikeDone?: boolean;
+  /** Видимые пулы кубов текущего раунда */
+  pools?: DicePools | null;
+  /** Защитный куб и оставшееся число блоков */
+  poolDefense?: { side: 'player' | 'enemy'; roll: number; charges: number } | null;
 };
 
 export type DiceExchange = {
@@ -231,6 +254,9 @@ export type DiceExchange = {
   selfDamage?: number;
   initiativeRoll?: number;
   playerStarts?: boolean;
+  pools?: DicePools | null;
+  playerAction?: DiceActionResolution | null;
+  enemyAction?: DiceActionResolution | null;
 };
 
 /** Противник с учётом усиления: +ран и +атак за каждые одержанные победы */
@@ -477,6 +503,223 @@ export function playDiceTurn(
       selfDamage,
       playerAttack: actor === 'player' ? attack : null,
       enemyAttack: actor === 'enemy' ? attack : null,
+      opponentDefeated,
+      playerDefeated,
+      clutch,
+      nextOpponentId,
+      healed,
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Пулы кубов Kill Team: видимые успехи, криты и защитные блоки
+// ---------------------------------------------------------------------------
+
+const criticalDamageOf = (fighter: Fighter) => fighter.critDamage ?? fighter.damage + 1;
+const clonePools = (pools: DicePools): DicePools => ({
+  player: pools.player.map((entry) => ({ ...entry })),
+  enemy: pools.enemy.map((entry) => ({ ...entry })),
+});
+
+export function createDicePools(
+  state: DiceBattleState,
+  players: Fighter[],
+  enemies: Fighter[],
+  params: DiceParams,
+  rng: Rng,
+): DicePools {
+  const player = players.find((fighter) => fighter.id === state.playerId)!;
+  const opponent = boostedEnemy(enemies.find((fighter) => fighter.id === state.opponentId)!, state.escalation, params);
+  const rollPool = (count: number): DicePoolEntry[] => Array.from({ length: count }, () => ({ value: rollD6(rng), used: false }));
+  return { player: rollPool(player.attacks), enemy: rollPool(opponent.attacks) };
+}
+
+function attackIndex(pool: DicePoolEntry[], fighter: Fighter, critical: boolean) {
+  return pool.findIndex((entry) => !entry.used && (critical ? entry.value === 6 : entry.value !== 6 && success(entry.value, fighter.skill)));
+}
+
+function hasAttack(pool: DicePoolEntry[], fighter: Fighter) {
+  return attackIndex(pool, fighter, false) >= 0 || attackIndex(pool, fighter, true) >= 0;
+}
+
+function defenseIndex(pool: DicePoolEntry[], fighter: Fighter) {
+  const candidates = pool
+    .map((entry, index) => ({ entry, index }))
+    .filter(({ entry }) => !entry.used && success(entry.value, fighter.save))
+    .sort((a, b) => b.entry.value - a.entry.value);
+  return candidates[0]?.index ?? pool.findIndex((entry) => !entry.used);
+}
+
+export function chooseEnemyPoolAction(state: DiceBattleState, players: Fighter[], enemies: Fighter[], params: DiceParams): DicePoolAction {
+  const opponent = boostedEnemy(enemies.find((fighter) => fighter.id === state.opponentId)!, state.escalation, params);
+  const pool = state.pools?.enemy ?? [];
+  if (!state.firstStrikeDone) return 'attack';
+  if (attackIndex(pool, opponent, true) >= 0) return 'critical';
+  if (attackIndex(pool, opponent, false) >= 0) return 'attack';
+  return 'defend';
+}
+
+export function playDicePoolTurn(
+  state: DiceBattleState,
+  action: DicePoolAction,
+  players: Fighter[],
+  enemies: Fighter[],
+  params: DiceParams,
+  rng: Rng,
+): { state: DiceBattleState; exchange: DiceExchange } {
+  if (state.finished) throw new Error('Battle is finished');
+  if (state.initiativeRoll == null) throw new Error('Roll initiative first');
+  if (action === 'ult' && state.usedUlt) throw new Error('Ultimate attack is already used');
+
+  const actor = state.turn ?? 'player';
+  const defenderSide = actor === 'player' ? 'enemy' : 'player';
+  const player = players.find((fighter) => fighter.id === state.playerId)!;
+  const opponent = boostedEnemy(enemies.find((fighter) => fighter.id === state.opponentId)!, state.escalation, params);
+  const attacker = actor === 'player' ? player : opponent;
+  const defender = actor === 'player' ? opponent : player;
+  const next: DiceBattleState = {
+    ...state,
+    defeated: [...state.defeated],
+    pools: state.pools ? clonePools(state.pools) : createDicePools(state, players, enemies, params, rng),
+    poolDefense: state.poolDefense ? { ...state.poolDefense } : null,
+    firstStrikeDone: state.firstStrikeDone ?? false,
+  };
+  const pools = next.pools!;
+  const actorPool = actor === 'player' ? pools.player : pools.enemy;
+  let resolution: DiceActionResolution = {
+    side: actor,
+    action,
+    rollIndex: null,
+    roll: null,
+    critical: false,
+    guaranteed: false,
+    blocked: false,
+    blockedByRoll: null,
+    damage: 0,
+    selfDamage: 0,
+    defenderWoundsLeft: actor === 'player' ? next.opponentWounds : next.playerWounds,
+  };
+
+  if (action === 'defend') {
+    const index = defenseIndex(actorPool, defender);
+    const entry = index >= 0 ? actorPool[index] : undefined;
+    if (entry) entry.used = true;
+    const roll = entry?.value ?? null;
+    const successful = roll !== null && success(roll, defender.save);
+    if (successful) next.poolDefense = { side: actor, roll: roll!, charges: roll === 6 ? 2 : 1 };
+    resolution = { ...resolution, rollIndex: index >= 0 ? index : null, roll, blockedByRoll: successful ? roll : null };
+    next.turn = defenderSide;
+  } else {
+    if (action === 'risk') {
+      const extra = { value: rollD6(rng), used: false };
+      actorPool.push(extra);
+      resolution = { ...resolution, rollIndex: actorPool.length - 1, roll: extra.value, selfDamage: extra.value === 1 ? 1 : 0 };
+    }
+    const critical = action === 'critical' || action === 'ult';
+    const guaranteed = !next.firstStrikeDone || action === 'ult';
+    let index = attackIndex(actorPool, attacker, critical);
+    if (index < 0 && action === 'risk') index = resolution.rollIndex;
+    if (index < 0 && guaranteed && action !== 'critical') index = actorPool.findIndex((entry) => !entry.used);
+    if (index < 0 && action === 'ult') index = attackIndex(actorPool, attacker, false);
+    if (index < 0 && action === 'ult') {
+      actorPool.push({ value: 6, used: false });
+      index = actorPool.length - 1;
+    }
+    if (index < 0) throw new Error(critical ? 'No critical dice available' : 'No normal dice available');
+
+    const entry = actorPool[index]!;
+    entry.used = true;
+    const roll = entry.value;
+    const attackSucceeded = guaranteed || success(roll, attacker.skill);
+    let blocked = false;
+    let blockedByRoll: number | null = null;
+    if (attackSucceeded && next.poolDefense && next.poolDefense.side === defenderSide && !guaranteed) {
+      blocked = critical ? next.poolDefense.roll === 6 : next.poolDefense.charges > 0;
+      if (blocked) {
+        blockedByRoll = next.poolDefense.roll;
+        next.poolDefense.charges -= 1;
+        if (next.poolDefense.charges <= 0) next.poolDefense = null;
+      }
+    }
+    if (action === 'ult') next.poolDefense = null;
+
+    const defenderWounds = actor === 'player' ? next.opponentWounds : next.playerWounds;
+    const damage = !attackSucceeded || blocked ? 0 : Math.min(defenderWounds, critical ? criticalDamageOf(attacker) : attacker.damage);
+    const selfDamage = blocked ? 0 : resolution.selfDamage;
+    if (actor === 'player') {
+      next.opponentWounds = Math.max(0, defenderWounds - damage);
+      next.playerWounds = Math.max(0, next.playerWounds - selfDamage);
+    } else {
+      next.playerWounds = Math.max(0, defenderWounds - damage);
+      next.opponentWounds = Math.max(0, next.opponentWounds - selfDamage);
+    }
+    next.firstStrikeDone = true;
+    if (action === 'ult') next.usedUlt = true;
+    next.turn = defenderSide;
+    resolution = {
+      ...resolution,
+      rollIndex: index,
+      roll,
+      critical,
+      guaranteed,
+      blocked,
+      blockedByRoll,
+      damage,
+      selfDamage,
+      defenderWoundsLeft: Math.max(0, defenderWounds - damage),
+    };
+  }
+
+  const finalPools = clonePools(pools);
+  const opponentDefeated = next.opponentWounds <= 0;
+  const playerDefeated = next.playerWounds <= 0;
+  let clutch = false;
+  let nextOpponentId: string | null = null;
+  let healed = 0;
+
+  if (opponentDefeated) {
+    next.wins += 1;
+    next.defeated.push(opponent.id);
+    clutch = next.playerWounds <= Math.ceil(player.wounds * params.clutchThreshold);
+    if (clutch) next.clutchWins += 1;
+    const remaining = enemies.filter((fighter) => !next.defeated.includes(fighter.id));
+    const nextOpponent = pickRandom(remaining.length > 0 ? remaining : enemies, rng);
+    next.escalation = next.wins;
+    nextOpponentId = nextOpponent.id;
+    next.opponentId = nextOpponent.id;
+    next.opponentWounds = boostedEnemy(nextOpponent, next.escalation, params).wounds;
+    healed = Math.min(params.healAfterWin, player.wounds - next.playerWounds);
+    next.playerWounds += healed;
+  }
+  if (playerDefeated) {
+    next.finished = true;
+    next.lost = true;
+  }
+
+  if (opponentDefeated || playerDefeated) {
+    next.pools = null;
+    next.poolDefense = null;
+    next.turn = 'player';
+  } else if (!hasAttack(pools.player, player) && !hasAttack(pools.enemy, opponent)) {
+    next.round += 1;
+    next.pools = null;
+    next.poolDefense = null;
+    next.turn = 'player';
+  }
+
+  return {
+    state: next,
+    exchange: {
+      round: next.round,
+      action,
+      blocked: resolution.blocked,
+      selfDamage: resolution.selfDamage,
+      pools: finalPools,
+      playerAction: actor === 'player' ? resolution : null,
+      enemyAction: actor === 'enemy' ? resolution : null,
+      playerAttack: null,
+      enemyAttack: null,
       opponentDefeated,
       playerDefeated,
       clutch,

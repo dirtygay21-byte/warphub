@@ -45,21 +45,28 @@ describe('dice: инициатива и действия через API', () => 
     expect(initiative.json.battle.playerStarts).toBe(roll % 2 === 0);
     expect(initiative.json.battle.turn).toBe('player');
 
+    expect(initiative.json.battle.pools.player.length).toBe(initiative.json.battle.player.attacks);
+    expect(initiative.json.battle.pools.enemy.length).toBe(initiative.json.battle.opponent.attacks);
+
     const defended = await api('POST', `/minigames/sessions/${sessionId}/dice/defend`, T.user);
     expect(defended.status).toBe(200);
     expect(defended.json.exchange.action).toBe('defend');
-    expect(defended.json.exchange.enemyAttack?.blocked).toBe(true);
+    expect(defended.json.exchange.playerAction.action).toBe('defend');
+    expect(defended.json.exchange.enemyAction).toHaveProperty('blocked');
     expect(defended.json.battle.playerWounds).toBe(initiative.json.battle.playerWounds);
 
     const attacked = await api('POST', `/minigames/sessions/${sessionId}/dice/attack`, T.user);
     expect(attacked.status).toBe(200);
     expect(attacked.json.battle.turn).toBe('player');
+    expect(attacked.json.exchange.playerAction.roll).toBeGreaterThanOrEqual(1);
+    expect(attacked.json.exchange.pools.player.length).toBeGreaterThan(0);
 
     const ultimate = await api('POST', `/minigames/sessions/${sessionId}/dice/ult`, T.user);
     expect(ultimate.status).toBe(200);
     expect(ultimate.json.battle.usedUlt).toBe(true);
-    expect(ultimate.json.exchange.playerAttack?.guaranteed).toBe(true);
-    expect(ultimate.json.exchange.playerAttack?.damage).toBeGreaterThan(0);
+    expect(ultimate.json.exchange.playerAction?.guaranteed).toBe(true);
+    expect(ultimate.json.exchange.playerAction?.critical).toBe(true);
+    expect(ultimate.json.exchange.playerAction?.damage).toBeGreaterThan(0);
 
     expect((await api('POST', `/minigames/sessions/${sessionId}/dice/ult`, T.user)).status).toBeGreaterThanOrEqual(400);
     expect((await api('POST', `/minigames/sessions/${sessionId}/dice/stop`, T.user)).status).toBe(200);

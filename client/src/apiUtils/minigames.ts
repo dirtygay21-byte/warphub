@@ -146,9 +146,10 @@ export type Fighter = {
   toughness: number;
   ap: number;
   damage: number;
+  critDamage?: number;
   save: number;
   sprite: string;
-  faction?: "order" | "horde" | "swarm";
+  faction?: "imperium" | "xenos" | "chaos" | "order" | "horde" | "swarm";
 };
 
 export type BattleView = {
@@ -165,6 +166,24 @@ export type BattleView = {
   playerStarts: boolean | null;
   turn: "player" | "enemy";
   usedUlt: boolean;
+  firstStrikeDone: boolean;
+  pools: DicePools | null;
+};
+
+export type DicePoolEntry = { value: number; used: boolean };
+export type DicePools = { player: DicePoolEntry[]; enemy: DicePoolEntry[] };
+export type DiceActionResolution = {
+  side: "player" | "enemy";
+  action: "attack" | "critical" | "defend" | "risk" | "ult";
+  rollIndex: number | null;
+  roll: number | null;
+  critical: boolean;
+  guaranteed: boolean;
+  blocked: boolean;
+  blockedByRoll: number | null;
+  damage: number;
+  selfDamage: number;
+  defenderWoundsLeft: number;
 };
 
 export type SwarmCreature = {
@@ -227,6 +246,9 @@ export type DiceExchange = {
   selfDamage?: number;
   initiativeRoll?: number;
   playerStarts?: boolean;
+  pools?: DicePools | null;
+  playerAction?: DiceActionResolution | null;
+  enemyAction?: DiceActionResolution | null;
 };
 
 export type DiceActionResult = {
@@ -252,7 +274,7 @@ export const finishMinigame = (sessionId: string, score: number) =>
 
 export const diceAction = (
   sessionId: string,
-  action: "initiative_even" | "initiative_odd" | "attack" | "defend" | "risk" | "ult" | "roll" | "stop",
+  action: "initiative_even" | "initiative_odd" | "attack" | "critical" | "defend" | "risk" | "ult" | "roll" | "stop",
 ) =>
   apiRequest<DiceActionResult>(
     `/minigames/sessions/${sessionId}/dice/${action}`,

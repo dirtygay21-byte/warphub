@@ -437,27 +437,27 @@ function swarmFighter(look: SwarmLook, pose: Pose): Sprite {
 // Каталог бойцов «Костей войны»
 // ---------------------------------------------------------------------------
 
-export type Faction = "order" | "horde" | "swarm";
+export type Faction = "imperium" | "xenos" | "chaos";
 
 const FIGHTERS: Record<string, { faction: Faction; draw: (pose: Pose) => Sprite }> = {
-  iron_captain: { faction: "order", draw: (pose) => orderFighter({ helm: "crest", weapon: "sword", cape: true, trim: "brass" }, pose) },
-  storm_huntress: { faction: "order", draw: (pose) => orderFighter({ helm: "lens", weapon: "rifle", light: true }, pose) },
-  scrap_brute: { faction: "order", draw: (pose) => orderFighter({ helm: "great", weapon: "hammer", trim: "brass" }, pose) },
-  gear_sage: { faction: "order", draw: (pose) => orderFighter({ helm: "visor", weapon: "cannon", trim: "brass" }, pose) },
-  ember_witch: { faction: "order", draw: (pose) => orderFighter({ helm: "hood", weapon: "staff" }, pose) },
-  gate_warden: { faction: "order", draw: (pose) => orderFighter({ helm: "visor", weapon: "shield" }, pose) },
-  fang_chief: { faction: "horde", draw: (pose) => hordeFighter({ weapon: "cleaver", boss: true }, pose) },
-  war_drone: { faction: "horde", draw: (pose) => hordeFighter({ weapon: "saw" }, pose) },
-  ash_cultist: { faction: "horde", draw: (pose) => hordeFighter({ weapon: "gun", small: true }, pose) },
-  hive_reaper: { faction: "swarm", draw: (pose) => swarmFighter({ kind: "reaper" }, pose) },
-  fallen_knight: { faction: "swarm", draw: (pose) => swarmFighter({ kind: "guard" }, pose) },
-  plague_hulk: { faction: "swarm", draw: (pose) => swarmFighter({ kind: "titan" }, pose) },
+  iron_captain: { faction: "imperium", draw: (pose) => orderFighter({ helm: "crest", weapon: "sword", cape: true, trim: "brass" }, pose) },
+  storm_huntress: { faction: "imperium", draw: (pose) => orderFighter({ helm: "lens", weapon: "rifle", light: true }, pose) },
+  scrap_brute: { faction: "imperium", draw: (pose) => orderFighter({ helm: "great", weapon: "hammer", trim: "brass" }, pose) },
+  gear_sage: { faction: "imperium", draw: (pose) => orderFighter({ helm: "visor", weapon: "cannon", trim: "brass" }, pose) },
+  ember_witch: { faction: "xenos", draw: (pose) => orderFighter({ helm: "hood", weapon: "staff" }, pose) },
+  gate_warden: { faction: "imperium", draw: (pose) => orderFighter({ helm: "visor", weapon: "shield" }, pose) },
+  fang_chief: { faction: "xenos", draw: (pose) => hordeFighter({ weapon: "cleaver", boss: true }, pose) },
+  war_drone: { faction: "xenos", draw: (pose) => hordeFighter({ weapon: "saw" }, pose) },
+  ash_cultist: { faction: "xenos", draw: (pose) => hordeFighter({ weapon: "gun", small: true }, pose) },
+  hive_reaper: { faction: "xenos", draw: (pose) => swarmFighter({ kind: "reaper" }, pose) },
+  fallen_knight: { faction: "chaos", draw: (pose) => swarmFighter({ kind: "guard" }, pose) },
+  plague_hulk: { faction: "chaos", draw: (pose) => swarmFighter({ kind: "titan" }, pose) },
 };
 
 export const FACTION_LABELS: Record<Faction, string> = {
-  order: "Орден Стальной Клятвы",
-  horde: "Ржавая Орда",
-  swarm: "Рой",
+  imperium: "Империум",
+  xenos: "Ксеносы",
+  chaos: "Хаос",
 };
 
 const cache = new Map<string, Sprite>();
@@ -472,7 +472,7 @@ export function fighterFrame(id: string, pose: Pose = "idle"): Sprite {
   return s;
 }
 
-export const fighterFaction = (id: string): Faction => FIGHTERS[id]?.faction ?? "swarm";
+export const fighterFaction = (id: string): Faction => FIGHTERS[id]?.faction ?? "xenos";
 export const FIGHTER_IDS = Object.keys(FIGHTERS);
 
 // ---------------------------------------------------------------------------
