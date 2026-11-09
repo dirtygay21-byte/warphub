@@ -703,6 +703,9 @@ export function playDicePoolTurn(
     next.turn = 'player';
   } else if (!hasAttack(pools.player, player) && !hasAttack(pools.enemy, opponent)) {
     next.round += 1;
+    // Каждый завершённый круг даёт обеим сторонам по одной дополнительной ране.
+    next.playerWounds += 1;
+    next.opponentWounds += 1;
     next.pools = null;
     next.poolDefense = null;
     next.turn = 'player';

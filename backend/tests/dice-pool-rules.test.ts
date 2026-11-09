@@ -41,7 +41,7 @@ describe('dice pools: видимые кубы, криты и защита', () =
 
     const critical = playDicePoolTurn({ ...base(), pools: { player: entries(6), enemy: entries(1) } }, 'critical', [player], [enemy], params, sequence(0));
     expect(critical.exchange.playerAction).toMatchObject({ roll: 6, critical: true, damage: 2 });
-    expect(critical.state.opponentWounds).toBe(4);
+    expect(critical.state.opponentWounds).toBe(5);
   });
 
   test('защита на 6 снимает два обычных успеха подряд', () => {
@@ -54,7 +54,7 @@ describe('dice pools: видимые кубы, криты и защита', () =
     const second = playDicePoolTurn(skipped.state, 'attack', [player], [enemy], params, sequence(0));
     expect(second.exchange.enemyAction?.blocked).toBe(true);
     expect(second.state.poolDefense).toBeNull();
-    expect(second.state.playerWounds).toBe(6);
+    expect(second.state.playerWounds).toBe(7);
   });
 
   test('обычная защита не останавливает критический успех', () => {
@@ -75,5 +75,12 @@ describe('dice pools: видимые кубы, криты и защита', () =
     expect(played.exchange.playerAction).toMatchObject({ guaranteed: true, critical: true, blocked: false, damage: 2 });
     expect(played.state.usedUlt).toBe(true);
     expect(() => playDicePoolTurn(played.state, 'ult', [player], [enemy], params, sequence(0))).toThrow('already used');
+  });
+
+  test('новый круг добавляет по одной ране каждому бойцу', () => {
+    const played = playDicePoolTurn({ ...base(), pools: { player: entries(4), enemy: entries(1) } }, 'attack', [player], [enemy], params, sequence(0));
+    expect(played.state.round).toBe(1);
+    expect(played.state.playerWounds).toBe(7);
+    expect(played.state.opponentWounds).toBe(6);
   });
 });
