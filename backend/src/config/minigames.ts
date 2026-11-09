@@ -183,21 +183,21 @@ export type Fighter = {
 };
 
 export const PLAYER_FIGHTERS: Fighter[] = [
-  { id: 'iron_captain', name: 'Кусто', wounds: 6, attacks: 4, skill: 3, strength: 4, toughness: 4, ap: 1, damage: 2, critDamage: 5, save: 3, sprite: 'iron_captain', faction: 'imperium' },
-  { id: 'storm_huntress', name: 'Дева', wounds: 5, attacks: 6, skill: 3, strength: 4, toughness: 3, ap: 1, damage: 1, critDamage: 3, save: 4, sprite: 'storm_huntress', faction: 'imperium' },
-  { id: 'scrap_brute', name: 'Рыцарь', wounds: 7, attacks: 3, skill: 4, strength: 6, toughness: 5, ap: 1, damage: 2, critDamage: 4, save: 5, sprite: 'scrap_brute', faction: 'imperium' },
-  { id: 'gear_sage', name: 'Машина', wounds: 5, attacks: 5, skill: 3, strength: 6, toughness: 4, ap: 2, damage: 2, critDamage: 2, save: 4, sprite: 'gear_sage', faction: 'imperium' },
-  { id: 'ember_witch', name: 'Эльдар', wounds: 4, attacks: 3, skill: 2, strength: 5, toughness: 3, ap: 2, damage: 3, critDamage: 3, save: 5, sprite: 'ember_witch', faction: 'xenos' },
-  { id: 'gate_warden', name: 'Десант', wounds: 7, attacks: 5, skill: 3, strength: 5, toughness: 5, ap: 1, damage: 2, critDamage: 3, save: 2, sprite: 'gate_warden', faction: 'imperium' },
+  { id: 'iron_captain', name: 'Кусто', wounds: 8, attacks: 4, skill: 3, strength: 4, toughness: 4, ap: 1, damage: 2, critDamage: 5, save: 3, sprite: 'iron_captain', faction: 'imperium' },
+  { id: 'storm_huntress', name: 'Дева', wounds: 3, attacks: 6, skill: 3, strength: 4, toughness: 3, ap: 1, damage: 1, critDamage: 3, save: 4, sprite: 'storm_huntress', faction: 'imperium' },
+  { id: 'scrap_brute', name: 'Рыцарь', wounds: 6, attacks: 3, skill: 4, strength: 6, toughness: 5, ap: 1, damage: 2, critDamage: 4, save: 5, sprite: 'scrap_brute', faction: 'imperium' },
+  { id: 'gear_sage', name: 'Машина', wounds: 4, attacks: 5, skill: 3, strength: 6, toughness: 4, ap: 2, damage: 2, critDamage: 2, save: 4, sprite: 'gear_sage', faction: 'imperium' },
+  { id: 'ember_witch', name: 'Эльдар', wounds: 3, attacks: 3, skill: 2, strength: 5, toughness: 3, ap: 2, damage: 3, critDamage: 3, save: 5, sprite: 'ember_witch', faction: 'xenos' },
+  { id: 'gate_warden', name: 'Десант', wounds: 5, attacks: 5, skill: 3, strength: 5, toughness: 5, ap: 1, damage: 2, critDamage: 3, save: 2, sprite: 'gate_warden', faction: 'imperium' },
 ];
 
 export const ENEMY_FIGHTERS: Fighter[] = [
-  { id: 'hive_reaper', name: 'Гаунт', wounds: 5, attacks: 6, skill: 4, strength: 4, toughness: 4, ap: 1, damage: 1, critDamage: 2, save: 5, sprite: 'hive_reaper', faction: 'xenos' },
+  { id: 'hive_reaper', name: 'Гаунт', wounds: 2, attacks: 6, skill: 4, strength: 4, toughness: 4, ap: 1, damage: 1, critDamage: 2, save: 5, sprite: 'hive_reaper', faction: 'xenos' },
   { id: 'fallen_knight', name: 'Предатель', wounds: 6, attacks: 5, skill: 3, strength: 5, toughness: 4, ap: 1, damage: 2, critDamage: 6, save: 3, sprite: 'fallen_knight', faction: 'chaos' },
-  { id: 'war_drone', name: 'Ноб', wounds: 5, attacks: 4, skill: 4, strength: 6, toughness: 5, ap: 2, damage: 3, critDamage: 5, save: 4, sprite: 'war_drone', faction: 'xenos' },
-  { id: 'fang_chief', name: 'Газ', wounds: 6, attacks: 4, skill: 4, strength: 5, toughness: 4, ap: 0, damage: 4, critDamage: 6, save: 5, sprite: 'fang_chief', faction: 'xenos' },
-  { id: 'ash_cultist', name: 'Дарк Эльдар', wounds: 4, attacks: 5, skill: 4, strength: 3, toughness: 3, ap: 0, damage: 2, critDamage: 6, save: 6, sprite: 'ash_cultist', faction: 'xenos' },
-  { id: 'plague_hulk', name: 'Демон Кхорна', wounds: 7, attacks: 2, skill: 4, strength: 5, toughness: 6, ap: 1, damage: 4, critDamage: 6, save: 5, sprite: 'plague_hulk', faction: 'chaos' },
+  { id: 'war_drone', name: 'Ноб', wounds: 4, attacks: 4, skill: 4, strength: 6, toughness: 5, ap: 2, damage: 3, critDamage: 5, save: 4, sprite: 'war_drone', faction: 'xenos' },
+  { id: 'fang_chief', name: 'Газ', wounds: 7, attacks: 4, skill: 4, strength: 5, toughness: 4, ap: 0, damage: 4, critDamage: 6, save: 5, sprite: 'fang_chief', faction: 'xenos' },
+  { id: 'ash_cultist', name: 'Дарк Эльдар', wounds: 3, attacks: 5, skill: 4, strength: 3, toughness: 3, ap: 0, damage: 2, critDamage: 6, save: 6, sprite: 'ash_cultist', faction: 'xenos' },
+  { id: 'plague_hulk', name: 'Демон Кхорна', wounds: 2, attacks: 2, skill: 4, strength: 5, toughness: 6, ap: 1, damage: 4, critDamage: 6, save: 5, sprite: 'plague_hulk', faction: 'chaos' },
 ];
 
 // ---------------------------------------------------------------------------

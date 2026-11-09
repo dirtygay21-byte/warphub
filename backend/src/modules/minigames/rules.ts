@@ -272,13 +272,27 @@ export function pickRandom<T>(items: readonly T[], rng: Rng): T {
   return items[Math.floor(rng() * items.length)]!;
 }
 
+/** Противники с HP>5 получают суммарно 15% выпадения, остальные — 85% равномерно. */
+export function pickBattleEnemy(items: readonly Fighter[], rng: Rng): Fighter {
+  const high = items.filter((fighter) => fighter.wounds > 5);
+  const low = items.filter((fighter) => fighter.wounds <= 5);
+  const highWeight = high.length ? 0.15 / high.length : 0;
+  const lowWeight = low.length ? 0.85 / low.length : 0;
+  let roll = rng();
+  for (const fighter of [...high, ...low]) {
+    roll -= fighter.wounds > 5 ? highWeight : lowWeight;
+    if (roll < 0) return fighter;
+  }
+  return items[items.length - 1]!;
+}
+
 export function startDiceBattle(
   players: Fighter[],
   enemies: Fighter[],
   rng: Rng,
 ): DiceBattleState {
   const player = pickRandom(players, rng);
-  const opponent = pickRandom(enemies, rng);
+  const opponent = pickBattleEnemy(enemies, rng);
   return {
     playerId: player.id,
     playerWounds: player.wounds,
@@ -684,7 +698,7 @@ export function playDicePoolTurn(
     clutch = next.playerWounds <= Math.ceil(player.wounds * params.clutchThreshold);
     if (clutch) next.clutchWins += 1;
     const remaining = enemies.filter((fighter) => !next.defeated.includes(fighter.id));
-    const nextOpponent = pickRandom(remaining.length > 0 ? remaining : enemies, rng);
+    const nextOpponent = pickBattleEnemy(remaining.length > 0 ? remaining : enemies, rng);
     next.escalation = next.wins;
     nextOpponentId = nextOpponent.id;
     next.opponentId = nextOpponent.id;
@@ -703,6 +717,9 @@ export function playDicePoolTurn(
     next.turn = 'player';
   } else if (!hasAttack(pools.player, player) && !hasAttack(pools.enemy, opponent)) {
     next.round += 1;
+    // Каждый завершённый круг даёт обеим сторонам по одной дополнительной ране.
+    next.playerWounds += 1;
+    next.opponentWounds += 1;
     next.pools = null;
     next.poolDefense = null;
     next.turn = 'player';
