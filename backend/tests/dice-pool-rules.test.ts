@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import {
   createDicePools,
+  pickBattleEnemy,
   playDicePoolTurn,
   type DiceBattleState,
   type DicePoolEntry,
@@ -75,6 +76,22 @@ describe('dice pools: видимые кубы, криты и защита', () =
     expect(played.exchange.playerAction).toMatchObject({ guaranteed: true, critical: true, blocked: false, damage: 2 });
     expect(played.state.usedUlt).toBe(true);
     expect(() => playDicePoolTurn(played.state, 'ult', [player], [enemy], params, sequence(0))).toThrow('already used');
+  });
+
+  test('противники с HP>5 получают суммарно 15% выпадения', () => {
+    const highA: Fighter = { ...enemy, id: 'high-a', wounds: 6 };
+    const highB: Fighter = { ...enemy, id: 'high-b', wounds: 7 };
+    const lowA: Fighter = { ...enemy, id: 'low-a', wounds: 2 };
+    const lowB: Fighter = { ...enemy, id: 'low-b', wounds: 3 };
+    const lowC: Fighter = { ...enemy, id: 'low-c', wounds: 4 };
+    const lowD: Fighter = { ...enemy, id: 'low-d', wounds: 5 };
+    const pool = [highA, highB, lowA, lowB, lowC, lowD];
+    expect(pickBattleEnemy(pool, () => 0.074).id).toBe('high-a');
+    expect(pickBattleEnemy(pool, () => 0.075).id).toBe('high-b');
+    expect(pickBattleEnemy(pool, () => 0.15).id).toBe('low-a');
+    expect(pickBattleEnemy(pool, () => 0.25).id).toBe('low-a');
+    expect(pickBattleEnemy(pool, () => 0.4).id).toBe('low-b');
+    expect(pickBattleEnemy(pool, () => 0.999).id).toBe('low-d');
   });
 
   test('новый круг добавляет по одной ране каждому бойцу', () => {
