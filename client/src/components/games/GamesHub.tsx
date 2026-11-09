@@ -6,12 +6,14 @@ import { useNavigate } from "react-router-dom";
 import { ErrorNote, GameTopBar, RewardCodeCard, TierStrip } from "./common";
 import { DsButton, Skeleton } from "@/components/ui/ds";
 import { errorText, useMinigames, oswald } from "./helpers";
+import { PixelSprite } from "./pixel/PixelSprite";
+import { eggSprite } from "./eggScene";
 
-const PREVIEW: Record<MinigameKey, { src: string; background: string; tag: string }> = {
-  runner: { src: "/games/ork-runner.png", background: "bg-[#c9c2b2]", tag: "Орки · Warhammer 40,000" },
-  dice: { src: "/games/fighters/iron_captain.png", background: "bg-[#171a12]", tag: "Империум · Ксеносы · Хаос" },
-  egg: { src: "/games/tyranid-warrior.png", background: "bg-[#c9c2b2]", tag: "Тираниды · Warhammer 40,000" },
-  cards: { src: "/games/aos/wild_ignarr.png", background: "bg-[#171a12]", tag: "Age of Sigmar · 261 карта" },
+const PREVIEW: Record<MinigameKey, { src: string | null; tag: string }> = {
+  runner: { src: "/games/ork-runner.png", tag: "Орки · Warhammer 40,000" },
+  dice: { src: "/games/fighters/iron_captain.png", tag: "Империум · Ксеносы · Хаос" },
+  egg: { src: null, tag: "Тираниды · Warhammer 40,000" },
+  cards: { src: "/games/aos/wild_ignarr.png", tag: "Age of Sigmar · 261 карта" },
 };
 
 /** Цвет фракции в карточке игры */
@@ -93,8 +95,12 @@ export default function GamesHub() {
                 onClick={() => navigate(`/games/${game.key}`)}
                 className="ds-press flex w-full items-center gap-4 p-4 text-left"
               >
-                <div className={`flex size-20 shrink-0 items-center justify-center rounded-xl border border-white/10 p-1.5 ${PREVIEW[game.key].background}`}>
-                  <img src={PREVIEW[game.key].src} alt={game.title} className="size-full object-contain [image-rendering:pixelated]" />
+                <div className="flex size-20 shrink-0 items-center justify-center">
+                  {game.key === "egg" ? (
+                    <PixelSprite sprite={eggSprite(3, 1)} scale={1.5} title={game.title} />
+                  ) : (
+                    <img src={PREVIEW[game.key].src!} alt={game.title} className="size-full object-contain [image-rendering:pixelated]" />
+                  )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-[12px] uppercase tracking-wider text-fg-3">{PREVIEW[game.key].tag}</p>

@@ -193,13 +193,13 @@ export function drawEggScene(
     }
   }
   ctx.globalAlpha = 1;
+  drawSprite(ctx, egg, ex, ey, { glowAlpha: 0.35 });
   if (state.creature && state.hatched) {
     const c = state.creature;
     const cy = ey + 18 - Math.round(state.rise * 24);
     if (c.kind === "image") drawGameImage(ctx, c.src, Math.round(EW / 2 - 22), cy, { width: 44, height: 56 });
     else drawSprite(ctx, c.sprite, Math.round(EW / 2 - c.sprite.w / 2), cy, { glowAlpha: 0.35 });
   }
-  drawSprite(ctx, egg, ex, ey, { glowAlpha: 0.35 });
   if (state.flash > 0) {
     ctx.globalAlpha = state.flash;
     ctx.fillStyle = glow;
