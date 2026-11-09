@@ -8,11 +8,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ErrorNote, GameTopBar, PixelButton, ResultPanel, TierList } from "./common";
-import { drawEggScene, EH, eggTier, EW, TIER_GLOW } from "./eggScene";
+import { drawEggScene, EH, eggTier, EW, TIER_GLOW, type EggCreatureVisual } from "./eggScene";
 import { errorText, oswald, stageFrame, useGameInfo } from "./helpers";
 import { creatureFrame } from "./pixel/factions";
 import { PixelSprite } from "./pixel/PixelSprite";
-import type { Sprite } from "./pixel/pixel";
 
 const RARITY_COLORS: Record<string, string> = {
   Ничего: "#8c7f68",
@@ -22,6 +21,21 @@ const RARITY_COLORS: Record<string, string> = {
   Эпическое: "#ffc4e1",
   Легендарное: "#ecfe46",
 };
+
+const INCUBATOR_ART: Record<string, string[]> = {
+  larva: ["backpack-gaunt"],
+  skitter: ["gaunt-soldier"],
+  spiker: ["gaunt-commander"],
+  horned_guard: ["scythe-tyranid", "orange-carnifex", "siege-carnifex"],
+  void_stalker: ["white-demon", "whip-demon", "horned-demon"],
+  brood_queen: ["brood-mother", "psychic-carnifex", "cannon-beast", "spider-tyranid", "flying-gargoyle"],
+};
+
+function visualFor(creature: SwarmCreature, taps: number): EggCreatureVisual {
+  const art = INCUBATOR_ART[creature.id];
+  if (art?.length) return { kind: "image", src: `/games/incubator/${art[taps % art.length]}.png` };
+  return { kind: "sprite", sprite: creatureFrame(creature.id) };
+}
 
 type Particle = { x: number; y: number; vx: number; vy: number; life: number; color: string };
 type Phase = "intro" | "countdown" | "playing" | "sending" | "hatch" | "result" | "error";
@@ -33,7 +47,7 @@ export default function EggGame() {
   const tapsRef = useRef(0);
   const wobbleRef = useRef(0);
   const particlesRef = useRef<Particle[]>([]);
-  const hatchRef = useRef<{ start: number; creature: Sprite | null } | null>(null);
+  const hatchRef = useRef<{ start: number; creature: EggCreatureVisual | null } | null>(null);
   const sessionRef = useRef<string | null>(null);
   const [creatures, setCreatures] = useState<SwarmCreature[]>([]);
   const creaturesRef = useRef<SwarmCreature[]>([]);
@@ -98,7 +112,7 @@ export default function EggGame() {
       const res = await finishMinigame(sessionRef.current!, tapsRef.current);
       setResult(res);
       const c = creatureFor(tapsRef.current, creaturesRef.current);
-      hatchRef.current = { start: performance.now() / 1000, creature: c ? creatureFrame(c.id) : null };
+      hatchRef.current = { start: performance.now() / 1000, creature: c ? visualFor(c, tapsRef.current) : null };
       // осколки скорлупы и слизь
       setTimeout(() => {
         const glow = TIER_GLOW[eggTier(tapsRef.current)]!;
@@ -205,6 +219,7 @@ export default function EggGame() {
   };
 
   const creature = creatureFor(taps, creatures);
+  const visual = creature ? visualFor(creature, taps) : null;
   const tier = eggTier(taps);
 
   return (
@@ -279,7 +294,11 @@ export default function EggGame() {
           {creature && (
             <div className="mt-4 flex flex-col items-center">
               <div className="rounded-2xl border border-white/10 bg-[#0b0709] p-3">
-                <PixelSprite sprite={creatureFrame(creature.id)} scale={4} title={creature.name} />
+                {visual?.kind === "image" ? (
+                  <img src={visual.src} alt={creature.name} className="size-44 object-contain [image-rendering:pixelated]" />
+                ) : (
+                  <PixelSprite sprite={visual!.sprite} scale={4} title={creature.name} />
+                )}
               </div>
               <p className={`mt-2 text-lg uppercase ${oswald}`}>{creature.name}</p>
               <p className="text-xs uppercase tracking-wider" style={{ color: RARITY_COLORS[creature.rarity] ?? "#fff" }}>
