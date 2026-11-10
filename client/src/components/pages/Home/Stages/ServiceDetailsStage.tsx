@@ -1,6 +1,5 @@
 import { createBooking, detailsKindForSlug } from "@/apiUtils/booking";
 import { getDisciplines, getServiceById } from "@/apiUtils/disciplines";
-import { getServicePricing } from "@/apiUtils/pricing";
 import { FieldLabel, NumberChips } from "@/components/booking/FormControls";
 import { DayBar, TimeChips } from "@/components/booking/TimeChips";
 import { DsButton, ToggleRow } from "@/components/ui/ds";
@@ -34,8 +33,6 @@ import { GAMES_BY_CATEGORY } from "@/components/booking/tableCategory";
 
 const CLUB_VISIT_SLUG = "club_visit";
 const MINUTE = 60 * 1000;
-const rubles = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 });
-const formatRubles = (value: number) => `${rubles.format(value)} ₽`;
 
 export default function ServiceDetailsStage() {
   const {
@@ -56,11 +53,6 @@ export default function ServiceDetailsStage() {
     queryKey: ["service", serviceId],
     queryFn: () => getServiceById(serviceId!),
     enabled: serviceId !== null,
-  });
-  const pricingQuery = useQuery({
-    queryKey: ["service-pricing", serviceId],
-    queryFn: () => getServicePricing(serviceId!),
-    enabled: serviceId !== null && detailsKindForSlug(serviceQuery.data?.slug) === "wh_player",
   });
   const disciplinesQuery = useQuery({
     queryKey: ["disciplines"],
@@ -139,11 +131,6 @@ export default function ServiceDetailsStage() {
   const [clubArmy, setClubArmy] = useState(false);
   const [painting, setPainting] = useState(emptyPaintingForm);
   const [showErrors, setShowErrors] = useState(false);
-  const armyRentalRate = pricingQuery.data?.armyRentalPricePer1000;
-  const armyRentalPoints = player.game === "kt" ? 1000 : Number(player.points) || 0;
-  const armyRentalEstimate = clubArmy && armyRentalRate !== undefined
-    ? armyRentalPoints * armyRentalRate / 1000
-    : null;
 
   const formError =
     detailsKind === "wh_player"
@@ -310,13 +297,6 @@ export default function ServiceDetailsStage() {
           />
           <ToggleRow
             title="Нужна армия клуба"
-            subtitle={pricingQuery.isError
-              ? "Не удалось загрузить тариф; стоимость будет рассчитана при записи"
-              : armyRentalRate === undefined
-                ? "Загружаем тариф аренды…"
-                : armyRentalEstimate !== null
-                  ? `${armyRentalPoints} очков · ${formatRubles(armyRentalEstimate)} (1000 очков = ${formatRubles(armyRentalRate)})`
-                  : `1000 очков = ${formatRubles(armyRentalRate)}`}
             checked={clubArmy}
             onChange={setClubArmy}
           />
@@ -339,7 +319,7 @@ export default function ServiceDetailsStage() {
 
       {limited && <LimitedTimeBanner minutes={limited.minutes} until={limited.until} fullMinutes={durationMinutes} place={selectedSlot.kind === "pool" ? "место" : "стол"} compact />}
 
-      <DsButton variant="primary" size="lg" onClick={handleSubmit} disabled={mutation.isPending || serviceQuery.isLoading || (detailsKind === "wh_player" && pricingQuery.isLoading)} className="w-full">
+      <DsButton variant="primary" size="lg" onClick={handleSubmit} disabled={mutation.isPending || serviceQuery.isLoading} className="w-full">
         {isJoin ? <Swords className="size-5" /> : <Dice6 className="size-5" />}
         {mutation.isPending ? "Записываем…" : isJoin ? "Присоединиться к игре" : "Записаться"}
       </DsButton>
