@@ -123,6 +123,14 @@ export type Situation = {
   apMod?: number;
   dMod?: number;
   sMod?: number;
+  /** стрельба навскидку (Fire Overwatch, snap shooting): попадание только на немодифицированную 6, без переброса попаданий */
+  snap?: boolean;
+  /** урон делится пополам с округлением вверх (правила цели) — до остальных модификаторов D */
+  halveD?: boolean;
+  /** критическое ранение на немодифицированные N+ (правила отряда; ANTI оружия берётся лучшее из двух) */
+  critWound?: number;
+  /** способности, выданные правилами (детачмент, стратагема, лидер) всему выбранному оружию */
+  grant?: { sustained?: number; lethal?: boolean; dev?: boolean; ignoresCover?: boolean; twin?: boolean; lance?: boolean };
 };
 
 type Parsed = {
@@ -144,7 +152,8 @@ type Parsed = {
   notCounted: string[];
 };
 
-const NO_EFFECT = new Set(['assault', 'pistol', 'close-quarters', 'extra attacks', 'one shot']);
+// без влияния на расчёт одной атаки; hazardous и psychic учитываются отдельно (примечание, модификаторы попадания)
+const NO_EFFECT = new Set(['assault', 'pistol', 'close-quarters', 'extra attacks', 'one shot', 'hazardous', 'psychic']);
 
 /** Разбор строки способностей оружия против цели (условия «: KEYWORD» проверяются по цели). */
 export function parseWeaponKeywords(s: string, target: Target): Parsed {
@@ -290,6 +299,18 @@ function weaponGroup(w: WeaponInput, target: Target, sit: Situation, start: Stat
   const kw = parseWeaponKeywords(w.keywords, target);
   const half = w.halfRange ?? !!sit.halfRange;
   const notes: string[] = [];
+  // способности, выданные правилами: добавляются к способностям оружия (лучшее из двух)
+  const g = sit.grant ?? {};
+  if (g.sustained && mean(kw.sustained ?? [1]) < g.sustained) kw.sustained = point(g.sustained);
+  if (g.lethal) kw.lethal = true;
+  if (g.dev) kw.dev = true;
+  if (g.ignoresCover) kw.ignoresCover = true;
+  if (g.twin) kw.twin = true;
+  if (g.lance && w.melee) kw.lance = true;
+  // [PSYCHIC]: можно игнорировать модификаторы BS/WS и броска на попадание — игнорируются ухудшающие
+  const psychic = /(^|,)\s*psychic\s*(,|$)/i.test(w.keywords);
+  // [HAZARDOUS]: после атак — бросок на опасность за каждое выбранное оружие (06.03): на 1–2 отряд получает смертельную рану
+  if (/(^|,)\s*hazardous\s*(,|$)/i.test(w.keywords)) notes.push(`HAZARDOUS: бросков на опасность ${Math.max(0, w.count)} — в среднем ${(Math.max(0, w.count) / 3).toFixed(1).replace('.', ',')} смертельных ран своему отряду (MONSTER/VEHICLE — по 3)`);
   const A = diceDist(w.A);
   const D0 = diceDist(w.D);
   const S = num(w.S) + (sit.sMod ?? 0);
@@ -306,16 +327,22 @@ function weaponGroup(w: WeaponInput, target: Target, sit: Situation, start: Stat
 
   // попадание
   const indirect = !!(sit.indirect && kw.indirect && !w.melee);
-  const cover = !w.melee && !kw.ignoresCover && (!!sit.cover || indirect);
+  const cover = !w.melee && !kw.ignoresCover && !psychic && (!!sit.cover || indirect);
   const base = num(w.skill);
   const torrent = kw.torrent || !Number.isFinite(base);
-  const skill = torrent ? null : Math.min(6, Math.max(2, base + (sit.skillMod ?? 0) + (cover ? 1 : 0)));
-  const hitMod = (sit.hitMod ?? 0) + (kw.heavy && sit.heavy && !w.melee ? 1 : 0);
+  const skillMod = psychic ? Math.min(0, sit.skillMod ?? 0) : (sit.skillMod ?? 0);
+  const skill = torrent ? null : Math.min(6, Math.max(2, base + skillMod + (cover ? 1 : 0)));
+  const hitMod0 = (sit.hitMod ?? 0) + (kw.heavy && sit.heavy && !w.melee ? 1 : 0);
+  const hitMod = psychic ? Math.max(0, hitMod0) : hitMod0;
+  const snap = !!sit.snap && !w.melee;
   const critOn = Math.min(6, Math.max(2, sit.critHit ?? 6));
   const failBelow = indirect ? (sit.indirectStationaryVisible ? 4 : 6) : 2; // 10.07: немодифицированные 1-5 (или 1-3) — промах
   type H = 'miss' | 'hit' | 'crit';
-  const hitOutcome = (f: number): H => (f < failBelow ? 'miss' : f >= critOn ? 'crit' : f + hitMod >= skill! ? 'hit' : 'miss');
-  const rrHit = indirect ? 'none' : (sit.rerollHit ?? 'none');
+  // навскидку: попадает только немодифицированная 6 (она же критическая), BS и модификаторы не важны
+  const hitOutcome = (f: number): H => (snap ? (f === 6 ? 'crit' : 'miss') : f < failBelow ? 'miss' : f >= critOn ? 'crit' : f + hitMod >= skill! ? 'hit' : 'miss');
+  const rrHit = indirect || snap ? 'none' : (sit.rerollHit ?? 'none');
+  if (snap) notes.push('навскидку (Fire Overwatch): попадание только на немодифицированную 6, без переброса');
+  if (psychic) notes.push('PSYCHIC: ухудшающие модификаторы попадания и укрытие не действуют');
   const hp = torrent ? { miss: 0, hit: 1, crit: 0 } : { miss: 0, hit: 0, crit: 0, ...rollProbs<H>(hitOutcome, (f, o) => (rrHit === 'ones' ? f === 1 : rrHit === 'fails' ? o === 'miss' : false)) };
   if (indirect) notes.push(`непрямая стрельба: промах на немодифицированные 1–${failBelow - 1}, цель в укрытии, без переброса попаданий`);
   if (cover) notes.push('укрытие: BS хуже на 1');
@@ -324,7 +351,7 @@ function weaponGroup(w: WeaponInput, target: Target, sit: Situation, start: Stat
   // ранение
   const woundOn = woundTarget(S, num(String(target.T)));
   const woundMod = (sit.woundMod ?? 0) + (kw.lance && sit.charged ? 1 : 0);
-  const critW = kw.anti ?? 6;
+  const critW = Math.min(kw.anti ?? 6, Math.min(6, Math.max(2, sit.critWound ?? 6)));
   type Wd = 'fail' | 'wound' | 'crit';
   const woundOutcome = (f: number): Wd => (f === 1 ? 'fail' : f >= critW ? 'crit' : f + woundMod >= woundOn ? 'wound' : 'fail');
   const rrW = kw.twin ? 'fails' : (sit.rerollWound ?? 'none');
@@ -368,6 +395,13 @@ function weaponGroup(w: WeaponInput, target: Target, sit: Situation, start: Stat
   // потеря ран за один непройденный удар: D (+MELTA, +dMod), каждая рана — FNP
   let D = D0;
   if (kw.melta && half) D = convolve(D, kw.melta);
+  if (sit.halveD) {
+    const h: Dist = [0];
+    D.forEach((pd, d) => pd > EPS && (h[Math.ceil(d / 2)] = (h[Math.ceil(d / 2)] ?? 0) + pd));
+    for (let i = 0; i < h.length; i++) h[i] ??= 0;
+    D = h;
+    notes.push('урон делится пополам (округление вверх)');
+  }
   if (sit.dMod) D = sit.dMod > 0 ? shift(D, sit.dMod) : clampMin1(D, sit.dMod);
   if (kw.melta && half) notes.push('MELTA: + к D на половине дальности');
   const keep = target.fnp != null ? (target.fnp - 1) / 6 : 1; // вероятность потерять каждую рану
