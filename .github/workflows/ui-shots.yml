@@ -17,7 +17,7 @@ concurrency:
 jobs:
   shots:
     name: Screenshots (demo build)
-    if: ${{ contains(github.event.pull_request.labels.*.name, 'ui-shots') }}
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'ui-shots') || contains(github.event.pull_request.labels.*.name, 'ui-audit') }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -40,7 +40,8 @@ jobs:
         run: |
           node tools/roster-demo/server.mjs > /tmp/server.log 2>&1 &
           for i in $(seq 1 30); do curl -sf http://localhost:5050/ >/dev/null && break; sleep 1; done
-          node tools/ui-shots/shots.mjs ui-shots
+          # обзор всех разделов (ui-audit) — на PR с меткой «ui-audit»; обычные снимки — с меткой «ui-shots»
+          if [ "${{ contains(github.event.pull_request.labels.*.name, 'ui-audit') }}" = "true" ]; then node tools/ui-shots/audit.mjs ui-shots; else node tools/ui-shots/shots.mjs ui-shots; fi
           cp /tmp/server.log ui-shots/server.log || true
       - name: Print screenshots (base64, for readers without artifact access)
         if: ${{ always() }}
