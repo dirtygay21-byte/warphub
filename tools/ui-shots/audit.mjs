@@ -55,11 +55,13 @@ const browser = await chromium.launch();
 const log = [];
 let n = 0;
 for (const width of [390, 360]) {
-  const ctx = await browser.newContext({ viewport: { width, height: 800 }, deviceScaleFactor: width === 390 ? 2 : 1, locale: 'ru-RU' });
+  // высота 2200: страницы прокручиваются внутри своего контейнера — высокий экран показывает их целиком
+  const ctx = await browser.newContext({ viewport: { width, height: Number(process.env.AUDIT_HEIGHT || 2200) }, deviceScaleFactor: 1, locale: 'ru-RU' });
   const page = await ctx.newPage();
   const errs = [];
   page.on('console', (m) => m.type() === 'error' && errs.push(m.text().slice(0, 160)));
-  page.on('pageerror', (e) => errs.push('pageerror: ' + e.message.slice(0, 160)));
+  page.on('pageerror', (e) => errs.push('pageerror: ' + e.message.slice(0, 160) + ' @ ' + String(e.stack ?? '').split('\n').slice(1, 3).join(' ← ').replace(/https?:\/\/[^/]+\//g, '').slice(0, 200)));
+  page.on('response', (r) => r.status() >= 400 && errs.push(`${r.status()} ${new URL(r.url()).pathname}`));
   for (const [name, route] of ROUTES) {
     if (only && !only.has(name)) continue;
     errs.length = 0;
@@ -91,7 +93,7 @@ for (const width of [390, 360]) {
       });
       const file = `${String(++n).padStart(2, '0')}-${width}-${name}.jpg`;
       await page.screenshot({ path: path.join(OUT, file), fullPage: true, type: 'jpeg', quality: 60 });
-      log.push(`${width} ${name} (${route} → ${r.path}): высота ${r.h}${r.over > 1 ? `; ШИРЕ ЭКРАНА на ${r.over}px` : ''}${r.clipped.length ? `; за краем: ${r.clipped.join(' | ')}` : ''}${r.small.length ? `; мелкие цели: ${r.small.join(' | ')}` : ''}${errs.length ? `; ошибки консоли: ${[...new Set(errs)].slice(0, 3).join(' | ')}` : ''}`);
+      log.push(`${width} ${name} (${route} → ${r.path}): высота ${r.h}${r.over > 1 ? `; ШИРЕ ЭКРАНА на ${r.over}px` : ''}${r.clipped.length ? `; за краем: ${r.clipped.join(' | ')}` : ''}${r.small.length ? `; мелкие цели: ${r.small.join(' | ')}` : ''}${errs.length ? `; ошибки консоли: ${[...new Set(errs)].filter((e) => !e.startsWith('Failed to load resource')).slice(0, 6).join(' | ')}` : ''}`);
       console.log('📸', file);
     } catch (e) {
       log.push(`${width} ${name}: НЕ ОТКРЫЛОСЬ — ${String(e.message ?? e).split('\n')[0]}`);
