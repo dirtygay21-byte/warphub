@@ -1,3 +1,4 @@
+import { learnDone } from '@/components/tutorial/progress';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BATTLE_SIZES, BATTLE_SIZE_ORDER } from '../engine/rules';
@@ -53,7 +54,8 @@ export function RosterList({
         rules={[
           { icon: 'book', title: 'Правила', sub: 'Стратагемы · Core Rules', onClick: onRules },
           { icon: 'spark', title: 'Как играть', sub: 'Обучение для новичков: ход, стрельба, бой', onClick: () => navigate('/learn/40k') },
-          { icon: 'shield', title: 'Обучающая игра', sub: 'Раунд по шагам за столом', onClick: () => navigate('/learn/40k/round') },
+          // обучающая игра — после карточек «Как играть» (13.11.2026)
+          ...(learnDone('40k') ? [{ icon: 'shield', title: 'Обучающая игра', sub: 'Раунд по шагам за столом', onClick: () => navigate('/learn/40k/round') }] : []),
         ]}
         game={[
           { icon: 'map', title: 'Начать игру', sub: 'Миссии · раскладки · трекер', onClick: onStartGame },

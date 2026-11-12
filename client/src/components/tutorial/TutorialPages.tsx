@@ -8,6 +8,7 @@ import { Check, ChevronLeft, ChevronRight, List, RotateCcw, X } from "lucide-rea
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { Navigate, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { TUTORIAL_GAMES, TUTORIAL_SOON, tutorialOf, type TutorialStep } from "./content";
+import { learnDone, markLearnDone } from "./progress";
 import TutorialDiagramView from "./TutorialDiagram";
 import { TUTORIAL_WALKS, type WalkStep } from "./walkthrough";
 
@@ -47,38 +48,54 @@ export function TutorialHub() {
     <div className="ds-enter pb-10 text-fg">
       <TopBar onBack={back} title="Как играть" />
       <div className="flex flex-col gap-5 px-5 pt-1">
-        <section className="rounded-[20px] border border-accent/30 bg-gradient-to-br from-accent/[0.18] to-accent/[0.02] p-5">
-          <h1 className="font-display text-[28px] font-semibold uppercase leading-[1.05]">
-            Первая игра
-            <br />
-            без паники
-          </h1>
-          <p className="mt-2 text-[15px] leading-snug text-fg-2">Короткие карточки со схемами: как устроен ход, как стрелять и драться.</p>
+        <section className="rounded-[16px] border border-accent/30 bg-gradient-to-br from-accent/[0.16] to-accent/[0.02] px-4 py-3">
+          <h1 className="font-display text-[20px] font-semibold uppercase leading-tight">Первая игра без паники</h1>
+          <p className="mt-1 text-[13.5px] leading-snug text-fg-2">Карточки со схемами: ход, стрельба, бой. После карточек откроется обучающая игра — раунд по шагам за столом.</p>
         </section>
 
         <section>
           <SectionLabel>Выберите игру</SectionLabel>
           <div className="overflow-hidden rounded-[18px] border border-white/10 bg-app-elevated">
-            {TUTORIAL_GAMES.map((game, i) => (
-              <button
-                key={game.id}
-                type="button"
-                onClick={() => (haptic.tap(), navigate(`/learn/${game.id}`))}
-                className={clsx("flex min-h-[72px] w-full items-center gap-3.5 px-4 py-3 text-left active:bg-white/[0.06]", i > 0 && "border-t border-white/[0.06]")}
-              >
-                <span className="font-display flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent text-base font-bold text-accent-foreground">{game.code}</span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-base font-bold">{game.title}</span>
-                  <span className="block text-[13px] text-fg-2">
-                    {game.steps.length} шагов · около {Math.max(3, Math.round(game.steps.length / 2))} мин
-                  </span>
-                </span>
-                <ChevronRight className="size-5 shrink-0 text-accent" />
-              </button>
-            ))}
+            {TUTORIAL_GAMES.map((game, i) => {
+              const walk = TUTORIAL_WALKS[game.id];
+              const done = learnDone(game.id);
+              return (
+                <div key={game.id} className={clsx(i > 0 && "border-t border-white/[0.06]")}>
+                  <button
+                    type="button"
+                    onClick={() => (haptic.tap(), navigate(`/learn/${game.id}`))}
+                    className="flex min-h-[60px] w-full items-center gap-3 px-3.5 py-2.5 text-left active:bg-white/[0.06]"
+                  >
+                    <span className="font-display flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent text-[15px] font-bold text-accent-foreground">{game.code}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[15px] font-bold leading-tight">{game.title}</span>
+                      <span className="block text-[12.5px] text-fg-2">
+                        {done ? "Пройдено · " : ""}
+                        {game.steps.length} шагов · около {Math.max(3, Math.round(game.steps.length / 2))} мин
+                      </span>
+                    </span>
+                    {done ? <Check className="size-5 shrink-0 text-accent" /> : <ChevronRight className="size-5 shrink-0 text-accent" />}
+                  </button>
+                  {/* обучающая игра — только после карточек «Как играть» этой игры (13.11.2026) */}
+                  {walk &&
+                    (done ? (
+                      <button
+                        type="button"
+                        onClick={() => (haptic.tap(), navigate(`/learn/${game.id}/round`))}
+                        className="flex min-h-[44px] w-full items-center gap-3 border-t border-white/[0.06] bg-accent/[0.06] py-2 pl-[66px] pr-3.5 text-left active:bg-white/[0.06]"
+                      >
+                        <span className="min-w-0 flex-1 text-[13.5px] font-semibold text-accent">Обучающая игра: раунд по шагам · {walk.steps.length} шагов</span>
+                        <ChevronRight className="size-4 shrink-0 text-accent" />
+                      </button>
+                    ) : (
+                      <p className="border-t border-white/[0.06] py-1.5 pl-[66px] pr-3.5 text-[12px] text-fg-3">Обучающая игра откроется после карточек</p>
+                    ))}
+                </div>
+              );
+            })}
             {TUTORIAL_SOON.map((game) => (
-              <div key={game.code} className="flex min-h-[72px] items-center gap-3.5 border-t border-white/[0.06] px-4 py-3 opacity-70">
-                <span className="font-display flex size-11 shrink-0 items-center justify-center rounded-xl bg-white/[0.08] text-base font-bold text-fg-2">{game.code}</span>
+              <div key={game.code} className="flex min-h-[56px] items-center gap-3 border-t border-white/[0.06] px-3.5 py-2 opacity-70">
+                <span className="font-display flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.08] text-base font-bold text-fg-2">{game.code}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-base font-bold">{game.title}</span>
                   <span className="block text-[13px] text-fg-3">Скоро</span>
@@ -87,28 +104,6 @@ export function TutorialHub() {
             ))}
           </div>
         </section>
-        {TUTORIAL_GAMES.some((g) => TUTORIAL_WALKS[g.id]) && (
-          <section>
-            <SectionLabel>Обучающая игра</SectionLabel>
-            <div className="overflow-hidden rounded-[18px] border border-accent/30 bg-app-elevated">
-              {TUTORIAL_GAMES.filter((g) => TUTORIAL_WALKS[g.id]).map((game, i) => (
-                <button
-                  key={game.id}
-                  type="button"
-                  onClick={() => (haptic.tap(), navigate(`/learn/${game.id}/round`))}
-                  className={clsx("flex min-h-[72px] w-full items-center gap-3.5 px-4 py-3 text-left active:bg-white/[0.06]", i > 0 && "border-t border-white/[0.06]")}
-                >
-                  <span className="font-display flex size-11 shrink-0 items-center justify-center rounded-xl border border-accent/50 text-base font-bold text-accent">{game.code}</span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-base font-bold">{game.title}: сыграть раунд</span>
-                    <span className="block text-[13px] text-fg-2">По шагам за столом · {TUTORIAL_WALKS[game.id]!.steps.length} шагов</span>
-                  </span>
-                  <ChevronRight className="size-5 shrink-0 text-accent" />
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
         <p className="text-[13px] leading-snug text-fg-3">Правила пересказаны кратко. Источник и редакция — на последней карточке.</p>
       </div>
     </div>
@@ -148,10 +143,10 @@ function Diamond({ children, tone }: { children: ReactNode; tone: "accent" | "da
 
 function StepCard({ step }: { step: TutorialStep }) {
   return (
-    <article className="flex flex-col gap-4">
+    <article className="flex flex-col gap-3">
       <header>
-        <div className="flex items-center gap-3">
-          <h1 className="font-display text-[30px] font-semibold uppercase leading-[1.05]">{step.title}</h1>
+        <div className="flex items-center gap-2.5">
+          <h1 className="font-display text-[24px] font-semibold uppercase leading-[1.05]">{step.title}</h1>
           {step.phase && <Diamond tone="accent">{step.phase}</Diamond>}
         </div>
         <p className="mt-0.5 text-sm text-fg-3">
@@ -160,9 +155,9 @@ function StepCard({ step }: { step: TutorialStep }) {
         </p>
       </header>
       <TutorialDiagramView diagram={step.diagram} />
-      <ul className="flex flex-col gap-2.5">
+      <ul className="flex flex-col gap-2">
         {step.points.map((point) => (
-          <li key={point} className="flex gap-2.5 text-[15px] leading-snug text-fg-2">
+          <li key={point} className="flex gap-2.5 text-[14.5px] leading-snug text-fg-2">
             <span aria-hidden="true" className="mt-[7px] size-1.5 shrink-0 rounded-[2px] bg-accent" />
             <span>
               <Rich text={point} />
@@ -204,6 +199,11 @@ export function TutorialViewer() {
   useEffect(() => {
     document.querySelector<HTMLElement>("[data-tutorial-top]")?.scrollIntoView({ block: "start" });
   }, [step]);
+
+  const reachedEnd = !!game && step === total - 1;
+  useEffect(() => {
+    if (game && reachedEnd) markLearnDone(game.id);
+  }, [game, reachedEnd]);
 
   if (!game) return <Navigate to="/learn" replace />;
   const current = game.steps[step]!;
@@ -421,6 +421,8 @@ export function TutorialRound() {
     document.querySelector<HTMLElement>("[data-tutorial-top]")?.scrollIntoView({ block: "start" });
   }, [pageParam]);
   if (!game || !walk) return <Navigate to="/learn" replace />;
+  // обучающая игра — после карточек «Как играть» (13.11.2026)
+  if (!learnDone(game.id)) return <Navigate to={`/learn/${game.id}`} replace />;
   // 0 — вступление (примеры отрядов), 1..N — шаги, N+1 — следующий раунд
   const total = walk.steps.length + 2;
   const page = Math.min(Math.max(Number(params.get("p") ?? 0) || 0, 0), total - 1);
