@@ -17,8 +17,39 @@ function notificationsEnabled(): boolean {
   return (process.env.TELEGRAM_NOTIFICATIONS ?? 'on').toLowerCase() !== 'off';
 }
 
+/**
+ * Журнал последних отправок (14.11.2026) — в памяти сервера, сбрасывается при перезапуске. Без текста сообщений:
+ * когда, кому (Telegram ID), что за сообщение, результат. Нужен, чтобы видеть в админке, доходят ли уведомления.
+ */
+export type SendLogEntry = { at: string; chatId: string; kind: string; ok: boolean; reason?: string; status?: number; description?: string; ms: number };
+const SEND_LOG_LIMIT = 60;
+const sendLog: SendLogEntry[] = [];
+
+export function recentSends(): SendLogEntry[] {
+  return [...sendLog].reverse();
+}
+
+function remember(chatId: number | string, kind: string, result: SendResult, ms: number) {
+  sendLog.push({
+    at: new Date().toISOString(),
+    chatId: String(chatId),
+    kind,
+    ok: result.ok,
+    ...(result.ok ? {} : { reason: result.reason, status: result.status, description: result.description?.slice(0, 200) }),
+    ms,
+  });
+  if (sendLog.length > SEND_LOG_LIMIT) sendLog.splice(0, sendLog.length - SEND_LOG_LIMIT);
+}
+
 /** Отправить сообщение и вернуть подробный результат (для проверки уведомлений из админки). */
-export async function sendTelegramMessageDetailed(chatId: number | string, text: string): Promise<SendResult> {
+export async function sendTelegramMessageDetailed(chatId: number | string, text: string, kind = 'message'): Promise<SendResult> {
+  const started = Date.now();
+  const result = await sendRaw(chatId, text);
+  remember(chatId, kind, result, Date.now() - started);
+  return result;
+}
+
+async function sendRaw(chatId: number | string, text: string): Promise<SendResult> {
   if (!notificationsEnabled()) return { ok: false, reason: 'disabled' };
 
   try {
@@ -54,21 +85,21 @@ export async function sendTelegramMessageDetailed(chatId: number | string, text:
   }
 }
 
-export async function sendTelegramMessage(chatId: number | string, text: string): Promise<boolean> {
-  return (await sendTelegramMessageDetailed(chatId, text)).ok;
+export async function sendTelegramMessage(chatId: number | string, text: string, kind = 'message'): Promise<boolean> {
+  return (await sendTelegramMessageDetailed(chatId, text, kind)).ok;
 }
 
 /** Отправить сообщение всем администраторам (не ждёт результата) */
 export function notifyAdmins(text: string): void {
   for (const adminId of getAdminTelegramIds()) {
-    void sendTelegramMessage(adminId, text);
+    void sendTelegramMessage(adminId, text, 'admin');
   }
 }
 
 /** Отправить сообщение пользователю (не ждёт результата) */
 export function notifyUser(telegramId: number | null | undefined, text: string) {
   if (!telegramId) return;
-  void sendTelegramMessage(telegramId, text);
+  void sendTelegramMessage(telegramId, text, 'user');
 }
 
 /**
@@ -79,6 +110,7 @@ export async function testNotification(admin: { telegramId: number; firstName: s
   const result = await sendTelegramMessageDetailed(
     admin.telegramId,
     `🔔 <b>Проверка уведомлений WarpHub</b>\nЕсли вы видите это сообщение, бот может писать вам. Уведомления о записях приходят всем администраторам.`,
+    'test-admin',
   );
   return { ...describeSendResult(result), recipients: getAdminTelegramIds().length };
 }
@@ -97,6 +129,7 @@ export async function testUserNotification(user: { telegramId: number }, now = D
   const result = await sendTelegramMessageDetailed(
     user.telegramId,
     `🔔 <b>Уведомления WarpHub работают</b>\nСюда придут подтверждения записей, сообщения о сопернике и об отмене.`,
+    'test-user',
   );
   const d = describeSendResult(result);
   // пользователю — без подробностей о сервере и токене
@@ -104,3 +137,31 @@ export async function testUserNotification(user: { telegramId: number }, now = D
   if (!result.ok && result.reason === 'telegram' && result.status === 403) return { ok: false, needsStart: true, message: 'Бот пока не может писать вам. Нажмите «Разрешить уведомления» или откройте чат с ботом и нажмите «Старт».' };
   return { ok: false, message: 'Сейчас не получилось отправить сообщение — попробуйте позже.' };
 }
+
+/**
+ * Диагностика уведомлений для админки (14.11.2026): включены ли, отвечает ли Telegram (getMe — какой бот,
+ * сколько миллисекунд), кто получает уведомления администраторов и чем закончились последние отправки.
+ * Ничего не отправляет. Токен не показывается.
+ */
+export async function notificationDiagnostics() {
+  const enabled = notificationsEnabled();
+  let bot: { ok: boolean; username?: string; ms: number; error?: string };
+  const started = Date.now();
+  try {
+    const response = await fetch(`${TELEGRAM_API}/bot${env.telegramBotToken}/getMe`, { signal: AbortSignal.timeout(10_000) });
+    const body = (await response.json().catch(() => ({}))) as { ok?: boolean; result?: { username?: string }; description?: string };
+    bot = body.ok
+      ? { ok: true, username: body.result?.username, ms: Date.now() - started }
+      : { ok: false, ms: Date.now() - started, error: `Telegram ${response.status}: ${body.description ?? 'нет ответа'}` };
+  } catch (error) {
+    bot = { ok: false, ms: Date.now() - started, error: `нет связи с api.telegram.org: ${(error as Error).message}` };
+  }
+  const log = recentSends();
+  const admins = getAdminTelegramIds().map((id) => {
+    const last = log.find((e) => e.chatId === id);
+    return { telegramId: id, last: last ?? null };
+  });
+  return { enabled, bot, admins, recent: log.slice(0, 30), since: SERVER_STARTED };
+}
+
+const SERVER_STARTED = new Date().toISOString();
