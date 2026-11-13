@@ -2,7 +2,7 @@ import { STATUS_LABELS, formatReservationDateTime, getStatusLabel, getStatusStyl
 import { formatClub } from "@/utils/clubTime";
 import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 import clsx from "clsx";
-import { ArrowDownUp, CalendarClock, Check, ChevronRight, Swords, WalletCards, X } from "lucide-react";
+import { ArrowDownUp, CalendarClock, ChevronRight, Swords, WalletCards, X } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
@@ -80,7 +80,6 @@ export function ReservationsTable({
                   on ? "border-accent/60 bg-accent/15 text-accent" : "border-white/[0.14] text-fg-2 hover:text-fg",
                 )}
               >
-                {on && <Check className="size-3.5" />}
                 {category.label}
               </button>
             );
@@ -143,8 +142,15 @@ export function ReservationsTable({
 const when = (row: AdminReservationRow) =>
   row.startsAt ? `${formatClub(row.startsAt, { day: "numeric", month: "short", weekday: "short" })} · ${row.timeRange}` : row.timeRange;
 
+const SHORT_STATUS: Record<string, string> = { pending: "Ждёт", confirmed: "Подтв.", cancelled: "Отмена" };
+
+/** Короткий статус в строке списка (полный — в окне записи). */
 function StatusPill({ status }: { status: string }) {
-  return <span className={clsx("shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold", getStatusStyle(status))}>{getStatusLabel(status)}</span>;
+  return (
+    <span title={getStatusLabel(status)} className={clsx("shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold", getStatusStyle(status))}>
+      {SHORT_STATUS[status] ?? getStatusLabel(status)}
+    </span>
+  );
 }
 
 function SeatsBadge({ occupied, seats }: { occupied: number; seats: number }) {
