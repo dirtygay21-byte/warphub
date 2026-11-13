@@ -9,6 +9,7 @@
  * Картинки: /demo-img/<имя>.svg (генерируются на лету), /s3/* — заглушки для s3Url(),
  * /demo-img/uploads/* — файлы, загруженные через POST /api/admin/upload.
  */
+import fs from 'node:fs';
 
 // ---------------------------------------------------------------------------
 // Конфиг (backend/src/config/booking.ts, events.ts)
@@ -29,33 +30,25 @@ const CFG = {
   uploadDest: ['events', 'news', 'dnd-games'],
 };
 
-const OPTIONS = {
-  experienceLevels: [
-    { value: 'beginner', label: 'Новичок', hint: '1–5 игр' },
-    { value: 'player', label: 'Игрок', hint: '5–15 игр' },
-    { value: 'experienced', label: 'Опытный', hint: '15–30 игр' },
-    { value: 'veteran', label: 'Ветеран', hint: '30–60 игр' },
-  ],
-  factions: [
-    'Adepta Sororitas', 'Adeptus Custodes', 'Adeptus Mechanicus', 'Aeldari', 'Agents of the Imperium',
-    'Astra Militarum', 'Black Templars', 'Blood Angels', 'Chaos Daemons', 'Chaos Knights',
-    'Chaos Space Marines', 'Dark Angels', 'Death Guard', 'Deathwatch', 'Drukhari', "Emperor's Children",
-    'Genestealer Cults', 'Grey Knights', 'Imperial Knights', 'Leagues of Votann', 'Necrons', 'Orks',
-    'Space Marines', 'Space Wolves', "T'au Empire", 'Thousand Sons', 'Tyranids', 'World Eaters',
-  ],
-  paintSources: [
-    { value: 'own', label: 'Свои краски' },
-    { value: 'club', label: 'Краски клуба' },
-  ],
-  dndTimePreferences: [
-    { value: 'morning', label: 'Утро' },
-    { value: 'afternoon', label: 'День' },
-    { value: 'evening', label: 'Вечер' },
-  ],
-  dndMaxPlayersPerRequest: 6,
-  pointsPresets: [500, 1000, 1500, 2000],
-  maxPoints: 10000,
-};
+// Справочники форм записи — из настоящего конфига сервера (backend/src/config/booking.ts → bookingOptions), чтобы демо
+// не отставало от приложения (13.11.2026: без games / killTeamGroups экран записей падал).
+function realBookingOptions() {
+  const src = fs.readFileSync(new URL('../../backend/src/config/booking.ts', import.meta.url), 'utf8');
+  const from = src.indexOf('export const bookingOptions = {');
+  const to = src.indexOf('} as const;', from);
+  if (from < 0 || to < 0) throw new Error('fake-backend: bookingOptions не найден в backend/src/config/booking.ts');
+  const body = src.slice(from + 'export const bookingOptions = '.length, to + 1).replace(/\bas const\b/g, '');
+  const o = new Function(`return (${body});`)();
+  const names = (dir) => {
+    try {
+      return JSON.parse(fs.readFileSync(new URL(`../../backend/roster-data/${dir}/index.json`, import.meta.url), 'utf8')).factions.map((f) => f.name).sort();
+    } catch {
+      return [];
+    }
+  };
+  return { ...o, killTeams: o.killTeamGroups.flatMap((g) => g.factions.flatMap((f) => [...f.teams])), aosFactions: names('aos'), warcryFactions: names('warcry') };
+}
+const OPTIONS = realBookingOptions();
 
 const expLabel = (v) => OPTIONS.experienceLevels.find((l) => l.value === v)?.label ?? '—';
 const timeLabel = (v) => OPTIONS.dndTimePreferences.find((o) => o.value === v)?.label ?? v;
