@@ -32,3 +32,19 @@ export const STATUS_ACTION_OPTIONS: Record<
   reject: { label: "Отменить", style: getStatusStyle("cancelled") },
   extend: { label: "Продлить", style: "bg-blue-400/15 text-blue-300" },
 };
+
+/** Порядок списка «Все записи» (14.11.2026) — сортирует сервер, список повторяет порядок для групп игр. */
+export const RESERVATION_SORTS: Array<{ key: "createdAt" | "startsAt"; desc: boolean; label: string }> = [
+  { key: "createdAt", desc: true, label: "Сначала новые записи" },
+  { key: "startsAt", desc: false, label: "По времени визита: ближайшие" },
+  { key: "startsAt", desc: true, label: "По времени визита: поздние" },
+  { key: "createdAt", desc: false, label: "Сначала старые записи" },
+];
+
+/** Категории (флажки) «Все записи»: по умолчанию — только ожидающие подтверждения. */
+export const RESERVATION_CATEGORIES: Array<{ id: "pending" | "confirmed" | "cancelled" | "past"; label: string }> = [
+  { id: "pending", label: "Ждут подтверждения" },
+  { id: "confirmed", label: "Подтверждённые" },
+  { id: "cancelled", label: "Отменённые" },
+  { id: "past", label: "Прошедшие" },
+];

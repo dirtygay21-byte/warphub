@@ -143,6 +143,9 @@ const buildAdminReservationsPath = (query: AdminReservationsQuery) => {
   appendSearchParam(params, "userId", query.userId);
   appendSearchParam(params, "startsAt", query.startsAt);
   appendSearchParam(params, "endsAt", query.endsAt);
+  appendSearchParam(params, "categories", query.categories);
+  appendSearchParam(params, "sortBy", query.sortBy);
+  appendSearchParam(params, "sortOrder", query.sortOrder);
   appendSearchParam(params, "limit", query.limit);
   appendSearchParam(params, "offset", query.offset);
 

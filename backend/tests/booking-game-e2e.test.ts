@@ -106,6 +106,14 @@ describe('игра в записи на Warhammer', () => {
     expect(a!.game!.players.map((p) => p.firstName)).toEqual(['host', 'right']);
     expect(a!.game!.players.map((p) => p.details?.army)).toEqual(['Pathfinders', 'Kasrkin']);
     expect((await api('GET', `/admin/reservations?limit=5&offset=0`, T.host)).status).toBe(403);
+    // категории: игра впереди и подтверждения ждёт — есть в pending, нет в past; count — по тем же фильтрам
+    const cat = async (c: string) => (await api('GET', `/admin/reservations?tableId=${tableId}&categories=${c}&limit=50&offset=0`, T.admin)).json as Array<{ status: string }>;
+    const pending = await cat('pending');
+    const confirmed = await cat('confirmed');
+    expect(pending.length + confirmed.length).toBe(2);
+    expect((await cat('past')).length).toBe(0);
+    expect((await cat('pending,confirmed')).length).toBe(2);
+    expect([400, 422]).toContain((await api('GET', `/admin/reservations?categories=bogus&limit=5&offset=0`, T.admin)).status);
   });
 
   test('в сессиях стола видна игра игроков', async () => {

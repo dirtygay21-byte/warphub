@@ -12,6 +12,7 @@ import {
   lt,
   lte,
   ne,
+  or,
   SQL,
   sql,
 } from 'drizzle-orm';
@@ -69,6 +70,7 @@ import {
   poolFitEnd,
   tableFitEnd,
   tableGameKey,
+  parseCategories,
 } from './rules';
 
 export { parseDateParam } from './rules';
@@ -1341,6 +1343,10 @@ export type ListReservationsFilters = {
   serviceId?: number;
   tableId?: number;
   status?: 'pending' | 'confirmed' | 'cancelled';
+  /** Категории через запятую: pending, confirmed, cancelled, past (rules.inCategory) */
+  categories?: string;
+  /** Момент «сейчас» для категорий (тесты) */
+  now?: Date;
   userId?: string;
   startsAt?: string;
   endsAt?: string;
@@ -1384,6 +1390,17 @@ function buildReservationFilters(filters: ListReservationsFilters): SQL[] {
 
   if (filters.userId !== undefined) {
     conditions.push(eq(reservationsTable.userId, filters.userId));
+  }
+
+  const categories = parseCategories(filters.categories);
+  if (categories.length > 0) {
+    const now = filters.now ?? new Date();
+    const parts = categories.map((category) => {
+      if (category === 'cancelled') return eq(reservationsTable.status, 'cancelled');
+      if (category === 'past') return and(ne(reservationsTable.status, 'cancelled'), lt(reservationsTable.endsAt, now))!;
+      return and(eq(reservationsTable.status, category), gte(reservationsTable.endsAt, now))!;
+    });
+    conditions.push(or(...parts)!);
   }
 
   if (filters.date !== undefined) {
