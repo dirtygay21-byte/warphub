@@ -3,7 +3,7 @@ import { s3Url } from "@/utils/s3utils";
 import clsx from "clsx";
 import { useEffect, useRef } from "react";
 import { oswald } from "../helpers";
-import { drawGameImage, gameImage } from "../pixel/assets";
+import { gameImage } from "../pixel/assets";
 import { RARITY_STYLE } from "./rarity";
 
 // ---------------------------------------------------------------------------
@@ -15,42 +15,84 @@ const K = 3;
 const ART_W = 96 * K;
 const ART_H = 88 * K;
 
-function imageLuminance(image: HTMLImageElement) {
-  const sample = document.createElement("canvas");
-  sample.width = 32;
-  sample.height = 32;
-  const ctx = sample.getContext("2d", { willReadFrequently: true });
-  if (!ctx) return 255;
-  ctx.drawImage(image, 0, 0, 32, 32);
-  const data = ctx.getImageData(0, 0, 32, 32).data;
-  let total = 0;
-  let count = 0;
-  for (let i = 0; i < data.length; i += 4) {
-    if ((data[i + 3] ?? 0) < 40) continue;
-    total += ((data[i] ?? 0) + (data[i + 1] ?? 0) + (data[i + 2] ?? 0)) / 3;
-    count += 1;
-  }
-  return count ? total / count : 255;
-}
+type PreparedArt = { canvas: HTMLCanvasElement; outline: HTMLCanvasElement; locked: HTMLCanvasElement; dark: boolean };
+const prepared = new Map<string, PreparedArt>();
 
-/** Силуэт спрайта одним цветом — для контура вокруг фигуры. */
-function silhouette(image: HTMLImageElement, color: string) {
+function onlyShape(source: HTMLCanvasElement, color: string) {
   const c = document.createElement("canvas");
-  c.width = image.naturalWidth;
-  c.height = image.naturalHeight;
+  c.width = source.width;
+  c.height = source.height;
   const x = c.getContext("2d");
-  if (!x) return null;
-  x.imageSmoothingEnabled = false;
-  x.drawImage(image, 0, 0);
-  x.globalCompositeOperation = "source-in";
-  x.fillStyle = color;
-  x.fillRect(0, 0, c.width, c.height);
+  if (x) {
+    x.drawImage(source, 0, 0);
+    x.globalCompositeOperation = "source-in";
+    x.fillStyle = color;
+    x.fillRect(0, 0, c.width, c.height);
+  }
   return c;
 }
 
 /**
- * Иллюстрация карты (13.11.2026): рисунок владельца без изменений, читаемость — за счёт подачи.
- * Фон — мягкий свет цвета редкости (светлый для тёмных спрайтов), под фигурой — тень, вокруг — контрастный контур.
+ * Подготовка рисунка (14.11.2026), один раз на спрайт: обрезка пустых полей (фигура крупнее), у тёмных спрайтов —
+ * подъём теней (чёрный контур рисунка не трогается), силуэты для контура и закрытой карты. Пиксели рисунка не
+ * перерисовываются — меняются только поля и яркость тёмных тонов.
+ */
+function prepareArt(src: string, image: HTMLImageElement): PreparedArt | null {
+  const hit = prepared.get(src);
+  if (hit) return hit;
+  const w = image.naturalWidth;
+  const h = image.naturalHeight;
+  const full = document.createElement("canvas");
+  full.width = w;
+  full.height = h;
+  const fx = full.getContext("2d", { willReadFrequently: true });
+  if (!fx) return null;
+  fx.drawImage(image, 0, 0);
+  const img = fx.getImageData(0, 0, w, h);
+  const d = img.data;
+  let minX = w, minY = h, maxX = -1, maxY = -1, lum = 0, n = 0;
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      if ((d[i + 3] ?? 0) < 40) continue;
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+      const l = ((d[i] ?? 0) + (d[i + 1] ?? 0) + (d[i + 2] ?? 0)) / 3;
+      if (l > 24) {
+        lum += l;
+        n++;
+      }
+    }
+  if (maxX < 0) return null;
+  const avg = n ? lum / n : 255;
+  const dark = avg < 95;
+  if (dark) {
+    // тёмные тона светлее (гамма 0.72), почти чёрный контур (<24) — как был
+    const lift = (v: number) => Math.round(255 * Math.pow(v / 255, 0.72));
+    for (let i = 0; i < d.length; i += 4) {
+      if ((d[i + 3] ?? 0) < 40) continue;
+      const l = ((d[i] ?? 0) + (d[i + 1] ?? 0) + (d[i + 2] ?? 0)) / 3;
+      if (l <= 24) continue;
+      d[i] = lift(d[i] ?? 0);
+      d[i + 1] = lift(d[i + 1] ?? 0);
+      d[i + 2] = lift(d[i + 2] ?? 0);
+    }
+    fx.putImageData(img, 0, 0);
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = maxX - minX + 1;
+  canvas.height = maxY - minY + 1;
+  canvas.getContext("2d")?.drawImage(full, minX, minY, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+  const art = { canvas, outline: onlyShape(canvas, dark ? "#fbf7ea" : "#e9e3cf"), locked: onlyShape(canvas, "#050505"), dark };
+  prepared.set(src, art);
+  return art;
+}
+
+/**
+ * Иллюстрация карты: рисунок владельца, обрезанный по фигуре и увеличенный кратно пикселю (чёткие края);
+ * свет цвета редкости за фигурой, тень на земле, светлый контур в 1 пиксель рисунка.
  */
 export function CardArt({ card, className, locked }: { card: CardDef; className?: string; locked?: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -62,51 +104,43 @@ export function CardArt({ card, className, locked }: { card: CardDef; className?
     const tone = RARITY_STYLE[card.rarity].color;
     const render = () => {
       if (!image.complete || image.naturalWidth === 0) return;
-      const darkSprite = imageLuminance(image) < 105;
+      const art = prepareArt(src, image);
+      if (!art) return;
+      ctx.imageSmoothingEnabled = false;
       ctx.clearRect(0, 0, ART_W, ART_H);
-      ctx.fillStyle = darkSprite ? "#b9b2a2" : "#12140e";
+      ctx.fillStyle = art.dark ? "#3a3d33" : "#12140e";
       ctx.fillRect(0, 0, ART_W, ART_H);
-      // свет за фигурой
       const glow = ctx.createRadialGradient(ART_W / 2, ART_H * 0.52, 8, ART_W / 2, ART_H * 0.52, ART_W * 0.62);
-      glow.addColorStop(0, darkSprite ? "rgba(255,255,255,0.75)" : `${tone}55`);
-      glow.addColorStop(0.55, darkSprite ? "rgba(255,255,255,0.18)" : `${tone}18`);
+      glow.addColorStop(0, art.dark ? "rgba(255,250,235,0.55)" : `${tone}55`);
+      glow.addColorStop(0.55, art.dark ? `${tone}30` : `${tone}18`);
       glow.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = glow;
       ctx.fillRect(0, 0, ART_W, ART_H);
-      // затемнение по краям
       const edge = ctx.createRadialGradient(ART_W / 2, ART_H / 2, ART_H * 0.45, ART_W / 2, ART_H / 2, ART_W * 0.78);
       edge.addColorStop(0, "rgba(0,0,0,0)");
-      edge.addColorStop(1, darkSprite ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.55)");
+      edge.addColorStop(1, "rgba(0,0,0,0.55)");
       ctx.fillStyle = edge;
       ctx.fillRect(0, 0, ART_W, ART_H);
-      // на светлом фоне редкость видна и в самой иллюстрации — цветная кайма по краям
-      if (darkSprite) {
-        const rim = ctx.createRadialGradient(ART_W / 2, ART_H / 2, ART_H * 0.42, ART_W / 2, ART_H / 2, ART_W * 0.74);
-        rim.addColorStop(0, `${tone}00`);
-        rim.addColorStop(1, `${tone}8c`);
-        ctx.fillStyle = rim;
-        ctx.fillRect(0, 0, ART_W, ART_H);
-      }
 
-      const scale = Math.min((ART_W - 6 * K) / image.naturalWidth, (ART_H - 8 * K) / image.naturalHeight);
-      const width = Math.max(1, Math.round(image.naturalWidth * scale));
-      const height = Math.max(1, Math.round(image.naturalHeight * scale));
+      // крупно и кратно: пиксель спрайта (1/3 логического) → целое число пикселей холста
+      const bw = art.canvas.width;
+      const bh = art.canvas.height;
+      const scale = Math.max(1, Math.min(Math.floor((ART_W - 8 * K) / bw), Math.floor((ART_H - 10 * K) / bh)));
+      const width = bw * scale;
+      const height = bh * scale;
       const x = Math.round((ART_W - width) / 2);
-      const y = ART_H - 3 * K - height;
-      // тень на земле
-      ctx.fillStyle = darkSprite ? "rgba(0,0,0,0.28)" : "rgba(0,0,0,0.6)";
+      const y = ART_H - 4 * K - height;
+      ctx.fillStyle = "rgba(0,0,0,0.6)";
       ctx.beginPath();
-      ctx.ellipse(ART_W / 2, ART_H - 4 * K, width * 0.36, 3 * K, 0, 0, Math.PI * 2);
+      ctx.ellipse(ART_W / 2, ART_H - 4 * K, width * 0.4, 3 * K, 0, 0, Math.PI * 2);
       ctx.fill();
-      // контур: силуэт, сдвинутый на 2 px канваса в восемь сторон
-      if (!locked) {
-        const outline = silhouette(image, darkSprite ? "#fbf7ea" : "#050604");
-        if (outline) {
-          ctx.imageSmoothingEnabled = false;
-          for (const [dx, dy] of [[-2, 0], [2, 0], [0, -2], [0, 2], [-2, -2], [2, -2], [-2, 2], [2, 2]] as const) ctx.drawImage(outline, x + dx, y + dy, width, height);
-        }
+      if (locked) {
+        ctx.drawImage(art.locked, x, y, width, height);
+        return;
       }
-      drawGameImage(ctx, src, x, y, { width, height, tint: locked ? "#050505" : undefined });
+      const o = Math.max(2, scale);
+      for (const [dx, dy] of [[-o, 0], [o, 0], [0, -o], [0, o]] as const) ctx.drawImage(art.outline, x + dx, y + dy, width, height);
+      ctx.drawImage(art.canvas, x, y, width, height);
     };
     render();
     image.addEventListener("load", render);

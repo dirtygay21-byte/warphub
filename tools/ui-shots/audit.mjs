@@ -95,6 +95,18 @@ for (const width of [390, 360]) {
       await page.screenshot({ path: path.join(OUT, file), fullPage: true, type: 'jpeg', quality: 60 });
       log.push(`${width} ${name} (${route} → ${r.path}): высота ${r.h}${r.over > 1 ? `; ШИРЕ ЭКРАНА на ${r.over}px` : ''}${r.clipped.length ? `; за краем: ${r.clipped.join(' | ')}` : ''}${r.small.length ? `; мелкие цели: ${r.small.join(' | ')}` : ''}${errs.length ? `; ошибки консоли: ${[...new Set(errs)].filter((e) => !e.startsWith('Failed to load resource')).slice(0, 6).join(' | ')}` : ''}`);
       console.log('📸', file);
+      // админка: окно игры за столом (14.11.2026)
+      if (name === 'admin') {
+        const game = page.getByRole('button', { name: /Игра за столом/ }).first();
+        if (await game.count()) {
+          await game.click({ timeout: 5000 });
+          await page.waitForTimeout(500);
+          const f2 = `${String(++n).padStart(2, '0')}-${width}-admin-game.jpg`;
+          await page.screenshot({ path: path.join(OUT, f2), type: 'jpeg', quality: 70 });
+          console.log('📸', f2);
+          await page.keyboard.press('Escape');
+        } else log.push(`${width} admin: строки «Игра за столом» нет`);
+      }
     } catch (e) {
       log.push(`${width} ${name}: НЕ ОТКРЫЛОСЬ — ${String(e.message ?? e).split('\n')[0]}`);
     }

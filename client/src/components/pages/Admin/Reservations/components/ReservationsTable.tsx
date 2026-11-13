@@ -9,8 +9,11 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import clsx from "clsx";
-import { Swords, WalletCards } from "lucide-react";
-import { Fragment, useMemo, useState } from "react";
+import { ChevronRight, Swords, WalletCards, X } from "lucide-react";
+import { AnimatePresence } from "motion/react";
+import { createPortal } from "react-dom";
+import { useDialogExit } from "@/components/ui/ds/useDialogExit";
+import { useEffect, useMemo, useState } from "react";
 import type { AdminReservationRow, StatusAction } from "../types";
 import { CopyUserId } from "./CopyUserId";
 import { StatusBadgeCell } from "./StatusBadgeCell";
@@ -150,22 +153,13 @@ export function ReservationsTable({
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const renderRow = (row: Row<AdminReservationRow>, inGame: boolean) => (
-    <tr
-      key={row.id}
-      className={clsx(
-        "border-b border-white/10 transition-colors hover:bg-white/3",
-        inGame && "bg-accent/[0.03]"
-      )}
-    >
-      {row.getVisibleCells().map((cell, index) => (
-        <td
-          key={cell.id}
-          className={clsx(
-            "whitespace-nowrap px-4 py-3 text-sm text-white/80",
-            inGame && index === 0 && "border-l-[3px] border-accent/70"
-          )}
-        >
+  const [openGame, setOpenGame] = useState<string | null>(null);
+  const openRows = openGame ? data.filter((row) => row.game?.key === openGame) : [];
+
+  const renderRow = (row: Row<AdminReservationRow>) => (
+    <tr key={row.id} className="border-b border-white/10 transition-colors hover:bg-white/3">
+      {row.getVisibleCells().map((cell) => (
+        <td key={cell.id} className="whitespace-nowrap px-4 py-3 text-sm text-white/80">
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </td>
       ))}
@@ -173,6 +167,7 @@ export function ReservationsTable({
   );
 
   return (
+    <>
     <div className="overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.25)]">
       <div className="overflow-x-auto">
         <table className="min-w-full">
@@ -217,16 +212,13 @@ export function ReservationsTable({
           <tbody>
             {groupByGame(table.getRowModel().rows).map((block) =>
               block.game ? (
-                <Fragment key={block.game.key}>
-                  <tr className="border-b border-accent/20 bg-accent/[0.06]">
-                    <td colSpan={columns.length} className="px-0 py-0">
-                      <TableGameHeader row={block.rows[0]!.original} />
-                    </td>
-                  </tr>
-                  {block.rows.map((row) => renderRow(row, true))}
-                </Fragment>
+                <tr key={block.game.key} className="border-b border-white/10 bg-accent/[0.05] transition-colors hover:bg-accent/[0.09]">
+                  <td colSpan={columns.length} className="px-0 py-0">
+                    <TableGameRow row={block.rows[0]!.original} onOpen={() => setOpenGame(block.game!.key)} />
+                  </td>
+                </tr>
               ) : (
-                renderRow(block.rows[0]!, false)
+                renderRow(block.rows[0]!)
               )
             )}
 
@@ -244,15 +236,25 @@ export function ReservationsTable({
         </table>
       </div>
     </div>
+    <AnimatePresence>
+      {openGame && openRows.length > 0 && (
+        <TableGameSheet
+          rows={openRows}
+          onClose={() => setOpenGame(null)}
+          onStatusAction={(row, action) => {
+            setOpenGame(null);
+            onStatusActionSelect(row, action);
+          }}
+          onPricing={(row) => {
+            setOpenGame(null);
+            onPricingSelect(row);
+          }}
+        />
+      )}
+    </AnimatePresence>
+    </>
   );
 }
-
-type Block = { game: AdminReservationRow["game"] | null; rows: Row<AdminReservationRow>[] };
-
-/**
- * Записи одной игры за столом — одним блоком (13.11.2026): место блока — по первой записи игры в текущей сортировке,
- * остальные записи этой игры на странице идут сразу за ней. Записи без игры — по одной, как раньше.
- */
 function groupByGame(rows: Row<AdminReservationRow>[]): Block[] {
   const blocks: Block[] = [];
   const byKey = new Map<string, Block>();
@@ -273,42 +275,132 @@ function groupByGame(rows: Row<AdminReservationRow>[]): Block[] {
   return blocks;
 }
 
-function TableGameHeader({ row }: { row: AdminReservationRow }) {
-  const game = row.game!;
-  const full = game.occupied >= game.seats;
+function gameTitle(row: AdminReservationRow) {
+  return `${row.serviceTitle} · ${row.tableLabel} · ${formatReservationDateTime(row.startsAt)}, ${row.timeRange}`;
+}
+
+function SeatsBadge({ occupied, seats }: { occupied: number; seats: number }) {
+  const full = occupied >= seats;
   return (
-    <div className="sticky left-0 w-[min(100vw-2rem,48rem)] whitespace-normal px-4 py-3">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-        <span className="inline-flex items-center gap-1.5 font-semibold text-accent">
-          <Swords className="size-4" />
-          Игра за столом
+    <span className={clsx("shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold", full ? "bg-accent/20 text-accent" : "bg-yellow-400/15 text-yellow-200")}>
+      {occupied}/{seats} · {full ? "стол собран" : "ждёт соперника"}
+    </span>
+  );
+}
+
+/** Игра за столом в списке (14.11.2026): одна строка — кто, когда, сколько мест; нажатие открывает окно с подробностями. */
+function TableGameRow({ row, onOpen }: { row: AdminReservationRow; onOpen: () => void }) {
+  const game = row.game!;
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="sticky left-0 flex w-[min(100vw-2rem,48rem)] items-center gap-3 px-4 py-3 text-left"
+    >
+      <Swords className="size-5 shrink-0 text-accent" />
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="text-sm font-semibold text-white/90">Игра за столом · {game.players.length} {game.players.length === 1 ? "игрок" : "игрока"}</span>
+          <SeatsBadge occupied={game.occupied} seats={game.seats} />
         </span>
-        <span className="text-white/90">
-          {row.serviceTitle} · {row.tableLabel} · {formatReservationDateTime(row.startsAt)}, {row.timeRange}
-        </span>
-        <span
-          className={clsx(
-            "rounded-full px-2 py-0.5 text-xs font-semibold",
-            full ? "bg-accent/20 text-accent" : "bg-yellow-400/15 text-yellow-200"
-          )}
-        >
-          {game.occupied}/{game.seats} · {full ? "стол собран" : "ждёт соперника"}
-        </span>
+        <span className="mt-0.5 block truncate text-[13px] text-fg-2">{gameTitle(row)}</span>
+        <span className="mt-0.5 block truncate text-[13px] text-white/80">{row.gamePlayers.map((p) => p.name).join(" · ")}</span>
+      </span>
+      <ChevronRight className="size-5 shrink-0 text-fg-3" />
+    </button>
+  );
+}
+
+/** Окно игры за столом: все участники отдельными карточками — статус и действия, выбор, счёт. */
+function TableGameSheet({
+  rows,
+  onClose,
+  onStatusAction,
+  onPricing,
+}: {
+  rows: AdminReservationRow[];
+  onClose: () => void;
+  onStatusAction: (row: AdminReservationRow, action: StatusAction) => void;
+  onPricing: (row: AdminReservationRow) => void;
+}) {
+  const leaving = useDialogExit();
+  const first = rows[0]!;
+  const game = first.game!;
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => event.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return createPortal(
+    <div className={`fixed inset-0 z-[70]${leaving ? " ds-leaving" : ""}`}>
+      <div className="ds-fade absolute inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Игра за столом"
+        className="ds-sheet absolute inset-x-0 bottom-0 mx-auto flex max-h-[92dvh] w-full max-w-lg flex-col overflow-y-auto rounded-t-[22px] border-t border-white/10 bg-app-elevated px-4 pb-[max(20px,env(safe-area-inset-bottom))] pt-2.5 text-fg"
+      >
+        <div className="h-1 w-10 shrink-0 self-center rounded bg-white/20" />
+        <div className="mt-2 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="font-display text-[22px] font-semibold uppercase leading-none">Игра за столом</h2>
+            <p className="mt-1.5 text-sm text-fg-2">{gameTitle(first)}</p>
+            <div className="mt-2">
+              <SeatsBadge occupied={game.occupied} seats={game.seats} />
+            </div>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Закрыть" className="ds-press flex size-11 shrink-0 items-center justify-center rounded-xl border border-white/[0.14] text-fg">
+            <X className="size-5" />
+          </button>
+        </div>
+        <ul className="mt-4 flex flex-col gap-3">
+          {first.gamePlayers.map((player, index) => {
+            const row = byId.get(player.reservationId);
+            return (
+              <li key={player.reservationId} className="rounded-2xl border border-white/10 bg-black/20 p-3.5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-fg-3">Игрок {index + 1}</p>
+                    <p className="mt-0.5 text-base font-semibold text-white/90">{player.name}</p>
+                    {row && <CopyUserId userId={row.userId} />}
+                  </div>
+                  {row ? (
+                    <StatusBadgeCell reservation={row} onActionSelect={(action) => onStatusAction(row, action)} />
+                  ) : (
+                    <span className="text-xs text-fg-3">{STATUS_LABELS[player.status] ?? player.status}</span>
+                  )}
+                </div>
+                <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-[13px]">
+                  <dt className="text-fg-3">Выбор</dt>
+                  <dd className={clsx("text-white/85", row?.needsHelp && "text-yellow-200")}>{player.detailsLabel || "—"}</dd>
+                  {row && (
+                    <>
+                      <dt className="text-fg-3">Армия клуба</dt>
+                      <dd className="text-white/85">{row.clubArmyCount > 0 ? row.clubArmyCount : "—"}</dd>
+                      <dt className="text-fg-3">Создана</dt>
+                      <dd className="text-white/85">{formatReservationDateTime(row.createdAt)}</dd>
+                    </>
+                  )}
+                </dl>
+                {row ? (
+                  <button
+                    type="button"
+                    onClick={() => onPricing(row)}
+                    className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-3 py-2 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
+                  >
+                    <WalletCards className="size-4" />
+                    Счёт
+                  </button>
+                ) : (
+                  <p className="mt-3 text-xs text-fg-3">Запись на другой странице списка — действия там.</p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       </div>
-      <ul className="mt-2 grid gap-1.5 sm:grid-cols-2">
-        {row.gamePlayers.map((player) => (
-          <li key={player.reservationId} className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-[13px]">
-            <p className="font-medium text-white/90">
-              {player.name}
-              <span className="ml-2 text-xs font-normal text-fg-3">
-                {STATUS_LABELS[player.status] ?? player.status}
-                {!player.onPage && " · запись на другой странице"}
-              </span>
-            </p>
-            <p className="mt-0.5 text-fg-2">{player.detailsLabel || "—"}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
+    </div>,
+    document.body
   );
 }

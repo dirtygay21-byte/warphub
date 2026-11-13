@@ -197,7 +197,12 @@ export function drawEggScene(
   if (state.creature && state.hatched) {
     const c = state.creature;
     const cy = ey + 18 - Math.round(state.rise * 24);
-    if (c.kind === "image") drawGameImage(ctx, c.src, Math.round(EW / 2 - 22), cy, { width: 44, height: 56 });
+    if (c.kind === "image") {
+      // контур цвета свечения кладки (14.11.2026): тёмные существа не сливаются с тёмным гнездом
+      const cx = Math.round(EW / 2 - 22);
+      for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]] as const) drawGameImage(ctx, c.src, cx + dx, cy + dy, { width: 44, height: 56, tint: glow });
+      drawGameImage(ctx, c.src, cx, cy, { width: 44, height: 56 });
+    }
     else drawSprite(ctx, c.sprite, Math.round(EW / 2 - c.sprite.w / 2), cy, { glowAlpha: 0.35 });
   }
   if (state.flash > 0) {
