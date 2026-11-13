@@ -594,10 +594,10 @@ export function createFakeBackend({ users }) {
   // как на сервере (13.11.2026): у записи за столом на 2+ места — её игра целиком
   const withTableGames = (items) =>
     items.map((r) => {
-      const seats = services.find((x) => x.id === r.serviceId)?.seatsPerTable ?? 0;
+      const seats = service(r.serviceId)?.seatsPerTable ?? 0;
       if (r.status === 'cancelled' || r.tableId == null || seats < 2) return { ...r, game: null };
       const t = new Date(r.startsAt).getTime();
-      const members = reservations
+      const members = S.reservations
         .filter((o) => o.serviceId === r.serviceId && o.tableId === r.tableId && o.startsAt.getTime() === t && o.status !== 'cancelled')
         .sort((a, b) => a.createdAt - b.createdAt);
       return {
