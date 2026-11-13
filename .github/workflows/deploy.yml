@@ -96,12 +96,16 @@ jobs:
           { echo "commit=$(git rev-parse HEAD)"; echo "parts=$PARTS"; echo "created=$(date -u +%FT%TZ)"; } > manifest.txt
           find . -type f ! -name SHA256SUMS | sort | xargs sha256sum > SHA256SUMS
           tar -czf ../package.tgz .
-          cd .. && ls -l package.tgz && sha256sum package.tgz
-      - uses: actions/upload-artifact@v7
+          cd .. && ls -l package.tgz && sha256sum package.tgz | tee package.tgz.sha256
+      # Пакет передаётся через кэш Actions, а не через хранилище артефактов (14.11.2026): хранилище артефактов
+      # переполнилось и освобождается с задержкой до суток, у кэша — своя квота. Ключ — номер запуска; контрольная
+      # сумма проверяется на шаге сервера. Кэш, которым не пользуются, GitHub удаляет сам через 7 дней.
+      - uses: actions/cache/save@v4
         with:
-          name: warphub-package-${{ github.run_id }}
-          path: package.tgz
-          retention-days: 3
+          key: warphub-package-${{ github.run_id }}
+          path: |
+            package.tgz
+            package.tgz.sha256
 
   deploy:
     name: Server (${{ inputs.mode }})
@@ -110,10 +114,17 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/download-artifact@v8
+      - uses: actions/cache/restore@v4
         if: ${{ needs.build.result == 'success' }}
         with:
-          name: warphub-package-${{ github.run_id }}
+          key: warphub-package-${{ github.run_id }}
+          fail-on-cache-miss: true
+          path: |
+            package.tgz
+            package.tgz.sha256
+      - name: Verify package checksum
+        if: ${{ needs.build.result == 'success' }}
+        run: sha256sum -c package.tgz.sha256
       - name: Run warphub-deploy on the server
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
