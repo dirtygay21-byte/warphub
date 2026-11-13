@@ -1,3 +1,4 @@
+import AppErrorBoundary from "@/components/AppErrorBoundary";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import TelegramInitializer from "@/components/TelegramInitializer";
 import TanstackProvider from "@/apiUtils/provider";
@@ -35,6 +36,7 @@ export default function App() {
         <TelegramInitializer />
 
         <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <AppErrorBoundary>
           <Routes>
             <Route path="/" element={<MainLayout />}>
               <Route path="reservations" element={<Reservation />} />
@@ -83,6 +85,7 @@ export default function App() {
 
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          </AppErrorBoundary>
         </BrowserRouter>
         <Toaster />
       </EffectsRoot>

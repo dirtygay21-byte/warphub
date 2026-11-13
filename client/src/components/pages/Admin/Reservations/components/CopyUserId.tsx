@@ -21,7 +21,7 @@ export function CopyUserId({ userId }: { userId: string }) {
         type="button"
         onClick={handleCopy}
         aria-label="Скопировать UUID пользователя"
-        className="rounded p-0.5 text-fg-3 transition-colors hover:bg-white/10 hover:text-white/80"
+        className="-m-2 rounded-lg p-3 text-fg-3 transition-colors hover:bg-white/10 hover:text-white/80"
       >
         {copied ? (
           <Check className="size-3.5 text-accent" />
