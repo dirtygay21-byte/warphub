@@ -56,7 +56,8 @@ for (const [tag, viewport] of [['p', { width: 390, height: 844 }], ['l', { width
     await page.getByRole('button', { name: /Warhammer\s+40,000/ }).first().click({ timeout: 8000 });
     await page.waitForTimeout(600);
     await page.getByRole('button', { name: /^Игра/ }).first().click({ timeout: 5000 });
-    await page.getByRole('button', { name: /Test Army/ }).first().click({ timeout: 5000 });
+    // плитка «Игра» тоже содержит «Test Army» в подписи — нажимаем пункт листа по его описанию
+    await page.getByText('Расставить армию на поле', { exact: false }).first().click({ timeout: 5000 });
     await page.waitForTimeout(500);
     await page.getByRole('button', { name: /Демо: Necrons/ }).first().click({ timeout: 5000 });
     await page.waitForTimeout(500);
