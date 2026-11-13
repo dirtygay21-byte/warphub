@@ -890,7 +890,7 @@ function UnitPanel({
       </button>
       <div className="flex gap-2">
         <Button variant={unit.placed && onAttack ? 'outline' : 'primary'} className="min-w-0 flex-1" onClick={onPlace}>
-          {unit.placed ? 'Переставить' : 'Поставить на поле'}
+          {unit.placed ? 'Переставить' : 'Поставить'}
         </Button>
         {onAttack && (
           <Button variant="primary" className="min-w-0 flex-1" onClick={onAttack}>

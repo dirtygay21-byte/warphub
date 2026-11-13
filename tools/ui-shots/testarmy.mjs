@@ -74,7 +74,7 @@ for (const [tag, viewport] of [['p', { width: 390, height: 844 }], ['l', { width
     if (await back.count()) await back.first().click({ timeout: 5000 });
     if (tabName) await page.getByRole('button', { name: new RegExp(tabName) }).first().click({ timeout: 5000 });
     await page.getByRole('button', { name: new RegExp(unitName) }).first().click({ timeout: 5000 });
-    await page.getByRole('button', { name: /Поставить на поле/ }).click({ timeout: 5000 });
+    await page.getByRole('button', { name: /^Поставить$/ }).click({ timeout: 5000 });
     await tapField(fx, fy);
   };
   await step('panel', async () => {
@@ -82,7 +82,7 @@ for (const [tag, viewport] of [['p', { width: 390, height: 844 }], ['l', { width
     await shot('panel-list');
     await page.getByRole('button', { name: /Necron Warriors/ }).first().click({ timeout: 5000 });
     await shot('panel-unit');
-    await page.getByRole('button', { name: /Поставить на поле/ }).click({ timeout: 5000 });
+    await page.getByRole('button', { name: /^Поставить$/ }).click({ timeout: 5000 });
     await tapField(0.5, tag === 'p' ? 0.7 : 0.5);
     await shot('unit-placed');
   });
