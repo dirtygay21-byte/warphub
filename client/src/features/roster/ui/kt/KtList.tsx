@@ -1,3 +1,4 @@
+import { learnDone } from '@/components/tutorial/progress';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadKtTeam } from '../../data';
@@ -45,7 +46,8 @@ export function KtList({
         rules={[
           { icon: 'book', title: 'Правила', sub: 'Core Rules · Wahapedia', onClick: () => openExternal('https://wahapedia.ru/kill-team3/the-rules/core-rules/') },
           { icon: 'spark', title: 'Как играть', sub: 'Обучение: активации, стрельба, бой', onClick: () => navigate('/learn/kt') },
-          { icon: 'shield', title: 'Обучающая игра', sub: 'Раунд по шагам за столом', onClick: () => navigate('/learn/kt/round') },
+          // обучающая игра — после карточек «Как играть» (13.11.2026)
+          ...(learnDone('kt') ? [{ icon: 'shield', title: 'Обучающая игра', sub: 'Раунд по шагам за столом', onClick: () => navigate('/learn/kt/round') }] : []),
         ]}
         game={[
           { icon: 'spark', title: 'Начать игру', sub: 'Approved Ops · CP · раунды', onClick: onStartGame },

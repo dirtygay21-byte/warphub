@@ -1,3 +1,4 @@
+import { learnDone } from '@/components/tutorial/progress';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadWarcryFaction } from '../../data';
@@ -45,7 +46,8 @@ export function WarcryList({
         rules={[
           { icon: 'book', title: 'Правила', sub: 'Battleplan · Warcrier', onClick: () => openExternal('https://warcrier.net/docs/rules/battleplan') },
           { icon: 'spark', title: 'Как играть', sub: 'Обучение: инициатива, действия, атака', onClick: () => navigate('/learn/warcry') },
-          { icon: 'shield', title: 'Обучающая игра', sub: 'Раунд по шагам за столом', onClick: () => navigate('/learn/warcry/round') },
+          // обучающая игра — после карточек «Как играть» (13.11.2026)
+          ...(learnDone('warcry') ? [{ icon: 'shield', title: 'Обучающая игра', sub: 'Раунд по шагам за столом', onClick: () => navigate('/learn/warcry/round') }] : []),
         ]}
         game={[
           { icon: 'spark', title: 'Начать игру', sub: 'Battleplan · инициатива · раунды', onClick: onStartGame },

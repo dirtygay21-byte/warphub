@@ -1,3 +1,4 @@
+import { learnDone } from '@/components/tutorial/progress';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AOS_CODE_PREFIX, decodeAosRoster, duplicateAosRoster, newAosRoster } from '../../aos/roster';
@@ -51,7 +52,8 @@ export function AosList({
           { icon: 'book', title: 'Правила', sub: 'Core Rules · Wahapedia', onClick: () => openExternal('https://wahapedia.ru/aos4/the-rules/the-core-rules/') },
           { icon: 'shield', title: 'Сезон', sub: 'General’s Handbook 2026-27', onClick: () => openExternal('https://wahapedia.ru/aos4/the-rules/general-s-handbook-2026-27/') },
           { icon: 'spark', title: 'Как играть', sub: 'Обучение для новичков: ход, бой, объекты', onClick: () => navigate('/learn/aos') },
-          { icon: 'shield', title: 'Обучающая игра', sub: 'Раунд по шагам за столом', onClick: () => navigate('/learn/aos/round') },
+          // обучающая игра — после карточек «Как играть» (13.11.2026)
+          ...(learnDone('aos') ? [{ icon: 'shield', title: 'Обучающая игра', sub: 'Раунд по шагам за столом', onClick: () => navigate('/learn/aos/round') }] : []),
         ]}
         game={[
           { icon: 'spark', title: 'Начать игру', sub: 'Батлплан, priority, CP, тактики', onClick: onStartGame },
