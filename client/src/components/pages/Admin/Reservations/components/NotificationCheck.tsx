@@ -81,9 +81,20 @@ function Diagnostics({ data }: { data: NotificationDiagnostics }) {
   return (
     <div className="mt-2 space-y-2 rounded-xl border border-white/10 bg-black/20 p-3 text-[13px]">
       <p className={data.enabled ? "text-accent" : "text-red-300"}>{data.enabled ? "✅ Уведомления включены на сервере" : "⚠️ Уведомления выключены на сервере (TELEGRAM_NOTIFICATIONS=off)"}</p>
+      {data.route && (
+        <p className="text-fg-2">
+          Маршрут к Telegram: {data.route.proxy ? `через прокси ${data.route.proxy}` : data.route.base === "https://api.telegram.org" ? "напрямую" : `через ${data.route.base}`}
+        </p>
+      )}
       <p className={data.bot.ok ? "text-accent" : "text-red-300"}>
         {data.bot.ok ? `✅ Telegram отвечает: бот @${data.bot.username ?? "?"}, ${data.bot.ms} мс` : `⚠️ ${data.bot.error} (${data.bot.ms} мс)`}
       </p>
+      {!data.bot.ok && (
+        <p className="text-fg-3">
+          Сервер не может достучаться до Telegram — так бывает на российских серверах: провайдеры блокируют api.telegram.org.
+          Нужен обход через сервер за границей (TELEGRAM_PROXY или TELEGRAM_API_BASE в .env backend).
+        </p>
+      )}
       <div>
         <p className="font-semibold text-fg-2">Получают уведомления о записях ({data.admins.length}):</p>
         <ul className="mt-1 space-y-0.5">

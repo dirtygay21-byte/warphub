@@ -53,6 +53,29 @@ describe('журнал отправок и диагностика', () => {
     }) as unknown as typeof fetch;
     const bad = await notificationDiagnostics();
     expect(bad.bot.ok).toBe(false);
-    expect(bad.bot.error).toContain('нет связи с api.telegram.org');
+    expect(bad.bot.error).toContain('нет связи с https://api.telegram.org');
+  });
+});
+
+describe('маршрут к Telegram (14.11.2026)', () => {
+  test('по умолчанию — api.telegram.org напрямую; TELEGRAM_API_BASE и TELEGRAM_PROXY меняют маршрут; в описании нет пароля', async () => {
+    const { telegramRoute, describeRoute } = await import('../src/modules/notifications/service');
+    delete process.env.TELEGRAM_API_BASE;
+    delete process.env.TELEGRAM_PROXY;
+    expect(telegramRoute()).toEqual({ base: 'https://api.telegram.org', proxy: undefined });
+    process.env.TELEGRAM_API_BASE = 'https://tg.example.com/';
+    process.env.TELEGRAM_PROXY = 'http://user:secret@10.0.0.1:3128';
+    expect(telegramRoute()).toEqual({ base: 'https://tg.example.com', proxy: 'http://user:secret@10.0.0.1:3128' });
+    expect(describeRoute()).toEqual({ base: 'https://tg.example.com', proxy: 'http://10.0.0.1:3128' });
+    process.env.TELEGRAM_NOTIFICATIONS = 'on';
+    let seen: { url: string; proxy?: string } | null = null;
+    globalThis.fetch = (async (url: string, init: { proxy?: string }) => ((seen = { url, proxy: init.proxy }), reply(200, { ok: true }))) as unknown as typeof fetch;
+    await sendTelegramMessageDetailed(555, 'x');
+    expect(seen!.url.startsWith('https://tg.example.com/bot')).toBe(true);
+    expect(seen!.url.endsWith('/sendMessage')).toBe(true);
+    expect(seen!.proxy).toBe('http://user:secret@10.0.0.1:3128');
+    expect(JSON.stringify(await notificationDiagnostics())).not.toContain('secret');
+    delete process.env.TELEGRAM_API_BASE;
+    delete process.env.TELEGRAM_PROXY;
   });
 });

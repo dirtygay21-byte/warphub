@@ -11,7 +11,43 @@ import { describeSendResult, escapeHtml, formatClubDateTime, formatUserName, typ
 
 export { escapeHtml, formatClubDateTime, formatUserName };
 
-const TELEGRAM_API = 'https://api.telegram.org';
+/**
+ * Маршрут к Telegram Bot API (14.11.2026). С серверов в России api.telegram.org часто недоступен (провайдеры режут
+ * соединение — диагностика показывала «The operation timed out»). Обход — через свой сервер за границей:
+ *   TELEGRAM_API_BASE=https://tg.example.com   — обратный прокси, пересылающий запросы на api.telegram.org;
+ *   TELEGRAM_PROXY=http://user:pass@1.2.3.4:3128 — HTTP(S)-прокси за границей (Bun fetch, опция proxy).
+ * Обе переменные — в .env backend, после изменения — перезапуск. Без них — прямое соединение, как раньше.
+ */
+export function telegramRoute() {
+  const base = (process.env.TELEGRAM_API_BASE ?? '').trim().replace(/\/+$/, '') || 'https://api.telegram.org';
+  const proxy = (process.env.TELEGRAM_PROXY ?? '').trim() || undefined;
+  return { base, proxy };
+}
+
+/** Описание маршрута для админки — без логина, пароля и токена. */
+export function describeRoute() {
+  const { base, proxy } = telegramRoute();
+  const safe = (u: string) => {
+    try {
+      const url = new URL(u);
+      return `${url.protocol}//${url.host}`;
+    } catch {
+      return 'неверный адрес';
+    }
+  };
+  return { base: safe(base), proxy: proxy ? safe(proxy) : null };
+}
+
+/** Запрос к Bot API по выбранному маршруту. */
+function telegramFetch(method: string, init: RequestInit & { timeoutMs?: number } = {}) {
+  const { base, proxy } = telegramRoute();
+  const { timeoutMs = 10_000, ...rest } = init;
+  return fetch(`${base}/bot${env.telegramBotToken}/${method}`, {
+    ...rest,
+    signal: AbortSignal.timeout(timeoutMs),
+    ...(proxy ? { proxy } : {}),
+  } as RequestInit);
+}
 
 function notificationsEnabled(): boolean {
   return (process.env.TELEGRAM_NOTIFICATIONS ?? 'on').toLowerCase() !== 'off';
@@ -53,7 +89,7 @@ async function sendRaw(chatId: number | string, text: string): Promise<SendResul
   if (!notificationsEnabled()) return { ok: false, reason: 'disabled' };
 
   try {
-    const response = await fetch(`${TELEGRAM_API}/bot${env.telegramBotToken}/sendMessage`, {
+    const response = await telegramFetch('sendMessage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -62,7 +98,6 @@ async function sendRaw(chatId: number | string, text: string): Promise<SendResul
         parse_mode: 'HTML',
         disable_web_page_preview: true,
       }),
-      signal: AbortSignal.timeout(10_000),
     });
 
     if (!response.ok) {
@@ -148,20 +183,20 @@ export async function notificationDiagnostics() {
   let bot: { ok: boolean; username?: string; ms: number; error?: string };
   const started = Date.now();
   try {
-    const response = await fetch(`${TELEGRAM_API}/bot${env.telegramBotToken}/getMe`, { signal: AbortSignal.timeout(10_000) });
+    const response = await telegramFetch('getMe');
     const body = (await response.json().catch(() => ({}))) as { ok?: boolean; result?: { username?: string }; description?: string };
     bot = body.ok
       ? { ok: true, username: body.result?.username, ms: Date.now() - started }
       : { ok: false, ms: Date.now() - started, error: `Telegram ${response.status}: ${body.description ?? 'нет ответа'}` };
   } catch (error) {
-    bot = { ok: false, ms: Date.now() - started, error: `нет связи с api.telegram.org: ${(error as Error).message}` };
+    bot = { ok: false, ms: Date.now() - started, error: `нет связи с ${describeRoute().base}${describeRoute().proxy ? ` через прокси ${describeRoute().proxy}` : ''}: ${(error as Error).message}` };
   }
   const log = recentSends();
   const admins = getAdminTelegramIds().map((id) => {
     const last = log.find((e) => e.chatId === id);
     return { telegramId: id, last: last ?? null };
   });
-  return { enabled, bot, admins, recent: log.slice(0, 30), since: SERVER_STARTED };
+  return { enabled, bot, route: describeRoute(), admins, recent: log.slice(0, 30), since: SERVER_STARTED };
 }
 
 const SERVER_STARTED = new Date().toISOString();
