@@ -1,3 +1,4 @@
+import { photoKey } from '../../photos';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { loadWarcryFaction } from '../../data';
 import { uid } from '../../engine/roster';
@@ -389,6 +390,7 @@ function FighterCard({
   return (
     <UnitRowCard
       id={`u-${x.uid}`}
+      photo={{ key: photoKey('warcry', f.id), readOnly }}
       title={x.name || f.name}
       crown={leader}
       meta={[leader ? 'Лидер' : null, x.role !== 'warband' ? ROLE_LABEL[x.role] : null, x.name ? f.name : null, from, `Move ${f.movement}`, `T${f.toughness}`, `${f.wounds} W`]}

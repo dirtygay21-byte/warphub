@@ -1,3 +1,4 @@
+import { photoKey } from '../../photos';
 import { useEffect, useMemo, useState } from 'react';
 import { loadKtTeam } from '../../data';
 import { uid } from '../../engine/roster';
@@ -358,6 +359,7 @@ function OpCard({
   return (
     <UnitRowCard
       id={`u-${x.uid}`}
+      photo={{ key: photoKey('kt', o.id), readOnly }}
       title={x.name || o.name}
       crown={leader}
       meta={[leader ? 'Лидер' : null, x.name ? o.name : null, `APL ${o.stats.apl}`, `${o.stats.wounds} W`, `Sv ${o.stats.save}`]}
