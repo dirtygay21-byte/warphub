@@ -53,7 +53,7 @@ export function StatusBadgeCell({
         type="button"
         onClick={() => setOpen((current) => !current)}
         className={clsx(
-          "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors hover:brightness-110",
+          "inline-flex min-h-9 items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-colors hover:brightness-110",
           getStatusStyle(status)
         )}
       >

@@ -10,8 +10,10 @@ import { RARITY_STYLE } from "./rarity";
 // Иллюстрация в исходном разрешении с контрастным нейтральным фоном
 // ---------------------------------------------------------------------------
 
-const ART_W = 96;
-const ART_H = 88;
+/** Канвас втрое плотнее спрайта (96×88 → 288×264): пиксели рисунка те же, а контур, тень и фон — тоньше. */
+const K = 3;
+const ART_W = 96 * K;
+const ART_H = 88 * K;
 
 function imageLuminance(image: HTMLImageElement) {
   const sample = document.createElement("canvas");
@@ -31,6 +33,25 @@ function imageLuminance(image: HTMLImageElement) {
   return count ? total / count : 255;
 }
 
+/** Силуэт спрайта одним цветом — для контура вокруг фигуры. */
+function silhouette(image: HTMLImageElement, color: string) {
+  const c = document.createElement("canvas");
+  c.width = image.naturalWidth;
+  c.height = image.naturalHeight;
+  const x = c.getContext("2d");
+  if (!x) return null;
+  x.imageSmoothingEnabled = false;
+  x.drawImage(image, 0, 0);
+  x.globalCompositeOperation = "source-in";
+  x.fillStyle = color;
+  x.fillRect(0, 0, c.width, c.height);
+  return c;
+}
+
+/**
+ * Иллюстрация карты (13.11.2026): рисунок владельца без изменений, читаемость — за счёт подачи.
+ * Фон — мягкий свет цвета редкости (светлый для тёмных спрайтов), под фигурой — тень, вокруг — контрастный контур.
+ */
 export function CardArt({ card, className, locked }: { card: CardDef; className?: string; locked?: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -38,23 +59,54 @@ export function CardArt({ card, className, locked }: { card: CardDef; className?
     if (!ctx) return;
     const src = `/games/aos/${card.id}.png`;
     const image = gameImage(src);
+    const tone = RARITY_STYLE[card.rarity].color;
     const render = () => {
       if (!image.complete || image.naturalWidth === 0) return;
       const darkSprite = imageLuminance(image) < 105;
       ctx.clearRect(0, 0, ART_W, ART_H);
-      ctx.imageSmoothingEnabled = false;
-      ctx.fillStyle = darkSprite ? "#c9c2b2" : "#171a12";
+      ctx.fillStyle = darkSprite ? "#b9b2a2" : "#12140e";
       ctx.fillRect(0, 0, ART_W, ART_H);
-      ctx.fillStyle = darkSprite ? "rgba(0,0,0,0.055)" : "rgba(236,254,70,0.055)";
-      for (let y = 0; y < ART_H; y += 8) ctx.fillRect(0, y, ART_W, 1);
-      const scale = Math.min((ART_W - 4) / image.naturalWidth, (ART_H - 6) / image.naturalHeight);
+      // свет за фигурой
+      const glow = ctx.createRadialGradient(ART_W / 2, ART_H * 0.52, 8, ART_W / 2, ART_H * 0.52, ART_W * 0.62);
+      glow.addColorStop(0, darkSprite ? "rgba(255,255,255,0.75)" : `${tone}55`);
+      glow.addColorStop(0.55, darkSprite ? "rgba(255,255,255,0.18)" : `${tone}18`);
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, ART_W, ART_H);
+      // затемнение по краям
+      const edge = ctx.createRadialGradient(ART_W / 2, ART_H / 2, ART_H * 0.45, ART_W / 2, ART_H / 2, ART_W * 0.78);
+      edge.addColorStop(0, "rgba(0,0,0,0)");
+      edge.addColorStop(1, darkSprite ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.55)");
+      ctx.fillStyle = edge;
+      ctx.fillRect(0, 0, ART_W, ART_H);
+      // на светлом фоне редкость видна и в самой иллюстрации — цветная кайма по краям
+      if (darkSprite) {
+        const rim = ctx.createRadialGradient(ART_W / 2, ART_H / 2, ART_H * 0.42, ART_W / 2, ART_H / 2, ART_W * 0.74);
+        rim.addColorStop(0, `${tone}00`);
+        rim.addColorStop(1, `${tone}8c`);
+        ctx.fillStyle = rim;
+        ctx.fillRect(0, 0, ART_W, ART_H);
+      }
+
+      const scale = Math.min((ART_W - 6 * K) / image.naturalWidth, (ART_H - 8 * K) / image.naturalHeight);
       const width = Math.max(1, Math.round(image.naturalWidth * scale));
       const height = Math.max(1, Math.round(image.naturalHeight * scale));
-      drawGameImage(ctx, src, Math.round((ART_W - width) / 2), ART_H - 2 - height, {
-        width,
-        height,
-        tint: locked ? "#050505" : undefined,
-      });
+      const x = Math.round((ART_W - width) / 2);
+      const y = ART_H - 3 * K - height;
+      // тень на земле
+      ctx.fillStyle = darkSprite ? "rgba(0,0,0,0.28)" : "rgba(0,0,0,0.6)";
+      ctx.beginPath();
+      ctx.ellipse(ART_W / 2, ART_H - 4 * K, width * 0.36, 3 * K, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // контур: силуэт, сдвинутый на 2 px канваса в восемь сторон
+      if (!locked) {
+        const outline = silhouette(image, darkSprite ? "#fbf7ea" : "#050604");
+        if (outline) {
+          ctx.imageSmoothingEnabled = false;
+          for (const [dx, dy] of [[-2, 0], [2, 0], [0, -2], [0, 2], [-2, -2], [2, -2], [-2, 2], [2, 2]] as const) ctx.drawImage(outline, x + dx, y + dy, width, height);
+        }
+      }
+      drawGameImage(ctx, src, x, y, { width, height, tint: locked ? "#050505" : undefined });
     };
     render();
     image.addEventListener("load", render);
