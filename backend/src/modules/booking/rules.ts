@@ -625,6 +625,9 @@ export function inCategory(r: { status: string; endsAt: Date | string }, categor
   if (category === 'cancelled') return r.status === 'cancelled';
   if (category === 'past') return r.status !== 'cancelled' && ended;
   return r.status === category && !ended;
+}
+
+/**
  * Напоминание о визите (14.11.2026): за REMIND_BEFORE до начала, одно на запись (reservations.remind_at — когда
  * отправлено). Не напоминает, если запись создана меньше чем за REMIND_MIN_AGE до этого момента (только что
  * пришло подтверждение) и если визит уже начался.
