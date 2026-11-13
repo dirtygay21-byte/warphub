@@ -18,6 +18,7 @@ import {
   extendReservation,
   getAdminWarhammerDay,
   listReservations,
+  withTableGames,
   moveReservationToTable,
   parseIsoDateTime,
   rejectReservation,
@@ -255,7 +256,7 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
     '/reservations',
     async ({ query }) => {
       try {
-        return await listReservations(query);
+        return await withTableGames(await listReservations(query));
       } catch (error) {
         if (error instanceof BookingError) return mapBookingError(error);
 

@@ -591,6 +591,29 @@ export function createFakeBackend({ users }) {
     id: r.id, serviceId: r.serviceId, tableId: r.tableId, partySize: r.partySize, seatClubArmyOptions: r.seatClubArmyOptions,
     buyArmyOptions: r.buyArmyOptions, details: r.details ?? null, startsAt: iso(r.startsAt), endsAt: iso(r.endsAt), status: r.status,
   });
+  // как на сервере (13.11.2026): у записи за столом на 2+ места — её игра целиком
+  const withTableGames = (items) =>
+    items.map((r) => {
+      const seats = services.find((x) => x.id === r.serviceId)?.seatsPerTable ?? 0;
+      if (r.status === 'cancelled' || r.tableId == null || seats < 2) return { ...r, game: null };
+      const t = new Date(r.startsAt).getTime();
+      const members = reservations
+        .filter((o) => o.serviceId === r.serviceId && o.tableId === r.tableId && o.startsAt.getTime() === t && o.status !== 'cancelled')
+        .sort((a, b) => a.createdAt - b.createdAt);
+      return {
+        ...r,
+        game: {
+          key: `${r.serviceId}:${r.tableId}:${t}`,
+          seats,
+          occupied: members.reduce((n, o) => n + o.partySize, 0),
+          players: members.map((o) => {
+            const u = userById(o.userId) ?? {};
+            return { reservationId: o.id, userId: o.userId, firstName: u.firstName ?? '—', lastName: u.lastName ?? null, username: u.username ?? null, status: o.status, partySize: o.partySize, details: o.details, createdAt: o.createdAt.toISOString() };
+          }),
+        },
+      };
+    });
+
   const toView = (r) => {
     const s = service(r.serviceId);
     const u = userById(r.userId);
@@ -1072,7 +1095,7 @@ export function createFakeBackend({ users }) {
 
     // --- администратор ---
     ['GET', /^\/admin\/reservations\/count$/, 'admin', ({ q }) => ({ count: filterReservations(reservationsQuery(q)).length })],
-    ['GET', /^\/admin\/reservations$/, 'admin', ({ q }) => listReservations(reservationsQuery(q))],
+    ['GET', /^\/admin\/reservations$/, 'admin', ({ q }) => withTableGames(listReservations(reservationsQuery(q)))],
     ['PATCH', /^\/admin\/reservations\/([^/]+)\/confirm$/, 'admin', ({ m }) => {
       const r = findRes(m[1]);
       if (r.status === 'cancelled') fail(409, 'Reservation is cancelled');

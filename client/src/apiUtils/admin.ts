@@ -4,6 +4,7 @@ import { mapReservation } from "@/apiUtils/reservations";
 import type {
   AdminReservation,
   AdminReservationsPage,
+  AdminTableGame,
   AdminReservationsQuery,
   AdminUploadResponse,
   Event,
@@ -55,6 +56,7 @@ type TableApi = {
 
 type AdminReservationApi = {
   id: string;
+  game?: AdminTableGame | null;
   userId?: string;
   user_id?: string;
   tableId?: number | null;
@@ -118,6 +120,7 @@ const mapAdminReservation = (
   user: reservation.user ? mapUser(reservation.user) : null,
   service: reservation.service ? mapService(reservation.service) : null,
   table: reservation.table ? mapTable(reservation.table) : null,
+  game: reservation.game ?? null,
 });
 
 const appendSearchParam = (

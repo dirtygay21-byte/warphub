@@ -55,6 +55,7 @@ import {
   gameFitsTable,
   TABLE_CATEGORY_LABEL,
   groupSessions,
+  groupTableGames,
   isDateAllowed,
   isOnSlotGrid,
   overlapsInterval,
@@ -67,6 +68,7 @@ import {
   type TableBooking,
   poolFitEnd,
   tableFitEnd,
+  tableGameKey,
 } from './rules';
 
 export { parseDateParam } from './rules';
@@ -1561,6 +1563,98 @@ async function withTablemates(
     ...r,
     tablemates: r.status === 'cancelled' || r.tableId === null ? [] : (byGame.get(key(r.serviceId, r.tableId, r.startsAt)) ?? []),
   }));
+}
+
+/** Участник игры за столом (админка): кто, статус записи, что выбрал. */
+export type AdminTableGamePlayer = {
+  reservationId: string;
+  userId: string;
+  firstName: string;
+  lastName: string | null;
+  username: string | null;
+  status: string;
+  partySize: number;
+  details: ReservationDetails | null;
+  createdAt: string;
+};
+
+/** Игра за столом, к которой относится запись: места, занято, все участники (в том числе с других страниц списка). */
+export type AdminTableGame = { key: string; seats: number; occupied: number; players: AdminTableGamePlayer[] };
+
+export type AdminReservationView = UserReservationView & { game: AdminTableGame | null };
+
+/**
+ * Админка «Все записи» (13.11.2026): каждой записи за столом с местами на двоих и больше — её игра целиком,
+ * чтобы администратор видел группу «кто с кем играет», а не сверял отдельные строки.
+ */
+export async function withTableGames(reservations: UserReservationView[]): Promise<AdminReservationView[]> {
+  const atTables = reservations.filter((r) => r.status !== 'cancelled' && tableGameKey(r.serviceId, r.tableId, r.startsAt));
+  if (atTables.length === 0) return reservations.map((r) => ({ ...r, game: null }));
+
+  const serviceIds = [...new Set(atTables.map((r) => r.serviceId))];
+  const services = await db
+    .select({ id: servicesTable.id, seatsPerTable: servicesTable.seatsPerTable, tableCapacityProfile: servicesTable.tableCapacityProfile })
+    .from(servicesTable)
+    .where(inArray(servicesTable.id, serviceIds));
+  const seatsOf = new Map(
+    services.map((s) => [s.id, s.seatsPerTable ?? (s.tableCapacityProfile ? profileCapacity(s.tableCapacityProfile as TableCapacityProfile) : 0)]),
+  );
+  const games = atTables.filter((r) => (seatsOf.get(r.serviceId) ?? 0) >= 2);
+  if (games.length === 0) return reservations.map((r) => ({ ...r, game: null }));
+
+  const rows = await db
+    .select({
+      reservationId: reservationsTable.id,
+      userId: reservationsTable.userId,
+      serviceId: reservationsTable.serviceId,
+      tableId: reservationsTable.tableId,
+      startsAt: reservationsTable.startsAt,
+      status: reservationsTable.status,
+      partySize: reservationsTable.partySize,
+      details: reservationsTable.details,
+      createdAt: reservationsTable.createdAt,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      username: usersTable.username,
+    })
+    .from(reservationsTable)
+    .innerJoin(usersTable, eq(reservationsTable.userId, usersTable.id))
+    .where(
+      and(
+        inArray(reservationsTable.serviceId, [...new Set(games.map((r) => r.serviceId))]),
+        inArray(reservationsTable.tableId, [...new Set(games.map((r) => r.tableId!))]),
+        inArray(reservationsTable.startsAt, [...new Set(games.map((r) => r.startsAt!))].map((iso) => new Date(iso))),
+        inArray(reservationsTable.status, ['pending', 'confirmed']),
+      ),
+    )
+    .orderBy(asc(reservationsTable.createdAt));
+
+  const grouped = groupTableGames(rows);
+  return reservations.map((r) => {
+    const key = r.status === 'cancelled' ? null : tableGameKey(r.serviceId, r.tableId, r.startsAt);
+    const seats = seatsOf.get(r.serviceId) ?? 0;
+    const members = key && seats >= 2 ? grouped.get(key) : undefined;
+    if (!key || !members) return { ...r, game: null };
+    return {
+      ...r,
+      game: {
+        key,
+        seats,
+        occupied: members.reduce((sum, m) => sum + m.partySize, 0),
+        players: members.map((m) => ({
+          reservationId: m.reservationId,
+          userId: m.userId,
+          firstName: m.firstName,
+          lastName: m.lastName,
+          username: m.username,
+          status: m.status,
+          partySize: m.partySize,
+          details: (m.details as ReservationDetails | null) ?? null,
+          createdAt: m.createdAt.toISOString(),
+        })),
+      },
+    };
+  });
 }
 
 async function getReservationById(

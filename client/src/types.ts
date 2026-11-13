@@ -161,10 +161,27 @@ export type ReservationTable = {
   name: string;
 };
 
+/** Участник игры за столом (админка, 13.11.2026) */
+export type AdminTableGamePlayer = {
+  reservationId: string;
+  userId: string;
+  firstName: string;
+  lastName: string | null;
+  username: string | null;
+  status: string;
+  partySize: number;
+  details: ReservationDetails | null;
+  createdAt: string;
+};
+
+/** Игра за столом: одна услуга, один стол, одно начало — все участники, в том числе с других страниц списка */
+export type AdminTableGame = { key: string; seats: number; occupied: number; players: AdminTableGamePlayer[] };
+
 export type AdminReservation = Reservation & {
   user?: TelegramUser | null;
   service?: Service | null;
   table?: ReservationTable | null;
+  game?: AdminTableGame | null;
 };
 
 export type AdminReservationsQuery = {
