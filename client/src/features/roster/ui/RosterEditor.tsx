@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { factionColor } from './common/factionColors';
 import { loadFaction } from '../data';
 import { availableDetachments, computeRoster, makeLookup, roleGroup, type ComputedRoster, type ComputedUnit, type DataLookup } from '../engine/compute';
 import { BATTLE_SIZES, BATTLE_SIZE_ORDER } from '../engine/rules';
@@ -188,6 +189,11 @@ function Editor({
     <div className="mx-auto min-h-dvh max-w-lg pb-32 lg:max-w-3xl">
       {/* ---- шапка ---- */}
       <div className="sticky top-0 z-30 border-b border-white/[0.06] bg-app/95 px-4 pb-3 pt-3 backdrop-blur">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[3px]"
+          style={{ background: `linear-gradient(90deg, ${factionColor('40k', roster.factionId)}, transparent 85%)` }}
+        />
         <div className="flex items-center gap-2">
           <IconButton icon="back" label="К списку" onClick={onBack} className="size-9" />
           {view ? (

@@ -43,7 +43,7 @@ import {
   type TAArmy,
   type TAUnit,
 } from '../../testarmy';
-import { Button, IconButton, Segmented } from '../kit';
+import { Button, Icon, IconButton, Segmented } from '../kit';
 import { cx } from '../util';
 
 const SIDE_COLOR: Record<Side, string> = { attacker: '#f87171', defender: '#60a5fa' };
@@ -94,9 +94,9 @@ export type BoardField = {
 
 type Tool = 'move' | 'ruler' | 'units';
 const TOOLS: { id: Tool; icon: string; label: string }[] = [
-  { id: 'move', icon: '✋', label: 'Двигать' },
-  { id: 'ruler', icon: '📏', label: 'Линейка' },
-  { id: 'units', icon: '⇔', label: 'Отряды' },
+  { id: 'move', icon: 'move', label: 'Двигать' },
+  { id: 'ruler', icon: 'ruler', label: 'Линейка' },
+  { id: 'units', icon: 'distance', label: 'Отряды' },
 ];
 
 type Drag = { uid: string; modelId: string | null; start: Pt; orig: TAUnit; moved: boolean; timer: number | undefined; pointerId: number };
@@ -596,18 +596,18 @@ function BoardInner({
 
       {/* колонка инструментов справа */}
       <nav className="flex w-14 shrink-0 flex-col items-center gap-1 overflow-y-auto border-l border-white/10 bg-app-elevated py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">
-        <RailButton icon="‹" label="Назад" onClick={onBack} />
-        <RailButton icon="☰" label="Отряды" active={panel} onClick={() => (haptic.select(), setPanel((v) => !v))} />
+        <RailButton icon="back" label="Назад" onClick={onBack} />
+        <RailButton icon="list" label="Отряды" active={panel} onClick={() => (haptic.select(), setPanel((v) => !v))} />
         <span className="my-0.5 h-px w-8 bg-white/10" />
         {TOOLS.map((t) => (
           <RailButton key={t.id} icon={t.icon} label={t.label} active={tool === t.id} onClick={() => chooseTool(t.id)} />
         ))}
-        <RailButton icon="◎" label={field.objectives.length ? `Цели ${field.objectiveRange ?? OBJECTIVE_RANGE}″` : 'Зоны 3″'} active={ranges} onClick={() => setRanges((v) => !v)} />
-        {tool === 'ruler' && ruler.a && <RailButton icon="✕" label="Сброс" onClick={() => setRuler({ a: null, b: null })} />}
+        <RailButton icon="target" label={field.objectives.length ? `Цели ${field.objectiveRange ?? OBJECTIVE_RANGE}″` : 'Зоны 3″'} active={ranges} onClick={() => setRanges((v) => !v)} />
+        {tool === 'ruler' && ruler.a && <RailButton icon="close" label="Сброс" onClick={() => setRuler({ a: null, b: null })} />}
         <span className="flex-1" />
-        <RailButton icon="+" label="Крупнее" onClick={() => zoomBy(1.4)} />
-        <RailButton icon="−" label="Мельче" onClick={() => zoomBy(1 / 1.4)} />
-        <RailButton icon="⤢" label="Всё поле" onClick={fit} />
+        <RailButton icon="plus" label="Крупнее" onClick={() => zoomBy(1.4)} />
+        <RailButton icon="minus" label="Мельче" onClick={() => zoomBy(1 / 1.4)} />
+        <RailButton icon="fit" label="Всё поле" onClick={fit} />
       </nav>
 
       {/* выезжающая панель справа: отряды или выбранный отряд */}
@@ -694,7 +694,7 @@ function RailButton({ icon, label, active, onClick }: { icon: string; label: str
         active ? 'bg-accent/20 text-accent' : 'text-fg-2 active:bg-white/10',
       )}
     >
-      <span className="text-xl leading-none">{icon}</span>
+      <Icon name={icon} className="size-5" />
       <span className="mt-0.5 w-full truncate text-center">{label}</span>
     </button>
   );

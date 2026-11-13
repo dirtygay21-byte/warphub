@@ -1,4 +1,5 @@
 import { learnDone } from '@/components/tutorial/progress';
+import { factionColor } from './common/factionColors';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BATTLE_SIZES, BATTLE_SIZE_ORDER } from '../engine/rules';
@@ -133,6 +134,7 @@ function RosterCard({ roster, faction, onOpen, onMenu }: { roster: Roster; facti
   const date = new Date(roster.updatedAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
   return (
     <li className="flex items-stretch overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
+      <span aria-hidden="true" className="w-1 shrink-0" style={{ background: factionColor('40k', roster.factionId) }} />
       <button type="button" onClick={() => (haptic.tap(), onOpen())} className="min-w-0 flex-1 px-4 py-3.5 text-left active:bg-white/[0.03]">
         <p className="truncate text-base font-semibold">{roster.name}</p>
         <p className="mt-0.5 truncate text-sm text-fg-3">

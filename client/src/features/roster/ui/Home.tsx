@@ -33,6 +33,7 @@ export function Home({
   aosIndex,
   onGame,
   onOpen,
+  resume,
 }: {
   onExit: () => void;
   rosters: Roster[];
@@ -42,6 +43,8 @@ export function Home({
   aosIndex: AosIndex | null;
   onGame: (g: GameSystem) => void;
   onOpen: (g: GameSystem, id: string) => void;
+  /** «Продолжить» (14.11.2026): последняя игра или Test Army */
+  resume?: { title: string; sub: string; onClick: () => void } | null;
 }) {
   const count = (g: GameTile['id']) => (g === '40k' ? rosters.length : g === 'aos' ? aosRosters.length : g === 'kt' ? ktRosters.length : wcRosters.length);
   const recent = [
@@ -61,6 +64,23 @@ export function Home({
           <h1 className="font-display mt-1 text-[32px] font-semibold uppercase leading-none">WarpBuilder</h1>
         </div>
       </header>
+      {resume && (
+        <button
+          type="button"
+          onClick={() => (haptic.tap(), resume.onClick())}
+          className="ds-press mb-3 flex min-h-16 w-full items-center gap-3 rounded-2xl border border-accent/30 bg-accent/[0.08] px-3.5 py-3 text-left"
+        >
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-accent text-accent-foreground">
+            <Icon name="play" className="size-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[12px] font-semibold uppercase tracking-[0.08em] text-accent">Продолжить</span>
+            <span className="block truncate text-base font-semibold">{resume.title}</span>
+            <span className="block truncate text-[13px] text-fg-2">{resume.sub}</span>
+          </span>
+          <Icon name="chevron" className="size-4 shrink-0 text-fg-3" />
+        </button>
+      )}
       <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
         {GAMES.map((g, i) => {
           const n = count(g.id);

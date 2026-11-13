@@ -44,6 +44,35 @@ import { KtFullGameScreen } from './kt/KtFullGameScreen';
 import { KtTestArmyScreen, WarcryTestArmyScreen } from './skirmish/SkirmishTestArmyScreen';
 import { Rules } from './Rules';
 
+type ResumeScreen = 'game' | 'test-army' | 'aos-game' | 'aos-test-army' | 'kt-game' | 'kt-test-army' | 'warcry-game' | 'warcry-test-army';
+const RESUMABLE: ResumeScreen[] = ['game', 'test-army', 'aos-game', 'aos-test-army', 'kt-game', 'kt-test-army', 'warcry-game', 'warcry-test-army'];
+const RESUME_KEY = 'warphub:wb-resume';
+const RESUME_LABEL: Record<ResumeScreen, string> = {
+  game: 'Игра',
+  'test-army': 'Test Army',
+  'aos-game': 'Игра',
+  'aos-test-army': 'Test Army',
+  'kt-game': 'Игра',
+  'kt-test-army': 'Test Army',
+  'warcry-game': 'Игра',
+  'warcry-test-army': 'Test Army',
+};
+const SYSTEM_LABEL: Record<GameSystem, string> = { '40k': 'Warhammer 40,000', aos: 'Age of Sigmar', kt: 'Kill Team', warcry: 'Warcry' };
+const systemOf = (screen: ResumeScreen): GameSystem =>
+  screen.startsWith('aos-') ? 'aos' : screen.startsWith('kt-') ? 'kt' : screen.startsWith('warcry-') ? 'warcry' : '40k';
+
+/** Последняя игра / Test Army (не старше 14 дней). */
+function readResume(): { screen: ResumeScreen; rosterId: string | null; system: GameSystem } | null {
+  try {
+    const v = JSON.parse(localStorage.getItem(RESUME_KEY) ?? 'null') as { screen?: string; rosterId?: string | null; at?: number } | null;
+    if (!v?.screen || !RESUMABLE.includes(v.screen as ResumeScreen) || !v.at || Date.now() - v.at > 14 * 864e5) return null;
+    const screen = v.screen as ResumeScreen;
+    return { screen, rosterId: v.rosterId ?? null, system: systemOf(screen) };
+  } catch {
+    return null;
+  }
+}
+
 type Route =
   | { screen: 'home' }
   | { screen: 'list' }
@@ -120,6 +149,17 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   const [rosters, setRosters] = useState<Roster[] | null>(null);
   const [aosRosters, setAosRosters] = useState<AosRoster[] | null>(null);
   const [route, setRoute] = useState<Route>({ screen: 'home' });
+
+  // «Продолжить» на главной WarpBuilder (14.11.2026): последняя игра или Test Army — одним нажатием
+  useEffect(() => {
+    if (!RESUMABLE.includes(route.screen as ResumeScreen)) return;
+    const r = route as { screen: ResumeScreen; rosterId?: string };
+    try {
+      localStorage.setItem(RESUME_KEY, JSON.stringify({ screen: r.screen, rosterId: r.rosterId ?? null, system: systemOf(r.screen), at: Date.now() }));
+    } catch {
+      /* приватный режим */
+    }
+  }, [route]);
 
   const setSystem = (s: GameSystem) => {
     setError(null);
@@ -236,8 +276,24 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
     );
   }
   if (route.screen === 'home' && rosters && aosRosters && ktRosters && wcRosters) {
+    const resume = readResume();
+    const resumeName =
+      resume?.rosterId &&
+      [...rosters, ...aosRosters, ...ktRosters, ...wcRosters].find((r) => r.id === resume.rosterId)?.name;
     return (
       <Home
+        resume={
+          resume
+            ? {
+                title: `${RESUME_LABEL[resume.screen]}${resumeName ? ` · ${resumeName}` : ''}`,
+                sub: SYSTEM_LABEL[resume.system],
+                onClick: () => {
+                  setSystem(resume.system);
+                  setRoute({ screen: resume.screen, back: { screen: 'home' }, rosterId: resume.rosterId ?? undefined } as Route);
+                },
+              }
+            : null
+        }
         onExit={onExit}
         rosters={rosters}
         aosRosters={aosRosters}

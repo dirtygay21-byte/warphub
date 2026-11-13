@@ -19,9 +19,12 @@ export function RosterCard({
   updatedAt,
   onOpen,
   onMenu,
+  accent,
 }: {
   name: string;
   sub: string;
+  /** цвет фракции — полоса слева (14.11.2026) */
+  accent?: string;
   tags?: ReactNode;
   status?: { errors: number; warnings: number };
   points?: number | null;
@@ -33,6 +36,7 @@ export function RosterCard({
   const date = new Date(updatedAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
   return (
     <li className="flex items-stretch overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
+      {accent && <span aria-hidden="true" className="w-1 shrink-0" style={{ background: accent }} />}
       <button type="button" onClick={() => (haptic.tap(), onOpen())} className="min-w-0 flex-1 px-4 py-3.5 text-left active:bg-white/[0.03]">
         <p className="truncate text-base font-semibold">{name}</p>
         <p className="mt-0.5 truncate text-sm text-fg-2">{sub}</p>
