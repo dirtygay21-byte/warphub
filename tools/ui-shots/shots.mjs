@@ -311,7 +311,7 @@ for (const [label, name] of [
 // «Учебный раунд» Kill Team: вступление, шаги с примерами, следующий раунд
 await step('kt-list-learn', async () => {
   await page.goto(BASE + '/roster', { waitUntil: 'networkidle' });
-  await page.getByRole('button', { name: /Kill Team/ }).first().click({ timeout: 5000 });
+  await page.getByRole('button', { name: /Kill Team/ }).filter({ hasNotText: 'Продолжить' }).first().click({ timeout: 5000 });
   await page.waitForTimeout(800);
   await shot('kt-list-tiles');
 });
@@ -350,7 +350,7 @@ for (const width of [390, 360]) {
   for (const [label, sw, name, unit] of SYSTEMS) {
     await step(`layout-${width}-${label}`, async () => {
       await page.goto(BASE + '/roster', { waitUntil: 'networkidle' });
-      await page.getByRole('button', { name: sw }).first().click({ timeout: 5000 }).catch(() => {});
+      await page.getByRole('button', { name: sw }).filter({ hasNotText: 'Продолжить' }).first().click({ timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(800);
       await shot(`layout-${width}-${label}-list`, true);
       if (width === 390)
