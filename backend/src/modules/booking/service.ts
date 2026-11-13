@@ -70,7 +70,8 @@ import {
 } from './rules';
 
 export { parseDateParam } from './rules';
-import { bookingNoticeText } from './notify-text';
+import { getAdminTelegramIds } from '../../config/admin';
+import { bookerConfirmText, bookingNoticeText } from './notify-text';
 import { createReservationPricing } from '../pricing/service';
 
 const ACTIVE_RESERVATION_STATUSES = ['pending', 'confirmed'] as const;
@@ -1184,6 +1185,21 @@ async function notifyAfterCreate(
       );
     }
 
+    const tableName = reservation.tableId !== null ? await getTableName(reservation.tableId) : null;
+    // самому записавшемуся — подтверждение (администратор и так получает полное сообщение ниже)
+    if (reason === 'created' && booker.user.telegramId && !getAdminTelegramIds().includes(String(booker.user.telegramId))) {
+      notifyUser(
+        booker.user.telegramId,
+        bookerConfirmText({
+          serviceTitle: service.title ?? service.slug,
+          startsAt: reservation.startsAt,
+          endsAt: reservation.endsAt,
+          tableName,
+          table: atTable ? { occupied: others.length + 1, seats: seats! } : null,
+        }),
+      );
+    }
+
     // администраторам — одно полное сообщение о каждой записи (N1)
     const text = bookingNoticeText({
       reason,
@@ -1191,7 +1207,7 @@ async function notifyAfterCreate(
       startsAt: reservation.startsAt,
       endsAt: reservation.endsAt,
       createdAt: reservation.createdAt,
-      tableName: reservation.tableId !== null ? await getTableName(reservation.tableId) : null,
+      tableName,
       user: booker.user,
       partySize: reservation.partySize,
       seatClubArmyOptions: reservation.seatClubArmyOptions,

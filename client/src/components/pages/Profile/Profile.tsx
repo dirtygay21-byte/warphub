@@ -8,6 +8,7 @@ import { getRosterAccess } from "@/apiUtils/roster";
 import { AccessCodeDialog } from "./AccessCodeDialog";
 import SupportSection from "./SupportSection";
 import PartnerSection from "./PartnerSection";
+import NotificationsSection from "./NotificationsSection";
 import TelegramOnly from "@/components/ui/TelegramOnly/TelegramOnly";
 import { isOutsideTelegram } from "@/utils/telegramEnv";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -263,6 +264,7 @@ export default function Profile() {
         )}
       </AnimatePresence>
 
+      <NotificationsSection />
       <PartnerSection />
       <SupportSection />
     </div>
