@@ -25,7 +25,7 @@ import {
   toReservationResponse,
 } from '../booking/service';
 import { getAdminUserProfile, searchUsersByUsername } from '../users/service';
-import { testNotification } from '../notifications/service';
+import { notificationDiagnostics, testNotification } from '../notifications/service';
 import { addAdmin, AdminsError, listAdmins, removeAdmin } from '../admins/service';
 import { isBuiltinAdmin } from '../../config/admin';
 import {
@@ -1236,6 +1236,13 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       },
     },
   )
+  .get('/notifications/diagnostics', () => notificationDiagnostics(), {
+    detail: {
+      tags: ['Admin'],
+      summary: 'Диагностика уведомлений',
+      description: 'Включены ли уведомления, отвечает ли Telegram (getMe), получатели-администраторы и последние отправки. Ничего не отправляет.',
+    },
+  })
   .post('/notifications/test', ({ user }) => testNotification(user), {
     detail: {
       tags: ['Admin'],

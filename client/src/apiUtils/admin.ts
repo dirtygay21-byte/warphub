@@ -492,3 +492,14 @@ export const addAdmin = (telegramId: string, note: string) =>
 
 export const removeAdmin = (telegramId: number) =>
   apiRequest<{ admins: AdminEntry[] }>(`/admin/admins/${telegramId}`, { method: "DELETE" });
+
+/** Диагностика уведомлений (14.11.2026): GET /admin/notifications/diagnostics */
+export type NotificationSendLog = { at: string; chatId: string; kind: string; ok: boolean; reason?: string; status?: number; description?: string; ms: number };
+export type NotificationDiagnostics = {
+  enabled: boolean;
+  bot: { ok: boolean; username?: string; ms: number; error?: string };
+  admins: Array<{ telegramId: string; last: NotificationSendLog | null }>;
+  recent: NotificationSendLog[];
+  since: string;
+};
+export const getNotificationDiagnostics = () => apiRequest<NotificationDiagnostics>("/admin/notifications/diagnostics");
