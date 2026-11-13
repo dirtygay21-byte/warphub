@@ -583,3 +583,25 @@ export function canBookDndSeats(
     requested <= dndAvailableSeats(capacity, activeQuantities)
   );
 }
+
+/**
+ * Игра за столом для админки (13.11.2026): записи одной услуги за одним столом с одним началом — одна игра
+ * (то же правило, что checkTableSession). Отменённые не входят. Ключ — «услуга:стол:начало».
+ */
+export type TableGameMember<T> = T & { serviceId: number; tableId: number | null; startsAt: Date | string | null; status: string };
+
+export const tableGameKey = (serviceId: number, tableId: number | null, startsAt: Date | string | null) =>
+  tableId === null || startsAt === null ? null : `${serviceId}:${tableId}:${new Date(startsAt).getTime()}`;
+
+export function groupTableGames<T>(rows: TableGameMember<T>[]): Map<string, TableGameMember<T>[]> {
+  const games = new Map<string, TableGameMember<T>[]>();
+  for (const row of rows) {
+    if (row.status === 'cancelled') continue;
+    const key = tableGameKey(row.serviceId, row.tableId, row.startsAt);
+    if (!key) continue;
+    const list = games.get(key) ?? [];
+    list.push(row);
+    games.set(key, list);
+  }
+  return games;
+}

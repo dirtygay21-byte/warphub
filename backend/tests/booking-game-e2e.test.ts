@@ -63,7 +63,7 @@ beforeAll(async () => {
     serviceId = Number(sql(`insert into services (discipline_id, slug, title, duration, seats_per_table) values (${disc}, 'wh_game', 'E2E игра', 240, 2) returning id`));
   }
   tableId = Number(sql(`insert into tables (name, category) values ('E2E стол игры', 'small') returning id`));
-  for (const [name, id] of Object.entries({ host: 4301, wrong: 4302, right: 4303 })) {
+  for (const [name, id] of Object.entries({ host: 4301, wrong: 4302, right: 4303, admin: 777 })) {
     const r = await api('POST', '/auth/telegram', undefined, { initData: initData({ id, first_name: name, ...(name === 'host' ? { username: 'host_nick' } : {}) }) });
     if (r.status !== 200) console.error(`::error::login ${name} → ${r.status}: ${JSON.stringify(r.json).slice(0, 600)}`);
     T[name] = r.json.token;
@@ -92,6 +92,20 @@ describe('игра в записи на Warhammer', () => {
     if (right.status !== 200) console.error(`::error::join → ${right.status}: ${JSON.stringify(right.json).slice(0, 600)}`);
     expect(right.status).toBe(200);
     expect(right.json.joinedSession).toBe(true);
+  });
+
+  test('админка «Все записи»: у каждой записи — её игра целиком (оба игрока, места, выбор) (13.11.2026)', async () => {
+    const r = await api('GET', `/admin/reservations?tableId=${tableId}&limit=50&offset=0`, T.admin);
+    if (r.status !== 200) console.error(`::error::admin list → ${r.status}: ${JSON.stringify(r.json).slice(0, 600)}`);
+    expect(r.status).toBe(200);
+    const items = (r.json as Array<{ id: string; status: string; game: { key: string; seats: number; occupied: number; players: Array<{ firstName: string; details: { army?: string } | null }> } | null }>).filter((x) => x.status !== 'cancelled');
+    expect(items.length).toBe(2);
+    const [a, b] = items;
+    expect(a!.game?.key).toBe(b!.game?.key);
+    expect(a!.game).toMatchObject({ seats: 2, occupied: 2 });
+    expect(a!.game!.players.map((p) => p.firstName)).toEqual(['host', 'right']);
+    expect(a!.game!.players.map((p) => p.details?.army)).toEqual(['Pathfinders', 'Kasrkin']);
+    expect((await api('GET', `/admin/reservations?limit=5&offset=0`, T.host)).status).toBe(403);
   });
 
   test('в сессиях стола видна игра игроков', async () => {

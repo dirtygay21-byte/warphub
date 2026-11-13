@@ -200,6 +200,8 @@ export default function AdminReservations() {
     [disciplinesQuery.data]
   );
 
+  const onPage = useMemo(() => new Set(reservations.map((reservation) => reservation.id)), [reservations]);
+
   const rows = useMemo<AdminReservationRow[]>(
     () =>
       reservations.map((reservation) => {
@@ -215,6 +217,7 @@ export default function AdminReservations() {
             : undefined,
           tableLabel:
             reservation.table?.name ??
+            reservation.tableName ??
             (reservation.tableId ? `#${reservation.tableId}` : "—"),
           timeRange: formatTimeRange(reservation.startsAt, reservation.endsAt),
           clubArmyCount: reservation.seatClubArmyOptions.filter(Boolean).length,
@@ -222,9 +225,20 @@ export default function AdminReservations() {
           needsHelp:
             isPaintingDetails(reservation.details) &&
             reservation.details.needsHelp,
+          gamePlayers: (reservation.game?.players ?? []).map((player) => ({
+            reservationId: player.reservationId,
+            name: getUserDisplayName({
+              firstName: player.firstName,
+              lastName: player.lastName ?? undefined,
+              username: player.username ?? undefined,
+            }),
+            status: player.status,
+            detailsLabel: summarizeDetails(player.details, bookingOptions),
+            onPage: onPage.has(player.reservationId),
+          })),
         };
       }),
-    [bookingOptions, disciplinesById, reservations, servicesById, usersById]
+    [bookingOptions, disciplinesById, onPage, reservations, servicesById, usersById]
   );
 
   const statusMutation = useMutation({

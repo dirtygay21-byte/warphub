@@ -20,6 +20,16 @@ export type AdminReservationRow = AdminReservation & {
   /** Армия · очки · опыт или данные покраски */
   detailsLabel: string;
   needsHelp: boolean;
+  /** Игра за столом (13.11.2026): все участники с подписью и выбором; onPage — запись есть на этой странице */
+  gamePlayers: AdminGamePlayerRow[];
+};
+
+export type AdminGamePlayerRow = {
+  reservationId: string;
+  name: string;
+  status: string;
+  detailsLabel: string;
+  onPage: boolean;
 };
 
 export type StatusAction = "confirm" | "reject" | "extend";
