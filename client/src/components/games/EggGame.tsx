@@ -293,9 +293,17 @@ export default function EggGame() {
         <ResultPanel game={game} result={result} title="Результат" onAgain={begin}>
           {creature && (
             <div className="mt-4 flex flex-col items-center">
-              <div className="rounded-2xl border border-white/10 bg-[#0b0709] p-3">
+              <div
+                className="rounded-2xl border border-white/10 p-3"
+                style={{ background: `radial-gradient(circle at 50% 55%, ${RARITY_COLORS[creature.rarity] ?? "#ffffff"}33, #0b0709 70%)` }}
+              >
                 {visual?.kind === "image" ? (
-                  <img src={visual.src} alt={creature.name} className="size-44 object-contain [image-rendering:pixelated]" />
+                  <img
+                    src={visual.src}
+                    alt={creature.name}
+                    className="size-44 object-contain [image-rendering:pixelated]"
+                    style={{ filter: "drop-shadow(3px 0 0 #f4ecd8) drop-shadow(-3px 0 0 #f4ecd8) drop-shadow(0 3px 0 #f4ecd8) drop-shadow(0 -3px 0 #f4ecd8) drop-shadow(0 6px 10px rgba(0,0,0,0.7))" }}
+                  />
                 ) : (
                   <PixelSprite sprite={visual!.sprite} scale={4} title={creature.name} />
                 )}
