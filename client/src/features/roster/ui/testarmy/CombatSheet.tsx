@@ -22,18 +22,30 @@ export function CombatSheet({ attacker, target, distance, onClose }: { attacker:
   // выбор оружия: по умолчанию — первый профиль каждого оружия, которое достаёт до цели
   const [pick, setPick] = useState<Record<string, boolean>>({});
   const isOn = (id: string, primary: boolean, reach: boolean) => pick[id] ?? (primary && reach);
-  const [sit, setSit] = useState<Situation>({});
-  const tgt = useMemo(() => targetFrom(target.cr, target.uid), [target.cr, target.uid]);
+  const tgt0 = useMemo(() => targetFrom(target.cr, target.uid), [target.cr, target.uid]);
+  // Stealth цели — укрытие включено сразу (можно выключить)
+  const [sit, setSit] = useState<Situation>(() => (tgt0?.stealth ? { cover: true } : {}));
+  // правки цели (13.11.2026): модификаторы от правил цели и оставшиеся модели
+  const [tm, setTm] = useState<{ hit: number; inv: number | null; fnp: number | null; models: number | null }>({ hit: 0, inv: null, fnp: null, models: null });
+  const tgt = useMemo(() => {
+    if (!tgt0) return null;
+    const t = tgt0.target;
+    const best = (a: number | null, b: number | null) => (a == null ? b : b == null ? a : Math.min(a, b));
+    return { ...tgt0, target: { ...t, inv: best(t.inv, tm.inv), fnp: best(t.fnp, tm.fnp), models: Math.min(t.models, Math.max(1, tm.models ?? t.models)) } };
+  }, [tgt0, tm]);
+  const sitAll = useMemo<Situation>(() => ({ ...sit, hitMod: (sit.hitMod ?? 0) + tm.hit }), [sit, tm.hit]);
+  const changed = (o: object) => Object.values(o).filter((v) => v !== undefined && v !== null && v !== false && v !== 0 && v !== 'none' && v !== 6).length;
   const chosen = rows.filter((r) => isOn(r.id, r.primary, inRange(r, distance)));
   const key = chosen.map((r) => r.id).join('|');
   // половина дальности — у каждого оружия своя (RAPID FIRE, MELTA)
   const result = useMemo(
-    () => (tgt && chosen.length ? simulate(chosen.map((r) => toWeaponInput(r, distance)), tgt.target, sit) : null),
+    () => (tgt && chosen.length ? simulate(chosen.map((r) => toWeaponInput(r, distance)), tgt.target, sitAll) : null),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- chosen меняется вместе с key
-    [key, tgt, sit, distance],
+    [key, tgt, sitAll, distance],
   );
   const flip = (id: string, cur: boolean) => (haptic.select(), setPick((o) => ({ ...o, [id]: !cur })));
   const toggle = (k: keyof Situation) => (haptic.select(), setSit((s) => ({ ...s, [k]: !s[k] })));
+  const grant = (g: NonNullable<Situation['grant']>) => (haptic.select(), setSit((s) => ({ ...s, grant: { ...s.grant, ...g } })));
 
   return (
     <Sheet open onClose={onClose} title="Атака" tall>
@@ -83,23 +95,84 @@ export function CombatSheet({ attacker, target, distance, onClose }: { attacker:
           <div className="flex flex-wrap gap-1.5">
             {!melee && <Chip on={!!sit.cover} onClick={() => toggle('cover')}>Цель в укрытии</Chip>}
             {!melee && <Chip on={!!sit.heavy} onClick={() => toggle('heavy')}>Стоял (Heavy)</Chip>}
+            {!melee && <Chip on={!!sit.snap} onClick={() => toggle('snap')}>Навскидку (Overwatch)</Chip>}
             {!melee && <Chip on={!!sit.indirect} onClick={() => toggle('indirect')}>Непрямая стрельба</Chip>}
             {!melee && sit.indirect && <Chip on={!!sit.indirectStationaryVisible} onClick={() => toggle('indirectStationaryVisible')}>Стоял, цель видна своим</Chip>}
-            {melee && <Chip on={!!sit.charged} onClick={() => toggle('charged')}>Атаковал (Lance)</Chip>}
-            <Chip on={sit.critHit === 5} onClick={() => (haptic.select(), setSit((s) => ({ ...s, critHit: s.critHit === 5 ? 6 : 5 })))}>Крит на 5+</Chip>
+            {melee && <Chip on={!!sit.charged} onClick={() => toggle('charged')}>Атаковал в этом ходу (Lance)</Chip>}
           </div>
-          <Row label="Переброс попаданий">
-            <Segmented value={sit.rerollHit ?? 'none'} onChange={(v) => setSit((s) => ({ ...s, rerollHit: v }))} options={[{ value: 'none', label: 'Нет' }, { value: 'ones', label: 'Единицы' }, { value: 'fails', label: 'Проваленные' }]} />
-          </Row>
-          <Row label="Переброс ранений">
-            <Segmented value={sit.rerollWound ?? 'none'} onChange={(v) => setSit((s) => ({ ...s, rerollWound: v }))} options={[{ value: 'none', label: 'Нет' }, { value: 'ones', label: 'Единицы' }, { value: 'fails', label: 'Проваленные' }]} />
-          </Row>
-          <Row label="К попаданию">
-            <Segmented value={String(sit.hitMod ?? 0)} onChange={(v) => setSit((s) => ({ ...s, hitMod: Number(v) }))} options={[{ value: '-1', label: '−1' }, { value: '0', label: '0' }, { value: '1', label: '+1' }]} />
-          </Row>
-          <Row label="К ранению">
-            <Segmented value={String(sit.woundMod ?? 0)} onChange={(v) => setSit((s) => ({ ...s, woundMod: Number(v) }))} options={[{ value: '-1', label: '−1' }, { value: '0', label: '0' }, { value: '1', label: '+1' }]} />
-          </Row>
+
+          {/* модификаторы от правил детачмента, стратагем и способностей — вручную (13.11.2026) */}
+          <Fold title="Модификаторы атакующего" count={changed({ ...sit, cover: 0, heavy: 0, snap: 0, indirect: 0, indirectStationaryVisible: 0, charged: 0, halveD: 0, grant: 0, dMod: Math.max(0, sit.dMod ?? 0), woundMod: Math.max(0, sit.woundMod ?? 0) }) + changed(sit.grant ?? {})}>
+            <Row label="Переброс попаданий">
+              <Segmented value={sit.rerollHit ?? 'none'} onChange={(v) => setSit((s) => ({ ...s, rerollHit: v }))} options={[{ value: 'none', label: 'Нет' }, { value: 'ones', label: 'Единицы' }, { value: 'fails', label: 'Проваленные' }]} />
+            </Row>
+            <Row label="Переброс ранений">
+              <Segmented value={sit.rerollWound ?? 'none'} onChange={(v) => setSit((s) => ({ ...s, rerollWound: v }))} options={[{ value: 'none', label: 'Нет' }, { value: 'ones', label: 'Единицы' }, { value: 'fails', label: 'Проваленные' }]} />
+            </Row>
+            <div className="grid grid-cols-2 gap-2">
+              <Row label="К попаданию">
+                <Segmented value={String(sit.hitMod ?? 0)} onChange={(v) => setSit((s) => ({ ...s, hitMod: Number(v) }))} options={[{ value: '-1', label: '−1' }, { value: '0', label: '0' }, { value: '1', label: '+1' }]} />
+              </Row>
+              <Row label="К ранению">
+                <Segmented value={String(Math.max(0, sit.woundMod ?? 0))} onChange={(v) => setSit((s) => ({ ...s, woundMod: Number(v) + Math.min(0, s.woundMod ?? 0) }))} options={[{ value: '0', label: '0' }, { value: '1', label: '+1' }]} />
+              </Row>
+              <Row label="Сила (S)">
+                <Segmented value={String(sit.sMod ?? 0)} onChange={(v) => setSit((s) => ({ ...s, sMod: Number(v) }))} options={[{ value: '0', label: '0' }, { value: '1', label: '+1' }, { value: '2', label: '+2' }]} />
+              </Row>
+              <Row label="Пробивание (AP)">
+                <Segmented value={String(sit.apMod ?? 0)} onChange={(v) => setSit((s) => ({ ...s, apMod: Number(v) }))} options={[{ value: '1', label: 'хуже' }, { value: '0', label: '0' }, { value: '-1', label: '−1' }]} />
+              </Row>
+              <Row label="Урон (D)">
+                <Segmented value={String(Math.max(0, sit.dMod ?? 0))} onChange={(v) => setSit((s) => ({ ...s, dMod: Number(v) + Math.min(0, s.dMod ?? 0) }))} options={[{ value: '0', label: '0' }, { value: '1', label: '+1' }]} />
+              </Row>
+              <Row label="Крит. попадание">
+                <Segmented value={String(sit.critHit ?? 6)} onChange={(v) => setSit((s) => ({ ...s, critHit: Number(v) }))} options={[{ value: '6', label: '6' }, { value: '5', label: '5+' }]} />
+              </Row>
+              <Row label="Крит. ранение">
+                <Segmented value={String(sit.critWound ?? 6)} onChange={(v) => setSit((s) => ({ ...s, critWound: Number(v) }))} options={[{ value: '6', label: '6' }, { value: '5', label: '5+' }, { value: '4', label: '4+' }]} />
+              </Row>
+            </div>
+            <Row label="Способности от правил — всему выбранному оружию">
+              <div className="flex flex-wrap gap-1.5">
+                <Chip on={sit.grant?.sustained === 1} onClick={() => grant({ sustained: sit.grant?.sustained === 1 ? undefined : 1 })}>Sustained Hits 1</Chip>
+                <Chip on={!!sit.grant?.lethal} onClick={() => grant({ lethal: !sit.grant?.lethal })}>Lethal Hits</Chip>
+                <Chip on={!!sit.grant?.dev} onClick={() => grant({ dev: !sit.grant?.dev })}>Devastating Wounds</Chip>
+                <Chip on={!!sit.grant?.twin} onClick={() => grant({ twin: !sit.grant?.twin })}>Twin-linked</Chip>
+                {!melee && <Chip on={!!sit.grant?.ignoresCover} onClick={() => grant({ ignoresCover: !sit.grant?.ignoresCover })}>Ignores Cover</Chip>}
+                {melee && <Chip on={!!sit.grant?.lance} onClick={() => grant({ lance: !sit.grant?.lance })}>Lance</Chip>}
+              </div>
+            </Row>
+          </Fold>
+
+          <Fold title="Модификаторы цели" count={changed({ ...tm, models: tm.models != null && tgt0 && tm.models < tgt0.target.models ? 1 : 0 }) + (sit.halveD ? 1 : 0) + ((sit.dMod ?? 0) < 0 ? 1 : 0) + ((sit.woundMod ?? 0) < 0 ? 1 : 0)}>
+            <div className="flex flex-wrap gap-1.5">
+              <Chip on={tm.hit === -1} onClick={() => (haptic.select(), setTm((t) => ({ ...t, hit: t.hit === -1 ? 0 : -1 })))}>−1 к попаданию по цели</Chip>
+              <Chip on={(sit.woundMod ?? 0) < 0} onClick={() => (haptic.select(), setSit((s) => ({ ...s, woundMod: (s.woundMod ?? 0) < 0 ? (s.woundMod ?? 0) + 1 : (s.woundMod ?? 0) - 1 })))}>−1 к ранению по цели</Chip>
+              <Chip on={(sit.dMod ?? 0) < 0} onClick={() => (haptic.select(), setSit((s) => ({ ...s, dMod: (s.dMod ?? 0) < 0 ? (s.dMod ?? 0) + 1 : (s.dMod ?? 0) - 1 })))}>−1 урон</Chip>
+              <Chip on={!!sit.halveD} onClick={() => toggle('halveD')}>Урон пополам</Chip>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Row label={`Непробиваемый${tgt0?.target.inv ? ` (в профиле ${tgt0.target.inv}+)` : ''}`}>
+                <Segmented value={String(tm.inv ?? 0)} onChange={(v) => setTm((t) => ({ ...t, inv: Number(v) || null }))} options={[{ value: '0', label: '—' }, { value: '6', label: '6+' }, { value: '5', label: '5+' }, { value: '4', label: '4+' }]} />
+              </Row>
+              <Row label={`Feel No Pain${tgt0?.target.fnp ? ` (в профиле ${tgt0.target.fnp}+)` : ''}`}>
+                <Segmented value={String(tm.fnp ?? 0)} onChange={(v) => setTm((t) => ({ ...t, fnp: Number(v) || null }))} options={[{ value: '0', label: '—' }, { value: '6', label: '6+' }, { value: '5', label: '5+' }, { value: '4', label: '4+' }]} />
+              </Row>
+            </div>
+            {tgt0 && tgt0.target.models > 1 && (
+              <Row label={`Моделей в цели сейчас (в ростере ${tgt0.target.models})`}>
+                <div className="flex items-center gap-2">
+                  <button type="button" aria-label="Меньше моделей" className="size-9 rounded-lg bg-white/[0.08] text-lg font-semibold active:bg-white/15" onClick={() => (haptic.select(), setTm((t) => ({ ...t, models: Math.max(1, (t.models ?? tgt0.target.models) - 1) })))}>
+                    −
+                  </button>
+                  <span className="w-10 text-center text-base font-semibold tabular-nums">{tgt?.target.models}</span>
+                  <button type="button" aria-label="Больше моделей" className="size-9 rounded-lg bg-white/[0.08] text-lg font-semibold active:bg-white/15" onClick={() => (haptic.select(), setTm((t) => ({ ...t, models: Math.min(tgt0.target.models, (t.models ?? tgt0.target.models) + 1) })))}>
+                    +
+                  </button>
+                </div>
+              </Row>
+            )}
+          </Fold>
         </section>
 
         {!tgt ? (
@@ -165,6 +238,19 @@ function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; chi
     <button type="button" aria-pressed={on} onClick={onClick} className={cx('rounded-lg px-2.5 py-1.5 text-xs font-semibold transition', on ? 'bg-accent text-accent-foreground' : 'bg-white/[0.06] text-fg-2')}>
       {children}
     </button>
+  );
+}
+/** Сворачиваемая группа модификаторов; count — сколько изменено (видно в свёрнутом виде). */
+function Fold({ title, count, children }: { title: string; count: number; children: ReactNode }) {
+  return (
+    <details className="rounded-xl border border-white/10 bg-white/[0.03]">
+      <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2.5 text-sm font-semibold">
+        <span className="min-w-0 flex-1">{title}</span>
+        {count > 0 && <span className="rounded-md bg-accent px-1.5 py-0.5 text-[11px] font-bold text-accent-foreground">{count}</span>}
+        <span aria-hidden className="text-fg-3">▾</span>
+      </summary>
+      <div className="space-y-2.5 px-3 pb-3">{children}</div>
+    </details>
   );
 }
 function Row({ label, children }: { label: string; children: ReactNode }) {
