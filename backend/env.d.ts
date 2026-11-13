@@ -2,6 +2,10 @@ declare namespace NodeJS {
   interface ProcessEnv {
     POSTGRES_URI: string;
     TELEGRAM_BOT_TOKEN: string;
+    /** обход блокировки api.telegram.org: свой обратный прокси (https://…) */
+    TELEGRAM_API_BASE?: string;
+    /** обход блокировки: HTTP(S)-прокси за границей (http://user:pass@host:port) */
+    TELEGRAM_PROXY?: string;
     JWT_SECRET: string;
     BOT_INTERNAL_SECRET: string;
     INIT_DATA_MAX_AGE_SEC: string;

@@ -501,6 +501,8 @@ export type NotificationSendLog = { at: string; chatId: string; kind: string; ok
 export type NotificationDiagnostics = {
   enabled: boolean;
   bot: { ok: boolean; username?: string; ms: number; error?: string };
+  /** маршрут к Telegram (14.11.2026): напрямую или через свой прокси; без пароля */
+  route?: { base: string; proxy: string | null };
   admins: Array<{ telegramId: string; last: NotificationSendLog | null }>;
   recent: NotificationSendLog[];
   since: string;
