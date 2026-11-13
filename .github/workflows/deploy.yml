@@ -101,7 +101,7 @@ jobs:
         with:
           name: warphub-package-${{ github.run_id }}
           path: package.tgz
-          retention-days: 30
+          retention-days: 3
 
   deploy:
     name: Server (${{ inputs.mode }})
