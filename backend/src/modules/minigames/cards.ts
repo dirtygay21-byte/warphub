@@ -58,7 +58,6 @@ async function balanceOf(executor: Tx | typeof db, userId: string) {
 export const getPointsBalance = (userId: string) => balanceOf(db, userId);
 
 const MILESTONE = 25_000;
-const cardsMaintenance = () => process.env.CARDS_MAINTENANCE !== '0';
 
 async function positivePointsOf(executor: Tx | typeof db, userId: string) {
   const [row] = await executor
@@ -183,7 +182,6 @@ export async function getCardsState(userId: string) {
 }
 
 export async function openPack(userId: string) {
-  if (cardsMaintenance()) throw new MinigameError('GAME_DISABLED', 'Card game is temporarily under maintenance');
   const settings = await getMinigameSettings();
   if (!settings.games.cards.enabled) {
     throw new MinigameError('GAME_DISABLED', 'This game is turned off');
