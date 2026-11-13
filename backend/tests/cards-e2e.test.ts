@@ -9,8 +9,7 @@ import { afterAll, beforeAll, describe as baseDescribe, expect, test } from 'bun
  * Эти проверки идут против запущенного тестового сервера и тестовой базы.
  * На боевом сервере они не запускаются: включаются только при WARPHUB_E2E=1.
  */
-// В период технической блокировки карточной игры обычные сценарии открытия паков не запускаются.
-const E2E = process.env.WARPHUB_E2E === '1' && process.env.CARDS_MAINTENANCE === '0';
+const E2E = process.env.WARPHUB_E2E === '1';
 const describe = E2E ? baseDescribe : baseDescribe.skip;
 import { createHmac } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
