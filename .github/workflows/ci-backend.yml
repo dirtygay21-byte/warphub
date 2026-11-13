@@ -46,6 +46,7 @@ jobs:
       S3_PUBLIC_URL: http://127.0.0.1/e2e
       PORT: "4100"
       TELEGRAM_NOTIFICATIONS: "off"
+      REMINDERS: "off"
       ADMIN_TELEGRAM_IDS: "777"
       DOMINATUS_API_URL: "http://127.0.0.1:41999"
       DOMINATUS_INTEGRATION_TOKEN: "test-integration-secret"
@@ -96,7 +97,7 @@ jobs:
           cat api.log; exit 1
       - name: E2E tests
         working-directory: backend
-        run: WARPHUB_E2E=1 bun test tests/admins-e2e.test.ts tests/pricing-e2e.test.ts tests/booking-short-e2e.test.ts tests/online-games-e2e.test.ts tests/dnd-flexible-e2e.test.ts tests/booking-game-e2e.test.ts tests/table-holds-e2e.test.ts tests/progress-e2e.test.ts tests/supporters-e2e.test.ts tests/club-closure-e2e.test.ts tests/dominatus-e2e.test.ts tests/tactical-tables-e2e.test.ts tests/dominatus-export-e2e.test.ts tests/dominatus-export-e2e.test.ts
+        run: WARPHUB_E2E=1 bun test tests/admins-e2e.test.ts tests/pricing-e2e.test.ts tests/booking-short-e2e.test.ts tests/online-games-e2e.test.ts tests/dnd-flexible-e2e.test.ts tests/booking-game-e2e.test.ts tests/table-holds-e2e.test.ts tests/progress-e2e.test.ts tests/supporters-e2e.test.ts tests/club-closure-e2e.test.ts tests/dominatus-e2e.test.ts tests/tactical-tables-e2e.test.ts tests/dominatus-export-e2e.test.ts tests/dominatus-export-e2e.test.ts tests/reminders.test.ts
       - name: API log on failure
         if: failure()
         working-directory: backend

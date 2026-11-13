@@ -605,3 +605,22 @@ export function groupTableGames<T>(rows: TableGameMember<T>[]): Map<string, Tabl
   }
   return games;
 }
+
+/**
+ * Напоминание о визите (14.11.2026): за REMIND_BEFORE до начала, одно на запись (reservations.remind_at — когда
+ * отправлено). Не напоминает, если запись создана меньше чем за REMIND_MIN_AGE до этого момента (только что
+ * пришло подтверждение) и если визит уже начался.
+ */
+export const REMIND_BEFORE_MS = 3 * 60 * 60_000;
+export const REMIND_MIN_AGE_MS = 30 * 60_000;
+
+export function dueForReminder(
+  r: { status: string; startsAt: Date | null; createdAt: Date; remindAt: Date | null },
+  now: Date,
+): boolean {
+  if (r.remindAt || !r.startsAt) return false;
+  if (r.status !== 'pending' && r.status !== 'confirmed') return false;
+  const left = r.startsAt.getTime() - now.getTime();
+  if (left <= 0 || left > REMIND_BEFORE_MS) return false;
+  return now.getTime() - r.createdAt.getTime() >= REMIND_MIN_AGE_MS;
+}

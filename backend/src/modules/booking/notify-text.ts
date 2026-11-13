@@ -108,3 +108,23 @@ export function bookerConfirmText(n: Pick<BookingNotice, 'serviceTitle' | 'start
   ];
   return lines.filter(Boolean).join('\n');
 }
+
+/** Напоминание о визите (14.11.2026): что, когда, стол, соперники (имя и ник — чтобы списаться). */
+export function reminderText(n: {
+  serviceTitle: string;
+  startsAt: Date;
+  endsAt: Date | null;
+  tableName: string | null;
+  status: string;
+  opponents: Array<{ firstName: string; lastName?: string | null; username?: string | null }>;
+}): string {
+  const lines = [
+    `⏰ <b>Напоминание: ${escapeHtml(n.serviceTitle)}</b>`,
+    `Когда: ${formatClubDateTime(n.startsAt, n.endsAt)}`,
+    n.tableName ? `Стол: ${escapeHtml(n.tableName)}` : '',
+    n.opponents.length ? `Соперник: ${n.opponents.map((o) => escapeHtml(formatUserName(o))).join(', ')}` : '',
+    n.status === 'pending' ? 'Запись ещё ждёт подтверждения администратора.' : '',
+    'Не получается прийти — отмените запись в приложении, раздел «Записи».',
+  ];
+  return lines.filter(Boolean).join('\n');
+}
