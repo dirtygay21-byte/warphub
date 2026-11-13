@@ -255,6 +255,10 @@ export function ReservationsTable({
     </>
   );
 }
+
+type Block = { game: AdminReservationRow["game"] | null; rows: Row<AdminReservationRow>[] };
+
+/** Записи одной игры за столом — одним блоком; место блока — по первой записи игры в текущей сортировке. */
 function groupByGame(rows: Row<AdminReservationRow>[]): Block[] {
   const blocks: Block[] = [];
   const byKey = new Map<string, Block>();
@@ -404,3 +408,4 @@ function TableGameSheet({
     document.body
   );
 }
+
