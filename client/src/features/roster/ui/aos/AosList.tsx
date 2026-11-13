@@ -1,4 +1,5 @@
 import { learnDone } from '@/components/tutorial/progress';
+import { factionColor } from '../common/factionColors';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AOS_CODE_PREFIX, decodeAosRoster, duplicateAosRoster, newAosRoster } from '../../aos/roster';
@@ -119,6 +120,7 @@ function Card({ roster, faction, onOpen, onMenu }: { roster: AosRoster; faction:
     <RosterCard
       name={roster.name}
       sub={faction}
+      accent={factionColor('aos', roster.factionId)}
       tags={
         <>
           <Tag>AoS</Tag>

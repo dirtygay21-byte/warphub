@@ -29,6 +29,13 @@ const paths: Record<string, string> = {
   edit: 'M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4',
   lock: 'M6 11h12v10H6zM8 11V7a4 4 0 018 0v4',
   camera: 'M4 8h3l2-3h6l2 3h3v11H4zM12 17a3.5 3.5 0 100-7 3.5 3.5 0 000 7z',
+  play: 'M8 5l11 7-11 7z',
+  move: 'M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3',
+  ruler: 'M3 17L17 3l4 4L7 21zM7 13l2 2M10 10l2 2M13 7l2 2',
+  distance: 'M4 12h16M7 9l-3 3 3 3M17 9l3 3-3 3',
+  list: 'M4 6h16M4 12h16M4 18h16',
+  target: 'M12 21a9 9 0 110-18 9 9 0 010 18zM12 16a4 4 0 110-8 4 4 0 010 8z',
+  fit: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5',
 };
 
 export function Icon({ name, className = 'size-5', strokeWidth = 2 }: { name: keyof typeof paths | string; className?: string; strokeWidth?: number }) {
