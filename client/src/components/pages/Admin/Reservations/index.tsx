@@ -217,6 +217,7 @@ export default function AdminReservations() {
             : undefined,
           tableLabel:
             reservation.table?.name ??
+            reservation.tableName ??
             (reservation.tableId ? `#${reservation.tableId}` : "—"),
           timeRange: formatTimeRange(reservation.startsAt, reservation.endsAt),
           clubArmyCount: reservation.seatClubArmyOptions.filter(Boolean).length,
