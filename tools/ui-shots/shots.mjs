@@ -102,6 +102,8 @@ const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, locale: 'ru-RU' });
 await ctx.addInitScript(
   ([k, w, r40, ra]) => {
+    // обучающая игра открыта (карточки «Как играть» пройдены) — иначе её адрес ведёт на карточки (13.11.2026)
+    localStorage.setItem('warphub.learn.done.v1', JSON.stringify({ '40k': true, aos: true, kt: true, warcry: true }));
     for (const s of ['', '.1001']) {
       localStorage.setItem('warphub.kt-rosters.v1' + s, JSON.stringify([k]));
       localStorage.setItem('warphub.warcry-rosters.v1' + s, JSON.stringify([w]));

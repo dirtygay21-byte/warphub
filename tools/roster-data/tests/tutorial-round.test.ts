@@ -65,4 +65,15 @@ describe('учебный раунд', () => {
     expect(ktList).toContain("title: 'Обучающая игра'");
     expect(ktList).toContain("navigate('/learn/kt/round')");
   });
+  test('обучающая игра — только после карточек «Как играть» (13.11.2026)', () => {
+    const pages = fs.readFileSync(path.join(ROOT, 'components', 'tutorial', 'TutorialPages.tsx'), 'utf8');
+    // последняя карточка отмечает прохождение; раунд без него ведёт на карточки; на хабе раунд — только у пройденных
+    expect(pages).toContain('markLearnDone(game.id)');
+    expect(pages).toContain('if (!learnDone(game.id)) return <Navigate to={`/learn/${game.id}`} replace />;');
+    expect(pages).not.toContain('<SectionLabel>Обучающая игра</SectionLabel>');
+    for (const [f, g] of [['RosterList.tsx', '40k'], ['aos/AosList.tsx', 'aos'], ['kt/KtList.tsx', 'kt'], ['warcry/WarcryList.tsx', 'warcry']] as const) {
+      const list = fs.readFileSync(path.join(ROOT, 'features', 'roster', 'ui', f), 'utf8');
+      expect(list).toContain(`...(learnDone('${g}') ? [{ icon: 'shield', title: 'Обучающая игра'`);
+    }
+  });
 });

@@ -172,7 +172,7 @@ function GamesTab() {
             <button
               type="button"
               onClick={() => setShowPast((value) => !value)}
-              className="mt-2 text-left text-sm font-medium text-fg-2 hover:text-white lg:col-span-2"
+              className="mt-2 inline-flex min-h-11 items-center text-left text-sm font-medium text-fg-2 hover:text-white lg:col-span-2"
             >
               {showPast ? "Скрыть прошедшие" : `Показать прошедшие (${past.length})`}
             </button>

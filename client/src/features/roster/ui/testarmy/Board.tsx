@@ -579,13 +579,23 @@ function BoardInner({
             {tool === 'ruler' && !rulerLine && rulerA && <circle cx={disp(rulerA)[0]} cy={disp(rulerA)[1]} r={0.35} fill="#fff" pointerEvents="none" />}
           </svg>
         </div>
-        <p className="pointer-events-none absolute left-2 right-2 top-[max(0.5rem,env(safe-area-inset-top))] truncate rounded-lg bg-black/65 px-2.5 py-1.5 text-[12px] text-white/80">
+        <p className="pointer-events-none absolute left-2 right-2 top-[max(0.5rem,env(safe-area-inset-top))] line-clamp-2 rounded-lg bg-black/75 px-2.5 py-1.5 text-[13px] leading-snug text-white/85">
           {status}
         </p>
+        {!panel && !sel && tool === 'move' && placedCount < me.units.length && (
+          <button
+            type="button"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => (haptic.select(), setPanel(true))}
+            className="absolute bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground shadow-[0_6px_20px_rgba(0,0,0,0.5)] active:opacity-80"
+          >
+            Выставить отряды · {placedCount}/{me.units.length}
+          </button>
+        )}
       </div>
 
       {/* колонка инструментов справа */}
-      <nav className="flex w-14 shrink-0 flex-col items-center gap-1.5 border-l border-white/10 bg-app-elevated py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">
+      <nav className="flex w-14 shrink-0 flex-col items-center gap-1 overflow-y-auto border-l border-white/10 bg-app-elevated py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">
         <RailButton icon="‹" label="Назад" onClick={onBack} />
         <RailButton icon="☰" label="Отряды" active={panel} onClick={() => (haptic.select(), setPanel((v) => !v))} />
         <span className="my-0.5 h-px w-8 bg-white/10" />
@@ -602,18 +612,18 @@ function BoardInner({
 
       {/* выезжающая панель справа: отряды или выбранный отряд */}
       {panel && (
-        <aside className="sheet-enter absolute bottom-0 right-14 top-0 z-10 flex w-[min(82vw,340px)] flex-col border-l border-white/10 bg-app-elevated/95 shadow-[-12px_0_32px_rgba(0,0,0,0.45)] backdrop-blur">
+        <aside className="sheet-enter absolute bottom-0 right-14 z-10 flex flex-col border-white/10 bg-app-elevated shadow-[0_-12px_32px_rgba(0,0,0,0.5)] portrait:left-0 portrait:max-h-[58%] portrait:rounded-tl-2xl portrait:border-t landscape:top-0 landscape:w-[min(82vw,340px)] landscape:border-l">
           <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2">
             <div className="min-w-0 flex-1">
               <p className="font-display truncate text-base font-semibold uppercase leading-none">Test Army</p>
-              <p className="truncate text-[12px] text-fg-3">
+              <p className="mt-0.5 truncate text-[12px] text-fg-3">
                 {me.name} · {field.title} · {side === 'attacker' ? 'атакующий' : 'защитник'}
                 {foe && ` · соперник: ${foe.name}`}
               </p>
             </div>
-            <IconButton icon="close" label="Закрыть" onClick={() => setPanel(false)} className="size-8" />
+            <IconButton icon="close" label="Закрыть" onClick={() => setPanel(false)} className="size-10" />
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-2.5">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             {sel ? (
               <UnitPanel
                 unit={sel}
@@ -680,11 +690,11 @@ function RailButton({ icon, label, active, onClick }: { icon: string; label: str
       aria-pressed={active}
       onClick={onClick}
       className={cx(
-        'flex w-12 flex-col items-center rounded-lg py-1 text-[9.5px] font-semibold leading-tight',
+        'flex min-h-11 w-[3.25rem] flex-col items-center justify-center rounded-lg py-1 text-[10.5px] font-semibold leading-tight',
         active ? 'bg-accent/20 text-accent' : 'text-fg-2 active:bg-white/10',
       )}
     >
-      <span className="text-lg leading-none">{icon}</span>
+      <span className="text-xl leading-none">{icon}</span>
       <span className="mt-0.5 w-full truncate text-center">{label}</span>
     </button>
   );
@@ -745,7 +755,7 @@ function UnitShapes({
 function UnitList({ units, label, color, onSelect }: { units: TAUnit[]; label: (u: TAUnit) => string; color: string; onSelect: (uid: string) => void }) {
   return (
     <div>
-      <p className="mb-2 text-[12px] text-fg-3">Выберите отряд — построение, базы, характеристики; затем «Поставить на поле».</p>
+      <p className="mb-2 text-[12px] text-fg-3">Выберите отряд, затем «Поставить на поле».</p>
       <ul className="space-y-1.5">
         {units.map((u) => (
           <li key={u.uid}>
@@ -754,11 +764,16 @@ function UnitList({ units, label, color, onSelect }: { units: TAUnit[]; label: (
               onClick={() => onSelect(u.uid)}
               className={cx('w-full rounded-xl border px-2.5 py-2 text-left', u.placed ? 'border-accent/40 bg-accent/[0.07]' : 'border-white/10 bg-white/[0.03] active:bg-white/10')}
             >
-              <span className="flex items-center gap-1.5 text-[12px] text-fg-3">
-                <b style={{ color }}>{label(u)}</b>
-                {u.placed ? 'на столе' : 'не выставлен'} · моделей: {u.models.length}
+              <span className="flex items-center gap-2">
+                <b className="grid size-7 shrink-0 place-items-center rounded-full border text-[13px]" style={{ color, borderColor: color }}>
+                  {label(u)}
+                </b>
+                <span className="min-w-0 flex-1">
+                  <span className="line-clamp-2 block text-sm font-semibold leading-tight">{u.name}</span>
+                  <span className="block text-[12px] text-fg-3">моделей: {u.models.length}</span>
+                </span>
+                <span className={cx('shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold', u.placed ? 'bg-accent/20 text-accent' : 'bg-white/10 text-fg-2')}>{u.placed ? 'на столе' : 'поставить'}</span>
               </span>
-              <span className="mt-0.5 line-clamp-2 block text-[13px] font-semibold leading-tight">{u.name}</span>
             </button>
           </li>
         ))}
@@ -867,17 +882,22 @@ function UnitPanel({
           {unit.tags?.length ? <p className="text-[12px] text-fg-3">{unit.tags.join(' · ')}</p> : null}
           <p className={cx('text-[12px]', unknown ? 'text-warn' : 'text-fg-3')}>{summary.map(([k, c]) => `${c} × ${k}`).join(' · ')}</p>
         </div>
-        <IconButton icon="close" label="К списку отрядов" onClick={onDone} className="size-8" />
+        <IconButton icon="close" label="К списку отрядов" onClick={onDone} className="size-10" />
       </div>
       <button type="button" onClick={onInfo} className="flex w-full items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-left text-xs active:bg-white/10">
         <span className="min-w-0 flex-1 truncate tabular-nums text-white/80">{stats ?? 'Характеристики'}</span>
         <span className="shrink-0 font-semibold text-accent">Характеристики ›</span>
       </button>
-      {onAttack && (
-        <button type="button" onClick={onAttack} className="w-full rounded-lg bg-accent px-2.5 py-2 text-xs font-semibold text-accent-foreground active:opacity-80">
-          ⚔ Атаковать — выбрать цель на столе
-        </button>
-      )}
+      <div className="flex gap-2">
+        <Button variant={unit.placed && onAttack ? 'outline' : 'primary'} className="min-w-0 flex-1" onClick={onPlace}>
+          {unit.placed ? 'Переставить' : 'Поставить'}
+        </Button>
+        {onAttack && (
+          <Button variant="primary" className="min-w-0 flex-1" onClick={onAttack}>
+            ⚔ Атаковать
+          </Button>
+        )}
+      </div>
       {info && (
         <div className="grid grid-cols-3 gap-1.5 text-center text-[12px]">
           <div className={cx('rounded-lg border px-1.5 py-1', info.objective?.inRange ? 'border-[#4ade80]/50 text-[#4ade80]' : 'border-white/10')}>
@@ -956,17 +976,15 @@ function UnitPanel({
           <p className="text-[12px] text-fg-3">После смены базы отряд перестраивается на том же месте.</p>
         </div>
       )}
-      <p className="text-[12px] text-fg-3">
-        Тяните базу — едет весь отряд; удерживайте базу полсекунды — двигается одна модель. Поле двигается пальцем по пустому месту, масштаб — двумя пальцами.
-      </p>
-      <Button variant="primary" className="w-full" onClick={onPlace}>
-        {unit.placed ? 'Переставить на поле' : 'Поставить на поле'}
-      </Button>
       {unit.placed && (
         <Button className="w-full" onClick={onRemove}>
           Убрать со стола
         </Button>
       )}
+      <details className="text-[12px] text-fg-3">
+        <summary className="cursor-pointer py-1 font-semibold text-fg-2">Как двигать</summary>
+        Тяните базу — едет весь отряд; удерживайте базу полсекунды — двигается одна модель. Поле двигается пальцем по пустому месту, масштаб — двумя пальцами.
+      </details>
     </div>
   );
 }

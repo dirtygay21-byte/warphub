@@ -93,3 +93,18 @@ function limitedLine(n: BookingNotice): string {
   const minutes = Math.round((n.endsAt.getTime() - n.startsAt.getTime()) / 60_000);
   return minutes < n.fullMinutes ? `⚠️ <b>Ограниченное время: ${hoursLabel(minutes)} вместо ${hoursLabel(n.fullMinutes)}</b> — дальше стол или места заняты` : '';
 }
+
+/**
+ * Подтверждение самому записавшемуся (13.11.2026): что, когда, стол; для игры за столом — ждёт ли стол соперника.
+ * Об отмене и о сопернике приходят отдельные сообщения.
+ */
+export function bookerConfirmText(n: Pick<BookingNotice, 'serviceTitle' | 'startsAt' | 'endsAt' | 'tableName' | 'table'>): string {
+  const lines = [
+    `✅ <b>Вы записаны: ${escapeHtml(n.serviceTitle)}</b>`,
+    `Когда: ${formatClubDateTime(n.startsAt, n.endsAt)}`,
+    n.tableName ? `Стол: ${escapeHtml(n.tableName)}` : '',
+    n.table && n.table.seats >= 2 ? (n.table.occupied >= n.table.seats ? 'Соперник уже есть — стол собран.' : 'Стол ждёт соперника — напишем, когда он запишется.') : '',
+    'Отменить или посмотреть запись — в приложении, раздел «Записи».',
+  ];
+  return lines.filter(Boolean).join('\n');
+}

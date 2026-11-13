@@ -2,6 +2,7 @@
  * Общие элементы WarpBuilder (R1 30.10.2026): одинаковый вид списков, шапок редакторов и карточек для всех игр
  * (AoS, Kill Team, Warcry). Разметка — как в разделе AoS; данные игр сюда не попадают — только отображение.
  */
+import { UnitPhotoBlock, UnitThumb } from './UnitPhoto';
 import { useRef, useState, type ReactNode } from 'react';
 import { haptic } from '../../telegram';
 import { Button, Icon, IconButton, Sheet, Tag } from '../kit';
@@ -535,9 +536,12 @@ export function UnitRowCard({
   open,
   onToggle,
   children,
+  photo,
 }: {
   id?: string;
   title: string;
+  /** ключ фото юнита (photos.ts): миниатюра в шапке, блок фото в раскрытой карточке; readOnly — только просмотр */
+  photo?: { key: string; readOnly?: boolean };
   crown?: boolean;
   meta?: (string | null | undefined | false)[];
   accentLine?: string | null;
@@ -553,6 +557,7 @@ export function UnitRowCard({
   return (
     <div id={id} className={cx('overflow-hidden rounded-2xl border bg-app-elevated transition', errors ? 'border-danger/40' : open ? 'border-white/20' : 'border-white/10')}>
       <button type="button" onClick={() => (haptic.tap(), onToggle())} aria-expanded={open} className="flex w-full items-center gap-3 px-3.5 py-3 text-left">
+        {photo && <UnitThumb photoKey={photo.key} />}
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-1.5 text-[15px] font-semibold leading-snug">
             {crown && <Icon name="crown" className="size-4 shrink-0 text-accent" />}
@@ -578,6 +583,7 @@ export function UnitRowCard({
             </p>
           ))}
           {children}
+          {photo && <UnitPhotoBlock photoKey={photo.key} name={title} readOnly={photo.readOnly} />}
         </div>
       )}
     </div>

@@ -82,3 +82,25 @@ export async function testNotification(admin: { telegramId: number; firstName: s
   );
   return { ...describeSendResult(result), recipients: getAdminTelegramIds().length };
 }
+
+const lastUserTest = new Map<number, number>();
+const USER_TEST_GAP_MS = 30_000;
+
+/**
+ * Проверка уведомлений из профиля (13.11.2026): тестовое сообщение самому пользователю и понятный ответ.
+ * Не чаще раза в 30 секунд на пользователя.
+ */
+export async function testUserNotification(user: { telegramId: number }, now = Date.now()) {
+  const last = lastUserTest.get(user.telegramId) ?? 0;
+  if (now - last < USER_TEST_GAP_MS) return { ok: false, message: 'Проверка уже отправлена — повторить можно через полминуты.' };
+  lastUserTest.set(user.telegramId, now);
+  const result = await sendTelegramMessageDetailed(
+    user.telegramId,
+    `🔔 <b>Уведомления WarpHub работают</b>\nСюда придут подтверждения записей, сообщения о сопернике и об отмене.`,
+  );
+  const d = describeSendResult(result);
+  // пользователю — без подробностей о сервере и токене
+  if (d.ok) return { ok: true, message: d.message };
+  if (!result.ok && result.reason === 'telegram' && result.status === 403) return { ok: false, needsStart: true, message: 'Бот пока не может писать вам. Нажмите «Разрешить уведомления» или откройте чат с ботом и нажмите «Старт».' };
+  return { ok: false, message: 'Сейчас не получилось отправить сообщение — попробуйте позже.' };
+}

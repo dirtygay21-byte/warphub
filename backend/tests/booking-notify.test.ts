@@ -3,7 +3,7 @@
  * И понятные причины, если бот не может написать (проверка уведомлений из админки).
  */
 import { describe, expect, test } from 'bun:test';
-import { bookingNoticeText, type BookingNotice } from '../src/modules/booking/notify-text';
+import { bookerConfirmText, bookingNoticeText, type BookingNotice } from '../src/modules/booking/notify-text';
 import { describeSendResult } from '../src/lib/telegram/format';
 
 // сб, 25 октября 2026, 18:00–21:00 по Екатеринбургу (UTC+5)
@@ -118,4 +118,21 @@ test('Kill Team: «Игра: Kill Team», «Команда», без строк�
   expect(t).toContain('Игра: Kill Team');
   expect(t).toContain("Команда: Pathfinders (T'au Empire)");
   expect(t).not.toContain('Очки');
+});
+
+describe('bookerConfirmText — подтверждение записавшемуся (13.11.2026)', () => {
+  test('игра за столом: что, когда, стол, ждёт соперника; без данных о других игроках', () => {
+    const t = bookerConfirmText(base);
+    expect(t.split('\n')[0]).toBe('✅ <b>Вы записаны: Игра Warhammer 40,000</b>');
+    expect(t).toMatch(/Когда: .*25 октября, 18:00–21:00/);
+    expect(t).toContain('Стол: Стол 3');
+    expect(t).toContain('Стол ждёт соперника');
+    expect(t).not.toContain('Telegram ID');
+  });
+  test('стол собран; без стола — строк о столе и сопернике нет', () => {
+    expect(bookerConfirmText({ ...base, table: { occupied: 2, seats: 2 } })).toContain('стол собран');
+    const t = bookerConfirmText({ ...base, serviceTitle: 'Посещение <клуба>', tableName: null, table: null });
+    expect(t).toContain('Посещение &lt;клуба&gt;');
+    expect(t).not.toContain('Стол');
+  });
 });

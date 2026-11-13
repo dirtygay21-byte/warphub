@@ -39,6 +39,7 @@ import {
   startSession,
 } from '../minigames/service';
 import { handleMinigame } from '../minigames/http';
+import { testUserNotification } from '../notifications/service';
 import { getPlayerProgress } from '../progress/service';
 import { getCardsState, getPointsHistory, openPack } from '../minigames/cards';
 import { getNewsById, listPublishedNews } from '../news/service';
@@ -409,6 +410,13 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
       tags: ['Users'],
       summary: 'Текущий пользователь',
       description: 'Возвращает профиль авторизованного пользователя.',
+    },
+  })
+  .post('/me/notifications/test', ({ user }) => testUserNotification(user), {
+    detail: {
+      tags: ['Users'],
+      summary: 'Проверка уведомлений',
+      description: 'Бот отправляет пользователю тестовое сообщение; ответ говорит, дошло ли оно.',
     },
   })
   .get('/me/progress', async ({ user }) => getPlayerProgress(user.id), {

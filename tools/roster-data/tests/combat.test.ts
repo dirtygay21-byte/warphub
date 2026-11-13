@@ -66,7 +66,35 @@ test('способности: TORRENT, SUSTAINED, LETHAL, DEVASTATING (не бо
   near(dev.slain[1]!, (5 / 6) * (1 / 6));
   assert.equal(dev.slain[2], 0);
   // неизвестное — в notCounted
-  assert.deepEqual(t({ keywords: 'hazardous, precision, assault' }).notCounted, ['hazardous', 'precision']);
+  assert.deepEqual(t({ keywords: 'hazardous, precision, assault, bubblechukka' }).notCounted, ['precision', 'bubblechukka']);
+  assert.ok(t({ keywords: 'hazardous', count: 3 }).notes.some((n) => n.startsWith('HAZARDOUS: бросков на опасность 3')));
+});
+
+test('модификаторы обстановки (13.11.2026): навскидку, выданные способности, крит. ранение, урон пополам, PSYCHIC', () => {
+  const t = (o: Partial<WeaponInput>, sit: Situation = {}, tg: Target = MEQ) => simulate([W(o)], tg, sit).weapons[0]!;
+  // навскидку (Fire Overwatch): только немодифицированная 6, переброс и +1 не помогают
+  near(t({}, { snap: true, rerollHit: 'fails', hitMod: 1 }).pHit, 1 / 6);
+  near(t({ keywords: 'torrent', skill: 'N/A' }, { snap: true }).pHit, 1);
+  near(t({ melee: true }, { snap: true }).pHit, 4 / 6, 1e-9, 'навскидку — только стрельба');
+  // выданные способности
+  near(t({}, { grant: { sustained: 1 } }).expected.hits, 4 / 6 + 1 / 6);
+  near(t({ keywords: 'sustained hits 2' }, { grant: { sustained: 1 } }).expected.hits, 4 / 6 + 2 / 6, 1e-9, 'лучшее из двух');
+  near(t({}, { grant: { lethal: true } }).expected.wounds, (3 / 6) * (1 / 2) + 1 / 6);
+  near(t({}, { grant: { dev: true } }).expected.mortalCrits, (4 / 6) * (1 / 6));
+  near(t({}, { grant: { twin: true } }).pWound, 3 / 4);
+  near(t({}, { cover: true, grant: { ignoresCover: true } }).pHit, 4 / 6);
+  // критическое ранение на 5+
+  near(t({}, { critWound: 5 }).pCritWound, 2 / 6);
+  near(t({ keywords: 'anti-infantry 4+' }, { critWound: 5 }).pCritWound, 3 / 6, 1e-9, 'ANTI лучше');
+  // урон пополам (вверх): D3 → 2, по W2 убивает; D2 → 1, не убивает за удар
+  const sure = { skill: '2', S: '12', AP: '-6', count: 1 } as const;
+  near(simulate([W({ ...sure, D: '3' })], { ...MEQ, Sv: 6 }, { halveD: true }).slain[1]!, (5 / 6) * (5 / 6));
+  near(simulate([W({ ...sure, D: '2' })], { ...MEQ, Sv: 6 }, { halveD: true }).slain[1]!, 0);
+  // −1 урон: не меньше 1
+  near(simulate([W({ ...sure, D: '1' })], { ...MEQ, W: 1, Sv: 6 }, { dMod: -1 }).slain[1]!, (5 / 6) * (5 / 6));
+  // PSYCHIC: −1 к попаданию и укрытие не действуют, +1 действует
+  near(t({ keywords: 'psychic' }, { hitMod: -1, cover: true }).pHit, 4 / 6);
+  near(t({ keywords: 'psychic' }, { hitMod: 1 }).pHit, 5 / 6);
 });
 
 test('спасбросок: лучший из Sv с AP и InSv; Feel No Pain', () => {

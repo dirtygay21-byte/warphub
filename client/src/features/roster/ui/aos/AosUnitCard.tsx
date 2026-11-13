@@ -1,3 +1,5 @@
+import { photoKey } from '../../photos';
+import { UnitPhotoBlock, UnitThumb } from '../common/UnitPhoto';
 import { useState } from 'react';
 import { eligibleFor, enhancementFit, generalFit, reinforceFit, unitBaseCost, unitTotal, type AosComputed, type AosIssue, type AosLookup } from '../../aos/engine';
 import type { AosRegiment, AosRoster, AosRule, AosUnit, AosWarscroll, AosWeapon } from '../../aos/types';
@@ -67,6 +69,7 @@ export function AosUnitCard({
   return (
     <div id={'u-' + unit.uid} className={cx('overflow-hidden rounded-2xl border bg-app-elevated transition', errors.length ? 'border-danger/40' : expanded ? 'border-white/20' : 'border-white/10')}>
       <button type="button" onClick={() => (haptic.tap(), actions.onToggle())} className="flex w-full items-center gap-3 px-3.5 py-3 text-left">
+        <UnitThumb photoKey={photoKey('aos', ws.id)} />
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-1.5 text-[15px] font-semibold leading-snug">
             {isGeneral && <Icon name="crown" className="size-4 shrink-0 text-accent" />}
@@ -94,6 +97,7 @@ export function AosUnitCard({
             </p>
           ))}
           {!readOnly && <Controls unit={unit} ws={ws} roster={roster} L={L} regiment={regiment} leader={leader} isGeneral={isGeneral} actions={actions} />}
+          <UnitPhotoBlock photoKey={photoKey('aos', ws.id)} name={ws.name} readOnly={readOnly} />
           {enhRefs.length > 0 && (
             <div className="space-y-1.5">
               <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Улучшения юнита</p>

@@ -77,7 +77,7 @@ const fnpOf = (ds: Datasheet) => {
  * Цель — одна группа одинаковых моделей (движок S1): основной профиль отряда (первый профиль инфолиста), его модели;
  * присоединённые персонажи не считаются — notes говорит об этом.
  */
-export function targetFrom(cr: ComputedRoster, uid: string): { target: Target; notes: string[] } | null {
+export function targetFrom(cr: ComputedRoster, uid: string): { target: Target; notes: string[]; stealth: boolean } | null {
   const [main, ...leaders] = unitParts(cr, uid);
   const ds = main?.ds;
   const st = ds?.stats[0];
@@ -89,5 +89,8 @@ export function targetFrom(cr: ComputedRoster, uid: string): { target: Target; n
   const notes: string[] = [];
   if (leaders.length) notes.push(`персонажи ${leaders.map((l) => l.ds!.name).join(', ')} не учитываются — считается отряд ${ds.name}`);
   if (ds.stats.length > 1) notes.push(`у отряда несколько профилей — взят «${st.name}»`);
-  return { target: { models: Math.max(1, main.models), T, Sv, inv: st.inv ? num(st.inv) : null, W, fnp: fnpOf(ds), keywords: [...ds.keywords, ...ds.factionKeywords] }, notes };
+  // Stealth (24): если способность есть у каждой модели отряда, отряд получает преимущество укрытия против дальнобойных атак
+  const stealth = [main, ...leaders].every((c) => c.ds!.abilities.some((a) => a.type === 'core' && a.name.toLowerCase() === 'stealth'));
+  if (stealth) notes.push('Stealth: цель считается в укрытии против стрельбы');
+  return { target: { models: Math.max(1, main.models), T, Sv, inv: st.inv ? num(st.inv) : null, W, fnp: fnpOf(ds), keywords: [...ds.keywords, ...ds.factionKeywords] }, notes, stealth };
 }

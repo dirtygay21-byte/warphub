@@ -1,3 +1,5 @@
+import { photoKey } from '../photos';
+import { UnitPhotoBlock, UnitThumb } from './common/UnitPhoto';
 import { useState, type ReactNode } from 'react';
 import { optionalWargear, paidWargear, type ComputedRoster, type ComputedUnit, type DataLookup, type Issue } from '../engine/compute';
 import type { Datasheet, Roster, RosterUnit, Weapon } from '../engine/types';
@@ -108,6 +110,7 @@ export function UnitCard({
     >
       {(hasErr || hasWarn) && <span className={cx('absolute inset-y-0 left-0 w-[3px]', hasErr ? 'bg-danger' : 'bg-warn')} aria-hidden />}
       <button type="button" onClick={onToggle} className="flex w-full items-center gap-3 px-4 py-3.5 text-left active:bg-white/[0.02]">
+        <UnitThumb photoKey={photoKey('40k', ds.id)} />
         <div className="min-w-0 flex-1">
           {role && <p className="mb-0.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-accent/70">{role}</p>}
           <p className="text-[15px] font-semibold leading-tight">
@@ -168,6 +171,8 @@ export function UnitCard({
           )}
 
           <Profile c={c} cr={cr} L={L} detachmentIds={roster.detachmentIds} />
+
+          <UnitPhotoBlock photoKey={photoKey('40k', ds.id)} name={ds.name} readOnly={readOnly} />
 
           {readOnly ? (
             <ReadOnlyChoices c={c} cr={cr} isWarlord={isWarlord} attachedTo={attachedTo?.ds?.name ?? null} ru={ru} />
