@@ -605,3 +605,24 @@ export function groupTableGames<T>(rows: TableGameMember<T>[]): Map<string, Tabl
   }
   return games;
 }
+
+/**
+ * Категории списка «Все записи» (14.11.2026): ожидают подтверждения и подтверждённые — ещё не закончились;
+ * отменённые — любые по времени; прошедшие — закончились и не отменены. Админ выбирает несколько сразу.
+ */
+export const RESERVATION_CATEGORIES = ['pending', 'confirmed', 'cancelled', 'past'] as const;
+export type ReservationCategory = (typeof RESERVATION_CATEGORIES)[number];
+
+export function parseCategories(value: string | undefined): ReservationCategory[] {
+  if (!value) return [];
+  const set = new Set(value.split(',').map((x) => x.trim()));
+  return RESERVATION_CATEGORIES.filter((c) => set.has(c));
+}
+
+/** Попадает ли запись в категорию (то же правило, что условие SQL в booking/service). */
+export function inCategory(r: { status: string; endsAt: Date | string }, category: ReservationCategory, now: Date): boolean {
+  const ended = new Date(r.endsAt).getTime() < now.getTime();
+  if (category === 'cancelled') return r.status === 'cancelled';
+  if (category === 'past') return r.status !== 'cancelled' && ended;
+  return r.status === category && !ended;
+}

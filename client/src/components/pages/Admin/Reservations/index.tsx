@@ -37,6 +37,7 @@ import {
   DEFAULT_PAGE_SIZE,
   EMPTY_FILTERS,
   EXTEND_HOUR_OPTIONS,
+  RESERVATION_SORTS,
 } from "./constants";
 import type {
   AdminFiltersForm,
@@ -73,10 +74,18 @@ export default function AdminReservations() {
   // API
   const queryClient = useQueryClient();
   const bookingOptions = useBookingOptions();
-  const queryParams = useMemo(
-    () => formToQuery(appliedFilters, pageSize, page * pageSize),
-    [appliedFilters, page, pageSize]
-  );
+  // Категории и порядок (14.11.2026): по умолчанию — только ожидающие подтверждения
+  const [categories, setCategories] = useState<string[]>(["pending"]);
+  const [sortIndex, setSortIndex] = useState(0);
+  const queryParams = useMemo(() => {
+    const sort = RESERVATION_SORTS[sortIndex] ?? RESERVATION_SORTS[0]!;
+    return {
+      ...formToQuery(appliedFilters, pageSize, page * pageSize),
+      ...(categories.length ? { categories: categories.join(",") } : {}),
+      sortBy: sort.key,
+      sortOrder: sort.desc ? ("desc" as const) : ("asc" as const),
+    };
+  }, [appliedFilters, categories, page, pageSize, sortIndex]);
 
   const reservationsQuery = useQuery({
     queryKey: ["admin-reservations", queryParams],
@@ -385,7 +394,17 @@ export default function AdminReservations() {
         )}
 
         <ReservationsTable
-          data={rows}
+          data={categories.length ? rows : []}
+          sortIndex={sortIndex}
+          onSortChange={(index) => {
+            setSortIndex(index);
+            setPage(0);
+          }}
+          categories={categories}
+          onCategoriesChange={(next) => {
+            setCategories(next);
+            setPage(0);
+          }}
           onStatusActionSelect={handleStatusActionSelect}
           onPricingSelect={setPricingReservation}
         />

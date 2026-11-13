@@ -31,3 +31,24 @@ describe('groupTableGames', () => {
     expect(tableGameKey(1, null, t(13))).toBeNull();
   });
 });
+
+import { inCategory, parseCategories } from '../src/modules/booking/rules';
+
+describe('категории «Все записи» (14.11.2026)', () => {
+  const now = new Date(Date.UTC(2026, 10, 14, 12));
+  const later = new Date(Date.UTC(2026, 10, 15, 12));
+  const earlier = new Date(Date.UTC(2026, 10, 13, 12));
+  test('разбор: только известные категории, порядок — как в списке', () => {
+    expect(parseCategories('past,pending,zzz')).toEqual(['pending', 'past']);
+    expect(parseCategories(undefined)).toEqual([]);
+  });
+  test('ожидают и подтверждённые — только не закончившиеся; прошедшие — закончились и не отменены; отменённые — любые', () => {
+    expect(inCategory({ status: 'pending', endsAt: later }, 'pending', now)).toBe(true);
+    expect(inCategory({ status: 'pending', endsAt: earlier }, 'pending', now)).toBe(false);
+    expect(inCategory({ status: 'pending', endsAt: earlier }, 'past', now)).toBe(true);
+    expect(inCategory({ status: 'confirmed', endsAt: later }, 'confirmed', now)).toBe(true);
+    expect(inCategory({ status: 'confirmed', endsAt: earlier }, 'past', now)).toBe(true);
+    expect(inCategory({ status: 'cancelled', endsAt: earlier }, 'past', now)).toBe(false);
+    expect(inCategory({ status: 'cancelled', endsAt: later }, 'cancelled', now)).toBe(true);
+  });
+});

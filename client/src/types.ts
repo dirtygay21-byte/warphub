@@ -192,6 +192,10 @@ export type AdminReservationsQuery = {
   userId?: string;
   startsAt?: string;
   endsAt?: string;
+  /** pending, confirmed, cancelled, past — через запятую (14.11.2026) */
+  categories?: string;
+  sortBy?: "startsAt" | "createdAt";
+  sortOrder?: "asc" | "desc";
   limit: number;
   offset: number;
 };

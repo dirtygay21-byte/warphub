@@ -106,6 +106,16 @@ for (const width of [390, 360]) {
           console.log('📸', f2);
           await page.keyboard.press('Escape');
         } else log.push(`${width} admin: строки «Игра за столом» нет`);
+        await page.waitForTimeout(400);
+        const one = page.locator('ul li button').filter({ hasNotText: 'Игра за столом' }).first();
+        if (await one.count()) {
+          await one.click({ timeout: 5000 });
+          await page.waitForTimeout(500);
+          const f3 = `${String(++n).padStart(2, '0')}-${width}-admin-booking.jpg`;
+          await page.screenshot({ path: path.join(OUT, f3), type: 'jpeg', quality: 70 });
+          console.log('📸', f3);
+          await page.keyboard.press('Escape');
+        }
       }
     } catch (e) {
       log.push(`${width} ${name}: НЕ ОТКРЫЛОСЬ — ${String(e.message ?? e).split('\n')[0]}`);

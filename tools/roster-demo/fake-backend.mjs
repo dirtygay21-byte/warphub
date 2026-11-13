@@ -627,6 +627,13 @@ export function createFakeBackend({ users }) {
   };
 
   function filterReservations(q) {
+    // категории «Все записи» (14.11.2026), как на сервере (booking/rules.inCategory)
+    const cats = q.categories ? String(q.categories).split(',') : [];
+    const inCat = (r) => {
+      if (!cats.length) return true;
+      const ended = r.endsAt.getTime() < Date.now();
+      return cats.some((c) => (c === 'cancelled' ? r.status === 'cancelled' : c === 'past' ? r.status !== 'cancelled' && ended : r.status === c && !ended));
+    };
     let list = S.reservations;
     if (q.serviceId !== undefined) list = list.filter((r) => r.serviceId === q.serviceId);
     if (q.tableId !== undefined) list = list.filter((r) => r.tableId === q.tableId);
@@ -638,7 +645,7 @@ export function createFakeBackend({ users }) {
     }
     if (q.startsAt !== undefined) list = list.filter((r) => r.startsAt >= parseIso(q.startsAt));
     if (q.endsAt !== undefined) list = list.filter((r) => r.endsAt <= parseIso(q.endsAt));
-    return list;
+    return list.filter(inCat);
   }
   function listReservations(q = {}) {
     const by = q.sortBy ?? 'startsAt';
@@ -913,6 +920,7 @@ export function createFakeBackend({ users }) {
       tableId: num(q.tableId, 'tableId'),
       status: oneOf(q.status, 'status', ['pending', 'confirmed', 'cancelled']),
       userId: q.userId,
+      categories: q.categories,
       startsAt: q.startsAt,
       endsAt: q.endsAt,
       sortBy: oneOf(q.sortBy, 'sortBy', ['startsAt', 'createdAt', 'status']),

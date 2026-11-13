@@ -117,6 +117,10 @@ const reservationsFilterQuery = t.Partial(
       format: 'uuid',
       description: 'ID пользователя',
     }),
+    categories: t.String({
+      pattern: '^(pending|confirmed|cancelled|past)(,(pending|confirmed|cancelled|past))*$',
+      description: 'Категории через запятую: pending (ждут подтверждения), confirmed, cancelled, past (прошедшие)',
+    }),
     startsAt: t.String({
       description: 'Нижняя граница startsAt (ISO 8601)',
     }),

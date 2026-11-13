@@ -1,411 +1,357 @@
-import { STATUS_LABELS, formatReservationDateTime } from "@/utils/reservationDisplay";
-import {
-  type ColumnDef,
-  type Row,
-  type SortingState,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import clsx from "clsx";
-import { ChevronRight, Swords, WalletCards, X } from "lucide-react";
-import { AnimatePresence } from "motion/react";
-import { createPortal } from "react-dom";
+import { STATUS_LABELS, formatReservationDateTime, getStatusLabel, getStatusStyle } from "@/utils/reservationDisplay";
+import { formatClub } from "@/utils/clubTime";
 import { useDialogExit } from "@/components/ui/ds/useDialogExit";
-import { useEffect, useMemo, useState } from "react";
+import clsx from "clsx";
+import { ArrowDownUp, CalendarClock, ChevronRight, Swords, WalletCards, X } from "lucide-react";
+import { AnimatePresence } from "motion/react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { RESERVATION_CATEGORIES, RESERVATION_SORTS } from "../constants";
 import type { AdminReservationRow, StatusAction } from "../types";
 import { CopyUserId } from "./CopyUserId";
 import { StatusBadgeCell } from "./StatusBadgeCell";
 
 type ReservationsTableProps = {
   data: AdminReservationRow[];
-  onStatusActionSelect: (
-    reservation: AdminReservationRow,
-    action: StatusAction
-  ) => void;
+  sortIndex: number;
+  onSortChange: (index: number) => void;
+  categories: string[];
+  onCategoriesChange: (next: string[]) => void;
+  onStatusActionSelect: (reservation: AdminReservationRow, action: StatusAction) => void;
   onPricingSelect: (reservation: AdminReservationRow) => void;
 };
 
+/** Запись или игра за столом в списке: одна карточка. */
+type Item = { key: string; game: boolean; rows: AdminReservationRow[] };
+
+/**
+ * «Все записи» (14.11.2026): компактный список вместо широкой таблицы — без прокрутки вбок.
+ * Каждая запись — одна строка (кто, что, когда, статус); игра за столом — одна строка на всех игроков.
+ * Нажатие открывает окно со всеми данными и действиями (статус, счёт).
+ */
 export function ReservationsTable({
   data,
+  sortIndex,
+  onSortChange,
+  categories,
+  onCategoriesChange,
   onStatusActionSelect,
   onPricingSelect,
 }: ReservationsTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "createdAt", desc: true },
-  ]);
+  const [open, setOpen] = useState<string | null>(null);
 
-  const columns = useMemo<ColumnDef<AdminReservationRow>[]>(
-    () => [
-      {
-        accessorKey: "userLabel",
-        header: "Пользователь",
-        cell: ({ row }) => (
-          <div className="min-w-[160px]">
-            <p className="font-medium text-white/90">
-              {row.original.userLabel}
-            </p>
-            <CopyUserId userId={row.original.userId} />
-          </div>
-        ),
-      },
-      {
-        accessorKey: "serviceTitle",
-        header: "Услуга",
-        cell: ({ row }) => (
-          <div className="min-w-[140px]">
-            <p className="font-medium text-white/90">
-              {row.original.serviceTitle}
-            </p>
-            {row.original.disciplineTitle && (
-              <p className="mt-1 text-xs text-fg-3">
-                {row.original.disciplineTitle}
-              </p>
-            )}
-          </div>
-        ),
-      },
-      {
-        accessorKey: "status",
-        header: "Статус",
-        enableSorting: false,
-        cell: ({ row }) => (
-          <StatusBadgeCell
-            reservation={row.original}
-            onActionSelect={(action) =>
-              onStatusActionSelect(row.original, action)
-            }
-          />
-        ),
-      },
-      {
-        accessorKey: "timeRange",
-        header: "Интервал",
-      },
-      {
-        accessorKey: "startsAt",
-        header: "Начало",
-        cell: ({ getValue }) => formatReservationDateTime(getValue<string>()),
-      },
-      {
-        accessorKey: "partySize",
-        header: "Гостей",
-      },
-      {
-        accessorKey: "tableLabel",
-        header: "Стол",
-      },
-      {
-        accessorKey: "detailsLabel",
-        header: "Данные",
-        enableSorting: false,
-        cell: ({ row }) => (
-          <span
-            className={clsx(
-              "block max-w-[280px] truncate",
-              row.original.needsHelp && "text-yellow-200",
-            )}
-            title={row.original.detailsLabel}
-          >
-            {row.original.detailsLabel}
-          </span>
-        ),
-      },
-      {
-        accessorKey: "clubArmyCount",
-        header: "Армия",
-        cell: ({ getValue }) => {
-          const count = getValue<number>();
-          return count > 0 ? count : "—";
-        },
-      },
-      {
-        id: "pricing",
-        header: "Счёт",
-        enableSorting: false,
-        cell: ({ row }) => (
-          <button
-            type="button"
-            onClick={() => onPricingSelect(row.original)}
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-3 py-2 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
-          >
-            <WalletCards className="size-4" />
-            Счёт
-          </button>
-        ),
-      },
-      {
-        accessorKey: "createdAt",
-        header: "Создана",
-        cell: ({ getValue }) => formatReservationDateTime(getValue<string>()),
-      },
-    ],
-    [onPricingSelect, onStatusActionSelect]
-  );
+  const items = useMemo(() => {
+    const sort = RESERVATION_SORTS[sortIndex] ?? RESERVATION_SORTS[0]!;
+    const time = (row: AdminReservationRow) => new Date(row[sort.key] ?? 0).getTime();
+    const sorted = [...data].sort((a, b) => (sort.desc ? time(b) - time(a) : time(a) - time(b)));
+    const list: Item[] = [];
+    const byGame = new Map<string, Item>();
+    for (const row of sorted) {
+      const game = row.game;
+      if (game && game.players.length >= 2) {
+        const existing = byGame.get(game.key);
+        if (existing) existing.rows.push(row);
+        else {
+          const item = { key: `g:${game.key}`, game: true, rows: [row] };
+          byGame.set(game.key, item);
+          list.push(item);
+        }
+      } else list.push({ key: `r:${row.id}`, game: false, rows: [row] });
+    }
+    return list;
+  }, [data, sortIndex]);
 
-  const table = useReactTable({
-    data,
-    columns,
-    state: { sorting },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  });
-
-  const [openGame, setOpenGame] = useState<string | null>(null);
-  const openRows = openGame ? data.filter((row) => row.game?.key === openGame) : [];
-
-  const renderRow = (row: Row<AdminReservationRow>) => (
-    <tr key={row.id} className="border-b border-white/10 transition-colors hover:bg-white/3">
-      {row.getVisibleCells().map((cell) => (
-        <td key={cell.id} className="whitespace-nowrap px-4 py-3 text-sm text-white/80">
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </td>
-      ))}
-    </tr>
-  );
+  const opened = open ? items.find((item) => item.key === open) : undefined;
 
   return (
-    <>
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.25)]">
-      <div className="overflow-x-auto">
-        <table className="min-w-full">
-          <thead className="border-b border-white/10 bg-white/3">
-            {table.getHeaderGroups().map((group) => (
-              <tr key={group.id}>
-                {group.headers.map((header) => {
-                  const sorted = header.column.getIsSorted();
-
-                  return (
-                    <th
-                      key={header.id}
-                      onClick={header.column.getToggleSortingHandler()}
-                      className={clsx(
-                        "whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-accent",
-                        header.column.getCanSort() &&
-                          "cursor-pointer select-none hover:bg-white/5"
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                        {header.column.getCanSort() && (
-                          <span className="text-[12px] text-fg-3">
-                            {sorted === "asc"
-                              ? "▲"
-                              : sorted === "desc"
-                              ? "▼"
-                              : "↕"}
-                          </span>
-                        )}
-                      </div>
-                    </th>
-                  );
-                })}
-              </tr>
+    <div className="overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
+      <div className="border-b border-white/10 px-4 py-3">
+        <div className="grid grid-cols-2 gap-2" role="group" aria-label="Какие записи показать">
+          {RESERVATION_CATEGORIES.map((category) => {
+            const on = categories.includes(category.id);
+            return (
+              <button
+                key={category.id}
+                type="button"
+                aria-pressed={on}
+                onClick={() => onCategoriesChange(on ? categories.filter((c) => c !== category.id) : [...categories, category.id])}
+                className={clsx(
+                  "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border px-2 text-[13px] font-semibold transition-colors",
+                  on ? "border-accent/60 bg-accent/15 text-accent" : "border-white/[0.14] text-fg-2 hover:text-fg",
+                )}
+              >
+                {category.label}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-2.5 flex items-center gap-2">
+          <ArrowDownUp className="size-4 shrink-0 text-fg-3" />
+          <select
+            value={sortIndex}
+            onChange={(event) => onSortChange(Number(event.target.value))}
+            className="min-h-11 min-w-0 flex-1 rounded-xl border border-white/[0.14] bg-field px-3 text-sm text-fg"
+            aria-label="Порядок записей"
+          >
+            {RESERVATION_SORTS.map((sort, index) => (
+              <option key={sort.label} value={index}>
+                {sort.label}
+              </option>
             ))}
-          </thead>
-
-          <tbody>
-            {groupByGame(table.getRowModel().rows).map((block) =>
-              block.game ? (
-                <tr key={block.game.key} className="border-b border-white/10 bg-accent/[0.05] transition-colors hover:bg-accent/[0.09]">
-                  <td colSpan={columns.length} className="px-0 py-0">
-                    <TableGameRow row={block.rows[0]!.original} onOpen={() => setOpenGame(block.game!.key)} />
-                  </td>
-                </tr>
-              ) : (
-                renderRow(block.rows[0]!)
-              )
-            )}
-
-            {table.getRowModel().rows.length === 0 && (
-              <tr>
-                <td
-                  colSpan={columns.length}
-                  className="py-16 text-center text-sm text-fg-3"
-                >
-                  Нет записей
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+          </select>
+        </div>
       </div>
-    </div>
-    <AnimatePresence>
-      {openGame && openRows.length > 0 && (
-        <TableGameSheet
-          rows={openRows}
-          onClose={() => setOpenGame(null)}
-          onStatusAction={(row, action) => {
-            setOpenGame(null);
-            onStatusActionSelect(row, action);
-          }}
-          onPricing={(row) => {
-            setOpenGame(null);
-            onPricingSelect(row);
-          }}
-        />
+
+      {items.length === 0 ? (
+        <p className="py-16 text-center text-sm text-fg-3">{categories.length ? "Нет записей" : "Выберите, какие записи показать"}</p>
+      ) : (
+        <ul className="divide-y divide-white/10">
+          {items.map((item) => (
+            <li key={item.key}>
+              {item.game ? (
+                <GameRow row={item.rows[0]!} onOpen={() => setOpen(item.key)} />
+              ) : (
+                <BookingRow row={item.rows[0]!} onOpen={() => setOpen(item.key)} />
+              )}
+            </li>
+          ))}
+        </ul>
       )}
-    </AnimatePresence>
-    </>
+
+      <AnimatePresence>
+        {opened && (
+          <DetailsSheet
+            item={opened}
+            onClose={() => setOpen(null)}
+            onStatusAction={(row, action) => {
+              setOpen(null);
+              onStatusActionSelect(row, action);
+            }}
+            onPricing={(row) => {
+              setOpen(null);
+              onPricingSelect(row);
+            }}
+          />
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
-type Block = { game: AdminReservationRow["game"] | null; rows: Row<AdminReservationRow>[] };
+/** «21 нояб., сб · 16:00 – 19:00» — дата и интервал без повтора времени */
+const when = (row: AdminReservationRow) =>
+  row.startsAt ? `${formatClub(row.startsAt, { day: "numeric", month: "short", weekday: "short" })} · ${row.timeRange}` : row.timeRange;
 
-/** Записи одной игры за столом — одним блоком; место блока — по первой записи игры в текущей сортировке. */
-function groupByGame(rows: Row<AdminReservationRow>[]): Block[] {
-  const blocks: Block[] = [];
-  const byKey = new Map<string, Block>();
-  for (const row of rows) {
-    const game = row.original.game;
-    if (!game || game.players.length < 2) {
-      blocks.push({ game: null, rows: [row] });
-      continue;
-    }
-    const block = byKey.get(game.key);
-    if (block) block.rows.push(row);
-    else {
-      const created = { game, rows: [row] };
-      byKey.set(game.key, created);
-      blocks.push(created);
-    }
-  }
-  return blocks;
-}
+const SHORT_STATUS: Record<string, string> = { pending: "Ждёт", confirmed: "Подтв.", cancelled: "Отмена" };
 
-function gameTitle(row: AdminReservationRow) {
-  return `${row.serviceTitle} · ${row.tableLabel} · ${formatReservationDateTime(row.startsAt)}, ${row.timeRange}`;
+/** Короткий статус в строке списка (полный — в окне записи). */
+function StatusPill({ status }: { status: string }) {
+  return (
+    <span title={getStatusLabel(status)} className={clsx("shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold", getStatusStyle(status))}>
+      {SHORT_STATUS[status] ?? getStatusLabel(status)}
+    </span>
+  );
 }
 
 function SeatsBadge({ occupied, seats }: { occupied: number; seats: number }) {
   const full = occupied >= seats;
   return (
-    <span className={clsx("shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold", full ? "bg-accent/20 text-accent" : "bg-yellow-400/15 text-yellow-200")}>
+    <span className={clsx("shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold", full ? "bg-accent/20 text-accent" : "bg-yellow-400/15 text-yellow-200")}>
       {occupied}/{seats} · {full ? "стол собран" : "ждёт соперника"}
     </span>
   );
 }
 
-/** Игра за столом в списке (14.11.2026): одна строка — кто, когда, сколько мест; нажатие открывает окно с подробностями. */
-function TableGameRow({ row, onOpen }: { row: AdminReservationRow; onOpen: () => void }) {
-  const game = row.game!;
+const rowClass = "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-white/[0.03] active:bg-white/[0.05]";
+
+function BookingRow({ row, onOpen }: { row: AdminReservationRow; onOpen: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="sticky left-0 flex w-[min(100vw-2rem,48rem)] items-center gap-3 px-4 py-3 text-left"
-    >
-      <Swords className="size-5 shrink-0 text-accent" />
+    <button type="button" onClick={onOpen} className={rowClass}>
+      <CalendarClock className="size-5 shrink-0 text-fg-3" />
       <span className="min-w-0 flex-1">
-        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="text-sm font-semibold text-white/90">Игра за столом · {game.players.length} {game.players.length === 1 ? "игрок" : "игрока"}</span>
-          <SeatsBadge occupied={game.occupied} seats={game.seats} />
+        <span className="block truncate text-sm font-semibold text-white/90">{row.userLabel}</span>
+        <span className="mt-0.5 block truncate text-[13px] text-white/80">
+          {row.serviceTitle}
+          {row.tableId ? ` · ${row.tableLabel}` : ""}
+          {row.partySize > 1 ? ` · гостей: ${row.partySize}` : ""}
         </span>
-        <span className="mt-0.5 block truncate text-[13px] text-fg-2">{gameTitle(row)}</span>
-        <span className="mt-0.5 block truncate text-[13px] text-white/80">{row.gamePlayers.map((p) => p.name).join(" · ")}</span>
+        <span className="mt-1 flex items-center gap-2">
+          <span className="min-w-0 truncate text-[13px] text-fg-2">{when(row)}</span>
+          <StatusPill status={row.status} />
+        </span>
+        {row.detailsLabel && (
+          <span className={clsx("mt-0.5 block truncate text-[12px]", row.needsHelp ? "text-yellow-200" : "text-fg-3")}>{row.detailsLabel}</span>
+        )}
       </span>
       <ChevronRight className="size-5 shrink-0 text-fg-3" />
     </button>
   );
 }
 
-/** Окно игры за столом: все участники отдельными карточками — статус и действия, выбор, счёт. */
-function TableGameSheet({
-  rows,
+function GameRow({ row, onOpen }: { row: AdminReservationRow; onOpen: () => void }) {
+  const game = row.game!;
+  return (
+    <button type="button" onClick={onOpen} className={clsx(rowClass, "bg-accent/[0.05]")}>
+      <Swords className="size-5 shrink-0 text-accent" />
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="text-sm font-semibold text-white/90">
+            Игра за столом · {game.players.length} {game.players.length === 1 ? "игрок" : "игрока"}
+          </span>
+          <SeatsBadge occupied={game.occupied} seats={game.seats} />
+        </span>
+        <span className="mt-0.5 block truncate text-[13px] text-white/80">{row.gamePlayers.map((p) => p.name).join(" · ")}</span>
+        <span className="mt-0.5 block truncate text-[13px] text-fg-2">
+          {row.serviceTitle} · {row.tableLabel} · {when(row)}
+        </span>
+      </span>
+      <ChevronRight className="size-5 shrink-0 text-fg-3" />
+    </button>
+  );
+}
+
+function Field({ label, children, warn }: { label: string; children: ReactNode; warn?: boolean }) {
+  return (
+    <>
+      <dt className="text-fg-3">{label}</dt>
+      <dd className={clsx("min-w-0 break-words", warn ? "text-yellow-200" : "text-white/85")}>{children}</dd>
+    </>
+  );
+}
+
+/** Карточка одной записи в окне: кто, статус с действиями, все данные, счёт. */
+function BookingCard({
+  row,
+  title,
+  showVisit,
+  onStatusAction,
+  onPricing,
+}: {
+  row: AdminReservationRow;
+  title?: string;
+  showVisit: boolean;
+  onStatusAction: (row: AdminReservationRow, action: StatusAction) => void;
+  onPricing: (row: AdminReservationRow) => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/20 p-3.5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          {title && <p className="text-xs font-semibold uppercase tracking-wide text-fg-3">{title}</p>}
+          <p className="mt-0.5 text-base font-semibold text-white/90">{row.userLabel}</p>
+          <CopyUserId userId={row.userId} />
+        </div>
+        <StatusBadgeCell reservation={row} onActionSelect={(action) => onStatusAction(row, action)} />
+      </div>
+      <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-[13px]">
+        {showVisit && (
+          <>
+            <Field label="Услуга">
+              {row.serviceTitle}
+              {row.disciplineTitle ? ` · ${row.disciplineTitle}` : ""}
+            </Field>
+            <Field label="Когда">{when(row)}</Field>
+            {row.tableId ? <Field label="Стол">{row.tableLabel}</Field> : null}
+          </>
+        )}
+        <Field label="Гостей">{row.partySize}</Field>
+        <Field label="Выбор" warn={row.needsHelp}>
+          {row.detailsLabel || "—"}
+        </Field>
+        <Field label="Армия клуба">{row.clubArmyCount > 0 ? row.clubArmyCount : "—"}</Field>
+        <Field label="Создана">{formatReservationDateTime(row.createdAt)}</Field>
+      </dl>
+      <button
+        type="button"
+        onClick={() => onPricing(row)}
+        className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-3 py-2 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
+      >
+        <WalletCards className="size-4" />
+        Счёт
+      </button>
+    </div>
+  );
+}
+
+function DetailsSheet({
+  item,
   onClose,
   onStatusAction,
   onPricing,
 }: {
-  rows: AdminReservationRow[];
+  item: Item;
   onClose: () => void;
   onStatusAction: (row: AdminReservationRow, action: StatusAction) => void;
   onPricing: (row: AdminReservationRow) => void;
 }) {
   const leaving = useDialogExit();
-  const first = rows[0]!;
-  const game = first.game!;
-  const byId = new Map(rows.map((row) => [row.id, row]));
+  const first = item.rows[0]!;
+  const game = item.game ? first.game! : null;
+  const byId = new Map(item.rows.map((row) => [row.id, row]));
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => event.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
   return createPortal(
     <div className={`fixed inset-0 z-[70]${leaving ? " ds-leaving" : ""}`}>
       <div className="ds-fade absolute inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Игра за столом"
+        aria-label={game ? "Игра за столом" : "Запись"}
         className="ds-sheet absolute inset-x-0 bottom-0 mx-auto flex max-h-[92dvh] w-full max-w-lg flex-col overflow-y-auto rounded-t-[22px] border-t border-white/10 bg-app-elevated px-4 pb-[max(20px,env(safe-area-inset-bottom))] pt-2.5 text-fg"
       >
         <div className="h-1 w-10 shrink-0 self-center rounded bg-white/20" />
         <div className="mt-2 flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="font-display text-[22px] font-semibold uppercase leading-none">Игра за столом</h2>
-            <p className="mt-1.5 text-sm text-fg-2">{gameTitle(first)}</p>
-            <div className="mt-2">
-              <SeatsBadge occupied={game.occupied} seats={game.seats} />
-            </div>
+            <h2 className="font-display text-[22px] font-semibold uppercase leading-none">{game ? "Игра за столом" : "Запись"}</h2>
+            {game && (
+              <>
+                <p className="mt-1.5 text-sm text-fg-2">
+                  {first.serviceTitle} · {first.tableLabel} · {when(first)}
+                </p>
+                <div className="mt-2">
+                  <SeatsBadge occupied={game.occupied} seats={game.seats} />
+                </div>
+              </>
+            )}
           </div>
           <button type="button" onClick={onClose} aria-label="Закрыть" className="ds-press flex size-11 shrink-0 items-center justify-center rounded-xl border border-white/[0.14] text-fg">
             <X className="size-5" />
           </button>
         </div>
+
         <ul className="mt-4 flex flex-col gap-3">
-          {first.gamePlayers.map((player, index) => {
-            const row = byId.get(player.reservationId);
-            return (
-              <li key={player.reservationId} className="rounded-2xl border border-white/10 bg-black/20 p-3.5">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-fg-3">Игрок {index + 1}</p>
-                    <p className="mt-0.5 text-base font-semibold text-white/90">{player.name}</p>
-                    {row && <CopyUserId userId={row.userId} />}
-                  </div>
+          {game ? (
+            first.gamePlayers.map((player, index) => {
+              const row = byId.get(player.reservationId);
+              return (
+                <li key={player.reservationId}>
                   {row ? (
-                    <StatusBadgeCell reservation={row} onActionSelect={(action) => onStatusAction(row, action)} />
+                    <BookingCard row={row} title={`Игрок ${index + 1}`} showVisit={false} onStatusAction={onStatusAction} onPricing={onPricing} />
                   ) : (
-                    <span className="text-xs text-fg-3">{STATUS_LABELS[player.status] ?? player.status}</span>
+                    <div className="rounded-2xl border border-white/10 bg-black/20 p-3.5 text-[13px]">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-fg-3">Игрок {index + 1}</p>
+                      <p className="mt-0.5 text-base font-semibold text-white/90">{player.name}</p>
+                      <p className="mt-1 text-fg-2">{player.detailsLabel || "—"}</p>
+                      <p className="mt-2 text-xs text-fg-3">
+                        {STATUS_LABELS[player.status] ?? player.status} · запись на другой странице списка — действия там.
+                      </p>
+                    </div>
                   )}
-                </div>
-                <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-[13px]">
-                  <dt className="text-fg-3">Выбор</dt>
-                  <dd className={clsx("text-white/85", row?.needsHelp && "text-yellow-200")}>{player.detailsLabel || "—"}</dd>
-                  {row && (
-                    <>
-                      <dt className="text-fg-3">Армия клуба</dt>
-                      <dd className="text-white/85">{row.clubArmyCount > 0 ? row.clubArmyCount : "—"}</dd>
-                      <dt className="text-fg-3">Создана</dt>
-                      <dd className="text-white/85">{formatReservationDateTime(row.createdAt)}</dd>
-                    </>
-                  )}
-                </dl>
-                {row ? (
-                  <button
-                    type="button"
-                    onClick={() => onPricing(row)}
-                    className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-3 py-2 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
-                  >
-                    <WalletCards className="size-4" />
-                    Счёт
-                  </button>
-                ) : (
-                  <p className="mt-3 text-xs text-fg-3">Запись на другой странице списка — действия там.</p>
-                )}
-              </li>
-            );
-          })}
+                </li>
+              );
+            })
+          ) : (
+            <li>
+              <BookingCard row={first} showVisit onStatusAction={onStatusAction} onPricing={onPricing} />
+            </li>
+          )}
         </ul>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
-
