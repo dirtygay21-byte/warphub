@@ -70,6 +70,8 @@ for (const [tag, viewport] of [['p', { width: 390, height: 844 }], ['l', { width
   });
   const place = async (tabName, unitName, fx, fy) => {
     if (!(await page.getByText('Test Army', { exact: true }).count())) await page.getByRole('button', { name: 'Отряды' }).first().click({ timeout: 5000 });
+    const back = page.getByRole('button', { name: 'К списку отрядов' });
+    if (await back.count()) await back.first().click({ timeout: 5000 });
     if (tabName) await page.getByRole('button', { name: new RegExp(tabName) }).first().click({ timeout: 5000 });
     await page.getByRole('button', { name: new RegExp(unitName) }).first().click({ timeout: 5000 });
     await page.getByRole('button', { name: /Поставить на поле/ }).click({ timeout: 5000 });
