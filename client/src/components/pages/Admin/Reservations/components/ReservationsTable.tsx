@@ -1,4 +1,5 @@
 import { STATUS_LABELS, formatReservationDateTime, getStatusLabel, getStatusStyle } from "@/utils/reservationDisplay";
+import { formatClub } from "@/utils/clubTime";
 import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 import clsx from "clsx";
 import { ArrowDownUp, CalendarClock, Check, ChevronRight, Swords, WalletCards, X } from "lucide-react";
@@ -65,7 +66,7 @@ export function ReservationsTable({
   return (
     <div className="overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
       <div className="border-b border-white/10 px-4 py-3">
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Какие записи показать">
+        <div className="grid grid-cols-2 gap-2" role="group" aria-label="Какие записи показать">
           {RESERVATION_CATEGORIES.map((category) => {
             const on = categories.includes(category.id);
             return (
@@ -75,7 +76,7 @@ export function ReservationsTable({
                 aria-pressed={on}
                 onClick={() => onCategoriesChange(on ? categories.filter((c) => c !== category.id) : [...categories, category.id])}
                 className={clsx(
-                  "inline-flex min-h-10 items-center gap-1.5 rounded-full border px-3 text-[13px] font-semibold transition-colors",
+                  "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border px-2 text-[13px] font-semibold transition-colors",
                   on ? "border-accent/60 bg-accent/15 text-accent" : "border-white/[0.14] text-fg-2 hover:text-fg",
                 )}
               >
@@ -138,7 +139,9 @@ export function ReservationsTable({
   );
 }
 
-const when = (row: AdminReservationRow) => `${formatReservationDateTime(row.startsAt)}, ${row.timeRange}`;
+/** «21 нояб., сб · 16:00 – 19:00» — дата и интервал без повтора времени */
+const when = (row: AdminReservationRow) =>
+  row.startsAt ? `${formatClub(row.startsAt, { day: "numeric", month: "short", weekday: "short" })} · ${row.timeRange}` : row.timeRange;
 
 function StatusPill({ status }: { status: string }) {
   return <span className={clsx("shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold", getStatusStyle(status))}>{getStatusLabel(status)}</span>;
@@ -160,16 +163,16 @@ function BookingRow({ row, onOpen }: { row: AdminReservationRow; onOpen: () => v
     <button type="button" onClick={onOpen} className={rowClass}>
       <CalendarClock className="size-5 shrink-0 text-fg-3" />
       <span className="min-w-0 flex-1">
-        <span className="flex items-center gap-2">
-          <span className="min-w-0 truncate text-sm font-semibold text-white/90">{row.userLabel}</span>
-          <StatusPill status={row.status} />
-        </span>
+        <span className="block truncate text-sm font-semibold text-white/90">{row.userLabel}</span>
         <span className="mt-0.5 block truncate text-[13px] text-white/80">
           {row.serviceTitle}
           {row.tableId ? ` · ${row.tableLabel}` : ""}
           {row.partySize > 1 ? ` · гостей: ${row.partySize}` : ""}
         </span>
-        <span className="mt-0.5 block truncate text-[13px] text-fg-2">{when(row)}</span>
+        <span className="mt-1 flex items-center gap-2">
+          <span className="min-w-0 truncate text-[13px] text-fg-2">{when(row)}</span>
+          <StatusPill status={row.status} />
+        </span>
         {row.detailsLabel && (
           <span className={clsx("mt-0.5 block truncate text-[12px]", row.needsHelp ? "text-yellow-200" : "text-fg-3")}>{row.detailsLabel}</span>
         )}
