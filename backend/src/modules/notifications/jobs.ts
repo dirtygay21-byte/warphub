@@ -7,7 +7,7 @@
  * Первый запуск помечает уже существующие новости, ивенты и ранги, чтобы не разослать старое.
  */
 import { and, asc, count, eq, gt, gte, inArray, lt, lte, ne, sql } from 'drizzle-orm';
-import { armyLine, bookingConfig, experienceLabel, gameLabel } from '../../config/booking';
+import { bookingConfig } from '../../config/booking';
 import { db } from '../../db';
 import {
   dndGamesTable,
@@ -39,6 +39,7 @@ import {
   recipientsOf,
   renderKind,
 } from './hub';
+import { bookingVars, detailVars, playerLine, whatOf } from './booking-vars';
 
 const MIN = 60_000;
 const HOUR = 60 * MIN;
@@ -50,13 +51,7 @@ const who = (u: Brief) => escapeHtml(formatUserName(u));
 
 /** Переменные игрока для объявлений поиска соперника. */
 export function playerVars(user: Brief, details: ReservationDetails | null) {
-  const wh = details?.kind === 'wh_player' ? details : null;
-  return {
-    игрок: who(user),
-    игра: escapeHtml(gameLabel(wh?.game)),
-    армия: wh ? escapeHtml(armyLine(wh.game, wh.army) + (wh.points != null ? ` · ${wh.points} очков` : '')) : '',
-    опыт: wh ? escapeHtml(experienceLabel(wh.experienceLevel)) : '',
-  };
+  return { ...detailVars(details), игрок: who(user) };
 }
 
 function seatsOf(service: { seatsPerTable: number | null; tableCapacityProfile: string | null }) {
@@ -160,6 +155,7 @@ async function eveReminders(now: Date) {
       service: servicesTable.title,
       slug: servicesTable.slug,
       tableName: tablesTable.name,
+      details: reservationsTable.details,
     })
     .from(reservationsTable)
     .innerJoin(usersTable, eq(reservationsTable.userId, usersTable.id))
@@ -175,15 +171,13 @@ async function eveReminders(now: Date) {
       r.tableId === null || !r.startsAt
         ? []
         : await db
-            .select({ firstName: usersTable.firstName, lastName: usersTable.lastName, username: usersTable.username })
+            .select({ firstName: usersTable.firstName, lastName: usersTable.lastName, username: usersTable.username, details: reservationsTable.details })
             .from(reservationsTable)
             .innerJoin(usersTable, eq(reservationsTable.userId, usersTable.id))
             .where(and(eq(reservationsTable.serviceId, r.serviceId), eq(reservationsTable.tableId, r.tableId), eq(reservationsTable.startsAt, r.startsAt), ne(reservationsTable.userId, r.userId), inArray(reservationsTable.status, [...ACTIVE])));
     await notifyKind('reminder_eve', r.telegramId, {
-      услуга: escapeHtml(r.service ?? r.slug),
-      когда: formatClubDateTime(r.startsAt, r.endsAt),
-      стол: r.tableName ? escapeHtml(r.tableName) : '',
-      соперник: opponents.map(who).join(', '),
+      ...bookingVars({ service: { title: r.service, slug: r.slug }, details: r.details as ReservationDetails | null, startsAt: r.startsAt, endsAt: r.endsAt, tableName: r.tableName }),
+      соперник: opponents.map((o) => playerLine(o, o.details as ReservationDetails | null)).join('; '),
     });
   }
 }
@@ -216,18 +210,20 @@ async function pendingTooLong(now: Date) {
       firstName: usersTable.firstName,
       lastName: usersTable.lastName,
       username: usersTable.username,
+      details: reservationsTable.details,
+      tableName: tablesTable.name,
     })
     .from(reservationsTable)
     .innerJoin(usersTable, eq(reservationsTable.userId, usersTable.id))
     .innerJoin(servicesTable, eq(reservationsTable.serviceId, servicesTable.id))
+    .leftJoin(tablesTable, eq(reservationsTable.tableId, tablesTable.id))
     .where(and(eq(reservationsTable.status, 'pending'), lte(reservationsTable.createdAt, new Date(now.getTime() - 3 * HOUR)), gt(reservationsTable.startsAt, now)));
   for (const r of rows) {
     if (!(await markOnce(`pending:${r.id}`))) continue;
     await notifyKindAdmins('admin_pending', {
+      ...bookingVars({ service: { title: r.service, slug: r.slug }, details: r.details as ReservationDetails | null, startsAt: r.startsAt, endsAt: r.endsAt, tableName: r.tableName }),
       часов: Math.floor((now.getTime() - r.createdAt.getTime()) / HOUR),
       игрок: who(r),
-      услуга: escapeHtml(r.service ?? r.slug),
-      когда: formatClubDateTime(r.startsAt, r.endsAt),
     });
   }
 }
@@ -245,6 +241,7 @@ async function morningDigest(now: Date) {
       firstName: usersTable.firstName,
       lastName: usersTable.lastName,
       username: usersTable.username,
+      details: reservationsTable.details,
     })
     .from(reservationsTable)
     .innerJoin(usersTable, eq(reservationsTable.userId, usersTable.id))
@@ -257,7 +254,10 @@ async function morningDigest(now: Date) {
     ждут: rows.filter((r) => r.status === 'pending').length,
     список: rows
       .slice(0, 25)
-      .map((r) => `• ${time(r.startsAt)} ${escapeHtml(r.service ?? r.slug)} — ${who(r)}${r.status === 'pending' ? ' ⏳' : ''}`)
+      .map((r) => {
+        const d = r.details as ReservationDetails | null;
+        return `• ${time(r.startsAt)} <b>${escapeHtml(whatOf({ title: r.service, slug: r.slug }, d))}</b> — ${playerLine(r, d)}${r.status === 'pending' ? ' ⏳' : ''}`;
+      })
       .join('\n'),
   });
 }
@@ -269,8 +269,9 @@ async function weeklyDigest(now: Date) {
   if (!games.length) return;
   const list = games.slice(0, 15).map(({ players }) => {
     const p = players[0]!;
-    const v = playerVars(p, p.details as ReservationDetails | null);
-    return `• ${formatClubDateTime(p.startsAt)} — ${v.игра}${v.армия ? `, ${v.армия}` : ''} (ищет соперника)`;
+    const d = p.details as ReservationDetails | null;
+    const v = detailVars(d);
+    return `• ${formatClubDateTime(p.startsAt)} — <b>${v.игра}</b>: ${playerLine(p, d)} (ищет соперника)`;
   });
   const text = await renderKind('weekly_digest', { список: list.join('\n') });
   // тем, у кого включены ивенты (категория типа) — подписчикам поиска тоже, если ивенты не выключены

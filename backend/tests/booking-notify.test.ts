@@ -23,7 +23,8 @@ const base: BookingNotice = {
 describe('bookingNoticeText', () => {
   test('игра за столом: вид, дата и время, стол, кто с Telegram ID, армия, очки, опыт, когда оформлено', () => {
     const t = bookingNoticeText(base);
-    expect(t).toContain('Новая запись: Игра Warhammer 40,000 — стол ждёт соперника (1/2)');
+    expect(t).toContain('Новая запись: Warhammer 40,000 — стол ждёт соперника (1/2)');
+    expect(t).toContain('Услуга: Игра Warhammer 40,000');
     expect(t).toMatch(/Когда: .*25 октября, 18:00–21:00/);
     expect(t).toContain('Стол: Стол 3');
     expect(t).toContain('Кто: Иван Петров (@ivan) · Telegram ID: 123456789');
@@ -33,6 +34,14 @@ describe('bookingNoticeText', () => {
     expect(t).toContain('Опыт: Игрок');
     expect(t).toMatch(/Оформлено: .*24 октября, 03:47/);
     expect(t).not.toContain('Мест:');
+  });
+
+  test('игра в заголовке: Kill Team, AoS (решение владельца 14.11.2026)', () => {
+    const kt = bookingNoticeText({ ...base, details: { kind: 'wh_player', game: 'kt', army: 'Kommandos', points: null, experienceLevel: 'player' } });
+    expect(kt.split('\n')[0]).toContain('Новая запись: Kill Team');
+    expect(kt).toContain('Команда: Kommandos');
+    const aos = bookingNoticeText({ ...base, details: { kind: 'wh_player', game: 'aos', army: 'Seraphon', points: 1000, experienceLevel: 'player' } });
+    expect(aos.split('\n')[0]).toContain('Новая запись: Age of Sigmar');
   });
 
   test('стол собран', () => {
