@@ -134,13 +134,14 @@ export default function Profile() {
         <div className="absolute inset-x-0 top-0 h-20 bg-linear-to-b from-accent/15 to-transparent" />
         <EffectsToggle />
         <div className="relative flex items-center gap-4 px-4 pb-4 pt-5 lg:flex-col lg:px-6 lg:pb-6 lg:pt-8 lg:text-center">
-          <div className="shrink-0">
+          <div className="flex shrink-0 justify-center">
             {supporter ? (
-              <SupporterFrame title={supporter} size={72} label={`Поддерживает клуб: ${SUPPORTER_LABELS[supporter]}`}>
+              <SupporterFrame inline title={supporter} size={72} label={`Поддерживает клуб: ${SUPPORTER_LABELS[supporter]}`}>
                 {avatar}
               </SupporterFrame>
             ) : (
               <AvatarFrame
+                inline
                 category={frame?.category ?? "warhammer"}
                 tier={frame ? RANK_ORDER.indexOf(frame.rank) : 0}
                 size={68}

@@ -5,6 +5,12 @@ export type SupporterTitle = "flame" | "crown" | "banner";
 
 const AVATAR_R = 52;
 
+/**
+ * Видимая ширина рамки по горизонтали (единицы макета, центр аватара — 0): для размещения рядом с текстом.
+ * Свечение за пределами почти прозрачное, поэтому место резервируется по видимой части, а не по всему svg.
+ */
+const VISIBLE_X: Record<SupporterTitle, [number, number]> = { flame: [-90, 90], crown: [-78, 78], banner: [-90, 175] };
+
 const reducedMotion = () => {
   try {
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -25,8 +31,11 @@ export default function SupporterFrame({
   size,
   children,
   label,
+  inline = false,
 }: {
   title: SupporterTitle;
+  /** рядом с текстом (шапка профиля): резервировать место под рамку и по бокам, а не центрировать */
+  inline?: boolean;
   /** диаметр аватара, px */
   size: number;
   children: ReactNode;
@@ -44,8 +53,15 @@ export default function SupporterFrame({
   const box = { width: w, height: h, left, top };
   return (
     <div
-      className="relative mx-auto"
-      style={{ width: size, height: size, marginTop: -top, marginBottom: h + top - size, marginLeft: "auto", marginRight: "auto" }}
+      className={inline ? "relative shrink-0" : "relative mx-auto"}
+      style={{
+        width: size,
+        height: size,
+        marginTop: -top,
+        marginBottom: h + top - size,
+        marginLeft: inline ? Math.round((-VISIBLE_X[title][0] - AVATAR_R) * unit) : "auto",
+        marginRight: inline ? Math.round((VISIBLE_X[title][1] - AVATAR_R) * unit) : "auto",
+      }}
       role={label ? "img" : undefined}
       aria-label={label}
     >
