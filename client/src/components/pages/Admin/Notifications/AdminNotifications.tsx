@@ -169,6 +169,8 @@ const STATUS: Record<Broadcast["status"], { label: string; cls: string }> = {
   done: { label: "Отправлена", cls: "bg-white/10 text-fg-2" },
 };
 
+const inAnHour = () => new Date(Date.now() + 3600_000).toISOString();
+
 const EMPTY: BroadcastInput = { title: "", text: "", imageUrl: null, buttons: [], audience: { kind: "all" }, schedule: { type: "now" } };
 
 function BroadcastsTab({ canEdit }: { canEdit: boolean }) {
@@ -258,14 +260,14 @@ function BroadcastEditor({ initial, onClose }: { initial: { id: number | null; i
   };
   const run = useMutation({
     mutationFn: async (action: "save" | "start" | "test") => {
-      if (action === "test") return { test: await testBroadcast(form) };
+      if (action === "test") return { kind: "test" as const, test: await testBroadcast(form) };
       const saved = await save();
-      if (action === "start") return { started: await startBroadcast(saved.id) };
-      return { saved };
+      if (action === "start") return { kind: "started" as const, started: await startBroadcast(saved.id) };
+      return { kind: "saved" as const, saved };
     },
     onSuccess: (r) => {
-      if ("test" in r) setNote(r.test.ok ? { ok: true, text: "Тест отправлен вам в Telegram." } : { ok: false, text: `Не отправилось: ${r.test.error ?? ""}` });
-      else if ("started" in r) {
+      if (r.kind === "test") setNote(r.test.ok ? { ok: true, text: "Тест отправлен вам в Telegram." } : { ok: false, text: `Не отправилось: ${r.test.error ?? ""}` });
+      else if (r.kind === "started") {
         setNote({ ok: true, text: r.started.status === "done" ? `Поставлено в очередь: ${r.started.queued}` : `Запланировано: ${fmt(r.started.nextRunAt)}` });
         setTimeout(onClose, 900);
       } else setNote({ ok: true, text: "Черновик сохранён." });
@@ -280,7 +282,7 @@ function BroadcastEditor({ initial, onClose }: { initial: { id: number | null; i
         type === "now"
           ? { type }
           : type === "once"
-            ? { type, at: new Date(Date.now() + 3600_000).toISOString() }
+            ? { type, at: inAnHour() }
             : type === "weekly"
               ? { type, days: [5], time: "12:00", until: null }
               : { type, day: 1, time: "12:00", until: null },

@@ -41,10 +41,10 @@ function sql(query: string): string {
 }
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// ближайший вторник не раньше чем через 3 дня
+// ближайшее воскресенье не раньше чем через 3 дня (будни могут быть закрыты днём)
 const day = (() => {
   const d = new Date(Date.now() + 3 * 86400_000);
-  while (new Date(d.getTime() + 5 * 3600_000).getUTCDay() !== 2) d.setTime(d.getTime() + 86400_000);
+  while (new Date(d.getTime() + 5 * 3600_000).getUTCDay() !== 0) d.setTime(d.getTime() + 86400_000);
   return new Date(d.getTime() + 5 * 3600_000).toISOString().slice(0, 10);
 })();
 const local = (hh: string) => new Date(`${day}T${hh}:00+05:00`).toISOString();
@@ -82,12 +82,13 @@ describe('уведомления', () => {
   test('запись за стол со свободным местом → «ищут соперника» подписчику 40K в очереди; себе и занятому — нет', async () => {
     // «занятый» уже записан на это время за другой стол
     const other = Number(sql(`insert into tables (name, category) values ('E2E стол 2', 'small') returning id`));
-    const busy = await api('POST', '/reservations', T.busy, { serviceId, tableId: other, startsAt: local('12:00'), partySize: 1, seatClubArmyOptions: [false], details: { game: 'aos', army: 'Seraphon', points: 1000, experienceLevel: 'player' } });
+    const busy = await api('POST', '/reservations', T.busy, { serviceId, tableId: other, startsAt: local('16:00'), partySize: 1, seatClubArmyOptions: [false], details: { game: 'aos', army: 'Seraphon', points: 1000, experienceLevel: 'player' } });
+    if (busy.status !== 200) console.error(`::error::busy → ${busy.status}: ${JSON.stringify(busy.json).slice(0, 400)}`);
     expect(busy.status).toBe(200);
     const r = await api('POST', '/reservations', T.seeker, {
       serviceId,
       tableId,
-      startsAt: local('12:00'),
+      startsAt: local('16:00'),
       partySize: 1,
       seatClubArmyOptions: [false],
       details: { game: '40k', army: 'Necrons', points: 2000, experienceLevel: 'player' },
