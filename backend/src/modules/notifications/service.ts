@@ -65,7 +65,21 @@ export function recentSends(): SendLogEntry[] {
   return [...sendLog].reverse();
 }
 
-function remember(chatId: number | string, kind: string, result: SendResult, ms: number) {
+/** Кнопка под сообщением: path — открыть Mini App на этой странице, url — внешняя ссылка. */
+export type MessageButton = { text: string; path?: string; url?: string };
+export type MessageExtra = { imageUrl?: string | null; buttons?: MessageButton[] | null; broadcastId?: number | null };
+
+/**
+ * Наблюдатель отправок (14.11.2026): журнал в базе, отметка «не может получать» (403) и сигнал о восстановлении
+ * связи — подключается из notifications/hub.ts, чтобы этот модуль не зависел от базы (юнит-тесты без PostgreSQL).
+ */
+type SendObserver = (entry: { chatId: string; kind: string; result: SendResult; broadcastId?: number | null }) => void;
+let observer: SendObserver | null = null;
+export function setSendObserver(fn: SendObserver | null) {
+  observer = fn;
+}
+
+function remember(chatId: number | string, kind: string, result: SendResult, ms: number, broadcastId?: number | null) {
   sendLog.push({
     at: new Date().toISOString(),
     chatId: String(chatId),
@@ -75,20 +89,80 @@ function remember(chatId: number | string, kind: string, result: SendResult, ms:
     ms,
   });
   if (sendLog.length > SEND_LOG_LIMIT) sendLog.splice(0, sendLog.length - SEND_LOG_LIMIT);
+  try {
+    observer?.({ chatId: String(chatId), kind, result, broadcastId });
+  } catch (error) {
+    console.warn('[notify] observer failed', (error as Error).message);
+  }
 }
 
+/** Адрес Mini App для кнопок «открыть приложение» (MINI_APP_URL в .env, по умолчанию https://warphub.ru). */
+export function miniAppUrl(path = '/') {
+  const base = (process.env.MINI_APP_URL ?? 'https://warphub.ru').replace(/\/+$/, '');
+  return `${base}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
+function replyMarkup(buttons: MessageButton[] | null | undefined) {
+  const rows = (buttons ?? [])
+    .filter((b) => b.text.trim() && (b.path || b.url))
+    .slice(0, 3)
+    .map((b) => [b.url ? { text: b.text.trim(), url: b.url } : { text: b.text.trim(), web_app: { url: miniAppUrl(b.path!) } }]);
+  return rows.length ? { inline_keyboard: rows } : undefined;
+}
+
+/** Подпись к картинке в Telegram — до 1024 символов; длиннее — картинка отдельно, текст следом. */
+const CAPTION_LIMIT = 1024;
+
 /** Отправить сообщение и вернуть подробный результат (для проверки уведомлений из админки). */
-export async function sendTelegramMessageDetailed(chatId: number | string, text: string, kind = 'message'): Promise<SendResult> {
+export async function sendTelegramMessageDetailed(
+  chatId: number | string,
+  text: string,
+  kind = 'message',
+  extra: MessageExtra = {},
+): Promise<SendResult> {
   const started = Date.now();
-  const result = await sendRaw(chatId, text);
-  remember(chatId, kind, result, Date.now() - started);
+  const result = await sendRaw(chatId, text, extra);
+  remember(chatId, kind, result, Date.now() - started, extra.broadcastId);
   return result;
 }
 
-async function sendRaw(chatId: number | string, text: string): Promise<SendResult> {
+async function readFailure(response: Response, chatId: number | string): Promise<SendResult> {
+  // 403 — пользователь не нажимал «Старт» у бота или заблокировал его; 401 — неверный токен
+  const body = await response.text().catch(() => '');
+  let description: string | undefined;
+  try {
+    description = (JSON.parse(body) as { description?: string }).description;
+  } catch {
+    description = body.slice(0, 200) || undefined;
+  }
+  console.warn(`[notify] Telegram ${response.status} for chat ${chatId}: ${body.slice(0, 200)}`);
+  return { ok: false, reason: 'telegram', status: response.status, description };
+}
+
+async function sendRaw(chatId: number | string, text: string, extra: MessageExtra = {}): Promise<SendResult> {
   if (!notificationsEnabled()) return { ok: false, reason: 'disabled' };
+  const markup = replyMarkup(extra.buttons);
 
   try {
+    if (extra.imageUrl) {
+      // картинку сервер скачивает сам (из своего хранилища) и отправляет файлом — Telegram может не достать до сервера в России
+      const image = await fetch(extra.imageUrl, { signal: AbortSignal.timeout(15_000) });
+      if (!image.ok) return { ok: false, reason: 'telegram', status: 0, description: `картинка не загрузилась: ${image.status}` };
+      const blob = await image.blob();
+      const withCaption = text.length <= CAPTION_LIMIT;
+      const form = new FormData();
+      form.append('chat_id', String(chatId));
+      form.append('photo', blob, 'image' + (blob.type.includes('png') ? '.png' : '.jpg'));
+      if (withCaption) {
+        form.append('caption', text);
+        form.append('parse_mode', 'HTML');
+        if (markup) form.append('reply_markup', JSON.stringify(markup));
+      }
+      const photo = await telegramFetch('sendPhoto', { method: 'POST', body: form, timeoutMs: 30_000 });
+      if (!photo.ok) return await readFailure(photo, chatId);
+      if (withCaption) return { ok: true };
+    }
+
     const response = await telegramFetch('sendMessage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -97,22 +171,11 @@ async function sendRaw(chatId: number | string, text: string): Promise<SendResul
         text,
         parse_mode: 'HTML',
         disable_web_page_preview: true,
+        ...(markup ? { reply_markup: markup } : {}),
       }),
     });
 
-    if (!response.ok) {
-      // 403 — пользователь не нажимал «Старт» у бота или заблокировал его; 401 — неверный токен
-      const body = await response.text().catch(() => '');
-      let description: string | undefined;
-      try {
-        description = (JSON.parse(body) as { description?: string }).description;
-      } catch {
-        description = body.slice(0, 200) || undefined;
-      }
-      console.warn(`[notify] Telegram ${response.status} for chat ${chatId}: ${body.slice(0, 200)}`);
-      return { ok: false, reason: 'telegram', status: response.status, description };
-    }
-
+    if (!response.ok) return await readFailure(response, chatId);
     return { ok: true };
   } catch (error) {
     console.warn(`[notify] failed for chat ${chatId}:`, (error as Error).message);

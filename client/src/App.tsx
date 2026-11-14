@@ -12,6 +12,7 @@ import ContentManagment from "@/components/pages/Admin/ContentManagment";
 import AdminWarhammer from "@/components/pages/Admin/Warhammer/AdminWarhammer";
 import AdminDnd from "@/components/pages/Admin/Dnd/AdminDnd";
 import AdminRewards from "@/components/pages/Admin/Rewards/AdminRewards";
+import AdminNotifications from "@/components/pages/Admin/Notifications/AdminNotifications";
 import AdminPricing from "@/components/pages/Admin/Pricing/AdminPricing";
 import GamesHub, { MyRewards } from "@/components/games/GamesHub";
 import RunnerGame from "@/components/games/RunnerGame";
@@ -78,6 +79,7 @@ export default function App() {
               <Route path="dnd" element={<AdminDnd />} />
               <Route path="roster" element={<AdminRoster />} />
               <Route path="rewards" element={<AdminRewards />} />
+              <Route path="notifications" element={<AdminNotifications />} />
               <Route path="admins" element={<AdminAdmins />} />
               <Route path="supporters" element={<AdminSupporters />} />
               <Route path="dominatus" element={<AdminDominatus />} />

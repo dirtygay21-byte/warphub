@@ -80,7 +80,7 @@ e2e('sendDueReminders (PostgreSQL)', () => {
     await sendDueReminders();
     const marked = sql(`select id from reservations where remind_at is not null and id in (${ids.map((id) => `'${id}'`).join(',')})`).split('\n').filter(Boolean);
     expect(marked).toEqual([ids[0]!]);
-    expect(recentSends().some((e) => e.chatId === '4409001' && e.kind === 'user')).toBe(true);
+    expect(recentSends().some((e) => e.chatId === '4409001' && e.kind === 'reminder_3h')).toBe(true);
     const before = recentSends().length;
     await sendDueReminders();
     expect(recentSends().length).toBe(before);

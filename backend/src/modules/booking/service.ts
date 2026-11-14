@@ -46,6 +46,8 @@ import {
   notifyAdmins,
   notifyUser,
 } from '../notifications/service';
+import { notifyKind, notifyKindAdmins } from '../notifications/hub';
+import { announceMatch } from '../notifications/jobs';
 import {
   checkTableSession,
   DetailsValidationError,
@@ -75,7 +77,7 @@ import {
 
 export { parseDateParam } from './rules';
 import { getAdminTelegramIds } from '../../config/admin';
-import { bookerConfirmText, bookingNoticeText } from './notify-text';
+import { bookingNoticeText } from './notify-text';
 import { createReservationPricing } from '../pricing/service';
 
 const ACTIVE_RESERVATION_STATUSES = ['pending', 'confirmed'] as const;
@@ -1179,29 +1181,35 @@ async function notifyAfterCreate(
 
     // соперникам за столом — что к их игре присоединились
     for (const other of others) {
-      notifyUser(
-        other.user.telegramId,
-        [
-          `⚔️ <b>К вашей игре присоединился соперник!</b>`,
-          `${serviceTitle(service)} — ${when}`,
-          describePlayer(booker.user, details),
-        ].join('\n'),
-      );
+      void notifyKind('opponent_joined', other.user.telegramId, {
+        услуга: serviceTitle(service),
+        когда: when,
+        соперник: describePlayer(booker.user, details),
+      });
     }
 
     const tableName = reservation.tableId !== null ? await getTableName(reservation.tableId) : null;
     // самому записавшемуся — подтверждение (администратор и так получает полное сообщение ниже)
     if (reason === 'created' && booker.user.telegramId && !getAdminTelegramIds().includes(String(booker.user.telegramId))) {
-      notifyUser(
-        booker.user.telegramId,
-        bookerConfirmText({
-          serviceTitle: service.title ?? service.slug,
-          startsAt: reservation.startsAt,
-          endsAt: reservation.endsAt,
-          tableName,
-          table: atTable ? { occupied: others.length + 1, seats: seats! } : null,
-        }),
-      );
+      const table = atTable ? { occupied: others.length + 1, seats: seats! } : null;
+      void notifyKind('booking_created', booker.user.telegramId, {
+        услуга: serviceTitle(service),
+        когда: when,
+        стол: tableName ? escapeHtml(tableName) : '',
+        стол_статус: table ? (table.occupied >= table.seats ? 'Соперник уже есть — стол собран.' : 'Стол ждёт соперника — напишем, когда он запишется.') : '',
+      });
+    }
+
+    // поиск соперника (14.11.2026): за столом осталось место — подписчикам этой игры
+    if (reason === 'created' && atTable && others.length + 1 < seats! && reservation.startsAt) {
+      void announceMatch('match_new', {
+        user: { id: booker.user.id, firstName: booker.user.firstName, lastName: booker.user.lastName ?? null, username: booker.user.username ?? null },
+        details,
+        startsAt: reservation.startsAt,
+        endsAt: reservation.endsAt,
+        tableName,
+        otherUserIds: others.map((o) => o.user.id),
+      }).catch((error) => console.warn('[notify] match announce failed', (error as Error).message));
     }
 
     // администраторам — одно полное сообщение о каждой записи (N1)
@@ -1221,9 +1229,26 @@ async function notifyAfterCreate(
       fullMinutes: serviceDuration(service),
     });
     const playersAtTable = others.map((other) => describePlayer(other.user, other.details));
-    notifyAdmins(playersAtTable.length ? `${text}\n— за столом также:\n${playersAtTable.join('\n')}` : text);
+    void notifyKindAdmins('admin_booking', { текст: playersAtTable.length ? `${text}\n— за столом также:\n${playersAtTable.join('\n')}` : text });
   } catch (error) {
     console.warn('[notify] booking notification failed', error);
+  }
+}
+
+/** Игроку о его записи: подтверждена / время изменено (14.11.2026). */
+async function notifyPlayerOf(reservation: Reservation, kind: 'booking_confirmed' | 'booking_time_changed') {
+  try {
+    const service = await loadService(db, reservation.serviceId);
+    const [booker] = await loadUsersForReservations([reservation.id]);
+    if (!service || !booker) return;
+    const tableName = reservation.tableId !== null ? await getTableName(reservation.tableId) : null;
+    await notifyKind(kind, booker.user.telegramId, {
+      услуга: serviceTitle(service),
+      когда: formatClubDateTime(reservation.startsAt, reservation.endsAt),
+      стол: tableName ? escapeHtml(tableName) : '',
+    });
+  } catch (error) {
+    console.warn('[notify] player notification failed', (error as Error).message);
   }
 }
 
@@ -1260,29 +1285,16 @@ async function notifyAfterCancel(
       remaining = await loadUsersForReservations(sessionMates.map((r) => r.id));
 
       for (const mate of remaining) {
-        notifyUser(
-          mate.user.telegramId,
-          [
-            `ℹ️ <b>Соперник отменил запись</b>`,
-            `${serviceTitle(service)} — ${when}`,
-            'Ваша запись сохранена, место за столом снова свободно.',
-          ].join('\n'),
-        );
+        void notifyKind('opponent_cancelled', mate.user.telegramId, { услуга: serviceTitle(service), когда: when });
       }
     }
 
     if (cancelledBy === 'admin' && booker) {
-      notifyUser(
-        booker.user.telegramId,
-        [
-          `❌ <b>Ваша запись отменена администратором</b>`,
-          `${serviceTitle(service)} — ${when}`,
-        ].join('\n'),
-      );
+      void notifyKind('booking_cancelled_admin', booker.user.telegramId, { услуга: serviceTitle(service), когда: when });
     }
 
-    notifyAdmins(
-      [
+    void notifyKindAdmins('admin_booking', {
+      текст: [
         `❌ <b>${serviceTitle(service)}: запись отменена</b>${
           cancelledBy === 'admin' ? ' (администратором)' : ''
         }`,
@@ -1295,7 +1307,7 @@ async function notifyAfterCancel(
       ]
         .filter(Boolean)
         .join('\n'),
-    );
+    });
   } catch (error) {
     console.warn('[notify] cancel notification failed', error);
   }
@@ -1833,6 +1845,7 @@ export async function confirmReservation(
     .where(eq(reservationsTable.id, reservationId))
     .returning();
 
+  void notifyPlayerOf(updated!, 'booking_confirmed');
   return updated!;
 }
 
@@ -1907,6 +1920,7 @@ export async function extendReservation(
     .where(eq(reservationsTable.id, reservationId))
     .returning();
 
+  void notifyPlayerOf(updated!, 'booking_time_changed');
   return updated!;
 }
 

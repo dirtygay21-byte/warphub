@@ -25,7 +25,47 @@ import {
   toReservationResponse,
 } from '../booking/service';
 import { getAdminUserProfile, searchUsersByUsername } from '../users/service';
-import { notificationDiagnostics, testNotification } from '../notifications/service';
+import { notificationDiagnostics, sendTelegramMessageDetailed, testNotification } from '../notifications/service';
+import { KIND_BY_ID, renderTemplate } from '../notifications/catalog';
+import { notificationLog, saveNotificationConfig } from '../notifications/hub';
+import { notificationCatalog, saveTemplate } from '../notifications/admin';
+import {
+  audienceCount,
+  BroadcastError,
+  createBroadcast,
+  deleteBroadcast,
+  isNotificationOwner,
+  listBroadcasts,
+  pauseBroadcast,
+  startBroadcast,
+  testBroadcast,
+  updateBroadcast,
+} from '../notifications/broadcasts';
+
+const BroadcastAudienceSchema = t.Object({
+  kind: t.Union([t.Literal('all'), t.Literal('game'), t.Literal('recent'), t.Literal('events'), t.Literal('admins'), t.Literal('me')]),
+  game: t.Optional(t.String()),
+  days: t.Optional(t.Integer({ minimum: 1, maximum: 365 })),
+});
+const BroadcastButtonSchema = t.Object({ text: t.String({ maxLength: 40 }), path: t.Optional(t.String()), url: t.Optional(t.String()) });
+const BroadcastBody = t.Object({
+  title: t.String({ maxLength: 120 }),
+  text: t.String({ maxLength: 4000 }),
+  imageUrl: t.Optional(t.Nullable(t.String())),
+  buttons: t.Optional(t.Array(BroadcastButtonSchema, { maxItems: 3 })),
+  audience: BroadcastAudienceSchema,
+  schedule: t.Union([
+    t.Object({ type: t.Literal('now') }),
+    t.Object({ type: t.Literal('once'), at: t.String() }),
+    t.Object({ type: t.Literal('weekly'), days: t.Array(t.Integer({ minimum: 1, maximum: 7 })), time: t.String(), until: t.Optional(t.Nullable(t.String())) }),
+    t.Object({ type: t.Literal('monthly'), day: t.Integer({ minimum: 1, maximum: 31 }), time: t.String(), until: t.Optional(t.Nullable(t.String())) }),
+  ]),
+});
+
+function broadcastError(error: unknown) {
+  if (error instanceof BroadcastError) return status(error.code === 'NOT_FOUND' ? 404 : error.code === 'FORBIDDEN' ? 403 : 400, { error: error.message });
+  return status(500, { error: (error as Error).message });
+}
 import { addAdmin, AdminsError, listAdmins, removeAdmin } from '../admins/service';
 import { isBuiltinAdmin } from '../../config/admin';
 import {
@@ -1239,6 +1279,135 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
         description: 'Счёт не может уйти в минус. Игрок получает сообщение от бота.',
       },
     },
+  )
+  // ---- Уведомления (14.11.2026): каталог, тексты, настройки, журнал, рассылки. Менять — только владелец.
+  .get('/notifications/catalog', async ({ user }) => notificationCatalog(user), {
+    detail: { tags: ['Admin'], summary: 'Уведомления: каталог, тексты, настройки' },
+  })
+  .put(
+    '/notifications/templates/:kind',
+    async ({ user, params, body }) => {
+      if (!isNotificationOwner(user)) return status(403, { error: 'Уведомления меняет только владелец' });
+      if (!KIND_BY_ID.has(params.kind)) return status(404, { error: 'Нет такого уведомления' });
+      return saveTemplate(params.kind, body);
+    },
+    {
+      body: t.Object({ enabled: t.Optional(t.Boolean()), text: t.Optional(t.Nullable(t.String({ maxLength: 4000 }))) }),
+      detail: { tags: ['Admin'], summary: 'Уведомления: включить / выключить, свой текст (null — стандартный)' },
+    },
+  )
+  .post(
+    '/notifications/templates/:kind/test',
+    async ({ user, params, body }) => {
+      if (!isNotificationOwner(user)) return status(403, { error: 'Только владелец' });
+      const kind = KIND_BY_ID.get(params.kind);
+      if (!kind) return status(404, { error: 'Нет такого уведомления' });
+      const text = renderTemplate(body.text?.trim() ? body.text : kind.defaultText, kind.vars);
+      const result = await sendTelegramMessageDetailed(user.telegramId, text || '—', `test:${kind.id}`);
+      return result.ok ? { ok: true } : { ok: false, error: result.description ?? result.reason };
+    },
+    {
+      body: t.Object({ text: t.Optional(t.Nullable(t.String({ maxLength: 4000 }))) }),
+      detail: { tags: ['Admin'], summary: 'Уведомления: тест типа себе (с примерами переменных)' },
+    },
+  )
+  .put(
+    '/notifications/config',
+    async ({ user, body }) => {
+      if (!isNotificationOwner(user)) return status(403, { error: 'Только владелец' });
+      await saveNotificationConfig(body);
+      return body;
+    },
+    {
+      body: t.Object({
+        quietFrom: t.Integer({ minimum: 0, maximum: 23 }),
+        quietTo: t.Integer({ minimum: 0, maximum: 23 }),
+        dailyLimit: t.Integer({ minimum: 0, maximum: 20 }),
+      }),
+      detail: { tags: ['Admin'], summary: 'Уведомления: тихие часы и дневной лимит объявлений' },
+    },
+  )
+  .get('/notifications/log', ({ query }) => notificationLog({ kind: query.kind, limit: query.limit }), {
+    query: t.Object({ kind: t.Optional(t.String()), limit: t.Optional(t.Numeric({ minimum: 1, maximum: 300 })) }),
+    detail: { tags: ['Admin'], summary: 'Уведомления: журнал отправок' },
+  })
+  .get('/broadcasts', () => listBroadcasts(), { detail: { tags: ['Admin'], summary: 'Рассылки' } })
+  .post(
+    '/broadcasts',
+    async ({ user, body }) => {
+      if (!isNotificationOwner(user)) return status(403, { error: 'Рассылки делает только владелец' });
+      try {
+        return await createBroadcast(body, user);
+      } catch (error) {
+        return broadcastError(error);
+      }
+    },
+    { body: BroadcastBody, detail: { tags: ['Admin'], summary: 'Создать рассылку (черновик)' } },
+  )
+  .put(
+    '/broadcasts/:id',
+    async ({ user, params, body }) => {
+      if (!isNotificationOwner(user)) return status(403, { error: 'Только владелец' });
+      try {
+        return await updateBroadcast(params.id, body);
+      } catch (error) {
+        return broadcastError(error);
+      }
+    },
+    { params: t.Object({ id: t.Numeric() }), body: BroadcastBody, detail: { tags: ['Admin'], summary: 'Изменить рассылку' } },
+  )
+  .delete(
+    '/broadcasts/:id',
+    async ({ user, params }) => {
+      if (!isNotificationOwner(user)) return status(403, { error: 'Только владелец' });
+      try {
+        return await deleteBroadcast(params.id);
+      } catch (error) {
+        return broadcastError(error);
+      }
+    },
+    { params: t.Object({ id: t.Numeric() }), detail: { tags: ['Admin'], summary: 'Удалить рассылку' } },
+  )
+  .post(
+    '/broadcasts/:id/start',
+    async ({ user, params }) => {
+      if (!isNotificationOwner(user)) return status(403, { error: 'Только владелец' });
+      try {
+        return await startBroadcast(params.id, user);
+      } catch (error) {
+        return broadcastError(error);
+      }
+    },
+    { params: t.Object({ id: t.Numeric() }), detail: { tags: ['Admin'], summary: 'Запустить: сейчас или по расписанию' } },
+  )
+  .post(
+    '/broadcasts/:id/pause',
+    async ({ user, params }) => {
+      if (!isNotificationOwner(user)) return status(403, { error: 'Только владелец' });
+      try {
+        return await pauseBroadcast(params.id);
+      } catch (error) {
+        return broadcastError(error);
+      }
+    },
+    { params: t.Object({ id: t.Numeric() }), detail: { tags: ['Admin'], summary: 'Приостановить рассылку' } },
+  )
+  .post(
+    '/broadcasts/test',
+    async ({ user, body }) => {
+      if (!isNotificationOwner(user)) return status(403, { error: 'Только владелец' });
+      try {
+        return await testBroadcast(body, user);
+      } catch (error) {
+        return broadcastError(error);
+      }
+    },
+    { body: BroadcastBody, detail: { tags: ['Admin'], summary: 'Тест рассылки себе' } },
+  )
+  .post(
+    '/broadcasts/audience',
+    async ({ user, body }) => audienceCount(body.audience, user),
+    { body: t.Object({ audience: BroadcastAudienceSchema }), detail: { tags: ['Admin'], summary: 'Сколько человек в аудитории' } },
   )
   .get('/notifications/diagnostics', () => notificationDiagnostics(), {
     detail: {

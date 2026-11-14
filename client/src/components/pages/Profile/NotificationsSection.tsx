@@ -1,7 +1,10 @@
 import { apiRequest } from "@/apiUtils/general";
 import { haptic } from "@/utils/haptic";
-import { useMutation } from "@tanstack/react-query";
-import { BellRing, LoaderCircle } from "lucide-react";
+import { GAME_OPTIONS, getNotificationPrefs, saveNotificationPrefs, type NotificationPrefs, type OpponentGame } from "@/apiUtils/notifications";
+import { ToggleRow } from "@/components/ui/ds";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import clsx from "clsx";
+import { BellRing, ChevronDown, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 
 type TestResult = { ok: boolean; message: string; needsStart?: boolean };
@@ -66,6 +69,78 @@ export default function NotificationsSection() {
       {denied && <p className="mt-2 text-[13px] text-fg-2">Разрешение не выдано. Его можно дать позже — здесь или кнопкой «Старт» в чате с ботом.</p>}
       {result && <p className={result.ok ? "mt-2 text-[13px] text-accent" : "mt-2 text-[13px] text-red-300"}>{result.ok ? "✅ " : "⚠️ "}{result.message}</p>}
       {test.isError && <p className="mt-2 text-[13px] text-red-300">Не удалось выполнить проверку — сервер не ответил.</p>}
+      <NotificationPrefsBlock />
     </section>
+  );
+}
+
+/**
+ * Что присылать (14.11.2026): поиск соперника — по играм, которые игрок включил сам (по умолчанию выключен);
+ * новости, ивенты, акции — включены; напоминание накануне — выключено. О своих записях бот пишет всегда.
+ */
+function NotificationPrefsBlock() {
+  const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const prefs = useQuery({ queryKey: ["notification-prefs"], queryFn: getNotificationPrefs, enabled: open });
+  const save = useMutation({
+    mutationFn: (input: Partial<NotificationPrefs>) => saveNotificationPrefs(input),
+    onSuccess: (data) => queryClient.setQueryData(["notification-prefs"], data),
+  });
+  const p = save.isPending && save.variables ? { ...prefs.data!, ...save.variables } : prefs.data;
+  const set = (input: Partial<NotificationPrefs>) => (haptic.select(), save.mutate(input));
+  const toggleGame = (g: OpponentGame) =>
+    p && set({ opponentGames: p.opponentGames.includes(g) ? p.opponentGames.filter((x) => x !== g) : [...p.opponentGames, g] });
+
+  return (
+    <div className="mt-4 border-t border-white/10 pt-3">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className="flex min-h-11 w-full items-center justify-between text-left text-sm font-semibold text-fg"
+      >
+        Что присылать
+        <ChevronDown className={clsx("size-5 text-fg-3 transition-transform", open && "rotate-180")} />
+      </button>
+      {open && (
+        <div className="mt-2 space-y-3">
+          {!p ? (
+            <p className="text-sm text-fg-3">{prefs.isError ? "Не удалось загрузить настройки." : "Загружаем…"}</p>
+          ) : (
+            <>
+              <div>
+                <p className="text-sm font-semibold text-fg">Поиск соперника</p>
+                <p className="mt-0.5 text-[13px] text-fg-2">Когда кто-то записался за стол и ищет соперника в вашей игре — пришлём приглашение.</p>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {GAME_OPTIONS.map((g) => {
+                    const on = p.opponentGames.includes(g.value);
+                    return (
+                      <button
+                        key={g.value}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => toggleGame(g.value)}
+                        className={clsx(
+                          "min-h-11 rounded-xl border px-2 text-[13px] font-semibold",
+                          on ? "border-accent/60 bg-accent/15 text-accent" : "border-white/[0.14] text-fg-2",
+                        )}
+                      >
+                        {g.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <ToggleRow title="Напоминание накануне" subtitle="Вечером перед днём записи" checked={p.eveReminder} onChange={(v) => set({ eveReminder: v })} />
+              <ToggleRow title="Новости и объявления клуба" checked={p.news} onChange={(v) => set({ news: v })} />
+              <ToggleRow title="Ивенты и игры D&D" subtitle="Новые ивенты, свободные игры на выходных, мало мест" checked={p.events} onChange={(v) => set({ events: v })} />
+              <ToggleRow title="Ранги и приглашения" subtitle="Новый ранг, «давно не заходили»" checked={p.promos} onChange={(v) => set({ promos: v })} />
+              <p className="text-[12px] text-fg-3">О ваших записях (подтверждение, соперник, отмена, напоминание за 3 часа) бот пишет всегда. Ночью (23:00–10:00) объявления не приходят.</p>
+              {save.isError && <p className="text-[13px] text-red-300">Не сохранилось — попробуйте ещё раз.</p>}
+            </>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
