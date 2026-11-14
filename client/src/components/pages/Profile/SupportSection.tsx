@@ -53,7 +53,7 @@ function openExternal(url: string) {
 /** Блок «Вы можете поддержать нас» внизу профиля (Instagram / TikTok / Boosty). */
 export default function SupportSection() {
   return (
-    <section className="mt-5 lg:col-span-2">
+    <section>
       <p className="mb-1 text-center text-[13px] font-bold uppercase tracking-[0.08em] text-fg-3">
         Вы можете поддержать нас
       </p>

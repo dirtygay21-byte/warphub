@@ -78,6 +78,7 @@ export const BUTTON_TARGETS: { path: string; label: string }[] = [
   { path: "/games", label: "Мини-игры" },
   { path: "/roster", label: "WarpBuilder" },
   { path: "/profile", label: "Профиль" },
+  { path: "/profile?tab=notifications", label: "Настройки уведомлений" },
 ];
 
 export const GAME_OPTIONS: { value: OpponentGame; label: string }[] = [
