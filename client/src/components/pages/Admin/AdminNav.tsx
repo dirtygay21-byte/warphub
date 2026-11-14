@@ -1,6 +1,7 @@
 import { haptic } from "@/utils/haptic";
 import clsx from "clsx";
 import {
+  BellRing,
   CalendarDays,
   ChevronDown,
   ChevronLeft,
@@ -35,6 +36,7 @@ const GROUPS: { title: string; items: Section[] }[] = [
     title: "Клуб",
     items: [
       { path: "/admin/content", label: "Контент", sub: "Ивенты и новости", icon: Newspaper },
+      { path: "/admin/notifications", label: "Уведомления", sub: "Рассылки и сообщения бота", icon: BellRing },
       { path: "/admin/rewards", label: "Награды", sub: "Скидки за мини-игры", icon: Gift },
       { path: "/admin/supporters", label: "Поддержка клуба", sub: "Особые звания и рамки аватара", icon: Crown },
       { path: "/admin/dominatus", label: "Dominatus", sub: "Кампания 40K: игроки, альянсы, фазы", icon: MapIcon },
