@@ -12,6 +12,7 @@ import { servicesTable } from '../../db/schema/services';
 import { minigameRewardsTable } from '../../db/schema/minigames';
 import { pointPromoCodesTable } from '../../db/schema/point-promos';
 import { normalizeRewardCode } from '../minigames/rules';
+import { clubArmyPointsFor } from '../booking/rules';
 import { armyRentalPriceFor, basePriceFor, paymentStatus, roundMoney, servicePricingDefaults, totalWithDiscounts, validateManualDiscount, type PricingDiscountInput } from './rules';
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
@@ -109,10 +110,11 @@ export async function upsertServicePrice(input: {
   return created!;
 }
 
-function rentedArmyPoints(reservation: ReservationRow): number {
+/** Аренда армии клуба: обучающие игры — 1000 очков, игра — очки, выбранные игроком (решение владельца 14.11.2026). */
+function rentedArmyPoints(reservation: ReservationRow, slug: string): number {
   const rentedSeats = reservation.seatClubArmyOptions?.filter(Boolean).length ?? 0;
   if (rentedSeats === 0 || reservation.details?.kind !== 'wh_player') return 0;
-  const pointsPerArmy = reservation.details.points ?? DEFAULT_KILL_TEAM_RENTAL_POINTS;
+  const pointsPerArmy = clubArmyPointsFor(slug, reservation.details, true) ?? DEFAULT_KILL_TEAM_RENTAL_POINTS;
   return pointsPerArmy * rentedSeats;
 }
 
@@ -128,6 +130,81 @@ async function countTrainingGames(executor: Executor, userId: string): Promise<n
   return Number(row?.value ?? 0);
 }
 
+/** Вариант цены записи: у покраски — свои или клубные краски. */
+function priceVariantOf(reservation: ReservationRow) {
+  return reservation.details?.kind === 'painting'
+    ? reservation.details.paintSource === 'club' ? 'club_materials' as const : 'own_materials' as const
+    : 'standard' as const;
+}
+
+type SessionKey = { tableId: number | null; serviceId: number; startsAt: Date | null };
+
+/**
+ * Игроки одной игры за столом (тот же стол, услуга и начало, активные записи) — id и число мест.
+ * Решение владельца 14.11.2026: цена «за стол» делится между игроками за столом; один игрок платит всю цену.
+ */
+async function sessionParties(executor: Executor, key: SessionKey) {
+  if (key.tableId === null || key.startsAt === null) return [];
+  return executor
+    .select({ id: reservationsTable.id, partySize: reservationsTable.partySize })
+    .from(reservationsTable)
+    .where(and(
+      eq(reservationsTable.tableId, key.tableId),
+      eq(reservationsTable.serviceId, key.serviceId),
+      eq(reservationsTable.startsAt, key.startsAt),
+      inArray(reservationsTable.status, ACTIVE_RESERVATION_STATUSES),
+    ));
+}
+
+function baseAmountFor(mode: PricingBillingMode, unitPrice: number, reservation: ReservationRow, tableGuests: number) {
+  const party = Math.max(1, reservation.partySize ?? 1);
+  if (mode === 'per_table' && reservation.tableId !== null && tableGuests > party) {
+    return roundMoney(unitPrice * party / tableGuests);
+  }
+  return basePriceFor(mode, unitPrice, party);
+}
+
+/**
+ * Пересчитать базу счёта по текущей записи (14.11.2026): доля стола, аренда армии по очкам и местам,
+ * вариант покраски. Тариф берётся из снимка записи; новый вариант покраски — по действующему тарифу.
+ * Оплата больше новой суммы не блокирует пересчёт: остаток 0, переплата видна в счёте.
+ */
+export async function refreshReservationPricing(tx: Tx, reservationId: string) {
+  const [reservation] = await tx.select().from(reservationsTable).where(eq(reservationsTable.id, reservationId)).limit(1);
+  if (!reservation || reservation.status === 'cancelled') return;
+  const [pricing] = await tx.select().from(reservationPricingTable).where(eq(reservationPricingTable.reservationId, reservationId)).limit(1).for('update');
+  if (!pricing) return;
+  const variant = priceVariantOf(reservation);
+  let unitPrice = pricing.unitPrice;
+  const [service] = await tx.select({ slug: servicesTable.slug }).from(servicesTable).where(eq(servicesTable.id, reservation.serviceId)).limit(1);
+  if (variant !== pricing.priceVariant) {
+    const price = await currentServicePrice(reservation.serviceId, tx);
+    const defaults = servicePricingDefaults(service?.slug ?? '');
+    unitPrice = variant === 'club_materials'
+      ? price?.clubMaterialsPrice ?? defaults.clubMaterialsPrice
+      : variant === 'own_materials'
+        ? price?.ownMaterialsPrice ?? defaults.ownMaterialsPrice
+        : price?.unitPrice ?? defaults.unitPrice;
+  }
+  const parties = await sessionParties(tx, reservation);
+  const tableGuests = parties.reduce((sum, row) => sum + Math.max(1, row.partySize ?? 1), 0);
+  const armyRentalPoints = rentedArmyPoints(reservation, service?.slug ?? '');
+  await tx.update(reservationPricingTable).set({
+    priceVariant: variant,
+    unitPrice,
+    baseAmount: baseAmountFor(pricing.billingMode as PricingBillingMode, unitPrice, reservation, tableGuests),
+    armyRentalPoints,
+    armyRentalAmount: armyRentalPriceFor(armyRentalPoints, pricing.armyRentalPricePer1000),
+    updatedAt: new Date(),
+  }).where(eq(reservationPricingTable.reservationId, reservationId));
+  await recalculateReservationTotal(tx, reservationId, { allowBelowPaid: true });
+}
+
+/** Пересчитать счета всех игроков игры за столом (после записи, отмены, переноса). */
+export async function refreshSessionPricing(tx: Tx, key: SessionKey) {
+  for (const row of await sessionParties(tx, key)) await refreshReservationPricing(tx, row.id);
+}
+
 export async function createReservationPricing(tx: Tx, reservation: ReservationRow) {
   const [price, service] = await Promise.all([
     currentServicePrice(reservation.serviceId, tx),
@@ -135,16 +212,14 @@ export async function createReservationPricing(tx: Tx, reservation: ReservationR
   ]);
   const defaults = servicePricingDefaults(service?.slug ?? '');
   const billingMode = (price?.billingMode ?? defaults.billingMode) as PricingBillingMode;
-  const priceVariant = reservation.details?.kind === 'painting'
-    ? reservation.details.paintSource === 'club' ? 'club_materials' as const : 'own_materials' as const
-    : 'standard' as const;
+  const priceVariant = priceVariantOf(reservation);
   const unitPrice = priceVariant === 'club_materials'
     ? price?.clubMaterialsPrice ?? defaults.clubMaterialsPrice
     : priceVariant === 'own_materials'
       ? price?.ownMaterialsPrice ?? defaults.ownMaterialsPrice
       : price?.unitPrice ?? defaults.unitPrice;
   const baseAmount = basePriceFor(billingMode, unitPrice, reservation.partySize ?? 1);
-  const armyRentalPoints = rentedArmyPoints(reservation);
+  const armyRentalPoints = rentedArmyPoints(reservation, service?.slug ?? '');
   const armyRentalPricePer1000 = price?.armyRentalPricePer1000 ?? defaults.armyRentalPricePer1000;
   const armyRentalAmount = armyRentalPriceFor(armyRentalPoints, armyRentalPricePer1000);
   await tx.insert(reservationPricingTable).values({
@@ -174,6 +249,8 @@ export async function createReservationPricing(tx: Tx, reservation: ReservationR
     }
   }
   await recalculateReservationTotal(tx, reservation.id);
+  // цена «за стол» делится между игроками — пересчитать всех за этим столом, включая новую запись
+  if (reservation.tableId !== null && billingMode === 'per_table') await refreshSessionPricing(tx, reservation);
 }
 
 async function lockReservation(tx: Tx, reservationId: string) {
@@ -191,16 +268,18 @@ export async function ensureReservationPricing(reservationId: string) {
   return db.transaction(async (tx) => {
     const reservation = await lockReservation(tx, reservationId);
     await createReservationPricingIfMissing(tx, reservation);
+    // счёт всегда по текущей записи: доля стола, аренда, вариант покраски (старые счета тоже)
+    await refreshReservationPricing(tx, reservationId);
     return getReservationPricing(reservationId, tx);
   });
 }
 
-async function recalculateReservationTotal(tx: Tx, reservationId: string) {
+async function recalculateReservationTotal(tx: Tx, reservationId: string, options: { allowBelowPaid?: boolean } = {}) {
   const [pricing] = await tx.select().from(reservationPricingTable).where(eq(reservationPricingTable.reservationId, reservationId)).limit(1).for('update');
   if (!pricing) throw new PricingError('PRICING_NOT_FOUND', 'Цена записи не найдена');
   const discounts = await tx.select().from(reservationDiscountsTable).where(eq(reservationDiscountsTable.reservationId, reservationId)).orderBy(asc(reservationDiscountsTable.createdAt), asc(reservationDiscountsTable.id));
   const totalAmount = totalWithDiscounts(roundMoney(pricing.baseAmount + pricing.armyRentalAmount), discounts);
-  if (totalAmount + 0.0001 < pricing.paidAmount) {
+  if (!options.allowBelowPaid && totalAmount + 0.0001 < pricing.paidAmount) {
     throw new PricingError('DISCOUNT_BELOW_PAID', 'Скидка не может уменьшить сумму ниже уже внесённой оплаты');
   }
   const [updated] = await tx.update(reservationPricingTable).set({ totalAmount, updatedAt: new Date() }).where(eq(reservationPricingTable.reservationId, reservationId)).returning();
@@ -226,6 +305,7 @@ export async function getReservationPricing(reservationId: string, executor: Exe
     serviceSlug: reservation.serviceSlug,
     status: paymentStatus(pricing.totalAmount, pricing.paidAmount),
     remainingAmount: roundMoney(Math.max(0, pricing.totalAmount - pricing.paidAmount)),
+    overpaidAmount: roundMoney(Math.max(0, pricing.paidAmount - pricing.totalAmount)),
     trainingGamesUsed,
     trainingGamesRemaining: Math.max(0, TRAINING_GAMES_LIMIT - trainingGamesUsed),
     discounts,
@@ -245,6 +325,13 @@ export async function applyManualDiscount(reservationId: string, input: PricingD
   return db.transaction(async (tx) => {
     const reservation = await lockReservation(tx, reservationId);
     await createReservationPricingIfMissing(tx, reservation);
+    if (input.kind === 'membership') {
+      const [existing] = await tx.select({ id: reservationDiscountsTable.id }).from(reservationDiscountsTable).where(and(
+        eq(reservationDiscountsTable.reservationId, reservationId),
+        eq(reservationDiscountsTable.kind, 'membership'),
+      )).limit(1);
+      if (existing) throw new PricingError('MEMBERSHIP_DISCOUNT_EXISTS', 'Скидка за членство уже применена к этой записи');
+    }
     await tx.insert(reservationDiscountsTable).values({
       reservationId,
       kind: input.kind,

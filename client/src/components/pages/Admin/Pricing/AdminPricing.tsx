@@ -179,7 +179,7 @@ function ServicePriceCard({ service }: { service: ServicePrice }) {
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs leading-5 text-fg-3">
           {billingMode === "per_guest" && "Итог = цена × число гостей."}
-          {billingMode === "per_table" && "Итог = фиксированная цена за бронирование."}
+          {billingMode === "per_table" && "Итог = цена за стол; если за столом несколько игроков — делится между ними поровну."}
           {billingMode === "per_pair" && "Итог = цена × число пар; нечётный гость считается как пара."}
           {isWarhammer && ` Аренда = очки × ${armyRentalPrice || "0"} / 1000.`}
         </p>

@@ -435,7 +435,23 @@ export type WhPlayerDetails = {
   /** лимит очков; у Kill Team очков нет — null */
   points: number | null;
   experienceLevel: ExperienceLevel;
+  /**
+   * Очки армии клуба (14.11.2026, решение владельца): обучающие игры — всегда 1000;
+   * обычная игра — сколько выбрал игрок. Есть только при «Нужна армия клуба».
+   */
+  clubArmyPoints?: number | null;
 };
+
+/** Армия клуба на обучающих играх — 1000 очков (решение владельца 14.11.2026). */
+export const TRAINING_CLUB_ARMY_POINTS = 1000;
+export const TRAINING_SLUGS = new Set(['wh_group_training', 'wh_solo_training']);
+
+/** Очки армии клуба для записи: обучение — 1000, игра — выбор игрока, иначе очки игры, у Kill Team — 1000. */
+export function clubArmyPointsFor(slug: string, details: WhPlayerDetails, wantsClubArmy: boolean): number | null {
+  if (!wantsClubArmy) return null;
+  if (TRAINING_SLUGS.has(slug)) return TRAINING_CLUB_ARMY_POINTS;
+  return details.clubArmyPoints ?? details.points ?? TRAINING_CLUB_ARMY_POINTS;
+}
 
 export type PaintingDetails = {
   kind: 'painting';
@@ -529,12 +545,21 @@ export function validateDetails(
       throw new DetailsValidationError('experienceLevel is invalid');
     }
 
+    let clubArmyPoints: number | null = null;
+    if (data.clubArmyPoints !== undefined && data.clubArmyPoints !== null && data.clubArmyPoints !== '') {
+      clubArmyPoints = Number(data.clubArmyPoints);
+      if (!Number.isInteger(clubArmyPoints) || clubArmyPoints < 1 || clubArmyPoints > bookingOptions.maxPoints) {
+        throw new DetailsValidationError(`clubArmyPoints must be a whole number from 1 to ${bookingOptions.maxPoints}`);
+      }
+    }
+
     return {
       kind,
       game,
       army: cleanText(data.army, 'army', 80),
       points,
       experienceLevel: data.experienceLevel,
+      ...(clubArmyPoints !== null ? { clubArmyPoints } : {}),
     };
   }
 

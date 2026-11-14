@@ -53,8 +53,12 @@ const PRICE_VARIANT_LABELS = {
 
 const WH_SERVICE_SLUGS = new Set(["wh_game", "wh_group_training", "wh_solo_training"]);
 
-const fieldClass =
-  "mt-1.5 min-h-11 w-full rounded-xl border border-white/10 bg-field px-3 py-2.5 text-sm text-white outline-none transition-colors focus:border-accent/60";
+const fieldBase =
+  "min-h-11 rounded-xl border border-white/10 bg-field px-3 py-2.5 text-sm text-white outline-none transition-colors focus:border-accent/60";
+const fieldClass = `mt-1.5 w-full ${fieldBase}`;
+
+/** Число из поля: запятая как разделитель (клавиатура Telegram), пробелы убираются. */
+const parseAmount = (value: string) => Number(value.replace(/\s/g, "").replace(",", "."));
 
 type PricingAction =
   | { type: "discount" }
@@ -89,7 +93,7 @@ export function ReservationPricingDialog({
     meta: { success: "Счёт обновлён" },
     mutationFn: async (action: PricingAction) => {
       if (action.type === "discount") {
-        const value = Number(discountValue);
+        const value = parseAmount(discountValue);
         return addAdminReservationDiscount(reservation.id, {
           kind: discountKind,
           note: discountNote.trim(),
@@ -100,7 +104,7 @@ export function ReservationPricingDialog({
       if (action.type === "training") return applyAdminTrainingGame(reservation.id);
       if (action.type === "payment") {
         return addAdminReservationPayment(reservation.id, {
-          amount: Number(paymentAmount),
+          amount: paymentValue,
           method: paymentMethod,
           note: paymentNote.trim() || undefined,
         });
@@ -157,17 +161,18 @@ export function ReservationPricingDialog({
   }, []);
 
   const pricing = query.data;
-  const numericDiscount = Number(discountValue);
+  const numericDiscount = parseAmount(discountValue);
   const discountInvalid =
     !discountNote.trim() ||
     !Number.isFinite(numericDiscount) ||
     numericDiscount < 0 ||
     (discountUnit === "percent" && numericDiscount > 100);
-  const numericPayment = Number(paymentAmount);
+  // пустое поле — весь остаток (раньше кнопка была неактивной: остаток виден только как подсказка в поле)
+  const paymentValue = paymentAmount.trim() === "" ? (pricing?.remainingAmount ?? 0) : parseAmount(paymentAmount);
   const paymentInvalid =
-    !Number.isFinite(numericPayment) ||
-    numericPayment <= 0 ||
-    (pricing != null && numericPayment > pricing.remainingAmount + 0.0001);
+    !Number.isFinite(paymentValue) ||
+    paymentValue <= 0 ||
+    (pricing != null && paymentValue > pricing.remainingAmount + 0.0001);
 
   const submitDiscount = (event: FormEvent) => {
     event.preventDefault();
@@ -239,6 +244,16 @@ export function ReservationPricingDialog({
                 {pricing.armyRentalPoints > 0 && (
                   <p className="mb-3 rounded-xl bg-accent/5 px-3 py-2 text-xs leading-5 text-fg-2">
                     Аренда армии: {pricing.armyRentalPoints} очков × {money.format(pricing.armyRentalPricePer1000)} / 1000 = {money.format(pricing.armyRentalAmount)}
+                  </p>
+                )}
+                {pricing.billingMode === "per_table" && pricing.baseAmount < pricing.unitPrice && (
+                  <p className="mb-3 rounded-xl bg-accent/5 px-3 py-2 text-xs leading-5 text-fg-2">
+                    Стол делится между игроками: доля этой записи {money.format(pricing.baseAmount)} из {money.format(pricing.unitPrice)}.
+                  </p>
+                )}
+                {(pricing.overpaidAmount ?? 0) > 0 && (
+                  <p className="mb-3 rounded-xl bg-yellow-400/10 px-3 py-2 text-xs leading-5 text-yellow-200">
+                    Переплата {money.format(pricing.overpaidAmount ?? 0)}: сумма счёта уменьшилась после оплаты (например, к столу присоединился второй игрок). Верните разницу игроку.
                   </p>
                 )}
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -340,23 +355,20 @@ export function ReservationPricingDialog({
                     </label>
                     <label className="text-xs font-medium text-fg-2">
                       Размер
-                      <span className="flex gap-2">
+                      <span className="mt-1.5 flex gap-2">
                         <input
-                          type="number"
-                          min="0"
-                          max={discountUnit === "percent" ? 100 : undefined}
-                          step="0.01"
+                          type="text"
                           inputMode="decimal"
                           value={discountValue}
                           onChange={(event) => setDiscountValue(event.target.value)}
-                          className={fieldClass}
+                          className={clsx(fieldBase, "min-w-0 flex-1")}
                           aria-label="Размер скидки"
                           required
                         />
                         <select
                           value={discountUnit}
                           onChange={(event) => setDiscountUnit(event.target.value as "percent" | "amount")}
-                          className={clsx(fieldClass, "w-24 shrink-0")}
+                          className={clsx(fieldBase, "w-20 shrink-0")}
                           aria-label="Единица скидки"
                         >
                           <option value="percent">%</option>
@@ -445,16 +457,12 @@ export function ReservationPricingDialog({
                     <label className="text-xs font-medium text-fg-2">
                       Сумма, ₽
                       <input
-                        type="number"
-                        min="0.01"
-                        max={pricing.remainingAmount}
-                        step="0.01"
+                        type="text"
                         inputMode="decimal"
                         value={paymentAmount}
                         onChange={(event) => setPaymentAmount(event.target.value)}
                         className={fieldClass}
-                        placeholder={String(pricing.remainingAmount)}
-                        required
+                        placeholder={`${pricing.remainingAmount} — весь остаток`}
                       />
                     </label>
                     <label className="text-xs font-medium text-fg-2">
@@ -484,7 +492,7 @@ export function ReservationPricingDialog({
                     className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-green-400/15 px-4 py-2.5 text-sm font-semibold text-green-200 disabled:opacity-40"
                   >
                     {mutation.isPending ? <LoaderCircle className="size-4 animate-spin" /> : <ReceiptRussianRuble className="size-4" />}
-                    Добавить оплату
+                    Добавить оплату{!paymentInvalid ? ` ${money.format(paymentValue)}` : ""}
                   </button>
                 </form>
               </details>
