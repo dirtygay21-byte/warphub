@@ -18,8 +18,11 @@ export default function AvatarFrame({
   size,
   children,
   label,
+  inline = false,
 }: {
   category: ProgressCategory;
+  /** рядом с текстом (шапка профиля): место под рамку и по бокам, без центрирования */
+  inline?: boolean;
   tier: number;
   /** диаметр аватара, px */
   size: number;
@@ -32,7 +35,7 @@ export default function AvatarFrame({
   const box = BOX * unit;
   const margin = Math.round((EXTENT[t]! - AVATAR_R) * unit);
   return (
-    <div className="relative mx-auto" style={{ width: size, height: size, margin: `${margin}px auto` }} role={label ? "img" : undefined} aria-label={label}>
+    <div className={inline ? "relative shrink-0" : "relative mx-auto"} style={{ width: size, height: size, margin: inline ? `${margin}px` : `${margin}px auto` }} role={label ? "img" : undefined} aria-label={label}>
       <div className="size-full overflow-hidden rounded-full">{children}</div>
       <svg
         aria-hidden="true"
