@@ -109,17 +109,16 @@ function block(b: CardBlock, tone: string): Node {
 export function cardTree(card: NotificationCard, logoSrc: string, height: number): Node {
   const tone = TONE[card.tone];
   const ts = titleSize(card.title);
+  // поля — отступом внутреннего блока: у корня satori считает padding сверх ширины (содержимое уезжало за край)
   return el(
     'div',
     {
       width: W,
       height,
-      flexDirection: 'column',
-      padding: PAD,
       backgroundColor: COLORS.bg,
       backgroundImage: `radial-gradient(circle at 88% 0%, ${tone}33 0%, rgba(17,17,16,0) 46%)`,
     },
-    [
+    el('div', { flexDirection: 'column', flexGrow: 1, margin: PAD, width: INNER }, [
       el('div', { alignItems: 'center', justifyContent: 'space-between' }, [
         el('img', { width: 88, height: 88 }, undefined, { src: logoSrc, width: 88, height: 88 }),
         el('div', { fontFamily: INTER, fontWeight: 600, fontSize: 22, letterSpacing: 8, color: COLORS.fg3 }, 'WARPHUB'),
@@ -134,7 +133,7 @@ export function cardTree(card: NotificationCard, logoSrc: string, height: number
         ...(card.note ? [el('div', { marginTop: 28, fontFamily: INTER, fontWeight: 400, fontSize: 28, lineHeight: 1.4, color: COLORS.fg3 }, card.note)] : []),
         el('div', { marginTop: card.note ? 16 : 28, fontFamily: OSWALD, fontWeight: 600, fontSize: 24, letterSpacing: 8, color: COLORS.fg3 }, '• WARPHUB.RU •'),
       ]),
-    ],
+    ]),
   );
 }
 
