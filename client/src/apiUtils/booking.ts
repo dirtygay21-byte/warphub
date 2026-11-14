@@ -85,6 +85,8 @@ export type WhPlayerDetails = {
   /** у Kill Team очков нет — null */
   points: number | null;
   experienceLevel: string;
+  /** очки армии клуба: обучающие игры — 1000, игра — выбор игрока (14.11.2026) */
+  clubArmyPoints?: number | null;
 };
 
 /** «Pathfinders (T'au Empire)»; команды нет в списке — как есть */

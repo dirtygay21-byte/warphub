@@ -63,6 +63,8 @@ export type ReservationPricing = {
   trainingGamesUsed: number;
   trainingGamesRemaining: number;
   status: "free" | "unpaid" | "partial" | "paid";
+  /** оплачено больше суммы счёта (после пересчёта доли стола) */
+  overpaidAmount?: number;
   discounts: ReservationDiscount[];
   payments: ReservationPayment[];
 };

@@ -74,12 +74,13 @@ import {
   tableFitEnd,
   tableGameKey,
   parseCategories,
+  clubArmyPointsFor,
 } from './rules';
 
 export { parseDateParam } from './rules';
 import { getAdminTelegramIds } from '../../config/admin';
 import { bookingNoticeText } from './notify-text';
-import { createReservationPricing } from '../pricing/service';
+import { createReservationPricing, refreshReservationPricing, refreshSessionPricing } from '../pricing/service';
 
 const ACTIVE_RESERVATION_STATUSES = ['pending', 'confirmed'] as const;
 const CLUB_VISIT_SLUG = 'club_visit';
@@ -880,7 +881,7 @@ export async function createReservation(
     );
   }
 
-  const details = parseDetails(service.slug, input.details);
+  const parsedDetails = parseDetails(service.slug, input.details);
   const detailsKind = detailsKindForSlug(service.slug);
 
   // Игроки WH записываются по одному: у каждого свои армия, очки и опыт.
@@ -908,6 +909,7 @@ export async function createReservation(
     partySize,
     input.buyArmyOptions,
   );
+  const details = withClubArmyPoints(service.slug, parsedDetails, seatClubArmyOptions?.some(Boolean) ?? false);
 
   const { openAt, closeAt } = getClubSessionBounds(dateParts);
 
@@ -1104,6 +1106,24 @@ type UserBrief = {
   lastName: string | null;
   username: string | null;
 };
+
+/** Очки армии клуба в данных записи: обучение — 1000, игра — выбор игрока (решение владельца 14.11.2026). */
+function withClubArmyPoints(slug: string, details: ReservationDetails | null, wantsClubArmy: boolean): ReservationDetails | null {
+  if (details?.kind !== 'wh_player') return details;
+  const rest = { ...details };
+  delete rest.clubArmyPoints;
+  const points = clubArmyPointsFor(slug, details, wantsClubArmy);
+  return points === null ? rest : { ...rest, clubArmyPoints: points };
+}
+
+/** Пересчёт счёта не должен ломать отмену или правку записи: ошибка — в лог. */
+async function refreshPricingSafely(run: () => Promise<unknown>) {
+  try {
+    await run();
+  } catch (error) {
+    console.warn('[pricing] refresh failed:', (error as Error).message);
+  }
+}
 
 async function loadUsersForReservations(
   reservationIds: string[],
@@ -1739,6 +1759,7 @@ export async function cancelReservation(
     .where(eq(reservationsTable.id, reservationId))
     .returning();
 
+  await refreshPricingSafely(() => db.transaction((tx) => refreshSessionPricing(tx, updated!)));
   void notifyAfterCancel(updated!, 'user');
 
   return updated!;
@@ -1792,8 +1813,13 @@ export async function updateReservationDetails(
     );
   }
 
-  const details = parseDetails(slug, rawDetails);
   const previous = (reservation.details as ReservationDetails | null) ?? null;
+  const edited = parseDetails(slug, rawDetails);
+  // форма правки может не прислать очки армии клуба — сохраняем выбранные при записи
+  if (edited?.kind === 'wh_player' && edited.clubArmyPoints == null && previous?.kind === 'wh_player' && previous.clubArmyPoints != null) {
+    edited.clubArmyPoints = previous.clubArmyPoints;
+  }
+  const details = withClubArmyPoints(slug, edited, reservation.seatClubArmyOptions?.some(Boolean) ?? false);
 
   if (details.kind === 'wh_player' && reservation.tableId !== null) {
     const [table] = await db.select({ category: tablesTable.category }).from(tablesTable).where(eq(tablesTable.id, reservation.tableId)).limit(1);
@@ -1807,6 +1833,7 @@ export async function updateReservationDetails(
     .set({ details })
     .where(eq(reservationsTable.id, reservationId))
     .returning();
+  await refreshPricingSafely(() => db.transaction((tx) => refreshReservationPricing(tx, reservationId)));
 
   if (
     details?.kind === 'painting' &&
@@ -1880,6 +1907,7 @@ export async function rejectReservation(
     .where(eq(reservationsTable.id, reservationId))
     .returning();
 
+  await refreshPricingSafely(() => db.transaction((tx) => refreshSessionPricing(tx, updated!)));
   void notifyAfterCancel(updated!, 'admin');
 
   return updated!;
@@ -2207,6 +2235,9 @@ export async function moveReservationToTable(
       .where(eq(reservationsTable.id, reservation.id))
       .returning();
 
+    // доля стола меняется и у старых соседей, и у новых
+    await refreshSessionPricing(tx, reservation);
+    await refreshSessionPricing(tx, row!);
     return row!;
   });
 

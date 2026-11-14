@@ -226,7 +226,7 @@ function mapPartnerError(error: PartnerError) {
 
 function mapPricingError(error: PricingError) {
   const notFound = ['SERVICE_NOT_FOUND', 'RESERVATION_NOT_FOUND', 'PRICING_NOT_FOUND', 'DISCOUNT_NOT_FOUND', 'REWARD_NOT_FOUND'];
-  const conflict = ['REWARD_USED', 'PAYMENT_EXCEEDED', 'DISCOUNT_BELOW_PAID', 'DISCOUNT_FORBIDDEN', 'TRAINING_DISCOUNT_EXISTS', 'TRAINING_LIMIT_REACHED'];
+  const conflict = ['REWARD_USED', 'PAYMENT_EXCEEDED', 'DISCOUNT_BELOW_PAID', 'DISCOUNT_FORBIDDEN', 'TRAINING_DISCOUNT_EXISTS', 'TRAINING_LIMIT_REACHED', 'MEMBERSHIP_DISCOUNT_EXISTS'];
   const code = notFound.includes(error.code) ? 404 : conflict.includes(error.code) ? 409 : 400;
   return status(code, { error: error.message, code: error.code });
 }

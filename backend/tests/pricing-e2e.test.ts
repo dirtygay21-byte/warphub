@@ -41,7 +41,7 @@ const paintDetails = { faction: 'Orks', model: 'Boyz', paintSource: 'own', needs
 const trainingDetails = { game: 'kt', army: 'Pathfinders', experienceLevel: 'player' };
 
 const T: Record<string, string> = {};
-const IDS = { admin: 777, player: 8801, other: 8802, raceTraining: 8803, rent40: 8804, rentKt: 8805, rentCustom: 8806, manualTraining: 8807, paintClub: 8808 };
+const IDS = { admin: 777, player: 8801, other: 8802, raceTraining: 8803, rent40: 8804, rentKt: 8805, rentCustom: 8806, manualTraining: 8807, paintClub: 8808, split1: 8809, split2: 8810, rentGame: 8811 };
 let trainingServiceId = 0;
 let gameServiceId = 0;
 let paintingServiceId = 0;
@@ -182,7 +182,7 @@ describe('pricing: тарифы и создание записей', () => {
     expect(pricing.flatMap((item) => item.json.discounts).filter((item) => item.kind === 'training')).toHaveLength(3);
   });
 
-  test('аренда 1500 очков добавляет 1500 ₽ и входит в сумму до скидок', async () => {
+  test('обучающая игра: армия клуба всегда 1000 очков (14.11.2026), аренда входит в сумму до скидок', async () => {
     expect((await api('PUT', `/admin/pricing/services/${trainingServiceId}`, T.admin, {
       billingMode: 'per_table', unitPrice: 1000, thirdGameDiscountPercent: 0,
     })).status).toBe(200);
@@ -200,15 +200,21 @@ describe('pricing: тарифы и создание записей', () => {
     const priced = await api('GET', `/admin/reservations/${reservation.rent40}/pricing`, T.admin);
     expect(priced.json).toMatchObject({
       baseAmount: 1000,
-      armyRentalPoints: 1500,
+      armyRentalPoints: 1000,
       armyRentalPricePer1000: 1000,
-      armyRentalAmount: 1500,
-      totalAmount: 2500,
+      armyRentalAmount: 1000,
+      totalAmount: 2000,
     });
     const discounted = await api('POST', `/admin/reservations/${reservation.rent40}/discounts`, T.admin, {
       kind: 'membership', percent: 10, note: 'Членство с арендой',
     });
-    expect(discounted.json.totalAmount).toBe(2250);
+    expect(discounted.json.totalAmount).toBe(1800);
+    // членство — одна скидка на запись
+    const again = await api('POST', `/admin/reservations/${reservation.rent40}/discounts`, T.admin, {
+      kind: 'membership', percent: 10, note: 'Членство ещё раз',
+    });
+    expect(again.status).toBe(409);
+    expect(again.json.code).toBe('MEMBERSHIP_DISCOUNT_EXISTS');
   });
 
   test('Kill Team использует базовые 1000 очков аренды', async () => {
@@ -244,11 +250,80 @@ describe('pricing: тарифы и создание записей', () => {
     });
     expect(created.status).toBe(200);
     const priced = await api('GET', `/admin/reservations/${created.json.id}/pricing`, T.admin);
-    expect(priced.json).toMatchObject({ armyRentalPoints: 1500, armyRentalPricePer1000: 500, armyRentalAmount: 750, totalAmount: 1750 });
+    expect(priced.json).toMatchObject({ armyRentalPoints: 1000, armyRentalPricePer1000: 500, armyRentalAmount: 500, totalAmount: 1500 });
     const old = await api('GET', `/admin/reservations/${reservation.rent40}/pricing`, T.admin);
     expect(old.json.armyRentalPricePer1000).toBe(1000);
-    expect(old.json.armyRentalAmount).toBe(1500);
-    expect(old.json.totalAmount).toBe(2250);
+    expect(old.json.armyRentalAmount).toBe(1000);
+    expect(old.json.totalAmount).toBe(1800);
+  });
+
+  test('обычная игра: армия клуба на выбранные игроком очки, по умолчанию — очки игры', async () => {
+    const chosenTable = Number(sql(`insert into tables (name, category) values ('E2E аренда на выбор', 'wh') returning id`));
+    const chosen = await api('POST', '/reservations', T.rentGame, {
+      serviceId: gameServiceId,
+      tableId: chosenTable,
+      startsAt: local('17:00'),
+      partySize: 1,
+      seatClubArmyOptions: [true],
+      details: { game: '40k', army: 'Orks', points: 2000, experienceLevel: 'player', clubArmyPoints: 1500 },
+    });
+    expect(chosen.status).toBe(200);
+    expect(chosen.json.details.clubArmyPoints).toBe(1500);
+    const priced = await api('GET', `/admin/reservations/${chosen.json.id}/pricing`, T.admin);
+    expect(priced.json).toMatchObject({ baseAmount: 1000, armyRentalPoints: 1500, armyRentalAmount: 1500, totalAmount: 2500 });
+
+    const defaultTable = Number(sql(`insert into tables (name, category) values ('E2E аренда по очкам игры', 'wh') returning id`));
+    const byGame = await api('POST', '/reservations', T.rentGame, {
+      serviceId: gameServiceId,
+      tableId: defaultTable,
+      startsAt: local('19:00'),
+      partySize: 1,
+      seatClubArmyOptions: [true],
+      details: { game: '40k', army: 'Orks', points: 2000, experienceLevel: 'player' },
+    });
+    expect(byGame.status).toBe(200);
+    const pricedByGame = await api('GET', `/admin/reservations/${byGame.json.id}/pricing`, T.admin);
+    expect(pricedByGame.json).toMatchObject({ armyRentalPoints: 2000, armyRentalAmount: 2000 });
+
+    const noArmyTable = Number(sql(`insert into tables (name, category) values ('E2E без армии клуба', 'wh') returning id`));
+    const noArmy = await api('POST', '/reservations', T.rentGame, {
+      serviceId: gameServiceId,
+      tableId: noArmyTable,
+      startsAt: local('21:00'),
+      partySize: 1,
+      seatClubArmyOptions: [false],
+      details: { game: '40k', army: 'Orks', points: 2000, experienceLevel: 'player', clubArmyPoints: 1500 },
+    });
+    expect(noArmy.status).toBe(200);
+    expect(noArmy.json.details.clubArmyPoints).toBeUndefined();
+  });
+
+  test('цена за стол делится между игроками; отмена возвращает полную цену; переплата не блокирует', async () => {
+    const splitTable = Number(sql(`insert into tables (name, category) values ('E2E общий стол', 'wh') returning id`));
+    const book = (token: string) => api('POST', '/reservations', token, {
+      serviceId: gameServiceId,
+      tableId: splitTable,
+      startsAt: local('14:00'),
+      partySize: 1,
+      seatClubArmyOptions: [false],
+      details: { game: '40k', army: 'Orks', points: 1000, experienceLevel: 'player' },
+    });
+    const first = await book(T.split1);
+    expect(first.status).toBe(200);
+    expect((await api('GET', `/admin/reservations/${first.json.id}/pricing`, T.admin)).json.totalAmount).toBe(1000);
+    // первый игрок заплатил всю цену до прихода соперника
+    expect((await api('POST', `/admin/reservations/${first.json.id}/payments`, T.admin, { amount: 1000, method: 'cash' })).status).toBe(200);
+
+    const second = await book(T.split2);
+    expect(second.status).toBe(200);
+    const a = await api('GET', `/admin/reservations/${first.json.id}/pricing`, T.admin);
+    const b = await api('GET', `/admin/reservations/${second.json.id}/pricing`, T.admin);
+    expect(a.json).toMatchObject({ baseAmount: 500, totalAmount: 500, paidAmount: 1000, remainingAmount: 0, overpaidAmount: 500, status: 'paid' });
+    expect(b.json).toMatchObject({ baseAmount: 500, totalAmount: 500, remainingAmount: 500 });
+
+    expect((await api('DELETE', `/reservations/${second.json.id}/cancel`, T.split2)).status).toBe(200);
+    const alone = await api('GET', `/admin/reservations/${first.json.id}/pricing`, T.admin);
+    expect(alone.json).toMatchObject({ baseAmount: 1000, totalAmount: 1000, overpaidAmount: 0, status: 'paid' });
   });
 });
 

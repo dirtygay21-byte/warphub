@@ -31,6 +31,8 @@ import ServiceDetailsImage from "./ServiceDetails/ServiceDetailsImage";
 import { boostyKindForService } from "@/components/booking/boosty";
 import { GAMES_BY_CATEGORY } from "@/components/booking/tableCategory";
 
+const TRAINING_SLUGS = new Set(["wh_group_training", "wh_solo_training"]);
+const CLUB_ARMY_TRAINING_POINTS = 1000;
 const CLUB_VISIT_SLUG = "club_visit";
 const MINUTE = 60 * 1000;
 
@@ -129,12 +131,21 @@ export default function ServiceDetailsStage() {
   const slotCategory = selectedSlot && (selectedSlot.kind === "new" || selectedSlot.kind === "join") ? selectedSlot.category : undefined;
   const gamesForSlot = slotCategory ? options.games.filter((g) => GAMES_BY_CATEGORY[slotCategory].includes(g.value)) : undefined;
   const [clubArmy, setClubArmy] = useState(false);
+  // армия клуба (решение владельца 14.11.2026): обучающая игра — всегда 1000 очков, обычная игра — игрок выбирает очки
+  const isTraining = TRAINING_SLUGS.has(service?.slug ?? "");
+  const [clubArmyPointsDraft, setClubArmyPoints] = useState("");
+  const pickArmyPoints = clubArmy && !isTraining && player.game !== "kt";
+  const clubArmyPoints = isTraining ? CLUB_ARMY_TRAINING_POINTS : Number(clubArmyPointsDraft || player.points || 0);
+  const clubArmyError =
+    pickArmyPoints && (!Number.isInteger(clubArmyPoints) || clubArmyPoints < 1 || clubArmyPoints > options.maxPoints)
+      ? "Укажите, на сколько очков нужна армия клуба"
+      : null;
   const [painting, setPainting] = useState(emptyPaintingForm);
   const [showErrors, setShowErrors] = useState(false);
 
   const formError =
     detailsKind === "wh_player"
-      ? validatePlayerForm(player, options.maxPoints)
+      ? (validatePlayerForm(player, options.maxPoints) ?? clubArmyError)
       : detailsKind === "painting"
         ? validatePaintingForm(painting)
         : null;
@@ -154,7 +165,7 @@ export default function ServiceDetailsStage() {
         seatClubArmyOptions: detailsKind === "wh_player" ? [clubArmy] : undefined,
         details:
           detailsKind === "wh_player"
-            ? playerFormToDetails(player)
+            ? { ...playerFormToDetails(player), ...(clubArmy && player.game !== "kt" ? { clubArmyPoints } : {}) }
             : detailsKind === "painting"
               ? paintingFormToDetails(painting)
               : undefined,
@@ -297,9 +308,53 @@ export default function ServiceDetailsStage() {
           />
           <ToggleRow
             title="Нужна армия клуба"
+            subtitle={
+              clubArmy
+                ? isTraining
+                  ? `Обучающая игра: армия клуба на ${CLUB_ARMY_TRAINING_POINTS} очков`
+                  : player.game === "kt"
+                    ? "Команда клуба для Kill Team"
+                    : "Выберите, на сколько очков нужна армия"
+                : undefined
+            }
             checked={clubArmy}
             onChange={setClubArmy}
           />
+          {pickArmyPoints && (
+            <section className="rounded-[14px] border border-white/10 bg-app-elevated p-4">
+              <FieldLabel>Очки армии клуба</FieldLabel>
+              <div className="flex flex-wrap gap-2">
+                {options.pointsPresets.map((preset) => {
+                  const on = clubArmyPoints === preset;
+                  return (
+                    <button
+                      key={preset}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => setClubArmyPoints(String(preset))}
+                      className={
+                        on
+                          ? "rounded-lg border border-accent bg-accent px-3 py-2 text-sm font-semibold text-accent-foreground"
+                          : "rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white active:bg-white/10"
+                      }
+                    >
+                      {preset}
+                    </button>
+                  );
+                })}
+              </div>
+              <input
+                type="text"
+                inputMode="numeric"
+                aria-label="Очки армии клуба"
+                placeholder="Или введите своё значение"
+                value={clubArmyPointsDraft || player.points}
+                onChange={(event) => setClubArmyPoints(event.target.value.replace(/\D/g, "").slice(0, 5))}
+                className="mt-2 min-h-11 w-full rounded-xl border border-white/10 bg-field px-3 py-2.5 text-base text-white outline-none focus:border-accent/60"
+              />
+              <p className="mt-2 text-xs text-fg-3">По умолчанию — как очки вашей игры. Аренда считается по этим очкам.</p>
+            </section>
+          )}
         </>
       )}
 

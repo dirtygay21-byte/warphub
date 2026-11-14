@@ -83,7 +83,7 @@ export function bookingNoticeText(n: BookingNotice): string {
     );
   }
   const clubArmy = seatsWith(n.seatClubArmyOptions);
-  if (clubArmy) lines.push(`Армия клуба: ${clubArmy}`);
+  if (clubArmy) lines.push(`Армия клуба: ${clubArmy}${d?.kind === 'wh_player' && d.clubArmyPoints ? ` · ${d.clubArmyPoints} очков` : ''}`);
   const buyArmy = seatsWith(n.buyArmyOptions);
   if (buyArmy) lines.push(`Покупка армии: ${buyArmy}`);
   lines.push(`Оформлено: ${formatClubDateTime(n.createdAt)}`);
