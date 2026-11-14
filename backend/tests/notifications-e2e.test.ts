@@ -62,7 +62,7 @@ beforeAll(async () => {
     const disc = sql(`select id from disciplines where slug = 'wh' limit 1`) || sql(`insert into disciplines (slug, title) values ('wh', 'E2E WH') returning id`);
     serviceId = Number(sql(`insert into services (discipline_id, slug, title, duration, seats_per_table) values (${disc}, 'wh_game', 'E2E игра', 240, 2) returning id`));
   }
-  tableId = Number(sql(`insert into tables (name, category) values ('E2E стол уведомлений', 'small') returning id`));
+  tableId = Number(sql(`insert into tables (name, category) values ('E2E стол уведомлений', 'wh') returning id`));
   for (const [name, id] of Object.entries(ID)) {
     const r = await api('POST', '/auth/telegram', undefined, { initData: initData({ id, first_name: name }) });
     T[name] = r.json.token;
@@ -81,7 +81,7 @@ describe('уведомления', () => {
 
   test('запись за стол со свободным местом → «ищут соперника» подписчику 40K в очереди; себе и занятому — нет', async () => {
     // «занятый» уже записан на это время за другой стол
-    const other = Number(sql(`insert into tables (name, category) values ('E2E стол 2', 'small') returning id`));
+    const other = Number(sql(`insert into tables (name, category) values ('E2E стол 2', 'wh') returning id`));
     const busy = await api('POST', '/reservations', T.busy, { serviceId, tableId: other, startsAt: local('16:00'), partySize: 1, seatClubArmyOptions: [false], details: { game: 'aos', army: 'Seraphon', points: 1000, experienceLevel: 'player' } });
     if (busy.status !== 200) console.error(`::error::busy → ${busy.status}: ${JSON.stringify(busy.json).slice(0, 400)}`);
     expect(busy.status).toBe(200);
