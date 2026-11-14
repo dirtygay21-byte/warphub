@@ -8,7 +8,8 @@ import { and, asc, eq, gt, inArray, isNull, lte, ne, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import { reservationsTable, servicesTable, tablesTable, usersTable } from '../../db/schema';
 import { notifyKind } from '../notifications/hub';
-import { escapeHtml, formatClubDateTime, formatUserName } from '../../lib/telegram/format';
+import { bookingVars, playerLine } from '../notifications/booking-vars';
+import type { ReservationDetails } from './rules';
 import { REMIND_BEFORE_MS, REMIND_MIN_AGE_MS } from './rules';
 
 export function remindersEnabled(): boolean {
@@ -38,6 +39,7 @@ export async function sendDueReminders(now = new Date()): Promise<number> {
       startsAt: reservationsTable.startsAt,
       endsAt: reservationsTable.endsAt,
       status: reservationsTable.status,
+      details: reservationsTable.details,
     });
   if (marked.length === 0) return 0;
 
@@ -63,7 +65,7 @@ export async function sendDueReminders(now = new Date()): Promise<number> {
         r.tableId === null
           ? []
           : await db
-              .select({ firstName: usersTable.firstName, lastName: usersTable.lastName, username: usersTable.username })
+              .select({ firstName: usersTable.firstName, lastName: usersTable.lastName, username: usersTable.username, details: reservationsTable.details })
               .from(reservationsTable)
               .innerJoin(usersTable, eq(reservationsTable.userId, usersTable.id))
               .where(
@@ -78,10 +80,8 @@ export async function sendDueReminders(now = new Date()): Promise<number> {
               )
               .orderBy(asc(reservationsTable.createdAt));
       await notifyKind('reminder_3h', row.telegramId, {
-        услуга: escapeHtml(row.serviceTitle ?? row.serviceSlug),
-        когда: formatClubDateTime(r.startsAt, r.endsAt),
-        стол: row.tableName ? escapeHtml(row.tableName) : '',
-        соперник: opponents.map((o) => escapeHtml(formatUserName(o))).join(', '),
+        ...bookingVars({ service: { title: row.serviceTitle, slug: row.serviceSlug }, details: r.details as ReservationDetails | null, startsAt: r.startsAt, endsAt: r.endsAt, tableName: row.tableName }),
+        соперник: opponents.map((o) => playerLine(o, o.details as ReservationDetails | null)).join('; '),
         ждёт_подтверждения: r.status === 'pending' ? 'Запись ещё ждёт подтверждения администратора.' : '',
       });
       sent++;

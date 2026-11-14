@@ -44,7 +44,9 @@ function seatsWith(options: boolean[] | null | undefined): string | null {
 }
 
 export function bookingNoticeText(n: BookingNotice): string {
-  const title = escapeHtml(n.serviceTitle);
+  // игра — в заголовке (решение владельца 14.11.2026): «Новая запись: Kill Team», услуга — отдельной строкой
+  const game = n.details?.kind === 'wh_player' ? gameLabel(n.details.game) : '';
+  const title = escapeHtml(game || n.serviceTitle);
   let head: string;
   if (n.reason === 'help-requested') head = `🎨 <b>${title}: нужна помощь</b>`;
   else if (n.table && n.table.seats >= 2)
@@ -56,6 +58,7 @@ export function bookingNoticeText(n: BookingNotice): string {
 
   const lines = [
     head,
+    game ? `Услуга: ${escapeHtml(n.serviceTitle)}` : '',
     `Когда: ${formatClubDateTime(n.startsAt, n.endsAt)}`,
     limitedLine(n),
     n.tableName ? `Стол: ${escapeHtml(n.tableName)}` : '',

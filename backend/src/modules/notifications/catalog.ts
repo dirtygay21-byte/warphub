@@ -24,7 +24,19 @@ export type NotificationKind = {
   vars: Record<string, string>;
 };
 
-const BOOKING_VARS = { услуга: 'Игра Warhammer', когда: 'сб, 15 ноября, 18:00–21:00', стол: 'Стол 1' };
+/** Переменные записи (booking-vars.ts): игра — везде, где запись на игру (решение владельца 14.11.2026). */
+const BOOKING_VARS = {
+  что: 'Kill Team',
+  услуга: 'Игра Warhammer',
+  когда: 'сб, 15 ноября, 18:00–21:00',
+  стол: 'Стол 1',
+  игра: 'Kill Team',
+  армия: 'Команда: Kommandos (Orks)',
+  очки: '',
+  опыт: 'Игрок',
+  покраска: '',
+};
+const SAMPLE_OPPONENT = 'Иван Петров (@ivan) — Kommandos, Игрок';
 
 export const NOTIFICATION_KINDS: NotificationKind[] = [
   // A. Мои записи — личные, всегда включены у игрока
@@ -35,9 +47,8 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Игроку сразу после записи (администратор получает своё сообщение)',
     category: null,
     announcement: false,
-    defaultText:
-      '✅ <b>Вы записаны: {услуга}</b>\nКогда: {когда}\nСтол: {стол}\n{стол_статус}\nОтменить или посмотреть запись — в приложении, раздел «Записи».',
-    vars: { ...BOOKING_VARS, стол_статус: 'Стол ждёт соперника — напишем, когда он запишется.' },
+    defaultText: '✅ <b>Вы записаны: {что}</b>\n🗓 {когда}\n🎲 {стол}\n{армия}\nОчки: {очки}\n{покраска}\n\nСоперник: {соперник}\n{стол_статус}\n\nПосмотреть или отменить запись — в приложении, раздел «Записи».',
+    vars: { ...BOOKING_VARS, соперник: '', стол_статус: 'Стол ждёт соперника — напишем, как только он запишется.' },
   },
   {
     id: 'booking_confirmed',
@@ -46,7 +57,7 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Игроку, когда администратор подтвердил запись',
     category: null,
     announcement: false,
-    defaultText: '👍 <b>Запись подтверждена: {услуга}</b>\nКогда: {когда}\nСтол: {стол}\nЖдём вас в клубе!',
+    defaultText: '👍 <b>Запись подтверждена: {что}</b>\n🗓 {когда}\n🎲 {стол}\n{армия}\nОчки: {очки}\n\nЖдём вас в клубе!',
     vars: BOOKING_VARS,
   },
   {
@@ -56,8 +67,8 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Игрокам за столом, когда записался ещё один',
     category: null,
     announcement: false,
-    defaultText: '⚔️ <b>К вашей игре присоединился соперник!</b>\n{услуга} — {когда}\n{соперник}',
-    vars: { ...BOOKING_VARS, соперник: 'Игрок: Иван Петров (@ivan)\nИгра: Warhammer 40,000\nАрмия: Orks\nОчки: 2000\nОпыт: Игрок' },
+    defaultText: '⚔️ <b>У вас есть соперник: {что}</b>\n🗓 {когда}\n🎲 {стол}\n\n<b>Соперник</b>\n{соперник}\n\nДо встречи за столом!',
+    vars: { ...BOOKING_VARS, соперник: 'Игрок: Иван Петров (@ivan)\nИгра: Kill Team\nКоманда: Kommandos (Orks)\nОпыт: Игрок' },
   },
   {
     id: 'opponent_cancelled',
@@ -66,8 +77,8 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Оставшимся игрокам за столом',
     category: null,
     announcement: false,
-    defaultText: 'ℹ️ <b>Соперник отменил запись</b>\n{услуга} — {когда}\nВаша запись сохранена, место за столом снова свободно.',
-    vars: BOOKING_VARS,
+    defaultText: 'ℹ️ <b>Соперник отменил запись: {что}</b>\n🗓 {когда}\n🎲 {стол}\nОтменил: {соперник}\nЗа столом теперь: {за_столом}\n\nВаша запись остаётся в силе. Место снова свободно — напишем, когда запишется новый соперник.',
+    vars: { ...BOOKING_VARS, соперник: SAMPLE_OPPONENT, за_столом: '1/2' },
   },
   {
     id: 'booking_cancelled_admin',
@@ -76,7 +87,7 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Игроку, когда администратор отклонил или отменил запись',
     category: null,
     announcement: false,
-    defaultText: '❌ <b>Ваша запись отменена администратором</b>\n{услуга} — {когда}',
+    defaultText: '❌ <b>Запись отменена: {что}</b>\n🗓 {когда}\n🎲 {стол}\n\nЗапись отменил администратор клуба. Есть вопросы — напишите администратору. Записаться на другое время можно в приложении.',
     vars: BOOKING_VARS,
   },
   {
@@ -86,7 +97,7 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Игроку, когда администратор продлил или изменил время',
     category: null,
     announcement: false,
-    defaultText: '🕒 <b>Время записи изменено: {услуга}</b>\nТеперь: {когда}\nСтол: {стол}',
+    defaultText: '🕒 <b>Время записи изменено: {что}</b>\nТеперь: {когда}\n🎲 {стол}\n\nНовое время не подходит — отмените запись в приложении, раздел «Записи».',
     vars: BOOKING_VARS,
   },
   {
@@ -96,9 +107,8 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Игроку за 3 часа до начала',
     category: null,
     announcement: false,
-    defaultText:
-      '⏰ <b>Напоминание: {услуга}</b>\nКогда: {когда}\nСтол: {стол}\nСоперник: {соперник}\n{ждёт_подтверждения}\nНе получается прийти — отмените запись в приложении, раздел «Записи».',
-    vars: { ...BOOKING_VARS, соперник: 'Иван Петров (@ivan)', ждёт_подтверждения: 'Запись ещё ждёт подтверждения администратора.' },
+    defaultText: '⏰ <b>Скоро игра: {что}</b>\n🗓 {когда}\n🎲 {стол}\n{армия}\nОчки: {очки}\nСоперник: {соперник}\n{ждёт_подтверждения}\n\nНе получается прийти — отмените запись в приложении, чтобы освободить стол.',
+    vars: { ...BOOKING_VARS, соперник: SAMPLE_OPPONENT, ждёт_подтверждения: '⚠️ Запись ещё ждёт подтверждения администратора.' },
   },
   {
     id: 'reminder_eve',
@@ -107,8 +117,8 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Игроку вечером (с 19:00) накануне — если включил в профиле',
     category: 'eve',
     announcement: false,
-    defaultText: '🌙 <b>Завтра: {услуга}</b>\nКогда: {когда}\nСтол: {стол}\nСоперник: {соперник}',
-    vars: { ...BOOKING_VARS, соперник: 'Иван Петров (@ivan)' },
+    defaultText: '🌙 <b>Завтра: {что}</b>\n🗓 {когда}\n🎲 {стол}\n{армия}\nОчки: {очки}\nСоперник: {соперник}\n\nПланы изменились — отмените запись в приложении.',
+    vars: { ...BOOKING_VARS, соперник: SAMPLE_OPPONENT },
   },
 
   // B. Поиск соперника — по играм, которые игрок включил сам
@@ -119,8 +129,8 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Подписчикам игры, когда кто-то записался за стол и место свободно',
     category: 'match',
     announcement: true,
-    defaultText: '🎲 <b>Ищут соперника: {игра}</b>\n{игрок}\n{армия}\nОпыт: {опыт}\nКогда: {когда}\nСтол: {стол}\nХочешь сыграть? Запишись на эту игру в приложении.',
-    vars: { игра: 'Warhammer 40,000', игрок: 'Иван Петров (@ivan)', армия: 'Orks · 2000 очков', опыт: 'Игрок', когда: BOOKING_VARS.когда, стол: 'Стол 1' },
+    defaultText: '🎲 <b>Ищут соперника: {игра}</b>\n{игрок}\n{армия}\nОчки: {очки}\nОпыт: {опыт}\n🗓 {когда}\n🎲 {стол}\n\nХотите сыграть? Нажмите «Записаться» и выберите эту игру.',
+    vars: { игра: 'Warhammer 40,000', игрок: 'Иван Петров (@ivan)', армия: 'Армия: Orks', очки: '2000', опыт: 'Игрок', когда: BOOKING_VARS.когда, стол: 'Стол 1' },
   },
   {
     id: 'match_still_free',
@@ -129,8 +139,8 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Подписчикам игры за сутки до начала, если место всё ещё свободно',
     category: 'match',
     announcement: true,
-    defaultText: '⏳ <b>Соперник ещё не нашёлся: {игра}</b>\n{игрок} ждёт игру {когда}.\n{армия}\nЗаписаться — в приложении.',
-    vars: { игра: 'Warhammer 40,000', игрок: 'Иван Петров (@ivan)', армия: 'Orks · 2000 очков', когда: BOOKING_VARS.когда },
+    defaultText: '⏳ <b>Соперник ещё не нашёлся: {игра}</b>\n{игрок} ждёт игру\n🗓 {когда}\n🎲 {стол}\n{армия}\nОчки: {очки}\nОпыт: {опыт}\n\nЕсть время? Запишитесь в приложении.',
+    vars: { игра: 'Warhammer 40,000', игрок: 'Иван Петров (@ivan)', армия: 'Армия: Orks', очки: '2000', опыт: 'Игрок', когда: BOOKING_VARS.когда, стол: 'Стол 1' },
   },
   {
     id: 'weekly_digest',
@@ -139,7 +149,7 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'По пятницам с 12:00 — тем, у кого включены ивенты или поиск соперника; если есть открытые игры',
     category: 'events',
     announcement: true,
-    defaultText: '📅 <b>Игры на выходных</b>\n{список}\nПрисоединиться — в приложении.',
+    defaultText: '📅 <b>Игры на выходных</b>\n{список}\n\nПрисоединиться — в приложении.',
     vars: { список: '• сб 15.11, 18:00 — Warhammer 40,000, Orks · 2000 (ищет соперника)' },
   },
 
@@ -151,7 +161,7 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Подписчикам новостей, когда новость опубликована',
     category: 'news',
     announcement: true,
-    defaultText: '📰 <b>{заголовок}</b>\n{текст}',
+    defaultText: '📰 <b>{заголовок}</b>\n\n{текст}',
     vars: { заголовок: 'Турнир в субботу', текст: 'Регистрация открыта — места ограничены.' },
   },
   {
@@ -161,7 +171,7 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Подписчикам ивентов, когда ивент создан',
     category: 'events',
     announcement: true,
-    defaultText: '🎉 <b>Новый ивент: {название}</b>\nКогда: {когда}\n{описание}',
+    defaultText: '🎉 <b>Новый ивент: {название}</b>\n🗓 {когда}\n\n{описание}\n\nПодробности и запись — в приложении.',
     vars: { название: 'Турнир Kill Team', когда: BOOKING_VARS.когда, описание: 'Формат 1 на 1, призы победителям.' },
   },
   {
@@ -171,7 +181,7 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Подписчикам ивентов, когда открыта запись на игру D&D',
     category: 'events',
     announcement: true,
-    defaultText: '🐉 <b>Новая игра D&D: {название}</b>\nКогда: {когда}\nМест: {места}',
+    defaultText: '🐉 <b>Новая игра D&D: {название}</b>\n🗓 {когда}\nМест: {места}\n\nЗапись — в приложении.',
     vars: { название: 'Затерянные шахты', когда: BOOKING_VARS.когда, места: '6' },
   },
   {
@@ -181,7 +191,7 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Записавшимся на ивент: за сутки и за 3 часа',
     category: null,
     announcement: false,
-    defaultText: '⏰ <b>{через}: {название}</b>\nКогда: {когда}',
+    defaultText: '⏰ <b>{через}: {название}</b>\n🗓 {когда}\nЖдём вас!',
     vars: { через: 'Завтра', название: 'Турнир Kill Team', когда: BOOKING_VARS.когда },
   },
   {
@@ -191,7 +201,7 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Подписчикам ивентов, когда на ивенте осталось 2 места или меньше (один раз)',
     category: 'events',
     announcement: true,
-    defaultText: '🔥 <b>Осталось мест: {места}</b> — {название}\nКогда: {когда}',
+    defaultText: '🔥 <b>Осталось мест: {места}</b> — {название}\n🗓 {когда}\nУспейте записаться в приложении.',
     vars: { места: '2', название: 'Турнир Kill Team', когда: BOOKING_VARS.когда },
   },
 
@@ -203,7 +213,7 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Игроку, когда он получил новый ранг (проверка раз в день)',
     category: 'promos',
     announcement: true,
-    defaultText: '🏅 <b>Новый ранг: {ранг}</b> — {категория}\nСыграно: {игры}. Новая рамка аватара уже в профиле!',
+    defaultText: '🏅 <b>Новый ранг: {ранг}</b> ({категория})\nСыграно игр: {игры}\nНовая рамка аватара уже в профиле — загляните!',
     vars: { ранг: 'Опытный', категория: 'Warhammer', игры: '15' },
   },
   {
@@ -213,7 +223,7 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Игроку, если больше 30 дней не было записей (не чаще раза в месяц)',
     category: 'promos',
     announcement: true,
-    defaultText: '👋 <b>Давно не виделись!</b>\nВ клубе свободные столы и новые игры — загляните в приложение.',
+    defaultText: '👋 <b>Давно не виделись!</b>\nСтолы в клубе ждут, а в приложении — новые игры и ивенты. Заходите сыграть!',
     vars: {},
   },
 
@@ -235,8 +245,8 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Администраторам каждый день с 10:00',
     category: null,
     announcement: false,
-    defaultText: '☀️ <b>Сегодня в клубе</b>\nЗаписей: {всего}\nЖдут подтверждения: {ждут}\n{список}',
-    vars: { всего: '5', ждут: '2', список: '• 18:00 Игра Warhammer — Иван Петров' },
+    defaultText: '☀️ <b>Сегодня в клубе</b>\nЗаписей: {всего} · ждут подтверждения: {ждут}\n\n{список}',
+    vars: { всего: '5', ждут: '2', список: '• 18:00 Kill Team — Иван Петров (@ivan), Kommandos ⏳' },
   },
   {
     id: 'admin_pending',
@@ -245,8 +255,8 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Администраторам, если запись ждёт подтверждения больше 3 часов (один раз)',
     category: null,
     announcement: false,
-    defaultText: '⏳ <b>Запись ждёт подтверждения уже {часов} ч</b>\n{игрок}: {услуга} — {когда}',
-    vars: { часов: '3', игрок: 'Иван Петров (@ivan)', услуга: 'Игра Warhammer', когда: BOOKING_VARS.когда },
+    defaultText: '⏳ <b>Ждёт подтверждения {часов} ч: {что}</b>\n{игрок}\n🗓 {когда}\n🎲 {стол}\n{армия}\nОчки: {очки}\n\nПодтвердите или отклоните запись в админке.',
+    vars: { ...BOOKING_VARS, часов: '3', игрок: 'Иван Петров (@ivan)' },
   },
   {
     id: 'admin_delivery_alert',

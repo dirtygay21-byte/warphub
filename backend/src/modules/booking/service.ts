@@ -48,6 +48,7 @@ import {
 } from '../notifications/service';
 import { notifyKind, notifyKindAdmins } from '../notifications/hub';
 import { announceMatch } from '../notifications/jobs';
+import { bookingVars, playerLine } from '../notifications/booking-vars';
 import {
   checkTableSession,
   DetailsValidationError,
@@ -1173,29 +1174,27 @@ async function notifyAfterCreate(
     const [booker] = await loadUsersForReservations([reservation.id]);
     if (!booker) return;
 
-    const when = formatClubDateTime(reservation.startsAt, reservation.endsAt);
     const details = (reservation.details as ReservationDetails | null) ?? null;
     const seats = context.seatsPerTable;
     const atTable = !!seats && seats >= 2 && reservation.tableId !== null;
     const others = atTable && context.joined ? await loadUsersForReservations(context.others) : [];
 
     // соперникам за столом — что к их игре присоединились
+    const tableName = reservation.tableId !== null ? await getTableName(reservation.tableId) : null;
+    const vars = bookingVars({ service, details, startsAt: reservation.startsAt, endsAt: reservation.endsAt, tableName });
     for (const other of others) {
       void notifyKind('opponent_joined', other.user.telegramId, {
-        услуга: serviceTitle(service),
-        когда: when,
+        ...bookingVars({ service, details: other.details, startsAt: reservation.startsAt, endsAt: reservation.endsAt, tableName }),
         соперник: describePlayer(booker.user, details),
       });
     }
 
-    const tableName = reservation.tableId !== null ? await getTableName(reservation.tableId) : null;
     // самому записавшемуся — подтверждение (администратор и так получает полное сообщение ниже)
     if (reason === 'created' && booker.user.telegramId && !getAdminTelegramIds().includes(String(booker.user.telegramId))) {
       const table = atTable ? { occupied: others.length + 1, seats: seats! } : null;
       void notifyKind('booking_created', booker.user.telegramId, {
-        услуга: serviceTitle(service),
-        когда: when,
-        стол: tableName ? escapeHtml(tableName) : '',
+        ...vars,
+        соперник: others.map((o) => playerLine(o.user, o.details)).join('\n'),
         стол_статус: table ? (table.occupied >= table.seats ? 'Соперник уже есть — стол собран.' : 'Стол ждёт соперника — напишем, когда он запишется.') : '',
       });
     }
@@ -1243,9 +1242,7 @@ async function notifyPlayerOf(reservation: Reservation, kind: 'booking_confirmed
     if (!service || !booker) return;
     const tableName = reservation.tableId !== null ? await getTableName(reservation.tableId) : null;
     await notifyKind(kind, booker.user.telegramId, {
-      услуга: serviceTitle(service),
-      когда: formatClubDateTime(reservation.startsAt, reservation.endsAt),
-      стол: tableName ? escapeHtml(tableName) : '',
+      ...bookingVars({ service, details: (reservation.details as ReservationDetails | null) ?? null, startsAt: reservation.startsAt, endsAt: reservation.endsAt, tableName }),
     });
   } catch (error) {
     console.warn('[notify] player notification failed', (error as Error).message);
@@ -1268,6 +1265,8 @@ async function notifyAfterCancel(
     const mode = resolveMode(service);
     const seats = mode.mode === 'table' ? mode.seatsPerTable : 0;
 
+    const cancelTable = reservation.tableId !== null ? await getTableName(reservation.tableId) : null;
+    const cancelGame = booker?.details?.kind === 'wh_player' ? gameLabel(booker.details.game) : '';
     let remaining: Awaited<ReturnType<typeof loadUsersForReservations>> = [];
     if (reservation.tableId !== null && seats >= 2) {
       const sessionMates = await db
@@ -1285,21 +1284,28 @@ async function notifyAfterCancel(
       remaining = await loadUsersForReservations(sessionMates.map((r) => r.id));
 
       for (const mate of remaining) {
-        void notifyKind('opponent_cancelled', mate.user.telegramId, { услуга: serviceTitle(service), когда: when });
+        void notifyKind('opponent_cancelled', mate.user.telegramId, {
+          ...bookingVars({ service, details: mate.details, startsAt: reservation.startsAt, endsAt: reservation.endsAt, tableName: cancelTable }),
+          соперник: booker ? playerLine(booker.user, booker.details) : '',
+          за_столом: `${remaining.length}/${seats}`,
+        });
       }
     }
 
     if (cancelledBy === 'admin' && booker) {
-      void notifyKind('booking_cancelled_admin', booker.user.telegramId, { услуга: serviceTitle(service), когда: when });
+      void notifyKind('booking_cancelled_admin', booker.user.telegramId, {
+        ...bookingVars({ service, details: booker.details, startsAt: reservation.startsAt, endsAt: reservation.endsAt, tableName: cancelTable }),
+      });
     }
 
     void notifyKindAdmins('admin_booking', {
       текст: [
-        `❌ <b>${serviceTitle(service)}: запись отменена</b>${
-          cancelledBy === 'admin' ? ' (администратором)' : ''
+        `❌ <b>Отмена: ${cancelGame ? escapeHtml(cancelGame) : serviceTitle(service)}</b>${
+          cancelledBy === 'admin' ? ' (отменил администратор)' : ' (отменил игрок)'
         }`,
-        `Дата: ${when}`,
-        `Стол: ${escapeHtml(await getTableName(reservation.tableId))}`,
+        cancelGame ? `Услуга: ${serviceTitle(service)}` : '',
+        `Когда: ${when}`,
+        cancelTable ? `Стол: ${escapeHtml(cancelTable)}` : '',
         booker ? describePlayer(booker.user, booker.details) : '',
         seats >= 2 && reservation.tableId !== null
           ? `Теперь за столом: ${remaining.length}/${seats}`
