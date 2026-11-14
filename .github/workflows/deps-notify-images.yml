@@ -1,0 +1,33 @@
+# Одноразовый: добавить библиотеки картинок уведомлений и обновить bun.lock (в сессии нет доступа к npm). Удаляется следующим коммитом.
+name: deps-notify-images
+on:
+  push:
+    branches: [feat/notify-images]
+    paths: [.github/workflows/deps-notify-images.yml]
+permissions:
+  contents: write
+jobs:
+  add:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/notify-images
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+      - name: bun add
+        working-directory: backend
+        run: |
+          bun add satori @resvg/resvg-js @fontsource/oswald @fontsource/inter-tight
+          grep -n '"satori"\|"@resvg/resvg-js"\|"@fontsource' package.json
+          ls node_modules/@fontsource/oswald/files | grep -E "cyrillic-(600|700)-normal.woff$|latin-(600|700)-normal.woff$"
+          ls node_modules/@fontsource/inter-tight/files | grep -E "(cyrillic|latin)-(400|600)-normal.woff$"
+          bun -e "const {Resvg}=require('@resvg/resvg-js'); const r=new Resvg('<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"10\" height=\"10\"><rect width=\"10\" height=\"10\" fill=\"#ECFE46\"/></svg>'); console.log('resvg ok', r.render().asPng().length)"
+      - name: commit lock
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add backend/package.json backend/bun.lock
+          git commit -m "backend: satori, @resvg/resvg-js, шрифты Oswald и Inter Tight для картинок уведомлений"
+          git push origin HEAD:feat/notify-images
