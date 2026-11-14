@@ -7,8 +7,8 @@
 import { and, asc, eq, gt, inArray, isNull, lte, ne, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import { reservationsTable, servicesTable, tablesTable, usersTable } from '../../db/schema';
-import { notifyUser } from '../notifications/service';
-import { reminderText } from './notify-text';
+import { notifyKind } from '../notifications/hub';
+import { escapeHtml, formatClubDateTime, formatUserName } from '../../lib/telegram/format';
 import { REMIND_BEFORE_MS, REMIND_MIN_AGE_MS } from './rules';
 
 export function remindersEnabled(): boolean {
@@ -77,17 +77,13 @@ export async function sendDueReminders(now = new Date()): Promise<number> {
                 ),
               )
               .orderBy(asc(reservationsTable.createdAt));
-      notifyUser(
-        row.telegramId,
-        reminderText({
-          serviceTitle: row.serviceTitle ?? row.serviceSlug,
-          startsAt: r.startsAt,
-          endsAt: r.endsAt,
-          tableName: row.tableName,
-          status: r.status,
-          opponents,
-        }),
-      );
+      await notifyKind('reminder_3h', row.telegramId, {
+        услуга: escapeHtml(row.serviceTitle ?? row.serviceSlug),
+        когда: formatClubDateTime(r.startsAt, r.endsAt),
+        стол: row.tableName ? escapeHtml(row.tableName) : '',
+        соперник: opponents.map((o) => escapeHtml(formatUserName(o))).join(', '),
+        ждёт_подтверждения: r.status === 'pending' ? 'Запись ещё ждёт подтверждения администратора.' : '',
+      });
       sent++;
     } catch (error) {
       console.warn('[reminders] reservation', r.id, (error as Error).message);

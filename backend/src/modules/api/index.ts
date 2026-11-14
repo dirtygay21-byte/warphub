@@ -40,6 +40,7 @@ import {
 } from '../minigames/service';
 import { handleMinigame } from '../minigames/http';
 import { testUserNotification } from '../notifications/service';
+import { getUserPrefs, saveUserPrefs } from '../notifications/hub';
 import { getPlayerProgress } from '../progress/service';
 import { getCardsState, getPointsHistory, openPack } from '../minigames/cards';
 import { getNewsById, listPublishedNews } from '../news/service';
@@ -418,6 +419,21 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
       summary: 'Проверка уведомлений',
       description: 'Бот отправляет пользователю тестовое сообщение; ответ говорит, дошло ли оно.',
     },
+  })
+  .get('/me/notifications/prefs', ({ user }) => getUserPrefs(user.id), {
+    detail: { tags: ['Users'], summary: 'Мои настройки уведомлений' },
+  })
+  .put('/me/notifications/prefs', ({ user, body }) => saveUserPrefs(user.id, body), {
+    body: t.Partial(
+      t.Object({
+        opponentGames: t.Array(t.String(), { maxItems: 4 }),
+        news: t.Boolean(),
+        events: t.Boolean(),
+        promos: t.Boolean(),
+        eveReminder: t.Boolean(),
+      }),
+    ),
+    detail: { tags: ['Users'], summary: 'Сохранить настройки уведомлений', description: 'Поиск соперника — игры 40k, aos, kt, warcry.' },
   })
   .get('/me/progress', async ({ user }) => getPlayerProgress(user.id), {
     detail: {

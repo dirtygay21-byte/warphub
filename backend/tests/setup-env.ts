@@ -13,3 +13,4 @@ process.env.S3_SECRET_KEY ??= 'test';
 process.env.S3_BUCKET ??= 'test';
 process.env.S3_PUBLIC_URL ??= 'http://127.0.0.1/test';
 process.env.TELEGRAM_NOTIFICATIONS ??= 'off';
+process.env.NOTIFICATION_LOG ??= 'off';
