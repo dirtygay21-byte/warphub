@@ -18,7 +18,7 @@ export default function PartnerSection() {
   const query = useQuery({ queryKey: ["partners"], queryFn: getPartners });
   const settings = query.data?.settings;
   return (
-    <section className="mt-6 lg:col-span-2" aria-labelledby="partner-showcase-title">
+    <section className="mt-6" aria-labelledby="partner-showcase-title">
       <div className="text-center">
         <p className="text-[13px] font-bold uppercase tracking-[0.08em] text-fg-3" id="partner-showcase-title">Миниатюры наших партнёров</p>
         <p className="mt-1 text-sm text-fg-2">Можете заказать миниатюры у наших партнёров</p>

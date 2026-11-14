@@ -4,7 +4,7 @@ import { GAME_OPTIONS, getNotificationPrefs, saveNotificationPrefs, type Notific
 import { ToggleRow } from "@/components/ui/ds";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
-import { BellRing, ChevronDown, LoaderCircle } from "lucide-react";
+import { BellRing, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 
 type TestResult = { ok: boolean; message: string; needsStart?: boolean };
@@ -16,7 +16,19 @@ const webApp = () => (typeof window !== "undefined" ? window.Telegram?.WebApp : 
  * в чате или дал разрешение здесь (Telegram.WebApp.requestWriteAccess, Bot API 6.9+). Без разрешения подтверждения
  * записей, сообщения о сопернике и об отмене не дойдут. «Проверить» — бот присылает тестовое сообщение.
  */
-export default function NotificationsSection() {
+/** Вкладка «Уведомления» профиля (14.11.2026): разрешение боту и «Что присылать» — отдельными карточками. */
+export default function NotificationsTab() {
+  return (
+    <div className="space-y-4">
+      <NotificationsSection />
+      <section className="rounded-2xl border border-white/10 bg-app-elevated p-4" aria-labelledby="notify-prefs-title">
+        <NotificationPrefsBlock />
+      </section>
+    </div>
+  );
+}
+
+function NotificationsSection() {
   const tg = webApp();
   const [allowed, setAllowed] = useState<boolean | null>(() => (tg?.initDataUnsafe?.user?.allows_write_to_pm ? true : null));
   const [denied, setDenied] = useState(false);
@@ -40,7 +52,7 @@ export default function NotificationsSection() {
   };
   const result = test.data;
   return (
-    <section className="mt-6 rounded-2xl border border-white/10 bg-app-elevated p-4 lg:col-span-2" aria-labelledby="notify-title">
+    <section className="rounded-2xl border border-white/10 bg-app-elevated p-4" aria-labelledby="notify-title">
       <div className="flex items-center gap-3">
         <BellRing className="size-5 shrink-0 text-accent" />
         <div className="min-w-0 flex-1">
@@ -69,7 +81,6 @@ export default function NotificationsSection() {
       {denied && <p className="mt-2 text-[13px] text-fg-2">Разрешение не выдано. Его можно дать позже — здесь или кнопкой «Старт» в чате с ботом.</p>}
       {result && <p className={result.ok ? "mt-2 text-[13px] text-accent" : "mt-2 text-[13px] text-red-300"}>{result.ok ? "✅ " : "⚠️ "}{result.message}</p>}
       {test.isError && <p className="mt-2 text-[13px] text-red-300">Не удалось выполнить проверку — сервер не ответил.</p>}
-      <NotificationPrefsBlock />
     </section>
   );
 }
@@ -79,9 +90,8 @@ export default function NotificationsSection() {
  * новости, ивенты, акции — включены; напоминание накануне — выключено. О своих записях бот пишет всегда.
  */
 function NotificationPrefsBlock() {
-  const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
-  const prefs = useQuery({ queryKey: ["notification-prefs"], queryFn: getNotificationPrefs, enabled: open });
+  const prefs = useQuery({ queryKey: ["notification-prefs"], queryFn: getNotificationPrefs });
   const save = useMutation({
     mutationFn: (input: Partial<NotificationPrefs>) => saveNotificationPrefs(input),
     onSuccess: (data) => queryClient.setQueryData(["notification-prefs"], data),
@@ -92,18 +102,9 @@ function NotificationPrefsBlock() {
     p && set({ opponentGames: p.opponentGames.includes(g) ? p.opponentGames.filter((x) => x !== g) : [...p.opponentGames, g] });
 
   return (
-    <div className="mt-4 border-t border-white/10 pt-3">
-      <button
-        type="button"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        className="flex min-h-11 w-full items-center justify-between text-left text-sm font-semibold text-fg"
-      >
-        Что присылать
-        <ChevronDown className={clsx("size-5 text-fg-3 transition-transform", open && "rotate-180")} />
-      </button>
-      {open && (
-        <div className="mt-2 space-y-3">
+    <div>
+      <p id="notify-prefs-title" className="text-sm font-semibold text-fg">Что присылать</p>
+      <div className="mt-3 space-y-3">
           {!p ? (
             <p className="text-sm text-fg-3">{prefs.isError ? "Не удалось загрузить настройки." : "Загружаем…"}</p>
           ) : (
@@ -139,8 +140,7 @@ function NotificationPrefsBlock() {
               {save.isError && <p className="text-[13px] text-red-300">Не сохранилось — попробуйте ещё раз.</p>}
             </>
           )}
-        </div>
-      )}
+      </div>
     </div>
   );
 }

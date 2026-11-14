@@ -308,6 +308,18 @@ for (const [label, name] of [
   });
 }
 
+// Профиль: шапка, меню разделов и каждая вкладка (переработка 14.11.2026)
+await step('profile-tabs', async () => {
+  await page.goto(BASE + '/profile', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(600);
+  await shot('profile-overview', true);
+  for (const [name, tab] of [['Уведомления', 'notifications'], ['Аккаунт', 'account'], ['Клуб', 'club']]) {
+    await page.getByRole('tab', { name }).click({ timeout: 5000 });
+    await page.waitForTimeout(500);
+    await shot(`profile-${tab}`, true);
+  }
+});
+
 // «Учебный раунд» Kill Team: вступление, шаги с примерами, следующий раунд
 await step('kt-list-learn', async () => {
   await page.goto(BASE + '/roster', { waitUntil: 'networkidle' });

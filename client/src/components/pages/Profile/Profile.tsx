@@ -8,24 +8,36 @@ import { getRosterAccess } from "@/apiUtils/roster";
 import { AccessCodeDialog } from "./AccessCodeDialog";
 import SupportSection from "./SupportSection";
 import PartnerSection from "./PartnerSection";
-import NotificationsSection from "./NotificationsSection";
+import NotificationsTab from "./NotificationsSection";
 import TelegramOnly from "@/components/ui/TelegramOnly/TelegramOnly";
 import { isOutsideTelegram } from "@/utils/telegramEnv";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getFullName, getInitials } from "@/utils/user";
 import { useQuery } from "@tanstack/react-query";
-import { AtSign, BookOpen, Check, Copy, Gamepad2, Hash, RefreshCw, ShieldCheck, Sparkles, Swords, UserRound } from "lucide-react";
+import { AtSign, Bell, BookOpen, Check, Copy, Gamepad2, Hash, LayoutGrid, RefreshCw, ShieldCheck, Sparkles, Store, Swords, UserRound } from "lucide-react";
 import { DsButton, GroupCard, NavRow, SectionLabel, Skeleton } from "@/components/ui/ds";
 import clsx from "clsx";
 import { useEffectsStore } from "@/stores/useEffectsStore";
 import { haptic } from "@/utils/haptic";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence } from "motion/react";
 import { toast } from "@/stores/useToastStore";
 
+/** Разделы профиля (переработка 14.11.2026): меню-вкладки, выбранная — в адресе `/profile?tab=…`. */
+type ProfileTab = "overview" | "notifications" | "account" | "club";
+const PROFILE_TABS: ProfileTab[] = ["overview", "notifications", "account", "club"];
+
 export default function Profile() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab") as ProfileTab | null;
+  const tab: ProfileTab = tabParam && PROFILE_TABS.includes(tabParam) ? tabParam : "overview";
+  const selectTab = (next: ProfileTab) => {
+    if (next === tab) return;
+    setSearchParams(next === "overview" ? {} : { tab: next }, { replace: true });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   const { setUser } = useAuthStore();
   const navigate = useNavigate();
   const isAdmin = useAuthStore((state) => state.isAdmin);
@@ -108,148 +120,193 @@ export default function Profile() {
     </div>
   );
 
+  const tabs: { value: ProfileTab; label: string; icon: ReactNode }[] = [
+    { value: "overview", label: "Обзор", icon: <LayoutGrid className="size-[18px]" /> },
+    { value: "notifications", label: "Уведомления", icon: <Bell className="size-[18px]" /> },
+    { value: "account", label: "Аккаунт", icon: <UserRound className="size-[18px]" /> },
+    { value: "club", label: "Клуб", icon: <Store className="size-[18px]" /> },
+  ];
+
   return (
     <div className="ds-enter px-5 py-3 text-fg lg:grid lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start lg:gap-x-6 lg:pt-8">
-      <section className="overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.35)] lg:sticky lg:top-8 lg:row-span-6">
-        <div className="relative px-6 pb-6 pt-8 text-center">
-          <EffectsToggle />
-          <div className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-accent/15 to-transparent" />
-
-          {supporter ? (
-            <SupporterFrame title={supporter} size={104} label={`Поддерживает клуб: ${SUPPORTER_LABELS[supporter]}`}>
-              {avatar}
-            </SupporterFrame>
-          ) : (
-            <AvatarFrame
-              category={frame?.category ?? "warhammer"}
-              tier={frame ? RANK_ORDER.indexOf(frame.rank) : 0}
-              size={96}
-              label={frame ? `Рамка: ${CATEGORY_LABELS[frame.category]} · ${frame.rankLabel}` : undefined}
-            >
-              {avatar}
-            </AvatarFrame>
-          )}
-
-          <h1 className="text-2xl font-semibold leading-tight">
-            {fullName || "Пользователь"}
-          </h1>
-
-          {user?.username ? (
-            <p className="mt-2 text-[15px] text-fg-2">@{user?.username}</p>
-          ) : (
-            <p className="mt-2 text-[15px] text-fg-3">Username не указан</p>
-          )}
-          {supporter && (
-            <p className="relative mt-3 inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-[13px] font-bold uppercase tracking-[0.04em] text-accent-foreground">
-              ★ {SUPPORTER_LABELS[supporter]} · Поддерживает клуб
+      {/* шапка: аватар с рамкой, имя, username — компактно (переработка профиля 14.11.2026) */}
+      <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.35)] lg:sticky lg:top-8">
+        <div className="absolute inset-x-0 top-0 h-20 bg-linear-to-b from-accent/15 to-transparent" />
+        <EffectsToggle />
+        <div className="relative flex items-center gap-4 px-4 pb-4 pt-5 lg:flex-col lg:px-6 lg:pb-6 lg:pt-8 lg:text-center">
+          <div className="shrink-0">
+            {supporter ? (
+              <SupporterFrame title={supporter} size={72} label={`Поддерживает клуб: ${SUPPORTER_LABELS[supporter]}`}>
+                {avatar}
+              </SupporterFrame>
+            ) : (
+              <AvatarFrame
+                category={frame?.category ?? "warhammer"}
+                tier={frame ? RANK_ORDER.indexOf(frame.rank) : 0}
+                size={68}
+                label={frame ? `Рамка: ${CATEGORY_LABELS[frame.category]} · ${frame.rankLabel}` : undefined}
+              >
+                {avatar}
+              </AvatarFrame>
+            )}
+          </div>
+          <div className="min-w-0 flex-1 pr-14 lg:pr-0">
+            <h1 className="truncate text-xl font-semibold leading-tight lg:text-2xl">{fullName || "Пользователь"}</h1>
+            <p className={clsx("mt-1 truncate text-[15px]", user?.username ? "text-fg-2" : "text-fg-3")}>
+              {user?.username ? `@${user.username}` : "Username не указан"}
             </p>
-          )}
+            {frame && !supporter && (
+              <p className="mt-1 truncate text-[13px] text-fg-3">
+                {CATEGORY_LABELS[frame.category]} · {frame.rankLabel}
+              </p>
+            )}
+            {supporter && (
+              <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-[0.04em] text-accent-foreground">
+                ★ {SUPPORTER_LABELS[supporter]}
+              </p>
+            )}
+          </div>
         </div>
       </section>
 
-      {progressQuery.data && (
-        <PlayerProgressCard
-          categories={progressQuery.data.categories}
-          selected={supporter ? null : (frame?.category ?? null)}
-          onSelect={(category) => {
-            saveFrame(category);
-            setFrameChoice(category);
-          }}
-        />
-      )}
-
-      <NavRow
-        className="mt-4"
-        tone="accent-outline"
-        bareIcon
-        icon={<Gamepad2 className="size-7" />}
-        title="Мини-игры"
-        subtitle="Играйте и получайте скидки в клубе"
-        onClick={() => navigate("/games")}
-      />
-
-      <NavRow
-        className="mt-3"
-        icon={<BookOpen className="size-5" />}
-        title="Как играть"
-        subtitle="Обучение для новичков: схемы и короткие правила"
-        onClick={() => navigate("/learn")}
-      />
-
-      <section className="mt-6">
-        <SectionLabel>Информация</SectionLabel>
-
-        <GroupCard>
-          <InfoRow
-            icon={<UserRound className="size-5" />}
-            label="Имя"
-            value={user?.firstName || "—"}
-          />
-          <InfoRow
-            icon={<UserRound className="size-5" />}
-            label="Фамилия"
-            value={user?.lastName || "—"}
-          />
-          <InfoRow
-            icon={<AtSign className="size-5" />}
-            label="Telegram"
-            value={user?.username ? `@${user?.username}` : "—"}
-          />
-          <InfoRow
-            icon={<Hash className="size-5" />}
-            label="Telegram ID"
-            value={user?.telegramId ? String(user?.telegramId) : "—"}
-            copy={user?.telegramId ? String(user?.telegramId) : undefined}
-          />
-        </GroupCard>
-      </section>
-
-      <DsButton
-        className="mt-4 w-full"
-        size="lg"
-        onClick={async () => {
-          const result = await profileQuery.refetch();
-          if (result.isError) toast.error("Не удалось обновить профиль. Попробуйте позже");
-          else toast.success("Профиль обновлён");
-        }}
-        disabled={profileQuery.isFetching}
-      >
-        <RefreshCw className={`size-[18px] ${profileQuery.isFetching ? "animate-spin" : ""}`} />
-        {profileQuery.isFetching ? "Обновляем…" : "Обновить имя и фото из Telegram"}
-      </DsButton>
-
-      {hasRosterAccess && (
-        <NavRow
-          className="mt-3"
-          tone="accent"
-          iconTone="solid"
-          icon={<Swords className="size-[22px]" />}
-          title="WarpBuilder"
-          subtitle="40K, Age of Sigmar, Kill Team, Warcry"
-          onClick={() => navigate("/roster")}
-        />
-      )}
-
-      {isAdmin && (
-        <NavRow
-          className="mt-3"
-          iconTone="neutral"
-          icon={<ShieldCheck className="size-[22px]" />}
-          title="Админ-панель"
-          subtitle="Записи, столы, контент, доступы"
-          onClick={() => navigate("/admin")}
-        />
-      )}
-
-      {isAuthenticated && rosterAccess.isSuccess && !hasRosterAccess && (
-        <button
-          type="button"
-          onClick={() => setCodeOpen(true)}
-          className="mx-auto mt-6 block min-h-11 px-4 text-sm font-medium text-fg-3 transition-colors active:text-fg-2"
+      <div className="min-w-0">
+        {/* меню разделов: закреплено сверху при прокрутке, выбранный раздел — в адресе (?tab=) */}
+        <nav
+          aria-label="Разделы профиля"
+          className="sticky top-[60px] z-40 -mx-5 mt-4 bg-app-bg/95 px-5 py-2 backdrop-blur lg:top-0 lg:mx-0 lg:mt-0 lg:px-0"
         >
-          Есть код доступа?
-        </button>
-      )}
+          <div role="tablist" className="grid grid-cols-4 gap-1 rounded-[14px] border border-white/10 bg-app-elevated p-1">
+            {tabs.map((t) => {
+              const on = t.value === tab;
+              return (
+                <button
+                  key={t.value}
+                  type="button"
+                  role="tab"
+                  id={`profile-tab-${t.value}`}
+                  aria-selected={on}
+                  aria-controls={`profile-panel-${t.value}`}
+                  onClick={() => selectTab(t.value)}
+                  className={clsx(
+                    "ds-press flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-[10px] px-1 text-[11.5px] font-semibold leading-tight",
+                    on ? "bg-accent text-accent-foreground" : "text-fg-2",
+                  )}
+                >
+                  {t.icon}
+                  <span className="max-w-full truncate">{t.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+
+        <div role="tabpanel" id={`profile-panel-${tab}`} aria-labelledby={`profile-tab-${tab}`} className="mt-3">
+          {tab === "overview" && (
+            <div className="space-y-6">
+              {progressQuery.data && (
+                <PlayerProgressCard
+                  categories={progressQuery.data.categories}
+                  selected={supporter ? null : (frame?.category ?? null)}
+                  onSelect={(category) => {
+                    saveFrame(category);
+                    setFrameChoice(category);
+                  }}
+                />
+              )}
+
+              <section>
+                <SectionLabel>Разделы</SectionLabel>
+                <div className="space-y-3">
+                  <NavRow
+                    tone="accent-outline"
+                    bareIcon
+                    icon={<Gamepad2 className="size-7" />}
+                    title="Мини-игры"
+                    subtitle="Играйте и получайте скидки в клубе"
+                    onClick={() => navigate("/games")}
+                  />
+                  <NavRow
+                    icon={<BookOpen className="size-5" />}
+                    title="Как играть"
+                    subtitle="Обучение для новичков: схемы и короткие правила"
+                    onClick={() => navigate("/learn")}
+                  />
+                  {hasRosterAccess && (
+                    <NavRow
+                      tone="accent"
+                      iconTone="solid"
+                      icon={<Swords className="size-[22px]" />}
+                      title="WarpBuilder"
+                      subtitle="40K, Age of Sigmar, Kill Team, Warcry"
+                      onClick={() => navigate("/roster")}
+                    />
+                  )}
+                  {isAdmin && (
+                    <NavRow
+                      iconTone="neutral"
+                      icon={<ShieldCheck className="size-[22px]" />}
+                      title="Админ-панель"
+                      subtitle="Записи, столы, контент, доступы"
+                      onClick={() => navigate("/admin")}
+                    />
+                  )}
+                </div>
+                {isAuthenticated && rosterAccess.isSuccess && !hasRosterAccess && (
+                  <button
+                    type="button"
+                    onClick={() => setCodeOpen(true)}
+                    className="mx-auto mt-4 block min-h-11 px-4 text-sm font-medium text-fg-3 transition-colors active:text-fg-2"
+                  >
+                    Есть код доступа?
+                  </button>
+                )}
+              </section>
+            </div>
+          )}
+
+          {tab === "notifications" && <NotificationsTab />}
+
+          {tab === "account" && (
+            <div className="space-y-4">
+              <section>
+                <SectionLabel>Данные из Telegram</SectionLabel>
+                <GroupCard>
+                  <InfoRow icon={<UserRound className="size-5" />} label="Имя" value={user?.firstName || "—"} />
+                  <InfoRow icon={<UserRound className="size-5" />} label="Фамилия" value={user?.lastName || "—"} />
+                  <InfoRow icon={<AtSign className="size-5" />} label="Telegram" value={user?.username ? `@${user?.username}` : "—"} />
+                  <InfoRow
+                    icon={<Hash className="size-5" />}
+                    label="Telegram ID"
+                    value={user?.telegramId ? String(user?.telegramId) : "—"}
+                    copy={user?.telegramId ? String(user?.telegramId) : undefined}
+                  />
+                </GroupCard>
+              </section>
+              <DsButton
+                className="w-full"
+                size="lg"
+                onClick={async () => {
+                  const result = await profileQuery.refetch();
+                  if (result.isError) toast.error("Не удалось обновить профиль. Попробуйте позже");
+                  else toast.success("Профиль обновлён");
+                }}
+                disabled={profileQuery.isFetching}
+              >
+                <RefreshCw className={`size-[18px] ${profileQuery.isFetching ? "animate-spin" : ""}`} />
+                {profileQuery.isFetching ? "Обновляем…" : "Обновить имя и фото из Telegram"}
+              </DsButton>
+              <p className="text-center text-[13px] text-fg-3">Имя, фото и username берутся из Telegram. Изменили их там — нажмите «Обновить».</p>
+            </div>
+          )}
+
+          {tab === "club" && (
+            <div>
+              <SupportSection />
+              <PartnerSection />
+            </div>
+          )}
+        </div>
+      </div>
 
       <AnimatePresence>
         {codeOpen && (
@@ -263,10 +320,6 @@ export default function Profile() {
           />
         )}
       </AnimatePresence>
-
-      <NotificationsSection />
-      <PartnerSection />
-      <SupportSection />
     </div>
   );
 }

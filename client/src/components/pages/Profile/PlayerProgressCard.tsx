@@ -76,7 +76,7 @@ export default function PlayerProgressCard({
     }
   }, [categories]);
   return (
-    <section className="mt-6">
+    <section>
       <button
         type="button"
         onClick={() => {
