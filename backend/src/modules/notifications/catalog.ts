@@ -236,7 +236,7 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     category: null,
     announcement: false,
     defaultText: '{текст}',
-    vars: { текст: '🆕 <b>Новая запись: Игра Warhammer</b>\n…' },
+    vars: { текст: '🆕 <b>Новая запись: Kill Team — стол ждёт соперника (1/2)</b>\nУслуга: Игра Warhammer\nКогда: сб, 15 ноября, 18:00–21:00\nСтол: Стол 1\nИгрок: Иван Петров (@ivan)\nКоманда: Kommandos (Orks)\nОпыт: Игрок' },
   },
   {
     id: 'admin_digest',
