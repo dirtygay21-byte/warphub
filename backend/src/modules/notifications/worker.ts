@@ -3,13 +3,14 @@
  * автоматические проверки (jobs.ts) — каждые 5 минут. Выключить: NOTIFICATION_WORKER=off (тестовый сервер).
  */
 import { runDueBroadcasts } from './broadcasts';
-import { installSendObserver, processOutbox } from './hub';
+import { installCardImages, installSendObserver, processOutbox } from './hub';
 import { runScheduledJobs } from './jobs';
 
 let started = false;
 
 export function startNotificationWorker(): void {
   installSendObserver();
+  installCardImages();
   if (started || (process.env.NOTIFICATION_WORKER ?? 'on').toLowerCase() === 'off') return;
   started = true;
   const safe = (name: string, fn: () => Promise<unknown>) => () =>

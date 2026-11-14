@@ -29,6 +29,7 @@ import { notificationDiagnostics, sendTelegramMessageDetailed, testNotification 
 import { KIND_BY_ID, renderTemplate } from '../notifications/catalog';
 import { notificationLog, saveNotificationConfig } from '../notifications/hub';
 import { notificationCatalog, saveTemplate } from '../notifications/admin';
+import { notificationImage } from '../notifications/card';
 import {
   audienceCount,
   BroadcastError,
@@ -1297,6 +1298,22 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
     },
   )
   .post(
+    '/notifications/templates/:kind/preview',
+    async ({ params, body }) => {
+      // картинка уведомления с примерами переменных — чтобы видеть результат до отправки (14.11.2026)
+      const kind = KIND_BY_ID.get(params.kind);
+      if (!kind) return status(404, { error: 'Нет такого уведомления' });
+      const text = renderTemplate(body.text?.trim() ? body.text : kind.defaultText, kind.vars) || '—';
+      const card = await notificationImage(kind.id, text);
+      if (!card) return status(500, { error: 'Не удалось нарисовать картинку' });
+      return { image: `data:image/png;base64,${Buffer.from(card.png).toString('base64')}`, caption: card.caption };
+    },
+    {
+      body: t.Object({ text: t.Optional(t.Nullable(t.String({ maxLength: 4000 }))) }),
+      detail: { tags: ['Admin'], summary: 'Уведомления: картинка с примерами переменных' },
+    },
+  )
+  .post(
     '/notifications/templates/:kind/test',
     async ({ user, params, body }) => {
       if (!isNotificationOwner(user)) return status(403, { error: 'Только владелец' });
@@ -1315,14 +1332,16 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
     '/notifications/config',
     async ({ user, body }) => {
       if (!isNotificationOwner(user)) return status(403, { error: 'Только владелец' });
-      await saveNotificationConfig(body);
-      return body;
+      const config = { ...body, images: body.images ?? true };
+      await saveNotificationConfig(config);
+      return config;
     },
     {
       body: t.Object({
         quietFrom: t.Integer({ minimum: 0, maximum: 23 }),
         quietTo: t.Integer({ minimum: 0, maximum: 23 }),
         dailyLimit: t.Integer({ minimum: 0, maximum: 20 }),
+        images: t.Optional(t.Boolean()),
       }),
       detail: { tags: ['Admin'], summary: 'Уведомления: тихие часы и дневной лимит объявлений' },
     },

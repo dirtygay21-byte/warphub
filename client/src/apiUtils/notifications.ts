@@ -23,7 +23,8 @@ export type NotificationKindView = {
   text: string | null;
   updatedAt: string | null;
 };
-export type NotificationConfig = { quietFrom: number; quietTo: number; dailyLimit: number };
+/** images — картинка вместо текста (14.11.2026) */
+export type NotificationConfig = { quietFrom: number; quietTo: number; dailyLimit: number; images?: boolean };
 export type NotificationCatalog = { canEdit: boolean; config: NotificationConfig; kinds: NotificationKindView[] };
 
 export const getNotificationCatalog = () => apiRequest<NotificationCatalog>("/admin/notifications/catalog");
@@ -31,6 +32,9 @@ export const saveNotificationTemplate = (kind: string, input: { enabled?: boolea
   apiRequest<{ kind: string; enabled: boolean; text: string | null }>(`/admin/notifications/templates/${kind}`, { method: "PUT", body: JSON.stringify(input) });
 export const testNotificationTemplate = (kind: string, text: string | null) =>
   apiRequest<{ ok: boolean; error?: string }>(`/admin/notifications/templates/${kind}/test`, { method: "POST", body: JSON.stringify({ text }) });
+/** Картинка уведомления с примерами переменных (14.11.2026). */
+export const previewNotificationImage = (kind: string, text: string | null) =>
+  apiRequest<{ image: string; caption: string }>(`/admin/notifications/templates/${kind}/preview`, { method: "POST", body: JSON.stringify({ text }) });
 export const saveNotificationConfig = (input: NotificationConfig) =>
   apiRequest<NotificationConfig>("/admin/notifications/config", { method: "PUT", body: JSON.stringify(input) });
 
