@@ -26,8 +26,9 @@ const OFFSET_MS = bookingConfig.timezoneOffsetMinutes * MIN;
 // ---------------------------------------------------------------- настройки
 
 /** images — картинка вместо текста (14.11.2026, по умолчанию включено). */
-export type NotificationConfig = { quietFrom: number; quietTo: number; dailyLimit: number; images: boolean };
-export const DEFAULT_CONFIG: NotificationConfig = { quietFrom: 23, quietTo: 10, dailyLimit: 2, images: true };
+/** animated — анимированные картинки (15.11.2026, по умолчанию включено). */
+export type NotificationConfig = { quietFrom: number; quietTo: number; dailyLimit: number; images: boolean; animated: boolean };
+export const DEFAULT_CONFIG: NotificationConfig = { quietFrom: 23, quietTo: 10, dailyLimit: 2, images: true, animated: true };
 const CONFIG_KEY = '_config';
 
 let cache: { at: number; config: NotificationConfig; templates: Map<string, { enabled: boolean; text: string | null }> } | null = null;
@@ -315,7 +316,10 @@ function persistLogs() {
 /** Журнал в базе, «не получает» после 403, сигнал администраторам, когда связь вернулась. */
 /** Картинки уведомлений: включаются вместе с наблюдателем (worker), выключаются в «Настройках». */
 export function installCardImages() {
-  setCardImageProvider(async (kind, text) => ((await getNotificationConfig()).images ? notificationImage(kind, text) : null));
+  setCardImageProvider(async (kind, text) => {
+    const config = await getNotificationConfig();
+    return config.images ? notificationImage(kind, text, config.animated) : null;
+  });
 }
 
 export function installSendObserver() {

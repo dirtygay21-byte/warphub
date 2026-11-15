@@ -5,7 +5,10 @@
  */
 import { KIND_BY_ID } from '../catalog';
 import { cardCaption, parseNotificationCard } from './parse';
-import { renderCardPng } from './render';
+import { renderCardGif, renderCardPng } from './render';
+
+/** Готовая картинка: фото (PNG) или анимация (GIF → Telegram sendAnimation). */
+export type CardFile = { data: Uint8Array; animated: boolean; caption: string };
 
 const cache = new Map<string, Promise<Uint8Array>>();
 
@@ -15,20 +18,36 @@ export function cardKindOf(kind: string) {
   return KIND_BY_ID.get(id) ?? null;
 }
 
-export async function notificationImage(kind: string, text: string): Promise<{ png: Uint8Array; caption: string } | null> {
-  if (process.env.NOTIFICATION_IMAGES === 'off') return null;
-  const def = cardKindOf(kind);
-  if (!def) return null;
-  const key = `${def.id}\n${text}`;
+function cached(key: string, render: () => Promise<Uint8Array>) {
   let job = cache.get(key);
   if (!job) {
-    job = renderCardPng(parseNotificationCard(text, def.title));
+    job = render();
     cache.set(key, job);
     if (cache.size > 64) cache.delete(cache.keys().next().value!);
     job.catch(() => cache.delete(key));
   }
+  return job;
+}
+
+/**
+ * Картинка уведомления. animated — анимированная (15.11.2026, «Анимация» в настройках); не получилась анимация —
+ * отправится обычная картинка, не получилась и она — текст.
+ */
+export async function notificationImage(kind: string, text: string, animated = false): Promise<CardFile | null> {
+  if (process.env.NOTIFICATION_IMAGES === 'off') return null;
+  const def = cardKindOf(kind);
+  if (!def) return null;
+  const caption = cardCaption(text);
+  const card = () => parseNotificationCard(text, def.title);
+  if (animated && process.env.NOTIFICATION_ANIMATION !== 'off') {
+    try {
+      return { data: await cached(`gif\n${def.id}\n${text}`, () => renderCardGif(card())), animated: true, caption };
+    } catch (error) {
+      console.warn(`[notify] card animation failed for ${kind}:`, (error as Error).message);
+    }
+  }
   try {
-    return { png: await job, caption: cardCaption(text) };
+    return { data: await cached(`png\n${def.id}\n${text}`, () => renderCardPng(card())), animated: false, caption };
   } catch (error) {
     console.warn(`[notify] card image failed for ${kind}:`, (error as Error).message);
     return null;

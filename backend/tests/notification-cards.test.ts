@@ -68,3 +68,20 @@ test('карточка: много данных и длинный текст —
   const out = process.env.CARD_SAMPLES_DIR;
   if (out) writeFileSync(`${out}/stress.png`, png);
 }, 20_000);
+
+describe('анимированная карточка (GIF, 15.11.2026)', () => {
+  const out = process.env.CARD_SAMPLES_DIR;
+  for (const id of ['booking_created', 'reminder_3h', 'booking_cancelled_admin']) {
+    test(id, async () => {
+      const { renderCardGif, GIF_W } = await import('../src/modules/notifications/card/render');
+      const kind = NOTIFICATION_KINDS.find((k) => k.id === id)!;
+      const gif = await renderCardGif(parseNotificationCard(renderTemplate(kind.defaultText, kind.vars), kind.title));
+      expect(new TextDecoder().decode(gif.slice(0, 6))).toBe('GIF89a');
+      const view = new DataView(gif.buffer, gif.byteOffset);
+      expect([view.getUint16(6, true), view.getUint16(8, true)]).toEqual([GIF_W, GIF_W * 9 / 16]);
+      expect(gif.length).toBeLessThan(2_000_000);
+      console.log(`gif ${id}: ${gif.length} bytes`);
+      if (out) writeFileSync(`${out}/anim-${id}.gif`, gif);
+    }, 60_000);
+  }
+});

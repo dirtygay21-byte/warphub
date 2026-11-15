@@ -725,6 +725,7 @@ function SettingsTab({ catalog }: { catalog?: NotificationCatalog }) {
   const hours = Array.from({ length: 24 }, (_, h) => h);
   const canEdit = catalog?.canEdit ?? false;
   const images = value.images ?? true;
+  const animated = value.animated ?? true;
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-app-elevated p-3.5">
@@ -744,6 +745,23 @@ function SettingsTab({ catalog }: { catalog?: NotificationCatalog }) {
           className={clsx("flex h-[30px] w-[50px] shrink-0 items-center rounded-full p-[3px] disabled:opacity-50", images ? "justify-end bg-accent" : "justify-start bg-white/[0.14]")}
         >
           <span className={clsx("size-6 rounded-full", images ? "bg-accent-foreground" : "bg-fg")} />
+        </button>
+      </div>
+      <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-app-elevated p-3.5">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold">Анимация</p>
+          <p className="mt-0.5 text-[12px] text-fg-3">Узор на картинке двигается (в Telegram проигрывается сама, по кругу). Выключите — придёт обычная картинка.</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={animated}
+          aria-label="Анимация картинок"
+          disabled={!canEdit || !images}
+          onClick={() => setForm({ ...value, animated: !animated })}
+          className={clsx("flex h-[30px] w-[50px] shrink-0 items-center rounded-full p-[3px] disabled:opacity-50", animated ? "justify-end bg-accent" : "justify-start bg-white/[0.14]")}
+        >
+          <span className={clsx("size-6 rounded-full", animated ? "bg-accent-foreground" : "bg-fg")} />
         </button>
       </div>
       <div className="rounded-2xl border border-white/10 bg-app-elevated p-3.5">
