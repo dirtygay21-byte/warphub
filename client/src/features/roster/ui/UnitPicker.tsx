@@ -9,6 +9,8 @@ import { cx } from './util';
 import { cleanRuleText } from '../text';
 import { cheapest, fitsPoints, PICKER_SORTS, pickerMatch, sizePriceLine, sortPicker, type PickerSort } from '../engine/picker';
 import type { RuOverlay } from '../ru';
+import { useEn, useT } from './common/i18n';
+import { allyNoteEn } from './unitTextRu';
 
 /** Сортировка и «Помещается» — на устройстве (удобство; хранилище может быть недоступно — тогда по умолчанию). */
 const PREFS = 'warphub:roster-40k-picker';
@@ -45,6 +47,42 @@ const CHIP: Record<UnitType, string> = {
   fortification: 'Укрепления',
   other: 'Прочие',
 };
+/** Английские подписи фильтров и разделов (переключатель RU/EN). */
+const CHIP_EN: Record<UnitType, string> = {
+  epic: 'Epic Heroes',
+  character: 'Characters',
+  battleline: 'Battleline',
+  transport: 'Transports',
+  infantry: 'Infantry',
+  mounted: 'Mounted',
+  walker: 'Walkers',
+  vehicle: 'Vehicles',
+  monster: 'Monsters',
+  aircraft: 'Aircraft',
+  titanic: 'Titanic',
+  fortification: 'Fortifications',
+  other: 'Other',
+};
+const TYPE_EN: Record<UnitType, string> = {
+  epic: 'Epic Heroes',
+  character: 'Characters',
+  battleline: 'Battleline',
+  transport: 'Dedicated Transports',
+  infantry: 'Infantry',
+  mounted: 'Mounted and Beasts',
+  walker: 'Walkers',
+  vehicle: 'Vehicles',
+  monster: 'Monsters',
+  aircraft: 'Aircraft',
+  titanic: 'Titanic',
+  fortification: 'Fortifications',
+  other: 'Other',
+};
+const SORT_EN: Record<PickerSort, { label: string; title: string }> = {
+  type: { label: 'Type', title: 'By type' },
+  az: { label: 'A–Z', title: 'Alphabetical' },
+  points: { label: 'Points', title: 'By points' },
+};
 
 export function UnitPicker({
   open,
@@ -65,6 +103,8 @@ export function UnitPicker({
   onToggleLegends: () => void;
   ru?: RuOverlay | null;
 }) {
+  const tt = useT();
+  const en = useEn();
   const [q, setQ] = useState('');
   const [prefs, setPrefsState] = useState(readPrefs);
   const setPrefs = (p: Partial<typeof prefs>) => {
@@ -131,17 +171,17 @@ export function UnitPicker({
       if (ds.legends) push('legends', 'Warhammer Legends', 'Legends', ds);
       else if (ds.group.startsWith('ally:')) {
         const a = L.faction.allies.find((x) => 'ally:' + x.key === ds.group);
-        push(ds.group, 'Союзники · ' + (a?.name ?? ''), a?.name ?? 'Союзники', ds);
+        push(ds.group, tt('Союзники · ', 'Allies · ') + (a?.name ?? ''), a?.name ?? tt('Союзники', 'Allies'), ds);
       } else if (ds.group.startsWith('det:')) {
         const name = L.det.get(ds.group.slice(4))?.name ?? '';
-        push(ds.group, 'Детачмент · ' + name, name || 'Детачмент', ds);
+        push(ds.group, tt('Детачмент · ', 'Detachment · ') + name, name || tt('Детачмент', 'Detachment'), ds);
       } else {
         const t = unitType(ds, isBattleline(ds, grants));
-        push(t, typeLabel(t), CHIP[t], ds);
+        push(t, en ? TYPE_EN[t] : typeLabel(t), en ? CHIP_EN[t] : CHIP[t], ds);
       }
     }
     return out;
-  }, [list, L, grants]);
+  }, [list, L, grants, en, tt]);
 
   const legendsCount = L.faction.datasheets.filter((d) => d.legends).length;
   // фильтр показывает ровно одну секцию; если её не стало (поиск, Legends) — снова «Все»
@@ -151,34 +191,34 @@ export function UnitPicker({
   const visible =
     prefs.sort === 'type'
       ? bySection
-      : [{ key: 'flat', title: PICKER_SORTS.find((x) => x.key === prefs.sort)!.title, chip: '', items: sortPicker(bySection.flatMap((x) => x.items), prefs.sort, (ds) => cheapest(ds, countOf(ds), chapter)) }];
+      : [{ key: 'flat', title: en ? SORT_EN[prefs.sort].title : PICKER_SORTS.find((x) => x.key === prefs.sort)!.title, chip: '', items: sortPicker(bySection.flatMap((x) => x.items), prefs.sort, (ds) => cheapest(ds, countOf(ds), chapter)) }];
   const allyInfo = active.startsWith('ally:') ? L.faction.allies.filter((a) => 'ally:' + a.key === active) : [];
 
   return (
-    <Sheet open={open} onClose={onClose} title="Добавить юнит" tall>
+    <Sheet open={open} onClose={onClose} title={tt('Добавить юнит', 'Add unit')} tall>
       <div className="sticky top-0 z-10 -mx-4 space-y-2.5 bg-app-elevated px-4 pb-3">
         <label className="flex h-11 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 focus-within:border-accent">
           <Icon name="search" className="size-4 text-fg-3" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Название, ключевое слово или способность" className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-fg-3" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={tt('Название, ключевое слово или способность', 'Name, keyword or ability')} className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-fg-3" />
           {q && (
-            <button type="button" aria-label="Очистить" onClick={() => setQ('')} className="text-fg-3">
+            <button type="button" aria-label={tt('Очистить', 'Clear')} onClick={() => setQ('')} className="text-fg-3">
               <Icon name="close" className="size-4" />
             </button>
           )}
         </label>
         <div className="flex items-center gap-2">
-          <div role="radiogroup" aria-label="Сортировка" className="flex min-w-0 flex-1 rounded-lg bg-white/[0.06] p-0.5">
+          <div role="radiogroup" aria-label={tt('Сортировка', 'Sort')} className="flex min-w-0 flex-1 rounded-lg bg-white/[0.06] p-0.5">
             {PICKER_SORTS.map((x) => (
               <button
                 key={x.key}
                 type="button"
                 role="radio"
                 aria-checked={prefs.sort === x.key}
-                aria-label={x.title}
+                aria-label={en ? SORT_EN[x.key].title : x.title}
                 onClick={() => (haptic.select(), setPrefs({ sort: x.key }))}
                 className={cx('min-w-0 flex-1 truncate rounded-md px-2 py-1.5 text-xs font-semibold transition', prefs.sort === x.key ? 'bg-white/[0.12] text-white' : 'text-fg-3')}
               >
-                {x.label}
+                {en ? SORT_EN[x.key].label : x.label}
               </button>
             ))}
           </div>
@@ -189,12 +229,12 @@ export function UnitPicker({
               onClick={() => (haptic.select(), setPrefs({ fits: !prefs.fits }))}
               className={cx('shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition', prefs.fits ? 'bg-accent text-accent-foreground' : 'bg-white/[0.06] text-fg-2')}
             >
-              Помещается <span className={cx('tabular-nums', prefs.fits ? 'text-accent-foreground/70' : 'text-fg-3')}>{Math.max(0, remaining)}</span>
+              {tt('Помещается', 'Fits')} <span className={cx('tabular-nums', prefs.fits ? 'text-accent-foreground/70' : 'text-fg-3')}>{Math.max(0, remaining)}</span>
             </button>
           )}
         </div>
         <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4">
-          {[{ key: 'all', chip: 'Все', items: list }, ...sections].map((t) => (
+          {[{ key: 'all', chip: tt('Все', 'All'), items: list }, ...sections].map((t) => (
             <button
               key={t.key}
               type="button"
@@ -213,7 +253,7 @@ export function UnitPicker({
           {allyInfo.map((a) => (
             <details key={a.key} className="group rounded-lg bg-white/[0.04] px-3 py-2 text-xs text-fg-3">
               <summary className="cursor-pointer list-none">
-                <b className="text-white/80">{a.name}:</b> {a.note}
+                <b className="text-white/80">{a.name}:</b> {en ? allyNoteEn(a.note) : a.note}
               </summary>
               {a.text && <p className="mt-1.5 whitespace-pre-line leading-relaxed text-fg-2">{cleanRuleText(a.text)}</p>}
             </details>
@@ -222,7 +262,7 @@ export function UnitPicker({
       )}
 
       {list.length === 0 ? (
-        <p className="py-10 text-center text-sm text-fg-3">{fitsOn ? `Ничего не найдено — осталось ${Math.max(0, remaining!)} очк.` : 'Ничего не найдено'}</p>
+        <p className="py-10 text-center text-sm text-fg-3">{fitsOn ? tt(`Ничего не найдено — осталось ${Math.max(0, remaining!)} очк.`, `Nothing found — ${Math.max(0, remaining!)} pts left`) : tt('Ничего не найдено', 'Nothing found')}</p>
       ) : (
         <div className="space-y-5">
           {visible.map((sec) => (
@@ -251,7 +291,7 @@ export function UnitPicker({
 
       {legendsCount > 0 && (
         <button type="button" onClick={onToggleLegends} className="mt-4 w-full rounded-xl border border-dashed border-white/10 px-3 py-2.5 text-xs font-semibold text-fg-3">
-          {roster.showLegends ? 'Скрыть' : 'Показать'} Warhammer Legends ({legendsCount})
+          {roster.showLegends ? tt('Скрыть', 'Hide') : tt('Показать', 'Show')} Warhammer Legends ({legendsCount})
         </button>
       )}
     </Sheet>
@@ -259,6 +299,8 @@ export function UnitPicker({
 }
 
 function PickerRow({ ds, count, limit, chapter, factionName, onAdd }: { ds: Datasheet; count: number; limit: number; chapter: string | null; factionName: string; onAdd: () => void }) {
+  const tt = useT();
+  const en = useEn();
   const next = bandFor(ds, count + 1, chapter);
   const opts = next?.options ?? [];
   const price = opts[0]?.cost;
@@ -268,18 +310,18 @@ function PickerRow({ ds, count, limit, chapter, factionName, onAdd }: { ds: Data
   const sizes = sizePriceLine(ds, count, chapter);
   if (ds.leads.length) sub.push(ds.support ? 'Support' : 'Leader');
   // размеры с ценами — отдельной строкой («5: 65 · 10: 130»); один размер — число моделей здесь, цена справа
-  if (!sizes && models.length && !(models.length === 1 && models[0] === 1)) sub.push(models.join(' / ') + ' мод.');
+  if (!sizes && models.length && !(models.length === 1 && models[0] === 1)) sub.push(models.join(' / ') + tt(' мод.', ' models'));
   if (ds.forgeWorld) sub.push('Forge World');
   // книга-источник, если она не основная книга фракции: так различаются одноимённые версии (Space Marines / Black Templars)
   else if (ds.source && !ds.legends && ds.source !== factionName) sub.push(ds.source);
-  if (ds.outdated) sub.push('* данные устарели');
+  if (ds.outdated) sub.push(tt('* данные устарели', '* outdated data'));
   const noCost = !ds.costs.length;
-  if (noCost) sub.push('нет цены в данных — в армию не входит');
+  if (noCost) sub.push(tt('нет цены в данных — в армию не входит', 'no points cost in the data — cannot be added'));
   return (
     <li className="border-b border-white/[0.06] last:border-b-0">
       <button type="button" onClick={onAdd} className={cx('flex w-full items-center gap-3 px-3.5 py-3 text-left transition active:bg-white/[0.06]', (full || noCost) && 'opacity-40')}>
         <div className="min-w-0 flex-1">
-          <p className="text-[14px] font-semibold leading-snug" title={outdatedNote(ds) ?? undefined}>
+          <p className="text-[14px] font-semibold leading-snug" title={outdatedNote(ds) ? (en ? 'Outdated data: not in the current wh-rules.ru source.' : outdatedNote(ds)!) : undefined}>
             {dsLabel(ds)}
           </p>
           {sub.length > 0 && <p className="mt-0.5 text-[12px] leading-snug text-fg-3">{sub.join(' · ')}</p>}
@@ -291,7 +333,7 @@ function PickerRow({ ds, count, limit, chapter, factionName, onAdd }: { ds: Data
           </span>
         )}
         <span className="w-11 shrink-0 text-right">
-          {opts.length > 1 && <span className="block text-[12px] leading-none text-fg-3">от</span>}
+          {opts.length > 1 && <span className="block text-[12px] leading-none text-fg-3">{tt('от', 'from')}</span>}
           <span className="font-display text-[17px] font-semibold leading-tight tabular-nums">{price ?? '—'}</span>
         </span>
         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">

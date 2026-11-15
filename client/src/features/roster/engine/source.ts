@@ -90,12 +90,19 @@ export const factionCredit = (faction: Pick<FactionData, 'id' | 'source'> | null
 };
 
 /** Короткая подпись для списка ростеров: самая новая версия очков (или выгрузка Wahapedia, если обновлений нет). */
-export const indexCredit = (index: IndexInfo): string => {
+export const indexCredit = (index: IndexInfo, lang: 'ru' | 'en' = 'ru'): string => {
   const latest = [...pointsUpdates(index)].sort((a, b) => a.source.date.localeCompare(b.source.date)).at(-1);
-  return latest ? `Очки: ${pointsLabel(latest.source)}` : `powered by ${wahapedia(index)}`;
+  return latest ? `${lang === 'en' ? 'Points' : 'Очки'}: ${pointsLabel(latest.source)}` : `powered by ${wahapedia(index)}`;
 };
 
 /** Что меняет обновление данных — по его виду (scripts/updates-40k.mjs), для игроков. */
+const UPDATE_KIND_EN: Record<string, string> = {
+  'whrules-faction': 'Datasheets, Detachments and army rules in full',
+  'whrules-faction-convert': 'Datasheets, Detachments and army rules in full (new Codex)',
+  'whrules-points': 'Unit points, per-copy price steps, Detachment DP, Enhancement points, paid wargear',
+  'whrules-wargear': 'Paid wargear and wargear options — as in the site’s roster builder',
+  'warmind-leaders': 'Which units Characters can lead (Leader) — completed from the Warmind check',
+};
 const UPDATE_KIND: Record<string, string> = {
   'whrules-faction': 'Инфолисты, детачменты и правила армии целиком',
   'whrules-faction-convert': 'Инфолисты, детачменты и правила армии целиком (новый кодекс)',
@@ -105,13 +112,18 @@ const UPDATE_KIND: Record<string, string> = {
 };
 
 /** Подробности для списка ростеров: выгрузка и каждое обновление — версия, дата, что меняет и какие армии. */
-export const indexCreditDetails = (index: IndexInfo): { title: string; text: string }[] => {
+export const indexCreditDetails = (index: IndexInfo, lang: 'ru' | 'en' = 'ru'): { title: string; text: string }[] => {
   const name = (id: string) => index.factions.find((f) => f.id === id)?.name ?? id;
+  const en = lang === 'en';
   return [
-    { title: `Выгрузка ${wahapedia(index)}`, text: 'Основа данных 40K: правила и инфолисты армий, которые не обновлялись целиком.' },
+    en
+      ? { title: `${wahapedia(index)} export`, text: 'The base of the 40K data: rules and datasheets of armies that were not updated in full.' }
+      : { title: `Выгрузка ${wahapedia(index)}`, text: 'Основа данных 40K: правила и инфолисты армий, которые не обновлялись целиком.' },
     ...(index.updates ?? []).map((u) => ({
       title: pointsLabel(u.source),
-      text: `${UPDATE_KIND[u.kind] ?? 'Обновление данных'}. Армии: ${(u.scope ?? []).map(name).join(', ') || '—'}.`,
+      text: en
+        ? `${UPDATE_KIND_EN[u.kind] ?? 'Data update'}. Armies: ${(u.scope ?? []).map(name).join(', ') || '—'}.`
+        : `${UPDATE_KIND[u.kind] ?? 'Обновление данных'}. Армии: ${(u.scope ?? []).map(name).join(', ') || '—'}.`,
     })),
   ];
 };

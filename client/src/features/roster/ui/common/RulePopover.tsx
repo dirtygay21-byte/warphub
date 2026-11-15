@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { loadGlossary } from '../../data';
-import { findAbility, findKeyword, parseRich, termHit, type Glossary, type GlossaryHit } from '../../glossary';
+import { findAbility, findKeyword, localizeGlossary, parseRich, termHit, type Glossary, type GlossaryHit } from '../../glossary';
 import { haptic, pushOverlay } from '../../telegram';
 import { cleanRuleText } from '../../text';
 import { IconButton } from '../kit';
 import { cx } from '../util';
+import { useEn, useT } from './i18n';
 
 /**
  * Всплывающая подсказка правила (01.11.2026, по образцу wh-rules.ru): нажатие на способность оружия, основную способность,
@@ -55,8 +56,12 @@ function resolve(g: Glossary, source: RuleLookup): Shown {
 }
 
 function RulePopover({ anchor, source, onClose }: { anchor: DOMRect; source: RuleSource; onClose: () => void }) {
+  const tt = useT();
+  const en = useEn();
   const box = useRef<HTMLDivElement>(null);
-  const [g, setG] = useState<Glossary | null>(null);
+  const [raw, setG] = useState<Glossary | null>(null);
+  // 16.11.2026: подсказка — на языке экрана (раньше всегда по-русски, и в режиме EN тексты смешивались)
+  const g = raw ? localizeGlossary(raw, en ? 'en' : 'ru') : null;
   const [failed, setFailed] = useState(false);
   // стек: нажатие на термин или способность в тексте открывает их в той же карточке
   const [stack, setStack] = useState<RuleLookup[]>([]);
@@ -145,13 +150,13 @@ function RulePopover({ anchor, source, onClose }: { anchor: DOMRect; source: Rul
       onKeyDown={(e) => e.stopPropagation()}
       className="fade-enter fixed z-[60] flex flex-col overflow-hidden rounded-xl border border-accent/30 bg-app-elevated shadow-2xl shadow-black/60">
       <div className="flex items-center gap-2 border-b border-white/[0.08] px-3 py-1.5">
-        {stack.length > 0 && <IconButton icon="back" label="Назад" onClick={() => setStack((s) => s.slice(0, -1))} className="size-7" />}
-        <p className="min-w-0 flex-1 truncate">{shown ? <Head shown={shown} /> : <span className="text-[13px] text-fg-3">Загрузка…</span>}</p>
+        {stack.length > 0 && <IconButton icon="back" label={tt('Назад', 'Back')} onClick={() => setStack((s) => s.slice(0, -1))} className="size-7" />}
+        <p className="min-w-0 flex-1 truncate">{shown ? <Head shown={shown} /> : <span className="text-[13px] text-fg-3">{tt('Загрузка…', 'Loading…')}</span>}</p>
         {shown?.kind === 'hit' && shown.hit.kind === 'ability' && shown.hit.ability.num && <span className="shrink-0 text-[12px] text-fg-3">{shown.hit.ability.num}</span>}
-        <IconButton icon="close" label="Закрыть" onClick={onClose} className="size-7" />
+        <IconButton icon="close" label={tt('Закрыть', 'Close')} onClick={onClose} className="size-7" />
       </div>
       <div className="overflow-y-auto overscroll-contain px-3 py-2.5 text-[13px] leading-relaxed text-fg-2">
-        {failed ? <p className="text-fg-3">Не удалось загрузить правила — проверьте связь.</p> : shown ? <Body shown={shown} g={g} link={link} /> : null}
+        {failed ? <p className="text-fg-3">{tt('Не удалось загрузить правила — проверьте связь.', 'Could not load the rules — check your connection.')}</p> : shown ? <Body shown={shown} g={g} link={link} /> : null}
       </div>
     </div>,
     document.body,
@@ -168,14 +173,15 @@ function Head({ shown }: { shown: Shown }) {
 }
 
 function Body({ shown, g, link }: { shown: Shown; g: Glossary | null; link: LinkRender }) {
+  const tt = useT();
   if (shown.kind === 'text')
     return (
       <>
         {shown.sub && <p className="mb-1 text-[12px] text-fg-3">{shown.sub}</p>}
-        {shown.rich ? <Rich text={shown.text} g={g} link={link} /> : <p className="whitespace-pre-line">{cleanRuleText(shown.text) || 'Нет данных.'}</p>}
+        {shown.rich ? <Rich text={shown.text} g={g} link={link} /> : <p className="whitespace-pre-line">{cleanRuleText(shown.text) || tt('Нет данных.', 'No data.')}</p>}
       </>
     );
-  if (shown.kind === 'missing') return <p className="text-fg-3">Нет данных: этого правила нет в глоссарии (wh-rules.ru, версия {g?.source.dataVersion ?? '—'}).</p>;
+  if (shown.kind === 'missing') return <p className="text-fg-3">{tt(`Нет данных: этого правила нет в глоссарии (wh-rules.ru, версия ${g?.source.dataVersion ?? '—'}).`, `No data: this rule is not in the glossary (wh-rules.ru, version ${g?.source.dataVersion ?? '—'}).`)}</p>;
   const h = shown.hit;
   const texts = h.kind === 'ability' ? [h.ability.text] : h.kind === 'weapon' ? h.texts : [h.text];
   return (
@@ -185,11 +191,11 @@ function Body({ shown, g, link }: { shown: Shown; g: Glossary | null; link: Link
       ))}
       {h.kind === 'ability' && h.ability.example && (
         <div className="rounded-lg bg-white/[0.04] px-2.5 py-2 text-[12px]">
-          <span className="font-semibold text-fg-3">Пример. </span>
+          <span className="font-semibold text-fg-3">{tt('Пример. ', 'Example. ')}</span>
           <Rich text={h.ability.example} g={g} link={link} inline />
         </div>
       )}
-      <p className="text-[11px] text-fg-3">Источник: wh-rules.ru · версия данных {g?.source.dataVersion}</p>
+      <p className="text-[11px] text-fg-3">{tt('Источник: wh-rules.ru · версия данных', 'Source: wh-rules.ru · data version')} {g?.source.dataVersion}</p>
     </div>
   );
 }

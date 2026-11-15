@@ -5,10 +5,12 @@ import { encodeRoster } from '../engine/roster';
 import type { Roster } from '../engine/types';
 import { haptic, shareText } from '../telegram';
 import { Button, Icon, Segmented, Sheet } from './kit';
+import { useT } from './common/i18n';
 
 type Fmt = 'gw' | 'compact' | 'code';
 
 export function ExportSheet({ open, onClose, roster, L, cr, dataVersion, credit = null }: { open: boolean; onClose: () => void; roster: Roster; L: DataLookup; cr: ComputedRoster; dataVersion: string | null; credit?: string | null }) {
+  const t = useT();
   const [fmt, setFmt] = useState<Fmt>('gw');
   const [copied, setCopied] = useState(false);
   const text = useMemo(() => {
@@ -38,12 +40,12 @@ export function ExportSheet({ open, onClose, roster, L, cr, dataVersion, credit 
     <Sheet
       open={open}
       onClose={onClose}
-      title="Экспорт"
+      title={t('Экспорт', 'Export')}
       tall
       footer={
         <div className="flex gap-2">
           <Button variant="primary" className="h-12 flex-1" onClick={copy}>
-            <Icon name={copied ? 'check' : 'copy'} /> {copied ? 'Скопировано' : 'Скопировать'}
+            <Icon name={copied ? 'check' : 'copy'} /> {copied ? t('Скопировано', 'Copied') : t('Скопировать', 'Copy')}
           </Button>
           {fmt !== 'code' && (
             <Button variant="ghost" className="h-12" onClick={() => shareText(text)}>
@@ -58,15 +60,15 @@ export function ExportSheet({ open, onClose, roster, L, cr, dataVersion, credit 
         onChange={setFmt}
         className="mb-3"
         options={[
-          { value: 'gw', label: 'Как в приложении GW' },
-          { value: 'compact', label: 'Коротко' },
-          { value: 'code', label: 'Код' },
+          { value: 'gw', label: t('Как в приложении GW', 'GW app format') },
+          { value: 'compact', label: t('Коротко', 'Compact') },
+          { value: 'code', label: t('Код', 'Code') },
         ]}
       />
       {cr.errors > 0 && fmt !== 'code' && (
-        <p className="mb-3 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-[13px] text-red-200">В ростере есть ошибки ({cr.errors}) — список не пройдёт проверку.</p>
+        <p className="mb-3 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-[13px] text-red-200">{t(`В ростере есть ошибки (${cr.errors}) — список не пройдёт проверку.`, `The roster has errors (${cr.errors}) — the list will not pass validation.`)}</p>
       )}
-      {fmt === 'code' && <p className="mb-3 text-sm text-fg-3">Код целиком содержит ростер — вставьте его в «Импорт по коду» на другом устройстве.</p>}
+      {fmt === 'code' && <p className="mb-3 text-sm text-fg-3">{t('Код целиком содержит ростер — вставьте его в «Импорт по коду» на другом устройстве.', 'The code contains the whole roster — paste it into “Import by code” on another device.')}</p>}
       <pre className="whitespace-pre-wrap break-words rounded-xl border border-white/10 bg-black/30 p-3 font-mono text-[12px] leading-relaxed text-white/85">{text}</pre>
     </Sheet>
   );

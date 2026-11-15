@@ -29,6 +29,7 @@ import type { WarcryIndex } from '../warcry/types';
 import type { WarcryRoster } from '../warcry/roster';
 import { WarcryList } from './warcry/WarcryList';
 import { WarcryEditor } from './warcry/WarcryEditor';
+import { Lang40k } from './common/i18n';
 import { RosterList } from './RosterList';
 import { AosList } from './aos/AosList';
 import { AosEditor } from './aos/AosEditor';
@@ -465,7 +466,11 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
   if (!index || !rosters) return null;
 
   if (route.screen === 'rules') {
-    return <Rules index={index} onBack={goBack} factionId={route.factionId} detachmentIds={route.detachmentIds} />;
+    return (
+      <Lang40k.Provider value>
+        <Rules index={index} onBack={goBack} factionId={route.factionId} detachmentIds={route.detachmentIds} />
+      </Lang40k.Provider>
+    );
   }
   if (route.screen === 'battlefield') {
     return <Battlefield onBack={goBack} initialDisposition={route.disposition} />;
@@ -481,6 +486,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
     const roster = rosters.find((r) => r.id === route.id);
     if (roster) {
       return (
+        <Lang40k.Provider value>
         <RosterEditor
           key={roster.id}
           roster={roster}
@@ -500,11 +506,13 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
             goList();
           }}
         />
+        </Lang40k.Provider>
       );
     }
   }
 
   return (
+    <Lang40k.Provider value>
     <RosterList
       onExit={goHome}
       switcher={switcher}
@@ -524,6 +532,7 @@ export function RosterBuilder({ onExit }: { onExit: () => void }) {
         update((list) => list.filter((x) => x.id !== id));
       }}
     />
+    </Lang40k.Provider>
   );
 }
 

@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { haptic, pushOverlay } from '../telegram';
 import { cx } from './util';
+import { useT } from './common/i18n';
 import { WormField } from '@/components/ui/ds/Lime';
 import { useEffect as useEffectFs, useState as useStateFs } from 'react';
 import { canFullscreen, isFullscreen, onFullscreenChanged, toggleFullscreen } from '@/utils/telegramApp';
@@ -106,6 +107,7 @@ export function IconButton({ icon, onClick, label, className }: { icon: string; 
 
 /** Нижняя шторка. */
 export function Sheet({ open, onClose, title, children, footer, tall }: { open: boolean; onClose: () => void; title: ReactNode; children: ReactNode; footer?: ReactNode; tall?: boolean }) {
+  const t = useT();
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -132,7 +134,7 @@ export function Sheet({ open, onClose, title, children, footer, tall }: { open: 
         <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-white/15 sm:hidden" />
         <div className="flex items-center gap-3 px-4 pb-2 pt-3">
           <h2 className="font-display min-w-0 flex-1 truncate text-lg font-semibold uppercase">{title}</h2>
-          <IconButton icon="close" label="Закрыть" onClick={onClose} className="size-9" />
+          <IconButton icon="close" label={t('Закрыть', 'Close')} onClick={onClose} className="size-9" />
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4">{children}</div>
         {footer && <div className="border-t border-white/10 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">{footer}</div>}
@@ -170,14 +172,15 @@ export function Segmented<T extends string>({ value, options, onChange, classNam
 }
 
 export function Counter({ value, onChange, min = 0, max = 99 }: { value: number; onChange: (n: number) => void; min?: number; max?: number }) {
+  const t = useT();
   const btn = 'flex size-9 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-white/80 active:bg-white/10 disabled:opacity-30';
   return (
     <div className="flex items-center gap-1.5">
-      <button type="button" aria-label="Меньше" className={btn} disabled={value <= min} onClick={() => (haptic.select(), onChange(value - 1))}>
+      <button type="button" aria-label={t('Меньше', 'Less')} className={btn} disabled={value <= min} onClick={() => (haptic.select(), onChange(value - 1))}>
         <Icon name="minus" className="size-4" />
       </button>
       <span className="w-7 text-center text-sm font-semibold tabular-nums">{value}</span>
-      <button type="button" aria-label="Больше" className={btn} disabled={value >= max} onClick={() => (haptic.select(), onChange(value + 1))}>
+      <button type="button" aria-label={t('Больше', 'More')} className={btn} disabled={value >= max} onClick={() => (haptic.select(), onChange(value + 1))}>
         <Icon name="plus" className="size-4" />
       </button>
     </div>
@@ -227,7 +230,9 @@ export function Empty({ title, children }: { title: string; children?: ReactNode
  * Полоса очков ростера (перестройка 15.11.2026): толще, и под ней — сколько осталось или на сколько перебор.
  * Общая для редакторов 40K, AoS, Kill Team и Warcry.
  */
-export function PointsBar({ used, limit, unit = 'очк.' }: { used: number; limit: number; unit?: string }) {
+export function PointsBar({ used, limit, unit }: { used: number; limit: number; unit?: string }) {
+  const t = useT();
+  unit ??= t('очк.', 'pts');
   const over = used > limit;
   const pct = limit ? Math.min(100, Math.round((used / limit) * 100)) : 0;
   const left = Math.abs(limit - used).toLocaleString('ru-RU');
@@ -238,7 +243,7 @@ export function PointsBar({ used, limit, unit = 'очк.' }: { used: number; lim
       </div>
       <p className="mt-1.5 flex justify-between text-[12px] font-semibold tabular-nums">
         <span className={over ? 'text-danger' : used === limit ? 'text-accent' : 'text-fg-2'}>
-          {over ? `Перебор на ${left} ${unit}` : used === limit ? 'Ровно в лимит' : `Осталось ${left} ${unit}`}
+          {over ? t(`Перебор на ${left} ${unit}`, `${left} ${unit} over`) : used === limit ? t('Ровно в лимит', 'Exactly at the limit') : t(`Осталось ${left} ${unit}`, `${left} ${unit} left`)}
         </span>
         <span className="text-fg-3">{pct}%</span>
       </p>
@@ -255,6 +260,7 @@ export function HeroWorm() {
 
 /** «На весь экран» (15.11.2026): полноэкранный режим Telegram для битв и Test Army; вне Telegram 8.0+ кнопки нет. */
 export function FullscreenButton({ className }: { className?: string }) {
+  const t = useT();
   const [on, setOn] = useStateFs(isFullscreen());
   useEffectFs(() => {
     const off = onFullscreenChanged(() => setOn(isFullscreen()));
@@ -270,8 +276,8 @@ export function FullscreenButton({ className }: { className?: string }) {
       type="button"
       onClick={() => (haptic.tap(), toggleFullscreen())}
       aria-pressed={on}
-      aria-label={on ? 'Выйти из полноэкранного режима' : 'На весь экран'}
-      title={on ? 'Выйти из полноэкранного режима' : 'На весь экран'}
+      aria-label={on ? t('Выйти из полноэкранного режима', 'Exit full screen') : t('На весь экран', 'Full screen')}
+      title={on ? t('Выйти из полноэкранного режима', 'Exit full screen') : t('На весь экран', 'Full screen')}
       className={cx('flex size-9 shrink-0 items-center justify-center rounded-xl border border-white/10 text-fg-2 active:bg-white/10', on && 'border-accent/60 text-accent', className)}
     >
       <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

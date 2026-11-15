@@ -7,6 +7,7 @@ import { useRef, useState, type ReactNode } from 'react';
 import { haptic } from '../../telegram';
 import { Button, Icon, IconButton, PointsBar, Sheet, Tag } from '../kit';
 import { cx, fmtPts } from '../util';
+import { useT } from './i18n';
 
 /** Карточка ростера в списке: название, подпись, метки, очки справа, меню. */
 export function RosterCard({
@@ -89,8 +90,9 @@ export type ToolItem = { icon: string; title: string; sub: string; onClick: () =
  * с выбором пунктов (правила, обучение, начало игры, Test Army). Одинаково во всех играх.
  */
 export function ToolMenus({ rules, game }: { rules: ToolItem[]; game: ToolItem[] }) {
+  const t = useT();
   const [open, setOpen] = useState<'rules' | 'game' | null>(null);
-  const groups = { rules: { icon: 'book', title: 'Правила', items: rules }, game: { icon: 'map', title: 'Игра', items: game } } as const;
+  const groups = { rules: { icon: 'book', title: t('Правила', 'Rules'), items: rules }, game: { icon: 'map', title: t('Игра', 'Game'), items: game } } as const;
   const shown = open ? groups[open] : null;
   return (
     <>
@@ -120,15 +122,17 @@ export function ToolMenus({ rules, game }: { rules: ToolItem[]; game: ToolItem[]
 }
 
 /** Шапка списка ростеров игры. */
-export function ListHeader({ kicker, title, onBack, onImport }: { kicker: string; title: string; onBack: () => void; onImport?: () => void }) {
+export function ListHeader({ kicker, title, onBack, onImport, extra }: { kicker: string; title: string; onBack: () => void; onImport?: () => void; extra?: ReactNode }) {
+  const t = useT();
   return (
     <header className="mb-4 flex items-end justify-between gap-3">
-      <IconButton icon="back" label="К играм" onClick={onBack} className="mb-0.5" />
+      <IconButton icon="back" label={t('К играм', 'Back to games')} onClick={onBack} className="mb-0.5" />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">{kicker}</p>
         <h1 className="font-display mt-1 text-[32px] font-semibold uppercase leading-none">{title}</h1>
       </div>
-      {onImport && <IconButton icon="upload" label="Импорт по коду" onClick={onImport} />}
+      {extra}
+      {onImport && <IconButton icon="upload" label={t('Импорт по коду', 'Import by code')} onClick={onImport} />}
     </header>
   );
 }

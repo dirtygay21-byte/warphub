@@ -12,8 +12,13 @@ import { useRu } from './common/useRu';
 import { Icon, Segmented, Sheet } from './kit';
 import { cx } from './util';
 import { haptic } from '../telegram';
+import { useEn, useT } from './common/i18n';
+
+const PHASE_EN: Record<string, string> = { Command: 'Command', Movement: 'Movement', Shooting: 'Shooting', Charge: 'Charge', Fight: 'Fight' };
 
 export function BattleSheet({ open, onClose, L, cr, detachmentIds }: { open: boolean; onClose: () => void; L: DataLookup; cr: ComputedRoster; detachmentIds: string[] }) {
+  const t = useT();
+  const en = useEn();
   const [tab, setTab] = useState<'strats' | 'units'>('strats');
   const [turn, setTurn] = useState<TurnFilter>('all');
   const [phase, setPhase] = useState<PhaseFilter>('all');
@@ -22,25 +27,25 @@ export function BattleSheet({ open, onClose, L, cr, detachmentIds }: { open: boo
   const all = useMemo(() => rosterStratagems(cr, L, detachmentIds), [cr, L, detachmentIds]);
   const list = all.filter((s) => inTurn(s.st, turn) && inPhase(s.st, phase) && matchStratagem(s, q, ruStratagem(ru, s.st.id)));
   const groups = [
-    { title: 'Детачмент', items: list.filter((s) => s.det) },
-    { title: 'Армия', items: list.filter((s) => !s.det && !s.core) },
-    { title: 'Основные', items: list.filter((s) => s.core) },
+    { title: t('Детачмент', 'Detachment'), items: list.filter((s) => s.det) },
+    { title: t('Армия', 'Army'), items: list.filter((s) => !s.det && !s.core) },
+    { title: t('Основные', 'Core'), items: list.filter((s) => s.core) },
   ].filter((g) => g.items.length);
   const units = sortRosterUnits(cr.units.filter((u) => u.ds));
 
   return (
-    <Sheet open={open} onClose={onClose} title="Боевой лист" tall>
+    <Sheet open={open} onClose={onClose} title={t('Боевой лист', 'Battle sheet')} tall>
       <div className="sticky top-0 z-10 -mx-4 space-y-2.5 bg-app-elevated px-4 pb-3">
-        <Segmented value={tab} onChange={setTab} options={[{ value: 'strats', label: `Стратагемы ${all.length}` }, { value: 'units', label: `Юниты ${units.length}` }]} />
+        <Segmented value={tab} onChange={setTab} options={[{ value: 'strats', label: `${t('Стратагемы', 'Stratagems')} ${all.length}` }, { value: 'units', label: `${t('Юниты', 'Units')} ${units.length}` }]} />
         {tab === 'strats' && (
           <>
             <Segmented
               value={turn}
               onChange={(v) => (haptic.select(), setTurn(v))}
               options={[
-                { value: 'all', label: 'Любой ход' },
-                { value: 'mine', label: 'Мой' },
-                { value: 'opp', label: 'Противника' },
+                { value: 'all', label: t('Любой ход', 'Any turn') },
+                { value: 'mine', label: t('Мой', 'Mine') },
+                { value: 'opp', label: t('Противника', 'Opponent’s') },
               ]}
             />
             <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4">
@@ -52,15 +57,15 @@ export function BattleSheet({ open, onClose, L, cr, detachmentIds }: { open: boo
                   onClick={() => (haptic.select(), setPhase(p))}
                   className={cx('shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition', phase === p ? 'bg-accent text-accent-foreground' : 'bg-white/[0.06] text-fg-2')}
                 >
-                  {p === 'all' ? 'Все фазы' : PHASE_LABEL[p]}
+                  {p === 'all' ? t('Все фазы', 'All phases') : en ? PHASE_EN[p] : PHASE_LABEL[p]}
                 </button>
               ))}
             </div>
             <label className="flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 focus-within:border-accent">
               <Icon name="search" className="size-4 text-fg-3" />
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск по названию и тексту" className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-fg-3" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('Поиск по названию и тексту', 'Search by name and text')} className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-fg-3" />
               {q && (
-                <button type="button" aria-label="Очистить" onClick={() => setQ('')} className="text-fg-3">
+                <button type="button" aria-label={t('Очистить', 'Clear')} onClick={() => setQ('')} className="text-fg-3">
                   <Icon name="close" className="size-4" />
                 </button>
               )}
@@ -86,7 +91,7 @@ export function BattleSheet({ open, onClose, L, cr, detachmentIds }: { open: boo
                       sub={[`${st.cp} CP`, st.turn, st.phase, det].filter(Boolean).join(' · ')}
                       text={st.text}
                       ru={ruStratagem(ru, st.id)}
-                      extra={targets.length ? <p className="mt-2 text-[12px] leading-snug text-fg-3">Для: {targets.join(', ')}</p> : null}
+                      extra={targets.length ? <p className="mt-2 text-[12px] leading-snug text-fg-3">{t('Для:', 'For:')} {targets.join(', ')}</p> : null}
                     />
                   ))}
                 </div>
@@ -94,7 +99,7 @@ export function BattleSheet({ open, onClose, L, cr, detachmentIds }: { open: boo
             ))}
           </div>
         ) : (
-          <p className="py-10 text-center text-sm text-fg-3">Нет стратагем для этого фильтра</p>
+          <p className="py-10 text-center text-sm text-fg-3">{t('Нет стратагем для этого фильтра', 'No Stratagems for this filter')}</p>
         )
       ) : units.length ? (
         <ul className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02]">
@@ -105,9 +110,9 @@ export function BattleSheet({ open, onClose, L, cr, detachmentIds }: { open: boo
               <li key={u.unit.uid} className="border-b border-white/[0.06] px-3 py-2.5 last:border-b-0">
                 <p className="flex items-baseline justify-between gap-2 text-[14px] font-semibold leading-snug">
                   <span className="min-w-0">{ds.name}</span>
-                  <span className="shrink-0 text-[12px] font-normal tabular-nums text-fg-3">{u.models} мод.</span>
+                  <span className="shrink-0 text-[12px] font-normal tabular-nums text-fg-3">{u.models} {t('мод.', 'models')}</span>
                 </p>
-                {host && <p className="text-[12px] text-fg-3">с отрядом {host}</p>}
+                {host && <p className="text-[12px] text-fg-3">{t('с отрядом', 'with')} {host}</p>}
                 <table className="mt-1 w-full table-fixed text-center text-[12.5px] tabular-nums">
                   <thead>
                     <tr className="text-[11px] uppercase text-fg-3">
@@ -147,7 +152,7 @@ export function BattleSheet({ open, onClose, L, cr, detachmentIds }: { open: boo
           })}
         </ul>
       ) : (
-        <p className="py-10 text-center text-sm text-fg-3">В ростере нет юнитов</p>
+        <p className="py-10 text-center text-sm text-fg-3">{t('В ростере нет юнитов', 'No units in the roster')}</p>
       )}
     </Sheet>
   );

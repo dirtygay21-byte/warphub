@@ -155,7 +155,9 @@ export function aosPointSystems(r: AosRoster, L: AosLookup, cr: AosComputed): Po
 
 // ---------- Warhammer 40,000 ----------
 
-export function w40kPointSystems(roster: Roster, L: DataLookup, cr: ComputedRoster): PointSystem[] {
+/** lang — язык подписей (переключатель RU/EN 40K, 16.11.2026). */
+export function w40kPointSystems(roster: Roster, L: DataLookup, cr: ComputedRoster, lang: 'ru' | 'en' = 'ru'): PointSystem[] {
+  const T = (ru: string, en: string) => (lang === 'en' ? en : ru);
   const size = BATTLE_SIZES[roster.battleSize];
   const base = cr.units.reduce((s, c) => s + c.base, 0);
   const extras = cr.units.reduce((s, c) => s + c.extras, 0);
@@ -167,57 +169,57 @@ export function w40kPointSystems(roster: Roster, L: DataLookup, cr: ComputedRost
     {
       id: '40k-army',
       category: 'army',
-      title: 'Очки армии',
-      about: 'Стоимость армии при сборке: юниты по числу моделей, платное снаряжение и улучшения. Сумма не должна превышать лимит размера игры.',
+      title: T('Очки армии', 'Army points'),
+      about: T('Стоимость армии при сборке: юниты по числу моделей, платное снаряжение и улучшения. Сумма не должна превышать лимит размера игры.', 'Army cost: units by model count, paid wargear and Enhancements. The total must not exceed the battle size limit.'),
       status: 'computed',
       lines: [
-        { label: 'Итого', value: `${n(cr.points)} / ${n(size.points)}`, bad: cr.points > size.points },
-        { label: 'Юниты (по числу моделей)', value: n(base) },
-        { label: 'Платное снаряжение', value: n(extras) },
-        { label: 'Улучшения', value: n(enh) },
+        { label: T('Итого', 'Total'), value: `${n(cr.points)} / ${n(size.points)}`, bad: cr.points > size.points },
+        { label: T('Юниты (по числу моделей)', 'Units (by model count)'), value: n(base) },
+        { label: T('Платное снаряжение', 'Paid wargear'), value: n(extras) },
+        { label: T('Улучшения', 'Enhancements'), value: n(enh) },
       ],
-      context: `${size.label}: ${n(size.points)} очков.`,
-      sources: [{ label: 'Munitorum Field Manual — выгрузка Wahapedia' }],
+      context: T(`${size.label}: ${n(size.points)} очков.`, `${size.label}: ${n(size.points)} points.`),
+      sources: [{ label: T('Munitorum Field Manual — выгрузка Wahapedia', 'Munitorum Field Manual — Wahapedia export') }],
     },
     {
       id: '40k-dp',
       category: 'army',
-      title: 'Очки детачментов (DP)',
-      about: 'Бюджет на детачменты: у каждого детачмента своя стоимость в DP.',
+      title: T('Очки детачментов (DP)', 'Detachment points (DP)'),
+      about: T('Бюджет на детачменты: у каждого детачмента своя стоимость в DP.', 'Detachment budget: each Detachment has its own DP cost.'),
       status: 'computed',
       lines: [
-        { label: 'Потрачено', value: `${cr.dp} / ${cr.dpLimit}`, bad: cr.issues.some((i) => i.code === 'dp') },
-        ...(size.singleOverBudget ? [{ label: 'Единственный детачмент', value: `до ${size.singleOverBudget} DP`, note: `В ${size.label} можно взять один детачмент дороже бюджета.` }] : []),
+        { label: T('Потрачено', 'Spent'), value: `${cr.dp} / ${cr.dpLimit}`, bad: cr.issues.some((i) => i.code === 'dp') },
+        ...(size.singleOverBudget ? [{ label: T('Единственный детачмент', 'Single Detachment'), value: T(`до ${size.singleOverBudget} DP`, `up to ${size.singleOverBudget} DP`), note: T(`В ${size.label} можно взять один детачмент дороже бюджета.`, `In ${size.label} one Detachment may exceed the budget.`) }] : []),
       ],
-      context: roster.battleSize === 'onslaught' ? 'Бюджет DP для Onslaught официально не подтверждён.' : undefined,
+      context: roster.battleSize === 'onslaught' ? T('Бюджет DP для Onslaught официально не подтверждён.', 'The DP budget for Onslaught is not officially confirmed.') : undefined,
     },
     {
       id: '40k-enh',
       category: 'army',
-      title: 'Улучшения',
-      about: 'Число улучшений ограничено размером игры (их очки входят в «Очки армии»).',
+      title: T('Улучшения', 'Enhancements'),
+      about: T('Число улучшений ограничено размером игры (их очки входят в «Очки армии»).', 'The number of Enhancements is limited by battle size (their points count towards Army points).'),
       status: 'computed',
-      lines: [{ label: 'Взято', value: `${cr.enhancementsUsed} / ${cr.enhancementsLimit}`, bad: cr.issues.some((i) => i.code === 'enh-cap') }],
+      lines: [{ label: T('Взято', 'Taken'), value: `${cr.enhancementsUsed} / ${cr.enhancementsLimit}`, bad: cr.issues.some((i) => i.code === 'enh-cap') }],
     },
     {
       id: '40k-cp',
       category: 'game',
-      title: 'Очки команд (CP)',
-      about: 'Тратятся на стратагемы во время партии. Стоимость каждой стратагемы — в карточке детачмента.',
+      title: T('Очки команд (CP)', 'Command points (CP)'),
+      about: T('Тратятся на стратагемы во время партии. Стоимость каждой стратагемы — в карточке детачмента.', 'Spent on Stratagems during the game. Each Stratagem’s cost is on the Detachment card.'),
       status: strats.length ? 'computed' : 'unavailable',
       lines: strats.length
-        ? [...byCp].sort((a, b) => Number(a[0]) - Number(b[0])).map(([cp, k]) => ({ label: `Стратагем за ${cp} CP`, value: String(k) }))
-        : [{ label: 'Стратагемы', value: '—', note: 'Детачмент не выбран.' }],
-      context: 'Сколько CP игрок получает за раунд — в данных конструктора нет; смотрите основные правила редакции.',
+        ? [...byCp].sort((a, b) => Number(a[0]) - Number(b[0])).map(([cp, k]) => ({ label: T(`Стратагем за ${cp} CP`, `${cp} CP Stratagems`), value: String(k) }))
+        : [{ label: T('Стратагемы', 'Stratagems'), value: '—', note: T('Детачмент не выбран.', 'No Detachment selected.') }],
+      context: T('Сколько CP игрок получает за раунд — в данных конструктора нет; смотрите основные правила редакции.', 'How many CP a player gains per round is not in the builder data; see the Core Rules.'),
     },
     {
       id: '40k-vp',
       category: 'game',
-      title: 'Победные очки (VP)',
-      about: 'Начисляются за основные и вторичные задачи миссии.',
+      title: T('Победные очки (VP)', 'Victory points (VP)'),
+      about: T('Начисляются за основные и вторичные задачи миссии.', 'Scored for primary and secondary mission objectives.'),
       status: 'unavailable',
-      lines: [{ label: 'Начисление VP', value: '—', note: 'Задачи миссий не входят в выгрузку Wahapedia; конструктор их не считает.' }],
-      context: 'Зависит от миссионного пакета.',
+      lines: [{ label: T('Начисление VP', 'VP scoring'), value: '—', note: T('Задачи миссий не входят в выгрузку Wahapedia; конструктор их не считает.', 'Mission objectives are not in the Wahapedia export; the builder does not count them.') }],
+      context: T('Зависит от миссионного пакета.', 'Depends on the mission pack.'),
     },
   ];
 }

@@ -73,7 +73,8 @@ describe('учебный раунд', () => {
     expect(pages).not.toContain('<SectionLabel>Обучающая игра</SectionLabel>');
     for (const [f, g] of [['RosterList.tsx', '40k'], ['aos/AosList.tsx', 'aos'], ['kt/KtList.tsx', 'kt'], ['warcry/WarcryList.tsx', 'warcry']] as const) {
       const list = fs.readFileSync(path.join(ROOT, 'features', 'roster', 'ui', f), 'utf8');
-      expect(list).toContain(`...(learnDone('${g}') ? [{ icon: 'shield', title: 'Обучающая игра'`);
+      // 40K: подпись на языке экрана — t('Обучающая игра', …) (переключатель RU/EN, 16.11.2026)
+      expect(list).toMatch(new RegExp(`\\.\\.\\.\\(learnDone\\('${g}'\\) \\? \\[\\{ icon: 'shield', title: (t\\()?'Обучающая игра'`));
     }
   });
 });
