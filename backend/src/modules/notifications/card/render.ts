@@ -70,6 +70,27 @@ const WHEN_LABELS = new Set(['Когда', 'Теперь', 'Время']);
 const FACT_PRIORITY = ['Стол', 'Соперник', 'Игрок', 'Отменил', 'За столом', 'Записей', 'Сыграно игр', 'Мест', 'Команда', 'Армия', 'Варбанда', 'Очки'];
 const MAX_FACTS = 2;
 
+/**
+ * Значение факта на картинке (15.11.2026, владелец: «тире и многоточие выглядят неправильно»): одинаково для всех
+ * карточек — только главная часть значения, без обрезки посередине. «Иван Петров (@ivan) — Kommandos, Игрок» →
+ * «Иван Петров (@ivan)»; «5 · ждут подтверждения: 2» → «5». Слишком длинное — без «(…)», затем по словам.
+ * Подробности остаются в подписи под картинкой.
+ */
+export function factValue(value: string, max = 22): string {
+  let v = value.split(/\s[—·]\s/)[0]!.trim();
+  if (v.length > max) v = v.replace(/\s*\([^)]*\)\s*$/, '').trim();
+  if (v.length > max) {
+    const words = v.split(/\s+/);
+    v = '';
+    for (const w of words) {
+      if ((v ? `${v} ${w}` : w).length > max) break;
+      v = v ? `${v} ${w}` : w;
+    }
+    v ||= words[0]!.slice(0, max);
+  }
+  return v;
+}
+
 function pick(card: NotificationCard): { when: string; facts: CardRow[]; text: string } {
   const rows = card.blocks.flatMap((b: CardBlock) => (b.type === 'rows' ? b.rows : []));
   const when = rows.find((r) => WHEN_LABELS.has(r.label))?.value ?? '';
@@ -134,7 +155,7 @@ export function cardTree(card: NotificationCard, logoSrc: string, background?: s
       ...facts.map((r) =>
         el('div', { alignItems: 'baseline', padding: '12px 28px', marginRight: 16, marginTop: 16, borderRadius: 22, backgroundColor: COLORS.panel }, [
           el('div', { fontFamily: INTER, fontWeight: 600, fontSize: 30, textTransform: 'uppercase', color: COLORS.fg3 }, clamp(r.label, 14)),
-          el('div', { marginLeft: 16, fontFamily: INTER, fontWeight: 600, fontSize: 46, color: COLORS.fg }, clamp(r.value, 22)),
+          el('div', { marginLeft: 16, fontFamily: INTER, fontWeight: 600, fontSize: 46, color: COLORS.fg }, factValue(r.value)),
         ]),
       ),
     ]),
