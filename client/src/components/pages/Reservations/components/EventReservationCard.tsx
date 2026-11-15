@@ -1,9 +1,8 @@
 import { DetailRow } from "./DetailRow";
 import ContentImage from "@/components/ui/ContentImage";
-import { formatReservationDate } from "@/utils/date";
 import { formatTimeRange } from "@/utils/reservationDisplay";
 import clsx from "clsx";
-import { DsButton } from "@/components/ui/ds";
+import { DateTile, DsButton } from "@/components/ui/ds";
 import {
   LoaderCircle,
   Table2,
@@ -33,28 +32,24 @@ export function EventReservationCard({
         !isPast && "border-white/10",
       )}
     >
-      {event.bannerUrl && (
-        <ContentImage
-          src={event.bannerUrl}
-          alt={event.title}
-          crop={event.bannerCrop}
-          className="aspect-[2/1] w-full"
-        />
-      )}
-
-      <div className="space-y-1 px-4 pt-4">
-        <div className="flex items-center justify-between gap-2">
-          <span className="min-w-0 truncate text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">Ивент · {event.title}</span>
-          <span className="inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-[9px] bg-accent px-2.5 text-[12px] font-semibold text-accent-foreground">
-            Записан
-          </span>
+      {/* как остальные записи (15.11.2026): дата плиткой, название и время; картинка ивента — маленькой справа */}
+      <div className="flex items-center gap-3 p-3">
+        <DateTile date={event.startsAt} tone={isPast ? "muted" : "lime"} />
+        <div className="min-w-0 flex-1">
+          <p className="line-clamp-2 text-[16px] font-bold leading-tight">{event.title}</p>
+          <p className="mt-1 flex items-center gap-2">
+            <span className="whitespace-nowrap text-[14px] text-fg">{formatTimeRange(event.startsAt, event.endsAt)}</span>
+            <span className="inline-flex h-[22px] shrink-0 items-center whitespace-nowrap rounded-[8px] bg-accent px-2 text-[11.5px] font-semibold text-accent-foreground">
+              Ивент · записан
+            </span>
+          </p>
         </div>
-        <p className="text-lg font-bold leading-snug">
-          {formatReservationDate(event.startsAt)} · <span className="whitespace-nowrap">{formatTimeRange(event.startsAt, event.endsAt)}</span>
-        </p>
+        {event.bannerUrl && (
+          <ContentImage src={event.bannerUrl} alt="" crop={event.bannerCrop} className="aspect-[4/3] w-[72px] shrink-0 overflow-hidden rounded-[10px]" />
+        )}
       </div>
 
-      <div className="space-y-2.5 px-4 py-3 text-sm">
+      <div className="space-y-2.5 border-t border-white/[0.06] px-4 py-3 text-sm">
         <DetailRow
           icon={<UsersRound className="size-4" />}
           label="Гостей"

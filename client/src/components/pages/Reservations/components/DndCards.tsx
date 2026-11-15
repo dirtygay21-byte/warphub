@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { DetailRow } from "./DetailRow";
+import { DateTile } from "@/components/ui/ds";
 
 function CancelButton({
   label,
@@ -80,19 +81,23 @@ export function DndBookingCard({
         inactive ? "border-white/[0.08] opacity-60" : "border-white/10",
       )}
     >
-      <div className="flex items-start justify-between gap-3 border-b border-white/[0.06] px-4 py-4">
-        <div className="min-w-0">
-          <h2 className="truncate text-[17px] font-bold">{booking.game.title}</h2>
-          <p className="mt-1 text-sm text-fg-3">D&D · {booking.game.gameType}</p>
+      {/* дата плиткой, как у остальных записей (15.11.2026) */}
+      <div className="flex items-center gap-3 border-b border-white/[0.06] p-3">
+        {booking.game.startsAt && <DateTile date={booking.game.startsAt} tone={inactive ? "muted" : "lime"} />}
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate text-[16px] font-bold leading-tight">{booking.game.title}</h2>
+          <p className="mt-1 flex items-center gap-2">
+            <span className="truncate text-[14px] text-fg-2">D&D · {booking.game.gameType}</span>
+            <span
+              className={clsx(
+                "inline-flex h-[22px] shrink-0 items-center whitespace-nowrap rounded-[8px] px-2 text-[11.5px] font-semibold",
+                inactive ? "bg-white/[0.08] text-fg-2" : "bg-accent text-accent-foreground",
+              )}
+            >
+              {statusLabel}
+            </span>
+          </p>
         </div>
-        <span
-          className={clsx(
-            "inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg px-2 text-[12px] font-semibold",
-            inactive ? "bg-white/[0.08] text-fg-2" : "bg-accent text-accent-foreground",
-          )}
-        >
-          {statusLabel}
-        </span>
       </div>
 
       <div className="space-y-3 px-4 py-4 text-sm">

@@ -332,7 +332,6 @@ export default function AdminReservations() {
 
   return (
     <div className="px-4 py-3 pb-28 text-white sm:px-6">
-      <NotificationCheck />
       {pendingTotal != null && (
         <LimeHero
           tone={pendingTotal > 0 ? "warn" : "lime"}
@@ -451,6 +450,11 @@ export default function AdminReservations() {
           setPage(0);
         }}
       />
+
+      {/* проверка уведомлений — внизу (15.11.2026): нужна редко, сверху занимала место над записями */}
+      <div className="mt-6">
+        <NotificationCheck />
+      </div>
 
       <AnimatePresence>
         {pendingStatusAction?.action === "extend" && (

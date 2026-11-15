@@ -8,6 +8,7 @@ import clsx from "clsx";
 import { ChevronRight } from "lucide-react";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { haptic } from "@/utils/haptic";
+import { formatClub } from "@/utils/clubTime";
 
 /** Заголовок раздела внутри экрана: мелкие заглавные, цвет подписей. */
 export function SectionLabel({ children, right, className }: { children: ReactNode; right?: ReactNode; className?: string }) {
@@ -226,3 +227,27 @@ export function StepBar({ step, total }: { step: number; total: number }) {
   );
 }
 export { LimeHero, LimeChip, LimeCorner, Worm, type LimeTone } from "./Lime";
+
+/**
+ * Дата плиткой (15.11.2026): день недели, число крупно, месяц — список записей читается по датам.
+ * tone: "lime"/"warn"/"danger" — сплошная плитка цвета статуса, "plain" — тёмная, "muted" — прошедшая.
+ */
+export function DateTile({ date, tone = "plain", className }: { date: string; tone?: "lime" | "warn" | "danger" | "plain" | "muted"; className?: string }) {
+  return (
+    <span
+      className={clsx(
+        "flex w-[56px] shrink-0 flex-col items-center justify-center rounded-[14px] py-1.5 leading-none",
+        tone === "lime" && "bg-accent text-accent-foreground",
+        tone === "warn" && "bg-warn text-accent-foreground",
+        tone === "danger" && "bg-danger text-accent-foreground",
+        tone === "plain" && "bg-white/[0.08] text-fg",
+        tone === "muted" && "bg-white/[0.05] text-fg-3",
+        className,
+      )}
+    >
+      <span className="text-[11px] font-semibold uppercase">{formatClub(date, { weekday: "short" })}</span>
+      <span className="font-display mt-1 text-[24px] font-semibold tabular-nums">{formatClub(date, { day: "numeric" })}</span>
+      <span className="mt-1 text-[11px] font-semibold">{formatClub(date, { month: "short" }).replace(".", "")}</span>
+    </span>
+  );
+}

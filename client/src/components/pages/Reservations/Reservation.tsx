@@ -14,7 +14,7 @@ import {
   isDndBookingInactive,
 } from "@/apiUtils/dnd";
 import { isPastEvent } from "./utils";
-import { LimeChip, LimeHero, Segmented } from "@/components/ui/ds";
+import { Segmented } from "@/components/ui/ds";
 import { haptic } from "@/utils/haptic";
 import ReservationCardSkeleton from "@/components/skeletons/ReservationCardSkeleton";
 import { formatReservationDate } from "@/utils/date";
@@ -190,28 +190,6 @@ export default function Reservation() {
   const visibleTrials = trialRequests.filter((request) => (request.status === "cancelled") === showPast);
   const visibleEvent = registeredEvent && isPastEvent(registeredEvent) === showPast ? registeredEvent : null;
 
-  // лаймовый концепт (15.11.2026): ближайшая активная запись — цветной блок над списком; цвет = статус
-  // (лайм — подтверждена или ивент, жёлтый — ждёт подтверждения). Карточки списка не меняются.
-  const nextUp = useMemo(() => {
-    if (showPast) return null;
-    const res = visibleReservations[0]; // на вкладке «Активные» — только будущие и не отменённые, по времени
-    const ev = visibleEvent;
-    if (ev && (!res || new Date(ev.startsAt) <= new Date(res.startsAt))) {
-      return { tone: "lime" as const, kicker: "Ближайшее", status: "Ивент", title: ev.title, startsAt: ev.startsAt, endsAt: ev.endsAt };
-    }
-    if (!res) return null;
-    const service = servicesById.get(res.serviceId);
-    const pending = res.status.toLowerCase() === "pending";
-    return {
-      tone: pending ? ("warn" as const) : ("lime" as const),
-      kicker: "Ближайшая запись",
-      status: pending ? "Ждёт подтверждения" : "Подтверждена",
-      title: service?.title ?? res.serviceTitle ?? "Запись",
-      startsAt: res.startsAt,
-      endsAt: res.endsAt,
-    };
-  }, [showPast, visibleReservations, visibleEvent, servicesById]);
-
   const visibleCount =
     visibleReservations.length +
     (visibleEvent ? 1 : 0) +
@@ -309,16 +287,6 @@ export default function Reservation() {
           ]}
         />
       </div>
-
-      {nextUp && (
-        <LimeHero tone={nextUp.tone} kicker={nextUp.kicker} title={nextUp.title} size="sm" className="ds-enter mb-4">
-          <div className="flex flex-wrap gap-2">
-            <LimeChip accent>{formatReservationDate(nextUp.startsAt)}</LimeChip>
-            <LimeChip>{formatTimeRange(nextUp.startsAt, nextUp.endsAt)}</LimeChip>
-            <LimeChip>{nextUp.status}</LimeChip>
-          </div>
-        </LimeHero>
-      )}
 
       {visibleCount === 0 ? (
         <div className="ds-enter rounded-[18px] border border-white/10 bg-app-elevated px-6 py-10 text-center">
