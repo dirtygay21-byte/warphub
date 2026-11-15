@@ -8,6 +8,7 @@ import { removeUnitPhoto, saveUnitPhoto, unitPhotoUrl, useUnitThumb } from '../.
 import { haptic, pushOverlay } from '../../telegram';
 import { Button, Icon } from '../kit';
 import { cx } from '../util';
+import { useT } from './i18n';
 
 /** Миниатюра в шапке карточки; фото нет — ничего (шапка остаётся компактной). */
 export function UnitThumb({ photoKey, className }: { photoKey: string; className?: string }) {
@@ -18,6 +19,7 @@ export function UnitThumb({ photoKey, className }: { photoKey: string; className
 
 /** Блок фото в раскрытой карточке. readOnly — только просмотр. */
 export function UnitPhotoBlock({ photoKey, name, readOnly = false }: { photoKey: string; name: string; readOnly?: boolean }) {
+  const t = useT();
   const thumb = useUnitThumb(photoKey);
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -40,19 +42,19 @@ export function UnitPhotoBlock({ photoKey, name, readOnly = false }: { photoKey:
       <input ref={input} type="file" accept="image/*" className="hidden" onChange={(e) => (void pick(e.target.files?.[0]), (e.target.value = ''))} />
       {thumb ? (
         <div className="flex items-center gap-3">
-          <button type="button" aria-label={`Фото: ${name} — открыть`} onClick={() => (haptic.tap(), setView(true))} className="shrink-0 overflow-hidden rounded-xl border border-white/15 active:opacity-80">
+          <button type="button" aria-label={t(`Фото: ${name} — открыть`, `Photo: ${name} — open`)} onClick={() => (haptic.tap(), setView(true))} className="shrink-0 overflow-hidden rounded-xl border border-white/15 active:opacity-80">
             <img src={thumb} alt="" className="size-20 object-cover" draggable={false} />
           </button>
           <div className="min-w-0 flex-1">
-            <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Фото миниатюры</p>
-            <p className="mt-0.5 text-[12px] leading-snug text-fg-3">Хранится на этом устройстве, видно во всех ваших ростерах с этим юнитом.</p>
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{t('Фото миниатюры', 'Miniature photo')}</p>
+            <p className="mt-0.5 text-[12px] leading-snug text-fg-3">{t('Хранится на этом устройстве, видно во всех ваших ростерах с этим юнитом.', 'Stored on this device, shown in all your rosters with this unit.')}</p>
             {!readOnly && (
               <div className="mt-1.5 flex gap-1.5">
                 <Button variant="outline" className="h-8 min-h-0 px-2.5 text-xs" disabled={busy} onClick={() => input.current?.click()}>
-                  {busy ? 'Сохраняем…' : 'Заменить'}
+                  {busy ? t('Сохраняем…', 'Saving…') : t('Заменить', 'Replace')}
                 </Button>
                 <Button variant="ghost" className="h-8 min-h-0 px-2.5 text-xs" disabled={busy} onClick={() => (haptic.tap(), void removeUnitPhoto(photoKey))}>
-                  <Icon name="trash" className="size-3.5" /> Убрать
+                  <Icon name="trash" className="size-3.5" /> {t('Убрать', 'Remove')}
                 </Button>
               </div>
             )}
@@ -60,7 +62,7 @@ export function UnitPhotoBlock({ photoKey, name, readOnly = false }: { photoKey:
         </div>
       ) : (
         <Button variant="outline" className="w-full" disabled={busy} onClick={() => input.current?.click()}>
-          <Icon name="camera" /> {busy ? 'Сохраняем…' : 'Добавить фото миниатюры'}
+          <Icon name="camera" /> {busy ? t('Сохраняем…', 'Saving…') : t('Добавить фото миниатюры', 'Add a miniature photo')}
         </Button>
       )}
       {error && <p className="mt-1.5 text-[12.5px] text-danger">{error}</p>}
@@ -70,6 +72,7 @@ export function UnitPhotoBlock({ photoKey, name, readOnly = false }: { photoKey:
 }
 
 function PhotoViewer({ photoKey, name, onClose }: { photoKey: string; name: string; onClose: () => void }) {
+  const t = useT();
   const [url, setUrl] = useState<string | null>(null);
   const [missing, setMissing] = useState(false);
   useEffect(() => {
@@ -90,15 +93,15 @@ function PhotoViewer({ photoKey, name, onClose }: { photoKey: string; name: stri
     // eslint-disable-next-line react-hooks/exhaustive-deps -- открытие одного фото
   }, [photoKey]);
   return createPortal(
-    <div role="dialog" aria-label={`Фото: ${name}`} className="fixed inset-0 z-[80] flex flex-col bg-black/95" onClick={onClose}>
+    <div role="dialog" aria-label={t(`Фото: ${name}`, `Photo: ${name}`)} className="fixed inset-0 z-[80] flex flex-col bg-black/95" onClick={onClose}>
       <div className="flex items-center gap-3 px-4 pb-2 pt-[calc(env(safe-area-inset-top)+12px)]">
         <p className="min-w-0 flex-1 truncate text-sm font-semibold">{name}</p>
-        <button type="button" aria-label="Закрыть" onClick={onClose} className="grid size-10 place-items-center rounded-xl bg-white/10 active:bg-white/20">
+        <button type="button" aria-label={t('Закрыть', 'Close')} onClick={onClose} className="grid size-10 place-items-center rounded-xl bg-white/10 active:bg-white/20">
           <Icon name="close" />
         </button>
       </div>
       <div className="flex min-h-0 flex-1 items-center justify-center p-3">
-        {url ? <img src={url} alt={name} className="max-h-full max-w-full rounded-xl object-contain" /> : <p className="text-sm text-fg-3">{missing ? 'Фото не найдено на устройстве.' : 'Загружаем…'}</p>}
+        {url ? <img src={url} alt={name} className="max-h-full max-w-full rounded-xl object-contain" /> : <p className="text-sm text-fg-3">{missing ? t('Фото не найдено на устройстве.', 'Photo not found on this device.') : t('Загружаем…', 'Loading…')}</p>}
       </div>
     </div>,
     document.body,
