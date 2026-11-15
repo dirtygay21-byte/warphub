@@ -83,8 +83,8 @@ export function bookingNoticeText(n: BookingNotice): string {
     );
   }
   const clubArmy = seatsWith(n.seatClubArmyOptions);
-  const game = d?.kind === 'wh_player' ? d.game : undefined;
-  if (clubArmy) lines.push(`${clubArmyLabel(game)}: ${clubArmy}${d?.kind === 'wh_player' && d.clubArmyPoints && gameHasPoints(game) ? ` · ${d.clubArmyPoints} очков` : ''}`);
+  const playerGame = d?.kind === 'wh_player' ? d.game : undefined;
+  if (clubArmy) lines.push(`${clubArmyLabel(playerGame)}: ${clubArmy}${d?.kind === 'wh_player' && d.clubArmyPoints && gameHasPoints(playerGame) ? ` · ${d.clubArmyPoints} очков` : ''}`);
   const buyArmy = seatsWith(n.buyArmyOptions);
   if (buyArmy) lines.push(`Покупка армии: ${buyArmy}`);
   lines.push(`Оформлено: ${formatClubDateTime(n.createdAt)}`);
