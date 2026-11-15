@@ -210,12 +210,15 @@ for (const lang of ['ru', 'en']) {
     await clickText(w40.name);
     await page.waitForTimeout(1500);
     await shot(`40k-${lang}-editor`, true);
-    const card = page.locator('[id^="u-"] > button[aria-expanded]').nth(1);
-    await card.scrollIntoViewIfNeeded();
-    await card.click({ timeout: 5000 });
-    await page.waitForTimeout(500);
-    await page.locator('[id^="u-"] details summary').first().click({ timeout: 5000 }).catch(() => {});
+    await clickText('Immortals');
+    await page.waitForTimeout(600);
+    await page.getByText(/Способности и подробности|Abilities and details/).first().click({ timeout: 5000 }).catch(() => {});
+    await page.waitForTimeout(400);
     await shot(`40k-${lang}-card`, true);
+    // подсказка правила (глоссарий) на языке экрана
+    await page.locator('[id^="u-"] button.underline').first().click({ timeout: 5000 }).catch(() => {});
+    await page.waitForTimeout(500);
+    await shot(`40k-${lang}-popover`);
   });
 }
 await page.evaluate(() => localStorage.setItem('warphub:roster-40k-lang', 'ru'));

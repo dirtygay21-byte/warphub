@@ -43,3 +43,11 @@ const ALLY_EN: Record<string, string> = {
 
 /** Пояснение к союзникам (WarpHub, по-русски в данных) — по-английски для режима EN; неизвестное — как есть. */
 export const allyNoteEn = (note: string): string => ALLY_EN[note] ?? note;
+
+/** Подпись размера отряда из данных («5 models», «1 model») — по-русски для RU; прочее — как есть. */
+export function sizeLabelRu(label: string): string {
+  const m = /^(\d+)(?:\s*-\s*(\d+))?\s+models?$/i.exec(label.trim());
+  if (!m) return label;
+  const n = Number(m[2] ?? m[1]);
+  return `${m[2] ? `${m[1]}–${m[2]}` : m[1]} ${plural(n, ['модель', 'модели', 'моделей'])}`;
+}

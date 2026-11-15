@@ -11,7 +11,7 @@ import { Button, Counter, Field, Icon, Segmented, Tag } from './kit';
 import { cx, fmtPts } from './util';
 import { cleanRuleText, INCOMPLETE_TEXT } from '../text';
 import { useEn, useT } from './common/i18n';
-import { compositionRu, invulnNoteRu } from './unitTextRu';
+import { compositionRu, invulnNoteRu, sizeLabelRu } from './unitTextRu';
 import { RuleText } from './DetachmentPanel';
 import { RuleTrigger, WeaponAbilityTag } from './common/RulePopover';
 import { useGlossary } from './common/useGlossary';
@@ -55,6 +55,7 @@ export function UnitCard({
   /** режим просмотра: вместо переключателей — итог выбора, без кнопок изменения */
   readOnly?: boolean;
 }) {
+  const en = useEn();
   const t = useT();
   const ds = c.ds;
   const isWarlord = roster.warlordUid === c.unit.uid;
@@ -79,7 +80,7 @@ export function UnitCard({
   const opt = c.band?.options.find((o) => o.label === c.unit.size);
   const attachedTo = c.unit.attachedTo ? cr.byUid.get(c.unit.attachedTo) : undefined;
   const meta: string[] = [];
-  if (opt && (c.band!.options.length > 1 || opt.models > 1)) meta.push(opt.label);
+  if (opt && (c.band!.options.length > 1 || opt.models > 1)) meta.push(en ? opt.label : sizeLabelRu(opt.label));
   if (c.enhancement) meta.push(c.enhancement.name);
   for (const [l, n] of [...Object.entries(c.unit.addons), ...Object.entries(paidWargear(c))]) if (n > 0) meta.push(`${n}× ${l}`);
 
@@ -192,7 +193,7 @@ export function UnitCard({
               <div className="space-y-5 border-t border-white/[0.06] px-3 pb-3 pt-3">
           {c.band && c.band.options.length > 1 && (
             <Field label={t('Состав', 'Unit size')} hint={c.band.from > 1 || c.band.to ? t(`цены для копии №${c.copy}`, `prices for copy #${c.copy}`) : undefined}>
-              <Segmented value={c.unit.size} onChange={(size) => onPatch({ size })} options={c.band.options.map((o) => ({ value: o.label, label: o.label, hint: `${o.cost} ${t('очк.', 'pts')}` }))} />
+              <Segmented value={c.unit.size} onChange={(size) => onPatch({ size })} options={c.band.options.map((o) => ({ value: o.label, label: en ? o.label : sizeLabelRu(o.label), hint: `${o.cost} ${t('очк.', 'pts')}` }))} />
             </Field>
           )}
           {c.band && c.band.options.length === 1 && c.band.to !== null && (
@@ -352,9 +353,10 @@ export function UnitCard({
 
 /** Итог выбора юнита для режима просмотра: состав, снаряжение, Warlord, улучшение, присоединение. */
 function ReadOnlyChoices({ c, cr, isWarlord, attachedTo, ru }: { c: ComputedUnit; cr: ComputedRoster; isWarlord: boolean; attachedTo: string | null; ru: RuOverlay | null }) {
+  const en = useEn();
   const t = useT();
   const lines: [string, string][] = [];
-  if (c.unit.size) lines.push([t('Состав', 'Unit size'), c.unit.size]);
+  if (c.unit.size) lines.push([t('Состав', 'Unit size'), en ? c.unit.size : sizeLabelRu(c.unit.size)]);
   const extras = [...Object.entries(c.unit.addons), ...Object.entries(paidWargear(c))].filter(([, n]) => n > 0).map(([l, n]) => `${n}× ${l}`);
   if (extras.length) lines.push([t('Дополнительно', 'Extras'), extras.join(', ')]);
   if (isWarlord) lines.push(['Warlord', t('да', 'yes')]);

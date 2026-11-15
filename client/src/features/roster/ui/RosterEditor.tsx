@@ -426,7 +426,7 @@ function Editor({
           ))
         )}
 
-        <p className="pt-2 text-center text-xs text-fg-3">{factionCredit(L.faction, index)}</p>
+        <p className="pt-2 text-center text-xs text-fg-3">{factionCredit(L.faction, index, t('ru', 'en') as 'ru' | 'en')}</p>
       </div>
 
       {/* ---- нижняя панель ---- */}
