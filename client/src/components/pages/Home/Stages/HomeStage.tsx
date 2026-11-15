@@ -1,5 +1,6 @@
 import NearestEventBanner from "@/components/pages/Home/NearestEventBanner";
 import HomeScreenHint from "@/components/pages/Home/HomeScreenHint";
+import OpenGamesBoard from "@/components/pages/Home/OpenGamesBoard";
 import { useRegistrationStageStore } from "@/stores/useRegistrationStageStore";
 import { getDisciplines, getServiceById } from "@/apiUtils/disciplines";
 import { getMyReservations } from "@/apiUtils/reservations";
@@ -152,6 +153,8 @@ export default function HomeStage() {
             </button>
           )}
         </LimeHero>
+
+        {isAuthenticated && <OpenGamesBoard disciplines={disciplinesQuery.data ?? []} />}
       </div>
 
       <div className="flex flex-col gap-5">

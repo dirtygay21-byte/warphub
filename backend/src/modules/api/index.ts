@@ -6,6 +6,7 @@ import {
   createReservation,
   getServiceAvailability,
   getUserReservations,
+  listOpenGamesCached,
   parseIsoDateTime,
   toReservationResponse,
   updateReservationDetails,
@@ -40,6 +41,7 @@ import {
 } from '../minigames/service';
 import { handleMinigame } from '../minigames/http';
 import { testUserNotification } from '../notifications/service';
+import { joinWaitlist, leaveWaitlist, myWaitlist, WaitlistError } from '../booking/waitlist';
 import { getUserPrefs, saveUserPrefs } from '../notifications/hub';
 import { getPlayerProgress } from '../progress/service';
 import { getCardsState, getPointsHistory, openPack } from '../minigames/cards';
@@ -457,6 +459,27 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
       summary: 'Прогресс игрока',
       description: 'Сыгранные игры и ранг по категориям (Warhammer, D&D, покраска, посещение): только подтверждённые и прошедшие записи.',
     },
+  })
+  .get('/open-games', async () => listOpenGamesCached(), {
+    detail: { summary: 'Игры, где ждут соперника, на 7 дней (доска «Ищут соперника»)' },
+  })
+  // лист ожидания (этап 2, 15.11.2026): «напишите, если на этот день освободится место»
+  .get('/waitlist/my', async ({ user }) => myWaitlist(user.id), { detail: { tags: ['Booking'], summary: 'Мои подписки на освободившееся место' } })
+  .post(
+    '/waitlist',
+    async ({ user, body }) => {
+      try {
+        return await joinWaitlist(user.id, body.serviceId, body.date);
+      } catch (error) {
+        if (error instanceof WaitlistError) return status(400, { error: error.message });
+        throw error;
+      }
+    },
+    { body: t.Object({ serviceId: t.Integer(), date: t.String() }), detail: { tags: ['Booking'], summary: 'Встать в лист ожидания на день' } },
+  )
+  .delete('/waitlist', async ({ user, query }) => leaveWaitlist(user.id, query.serviceId, query.date), {
+    query: t.Object({ serviceId: t.Numeric(), date: t.String() }),
+    detail: { tags: ['Booking'], summary: 'Выйти из листа ожидания' },
   })
   .get('/reservations/my', async ({ user }) => getUserReservations(user.id), {
     detail: {

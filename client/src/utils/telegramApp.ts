@@ -9,6 +9,7 @@ type WebAppExtras = {
   isVersionAtLeast?: (version: string) => boolean;
   downloadFile?: (params: { url: string; file_name: string }, callback?: (accepted: boolean) => void) => void;
   openLink?: (url: string) => void;
+  openTelegramLink?: (url: string) => void;
   addToHomeScreen?: () => void;
   checkHomeScreenStatus?: (callback: (status: HomeScreenStatus) => void) => void;
   requestFullscreen?: () => void;
@@ -64,4 +65,15 @@ export function onFullscreenChanged(handler: () => void): () => void {
   const app = webApp();
   app?.onEvent?.("fullscreenChanged", handler);
   return () => app?.offEvent?.("fullscreenChanged", handler);
+}
+
+/** Ссылка на бота клуба — из неё открывается WarpHub. */
+export const WARPHUB_BOT_URL = "https://t.me/WarpHubBot";
+
+/** «Поделиться» в чат Telegram (выбор чата — в самом Telegram), этап 2, 15.11.2026. */
+export function shareToChat(text: string, url = WARPHUB_BOT_URL) {
+  const link = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text.slice(0, 3000))}`;
+  const app = webApp();
+  if (app?.openTelegramLink) app.openTelegramLink(link);
+  else window.open(link, "_blank", "noopener");
 }

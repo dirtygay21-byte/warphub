@@ -17,3 +17,4 @@ export * from './partners';
 export * from './pricing';
 export * from './point-promos';
 export * from './notifications';
+export * from './waitlist';

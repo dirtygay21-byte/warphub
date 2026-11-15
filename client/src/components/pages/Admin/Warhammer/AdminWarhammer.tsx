@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import HoldCard from "@/components/pages/Admin/TableHolds/HoldCard";
 import UpcomingHolds from "@/components/pages/Admin/TableHolds/UpcomingHolds";
+import ClubArmyCalendar from "./ClubArmyCalendar";
 import TableHoldSheet from "@/components/pages/Admin/TableHolds/TableHoldSheet";
 import { DsButton, Skeleton } from "@/components/ui/ds";
 import { useMemo, useState } from "react";
@@ -115,6 +116,7 @@ export default function AdminWarhammer() {
       <AnimatePresence>
         {holdOpen && <TableHoldSheet prefill={{ dateKey }} onClose={() => setHoldOpen(false)} />}
       </AnimatePresence>
+      <ClubArmyCalendar />
 
       {dayQuery.isLoading ? (
         <div className="flex flex-col gap-3" aria-busy="true" aria-label="Загружаем день">

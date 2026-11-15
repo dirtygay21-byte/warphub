@@ -49,6 +49,7 @@ import {
 } from '../notifications/service';
 import { notifyKind, notifyKindAdmins } from '../notifications/hub';
 import { announceMatch } from '../notifications/jobs';
+import { notifyWaitlist } from './waitlist';
 import { bookingVars, playerLine } from '../notifications/booking-vars';
 import {
   checkTableSession,
@@ -1762,6 +1763,7 @@ export async function cancelReservation(
 
   await refreshPricingSafely(() => db.transaction((tx) => refreshSessionPricing(tx, updated!)));
   void notifyAfterCancel(updated!, 'user');
+  void notifyWaitlist(updated!);
 
   return updated!;
 }
@@ -1910,6 +1912,7 @@ export async function rejectReservation(
 
   await refreshPricingSafely(() => db.transaction((tx) => refreshSessionPricing(tx, updated!)));
   void notifyAfterCancel(updated!, 'admin');
+  void notifyWaitlist(updated!);
 
   return updated!;
 }
@@ -2256,4 +2259,52 @@ export async function moveReservationToTable(
   })().catch((error) => console.warn('[notify] move notification failed', error));
 
   return updated;
+}
+
+// ----------------------------------------------------------------------------
+// Доска «Ищут соперника» (этап 2, 15.11.2026)
+// ----------------------------------------------------------------------------
+
+export type OpenGameView = SessionView & {
+  serviceId: number;
+  serviceTitle: string | null;
+  disciplineId: number;
+  date: string;
+  hasTrainer: boolean;
+  tableCategory?: string;
+};
+
+/**
+ * Начатые игры за столом, где есть свободное место, на ближайшие `days` дней клуба — по тем же данным,
+ * что выбор времени при записи (getServiceAvailability), поэтому присоединение работает так же.
+ */
+// доска «Ищут соперника» (этап 2, 15.11.2026): обход услуг × 7 дней — кэш на 30 с, чтобы главная не грузила базу
+let openGamesCache: { at: number; data: OpenGameView[] } | null = null;
+export async function listOpenGamesCached(): Promise<OpenGameView[]> {
+  const now = Date.now();
+  if (openGamesCache && now - openGamesCache.at < 30_000) return openGamesCache.data;
+  const data = await listOpenGames(new Date(now));
+  openGamesCache = { at: now, data };
+  return data;
+}
+
+export async function listOpenGames(now = new Date(), days = 7): Promise<OpenGameView[]> {
+  const services = await db
+    .select({ id: servicesTable.id, title: servicesTable.title, disciplineId: servicesTable.disciplineId })
+    .from(servicesTable)
+    .where(eq(servicesTable.isActive, true));
+  const out: OpenGameView[] = [];
+  for (let i = 0; i < days; i++) {
+    const date = formatLocalIso(new Date(now.getTime() + i * 24 * 60 * 60 * 1000)).slice(0, 10);
+    for (const s of services) {
+      const a = await getServiceAvailability(s.id, date);
+      if (!a || !a.dateAllowed || a.service.mode !== 'table') continue;
+      for (const session of a.sessions) {
+        if (session.occupied < 1 || session.freeSeats < 1) continue;
+        if (Date.parse(session.startsAt) <= now.getTime()) continue;
+        out.push({ ...session, serviceId: s.id, serviceTitle: s.title, disciplineId: s.disciplineId, date, hasTrainer: a.service.hasTrainer });
+      }
+    }
+  }
+  return out.sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));
 }

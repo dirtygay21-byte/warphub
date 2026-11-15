@@ -8,6 +8,7 @@ import {
   CalendarPlus,
   Clock3,
   RotateCcw,
+  Send,
   UsersRound,
 } from "lucide-react";
 import { formatClubTime, formatClubTimeRange } from "@/utils/clubTime";
@@ -16,7 +17,8 @@ import { getServiceDetailsMeta } from "./ServiceDetails/utils";
 import { formatSelectedDate } from "@/utils/date";
 import { Badge, DsButton, LimeHero } from "@/components/ui/ds";
 import type { ReactNode } from "react";
-import { downloadFile } from "@/utils/telegramApp";
+import { downloadFile, shareToChat } from "@/utils/telegramApp";
+import { openGameShareText } from "@/components/pages/Home/OpenGamesBoard";
 
 type ConfirmationStatus = "Success" | "Succes" | "Error";
 
@@ -33,6 +35,7 @@ export default function ConfirmationStage({
     selectedTable,
     serviceId,
     lastBooking,
+    selectedSlot,
   } = useReservationStore();
   const { resetStages, previousStage } = useRegistrationStageStore();
   const navigate = useNavigate();
@@ -127,6 +130,20 @@ export default function ConfirmationStage({
           <DsButton variant="primary" size="lg" onClick={previousStage} className="w-full">
             <RotateCcw className="size-5" />
             Попробовать снова
+          </DsButton>
+        )}
+        {/* этап 2 (15.11.2026): один за столом на двоих — позвать соперника в чат Telegram */}
+        {isSuccess && !lastBooking?.joined && lastBooking?.startsAt && selectedSlot?.kind === "new" && selectedSlot.capacity > 1 && (lastBooking.partySize ?? 1) < selectedSlot.capacity && (
+          <DsButton
+            variant="secondary"
+            size="lg"
+            onClick={() =>
+              shareToChat(openGameShareText({ serviceTitle: activity ?? null, startsAt: lastBooking.startsAt!, endsAt: lastBooking.endsAt ?? lastBooking.startsAt!, players: [] }))
+            }
+            className="w-full"
+          >
+            <Send className="size-5" />
+            Позвать соперника в чат
           </DsButton>
         )}
         {isSuccess && lastBooking?.id && (

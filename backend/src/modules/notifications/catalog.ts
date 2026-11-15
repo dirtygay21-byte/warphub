@@ -81,6 +81,16 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     vars: { ...BOOKING_VARS, соперник: SAMPLE_OPPONENT, за_столом: '1/2' },
   },
   {
+    id: 'waitlist_free',
+    group: 'bookings',
+    title: 'Освободилось место (лист ожидания)',
+    when: 'Игроку, который просил написать, если на этот день освободится место',
+    category: null,
+    announcement: false,
+    defaultText: '🔔 <b>Освободилось место: {что}</b>\n🗓 {когда}\n\nКто-то отменил запись на этот день. Успейте записаться — место достанется первому.',
+    vars: { что: 'Kill Team', когда: 'сб, 15 ноября, 18:00–21:00' },
+  },
+  {
     id: 'booking_cancelled_admin',
     group: 'bookings',
     title: 'Запись отменена администратором',
