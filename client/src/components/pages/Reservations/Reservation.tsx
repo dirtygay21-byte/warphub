@@ -197,14 +197,15 @@ export default function Reservation() {
     const res = visibleReservations[0]; // на вкладке «Активные» — только будущие и не отменённые, по времени
     const ev = visibleEvent;
     if (ev && (!res || new Date(ev.startsAt) <= new Date(res.startsAt))) {
-      return { tone: "lime" as const, kicker: "Ближайшее · ивент", title: ev.title, startsAt: ev.startsAt, endsAt: ev.endsAt };
+      return { tone: "lime" as const, kicker: "Ближайшее", status: "Ивент", title: ev.title, startsAt: ev.startsAt, endsAt: ev.endsAt };
     }
     if (!res) return null;
     const service = servicesById.get(res.serviceId);
     const pending = res.status.toLowerCase() === "pending";
     return {
       tone: pending ? ("warn" as const) : ("lime" as const),
-      kicker: pending ? "Ближайшая · ждёт подтверждения" : "Ближайшая · подтверждена",
+      kicker: "Ближайшая запись",
+      status: pending ? "Ждёт подтверждения" : "Подтверждена",
       title: service?.title ?? res.serviceTitle ?? "Запись",
       startsAt: res.startsAt,
       endsAt: res.endsAt,
@@ -314,6 +315,7 @@ export default function Reservation() {
           <div className="flex flex-wrap gap-2">
             <LimeChip accent>{formatReservationDate(nextUp.startsAt)}</LimeChip>
             <LimeChip>{formatTimeRange(nextUp.startsAt, nextUp.endsAt)}</LimeChip>
+            <LimeChip>{nextUp.status}</LimeChip>
           </div>
         </LimeHero>
       )}
