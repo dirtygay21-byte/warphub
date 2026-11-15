@@ -70,6 +70,16 @@ export type MessageButton = { text: string; path?: string; url?: string };
 export type MessageExtra = { imageUrl?: string | null; buttons?: MessageButton[] | null; broadcastId?: number | null };
 
 /**
+ * Картинка вместо текста (14.11.2026): подключается из notifications/hub.ts (настройка в базе), чтобы этот модуль
+ * не зависел от базы. null — отправить обычный текст.
+ */
+type CardImageProvider = (kind: string, text: string) => Promise<{ png: Uint8Array; caption: string } | null>;
+let cardImages: CardImageProvider | null = null;
+export function setCardImageProvider(fn: CardImageProvider | null) {
+  cardImages = fn;
+}
+
+/**
  * Наблюдатель отправок (14.11.2026): журнал в базе, отметка «не может получать» (403) и сигнал о восстановлении
  * связи — подключается из notifications/hub.ts, чтобы этот модуль не зависел от базы (юнит-тесты без PostgreSQL).
  */
@@ -121,7 +131,16 @@ export async function sendTelegramMessageDetailed(
   extra: MessageExtra = {},
 ): Promise<SendResult> {
   const started = Date.now();
-  const result = await sendRaw(chatId, text, extra);
+  let result: SendResult | null = null;
+  if (cardImages && !extra.imageUrl && notificationsEnabled()) {
+    const card = await cardImages(kind, text).catch(() => null);
+    if (card) {
+      result = await sendCard(chatId, card, extra);
+      // Telegram не принял картинку (не сеть и не блокировка) — отправим текстом
+      if (!result.ok && result.reason === 'telegram' && result.status !== 403 && result.status !== 401) result = null;
+    }
+  }
+  result ??= await sendRaw(chatId, text, extra);
   remember(chatId, kind, result, Date.now() - started, extra.broadcastId);
   return result;
 }
@@ -137,6 +156,25 @@ async function readFailure(response: Response, chatId: number | string): Promise
   }
   console.warn(`[notify] Telegram ${response.status} for chat ${chatId}: ${body.slice(0, 200)}`);
   return { ok: false, reason: 'telegram', status: response.status, description };
+}
+
+async function sendCard(chatId: number | string, card: { png: Uint8Array; caption: string }, extra: MessageExtra): Promise<SendResult> {
+  if (!notificationsEnabled()) return { ok: false, reason: 'disabled' };
+  const markup = replyMarkup(extra.buttons);
+  try {
+    const form = new FormData();
+    form.append('chat_id', String(chatId));
+    form.append('photo', new Blob([card.png], { type: 'image/png' }), 'warphub.png');
+    form.append('caption', card.caption);
+    form.append('parse_mode', 'HTML');
+    if (markup) form.append('reply_markup', JSON.stringify(markup));
+    const photo = await telegramFetch('sendPhoto', { method: 'POST', body: form, timeoutMs: 30_000 });
+    if (!photo.ok) return await readFailure(photo, chatId);
+    return { ok: true };
+  } catch (error) {
+    console.warn(`[notify] card failed for chat ${chatId}:`, (error as Error).message);
+    return { ok: false, reason: 'network', description: (error as Error).message };
+  }
 }
 
 async function sendRaw(chatId: number | string, text: string, extra: MessageExtra = {}): Promise<SendResult> {

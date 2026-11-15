@@ -9,6 +9,7 @@ import {
   getNotificationLog,
   listBroadcasts,
   pauseBroadcast,
+  previewNotificationImage,
   saveNotificationConfig,
   saveNotificationTemplate,
   startBroadcast,
@@ -612,6 +613,7 @@ function KindCard({ kind, canEdit, open, onToggle }: { kind: NotificationKindVie
             <p className="mb-1 text-[12px] text-fg-3">Пример</p>
             <Preview text={fill(text, kind.vars)} />
           </div>
+          <CardPreview kind={kind.id} text={text} />
           {note && <p className={clsx("text-sm", note.ok ? "text-accent" : "text-red-300")}>{note.text}</p>}
           {canEdit && (
             <div className="flex flex-wrap gap-2">
@@ -628,6 +630,26 @@ function KindCard({ kind, canEdit, open, onToggle }: { kind: NotificationKindVie
               )}
             </div>
           )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Картинка уведомления (14.11.2026): так её увидит игрок — с примерами вместо переменных. */
+function CardPreview({ kind, text }: { kind: string; text: string }) {
+  const preview = useMutation({ mutationFn: () => previewNotificationImage(kind, text) });
+  return (
+    <div>
+      <button type="button" className={btnGhost} disabled={preview.isPending} onClick={() => preview.mutate()}>
+        {preview.isPending ? <LoaderCircle className="size-4 animate-spin" /> : <ImagePlus className="size-4" />}
+        {preview.data ? "Обновить картинку" : "Показать картинку"}
+      </button>
+      {preview.isError && <p className="mt-2 text-sm text-red-300">{(preview.error as Error).message}</p>}
+      {preview.data && (
+        <div className="mt-2 max-w-sm overflow-hidden rounded-2xl rounded-bl-md bg-[#2b5278]/40">
+          <img src={preview.data.image} alt="Картинка уведомления" className="w-full" />
+          <div className="px-3 py-2 text-[14px] leading-snug text-white" dangerouslySetInnerHTML={{ __html: telegramHtml(preview.data.caption) }} />
         </div>
       )}
     </div>
@@ -702,8 +724,28 @@ function SettingsTab({ catalog }: { catalog?: NotificationCatalog }) {
   if (!value) return <p className="text-sm text-fg-3">Загружаем…</p>;
   const hours = Array.from({ length: 24 }, (_, h) => h);
   const canEdit = catalog?.canEdit ?? false;
+  const images = value.images ?? true;
   return (
     <div className="space-y-4">
+      <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-app-elevated p-3.5">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold">Картинки вместо текста</p>
+          <p className="mt-0.5 text-[12px] text-fg-3">
+            Уведомления приходят карточкой-изображением в стиле WarpHub и 1–2 строками подписи. Картинка собирается из текста уведомления — правка текста меняет и её. Ваши рассылки отправляются как есть.
+          </p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={images}
+          aria-label="Картинки вместо текста"
+          disabled={!canEdit}
+          onClick={() => setForm({ ...value, images: !images })}
+          className={clsx("flex h-[30px] w-[50px] shrink-0 items-center rounded-full p-[3px] disabled:opacity-50", images ? "justify-end bg-accent" : "justify-start bg-white/[0.14]")}
+        >
+          <span className={clsx("size-6 rounded-full", images ? "bg-accent-foreground" : "bg-fg")} />
+        </button>
+      </div>
       <div className="rounded-2xl border border-white/10 bg-app-elevated p-3.5">
         <p className="text-sm font-semibold">Тихие часы</p>
         <p className="mt-0.5 text-[12px] text-fg-3">Объявления (поиск соперника, новости, рассылки) в это время ждут утра. Личные уведомления о записях приходят всегда.</p>

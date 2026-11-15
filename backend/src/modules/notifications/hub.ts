@@ -17,15 +17,17 @@ import {
 } from '../../db/schema';
 import { formatClubDateTime } from '../../lib/telegram/format';
 import { BROADCAST_KIND, KIND_BY_ID, renderTemplate, type NotificationCategory } from './catalog';
-import { sendTelegramMessageDetailed, setSendObserver, type MessageButton } from './service';
+import { sendTelegramMessageDetailed, setCardImageProvider, setSendObserver, type MessageButton } from './service';
+import { notificationImage } from './card';
 
 const MIN = 60_000;
 const OFFSET_MS = bookingConfig.timezoneOffsetMinutes * MIN;
 
 // ---------------------------------------------------------------- настройки
 
-export type NotificationConfig = { quietFrom: number; quietTo: number; dailyLimit: number };
-export const DEFAULT_CONFIG: NotificationConfig = { quietFrom: 23, quietTo: 10, dailyLimit: 2 };
+/** images — картинка вместо текста (14.11.2026, по умолчанию включено). */
+export type NotificationConfig = { quietFrom: number; quietTo: number; dailyLimit: number; images: boolean };
+export const DEFAULT_CONFIG: NotificationConfig = { quietFrom: 23, quietTo: 10, dailyLimit: 2, images: true };
 const CONFIG_KEY = '_config';
 
 let cache: { at: number; config: NotificationConfig; templates: Map<string, { enabled: boolean; text: string | null }> } | null = null;
@@ -311,6 +313,11 @@ function persistLogs() {
 }
 
 /** Журнал в базе, «не получает» после 403, сигнал администраторам, когда связь вернулась. */
+/** Картинки уведомлений: включаются вместе с наблюдателем (worker), выключаются в «Настройках». */
+export function installCardImages() {
+  setCardImageProvider(async (kind, text) => ((await getNotificationConfig()).images ? notificationImage(kind, text) : null));
+}
+
 export function installSendObserver() {
   setSendObserver(({ chatId, kind, result, broadcastId }) => {
     if (!persistLogs()) return;
