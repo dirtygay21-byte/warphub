@@ -4,7 +4,7 @@
  */
 import { Painter } from "./pixel/paint";
 import { drawSprite, seeded, type Sprite } from "./pixel/pixel";
-import { drawGameImage } from "./pixel/assets";
+import { drawGameImage, gameImage } from "./pixel/assets";
 
 export type EggCreatureVisual = { kind: "sprite"; sprite: Sprite } | { kind: "image"; src: string };
 
@@ -198,10 +198,14 @@ export function drawEggScene(
     const c = state.creature;
     const cy = ey + 18 - Math.round(state.rise * 24);
     if (c.kind === "image") {
-      // контур цвета свечения кладки (14.11.2026): тёмные существа не сливаются с тёмным гнездом
-      const cx = Math.round(EW / 2 - 22);
-      for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]] as const) drawGameImage(ctx, c.src, cx + dx, cy + dy, { width: 44, height: 56, tint: glow });
-      drawGameImage(ctx, c.src, cx, cy, { width: 44, height: 56 });
+      // 16.11.2026: та же картинка, что на экране результата — обрезанная, с бежевым контуром, увеличенная ×4
+      // (tools/design/incubator/result-art.py); рисуем в масштабе 1:1 к пикселям сцены, ноги — на прежнем уровне
+      const img = gameImage(c.src);
+      if (img.complete && img.naturalWidth) {
+        const w = img.naturalWidth / 4;
+        const h = img.naturalHeight / 4;
+        drawGameImage(ctx, c.src, Math.round(EW / 2 - w / 2), Math.round(cy + 46 - h), { width: w, height: h });
+      }
     }
     else drawSprite(ctx, c.sprite, Math.round(EW / 2 - c.sprite.w / 2), cy, { glowAlpha: 0.35 });
   }
