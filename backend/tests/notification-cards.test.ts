@@ -38,6 +38,18 @@ describe('карточка уведомления: разбор текста (14
   });
 });
 
+describe('карточка результата лиги (этап 3b)', () => {
+  test('победа: PNG 1280×720 с рейтингом', async () => {
+    const { buildResultCard } = await import('../src/modules/league/card');
+    const card = buildResultCard({ result: 'win', gameLabel: 'Warhammer 40,000', when: 'сб, 15 ноября, 18:00–21:00', opponent: 'Иван Петров', season: '2026-Q4', rating: { rating: 1016, delta: 16 } });
+    expect(card.subtitle).toBe('IV квартал 2026');
+    const png = await renderCardPng(card);
+    expect(Array.from(png.slice(0, 4))).toEqual([0x89, 0x50, 0x4e, 0x47]);
+    const out = process.env.CARD_SAMPLES_DIR;
+    if (out) (mkdirSync(out, { recursive: true }), writeFileSync(`${out}/league-result.png`, png));
+  }, 20_000);
+});
+
 describe('карточка уведомления: PNG по всем стандартным текстам', () => {
   const out = process.env.CARD_SAMPLES_DIR;
   if (out) mkdirSync(out, { recursive: true });

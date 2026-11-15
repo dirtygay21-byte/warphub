@@ -8,6 +8,7 @@ import { gameResultsTable, reservationsTable, servicesTable, tablesTable, usersT
 import { gameLabel } from '../../config/booking';
 import { escapeHtml, formatClubDateTime, formatUserName } from '../../lib/telegram/format';
 import type { ReservationDetails } from '../booking/rules';
+import { buildResultCard } from './card';
 import { notifyKind, notifyKindAdmins } from '../notifications/hub';
 import {
   ASK_AFTER_MS,
@@ -407,19 +408,16 @@ export async function resultCardPng(id: string, sideRaw: unknown): Promise<Uint8
     .map((x) => ({ id: x.id, playerA: x.playerA, playerB: x.playerB, outcome: x.outcome!, startsAt: x.startsAt }));
   const after = ratingAfter(seasonResults, r.id, me);
   const { renderCardPng } = await import('../notifications/card/render');
-  const rows = [
-    { label: 'Когда', value: formatClubDateTime(r.startsAt, r.endsAt) },
-    { label: 'Соперник', value: other ? nameOf({ firstName: other.firstName, lastName: other.lastName, username: null }) : 'Игрок' },
-    ...(after ? [{ label: 'Рейтинг', value: `${after.rating} (${after.delta >= 0 ? '+' : ''}${after.delta})` }] : []),
-  ];
-  const png = await renderCardPng({
-    kicker: result === 'win' ? 'Победа' : result === 'draw' ? 'Ничья' : 'Клубная лига',
-    title: gameLabel(r.game),
-    subtitle: seasonLabel(season).split(' · ')[0]!,
-    tone: result === 'win' ? 'accent' : 'neutral',
-    blocks: [{ type: 'rows', rows }],
-    note: '',
-  });
+  const png = await renderCardPng(
+    buildResultCard({
+      result,
+      gameLabel: gameLabel(r.game),
+      when: formatClubDateTime(r.startsAt, r.endsAt),
+      opponent: other ? nameOf({ firstName: other.firstName, lastName: other.lastName, username: null }) : 'Игрок',
+      season,
+      rating: after,
+    }),
+  );
   if (cardCache.size > 200) cardCache.clear();
   cardCache.set(key, png);
   return png;
