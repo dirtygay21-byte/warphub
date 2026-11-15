@@ -18,3 +18,4 @@ export * from './pricing';
 export * from './point-promos';
 export * from './notifications';
 export * from './waitlist';
+export * from './game-results';

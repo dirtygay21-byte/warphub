@@ -14,7 +14,8 @@ import { isOutsideTelegram } from "@/utils/telegramEnv";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getFullName, getInitials } from "@/utils/user";
 import { useQuery } from "@tanstack/react-query";
-import { AtSign, Bell, BookOpen, Check, Copy, Gamepad2, Hash, LayoutGrid, RefreshCw, ShieldCheck, Sparkles, Store, Swords, UserRound } from "lucide-react";
+import LeagueStatsCard from "@/components/pages/League/LeagueStatsCard";
+import { AtSign, Bell, BookOpen, Check, Copy, Gamepad2, Hash, LayoutGrid, RefreshCw, ShieldCheck, Sparkles, Store, Swords, Trophy, UserRound } from "lucide-react";
 import { ActionTile, DsButton, GroupCard, WormField, SectionLabel, Skeleton } from "@/components/ui/ds";
 import clsx from "clsx";
 import { useEffectsStore } from "@/stores/useEffectsStore";
@@ -216,11 +217,14 @@ export default function Profile() {
                 />
               )}
 
+              {isAuthenticated && <LeagueStatsCard />}
+
               <section>
                 <SectionLabel>Разделы</SectionLabel>
                 {/* разделы плитками по две (15.11.2026) — всё видно без прокрутки */}
                 <div className="grid grid-cols-2 gap-2.5 [&>*:last-child:nth-child(odd)]:col-span-2">
                   <ActionTile accent icon={<Gamepad2 className="size-5" />} title="Мини-игры" subtitle="Скидки за игры" onClick={() => navigate("/games")} />
+                  <ActionTile icon={<Trophy className="size-5" />} title="Лига" subtitle="Рейтинг и партии" onClick={() => navigate("/league")} />
                   <ActionTile icon={<BookOpen className="size-5" />} title="Как играть" subtitle="Схемы и правила" onClick={() => navigate("/learn")} />
                   {hasRosterAccess && (
                     <ActionTile icon={<Swords className="size-5" />} title="WarpBuilder" subtitle="Ростеры и игры" onClick={() => navigate("/roster")} />

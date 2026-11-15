@@ -23,6 +23,7 @@ import {
 } from '../../db/schema';
 import { escapeHtml, formatClubDateTime, formatUserName } from '../../lib/telegram/format';
 import { getPlayerProgress } from '../progress/service';
+import { runLeagueJobs } from '../league/service';
 import type { ReservationDetails } from '../booking/rules';
 import {
   allRecipients,
@@ -441,6 +442,7 @@ export async function runScheduledJobs(now = new Date()) {
     ['event-reminders', eventReminders],
     ['few-seats', fewSeats],
     ['daily', ranksAndInactive],
+    ['league', runLeagueJobs],
   ];
   for (const [name, job] of jobs) {
     try {

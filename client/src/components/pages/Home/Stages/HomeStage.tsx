@@ -9,7 +9,8 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { s3Url } from "@/utils/s3utils";
 import { getRosterAccess } from "@/apiUtils/roster";
-import { BookOpen, ChevronRight, RotateCcw, Swords } from "lucide-react";
+import { BookOpen, ChevronRight, RotateCcw, Swords, Trophy } from "lucide-react";
+import { getMyResults } from "@/apiUtils/league";
 import { DateTile, LimeHero, SectionLabel } from "@/components/ui/ds";
 import { haptic } from "@/utils/haptic";
 import { isInactiveReservation, sortReservationsForDisplay } from "@/utils/reservation";
@@ -40,6 +41,9 @@ export default function HomeStage() {
   // WarpBuilder — скрытый раздел: плитка только у тех, у кого есть доступ по коду (как в профиле и боковом меню)
   const rosterAccess = useQuery({ queryKey: ["roster-access"], queryFn: getRosterAccess, retry: false });
   const reservationsQuery = useQuery({ queryKey: ["reservations"], queryFn: getMyReservations, enabled: isAuthenticated });
+  // клубная лига (этап 3): партии, где игрок должен внести или подтвердить результат
+  const resultsQuery = useQuery({ queryKey: ["my-results"], queryFn: getMyResults, enabled: isAuthenticated, retry: false });
+  const pendingResults = (resultsQuery.data ?? []).filter((r) => r.action !== "none").length;
 
   const next = useMemo(() => {
     const data = reservationsQuery.data;
@@ -95,6 +99,22 @@ export default function HomeStage() {
     <div className="ds-enter relative z-[50] flex flex-col gap-5 px-5 py-3 pb-8 text-fg lg:grid lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start lg:gap-8 lg:pb-12 lg:pt-4">
       <div className="flex flex-col gap-5">
         <HomeScreenHint bookings={reservationsQuery.data?.reservations.length ?? 0} />
+        {pendingResults > 0 && (
+          <button
+            type="button"
+            onClick={() => (haptic.tap(), navigate("/league"))}
+            className="ds-press flex w-full items-center gap-3 rounded-[18px] border border-accent/60 bg-app-elevated p-3 text-left"
+          >
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-[14px] bg-accent text-accent-foreground">
+              <Trophy className="size-6" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[16px] font-bold leading-tight">Как прошла игра?</span>
+              <span className="mt-0.5 block text-[13px] text-fg-2">Внесите или подтвердите результат — он пойдёт в рейтинг лиги</span>
+            </span>
+            <ChevronRight className="size-5 shrink-0 text-accent" />
+          </button>
+        )}
         {next && (
           <section>
             <SectionLabel>Ваша ближайшая запись</SectionLabel>
@@ -163,7 +183,8 @@ export default function HomeStage() {
           <NearestEventBanner />
         </section>
 
-        <div className={rosterAccess.data?.hasAccess ? "grid grid-cols-2 gap-2.5" : "grid grid-cols-1"}>
+        <div className="grid grid-cols-2 gap-2.5 [&>*:last-child:nth-child(odd)]:col-span-2">
+          <Tile icon={<Trophy className="size-5" />} title="Лига" sub="Рейтинг клуба" onClick={() => navigate("/league")} />
           <Tile icon={<BookOpen className="size-5" />} title="Как играть" sub="Первая игра без паники" onClick={() => navigate("/learn")} />
           {rosterAccess.data?.hasAccess && (
             <Tile icon={<Swords className="size-5" />} title="WarpBuilder" sub="Ростеры и игры" onClick={() => navigate("/roster")} />
