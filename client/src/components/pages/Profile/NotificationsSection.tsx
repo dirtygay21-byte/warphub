@@ -123,7 +123,7 @@ function NotificationPrefsBlock() {
                         onClick={() => toggleGame(g.value)}
                         className={clsx(
                           "min-h-11 rounded-xl border px-2 text-[13px] font-semibold",
-                          on ? "border-accent/60 bg-accent/15 text-accent" : "border-white/[0.14] text-fg-2",
+                          on ? "border-accent bg-accent text-accent-foreground" : "border-white/[0.14] text-fg-2",
                         )}
                       >
                         {g.label}

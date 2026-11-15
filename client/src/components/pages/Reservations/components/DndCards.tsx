@@ -88,7 +88,7 @@ export function DndBookingCard({
         <span
           className={clsx(
             "inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg px-2 text-[12px] font-semibold",
-            inactive ? "bg-white/[0.08] text-fg-2" : "bg-accent/15 text-accent",
+            inactive ? "bg-white/[0.08] text-fg-2" : "bg-accent text-accent-foreground",
           )}
         >
           {statusLabel}
@@ -194,8 +194,8 @@ export function TrialRequestCard({
         <span
           className={clsx(
             "inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg px-2 text-[12px] font-semibold",
-            request.status === "new" && "bg-warn/15 text-warn",
-            request.status === "grouped" && "bg-accent/15 text-accent",
+            request.status === "new" && "bg-warn text-accent-foreground",
+            request.status === "grouped" && "bg-accent text-accent-foreground",
             request.status === "cancelled" && "bg-white/[0.08] text-fg-2",
           )}
         >

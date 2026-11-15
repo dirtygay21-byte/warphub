@@ -18,9 +18,9 @@ export default function NavigationItem({
       id={id}
       onClick={onClick}
       className={clsx(
-        "flex flex-col items-center justify-center gap-1 hover:cursor-pointer",
-        isActive && "text-accent",
-        !isActive && "text-muted"
+        "flex min-h-11 min-w-16 flex-col items-center justify-center gap-1 hover:cursor-pointer",
+        isActive && "font-semibold text-accent",
+        !isActive && "text-fg-2"
       )}
     >
       <div className="size-6">{icon}</div>

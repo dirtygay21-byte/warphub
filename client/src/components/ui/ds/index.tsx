@@ -13,7 +13,7 @@ import { haptic } from "@/utils/haptic";
 export function SectionLabel({ children, right, className }: { children: ReactNode; right?: ReactNode; className?: string }) {
   return (
     <div className={clsx("mb-2.5 flex items-center justify-between gap-2", className)}>
-      <h2 className="text-[13px] font-bold uppercase tracking-[0.08em] text-fg-3">{children}</h2>
+      <h2 className="font-display text-[15px] font-semibold uppercase tracking-[0.14em] text-fg-2">{children}</h2>
       {right}
     </div>
   );
@@ -24,7 +24,7 @@ export function ScreenTitle({ children, kicker, className }: { children: ReactNo
   return (
     <div className={clsx("flex flex-col gap-1", className)}>
       {kicker && <span className="text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">{kicker}</span>}
-      <h1 className="font-display text-[28px] font-semibold uppercase leading-none text-fg">{children}</h1>
+      <h1 className="font-display text-[30px] font-bold uppercase leading-none text-fg">{children}</h1>
     </div>
   );
 }
@@ -33,8 +33,8 @@ type Tone = "plain" | "accent" | "accent-outline";
 
 const TONE: Record<Tone, string> = {
   plain: "border border-white/10 bg-app-elevated",
-  accent: "border border-accent/35 bg-accent/[0.08]",
-  "accent-outline": "border-[1.5px] border-accent/70 bg-accent/[0.08]",
+  accent: "border-2 border-accent bg-transparent",
+  "accent-outline": "border-2 border-accent bg-transparent",
 };
 
 /**
@@ -83,7 +83,7 @@ export function NavRow({
           </span>
         ))}
       <span className="min-w-0 flex-1">
-        <span className="block text-[17px] font-bold leading-tight">{title}</span>
+        <span className="block text-[16px] font-bold leading-tight">{title}</span>
         {subtitle && <span className="mt-0.5 block text-sm leading-snug text-fg-2">{subtitle}</span>}
       </span>
       <ChevronRight className={clsx("size-5 shrink-0", tone === "plain" ? "text-fg-3" : "text-accent")} />
@@ -101,11 +101,11 @@ export function Badge({ children, tone = "muted", className }: { children: React
   return (
     <span
       className={clsx(
-        "inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg px-2 text-xs font-semibold",
+        "inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-[9px] px-2.5 text-xs font-semibold",
         tone === "muted" && "bg-white/[0.08] text-fg-2",
-        tone === "accent" && "bg-accent/15 text-accent",
-        tone === "warn" && "bg-warn/15 text-warn",
-        tone === "danger" && "bg-danger/15 text-danger",
+        tone === "accent" && "bg-accent text-accent-foreground",
+        tone === "warn" && "bg-warn text-accent-foreground",
+        tone === "danger" && "bg-danger text-accent-foreground",
         className,
       )}
     >
@@ -134,10 +134,11 @@ export function DsButton({
         onClick?.(e);
       }}
       className={clsx(
-        "ds-press inline-flex items-center justify-center gap-2 rounded-[14px] font-semibold disabled:opacity-50",
+        "ds-press inline-flex items-center justify-center gap-2 rounded-[16px] font-semibold disabled:opacity-50",
         size === "lg" ? "h-[54px] px-5 text-[17px]" : "h-11 px-4 text-[15px]",
         variant === "primary" && "bg-accent text-accent-foreground",
-        variant === "secondary" && "border border-white/[0.16] bg-app-elevated text-fg",
+        variant === "primary" && size === "lg" && "font-display text-[18px] uppercase tracking-[0.06em]",
+        variant === "secondary" && "border-[1.5px] border-white/[0.18] bg-transparent text-fg",
         variant === "danger" && "border border-danger/40 bg-transparent text-danger",
         variant === "ghost" && "bg-transparent text-fg-2",
         className,
@@ -161,7 +162,7 @@ export function Segmented<T extends string>({
   className?: string;
 }) {
   return (
-    <div className={clsx("grid gap-1 rounded-[14px] bg-app-elevated p-1", className)} style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
+    <div className={clsx("grid gap-1 rounded-[16px] border border-white/10 bg-app-elevated p-1", className)} style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
       {options.map((o) => (
         <button
           key={o.value}
@@ -169,7 +170,7 @@ export function Segmented<T extends string>({
           aria-pressed={o.value === value}
           onClick={() => (haptic.select(), onChange(o.value))}
           className={clsx(
-            "ds-press h-10 rounded-[10px] text-[15px] font-semibold",
+            "ds-press min-h-11 rounded-[12px] px-1 text-[15px] font-semibold",
             o.value === value ? "bg-accent text-accent-foreground" : "bg-transparent text-fg-2",
           )}
         >

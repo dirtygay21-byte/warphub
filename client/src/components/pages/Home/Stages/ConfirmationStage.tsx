@@ -11,23 +11,13 @@ import {
 } from "lucide-react";
 import { formatClubTime, formatClubTimeRange } from "@/utils/clubTime";
 import { hoursLabel } from "@/utils/slots";
-import type { ReactNode } from "react";
 import { getServiceDetailsMeta } from "./ServiceDetails/utils";
 import { formatSelectedDate } from "@/utils/date";
-import { DsButton, LimeHero } from "@/components/ui/ds";
+import { LimeChip, Worm } from "@/components/ui/ds";
+import { haptic } from "@/utils/haptic";
 
 type ConfirmationStatus = "Success" | "Succes" | "Error";
 
-const confetti = [
-  "left-[18%] top-[15%] bg-accent",
-  "left-[27%] top-[9%] bg-green-400",
-  "left-[73%] top-[14%] bg-yellow-400",
-  "left-[82%] top-[22%] bg-red-400",
-  "left-[13%] top-[38%] bg-orange-400",
-  "left-[78%] top-[40%] bg-green-400",
-  "left-[22%] top-[52%] bg-green-400",
-  "left-[64%] top-[7%] bg-accent",
-];
 
 export default function ConfirmationStage({
   status = "Success",
@@ -89,58 +79,55 @@ export default function ConfirmationStage({
     navigate("/");
   };
 
+  const ink = "#111110";
   return (
-    <div className="ds-enter relative min-h-[calc(100dvh-160px)] overflow-hidden px-5 py-8 text-center text-fg">
-      {isSuccess && (
-        <div className="fx-strong-only pointer-events-none absolute inset-x-0 top-0 h-52">
-          {confetti.map((className) => (
-            <span
-              key={className}
-              className={`absolute size-1.5 rounded-full shadow-[0_0_12px_currentColor] ${className}`}
-            />
-          ))}
+    <div className="ds-enter px-4 pb-6 pt-2">
+      {/* лаймовый концепт (15.11.2026): итог записи — лаймовый экран с червяками (красный — запись не создана) */}
+      <section
+        className={`ds-pop relative isolate flex min-h-[calc(100dvh-180px)] flex-col overflow-hidden rounded-[26px] px-5 pb-5 pt-7 text-[#111110] ${
+          isSuccess ? "bg-accent" : "bg-danger"
+        }`}
+      >
+        <svg aria-hidden="true" width="100%" height="100%" className="pointer-events-none absolute inset-0">
+          <svg x="100%" y="0" overflow="visible">
+            <Worm x={-70} y={40} angle={40} period={320} amp={34} width={40} seconds={8} />
+          </svg>
+          <svg x="0" y="100%" overflow="visible">
+            <Worm x={40} y={-30} angle={-30} period={200} amp={22} width={30} seconds={6} />
+          </svg>
+        </svg>
+
+        <div className="relative mt-24 font-display text-[16px] font-semibold uppercase tracking-[0.18em]">
+          {isSuccess ? "Готово" : "Ошибка"}
         </div>
-      )}
+        <h2 className="relative mt-2 max-w-[11ch] font-display text-[52px] font-bold uppercase leading-[0.95]">
+          {!isSuccess ? "Запись не создана" : lastBooking?.joined ? "Ты в игре!" : "Ты записан!"}
+        </h2>
+        <p className="relative mt-3 text-[16px] font-medium">
+          {isSuccess ? "Мы ждем тебя в клубе" : "Не удалось подтвердить запись. Попробуй еще раз."}
+        </p>
 
-      <div className="relative mx-auto flex max-w-sm flex-col items-center">
-        {/* лаймовый концепт (15.11.2026): итог — цветной блок с червяками (лайм — записан, красный — ошибка) */}
-        <LimeHero
-          tone={isSuccess ? "lime" : "danger"}
-          kicker={isSuccess ? "Готово" : "Ошибка"}
-          title={!isSuccess ? "Запись не создана" : lastBooking?.joined ? "Ты в игре!" : "Ты записан!"}
-          className="ds-pop w-full text-left"
-        >
-          <p className="text-base font-medium">
-            {isSuccess ? "Мы ждем тебя в клубе" : "Не удалось подтвердить запись. Попробуй еще раз."}
-          </p>
-        </LimeHero>
-
-        <div className="mt-4 w-full rounded-[18px] border border-white/10 bg-app-elevated p-4 text-left">
-          <div className="mb-3 flex items-start justify-between gap-3">
-            <h3 className="text-[17px] font-bold leading-tight">
-              {serviceQuery.isLoading
-                ? "Загрузка…"
-                : (activity ?? "Услуга")}
-            </h3>
-            {discipline && (
-              <span className="shrink-0 whitespace-nowrap rounded-lg bg-white/[0.08] px-2 py-1 text-[12px] font-semibold text-fg-2">
-                {discipline}
-              </span>
-            )}
-          </div>
-
-          <div className="space-y-3">
-            <InfoRow
-              icon={<CalendarDays className="size-5" />}
-              value={formatSelectedDate(selectedDate)}
-            />
-            <InfoRow icon={<Clock3 className="size-5" />} value={time} />
-            <InfoRow icon={<UsersRound className="size-5" />} value={placesLabel} />
-          </div>
+        <div className="relative mt-5 font-display text-[22px] font-semibold uppercase leading-tight">
+          {serviceQuery.isLoading ? "Загрузка…" : (activity ?? "Услуга")}
+        </div>
+        <div className="relative mt-3 flex flex-wrap gap-2">
+          {discipline && <LimeChip accent>{discipline}</LimeChip>}
+          <LimeChip>
+            <CalendarDays className="mr-1.5 size-4" />
+            {formatSelectedDate(selectedDate)}
+          </LimeChip>
+          <LimeChip>
+            <Clock3 className="mr-1.5 size-4" />
+            {time}
+          </LimeChip>
+          <LimeChip>
+            <UsersRound className="mr-1.5 size-4" />
+            {placesLabel}
+          </LimeChip>
         </div>
 
         {isSuccess && limited && fullMinutes && lastBooking?.endsAt && (
-          <div role="status" className="mt-3 w-full rounded-[14px] border border-danger/50 bg-danger/10 px-4 py-3 text-left text-sm text-fg">
+          <div role="status" className="relative mt-4 rounded-[14px] bg-[#111110] px-4 py-3 text-left text-sm text-fg">
             <p className="font-semibold text-danger">
               ⚠️ Время ограничено: {hoursLabel(limited)} вместо {hoursLabel(fullMinutes)} — до {formatClubTime(lastBooking.endsAt)}
             </p>
@@ -150,36 +137,38 @@ export default function ConfirmationStage({
           </div>
         )}
 
-        {isSuccess ? (
-          <>
-            <div className="mt-3 w-full rounded-[14px] bg-white/[0.05] px-4 py-3 text-sm text-fg-2">
-              Мы напомним тебе за 1 час до начала игры.
-            </div>
+        {isSuccess && <p className="relative mt-4 max-w-[30ch] text-[15px] leading-snug">Мы напомним тебе за 1 час до начала игры.</p>}
 
-            <DsButton variant="primary" size="lg" onClick={handleMyRecordsClick} className="mt-5 w-full">
+        <div className="relative mt-auto flex flex-col gap-2.5 pt-6">
+          {isSuccess ? (
+            <button
+              type="button"
+              onClick={() => (haptic.tap(), handleMyRecordsClick())}
+              className="ds-press flex min-h-[54px] items-center justify-center rounded-[16px] bg-[#111110] font-display text-[18px] font-semibold uppercase tracking-[0.06em] text-accent"
+            >
               Мои записи
-            </DsButton>
-          </>
-        ) : (
-          <DsButton variant="primary" size="lg" onClick={previousStage} className="mt-5 w-full">
-            <RotateCcw className="size-5" />
-            Попробовать снова
-          </DsButton>
-        )}
-
-        <DsButton variant="secondary" size="lg" onClick={handleHomeClick} className="mt-3 w-full">
-          На главную
-        </DsButton>
-      </div>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => (haptic.tap(), previousStage())}
+              className="ds-press flex min-h-[54px] items-center justify-center gap-2 rounded-[16px] bg-[#111110] font-display text-[18px] font-semibold uppercase tracking-[0.06em] text-danger"
+            >
+              <RotateCcw className="size-5" />
+              Попробовать снова
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => (haptic.tap(), handleHomeClick())}
+            className="ds-press flex min-h-[52px] items-center justify-center rounded-[16px] border-2 font-semibold"
+            style={{ borderColor: ink }}
+          >
+            На главную
+          </button>
+        </div>
+      </section>
     </div>
   );
 }
 
-function InfoRow({ icon, value }: { icon: ReactNode; value: string }) {
-  return (
-    <div className="flex items-center gap-3 text-[15px] text-fg">
-      <span className="text-fg-2">{icon}</span>
-      <span>{value}</span>
-    </div>
-  );
-}

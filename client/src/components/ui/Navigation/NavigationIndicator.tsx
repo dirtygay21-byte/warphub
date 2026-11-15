@@ -16,8 +16,9 @@ export default function NavigationIndicator({
     if (!item) return;
 
     setIndicatorStyle({
-      left: item.offsetLeft - item.offsetWidth / 2,
-      width: item.offsetWidth * 2,
+      // лаймовый концепт: короткая полоска 22 px над подписью выбранного раздела
+      left: item.offsetLeft + item.offsetWidth / 2 - 11,
+      width: 22,
     });
   });
 
@@ -41,7 +42,7 @@ export default function NavigationIndicator({
 
   return (
     <div
-      className="nav-indicator absolute left-0 top-0 h-[2px] transition-[left,width] duration-300"
+      className="nav-indicator absolute left-0 top-2 h-[5px] transition-[left] duration-300"
       style={indicatorStyle}
     />
   );

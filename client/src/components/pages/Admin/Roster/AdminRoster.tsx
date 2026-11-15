@@ -20,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 const when = (value: string) => formatClub(value, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
 const STATUS: Record<RosterCode["status"], { label: string; className: string }> = {
-  active: { label: "Активен", className: "bg-accent/15 text-accent" },
+  active: { label: "Активен", className: "bg-accent text-accent-foreground" },
   used: { label: "Использован", className: "bg-white/10 text-fg-2" },
   expired: { label: "Истёк", className: "bg-white/5 text-fg-3" },
   revoked: { label: "Отозван", className: "bg-red-400/10 text-red-300" },

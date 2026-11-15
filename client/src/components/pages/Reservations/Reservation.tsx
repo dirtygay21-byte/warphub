@@ -266,7 +266,7 @@ export default function Reservation() {
     return (
       <div className="px-5 pb-3 pt-6 text-fg lg:pt-8">
         <div className="mb-4">
-          <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Мои записи</h1>
+          <h1 className="font-display text-[30px] font-bold uppercase leading-none">Мои записи</h1>
           <p className="mt-2 text-sm text-fg-2">Загружаем записи…</p>
         </div>
 
@@ -283,7 +283,7 @@ export default function Reservation() {
     <div className="ds-enter px-5 pb-3 pt-6 text-fg lg:pt-8">
       <div className="mb-4 flex flex-col gap-3.5">
         <div className="flex items-center justify-between gap-3">
-          <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Мои записи</h1>
+          <h1 className="font-display text-[30px] font-bold uppercase leading-none">Мои записи</h1>
           <button
             type="button"
             onClick={() => {
@@ -310,7 +310,7 @@ export default function Reservation() {
       </div>
 
       {nextUp && (
-        <LimeHero tone={nextUp.tone} kicker={nextUp.kicker} title={nextUp.title} size="sm" className="ds-enter mb-4">
+        <LimeHero tone={nextUp.tone} kicker={nextUp.kicker} title={nextUp.title} className="ds-enter mb-4">
           <div className="flex flex-wrap gap-2">
             <LimeChip accent>{formatReservationDate(nextUp.startsAt)}</LimeChip>
             <LimeChip>{formatTimeRange(nextUp.startsAt, nextUp.endsAt)}</LimeChip>

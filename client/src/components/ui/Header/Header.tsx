@@ -35,7 +35,7 @@ export default function Header() {
   const isHomeRoute = pathname === "/";
   const isTitleOnlyRoute = ["/reservations", "/news", "/profile"].some((p) => pathname.startsWith(p));
   // у «Моих записей» и «Новостей» свой крупный заголовок — шапка с тем же названием не нужна (U8)
-  const pageHasOwnTitle = ["/reservations", "/news"].some((p) => pathname.startsWith(p));
+  const pageHasOwnTitle = ["/reservations", "/news", "/profile"].some((p) => pathname.startsWith(p));
   // Обрабатываем нажатия на кнопку назад и чистим соответсвующий стейт
   const handleBackBtnClick = () => {
     switch (currentStage) {
@@ -55,7 +55,7 @@ export default function Header() {
     <>
       <div
         className={clsx(
-          "sticky top-0 z-50 w-full flex items-center h-[60px] gap-6 px-4 text-accent bg-app-bg",
+          "sticky top-0 z-50 w-full flex items-center h-[60px] gap-3 px-5 text-accent bg-app-bg",
           // на широком экране раздел видно в боковой панели, а у страницы свой крупный заголовок
           isTitleOnlyRoute && "lg:hidden",
           pageHasOwnTitle && "hidden"
@@ -70,10 +70,14 @@ export default function Header() {
 
         {isHomeRoute && currentStage === "Home" && (
           <>
-            <img src={s3Url("logo.png")} alt="logo" className="size-10 lg:hidden" />
-            <h1 className="text-md [font-family:var(--font-oswald)]">
-              {`ДОБРО ПОЖАЛОВАТЬ${username ? `, ${username}` : ""} !`}
-            </h1>
+            {/* лаймовый концепт (15.11.2026): логотип и название клуба, приветствие справа */}
+            <img src={s3Url("logo.png")} alt="" className="size-9 lg:hidden" />
+            <h1 className="font-display text-[22px] font-bold uppercase tracking-[0.04em] text-fg">WarpHub</h1>
+            {username && (
+              <span className="ml-auto truncate font-display text-[14px] font-semibold uppercase tracking-[0.08em] text-fg-2">
+                Привет, <span className="text-accent">{username}</span>
+              </span>
+            )}
           </>
         )}
         {isHomeRoute && currentStage !== "Home" && (
@@ -85,7 +89,7 @@ export default function Header() {
             >
               <ChevronLeft className="size-8" />
             </button>
-            <p className="text-md font-medium text-fg">
+            <p className="font-display text-[18px] font-semibold uppercase tracking-[0.04em] text-fg">
               {STAGE_TITLES[currentStage]}
             </p>
           </div>

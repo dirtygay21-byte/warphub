@@ -77,7 +77,7 @@ export function ReservationsTable({
                 onClick={() => onCategoriesChange(on ? categories.filter((c) => c !== category.id) : [...categories, category.id])}
                 className={clsx(
                   "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border px-2 text-[13px] font-semibold transition-colors",
-                  on ? "border-accent/60 bg-accent/15 text-accent" : "border-white/[0.14] text-fg-2 hover:text-fg",
+                  on ? "border-accent bg-accent text-accent-foreground" : "border-white/[0.14] text-fg-2 hover:text-fg",
                 )}
               >
                 {category.label}

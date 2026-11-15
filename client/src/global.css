@@ -122,28 +122,19 @@ body {
     display: none;
   }
 
+  /* лаймовый концепт (15.11.2026): плоская лаймовая полоска над выбранным разделом, без свечения */
   .nav-indicator {
-    box-shadow: 0 0 20px 0 rgb(var(--color-accent));
-    background: linear-gradient(
-      to left,
-      transparent 5%,
-      rgb(var(--color-accent)) 50%,
-      transparent 95%
-    );
+    background: rgb(var(--color-accent));
+    border-radius: 999px;
   }
 
+  /* лаймовый концепт: без свечения — плоский лайм */
   .register-btn-glow {
-    box-shadow:
-      0 0 24px rgb(var(--color-accent) / 0.45),
-      0 0 56px rgb(var(--color-accent) / 0.28),
-      0 12px 32px rgba(0, 0, 0, 0.35);
+    box-shadow: none;
   }
 
   .event-banner-glow {
-    box-shadow:
-      0 14px 36px rgba(255, 255, 255, 0.07),
-      0 8px 20px rgba(255, 255, 255, 0.04),
-      0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: none;
   }
 }
 
@@ -169,7 +160,7 @@ body {
   }
   /* выбранный вариант: короткое свечение */
   .ds-selected-glow {
-    box-shadow: 0 0 18px rgb(var(--color-accent) / 0.35);
+    box-shadow: none;
   }
   /* заготовка загрузки с бегущим бликом */
   .ds-shimmer {

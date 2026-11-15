@@ -45,7 +45,7 @@ export function EventReservationCard({
       <div className="space-y-1 px-4 pt-4">
         <div className="flex items-center justify-between gap-2">
           <span className="min-w-0 truncate text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">Ивент · {event.title}</span>
-          <span className="inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg bg-accent/15 px-2 text-[12px] font-semibold text-accent">
+          <span className="inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-[9px] bg-accent px-2.5 text-[12px] font-semibold text-accent-foreground">
             Записан
           </span>
         </div>

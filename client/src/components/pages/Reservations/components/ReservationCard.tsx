@@ -120,7 +120,7 @@ export function ReservationCard({
             {isServiceLoading ? (
               <Skeleton width={80} height={24} />
             ) : (
-              <span className={clsx("inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg px-2 text-[12px] font-semibold", getStatusStyle(reservation.status))}>
+              <span className={clsx("inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-[9px] px-2.5 text-[12px] font-semibold", getStatusStyle(reservation.status))}>
                 {getStatusLabel(reservation.status)}
               </span>
             )}
