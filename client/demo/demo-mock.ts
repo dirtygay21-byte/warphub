@@ -180,7 +180,7 @@ const toLocal = (iso: string) => {
 };
 
 const adminDay = (date: string) => ({
-  date, tables: [{ id: 1, name: "Стол 1" }, { id: 2, name: "Стол 2" }], paintingCapacity: 5,
+  date, tables: [{ id: 1, name: "Стол 1" }, { id: 2, name: "Стол 2" }], paintingCapacity: 5, holds: [],
   sessions: availability(2, date).sessions.map((s) => ({
     serviceId: 2, serviceSlug: "wh_game", serviceTitle: "Игра", hasTrainer: false, ...s,
     players: s.players.map((p, i) => ({ reservationId: `${s.tableId}-${i}`, status: i ? "pending" : "confirmed", partySize: 1, seatClubArmyOptions: [false], details: { kind: "wh_player", army: p.army, points: p.points, experienceLevel: p.experienceLevel }, user: u(p.firstName, p.firstName.toLowerCase(), 1000 + i) })),

@@ -1237,7 +1237,7 @@ export function createFakeBackend({ users }) {
         }
       }
       sessions.sort((a, b) => a.startsAt.localeCompare(b.startsAt) || a.tableId - b.tableId);
-      return { date: q.date, tables, sessions, painting, paintingCapacity };
+      return { date: q.date, tables, sessions, painting, paintingCapacity, holds: [] };
     }],
     ['GET', /^\/admin\/users$/, 'admin', ({ q }) => {
       const name = String(q.username ?? '').trim().replace(/^@/, '').toLowerCase();
