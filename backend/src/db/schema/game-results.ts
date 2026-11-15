@@ -13,9 +13,8 @@ export const gameResultsTable = pgTable(
   {
     id: uuid('id').defaultRandom().primaryKey(),
     game: varchar('game', { length: 16 }).notNull(),
-    serviceId: integer('service_id')
-      .notNull()
-      .references(() => servicesTable.id, { onDelete: 'cascade' }),
+    /** услуга записи; у партии турнира — null (этап 4) */
+    serviceId: integer('service_id').references(() => servicesTable.id, { onDelete: 'cascade' }),
     tableId: integer('table_id').references(() => tablesTable.id, { onDelete: 'set null' }),
     startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
     endsAt: timestamp('ends_at', { withTimezone: true }),
@@ -36,6 +35,8 @@ export const gameResultsTable = pgTable(
     /** кто закрыл: opponent | auto | admin */
     confirmedBy: varchar('confirmed_by', { length: 16 }),
     note: text('note'),
+    /** партия турнира (этап 4): результат вносит администратор турнира, сразу засчитан */
+    tournamentGameId: uuid('tournament_game_id'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
   (t) => [
@@ -43,5 +44,6 @@ export const gameResultsTable = pgTable(
     index('game_results_player_a_index').on(t.playerA),
     index('game_results_player_b_index').on(t.playerB),
     index('game_results_status_index').on(t.status),
+    uniqueIndex('game_results_tournament_game_unique').on(t.tournamentGameId),
   ],
 );

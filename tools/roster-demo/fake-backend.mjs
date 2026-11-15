@@ -847,6 +847,48 @@ export function createFakeBackend({ users }) {
     return { id: u.id, telegramId: u.telegramId, firstName: u.firstName, lastName: u.lastName || null, username: u.username || null };
   };
   const findGame = (id) => S.dndGames.find((g) => g.id === Number(id));
+  // ---------- турнир (этап 4): образец для ивента 2
+  function tournamentSeed(eventId, user) {
+    if (eventId !== 2) return null;
+    if (S.tournament) return S.tournament;
+    const others = allUsers().filter((u) => u.id !== user.id).slice(0, 3);
+    const names = [[user.id, user.firstName], ...others.map((u) => [u.id, u.firstName]), [null, 'Гость: Сергей'], [null, 'Гость: Олег']];
+    const players = names.map(([userId, name], i) => ({ id: `tp${i + 1}`, userId, name, army: null, dropped: false }));
+    const G = (id, round, tableNo, a, b, result, vpA, vpB) => ({ id, round, tableNo, playerA: a, playerB: b, result, vpA, vpB });
+    S.tournament = {
+      eventId, game: '40k', rounds: 3, status: 'running', players,
+      games: [
+        G('tg1', 1, 1, 'tp1', 'tp4', 'a', 72, 48), G('tg2', 1, 2, 'tp2', 'tp5', 'b', 40, 61), G('tg3', 1, 3, 'tp3', 'tp6', 'draw', 55, 55),
+        G('tg4', 2, 1, 'tp1', 'tp5', null, null, null), G('tg5', 2, 2, 'tp3', 'tp6', 'a', 66, 50), G('tg6', 2, 3, 'tp4', 'tp2', null, null, null),
+      ],
+    };
+    return S.tournament;
+  }
+  function tournamentView(eventId, user) {
+    const t = tournamentSeed(eventId, user);
+    if (!t) return null;
+    const e = S.events.find((x) => x.id === eventId);
+    const st = new Map(t.players.map((p) => [p.id, { playerId: p.id, points: 0, wins: 0, draws: 0, losses: 0, vp: 0, sos: 0, opp: [] }]));
+    for (const g of t.games) {
+      if (!g.result) continue;
+      const a = st.get(g.playerA), b = st.get(g.playerB);
+      a.vp += g.vpA ?? 0; b.vp += g.vpB ?? 0; a.opp.push(b.playerId); b.opp.push(a.playerId);
+      if (g.result === 'a') (a.points += 3, a.wins++, b.losses++); else if (g.result === 'b') (b.points += 3, b.wins++, a.losses++); else (a.points++, b.points++, a.draws++, b.draws++);
+    }
+    for (const r of st.values()) r.sos = r.opp.reduce((sum, id) => sum + st.get(id).points, 0);
+    const rows = [...st.values()].sort((x, y) => y.points - x.points || y.vp - x.vp || y.sos - x.sos);
+    const round = Math.max(...t.games.map((g) => g.round));
+    const byId = new Map(t.players.map((p) => [p.id, p]));
+    return {
+      eventId, eventTitle: e?.title ?? 'Турнир', startsAt: (e?.startsAt ?? new Date()).toISOString(), game: t.game, gameLabel: 'Warhammer 40,000',
+      rounds: t.rounds, currentRound: round, status: t.status,
+      roundComplete: t.games.filter((g) => g.round === round).every((g) => g.result),
+      players: t.players.map((p) => ({ ...p, me: p.userId === user.id })),
+      pairings: [...new Set(t.games.map((g) => g.round))].sort((a, b) => b - a).map((r) => ({ round: r, games: t.games.filter((g) => g.round === r) })),
+      standings: rows.map((r, i) => ({ rank: i + 1, playerId: r.playerId, name: byId.get(r.playerId).name, points: r.points, wins: r.wins, draws: r.draws, losses: r.losses, vp: r.vp, sos: r.sos, me: byId.get(r.playerId).userId === user.id, dropped: false })),
+    };
+  }
+
   // ---------- клубная лига (этап 3): образцовые партии и таблица Эло
   function leagueSeed(user) {
     if (S.results) return S.results;
@@ -1117,6 +1159,15 @@ export function createFakeBackend({ users }) {
       if (body.outcome === 'void') r.status = 'void';
       else Object.assign(r, { outcome: body.outcome, status: 'confirmed' });
       return { ok: true };
+    }],
+    // этап 4 (15.11.2026): турнир ивента «Осенний кубок» (id 2) — образец, второй раунд идёт
+    ['GET', /^\/events\/(\d+)\/tournament$/, 'user', ({ user, m }) => tournamentView(Number(m[1]), user)],
+    ['GET', /^\/admin\/events\/(\d+)\/tournament$/, 'admin', ({ user, m }) => tournamentView(Number(m[1]), user)],
+    ['PUT', /^\/admin\/events\/(\d+)\/tournament\/games\/([^/]+)$/, 'admin', ({ user, m, body }) => {
+      const t = tournamentSeed(Number(m[1]), user) ?? fail(404, 'Турнир не найден');
+      const g = t.games.find((x) => x.id === m[2]) ?? fail(404, 'Партия не найдена');
+      Object.assign(g, { result: body.result ?? null, vpA: body.vpA ?? null, vpB: body.vpB ?? null });
+      return tournamentView(Number(m[1]), user);
     }],
     ['GET', /^\/reservations\/my$/, 'user', ({ user }) => {
       const e = nearestEvent();

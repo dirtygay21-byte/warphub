@@ -1,7 +1,8 @@
 import { getAdminEvents } from "@/apiUtils/admin";
 import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
-import { CalendarX2, Plus, RefreshCw } from "lucide-react";
+import { CalendarX2, Plus, RefreshCw, Trophy } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import EventCard from "./components/EventCard";
 import EventDetailsModal from "./components/EventDetailsModal";
@@ -9,6 +10,7 @@ import { Skeleton } from "@/components/ui/ds";
 import { AnimatePresence } from "motion/react";
 
 export default function EventsList() {
+  const navigate = useNavigate();
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
@@ -118,11 +120,18 @@ export default function EventsList() {
             )}
           >
             {events.map((event) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                onClick={() => openEditModal(event.id)}
-              />
+              <div key={event.id} className="flex flex-col gap-1.5">
+                <EventCard event={event} onClick={() => openEditModal(event.id)} />
+                {/* турнир по швейцарской системе (этап 4, 15.11.2026) */}
+                <button
+                  type="button"
+                  onClick={() => navigate(`/admin/tournament/${event.id}`)}
+                  className="ds-press flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/3 text-[13.5px] font-semibold text-accent"
+                >
+                  <Trophy className="size-4" />
+                  Турнир
+                </button>
+              </div>
             ))}
           </div>
         )}

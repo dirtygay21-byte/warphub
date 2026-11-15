@@ -22,6 +22,8 @@ import CardsGame, { CardCollection } from "@/components/games/CardsGame";
 import GamesLayout from "@/layouts/GamesLayout";
 import { TutorialHub, TutorialRound, TutorialViewer } from "@/components/tutorial/TutorialPages";
 import LeaguePage from "@/components/pages/League/LeaguePage";
+import TournamentPage from "@/components/pages/Tournament/TournamentPage";
+import AdminTournament from "@/components/pages/Admin/Tournament/AdminTournament";
 import Reservation from "@/components/pages/Reservations/Reservation";
 import News from "@/components/pages/News/News";
 import Profile from "@/components/pages/Profile/Profile";
@@ -62,6 +64,10 @@ export default function App() {
             <Route path="/league" element={<GamesLayout />}>
               <Route index element={<LeaguePage />} />
             </Route>
+            {/* турнир ивента (этап 4) */}
+            <Route path="/tournament/:eventId" element={<GamesLayout />}>
+              <Route index element={<TournamentPage />} />
+            </Route>
 
             {/* «Как играть» — тот же полноэкранный каркас без нижнего меню, что у мини-игр */}
             <Route path="/learn" element={<GamesLayout />}>
@@ -82,6 +88,7 @@ export default function App() {
               <Route path="pricing" element={<AdminPricing />} />
               <Route path="content" element={<ContentManagment />} />
               <Route path="warhammer" element={<AdminWarhammer />} />
+              <Route path="tournament/:eventId" element={<AdminTournament />} />
               <Route path="dnd" element={<AdminDnd />} />
               <Route path="roster" element={<AdminRoster />} />
               <Route path="rewards" element={<AdminRewards />} />

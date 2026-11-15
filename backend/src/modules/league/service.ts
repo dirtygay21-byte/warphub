@@ -246,6 +246,10 @@ export async function disputeResult(userId: string, id: string, note: unknown) {
 // ------------------------------------------------------------------ таблица
 
 let cache: { at: number; rows: (typeof gameResultsTable.$inferSelect)[] } | null = null;
+/** Сбросить кэш лиги после изменения результатов извне (турнир, этап 4). */
+export function invalidateLeagueCache() {
+  invalidateLeague();
+}
 function invalidateLeague() {
   cache = null;
   cardCache.clear();

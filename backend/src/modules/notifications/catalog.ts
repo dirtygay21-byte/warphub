@@ -101,6 +101,16 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     vars: { игра: 'Kill Team', когда: 'сб, 15 ноября, 18:00–21:00', соперник: 'Иван Петров (@ivan)', результат: 'поражение' },
   },
   {
+    id: 'tournament_round',
+    group: 'bookings',
+    title: 'Турнир: пара на раунд',
+    when: 'Участникам турнира, когда администратор запускает раунд',
+    category: null,
+    announcement: false,
+    defaultText: '⚔️ <b>{турнир}: раунд {раунд}</b>\n🎲 Стол: {стол}\nСоперник: {соперник}\n\nПары и таблица — в приложении.',
+    vars: { турнир: 'Осенний кубок Warhammer 40,000', раунд: '2', стол: '3', соперник: 'Иван Петров' },
+  },
+  {
     id: 'waitlist_free',
     group: 'bookings',
     title: 'Освободилось место (лист ожидания)',

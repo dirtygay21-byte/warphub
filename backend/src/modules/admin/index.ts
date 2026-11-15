@@ -13,6 +13,16 @@ import { adminAdjustPoints, adminFindPlayers, getPointsHistory } from '../miniga
 import { adminMiddleware } from '../../plugins/admin-middleware';
 import { getClubArmyCalendar } from '../booking/club-armies';
 import { adminListResults, adminResolveResult, LeagueError } from '../league/service';
+import { addPlayer, createTournament, deleteTournament, finishTournament, getTournament, setGameResult, startNextRound, TournamentError, updatePlayer } from '../tournaments/service';
+
+async function tournamentCall<T>(fn: () => Promise<T>) {
+  try {
+    return await fn();
+  } catch (error) {
+    if (error instanceof TournamentError) return status(error.code === 'NOT_FOUND' ? 404 : error.code === 'BAD_STATE' ? 409 : 400, { error: error.message });
+    throw error;
+  }
+}
 import {
   BookingError,
   confirmReservation,
@@ -519,6 +529,43 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       },
     },
   )
+  // турниры (этап 4, 15.11.2026): ивент → швейцарская система
+  .get('/events/:id/tournament', async ({ params }) => (await getTournament(params.id, null)) ?? null, {
+    params: t.Object({ id: t.Numeric() }),
+    detail: { tags: ['Admin'], summary: 'Турнир ивента' },
+  })
+  .post('/events/:id/tournament', async ({ params, body }) => tournamentCall(() => createTournament(params.id, body.game, body.rounds)), {
+    params: t.Object({ id: t.Numeric() }),
+    body: t.Object({ game: t.String(), rounds: t.Integer() }),
+    detail: { tags: ['Admin'], summary: 'Создать турнир из ивента (участники — записавшиеся)' },
+  })
+  .delete('/events/:id/tournament', async ({ params }) => tournamentCall(() => deleteTournament(params.id)), {
+    params: t.Object({ id: t.Numeric() }),
+    detail: { tags: ['Admin'], summary: 'Удалить турнир, пока он не начат' },
+  })
+  .post('/events/:id/tournament/players', async ({ params, body }) => tournamentCall(() => addPlayer(params.id, body.name, body.army)), {
+    params: t.Object({ id: t.Numeric() }),
+    body: t.Object({ name: t.String(), army: t.Optional(t.String()) }),
+    detail: { tags: ['Admin'], summary: 'Добавить участника-гостя' },
+  })
+  .patch('/events/:id/tournament/players/:playerId', async ({ params, body }) => tournamentCall(() => updatePlayer(params.id, params.playerId, body)), {
+    params: t.Object({ id: t.Numeric(), playerId: t.String({ format: 'uuid' }) }),
+    body: t.Object({ army: t.Optional(t.String()), dropped: t.Optional(t.Boolean()) }),
+    detail: { tags: ['Admin'], summary: 'Армия участника; снять с турнира / вернуть' },
+  })
+  .post('/events/:id/tournament/next-round', async ({ params }) => tournamentCall(() => startNextRound(params.id)), {
+    params: t.Object({ id: t.Numeric() }),
+    detail: { tags: ['Admin'], summary: 'Запустить следующий раунд (пары по швейцарской системе)' },
+  })
+  .put('/events/:id/tournament/games/:gameId', async ({ params, body }) => tournamentCall(() => setGameResult(params.id, params.gameId, body)), {
+    params: t.Object({ id: t.Numeric(), gameId: t.String({ format: 'uuid' }) }),
+    body: t.Object({ result: t.Union([t.Literal('a'), t.Literal('b'), t.Literal('draw'), t.Null()]), vpA: t.Optional(t.Union([t.Integer(), t.Null()])), vpB: t.Optional(t.Union([t.Integer(), t.Null()])) }),
+    detail: { tags: ['Admin'], summary: 'Результат партии турнира и VP' },
+  })
+  .post('/events/:id/tournament/finish', async ({ params }) => tournamentCall(() => finishTournament(params.id)), {
+    params: t.Object({ id: t.Numeric() }),
+    detail: { tags: ['Admin'], summary: 'Завершить турнир' },
+  })
   // клубная лига (этап 3): споры и ручное решение
   .get('/results', async ({ query }) => adminListResults(query.status), {
     query: t.Object({ status: t.Optional(t.String()) }),
