@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { haptic, pushOverlay } from '../telegram';
 import { cx } from './util';
+import { Worm } from '@/components/ui/ds/Lime';
 
 
 const paths: Record<string, string> = {
@@ -56,7 +57,7 @@ export function Button({
 }: {
   children: ReactNode;
   onClick?: () => void;
-  variant?: 'primary' | 'ghost' | 'danger' | 'outline';
+  variant?: 'primary' | 'ghost' | 'danger' | 'outline' | 'ink';
   className?: string;
   disabled?: boolean;
   type?: 'button' | 'submit';
@@ -75,6 +76,7 @@ export function Button({
         variant === 'ghost' && 'bg-white/[0.05] text-white/85 hover:bg-white/[0.09] active:bg-white/10',
         variant === 'outline' && 'border border-white/10 text-white/85 hover:bg-white/[0.04] active:bg-white/5',
         variant === 'danger' && 'bg-danger/10 text-danger hover:bg-danger/15 active:bg-danger/20',
+        variant === 'ink' && 'min-h-12 bg-[#111110] text-[15px] text-accent',
         className,
       )}
     >
@@ -239,5 +241,15 @@ export function PointsBar({ used, limit, unit = 'очк.' }: { used: number; lim
         <span className="text-fg-3">{pct}%</span>
       </p>
     </div>
+  );
+}
+
+
+/** Червяк в углу цветного блока WarpBuilder (блок — relative overflow-hidden, цвет «Варп»). */
+export function HeroWorm() {
+  return (
+    <svg aria-hidden="true" width="130" height="110" viewBox="0 0 130 110" className="pointer-events-none absolute right-0 top-0">
+      <Worm x={92} y={26} angle={32} period={130} amp={11} width={10} seconds={9} />
+    </svg>
   );
 }
