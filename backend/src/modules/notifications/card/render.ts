@@ -110,11 +110,14 @@ ${single ? worm(`M${W + 60} ${H - 260} C${W - 120} ${H - 300} ${W - 160} ${H - 1
 
 const rowCount = (blocks: CardBlock[]) => blocks.reduce((n, b) => n + (b.type === 'rows' ? b.rows.length : 0), 0);
 
-/** Панель данных справа: до 4 строк — «метка над значением», больше — в одну линию, чтобы влезло в 720. */
+/**
+ * Правая колонка — одна тёмная панель со всеми данными (узор под ней не мешает читать).
+ * До 4 строк — «метка над значением», больше — в одну линию, чтобы влезло в 720.
+ */
 function panel(rows: CardRow[], dense: boolean, first: boolean): Node {
   return el(
     'div',
-    { flexDirection: 'column', marginTop: first ? 0 : 16, padding: dense ? '4px 28px' : '6px 30px', backgroundColor: COLORS.panel, borderRadius: 26 },
+    { flexDirection: 'column', marginTop: first ? 0 : 8 },
     rows.slice(0, 7).map((r, i) =>
       dense
         ? el('div', { alignItems: 'baseline', padding: '13px 0', borderTop: i ? '2px solid rgba(255,255,255,0.08)' : 'none' }, [
@@ -129,22 +132,22 @@ function panel(rows: CardRow[], dense: boolean, first: boolean): Node {
   );
 }
 
-function rightBlock(b: CardBlock, dense: boolean, first: boolean): Node | null {
+function rightBlock(b: CardBlock, dense: boolean, first: boolean, tone: string): Node | null {
   if (b.type === 'rows') return panel(b.rows, dense, first);
-  if (b.type === 'heading') return lines({ marginTop: first ? 0 : 22, fontFamily: OSWALD, fontWeight: 600, fontSize: 30, textTransform: 'uppercase', color: INK }, 1, b.text, 40);
+  if (b.type === 'heading') return lines({ marginTop: first ? 4 : 20, fontFamily: OSWALD, fontWeight: 600, fontSize: 28, textTransform: 'uppercase', color: tone }, 1, b.text, 40);
   if (b.type === 'list') {
     return el(
       'div',
       { flexDirection: 'column', marginTop: first ? 0 : 10 },
-      b.items.slice(0, 6).map((item) =>
+      b.items.slice(0, 5).map((item) =>
         el('div', { alignItems: 'flex-start', marginTop: 10 }, [
-          el('div', { width: 12, height: 12, marginTop: 12, marginRight: 18, borderRadius: 6, backgroundColor: INK, flexShrink: 0 }),
-          lines({ flex: 1, fontFamily: INTER, fontWeight: 400, fontSize: 26, lineHeight: 1.35, color: INK }, 2, item, 90),
+          el('div', { width: 10, height: 10, marginTop: 12, marginRight: 16, borderRadius: 5, backgroundColor: tone, flexShrink: 0 }),
+          lines({ flex: 1, fontFamily: INTER, fontWeight: 400, fontSize: 24, lineHeight: 1.35, color: COLORS.fg }, 2, item, 90),
         ]),
       ),
     );
   }
-  return lines({ marginTop: first ? 0 : 16, fontFamily: INTER, fontWeight: 400, fontSize: 26, lineHeight: 1.4, color: MUTED }, 3, b.text, 200);
+  return lines({ marginTop: first ? 4 : 16, fontFamily: INTER, fontWeight: 400, fontSize: 24, lineHeight: 1.4, color: COLORS.neutral }, 3, b.text, 200);
 }
 
 export function cardTree(card: NotificationCard, logoSrc: string): Node {
@@ -199,8 +202,12 @@ export function cardTree(card: NotificationCard, logoSrc: string): Node {
     ? null
     : el(
         'div',
-        { flexDirection: 'column', width: RIGHT, height: H - PAD * 2, marginLeft: GAP, justifyContent: 'center', overflow: 'hidden' },
-        blocks.map((b, i) => rightBlock(b, dense, i === 0)).filter(Boolean),
+        { flexDirection: 'column', width: RIGHT, height: H - PAD * 2, marginLeft: GAP, justifyContent: 'center' },
+        el(
+          'div',
+          { flexDirection: 'column', maxHeight: H - PAD * 2, overflow: 'hidden', padding: '18px 30px 22px', backgroundColor: COLORS.panel, borderRadius: 26 },
+          blocks.map((b, i) => rightBlock(b, dense, i === 0, tone)).filter(Boolean),
+        ),
       );
 
   // фон-узор картинкой; содержимое — абсолютно и после фона, иначе satori рисует фон поверх текста
