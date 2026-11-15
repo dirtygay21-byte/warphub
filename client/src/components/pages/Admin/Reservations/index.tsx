@@ -2,6 +2,7 @@ import {
   confirmAdminReservation,
   extendAdminReservation,
   getAdminReservations,
+  getAdminReservationsCount,
   getUserById,
   rejectAdminReservation,
 } from "@/apiUtils/admin";
@@ -98,9 +99,9 @@ export default function AdminReservations() {
   // лаймовый концепт (15.11.2026): сколько записей ждёт подтверждения — цветной блок над списком (жёлтый — есть, лайм — нет)
   const pendingQuery = useQuery({
     queryKey: ["admin-reservations", "pending-count"],
-    queryFn: () => getAdminReservations({ categories: "pending", limit: 1, offset: 0 }),
+    queryFn: () => getAdminReservationsCount("pending"),
   });
-  const pendingTotal = pendingQuery.data?.total ?? null;
+  const pendingTotal = pendingQuery.data ?? null;
 
   const servicesQuery = useQuery({
     queryKey: ["services"],

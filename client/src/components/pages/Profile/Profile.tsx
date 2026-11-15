@@ -133,9 +133,9 @@ export default function Profile() {
       <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.35)] lg:sticky lg:top-8">
         <div className="absolute inset-x-0 top-0 h-20 bg-linear-to-b from-accent/15 to-transparent" />
         {/* лаймовый концепт (15.11.2026): уголок с червяком — справа снизу, сверху переключатель эффектов */}
-        <LimeCorner size={72} className="bottom-0 top-auto rotate-90" />
+        <LimeCorner size={60} className="bottom-0 top-auto rotate-90" />
         <EffectsToggle />
-        <div className="relative flex items-center gap-4 py-4 pl-4 pr-16 pt-5 lg:flex-col lg:px-6 lg:pb-6 lg:pt-8 lg:text-center">
+        <div className="relative flex items-center gap-4 py-4 pl-4 pr-10 pt-5 lg:flex-col lg:px-6 lg:pb-6 lg:pt-8 lg:text-center">
           <div className="flex shrink-0 justify-center">
             {supporter ? (
               <SupporterFrame inline title={supporter} size={72} label={`Поддерживает клуб: ${SUPPORTER_LABELS[supporter]}`}>

@@ -59,16 +59,16 @@ export function Worm({
 
 /** Червяки в правом верхнем углу цветного блока. */
 function CornerWorms({ size }: { size: "lg" | "sm" }) {
-  const box = size === "lg" ? 170 : 120;
+  const [w, h] = size === "lg" ? [280, 200] : [140, 140];
   return (
-    <svg aria-hidden="true" width={box} height={box} viewBox={`0 0 ${box} ${box}`} className="pointer-events-none absolute right-0 top-0">
+    <svg aria-hidden="true" width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="pointer-events-none absolute right-0 top-0">
       {size === "lg" ? (
         <>
-          <Worm x={150} y={6} angle={48} period={170} amp={19} width={24} seconds={7} />
-          <Worm x={176} y={92} angle={48} period={120} amp={13} width={16} seconds={5} />
+          <Worm x={200} y={40} angle={32} period={170} amp={18} width={22} seconds={7} />
+          <Worm x={270} y={130} angle={32} period={120} amp={12} width={14} seconds={5} />
         </>
       ) : (
-        <Worm x={112} y={4} angle={52} period={130} amp={14} width={18} seconds={6} />
+        <Worm x={100} y={34} angle={34} period={130} amp={13} width={17} seconds={6} />
       )}
     </svg>
   );
@@ -130,7 +130,7 @@ export function LimeCorner({ size = 84, className }: { size?: number; className?
       </defs>
       <path d="M100 0 V100 A100 100 0 0 1 0 0 Z" fill="rgb(var(--color-accent))" />
       <g clipPath={`url(#${clip})`}>
-        <Worm x={96} y={8} angle={45} period={90} amp={10} width={13} seconds={5} />
+        <Worm x={55} y={12} angle={40} period={90} amp={11} width={15} seconds={5} />
       </g>
     </svg>
   );
