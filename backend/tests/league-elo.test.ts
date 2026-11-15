@@ -53,3 +53,17 @@ describe('лига: результат глазами игрока', () => {
     expect(outcomeFor(false, 'win')).toBe('b');
   });
 });
+
+describe('лига: рейтинг после партии (карточка, этап 3b)', () => {
+  test('рейтинг и изменение — по партиям до этой включительно', async () => {
+    const { ratingAfter } = await import('../src/modules/league/elo');
+    const games = [
+      { id: 'g1', playerA: 'u1', playerB: 'u2', outcome: 'a' as const, startsAt: at('2026-11-01T10:00:00Z') },
+      { id: 'g2', playerA: 'u1', playerB: 'u3', outcome: 'a' as const, startsAt: at('2026-11-02T10:00:00Z') },
+    ];
+    expect(ratingAfter(games, 'g1', 'u1')).toEqual({ rating: 1016, delta: 16 });
+    expect(ratingAfter(games, 'g1', 'u2')).toEqual({ rating: 984, delta: -16 });
+    expect(ratingAfter(games, 'g2', 'u1')!.rating).toBeGreaterThan(1016);
+    expect(ratingAfter(games, 'nope', 'u1')).toBeNull();
+  });
+});

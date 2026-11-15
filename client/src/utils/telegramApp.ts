@@ -10,6 +10,7 @@ type WebAppExtras = {
   downloadFile?: (params: { url: string; file_name: string }, callback?: (accepted: boolean) => void) => void;
   openLink?: (url: string) => void;
   openTelegramLink?: (url: string) => void;
+  shareToStory?: (mediaUrl: string, params?: { text?: string; widget_link?: { url: string; name?: string } }) => void;
   addToHomeScreen?: () => void;
   checkHomeScreenStatus?: (callback: (status: HomeScreenStatus) => void) => void;
   requestFullscreen?: () => void;
@@ -76,4 +77,10 @@ export function shareToChat(text: string, url = WARPHUB_BOT_URL) {
   const app = webApp();
   if (app?.openTelegramLink) app.openTelegramLink(link);
   else window.open(link, "_blank", "noopener");
+}
+
+/** История Telegram (7.8+) с картинкой по публичной ссылке, этап 3b. */
+export const canShareToStory = () => !!webApp()?.shareToStory && !!webApp()?.isVersionAtLeast?.("7.8");
+export function shareToStory(mediaUrl: string, text: string) {
+  webApp()?.shareToStory?.(mediaUrl, { text: text.slice(0, 200), widget_link: { url: WARPHUB_BOT_URL, name: "WarpHub" } });
 }
