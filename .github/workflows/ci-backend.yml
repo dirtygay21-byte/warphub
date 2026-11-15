@@ -71,7 +71,7 @@ jobs:
         working-directory: backend
         run: |
           CARD_SAMPLES_DIR=card-samples bun test tests/notification-cards.test.ts
-          for f in card-samples/*.png; do echo "SHOT-BEGIN card-$(basename "$f")"; base64 -w 0 "$f"; echo; echo "SHOT-END"; done
+          for f in card-samples/*; do echo "SHOT-BEGIN card-$(basename "$f")"; base64 -w 0 "$f"; echo; echo "SHOT-END"; done
       - name: Partner migration applies to empty PostgreSQL
         run: |
           MIGRATION_URI=postgres://postgres:postgres@127.0.0.1:5432/wh_partner_migration

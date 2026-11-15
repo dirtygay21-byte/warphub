@@ -27,7 +27,7 @@ import {
 import { getAdminUserProfile, searchUsersByUsername } from '../users/service';
 import { notificationDiagnostics, sendTelegramMessageDetailed, testNotification } from '../notifications/service';
 import { KIND_BY_ID, renderTemplate } from '../notifications/catalog';
-import { notificationLog, saveNotificationConfig } from '../notifications/hub';
+import { getNotificationConfig, notificationLog, saveNotificationConfig } from '../notifications/hub';
 import { notificationCatalog, saveTemplate } from '../notifications/admin';
 import { notificationImage } from '../notifications/card';
 import {
@@ -1304,9 +1304,10 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       const kind = KIND_BY_ID.get(params.kind);
       if (!kind) return status(404, { error: 'Нет такого уведомления' });
       const text = renderTemplate(body.text?.trim() ? body.text : kind.defaultText, kind.vars) || '—';
-      const card = await notificationImage(kind.id, text);
+      const card = await notificationImage(kind.id, text, (await getNotificationConfig()).animated);
       if (!card) return status(500, { error: 'Не удалось нарисовать картинку' });
-      return { image: `data:image/png;base64,${Buffer.from(card.png).toString('base64')}`, caption: card.caption };
+      const type = card.animated ? 'image/gif' : 'image/png';
+      return { image: `data:${type};base64,${Buffer.from(card.data).toString('base64')}`, caption: card.caption, animated: card.animated };
     },
     {
       body: t.Object({ text: t.Optional(t.Nullable(t.String({ maxLength: 4000 }))) }),
@@ -1332,7 +1333,7 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
     '/notifications/config',
     async ({ user, body }) => {
       if (!isNotificationOwner(user)) return status(403, { error: 'Только владелец' });
-      const config = { ...body, images: body.images ?? true };
+      const config = { ...body, images: body.images ?? true, animated: body.animated ?? true };
       await saveNotificationConfig(config);
       return config;
     },
@@ -1342,6 +1343,7 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
         quietTo: t.Integer({ minimum: 0, maximum: 23 }),
         dailyLimit: t.Integer({ minimum: 0, maximum: 20 }),
         images: t.Optional(t.Boolean()),
+        animated: t.Optional(t.Boolean()),
       }),
       detail: { tags: ['Admin'], summary: 'Уведомления: тихие часы и дневной лимит объявлений' },
     },

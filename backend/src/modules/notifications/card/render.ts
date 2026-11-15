@@ -84,18 +84,24 @@ function titleSize(title: string) {
   return n <= 12 ? 128 : n <= 18 ? 108 : n <= 28 ? 88 : 72;
 }
 
-function backdrop(tone: string) {
+/**
+ * Фон с «червяками». phase 0…1 — кадр анимации (15.11.2026): изгибы червяков плавно покачиваются по кругу,
+ * у каждого со своим сдвигом; концы за краем картинки, поэтому движение выглядит как ползание.
+ */
+function backdrop(tone: string, phase = 0) {
   const worm = (d: string) => `<path d="${d}" fill="none" stroke="${INK}" stroke-width="62" stroke-linecap="round"/>`;
+  const a = (k: number, amp: number) => (amp * Math.sin(2 * Math.PI * (phase + k))).toFixed(1);
+  const b = (k: number, amp: number) => (amp * Math.cos(2 * Math.PI * (phase + k))).toFixed(1);
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
 <rect width="${W}" height="${H}" fill="${tone}"/>
-${worm(`M${W - 420} -60 C${W - 380} 110 ${W - 230} 60 ${W - 190} 200 S${W - 80} 360 ${W + 60} 320`)}
-${worm(`M${W - 250} -60 C${W - 220} 50 ${W - 110} 20 ${W - 70} 120 S${W + 10} 200 ${W + 70} 170`)}
-${worm(`M${W + 60} ${H - 250} C${W - 100} ${H - 290} ${W - 130} ${H - 120} ${W - 270} ${H - 110} S${W - 400} ${H + 10} ${W - 430} ${H + 60}`)}
+<g transform="translate(${a(0, 6)} ${b(0, 4)})">${worm(`M${W - 420} -60 C${W - 380} ${110} ${W - 230 + +a(0.1, 26)} ${60 + +b(0.1, 22)} ${W - 190 + +a(0.25, 18)} ${200 + +b(0.25, 14)} S${W - 80 + +a(0.4, 24)} ${360 + +b(0.4, 20)} ${W + 60} 320`)}</g>
+<g transform="translate(${a(0.33, 6)} ${b(0.33, 4)})">${worm(`M${W - 250} -60 C${W - 220} 50 ${W - 110 + +a(0.45, 22)} ${20 + +b(0.45, 18)} ${W - 70 + +a(0.6, 16)} ${120 + +b(0.6, 14)} S${W + 10} 200 ${W + 70} 170`)}</g>
+<g transform="translate(${a(0.66, 6)} ${b(0.66, 4)})">${worm(`M${W + 60} ${H - 250} C${W - 100 + +a(0.7, 24)} ${H - 290 + +b(0.7, 20)} ${W - 130 + +a(0.85, 22)} ${H - 120 + +b(0.85, 18)} ${W - 270 + +a(0.95, 18)} ${H - 110 + +b(0.95, 14)} S${W - 400} ${H + 10} ${W - 430} ${H + 60}`)}</g>
 </svg>`;
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }
 
-export function cardTree(card: NotificationCard, logoSrc: string): Node {
+export function cardTree(card: NotificationCard, logoSrc: string, background?: string): Node {
   const tone = TONE[card.tone];
   const { when, facts, text } = pick(card);
   const content = el('div', { flexDirection: 'column', width: TEXT_W, height: H - PAD * 2 }, [
@@ -120,7 +126,7 @@ export function cardTree(card: NotificationCard, logoSrc: string): Node {
   ]);
   // фон-узор картинкой; содержимое — абсолютно и после фона, иначе satori рисует фон поверх текста
   return el('div', { width: W, height: H, position: 'relative', backgroundColor: tone }, [
-    el('img', { position: 'absolute', top: 0, left: 0, width: W, height: H }, undefined, { src: backdrop(tone), width: W, height: H }),
+    el('img', { position: 'absolute', top: 0, left: 0, width: W, height: H }, undefined, { src: background ?? backdrop(tone), width: W, height: H }),
     el('div', { position: 'absolute', top: PAD, left: PAD, width: TEXT_W, height: H - PAD * 2 }, content),
   ]);
 }
@@ -131,4 +137,33 @@ export async function renderCardPng(card: NotificationCard): Promise<Uint8Array>
   const [{ default: satori }, { Resvg }] = await Promise.all([import('satori'), import('@resvg/resvg-js')]);
   const svg = await satori(cardTree(card, l) as never, { width: W, height: H, fonts: fl });
   return new Resvg(svg, { fitTo: { mode: 'width', value: W } }).render().asPng();
+}
+
+/**
+ * Анимированная карточка (GIF, 15.11.2026): текст рисуется один раз (satori), меняется только фон-узор —
+ * его картинка подменяется в готовом SVG для каждого кадра. 640×360 (в чате показывается ещё меньше),
+ * 20 кадров по 80 мс, бесконечный повтор; палитра по первому кадру (цвета во всех кадрах одни и те же).
+ */
+export const GIF_W = 640;
+export const GIF_FRAMES = 20;
+const GIF_DELAY = 80;
+
+export async function renderCardGif(card: NotificationCard): Promise<Uint8Array> {
+  const { fonts: fl, logo: l } = assets();
+  const [{ default: satori }, { Resvg }, gifenc] = await Promise.all([import('satori'), import('@resvg/resvg-js'), import('gifenc')]);
+  const tone = TONE[card.tone];
+  const first = backdrop(tone, 0);
+  const svg = await satori(cardTree(card, l, first) as never, { width: W, height: H, fonts: fl });
+  if (!svg.includes(first)) throw new Error('animation: background not found in svg');
+  const gif = gifenc.GIFEncoder();
+  let palette: number[][] | null = null;
+  for (let i = 0; i < GIF_FRAMES; i++) {
+    const frame = i === 0 ? svg : svg.replace(first, backdrop(tone, i / GIF_FRAMES));
+    const image = new Resvg(frame, { fitTo: { mode: 'width', value: GIF_W } }).render();
+    const rgba = new Uint8Array(image.pixels.buffer, image.pixels.byteOffset, image.pixels.length);
+    palette ??= gifenc.quantize(rgba, 64);
+    gif.writeFrame(gifenc.applyPalette(rgba, palette), image.width, image.height, { palette: i === 0 ? palette : undefined, delay: GIF_DELAY });
+  }
+  gif.finish();
+  return gif.bytes();
 }
