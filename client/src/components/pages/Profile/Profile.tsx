@@ -131,12 +131,12 @@ export default function Profile() {
     <div className="ds-enter px-5 py-3 text-fg lg:grid lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start lg:gap-x-6 lg:pt-8">
       {/* шапка: аватар с рамкой, имя, username — компактно (переработка профиля 14.11.2026) */}
       {/* лаймовый концепт (15.11.2026): шапка — лаймовый блок с червяками, аватар в чёрном кольце; переключатель эффектов — снизу справа */}
-      <section className="relative isolate overflow-hidden rounded-[26px] bg-accent text-[#111110] lg:sticky lg:top-8">
+      <section className="relative isolate overflow-hidden rounded-[20px] bg-accent text-[#111110] lg:sticky lg:top-8">
         <svg aria-hidden="true" width="150" height="150" viewBox="0 0 150 150" className="pointer-events-none absolute right-0 top-0">
-          <Worm x={128} y={18} angle={40} period={150} amp={16} width={22} seconds={7} />
+          <Worm x={128} y={18} angle={36} period={150} amp={12} width={11} seconds={10} />
         </svg>
         <EffectsToggle />
-        <div className="relative flex items-center gap-4 pb-14 pl-5 pr-16 pt-5 lg:flex-col lg:px-6 lg:pb-16 lg:pt-8 lg:text-center">
+        <div className="relative flex items-center gap-4 pb-14 pl-4 pr-14 pt-4 lg:flex-col lg:px-6 lg:pb-16 lg:pt-8 lg:text-center">
           <div className="flex shrink-0 justify-center rounded-full bg-[#111110] p-1">
             {supporter ? (
               <SupporterFrame inline title={supporter} size={72} label={`Поддерживает клуб: ${SUPPORTER_LABELS[supporter]}`}>
@@ -155,7 +155,7 @@ export default function Profile() {
             )}
           </div>
           <div className="min-w-0 flex-1 lg:pr-0">
-            <h1 className="line-clamp-2 font-display text-[26px] font-bold uppercase leading-[1.02] lg:text-[28px]">{fullName || "Пользователь"}</h1>
+            <h1 className="line-clamp-2 text-[20px] font-bold leading-tight lg:text-[22px]">{fullName || "Пользователь"}</h1>
             <p className={clsx("mt-1 truncate text-[15px] font-medium", user?.username ? "text-[#111110]" : "text-[#111110]/60")}>
               {user?.username ? `@${user.username}` : "Username не указан"}
             </p>
@@ -165,7 +165,7 @@ export default function Profile() {
               </p>
             )}
             {supporter && (
-              <p className="mt-2 inline-flex items-center gap-1.5 rounded-[10px] bg-[#111110] px-2.5 py-1 font-display text-[13px] font-semibold uppercase tracking-[0.08em] text-accent">
+              <p className="mt-2 inline-flex items-center gap-1.5 rounded-[9px] bg-[#111110] px-2.5 py-1 text-[12px] font-semibold text-accent">
                 ★ {SUPPORTER_LABELS[supporter]}
               </p>
             )}

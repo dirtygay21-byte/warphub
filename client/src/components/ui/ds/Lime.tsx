@@ -59,16 +59,14 @@ export function Worm({
 
 /** Червяки в правом верхнем углу цветного блока. */
 function CornerWorms({ size }: { size: "lg" | "sm" }) {
-  const [w, h] = size === "lg" ? [280, 200] : [140, 140];
+  // мягкий вариант (15.11.2026): один тонкий червяк, медленнее — блок легче и не спорит с текстом
+  const [w, h] = size === "lg" ? [200, 160] : [140, 120];
   return (
     <svg aria-hidden="true" width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="pointer-events-none absolute right-0 top-0">
       {size === "lg" ? (
-        <>
-          <Worm x={200} y={40} angle={32} period={170} amp={18} width={22} seconds={7} />
-          <Worm x={270} y={130} angle={32} period={120} amp={12} width={14} seconds={5} />
-        </>
+        <Worm x={140} y={34} angle={30} period={160} amp={13} width={12} seconds={10} />
       ) : (
-        <Worm x={100} y={34} angle={34} period={130} amp={13} width={17} seconds={6} />
+        <Worm x={100} y={30} angle={32} period={130} amp={11} width={10} seconds={9} />
       )}
     </svg>
   );
@@ -93,13 +91,13 @@ export function LimeHero({
   className?: string;
 }) {
   return (
-    <section className={clsx("relative isolate overflow-hidden rounded-[22px] text-[#111110]", TONE_BG[tone], size === "lg" ? "p-5" : "p-4", className)}>
+    <section className={clsx("relative isolate overflow-hidden rounded-[20px] p-4 text-[#111110]", TONE_BG[tone], className)}>
       <CornerWorms size={size} />
-      <div className={clsx("relative flex flex-col gap-1.5", size === "lg" ? "pr-20" : "pr-14")}>
-        {kicker && <span className="font-display text-[13px] font-semibold uppercase tracking-[0.12em]">{kicker}</span>}
-        <h2 className={clsx("font-display font-bold uppercase leading-[0.98]", size === "lg" ? "text-[32px]" : "text-[24px]")}>{title}</h2>
+      <div className={clsx("relative flex flex-col gap-1", size === "lg" ? "pr-16" : "pr-12")}>
+        {kicker && <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#111110]/70">{kicker}</span>}
+        <h2 className={clsx("font-display font-semibold uppercase leading-[1.05]", size === "lg" ? "text-[24px]" : "text-[20px]")}>{title}</h2>
       </div>
-      {children && <div className="relative mt-3 flex flex-col gap-3">{children}</div>}
+      {children && <div className="relative mt-2.5 flex flex-col gap-2.5 text-[14px] leading-snug">{children}</div>}
     </section>
   );
 }
@@ -109,8 +107,8 @@ export function LimeChip({ children, accent }: { children: ReactNode; accent?: b
   return (
     <span
       className={clsx(
-        "inline-flex min-h-[30px] items-center whitespace-nowrap rounded-[10px] bg-[#111110] px-2.5 text-[13px] font-semibold",
-        accent ? "font-display uppercase tracking-[0.04em] text-accent" : "text-fg",
+        "inline-flex min-h-7 items-center whitespace-nowrap rounded-[9px] bg-[#111110] px-2.5 text-[12.5px] font-semibold",
+        accent ? "text-accent" : "text-fg",
       )}
     >
       {children}
@@ -130,7 +128,7 @@ export function LimeCorner({ size = 84, className }: { size?: number; className?
       </defs>
       <path d="M100 0 V100 A100 100 0 0 1 0 0 Z" fill="rgb(var(--color-accent))" />
       <g clipPath={`url(#${clip})`}>
-        <Worm x={55} y={12} angle={40} period={90} amp={11} width={15} seconds={5} />
+        <Worm x={55} y={12} angle={40} period={90} amp={9} width={10} seconds={8} />
       </g>
     </svg>
   );

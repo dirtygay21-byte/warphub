@@ -345,7 +345,7 @@ export default function AdminReservations() {
             <button
               type="button"
               onClick={() => (setCategories(["pending"]), setPage(0))}
-              className="ds-press min-h-11 self-start rounded-[12px] bg-[#111110] px-4 font-display text-[15px] font-semibold uppercase tracking-[0.06em] text-accent"
+              className="ds-press min-h-11 self-start rounded-[12px] bg-[#111110] px-4 text-[14px] font-semibold text-accent"
             >
               Показать
             </button>
@@ -354,7 +354,7 @@ export default function AdminReservations() {
       )}
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-[28px] font-bold uppercase leading-none">Все записи</h1>
+          <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Все записи</h1>
           <p className="mt-1 text-sm text-fg-3">
             {reservations.length > 0
               ? totalCount != null

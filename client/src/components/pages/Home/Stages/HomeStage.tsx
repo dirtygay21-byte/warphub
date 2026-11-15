@@ -36,12 +36,12 @@ export default function HomeStage() {
         </div>
         {/* «Записаться» — в потоке страницы под ивентом (A1); на компьютере — в боковой панели.
             Лаймовый концепт (15.11.2026): кнопка в лаймовом блоке с червяками — главный блок экрана. */}
-        <LimeHero kicker="Запись в клуб" title="Играем?" className="lg:hidden">
+        <LimeHero kicker="Запись в клуб" title="Играем?" size="sm" className="lg:hidden">
           <p className="text-[15px] leading-snug">Выберите игру, стол и время.</p>
           <button
             type="button"
             onClick={() => (haptic.tap(), handleRegistartionClick(null))}
-            className="ds-press flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[14px] bg-[#111110] font-display text-[18px] font-semibold uppercase tracking-[0.06em] text-accent"
+            className="ds-press flex min-h-12 w-full items-center justify-center gap-2 rounded-[14px] bg-[#111110] text-[16px] font-semibold text-accent"
           >
             <Calendar className="size-5" />
             Записаться
@@ -62,7 +62,7 @@ export default function HomeStage() {
                 key={discipline.id}
                 type="button"
                 onClick={() => (haptic.tap(), handleRegistartionClick(discipline.id))}
-                className="ds-press fx-press flex min-h-[92px] flex-col justify-between gap-3 rounded-[18px] border border-white/10 bg-app-elevated p-3.5 text-left text-fg last:odd:col-span-2"
+                className="ds-press fx-press flex min-h-[84px] flex-col justify-between gap-2.5 rounded-[18px] border border-white/10 bg-app-elevated p-3.5 text-left text-fg last:odd:col-span-2"
               >
                 <span className="flex size-9 items-center justify-center rounded-[10px] bg-white/[0.08]">
                   <img src={s3Url(`disciplines/${discipline.slug}.webp`)} alt="" className="size-6" />

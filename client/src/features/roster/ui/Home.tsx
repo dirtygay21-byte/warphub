@@ -73,13 +73,13 @@ export function Home({
         >
           {/* лаймовый концепт (15.11.2026): «Продолжить» — главный блок экрана, лаймовый с червяком */}
           <svg aria-hidden="true" width="110" height="80" viewBox="0 0 110 80" className="pointer-events-none absolute right-0 top-0">
-            <Worm x={104} y={0} angle={50} period={120} amp={13} width={16} seconds={5} />
+            <Worm x={104} y={0} angle={46} period={120} amp={10} width={10} seconds={9} />
           </svg>
           <span className="relative flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-[#111110] text-accent">
             <Icon name="play" className="size-5" />
           </span>
           <span className="relative min-w-0 flex-1 pr-10">
-            <span className="font-display block text-[13px] font-semibold uppercase tracking-[0.1em]">Продолжить</span>
+            <span className="block text-[12px] font-semibold uppercase tracking-[0.08em] text-[#111110]/70">Продолжить</span>
             <span className="block truncate text-base font-bold">{resume.title}</span>
             <span className="block truncate text-[13px] text-[#111110]/75">{resume.sub}</span>
           </span>

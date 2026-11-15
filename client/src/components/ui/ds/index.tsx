@@ -13,7 +13,7 @@ import { haptic } from "@/utils/haptic";
 export function SectionLabel({ children, right, className }: { children: ReactNode; right?: ReactNode; className?: string }) {
   return (
     <div className={clsx("mb-2.5 flex items-center justify-between gap-2", className)}>
-      <h2 className="font-display text-[15px] font-semibold uppercase tracking-[0.14em] text-fg-2">{children}</h2>
+      <h2 className="text-[13px] font-bold uppercase tracking-[0.08em] text-fg-3">{children}</h2>
       {right}
     </div>
   );
@@ -24,7 +24,7 @@ export function ScreenTitle({ children, kicker, className }: { children: ReactNo
   return (
     <div className={clsx("flex flex-col gap-1", className)}>
       {kicker && <span className="text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">{kicker}</span>}
-      <h1 className="font-display text-[30px] font-bold uppercase leading-none text-fg">{children}</h1>
+      <h1 className="font-display text-[28px] font-semibold uppercase leading-none text-fg">{children}</h1>
     </div>
   );
 }
@@ -33,8 +33,8 @@ type Tone = "plain" | "accent" | "accent-outline";
 
 const TONE: Record<Tone, string> = {
   plain: "border border-white/10 bg-app-elevated",
-  accent: "border-2 border-accent bg-transparent",
-  "accent-outline": "border-2 border-accent bg-transparent",
+  accent: "border-[1.5px] border-accent/70 bg-accent/[0.06]",
+  "accent-outline": "border-[1.5px] border-accent/70 bg-accent/[0.06]",
 };
 
 /**
@@ -134,10 +134,9 @@ export function DsButton({
         onClick?.(e);
       }}
       className={clsx(
-        "ds-press inline-flex items-center justify-center gap-2 rounded-[16px] font-semibold disabled:opacity-50",
+        "ds-press inline-flex items-center justify-center gap-2 rounded-[14px] font-semibold disabled:opacity-50",
         size === "lg" ? "h-[54px] px-5 text-[17px]" : "h-11 px-4 text-[15px]",
         variant === "primary" && "bg-accent text-accent-foreground",
-        variant === "primary" && size === "lg" && "font-display text-[18px] uppercase tracking-[0.06em]",
         variant === "secondary" && "border-[1.5px] border-white/[0.18] bg-transparent text-fg",
         variant === "danger" && "border border-danger/40 bg-transparent text-danger",
         variant === "ghost" && "bg-transparent text-fg-2",

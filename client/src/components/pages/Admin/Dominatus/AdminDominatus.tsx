@@ -47,7 +47,7 @@ export default function AdminDominatus() {
   const q = useQuery({ queryKey: KEY, queryFn: adminDominatus });
   return (
     <div className="px-4 py-3 pb-28 text-fg sm:px-6">
-      <h1 className="font-display text-[28px] font-bold uppercase leading-none">Dominatus</h1>
+      <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Dominatus</h1>
       <p className="mt-1 text-sm text-fg-2">Нарративная кампания 40K. Вы — Warmaster: игроки, альянсы, фазы. Битвы записывают игроки в «Начать игру».</p>
       {q.isLoading ? (
         <LoaderCircle className="mt-6 size-6 animate-spin text-accent" />

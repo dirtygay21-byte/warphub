@@ -13,8 +13,8 @@ import { formatClubTime, formatClubTimeRange } from "@/utils/clubTime";
 import { hoursLabel } from "@/utils/slots";
 import { getServiceDetailsMeta } from "./ServiceDetails/utils";
 import { formatSelectedDate } from "@/utils/date";
-import { LimeChip, Worm } from "@/components/ui/ds";
-import { haptic } from "@/utils/haptic";
+import { Badge, DsButton, LimeHero } from "@/components/ui/ds";
+import type { ReactNode } from "react";
 
 type ConfirmationStatus = "Success" | "Succes" | "Error";
 
@@ -79,96 +79,67 @@ export default function ConfirmationStage({
     navigate("/");
   };
 
-  const ink = "#111110";
   return (
-    <div className="ds-enter px-4 pb-6 pt-2">
-      {/* лаймовый концепт (15.11.2026): итог записи — лаймовый экран с червяками (красный — запись не создана) */}
-      <section
-        className={`ds-pop relative isolate flex min-h-[calc(100dvh-180px)] flex-col overflow-hidden rounded-[26px] px-5 pb-5 pt-7 text-[#111110] ${
-          isSuccess ? "bg-accent" : "bg-danger"
-        }`}
+    <div className="ds-enter mx-auto flex max-w-sm flex-col gap-3 px-5 pb-8 pt-3 text-fg">
+      {/* мягкий лаймовый вариант (15.11.2026): итог — лаймовый блок сверху, ниже обычная карточка и кнопки */}
+      <LimeHero
+        tone={isSuccess ? "lime" : "danger"}
+        kicker={isSuccess ? "Готово" : "Ошибка"}
+        title={!isSuccess ? "Запись не создана" : lastBooking?.joined ? "Ты в игре!" : "Ты записан!"}
+        className="ds-pop"
       >
-        <svg aria-hidden="true" width="100%" height="100%" className="pointer-events-none absolute inset-0">
-          <svg x="100%" y="0" overflow="visible">
-            <Worm x={-70} y={40} angle={40} period={320} amp={34} width={40} seconds={8} />
-          </svg>
-          <svg x="0" y="100%" overflow="visible">
-            <Worm x={40} y={-30} angle={-30} period={200} amp={22} width={30} seconds={6} />
-          </svg>
-        </svg>
+        <p>{isSuccess ? "Мы ждем тебя в клубе" : "Не удалось подтвердить запись. Попробуй еще раз."}</p>
+      </LimeHero>
 
-        <div className="relative mt-24 font-display text-[16px] font-semibold uppercase tracking-[0.18em]">
-          {isSuccess ? "Готово" : "Ошибка"}
+      <div className="rounded-[18px] border border-white/10 bg-app-elevated p-4">
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <h3 className="text-[17px] font-bold leading-tight">{serviceQuery.isLoading ? "Загрузка…" : (activity ?? "Услуга")}</h3>
+          {discipline && <Badge>{discipline}</Badge>}
         </div>
-        <h2 className="relative mt-2 max-w-[11ch] font-display text-[52px] font-bold uppercase leading-[0.95]">
-          {!isSuccess ? "Запись не создана" : lastBooking?.joined ? "Ты в игре!" : "Ты записан!"}
-        </h2>
-        <p className="relative mt-3 text-[16px] font-medium">
-          {isSuccess ? "Мы ждем тебя в клубе" : "Не удалось подтвердить запись. Попробуй еще раз."}
-        </p>
+        <div className="space-y-3">
+          <InfoRow icon={<CalendarDays className="size-5" />} value={formatSelectedDate(selectedDate)} />
+          <InfoRow icon={<Clock3 className="size-5" />} value={time} />
+          <InfoRow icon={<UsersRound className="size-5" />} value={placesLabel} />
+        </div>
+      </div>
 
-        <div className="relative mt-5 font-display text-[22px] font-semibold uppercase leading-tight">
-          {serviceQuery.isLoading ? "Загрузка…" : (activity ?? "Услуга")}
+      {isSuccess && limited && fullMinutes && lastBooking?.endsAt && (
+        <div role="status" className="rounded-[14px] border border-danger/50 bg-danger/10 px-4 py-3 text-sm text-fg">
+          <p className="font-semibold text-danger">
+            ⚠️ Время ограничено: {hoursLabel(limited)} вместо {hoursLabel(fullMinutes)} — до {formatClubTime(lastBooking.endsAt)}
+          </p>
+          <p className="mt-1 text-fg-2">
+            Если не успеете, попросим освободить место к следующей записи; если будет свободно — постараемся продлить.
+          </p>
         </div>
-        <div className="relative mt-3 flex flex-wrap gap-2">
-          {discipline && <LimeChip accent>{discipline}</LimeChip>}
-          <LimeChip>
-            <CalendarDays className="mr-1.5 size-4" />
-            {formatSelectedDate(selectedDate)}
-          </LimeChip>
-          <LimeChip>
-            <Clock3 className="mr-1.5 size-4" />
-            {time}
-          </LimeChip>
-          <LimeChip>
-            <UsersRound className="mr-1.5 size-4" />
-            {placesLabel}
-          </LimeChip>
-        </div>
+      )}
 
-        {isSuccess && limited && fullMinutes && lastBooking?.endsAt && (
-          <div role="status" className="relative mt-4 rounded-[14px] bg-[#111110] px-4 py-3 text-left text-sm text-fg">
-            <p className="font-semibold text-danger">
-              ⚠️ Время ограничено: {hoursLabel(limited)} вместо {hoursLabel(fullMinutes)} — до {formatClubTime(lastBooking.endsAt)}
-            </p>
-            <p className="mt-1 text-fg-2">
-              Если не успеете, попросим освободить место к следующей записи; если будет свободно — постараемся продлить.
-            </p>
-          </div>
+      {isSuccess && <p className="rounded-[14px] bg-white/[0.05] px-4 py-3 text-sm text-fg-2">Мы напомним тебе за 1 час до начала игры.</p>}
+
+      <div className="mt-2 flex flex-col gap-2.5">
+        {isSuccess ? (
+          <DsButton variant="primary" size="lg" onClick={handleMyRecordsClick} className="w-full">
+            Мои записи
+          </DsButton>
+        ) : (
+          <DsButton variant="primary" size="lg" onClick={previousStage} className="w-full">
+            <RotateCcw className="size-5" />
+            Попробовать снова
+          </DsButton>
         )}
-
-        {isSuccess && <p className="relative mt-4 max-w-[30ch] text-[15px] leading-snug">Мы напомним тебе за 1 час до начала игры.</p>}
-
-        <div className="relative mt-auto flex flex-col gap-2.5 pt-6">
-          {isSuccess ? (
-            <button
-              type="button"
-              onClick={() => (haptic.tap(), handleMyRecordsClick())}
-              className="ds-press flex min-h-[54px] items-center justify-center rounded-[16px] bg-[#111110] font-display text-[18px] font-semibold uppercase tracking-[0.06em] text-accent"
-            >
-              Мои записи
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => (haptic.tap(), previousStage())}
-              className="ds-press flex min-h-[54px] items-center justify-center gap-2 rounded-[16px] bg-[#111110] font-display text-[18px] font-semibold uppercase tracking-[0.06em] text-danger"
-            >
-              <RotateCcw className="size-5" />
-              Попробовать снова
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => (haptic.tap(), handleHomeClick())}
-            className="ds-press flex min-h-[52px] items-center justify-center rounded-[16px] border-2 font-semibold"
-            style={{ borderColor: ink }}
-          >
-            На главную
-          </button>
-        </div>
-      </section>
+        <DsButton variant="secondary" size="lg" onClick={handleHomeClick} className="w-full">
+          На главную
+        </DsButton>
+      </div>
     </div>
   );
 }
 
+function InfoRow({ icon, value }: { icon: ReactNode; value: string }) {
+  return (
+    <div className="flex items-center gap-3 text-[15px] text-fg">
+      <span className="text-fg-2">{icon}</span>
+      <span>{value}</span>
+    </div>
+  );
+}

@@ -72,10 +72,10 @@ export default function Header() {
           <>
             {/* лаймовый концепт (15.11.2026): логотип и название клуба, приветствие справа */}
             <img src={s3Url("logo.png")} alt="" className="size-9 lg:hidden" />
-            <h1 className="font-display text-[22px] font-bold uppercase tracking-[0.04em] text-fg">WarpHub</h1>
+            <h1 className="font-display text-[20px] font-semibold uppercase tracking-[0.04em] text-fg">WarpHub</h1>
             {username && (
-              <span className="ml-auto truncate font-display text-[14px] font-semibold uppercase tracking-[0.08em] text-fg-2">
-                Привет, <span className="text-accent">{username}</span>
+              <span className="ml-auto truncate text-[14px] text-fg-2">
+                Привет, <span className="font-semibold text-fg">{user?.firstName}</span>
               </span>
             )}
           </>
@@ -89,7 +89,7 @@ export default function Header() {
             >
               <ChevronLeft className="size-8" />
             </button>
-            <p className="font-display text-[18px] font-semibold uppercase tracking-[0.04em] text-fg">
+            <p className="text-[16px] font-semibold text-fg">
               {STAGE_TITLES[currentStage]}
             </p>
           </div>
