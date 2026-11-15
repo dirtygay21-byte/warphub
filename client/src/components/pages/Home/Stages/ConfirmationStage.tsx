@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
   CalendarDays,
+  CalendarPlus,
   Clock3,
   RotateCcw,
   UsersRound,
@@ -15,6 +16,7 @@ import { getServiceDetailsMeta } from "./ServiceDetails/utils";
 import { formatSelectedDate } from "@/utils/date";
 import { Badge, DsButton, LimeHero } from "@/components/ui/ds";
 import type { ReactNode } from "react";
+import { downloadFile } from "@/utils/telegramApp";
 
 type ConfirmationStatus = "Success" | "Succes" | "Error";
 
@@ -125,6 +127,17 @@ export default function ConfirmationStage({
           <DsButton variant="primary" size="lg" onClick={previousStage} className="w-full">
             <RotateCcw className="size-5" />
             Попробовать снова
+          </DsButton>
+        )}
+        {isSuccess && lastBooking?.id && (
+          <DsButton
+            variant="secondary"
+            size="lg"
+            onClick={() => downloadFile(`${import.meta.env.VITE_BACKEND_API_URL}/reservations/${lastBooking.id}/calendar.ics`, "warphub.ics")}
+            className="w-full"
+          >
+            <CalendarPlus className="size-5" />
+            Добавить в календарь
           </DsButton>
         )}
         <DsButton variant="secondary" size="lg" onClick={handleHomeClick} className="w-full">

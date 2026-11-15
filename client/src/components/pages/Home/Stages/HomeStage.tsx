@@ -1,20 +1,24 @@
 import NearestEventBanner from "@/components/pages/Home/NearestEventBanner";
+import HomeScreenHint from "@/components/pages/Home/HomeScreenHint";
 import { useRegistrationStageStore } from "@/stores/useRegistrationStageStore";
-import { getDisciplines } from "@/apiUtils/disciplines";
+import { getDisciplines, getServiceById } from "@/apiUtils/disciplines";
 import { getMyReservations } from "@/apiUtils/reservations";
 import { useReservationStore } from "@/stores/useReservationStore";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { s3Url } from "@/utils/s3utils";
 import { getRosterAccess } from "@/apiUtils/roster";
-import { BookOpen, ChevronRight, Swords } from "lucide-react";
+import { BookOpen, ChevronRight, RotateCcw, Swords } from "lucide-react";
 import { DateTile, LimeHero, SectionLabel } from "@/components/ui/ds";
 import { haptic } from "@/utils/haptic";
 import { isInactiveReservation, sortReservationsForDisplay } from "@/utils/reservation";
 import { formatTimeRange, getStatusLabel } from "@/utils/reservationDisplay";
 import { isPastEvent } from "@/components/pages/Reservations/utils";
 import { useNavigate } from "react-router-dom";
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
+import { isWhPlayerDetails, summarizeDetails } from "@/apiUtils/booking";
+import { useBookingOptions } from "@/hooks/useBookingOptions";
+import { toast } from "@/stores/useToastStore";
 
 /**
  * Главная (перестройка 15.11.2026, «кратно удобнее»):
@@ -25,7 +29,9 @@ import { useMemo, type ReactNode } from "react";
  */
 export default function HomeStage() {
   const { nextStage } = useRegistrationStageStore();
-  const { setDisciplineId } = useReservationStore();
+  const { setDisciplineId, setServiceId, setPrefillDetails } = useReservationStore();
+  const queryClient = useQueryClient();
+  const options = useBookingOptions();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const navigate = useNavigate();
 
@@ -53,8 +59,33 @@ export default function HomeStage() {
     };
   }, [reservationsQuery.data]);
 
+  // «Записаться снова» (15.11.2026): последняя запись — та же услуга, армия, очки и опыт; сразу к выбору времени
+  const last = useMemo(() => {
+    const list = reservationsQuery.data?.reservations ?? [];
+    return [...list].sort((a, b) => Date.parse(b.startsAt) - Date.parse(a.startsAt))[0] ?? null;
+  }, [reservationsQuery.data]);
+  const [repeating, setRepeating] = useState(false);
+  const repeat = async () => {
+    if (!last || repeating) return;
+    haptic.tap();
+    setRepeating(true);
+    try {
+      const service = await queryClient.fetchQuery({ queryKey: ["service", last.serviceId], queryFn: () => getServiceById(last.serviceId) });
+      setDisciplineId(service.disciplineId);
+      setServiceId(service.id);
+      setPrefillDetails(isWhPlayerDetails(last.details) ? last.details : null);
+      nextStage();
+      nextStage();
+    } catch {
+      toast.error("Не удалось открыть запись — выберите игру вручную");
+    } finally {
+      setRepeating(false);
+    }
+  };
+
   const start = (disciplineId: number | null) => {
     haptic.tap();
+    setPrefillDetails(null);
     setDisciplineId(disciplineId);
     nextStage();
   };
@@ -62,6 +93,7 @@ export default function HomeStage() {
   return (
     <div className="ds-enter relative z-[50] flex flex-col gap-5 px-5 py-3 pb-8 text-fg lg:grid lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start lg:gap-8 lg:pb-12 lg:pt-4">
       <div className="flex flex-col gap-5">
+        <HomeScreenHint bookings={reservationsQuery.data?.reservations.length ?? 0} />
         {next && (
           <section>
             <SectionLabel>Ваша ближайшая запись</SectionLabel>
@@ -99,6 +131,21 @@ export default function HomeStage() {
                 </button>
               ))}
           </div>
+          {last && (
+            <button
+              type="button"
+              onClick={() => void repeat()}
+              disabled={repeating}
+              className="ds-press flex min-h-12 w-full items-center gap-3 rounded-[14px] bg-[#111110] px-3 text-left text-fg disabled:opacity-60"
+            >
+              <RotateCcw className="size-5 shrink-0 text-accent" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[14px] font-semibold">Снова: {last.serviceTitle ?? "прошлая запись"}</span>
+                {isWhPlayerDetails(last.details) && <span className="block truncate text-[12.5px] text-fg-2">{summarizeDetails(last.details, options)}</span>}
+              </span>
+              <ChevronRight className="size-5 shrink-0 text-accent" />
+            </button>
+          )}
           {disciplinesQuery.isError && (
             <button type="button" onClick={() => start(null)} className="ds-press min-h-12 rounded-[14px] bg-[#111110] font-semibold text-accent">
               Записаться

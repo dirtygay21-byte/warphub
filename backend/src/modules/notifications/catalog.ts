@@ -245,8 +245,8 @@ export const NOTIFICATION_KINDS: NotificationKind[] = [
     when: 'Администраторам каждый день с 10:00',
     category: null,
     announcement: false,
-    defaultText: '☀️ <b>Сегодня в клубе</b>\nЗаписей: {всего} · ждут подтверждения: {ждут}\n\n{список}',
-    vars: { всего: '5', ждут: '2', список: '• 18:00 Kill Team — Иван Петров (@ivan), Kommandos ⏳' },
+    defaultText: '☀️ <b>Сегодня в клубе</b>\nЗаписей: {всего} · ждут подтверждения: {ждут}\nНужна армия клуба: {армия}\n\n{список}',
+    vars: { всего: '5', ждут: '2', армия: '1', список: '• 18:00 Kill Team — Иван Петров (@ivan), Kommandos · команда клуба ⏳' },
   },
   {
     id: 'admin_pending',

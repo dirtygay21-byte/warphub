@@ -45,6 +45,7 @@ import { getPlayerProgress } from '../progress/service';
 import { getCardsState, getPointsHistory, openPack } from '../minigames/cards';
 import { getNewsById, listPublishedNews } from '../news/service';
 import { getPartnerShowcase } from '../partners/service';
+import { reservationIcs } from '../booking/calendar';
 import { currentServicePrice } from '../pricing/service';
 import { servicePricingDefaults } from '../pricing/rules';
 import { jwtPlugin } from '../../plugins/jwt-plugin';
@@ -398,6 +399,21 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
         tags: ['Events'],
         summary: 'Ивент по ID',
       },
+    },
+  )
+  // «Добавить в календарь» (15.11.2026): файл .ics по id записи — без входа, Telegram открывает файл без авторизации
+  .get(
+    '/reservations/:id/calendar.ics',
+    async ({ params, set }) => {
+      const ics = await reservationIcs(params.id);
+      if (!ics) return status(404, { error: 'Reservation not found' });
+      set.headers['content-type'] = 'text/calendar; charset=utf-8';
+      set.headers['content-disposition'] = 'attachment; filename="warphub.ics"';
+      return ics;
+    },
+    {
+      params: t.Object({ id: t.String({ format: 'uuid' }) }),
+      detail: { summary: 'Файл календаря для записи (.ics)' },
     },
   )
   .use(authMiddleware)

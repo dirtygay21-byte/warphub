@@ -477,3 +477,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .lime-flow { animation: none; }
 }
+
+/* Полноэкранный режим Telegram (15.11.2026): экраны битв и Test Army отступают от кнопок Telegram сверху.
+   Вне полноэкранного режима переменные равны 0 — отступ прежний (pt-5). */
+.tg-safe-top {
+  padding-top: calc(1.25rem + var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));
+}
