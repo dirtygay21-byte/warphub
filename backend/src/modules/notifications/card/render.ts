@@ -80,6 +80,7 @@ function lineCount(text: string, size: number, k: number, width = INNER) {
 }
 
 const TILE_GAP = 20;
+const TILE_PAD_X = 28;
 const HALF = (INNER - TILE_GAP) / 2;
 const isWide = (r: CardRow) => r.value.length > 22 || r.label.length > 18;
 
@@ -87,7 +88,7 @@ function tilesHeight(rows: CardRow[]) {
   let h = 0;
   let pendingHalf = false;
   for (const r of rows) {
-    const tile = 36 + 30 + 10 + lineCount(r.value, 34, 0.5, (isWide(r) ? INNER : HALF) - 56) * 44 + 32;
+    const tile = 4 + 30 + 34 + 10 + lineCount(r.value, 34, 0.5, (isWide(r) ? INNER : HALF) - 60) * 44 + 32;
     if (isWide(r)) {
       if (pendingHalf) pendingHalf = false;
       h += tile + TILE_GAP;
@@ -165,9 +166,10 @@ function tiles(rows: CardRow[], tone: string): Node {
         'div',
         {
           flexDirection: 'column',
-          width: isWide(r) ? INNER : HALF,
+          // satori считает ширину без полей и рамки — вычитаем их, иначе две плитки не встают в ряд
+          width: (isWide(r) ? INNER : HALF) - TILE_PAD_X * 2 - 4,
           marginBottom: TILE_GAP,
-          padding: '30px 28px 32px',
+          padding: `30px ${TILE_PAD_X}px 32px`,
           backgroundColor: 'rgba(26,26,24,0.88)',
           border: '2px solid rgba(255,255,255,0.08)',
           borderRadius: 28,
