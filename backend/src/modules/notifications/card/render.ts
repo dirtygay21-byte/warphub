@@ -18,7 +18,7 @@ export const CARD_H = 720;
 const W = CARD_W;
 const H = CARD_H;
 const PAD = 60;
-const TEXT_W = W - PAD * 2 - 340; // справа — узор
+const TEXT_W = W - PAD * 2 - 280; // справа — узор
 const OSWALD = "'Oswald', 'Oswald Cyr', 'Inter Tight', 'Inter Tight Cyr'";
 const INTER = "'Inter Tight', 'Inter Tight Cyr'";
 const INK = '#111110';
@@ -85,33 +85,38 @@ function titleSize(title: string) {
 }
 
 /**
- * Фон: три толстые чёрные волнистые линии справа (стиль мерча). 15.11.2026 (владелец): в анимации линии
- * текут вдоль себя — уходят за край картинки и появляются с другой стороны, бесконечно. Линия — синусоида,
- * за цикл она сдвигается ровно на длину волны, поэтому последний кадр переходит в первый без скачка.
- * phase 0…1 — кадр; статичная картинка — phase 0.
+ * Фон: толстые чёрные «червяки» из правых углов (стиль мерча, выбор владельца). 15.11.2026: в анимации каждый
+ * червяк плавно ездит туда-сюда вдоль своего направления (заезжает за край и выезжает обратно), у каждого свой
+ * сдвиг по времени; к концам добавлены прямые «хвосты» за краем, чтобы при движении концы не показывались.
+ * phase 0…1 — кадр (синус, поэтому цикл бесшовный); статичная картинка — phase 0.
  */
-const FLOW = { angle: 74, lambda: 320, amp: 34, gap: 118, cx: W - 120, cy: H / 2, half: 900, stroke: 56 };
+const WORM_SWING = 60;
 
-function strand(offset: number, shift: number) {
-  const { lambda, amp, half } = FLOW;
-  const step = lambda / 2;
-  let x = -half - lambda * 2 + shift;
-  let d = `M${x.toFixed(1)} ${offset}`;
-  for (let i = 0; x < half + lambda; i++, x += step) {
-    const dy = (i % 2 ? 1 : -1) * amp * 1.33;
-    d += ` C${(x + step * 0.35).toFixed(1)} ${(offset + dy).toFixed(1)} ${(x + step * 0.65).toFixed(1)} ${(offset + dy).toFixed(1)} ${(x + step).toFixed(1)} ${offset}`;
-  }
-  return `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${FLOW.stroke}" stroke-linecap="round"/>`;
-}
+type Worm = { d: string; dir: [number, number]; k: number };
+const WORMS: Worm[] = [
+  {
+    d: `M${W - 454} -206 L${W - 420} -60 C${W - 380} 110 ${W - 230} 60 ${W - 190} 200 S${W - 80} 360 ${W + 60} 320 L${W + 204} 279`,
+    dir: [0.78, 0.62],
+    k: 0,
+  },
+  {
+    d: `M${W - 290} -205 L${W - 250} -60 C${W - 220} 50 ${W - 110} 20 ${W - 70} 120 S${W + 10} 200 ${W + 70} 170 L${W + 204} 103`,
+    dir: [0.81, 0.58],
+    k: 1 / 3,
+  },
+  {
+    d: `M${W + 206} ${H - 214} L${W + 60} ${H - 250} C${W - 100} ${H - 290} ${W - 130} ${H - 120} ${W - 270} ${H - 110} S${W - 400} ${H + 10} ${W - 430} ${H + 60} L${W - 507} ${H + 189}`,
+    dir: [-0.85, 0.53],
+    k: 2 / 3,
+  },
+];
 
 function backdrop(tone: string, phase = 0) {
-  const shift = phase * FLOW.lambda;
-  // у линий разный сдвиг по фазе, чтобы гребни не шли «строем»
-  const lines = [-FLOW.gap, 0, FLOW.gap].map((off, k) => strand(off, (shift + (k * FLOW.lambda) / 3) % FLOW.lambda)).join('');
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-<rect width="${W}" height="${H}" fill="${tone}"/>
-<g transform="translate(${FLOW.cx} ${FLOW.cy}) rotate(${FLOW.angle})">${lines}</g>
-</svg>`;
+  const worms = WORMS.map(({ d, dir, k }) => {
+    const s = WORM_SWING * Math.sin(2 * Math.PI * (phase + k));
+    return `<path transform="translate(${(dir[0] * s).toFixed(1)} ${(dir[1] * s).toFixed(1)})" d="${d}" fill="none" stroke="${INK}" stroke-width="62" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }).join('');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="${tone}"/>${worms}</svg>`;
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }
 
@@ -156,12 +161,12 @@ export async function renderCardPng(card: NotificationCard): Promise<Uint8Array>
 /**
  * Анимированная карточка (GIF, 15.11.2026). Текст рисуется один раз (satori), для кадров подменяется только фон.
  * Качество (владелец: «стало хуже»): полный размер 1280×720, палитра 255 цветов по первому кадру; в следующих
- * кадрах неизменившиеся точки прозрачные (остаётся предыдущий кадр) — меняется только полоса с линиями,
- * поэтому файл небольшой. 30 кадров по 50 мс, линии проходят одну длину волны за цикл, повтор бесконечный.
+ * кадрах неизменившиеся точки прозрачные (остаётся предыдущий кадр) — меняются только червяки,
+ * поэтому файл небольшой. 36 кадров по 60 мс (≈2,2 с), червяки ездят туда-сюда, повтор бесконечный.
  */
 export const GIF_W = W;
-export const GIF_FRAMES = 30;
-const GIF_DELAY = 50;
+export const GIF_FRAMES = 36;
+const GIF_DELAY = 60;
 
 export async function renderCardGif(card: NotificationCard): Promise<Uint8Array> {
   const { fonts: fl, logo: l } = assets();
