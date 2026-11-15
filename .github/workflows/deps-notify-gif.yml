@@ -1,0 +1,31 @@
+# Одноразовый: добавить gifenc (анимация картинок уведомлений) и обновить bun.lock (в сессии нет доступа к npm). Удаляется следующим коммитом.
+name: deps-notify-gif
+on:
+  push:
+    branches: [feat/notify-animated]
+    paths: [.github/workflows/deps-notify-gif.yml]
+permissions:
+  contents: write
+jobs:
+  add:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/notify-animated
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+      - name: bun add
+        working-directory: backend
+        run: |
+          bun add gifenc
+          grep -n '"gifenc"' package.json
+          bun -e "const g=require('gifenc'); console.log('gifenc ok', Object.keys(g).join(','))"
+      - name: commit lock
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add backend/package.json backend/bun.lock
+          git commit -m "backend: gifenc для анимированных картинок уведомлений"
+          git push origin HEAD:feat/notify-animated
