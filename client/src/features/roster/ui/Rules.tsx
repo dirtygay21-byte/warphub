@@ -340,7 +340,6 @@ function GlossaryTab({ g }: { g: Glossary | null }) {
 }
 
 function StratCard({ s, ru, g }: { s: Stratagem; ru: RuText | null; g: Glossary | null }) {
-  const t = useT();
   const en = useEn();
   const [open, setOpen] = useState(false);
   return (
