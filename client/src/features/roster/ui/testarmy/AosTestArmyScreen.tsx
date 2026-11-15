@@ -7,7 +7,7 @@ import { pushOverlay, tg } from '../../telegram';
 import { buildAosUnits, FOE_PREFIX, objectiveRadius, otherSide, parseSave, rectsUnionPolys, restoreUnits, type ArmyKey, type Pt, type Side, type TAArmy, type TASave, type TAUnit } from '../../testarmy';
 import { Warscroll } from '../aos/AosUnitCard';
 import { BattleplanMap } from '../aosgame/BattleplanMap';
-import { Button, IconButton, Segmented, Sheet } from '../kit';
+import { Button, IconButton, Segmented, Sheet, FullscreenButton } from '../kit';
 import { cx, fmtPts } from '../util';
 import { Board, type BoardArmy, type BoardField } from './Board';
 
@@ -403,13 +403,14 @@ function FieldPicker({
 
 function Shell({ onBack, children }: { onBack: () => void; children: ReactNode }) {
   return (
-    <div className="mx-auto min-h-dvh max-w-lg px-4 pb-24 pt-5">
+    <div className="tg-safe-top mx-auto min-h-dvh max-w-lg px-4 pb-24 pt-5">
       <header className="mb-4 flex items-end gap-3">
         <IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpBuilder · Age of Sigmar</p>
           <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Test Army</h1>
         </div>
+        <FullscreenButton className="mb-0.5" />
       </header>
       {children}
     </div>

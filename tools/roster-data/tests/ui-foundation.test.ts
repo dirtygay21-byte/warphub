@@ -10,7 +10,8 @@ const expectTokens = (text: string, tokens: string[]) => {
 test('GameShell сохраняет wide layout 40K, master и совместимые варианты отмены', () => {
   const text = source('GameShell.tsx');
   expectTokens(text, [
-    "'mx-auto min-h-dvh max-w-lg px-4 pt-5'",
+    "'tg-safe-top mx-auto min-h-dvh max-w-lg px-4 pt-5'",
+    '<FullscreenButton className="mb-0.5" />',
     'kicker: string',
     'title: string',
     'onMaster?: () => void',

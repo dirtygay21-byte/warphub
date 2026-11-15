@@ -2,6 +2,8 @@ import { useEffect, type ReactNode } from 'react';
 import { haptic, pushOverlay } from '../telegram';
 import { cx } from './util';
 import { WormField } from '@/components/ui/ds/Lime';
+import { useEffect as useEffectFs, useState as useStateFs } from 'react';
+import { canFullscreen, isFullscreen, onFullscreenChanged, toggleFullscreen } from '@/utils/telegramApp';
 
 
 const paths: Record<string, string> = {
@@ -248,4 +250,33 @@ export function PointsBar({ used, limit, unit = 'очк.' }: { used: number; lim
 /** Червяк в углу цветного блока WarpBuilder (блок — relative overflow-hidden, цвет «Варп»). */
 export function HeroWorm() {
   return <WormField />;
+}
+
+
+/** «На весь экран» (15.11.2026): полноэкранный режим Telegram для битв и Test Army; вне Telegram 8.0+ кнопки нет. */
+export function FullscreenButton({ className }: { className?: string }) {
+  const [on, setOn] = useStateFs(isFullscreen());
+  useEffectFs(() => {
+    const off = onFullscreenChanged(() => setOn(isFullscreen()));
+    // ушли с экрана битвы — выходим из полноэкранного режима, чтобы шапки других экранов не уходили под кнопки Telegram
+    return () => {
+      off();
+      if (isFullscreen()) toggleFullscreen();
+    };
+  }, []);
+  if (!canFullscreen()) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => (haptic.tap(), toggleFullscreen())}
+      aria-pressed={on}
+      aria-label={on ? 'Выйти из полноэкранного режима' : 'На весь экран'}
+      title={on ? 'Выйти из полноэкранного режима' : 'На весь экран'}
+      className={cx('flex size-9 shrink-0 items-center justify-center rounded-xl border border-white/10 text-fg-2 active:bg-white/10', on && 'border-accent/60 text-accent', className)}
+    >
+      <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        {on ? <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" /> : <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />}
+      </svg>
+    </button>
+  );
 }

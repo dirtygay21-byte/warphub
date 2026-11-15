@@ -7,7 +7,7 @@
  * Первый запуск помечает уже существующие новости, ивенты и ранги, чтобы не разослать старое.
  */
 import { and, asc, count, eq, gt, gte, inArray, lt, lte, ne, sql } from 'drizzle-orm';
-import { bookingConfig } from '../../config/booking';
+import { bookingConfig, clubArmyLabel } from '../../config/booking';
 import { db } from '../../db';
 import {
   dndGamesTable,
@@ -242,6 +242,7 @@ async function morningDigest(now: Date) {
       lastName: usersTable.lastName,
       username: usersTable.username,
       details: reservationsTable.details,
+      clubArmy: reservationsTable.seatClubArmyOptions,
     })
     .from(reservationsTable)
     .innerJoin(usersTable, eq(reservationsTable.userId, usersTable.id))
@@ -249,14 +250,19 @@ async function morningDigest(now: Date) {
     .where(and(inArray(reservationsTable.status, [...ACTIVE]), gte(reservationsTable.startsAt, start), lt(reservationsTable.startsAt, new Date(start.getTime() + DAY))))
     .orderBy(asc(reservationsTable.startsAt));
   const time = (d: Date | null) => (d ? formatClubDateTime(d).split(', ').pop() : '—');
+  // армия / команда / варбанда клуба на сегодня (15.11.2026): сколько записей её просят — подготовить заранее
+  const wantsArmy = (r: (typeof rows)[number]) => (r.clubArmy ?? []).some(Boolean);
+  const armies = rows.filter(wantsArmy).length;
   await notifyKindAdmins('admin_digest', {
     всего: rows.length,
     ждут: rows.filter((r) => r.status === 'pending').length,
+    армия: armies > 0 ? armies : '',
     список: rows
       .slice(0, 25)
       .map((r) => {
         const d = r.details as ReservationDetails | null;
-        return `• ${time(r.startsAt)} <b>${escapeHtml(whatOf({ title: r.service, slug: r.slug }, d))}</b> — ${playerLine(r, d)}${r.status === 'pending' ? ' ⏳' : ''}`;
+        const army = wantsArmy(r) ? ` · ${d?.kind === 'wh_player' ? clubArmyLabel(d.game).toLowerCase() : 'армия клуба'}` : '';
+        return `• ${time(r.startsAt)} <b>${escapeHtml(whatOf({ title: r.service, slug: r.slug }, d))}</b> — ${playerLine(r, d)}${army}${r.status === 'pending' ? ' ⏳' : ''}`;
       })
       .join('\n'),
   });

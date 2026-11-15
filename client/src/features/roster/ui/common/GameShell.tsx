@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { IconButton } from '../kit';
+import { FullscreenButton, IconButton } from '../kit';
 import { cx } from '../util';
 
 /** Общая шапка игрового экрана. Визуальные различия режимов передаются через props. */
@@ -25,13 +25,14 @@ export function GameShell({
   children: ReactNode;
 }) {
   return (
-    <div className={cx('mx-auto min-h-dvh max-w-lg px-4 pt-5', className)}>
+    <div className={cx('tg-safe-top mx-auto min-h-dvh max-w-lg px-4 pt-5', className)}>
       <header className="mb-4 flex items-end gap-3">
         <IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{kicker}</p>
           <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">{title}</h1>
         </div>
+        <FullscreenButton className="mb-0.5" />
         {onMaster && (
           <button
             type="button"

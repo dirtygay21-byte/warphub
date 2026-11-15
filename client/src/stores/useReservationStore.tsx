@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { AvailabilitySegment, SessionPlayer } from "@/apiUtils/booking";
+import type { AvailabilitySegment, SessionPlayer, WhPlayerDetails } from "@/apiUtils/booking";
 import type { Table } from "@/types";
 import { getToday } from "@/utils/date";
 
@@ -43,6 +43,8 @@ export type SelectedSlot =
     };
 
 export type LastBooking = {
+  /** id записи — для файла календаря (15.11.2026) */
+  id?: string;
   startsAt: string | null;
   endsAt: string | null;
   joined: boolean;
@@ -63,6 +65,8 @@ type ReservationStore = {
   buyArmyOptions: boolean[];
   lastBooking: LastBooking | null;
   dndInitialView: DndInitialView;
+  /** «Записаться снова» (15.11.2026): данные игрока из прошлой записи — подставляются в форму */
+  prefillDetails: WhPlayerDetails | null;
 
   setDisciplineId: (id: number | null) => void;
   setServiceId: (id: number | null) => void;
@@ -75,6 +79,7 @@ type ReservationStore = {
   setBuyArmyOptions: (options: boolean[]) => void;
   setLastBooking: (booking: LastBooking | null) => void;
   setDndInitialView: (view: DndInitialView) => void;
+  setPrefillDetails: (details: WhPlayerDetails | null) => void;
   resetReservation: () => void;
 };
 
@@ -90,6 +95,7 @@ export const useReservationStore = create<ReservationStore>((set) => ({
   buyArmyOptions: [],
   lastBooking: null,
   dndInitialView: "home",
+  prefillDetails: null,
   setDisciplineId: (id: number | null) =>
     set({
       disciplineId: id,
@@ -116,6 +122,7 @@ export const useReservationStore = create<ReservationStore>((set) => ({
   setBuyArmyOptions: (options: boolean[]) => set({ buyArmyOptions: options }),
   setLastBooking: (booking: LastBooking | null) => set({ lastBooking: booking }),
   setDndInitialView: (view: DndInitialView) => set({ dndInitialView: view }),
+  setPrefillDetails: (details: WhPlayerDetails | null) => set({ prefillDetails: details }),
   resetReservation: () =>
     set({
       disciplineId: null,
@@ -129,5 +136,6 @@ export const useReservationStore = create<ReservationStore>((set) => ({
       buyArmyOptions: [],
       lastBooking: null,
       dndInitialView: "home",
+      prefillDetails: null,
     }),
 }));

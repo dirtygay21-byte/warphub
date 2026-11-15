@@ -6,7 +6,7 @@ import type { DataIndex, Roster } from '../../engine/types';
 import { pushOverlay, tg } from '../../telegram';
 import { buildUnits, FOE_PREFIX, OBJECTIVE_RULE_SOURCE, otherSide, parseSave, restoreUnits, type ArmyKey, type Pt, type Side, type TAArmy, type TASave, type TAUnit } from '../../testarmy';
 import { BattleMap } from '../Battlefield';
-import { Button, IconButton, Segmented } from '../kit';
+import { Button, IconButton, Segmented, FullscreenButton } from '../kit';
 import { cx, fmtPts } from '../util';
 import { Board, type BoardArmy as BoardArmyView, type BoardField } from './Board';
 import { UnitInfo } from './UnitInfo';
@@ -414,13 +414,14 @@ function FieldPicker({
 
 function Shell({ onBack, children }: { onBack: () => void; children: ReactNode }) {
   return (
-    <div className="mx-auto min-h-dvh max-w-lg px-4 pb-24 pt-5">
+    <div className="tg-safe-top mx-auto min-h-dvh max-w-lg px-4 pb-24 pt-5">
       <header className="mb-4 flex items-end gap-3">
         <IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpBuilder · 40K</p>
           <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Test Army</h1>
         </div>
+        <FullscreenButton className="mb-0.5" />
       </header>
       {children}
     </div>

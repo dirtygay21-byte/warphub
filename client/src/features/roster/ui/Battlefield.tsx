@@ -3,7 +3,7 @@ import { loadBattlefield, loadMissions, type BattlefieldData, type BfDeployment,
 import { matchupMission } from '../game';
 import { CapsNote, MissionCardView, SecondaryList } from './MissionCard';
 import { openExternal, pushOverlay } from '../telegram';
-import { IconButton } from './kit';
+import { IconButton, FullscreenButton } from './kit';
 import { cx } from './util';
 
 const LETTERS = ['A', 'B', 'C'];
@@ -500,13 +500,14 @@ function MissionsBlock({ data, missions, failed, you, foe, side, onSide }: { dat
 
 function Shell({ onBack, children }: { onBack: () => void; children: ReactNode }) {
   return (
-    <div className="mx-auto min-h-dvh max-w-lg px-4 pb-10 pt-5 lg:max-w-4xl lg:pt-8">
+    <div className="tg-safe-top mx-auto min-h-dvh max-w-lg px-4 pb-10 pt-5 lg:max-w-4xl lg:pt-8">
       <header className="mb-4 flex items-end gap-3">
         <IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Chapter Approved 2026–27</p>
           <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Поле боя</h1>
         </div>
+        <FullscreenButton className="mb-0.5" />
       </header>
       {children}
     </div>

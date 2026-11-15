@@ -6,7 +6,7 @@ import type { SkirmishGameData, SkirmishSystem } from '../../skirmish/types';
 import type { WarcryRoster } from '../../warcry/roster';
 import type { WarcryIndex } from '../../warcry/types';
 import { haptic, openExternal } from '../../telegram';
-import { Button, Icon, IconButton, Segmented, HeroWorm } from '../kit';
+import { Button, Icon, IconButton, Segmented, HeroWorm, FullscreenButton } from '../kit';
 
 export type SkirmishRoster = KtRoster | WarcryRoster;
 type Seat = 'p1' | 'p2';
@@ -264,6 +264,6 @@ function SourceLink({ data }: { data: SkirmishGameData }) {
   return <button type="button" onClick={() => openExternal(data.system === 'kt' ? data.missionPack.url : data.source.url)} className="mt-5 flex w-full items-center gap-2 rounded-xl px-2 py-2 text-left text-[12px] text-fg-3 active:bg-white/5"><Icon name="book" className="size-4 shrink-0 text-accent" /><span className="flex-1">Источник: {data.source.name} · проверено {data.source.checked}. Официальный генератор и карты.</span><Icon name="chevron" className="size-4" /></button>;
 }
 function Shell({ onBack, title, children }: { onBack: () => void; title: string; children: ReactNode }) {
-  return <div className="mx-auto min-h-dvh max-w-lg px-4 pb-24 pt-5"><header className="mb-4 flex items-end gap-3"><IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" /><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpBuilder</p><h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">{title} · игра</h1></div></header>{children}</div>;
+  return <div className="tg-safe-top mx-auto min-h-dvh max-w-lg px-4 pb-24 pt-5"><header className="mb-4 flex items-end gap-3"><IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" /><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpBuilder</p><h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">{title} · игра</h1></div><FullscreenButton className="mb-0.5 ml-auto" /></header>{children}</div>;
 }
 function Spinner() { return <div className="mx-auto mt-16 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />; }

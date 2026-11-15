@@ -7,6 +7,7 @@ import { PaintingForm, PlayerInfoForm } from "@/components/booking/PlayerForms";
 import {
   emptyPaintingForm,
   emptyPlayerForm,
+  playerFormFromDetails,
   type PlayerFormValue,
   paintingFormToDetails,
   playerFormToDetails,
@@ -45,6 +46,7 @@ export default function ServiceDetailsStage() {
     partyCount,
     setPartyCount,
     setLastBooking,
+    prefillDetails,
   } = useReservationStore();
   const { nextStage } = useRegistrationStageStore();
   const options = useBookingOptions();
@@ -122,7 +124,8 @@ export default function ServiceDetailsStage() {
         ? { minutes: windowLimit.maxMinutes, until: windowLimit.until }
         : null;
 
-  const [playerDraft, setPlayer] = useState(() => emptyPlayerForm());
+  // «Записаться снова»: армия, очки и опыт из прошлой записи
+  const [playerDraft, setPlayer] = useState(() => (prefillDetails ? playerFormFromDetails(prefillDetails) : emptyPlayerForm()));
   // присоединение к столу: игра — как у первого игрока (сервер проверяет то же)
   const lockedGame =
     selectedSlot?.kind === "join" ? ((selectedSlot.players.find((p) => p.game)?.game as PlayerFormValue["game"] | undefined) ?? "40k") : null;
@@ -175,6 +178,7 @@ export default function ServiceDetailsStage() {
     },
     onSuccess: (result) => {
       setLastBooking({
+        id: result.id,
         startsAt: result.startsAt ?? startsAt,
         endsAt: result.endsAt ?? endsAt,
         joined: result.joinedSession ?? false,

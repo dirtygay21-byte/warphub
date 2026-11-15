@@ -9,7 +9,7 @@ import { buildKtUnits, buildWarcryUnits, FOE_PREFIX, otherSide, parseSave, resto
 import { pushOverlay, tg, openExternal } from '../../telegram';
 import { decodeWarcryRoster, neededFactions, type WarcryRoster } from '../../warcry/roster';
 import type { WarcryIndex } from '../../warcry/types';
-import { Button, IconButton, Segmented, Sheet } from '../kit';
+import { Button, IconButton, Segmented, Sheet, FullscreenButton } from '../kit';
 import { cx } from '../util';
 import { Board, type BoardField } from '../testarmy/Board';
 import { KtMapPanel, WarcryDeploymentPanel } from './SkirmishMaps';
@@ -299,6 +299,6 @@ function InfoSheet({ title, onClose, lines, weapons }: { title: string; onClose:
   return <Sheet open onClose={onClose} title={title}><div className="space-y-3 pb-3">{lines.map((line, i) => <p key={i} className="text-sm text-fg-2">{line}</p>)}{weapons.length > 0 && <div><p className="mb-1 text-xs font-semibold uppercase tracking-wider text-fg-3">Оружие</p><ul className="space-y-1 text-[13px] text-fg-2">{weapons.map((w, i) => <li key={i}>{w}</li>)}</ul></div>}</div></Sheet>;
 }
 function Shell({ onBack, system, children }: { onBack: () => void; system: SkirmishSystem; children: ReactNode }) {
-  return <div className="mx-auto min-h-dvh max-w-lg px-4 pb-24 pt-5"><header className="mb-4 flex items-end gap-3"><IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" /><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpBuilder · {system === 'kt' ? 'Kill Team' : 'Warcry'}</p><h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Test Army</h1></div></header>{children}</div>;
+  return <div className="tg-safe-top mx-auto min-h-dvh max-w-lg px-4 pb-24 pt-5"><header className="mb-4 flex items-end gap-3"><IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" /><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">WarpBuilder · {system === 'kt' ? 'Kill Team' : 'Warcry'}</p><h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Test Army</h1></div><FullscreenButton className="mb-0.5 ml-auto" /></header>{children}</div>;
 }
 function Spinner({ full }: { full?: boolean }) { return <div className={cx(full && 'flex min-h-dvh items-center justify-center')}><div className={cx('mx-auto size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent', !full && 'mt-16')} /></div>; }
