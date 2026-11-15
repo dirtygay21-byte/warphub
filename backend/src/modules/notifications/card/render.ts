@@ -16,7 +16,7 @@ import type { CardBlock, CardRow, NotificationCard } from './parse';
 
 export const CARD_STYLES = ['base', 'date', 'tiles', 'stripe', 'date-compact', 'date-mini', 'date-band', 'date-grey', 'date-lime', 'lime-faint', 'lime-swoosh', 'lime-corner'] as const;
 export type CardStyle = (typeof CARD_STYLES)[number];
-const DEFAULT_STYLE: CardStyle = 'date';
+const DEFAULT_STYLE: CardStyle = 'lime-corner';
 /** compact: 0 — обычно; 1 — логотип и надзаголовок в одну строку, строки данных «метка — значение» в одну линию;
  *  2 — то же без панели вокруг данных, меньше поля и кегли (самый низкий). */
 /** pattern — узоры мерча WarpHub (15.11.2026): band — лаймовая волна внизу; grey — серые волны на тёмном;
@@ -187,8 +187,32 @@ function tilesHeight(rows: CardRow[]) {
   return h;
 }
 
+/**
+ * Одна колонка (15.11.2026, владелец: «одна плашка справа выглядит странно»): если данных мало (до двух строк,
+ * без списков и подзаголовков блоков), они встают плашками под датой слева, а текст — под ними; правой колонки нет.
+ */
+function isSingle(f: Flags, blocks: CardBlock[]) {
+  if (!f.pattern) return false;
+  if (blocks.some((b) => b.type === 'heading' || b.type === 'list')) return false;
+  const rows = blocks.reduce((n, b) => n + (b.type === 'rows' ? b.rows.length : 0), 0);
+  return rows <= 2;
+}
+const SINGLE_W = W - PAD * 2 - 300;
+
 function heights(card: NotificationCard, f: Flags, when: string, blocks: CardBlock[]) {
   if (f.compact) return compactHeight(card, f, when, blocks);
+  if (isSingle(f, blocks)) {
+    const ts = titleSize(card.title);
+    let h = 72 + 48 + 34 + 14 + lineCount(card.title.toUpperCase(), ts, 0.5, SINGLE_W) * ts * 1.04 + 10;
+    if (when) h += 26 + 50;
+    if (card.subtitle) h += 24 + 50;
+    for (const b of blocks) {
+      if (b.type === 'rows') h += 28 + b.rows.length * 70;
+      if (b.type === 'text') h += 20 + lineCount(b.text, 30, 0.52, SINGLE_W) * 42;
+    }
+    h += 48 + (card.note ? lineCount(card.note, 26, 0.52, SINGLE_W) * 37 + 16 : 0) + 36;
+    return Math.round(Math.min(2400, Math.max(MIN_H, h + PAD * 2 + 48)) + (hasBand(f.pattern) ? BAND - 40 : 0));
+  }
   const ts = titleSize(card.title);
   let left = 72 + 48 + 34; // логотип и надзаголовок
   left += 14 + lineCount(card.title.toUpperCase(), ts, 0.5, LEFT) * ts * 1.04 + 34;
@@ -347,6 +371,36 @@ export function cardTree(card: NotificationCard, logoSrc: string, height: number
       el('div', { fontFamily: OSWALD, fontWeight: 600, fontSize: 22, letterSpacing: 8, color: muted }, '• WARPHUB.RU •'),
     ]),
   ]);
+  if (f.pattern && isSingle(f, blocks)) {
+    // данных мало — всё в одну колонку: плашки «метка значение» и текст под датой
+    const items: Node[] = [];
+    for (const b of blocks) {
+      if (b.type === 'rows') {
+        items.push(
+          el(
+            'div',
+            { flexWrap: 'wrap', marginTop: 28 },
+            b.rows.map((r) =>
+              el('div', { alignItems: 'baseline', padding: '12px 22px', marginRight: 14, marginBottom: 12, backgroundColor: COLORS.bg, borderRadius: 16 }, [
+                el('div', { fontFamily: INTER, fontWeight: 600, fontSize: 18, letterSpacing: 2.5, textTransform: 'uppercase', color: COLORS.fg3 }, r.label),
+                el('div', { marginLeft: 14, fontFamily: INTER, fontWeight: 600, fontSize: 28, color: COLORS.fg }, r.value),
+              ]),
+            ),
+          ),
+        );
+      }
+      if (b.type === 'text') {
+        items.push(el('div', { marginTop: 20, fontFamily: INTER, fontWeight: 400, fontSize: 30, lineHeight: 1.4, color: onLime ? 'rgba(17,17,16,0.8)' : COLORS.fg2 }, b.text));
+      }
+    }
+    const children = left.props.children as Node[];
+    const single = el('div', { flexDirection: 'column', width: SINGLE_W, flexShrink: 0 }, [...children.slice(0, -1), ...items, children.at(-1)]);
+    const contentH = height - PAD * 2 - (hasBand(f.pattern) ? BAND - 40 : 0);
+    return el('div', { width: W, height, position: 'relative', backgroundColor: COLORS.bg }, [
+      el('img', { position: 'absolute', top: 0, left: 0, width: W, height }, undefined, { src: patternSvg(f.pattern, height, tone), width: W, height }),
+      el('div', { position: 'absolute', top: PAD, left: PAD, width: W - PAD * 2, height: contentH }, [single]),
+    ]);
+  }
   if (f.pattern) {
     const right = el(
       'div',
