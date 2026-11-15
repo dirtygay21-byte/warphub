@@ -12,6 +12,7 @@ import { handleMinigame } from '../minigames/http';
 import { adminAdjustPoints, adminFindPlayers, getPointsHistory } from '../minigames/cards';
 import { adminMiddleware } from '../../plugins/admin-middleware';
 import { getClubArmyCalendar } from '../booking/club-armies';
+import { adminListResults, adminResolveResult, LeagueError } from '../league/service';
 import {
   BookingError,
   confirmReservation,
@@ -516,6 +517,27 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
         description:
           'Изменяет reservations.endsAt. Новое время должно быть позже startsAt и не позже закрытия клуба (10:00 след. дня UTC+5).',
       },
+    },
+  )
+  // клубная лига (этап 3): споры и ручное решение
+  .get('/results', async ({ query }) => adminListResults(query.status), {
+    query: t.Object({ status: t.Optional(t.String()) }),
+    detail: { tags: ['Admin'], summary: 'Результаты партий лиги (по умолчанию — споры)' },
+  })
+  .post(
+    '/results/:id/resolve',
+    async ({ params, body }) => {
+      try {
+        return await adminResolveResult(params.id, body.outcome);
+      } catch (error) {
+        if (error instanceof LeagueError) return status(error.code === 'NOT_FOUND' ? 404 : 400, { error: error.message });
+        throw error;
+      }
+    },
+    {
+      params: t.Object({ id: t.String({ format: 'uuid' }) }),
+      body: t.Object({ outcome: t.String() }),
+      detail: { tags: ['Admin'], summary: 'Решить спор: a / b / draw — засчитать, void — не учитывать' },
     },
   )
   .get('/club-armies', async () => getClubArmyCalendar(), {

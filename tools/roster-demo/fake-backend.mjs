@@ -847,6 +847,51 @@ export function createFakeBackend({ users }) {
     return { id: u.id, telegramId: u.telegramId, firstName: u.firstName, lastName: u.lastName || null, username: u.username || null };
   };
   const findGame = (id) => S.dndGames.find((g) => g.id === Number(id));
+  // ---------- клубная лига (этап 3): образцовые партии и таблица Эло
+  function leagueSeed(user) {
+    if (S.results) return S.results;
+    const others = allUsers().filter((u) => u.id !== user.id);
+    const o = (i) => others[i % Math.max(1, others.length)]?.id ?? user.id;
+    const day = (d, h) => new Date(Date.now() - d * 86400e3 + (h - new Date().getUTCHours() - 5) * 3600e3);
+    const g = (id, game, a, b, outcome, status, d, extra = {}) => ({ id, game, a, b, outcome, status, startsAt: day(d, 18).toISOString(), endsAt: day(d, 21).toISOString(), reportedBy: outcome ? a : null, ...extra });
+    S.results = [
+      g('lr1', '40k', user.id, o(0), null, 'awaiting', 0),
+      g('lr2', 'kt', o(1), user.id, 'a', 'reported', 1, { tableName: 'Стол 3' }),
+      g('lr3', '40k', user.id, o(1), 'a', 'confirmed', 7),
+      g('lr4', '40k', o(0), user.id, 'draw', 'confirmed', 8),
+      g('lr5', '40k', o(2), o(0), 'a', 'confirmed', 9),
+      g('lr6', '40k', o(1), o(2), 'b', 'confirmed', 10),
+      g('lr7', 'kt', user.id, o(2), 'a', 'confirmed', 6),
+      g('lr8', '40k', o(0), o(1), 'a', 'disputed', 2, { note: 'Не доиграли последний раунд' }),
+    ];
+    return S.results;
+  }
+  function leagueTable(results) {
+    const rows = new Map();
+    const row = (id) => rows.get(id) ?? (rows.set(id, { userId: id, rating: 1000, games: 0, wins: 0, draws: 0, losses: 0, lastDelta: 0 }), rows.get(id));
+    for (const r of [...results].sort((x, y) => Date.parse(x.startsAt) - Date.parse(y.startsAt))) {
+      const a = row(r.a), b = row(r.b);
+      const sa = r.outcome === 'a' ? 1 : r.outcome === 'b' ? 0 : 0.5;
+      const d = 32 * (sa - 1 / (1 + 10 ** ((b.rating - a.rating) / 400)));
+      a.rating += d; b.rating -= d; a.lastDelta = d; b.lastDelta = -d; a.games++; b.games++;
+      if (sa === 1) (a.wins++, b.losses++); else if (sa === 0) (b.wins++, a.losses++); else (a.draws++, b.draws++);
+    }
+    return [...rows.values()].map((r) => ({ ...r, rating: Math.round(r.rating), lastDelta: Math.round(r.lastDelta) })).sort((x, y) => y.rating - x.rating || y.games - x.games);
+  }
+  function myResult(r, me) {
+    const isA = r.a === me;
+    const other = userById(isA ? r.b : r.a);
+    const result = !r.outcome ? null : r.outcome === 'draw' ? 'draw' : (r.outcome === 'a') === isA ? 'win' : 'loss';
+    const byMe = r.reportedBy === me;
+    return {
+      id: r.id, game: r.game, gameLabel: r.game === 'kt' ? 'Kill Team' : 'Warhammer 40,000', startsAt: r.startsAt, endsAt: r.endsAt, tableName: r.tableName ?? 'Стол 1',
+      opponent: { firstName: other?.firstName ?? 'Игрок', lastName: other?.lastName ?? null, username: other?.username ?? null },
+      status: r.status, result, reportedByMe: byMe,
+      action: r.status === 'awaiting' || (r.status === 'reported' && byMe) ? 'report' : r.status === 'reported' ? 'confirm' : 'none',
+      season: '2026-Q4',
+    };
+  }
+
 
   function optionalText(v, field, max) {
     if (v === undefined || v === null) return null;
@@ -1022,6 +1067,56 @@ export function createFakeBackend({ users }) {
             seats: (r.seatClubArmyOptions ?? []).filter(Boolean).length,
           };
         });
+    }],
+    // этап 3 (15.11.2026): клубная лига — упрощённо, как backend/src/modules/league (Эло, K=32, старт 1000)
+    ['GET', /^\/results\/my$/, 'user', ({ user }) => leagueSeed(user).filter((r) => r.a === user.id || r.b === user.id).map((r) => myResult(r, user.id))],
+    ['POST', /^\/results\/([^/]+)\/report$/, 'user', ({ user, m, body }) => {
+      const r = (S.results ?? []).find((x) => x.id === m[1]) ?? fail(404, 'Партия не найдена');
+      const isA = r.a === user.id;
+      r.outcome = body.result === 'draw' ? 'draw' : (body.result === 'win') === isA ? 'a' : 'b';
+      r.status = 'reported';
+      r.reportedBy = user.id;
+      return { ok: true };
+    }],
+    ['POST', /^\/results\/([^/]+)\/confirm$/, 'user', ({ m }) => {
+      const r = (S.results ?? []).find((x) => x.id === m[1]) ?? fail(404, 'Партия не найдена');
+      r.status = 'confirmed';
+      return { ok: true };
+    }],
+    ['POST', /^\/results\/([^/]+)\/dispute$/, 'user', ({ m }) => {
+      const r = (S.results ?? []).find((x) => x.id === m[1]) ?? fail(404, 'Партия не найдена');
+      r.status = 'disputed';
+      return { ok: true };
+    }],
+    ['GET', /^\/league$/, 'user', ({ user, q }) => {
+      leagueSeed(user);
+      const game = ['40k', 'aos', 'kt', 'warcry'].includes(q.game) ? q.game : '40k';
+      const rows = leagueTable(S.results.filter((r) => r.game === game && r.status === 'confirmed'));
+      return {
+        game, season: '2026-Q4', seasonLabel: 'IV квартал 2026 · окт–дек', seasons: [{ id: '2026-Q4', label: 'IV квартал 2026 · окт–дек' }],
+        rows: rows.map((r, i) => ({ ...r, rank: i + 1, name: userById(r.userId)?.firstName ?? 'Игрок', username: userById(r.userId)?.username ?? null, me: r.userId === user.id })),
+      };
+    }],
+    ['GET', /^\/league\/my-stats$/, 'user', ({ user }) => {
+      leagueSeed(user);
+      const games = ['40k', 'kt'].map((game) => {
+        const mine = S.results.filter((r) => r.game === game && r.status === 'confirmed' && (r.a === user.id || r.b === user.id));
+        const table = leagueTable(S.results.filter((r) => r.game === game && r.status === 'confirmed'));
+        const idx = table.findIndex((r) => r.userId === user.id);
+        const row = table[idx];
+        return { game, gameLabel: game === 'kt' ? 'Kill Team' : 'Warhammer 40,000', games: mine.length, wins: row?.wins ?? 0, draws: row?.draws ?? 0, losses: row?.losses ?? 0, rating: row?.rating ?? null, rank: idx >= 0 ? idx + 1 : null, players: table.length };
+      }).filter((g) => g.games > 0);
+      return { season: '2026-Q4', seasonLabel: 'IV квартал 2026 · окт–дек', games };
+    }],
+    ['GET', /^\/admin\/results$/, 'admin', ({ user }) => leagueSeed(user).filter((r) => r.status === 'disputed').map((r) => ({
+      id: r.id, game: r.game, gameLabel: r.game === 'kt' ? 'Kill Team' : 'Warhammer 40,000', startsAt: r.startsAt, endsAt: r.endsAt,
+      playerA: userInfo(r.a), playerB: userInfo(r.b), outcome: r.outcome, status: r.status, reportedBy: r.reportedBy ? userInfo(r.reportedBy) : null, note: r.note ?? null,
+    }))],
+    ['POST', /^\/admin\/results\/([^/]+)\/resolve$/, 'admin', ({ m, body }) => {
+      const r = (S.results ?? []).find((x) => x.id === m[1]) ?? fail(404, 'Партия не найдена');
+      if (body.outcome === 'void') r.status = 'void';
+      else Object.assign(r, { outcome: body.outcome, status: 'confirmed' });
+      return { ok: true };
     }],
     ['GET', /^\/reservations\/my$/, 'user', ({ user }) => {
       const e = nearestEvent();

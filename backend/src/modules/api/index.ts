@@ -42,6 +42,15 @@ import {
 import { handleMinigame } from '../minigames/http';
 import { testUserNotification } from '../notifications/service';
 import { joinWaitlist, leaveWaitlist, myWaitlist, WaitlistError } from '../booking/waitlist';
+import { confirmResult, disputeResult, getLeagueTable, LeagueError, listMyResults, myLeagueStats, reportResult } from '../league/service';
+
+function mapLeagueError(error: unknown) {
+  if (error instanceof LeagueError) {
+    const code = error.code === 'NOT_FOUND' ? 404 : error.code === 'FORBIDDEN' ? 403 : error.code === 'BAD_STATE' ? 409 : 400;
+    return status(code, { error: error.message });
+  }
+  throw error;
+}
 import { getUserPrefs, saveUserPrefs } from '../notifications/hub';
 import { getPlayerProgress } from '../progress/service';
 import { getCardsState, getPointsHistory, openPack } from '../minigames/cards';
@@ -462,6 +471,27 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
   })
   .get('/open-games', async () => listOpenGamesCached(), {
     detail: { summary: 'Игры, где ждут соперника, на 7 дней (доска «Ищут соперника»)' },
+  })
+  // клубная лига (этап 3, 15.11.2026): результаты партий и таблица Эло
+  .get('/league', async ({ user, query }) => getLeagueTable(user.id, query.game, query.season), {
+    query: t.Object({ game: t.Optional(t.String()), season: t.Optional(t.String()) }),
+    detail: { tags: ['League'], summary: 'Таблица лиги (Эло) по игре и сезону' },
+  })
+  .get('/league/my-stats', async ({ user }) => myLeagueStats(user.id), { detail: { tags: ['League'], summary: 'Статистика игрока по играм' } })
+  .get('/results/my', async ({ user }) => listMyResults(user.id), { detail: { tags: ['League'], summary: 'Мои партии и их результаты' } })
+  .post('/results/:id/report', async ({ user, params, body }) => reportResult(user.id, params.id, body.result).catch(mapLeagueError), {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    body: t.Object({ result: t.String() }),
+    detail: { tags: ['League'], summary: 'Внести результат партии (win / loss / draw)' },
+  })
+  .post('/results/:id/confirm', async ({ user, params }) => confirmResult(user.id, params.id).catch(mapLeagueError), {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    detail: { tags: ['League'], summary: 'Подтвердить результат, внесённый соперником' },
+  })
+  .post('/results/:id/dispute', async ({ user, params, body }) => disputeResult(user.id, params.id, body?.note).catch(mapLeagueError), {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    body: t.Optional(t.Object({ note: t.Optional(t.String()) })),
+    detail: { tags: ['League'], summary: 'Оспорить результат — решит администратор' },
   })
   // лист ожидания (этап 2, 15.11.2026): «напишите, если на этот день освободится место»
   .get('/waitlist/my', async ({ user }) => myWaitlist(user.id), { detail: { tags: ['Booking'], summary: 'Мои подписки на освободившееся место' } })

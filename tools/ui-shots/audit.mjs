@@ -32,6 +32,8 @@ const ROUTES = [
   ['games-dice', '/games/dice'],
   ['games-egg', '/games/egg'],
   ['games-runner', '/games/runner'],
+  ['league', '/league'],
+  ['league-table', '/league?tab=table'],
   ['learn', '/learn'],
   ['learn-40k', '/learn/40k'],
   ['learn-aos', '/learn/aos'],
