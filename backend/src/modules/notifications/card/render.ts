@@ -14,15 +14,19 @@ import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import type { CardBlock, CardRow, NotificationCard } from './parse';
 
-export const CARD_STYLES = ['base', 'date', 'tiles', 'stripe'] as const;
+export const CARD_STYLES = ['base', 'date', 'tiles', 'stripe', 'date-compact', 'date-mini'] as const;
 export type CardStyle = (typeof CARD_STYLES)[number];
-const DEFAULT_STYLE: CardStyle = 'base';
-type Flags = { date: boolean; tiles: boolean; stripe: boolean };
+const DEFAULT_STYLE: CardStyle = 'date';
+/** compact: 0 — обычно; 1 — логотип и надзаголовок в одну строку, строки данных «метка — значение» в одну линию;
+ *  2 — то же без панели вокруг данных, меньше поля и кегли (самый низкий). */
+type Flags = { date: boolean; tiles: boolean; stripe: boolean; compact: 0 | 1 | 2 };
 const FLAGS: Record<CardStyle, Flags> = {
-  base: { date: false, tiles: false, stripe: false },
-  date: { date: true, tiles: false, stripe: false },
-  tiles: { date: false, tiles: true, stripe: false },
-  stripe: { date: false, tiles: false, stripe: true },
+  base: { date: false, tiles: false, stripe: false, compact: 0 },
+  date: { date: true, tiles: false, stripe: false, compact: 0 },
+  tiles: { date: false, tiles: true, stripe: false, compact: 0 },
+  stripe: { date: false, tiles: false, stripe: true, compact: 0 },
+  'date-compact': { date: true, tiles: false, stripe: false, compact: 1 },
+  'date-mini': { date: true, tiles: false, stripe: false, compact: 2 },
 };
 
 const W = 1280;
@@ -120,6 +124,7 @@ function tilesHeight(rows: CardRow[]) {
 }
 
 function heights(card: NotificationCard, f: Flags, when: string, blocks: CardBlock[]) {
+  if (f.compact) return compactHeight(card, f, when, blocks);
   const ts = titleSize(card.title);
   let left = 72 + 48 + 34; // логотип и надзаголовок
   left += 14 + lineCount(card.title.toUpperCase(), ts, 0.5, LEFT) * ts * 1.04 + 34;
@@ -134,6 +139,50 @@ function heights(card: NotificationCard, f: Flags, when: string, blocks: CardBlo
     if (b.type === 'text') right += 24 + lineCount(b.text, 30, 0.52, RIGHT) * 42;
   }
   return Math.round(Math.min(2400, Math.max(MIN_H, Math.max(left, right) + PAD * 2 + 48)));
+}
+
+const C = {
+  1: { pad: 52, minH: 600, title: 0.86, when: 36, row: 30, rowPad: 14 },
+  2: { pad: 44, minH: 520, title: 0.78, when: 32, row: 28, rowPad: 10 },
+} as const;
+
+function compactHeight(card: NotificationCard, f: Flags, when: string, blocks: CardBlock[]) {
+  const c = C[f.compact as 1 | 2];
+  const ts = Math.round(titleSize(card.title) * c.title);
+  const left0 = W - c.pad * 2 - RIGHT - GAP;
+  let left = 56 + 34; // логотип+надзаголовок
+  left += lineCount(card.title.toUpperCase(), ts, 0.5, left0) * ts * 1.04 + 20 + 10;
+  if (when) left += 20 + lineCount(when, c.when, 0.46, left0) * c.when * 1.25;
+  if (card.subtitle) left += 20 + lineCount(card.subtitle, 24, 0.5, left0 - 50) * 32 + 18;
+  left += 36 + (card.note ? lineCount(card.note, 24, 0.52, left0) * 34 + 12 : 0) + 30;
+  let right = 0;
+  for (const b of blocks) {
+    if (b.type === 'rows') right += (f.compact === 1 ? 12 : 0) + b.rows.reduce((s, r) => s + c.rowPad * 2 + lineCount(r.value, c.row, 0.52, RIGHT - 230) * c.row * 1.3 + 2, 0) + (f.compact === 1 ? 12 : 0);
+    if (b.type === 'heading') right += 26 + lineCount(b.text, 30, 0.5, RIGHT) * 40;
+    if (b.type === 'list') right += 12 + b.items.reduce((s, i) => s + 10 + lineCount(i, 28, 0.52, RIGHT - 36) * 38, 0);
+    if (b.type === 'text') right += 20 + lineCount(b.text, 28, 0.52, RIGHT) * 39;
+  }
+  return Math.round(Math.min(2400, Math.max(c.minH, Math.max(left, right) + c.pad * 2 + 24)));
+}
+
+/** Строки «метка — значение» в одну линию (компактные варианты). */
+function inlineRows(rows: CardRow[], f: Flags, first: boolean): Node {
+  const c = C[f.compact as 1 | 2];
+  const panel = f.compact === 1;
+  return el(
+    'div',
+    {
+      flexDirection: 'column',
+      marginTop: first ? 0 : 20,
+      ...(panel ? { padding: '4px 28px', backgroundColor: COLORS.elevated, border: '2px solid rgba(255,255,255,0.08)', borderRadius: 24 } : {}),
+    },
+    rows.map((r, i) =>
+      el('div', { alignItems: 'baseline', padding: `${c.rowPad}px 0`, borderTop: i ? '2px solid rgba(255,255,255,0.07)' : 'none' }, [
+        el('div', { width: 190, flexShrink: 0, fontFamily: INTER, fontWeight: 600, fontSize: 19, letterSpacing: 2.5, textTransform: 'uppercase', color: COLORS.fg3 }, r.label),
+        el('div', { flex: 1, fontFamily: INTER, fontWeight: 600, fontSize: c.row, lineHeight: 1.3, color: COLORS.fg }, r.value),
+      ]),
+    ),
+  );
 }
 
 function tiles(rows: CardRow[], tone: string): Node {
@@ -165,6 +214,7 @@ function tiles(rows: CardRow[], tone: string): Node {
 function block(b: CardBlock, tone: string, f: Flags, first: boolean): Node {
   const top = first ? 0 : 28;
   if (b.type === 'rows' && f.tiles) return el('div', { marginTop: top }, tiles(b.rows, tone));
+  if (b.type === 'rows' && f.compact) return inlineRows(b.rows, f, first);
   if (b.type === 'rows') {
     return el(
       'div',
@@ -198,8 +248,9 @@ function block(b: CardBlock, tone: string, f: Flags, first: boolean): Node {
 export function cardTree(card: NotificationCard, logoSrc: string, height: number, style: CardStyle = DEFAULT_STYLE): Node {
   const f = FLAGS[style];
   const tone = TONE[card.tone];
-  const ts = titleSize(card.title);
   const { when, blocks } = splitWhen(card, f.date);
+  if (f.compact) return compactTree(card, logoSrc, height, f, tone, when, blocks);
+  const ts = titleSize(card.title);
   const left = el('div', { flexDirection: 'column', width: LEFT, flexShrink: 0 }, [
     el('div', { alignItems: 'center', justifyContent: 'space-between' }, [
       el('img', { width: 72, height: 72 }, undefined, { src: logoSrc, width: 72, height: 72 }),
@@ -242,6 +293,46 @@ export function cardTree(card: NotificationCard, logoSrc: string, height: number
       ...(f.stripe ? { borderLeft: `14px solid ${tone}` } : {}),
     },
     el('div', { flexGrow: 1, margin: PAD, marginLeft: f.stripe ? PAD - 14 : PAD, width: W - PAD * 2 }, [left, right]),
+  );
+}
+
+function compactTree(card: NotificationCard, logoSrc: string, height: number, f: Flags, tone: string, when: string, blocks: CardBlock[]): Node {
+  const c = C[f.compact as 1 | 2];
+  const ts = Math.round(titleSize(card.title) * c.title);
+  const leftW = W - c.pad * 2 - RIGHT - GAP;
+  const left = el('div', { flexDirection: 'column', width: leftW, flexShrink: 0 }, [
+    el('div', { alignItems: 'center' }, [
+      el('img', { width: 56, height: 56 }, undefined, { src: logoSrc, width: 56, height: 56 }),
+      el('div', { marginLeft: 18, fontFamily: INTER, fontWeight: 600, fontSize: 22, letterSpacing: 4, textTransform: 'uppercase', color: tone }, card.kicker),
+    ]),
+    el('div', { marginTop: 30, fontFamily: OSWALD, fontWeight: 700, fontSize: ts, lineHeight: 1.04, textTransform: 'uppercase', color: COLORS.fg }, card.title),
+    el('div', { marginTop: 18, width: 110, height: 8, borderRadius: 4, backgroundColor: tone }),
+    ...(when ? [el('div', { marginTop: 20, fontFamily: OSWALD, fontWeight: 600, fontSize: c.when, lineHeight: 1.2, textTransform: 'uppercase', color: COLORS.fg }, when)] : []),
+    ...(card.subtitle
+      ? [
+          el('div', { marginTop: 18 }, [
+            el(
+              'div',
+              { padding: '6px 20px', border: `3px solid ${tone}`, borderRadius: 40, fontFamily: OSWALD, fontWeight: 600, fontSize: 24, letterSpacing: 1, textTransform: 'uppercase', color: tone },
+              card.subtitle,
+            ),
+          ]),
+        ]
+      : []),
+    el('div', { flexDirection: 'column', marginTop: 'auto', paddingTop: 36 }, [
+      ...(card.note ? [el('div', { marginBottom: 12, fontFamily: INTER, fontWeight: 400, fontSize: 24, lineHeight: 1.4, color: COLORS.fg3 }, card.note)] : []),
+      el('div', { fontFamily: OSWALD, fontWeight: 600, fontSize: 20, letterSpacing: 8, color: COLORS.fg3 }, '• WARPHUB.RU •'),
+    ]),
+  ]);
+  const right = el(
+    'div',
+    { flexDirection: 'column', width: RIGHT, marginLeft: GAP, justifyContent: 'center' },
+    blocks.map((b, i) => block(b, tone, f, i === 0)),
+  );
+  return el(
+    'div',
+    { width: W, height, backgroundColor: COLORS.bg, backgroundImage: `radial-gradient(circle at 0% 0%, ${tone}2E 0%, rgba(17,17,16,0) 42%)` },
+    el('div', { flexGrow: 1, margin: c.pad, width: W - c.pad * 2 }, [left, right]),
   );
 }
 
