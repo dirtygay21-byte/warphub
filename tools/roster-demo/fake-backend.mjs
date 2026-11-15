@@ -859,7 +859,7 @@ export function createFakeBackend({ users }) {
       eventId, game: '40k', rounds: 3, status: 'running', players,
       games: [
         G('tg1', 1, 1, 'tp1', 'tp4', 'a', 72, 48), G('tg2', 1, 2, 'tp2', 'tp5', 'b', 40, 61), G('tg3', 1, 3, 'tp3', 'tp6', 'draw', 55, 55),
-        G('tg4', 2, 1, 'tp1', 'tp5', null, null, null), G('tg5', 2, 2, 'tp3', 'tp6', 'a', 66, 50), G('tg6', 2, 3, 'tp4', 'tp2', null, null, null),
+        G('tg4', 2, 1, 'tp1', 'tp5', null, null, null), G('tg5', 2, 2, 'tp3', 'tp2', 'a', 66, 50), G('tg6', 2, 3, 'tp6', 'tp4', null, null, null),
       ],
     };
     return S.tournament;

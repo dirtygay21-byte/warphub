@@ -53,7 +53,9 @@ const GROUPS: { title: string; items: Section[] }[] = [
 
 const SECTIONS = GROUPS.flatMap((group) => group.items);
 
+// турнир открывается из ивента — подсвечиваем «Контент» (этап 4)
 const sectionOf = (pathname: string) =>
+  (pathname.startsWith("/admin/tournament") ? SECTIONS.find((s) => s.path === "/admin/content") : undefined) ??
   SECTIONS.filter((s) => s.path !== "/admin").find((s) => pathname.startsWith(s.path)) ?? SECTIONS[0]!;
 
 /**
