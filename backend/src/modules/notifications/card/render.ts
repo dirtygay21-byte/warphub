@@ -14,14 +14,17 @@ import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import type { CardBlock, CardRow, NotificationCard } from './parse';
 
-export const CARD_STYLES = ['base', 'date', 'tiles', 'stripe', 'date-compact', 'date-mini', 'date-band', 'date-grey', 'date-lime'] as const;
+export const CARD_STYLES = ['base', 'date', 'tiles', 'stripe', 'date-compact', 'date-mini', 'date-band', 'date-grey', 'date-lime', 'lime-faint', 'lime-swoosh', 'lime-corner'] as const;
 export type CardStyle = (typeof CARD_STYLES)[number];
 const DEFAULT_STYLE: CardStyle = 'date';
 /** compact: 0 — обычно; 1 — логотип и надзаголовок в одну строку, строки данных «метка — значение» в одну линию;
  *  2 — то же без панели вокруг данных, меньше поля и кегли (самый низкий). */
 /** pattern — узоры мерча WarpHub (15.11.2026): band — лаймовая волна внизу; grey — серые волны на тёмном;
  *  lime — лаймовый фон и чёрные «червячки» справа. Заголовок в узорных вариантах — цветом смысла, без полоски. */
-type Pattern = 'band' | 'grey' | 'lime';
+type Pattern = 'band' | 'grey' | 'lime' | 'lime-faint' | 'lime-swoosh' | 'lime-corner';
+const isLime = (p?: Pattern) => !!p && p.startsWith('lime');
+/** узоры с полосой внизу — содержимое заканчивается выше неё */
+const hasBand = (p?: Pattern) => p === 'band' || p === 'lime-swoosh';
 type Flags = { date: boolean; tiles: boolean; stripe: boolean; compact: 0 | 1 | 2; pattern?: Pattern };
 const FLAGS: Record<CardStyle, Flags> = {
   base: { date: false, tiles: false, stripe: false, compact: 0 },
@@ -33,6 +36,9 @@ const FLAGS: Record<CardStyle, Flags> = {
   'date-band': { date: true, tiles: false, stripe: false, compact: 0, pattern: 'band' },
   'date-grey': { date: true, tiles: false, stripe: false, compact: 0, pattern: 'grey' },
   'date-lime': { date: true, tiles: false, stripe: false, compact: 0, pattern: 'lime' },
+  'lime-faint': { date: true, tiles: false, stripe: false, compact: 0, pattern: 'lime-faint' },
+  'lime-swoosh': { date: true, tiles: false, stripe: false, compact: 0, pattern: 'lime-swoosh' },
+  'lime-corner': { date: true, tiles: false, stripe: false, compact: 0, pattern: 'lime-corner' },
 };
 
 const BAND = 190;
@@ -59,6 +65,24 @@ function patternSvg(pattern: Pattern, height: number, tone: string) {
       .map((k) => `<path d="${wave(-120, W + 320, height * k, 60, 330)}" fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="64" stroke-linecap="round"/>`)
       .join('');
     body = `<g transform="rotate(-8 ${W / 2} ${height / 2})">${body}</g>`;
+  } else if (pattern === 'lime-faint') {
+    // как «Без тебя не начнём»: лайм и чуть более тёмные широкие волны
+    body = `<rect width="${W}" height="${height}" fill="${tone}"/>` +
+      `<g transform="rotate(-10 ${W / 2} ${height / 2})">` +
+      [0.18, 0.55, 0.92].map((k) => `<path d="${wave(-160, W + 360, height * k, 70, 360)}" fill="none" stroke="#111110" stroke-opacity="0.08" stroke-width="90" stroke-linecap="round"/>`).join('') +
+      `</g>`;
+  } else if (pattern === 'lime-swoosh') {
+    // как «Твой ход», наоборот: лайм сверху, внизу чёрная волна и лаймовая линия по ней
+    const top = height - BAND + 40;
+    body = `<rect width="${W}" height="${height}" fill="${tone}"/>` +
+      `<path d="${wave(-60, W + 260, top, 34, 240)} L${W + 260} ${height + 10} L-60 ${height + 10} Z" fill="#111110"/>` +
+      `<path d="${wave(-80, W + 300, height - 70, 30, 280)}" fill="none" stroke="${tone}" stroke-width="30" stroke-linecap="round"/>`;
+  } else if (pattern === 'lime-corner') {
+    // как «Спасибо, что заглянул в Варп»: толстые чёрные «червяки» из угла
+    body = `<rect width="${W}" height="${height}" fill="${tone}"/>` +
+      `<path d="M${W - 520} -60 C${W - 470} 120 ${W - 300} 60 ${W - 250} 210 S${W - 120} 380 ${W + 60} 330" fill="none" stroke="#111110" stroke-width="58" stroke-linecap="round"/>` +
+      `<path d="M${W - 340} -60 C${W - 300} 60 ${W - 170} 20 ${W - 120} 130 S${W - 20} 210 ${W + 60} 170" fill="none" stroke="#111110" stroke-width="58" stroke-linecap="round"/>` +
+      `<path d="M-60 ${height - 170} C120 ${height - 230} 180 ${height - 60} 330 ${height - 90} S520 ${height + 10} 600 ${height + 60}" fill="none" stroke="#111110" stroke-width="58" stroke-linecap="round"/>`;
   } else {
     body = `<rect width="${W}" height="${height}" fill="${tone}"/>`;
     for (let y = 40; y < height + 80; y += 150) {
@@ -178,7 +202,7 @@ function heights(card: NotificationCard, f: Flags, when: string, blocks: CardBlo
     if (b.type === 'list') right += 16 + b.items.reduce((s, i) => s + 12 + lineCount(i, 30, 0.52, RIGHT - 40) * 42, 0);
     if (b.type === 'text') right += 24 + lineCount(b.text, 30, 0.52, RIGHT) * 42;
   }
-  return Math.round(Math.min(2400, Math.max(MIN_H, Math.max(left, right) + PAD * 2 + 48)) + (f.pattern === 'band' ? BAND - 40 : 0));
+  return Math.round(Math.min(2400, Math.max(MIN_H, Math.max(left, right) + PAD * 2 + 48)) + (hasBand(f.pattern) ? BAND - 40 : 0));
 }
 
 const C = {
@@ -291,7 +315,7 @@ export function cardTree(card: NotificationCard, logoSrc: string, height: number
   const { when, blocks } = splitWhen(card, f.date);
   if (f.compact) return compactTree(card, logoSrc, height, f, tone, when, blocks);
   const ts = titleSize(card.title);
-  const onLime = f.pattern === 'lime';
+  const onLime = isLime(f.pattern);
   const ink = onLime ? COLORS.bg : COLORS.fg; // основной текст
   const accentText = onLime ? COLORS.bg : tone; // надзаголовок
   const muted = onLime ? 'rgba(17,17,16,0.72)' : COLORS.fg3;
@@ -329,7 +353,7 @@ export function cardTree(card: NotificationCard, logoSrc: string, height: number
       { flexDirection: 'column', width: RIGHT, marginLeft: GAP, justifyContent: 'center' },
       blocks.map((b, i) => block(b, tone, f, i === 0, onLime)),
     );
-    const contentH = height - PAD * 2 - (f.pattern === 'band' ? BAND - 40 : 0);
+    const contentH = height - PAD * 2 - (hasBand(f.pattern) ? BAND - 40 : 0);
     // фон-узор картинкой; содержимое — абсолютно и после фона, иначе satori рисует фон поверх текста
     return el('div', { width: W, height, position: 'relative', backgroundColor: COLORS.bg }, [
       el('img', { position: 'absolute', top: 0, left: 0, width: W, height }, undefined, { src: patternSvg(f.pattern, height, tone), width: W, height }),
