@@ -20,6 +20,7 @@ import {
   bookingConfig,
   experienceLabel,
   armyLine,
+  gameHasPoints,
   gameLabel,
   type TableCapacityProfile,
 } from '../../config/booking';
@@ -514,7 +515,7 @@ function toPlayerView(
       game: details.game ?? '40k',
       gameLabel: gameLabel(details.game),
       army: details.army,
-      points: details.points,
+      points: gameHasPoints(details.game) ? details.points : null,
       experienceLevel: details.experienceLevel,
       experienceLabel: experienceLabel(details.experienceLevel),
     };
@@ -1173,7 +1174,7 @@ function describePlayer(user: UserBrief, details: ReservationDetails | null) {
     lines.push(
       `Игра: ${escapeHtml(gameLabel(details.game))}`,
       escapeHtml(armyLine(details.game, details.army)),
-      ...(details.points != null ? [`Очки: ${details.points}`] : []),
+      ...(details.points != null && gameHasPoints(details.game) ? [`Очки: ${details.points}`] : []),
       `Опыт: ${escapeHtml(experienceLabel(details.experienceLevel))}`,
     );
   }

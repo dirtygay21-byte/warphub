@@ -1,11 +1,4 @@
-import {
-  experienceLabelOf,
-  gameLabelOf,
-  killTeamWithFaction,
-  isPaintingDetails,
-  isWhPlayerDetails,
-  type ReservationDetails,
-} from "@/apiUtils/booking";
+import { experienceLabelOf, gameLabelOf, killTeamWithFaction, isPaintingDetails, isWhPlayerDetails, type ReservationDetails, gameHasPoints } from "@/apiUtils/booking";
 import { useBookingOptions } from "@/hooks/useBookingOptions";
 import { Brush, Gamepad2, HelpCircle, Medal, Palette, Shield, Swords } from "lucide-react";
 import { DetailRow } from "./DetailRow";
@@ -34,7 +27,7 @@ export function BookingDetailsRows({
           value={game === "kt" ? killTeamWithFaction(options, details.army) : details.army}
           isLoading={false}
         />
-        {details.points != null && (
+        {details.points != null && gameHasPoints(game) && (
           <DetailRow
             icon={<Swords className="size-4" />}
             label="Очки"

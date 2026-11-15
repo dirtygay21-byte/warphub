@@ -3,7 +3,7 @@
  * Всё берётся из записи в приложении: игра (40K / AoS / Kill Team / Warcry), армия или команда, очки, опыт;
  * у покраски — фракция и модель. Пустые значения убирают свою строку шаблона (renderTemplate).
  */
-import { armyLine, experienceLabel, gameLabel, paintSourceLabel } from '../../config/booking';
+import { armyLine, experienceLabel, gameHasPoints, gameLabel, paintSourceLabel } from '../../config/booking';
 import { escapeHtml, formatClubDateTime, formatUserName } from '../../lib/telegram/format';
 import type { ReservationDetails } from '../booking/rules';
 
@@ -26,7 +26,7 @@ export function detailVars(details: ReservationDetails | null | undefined) {
     return {
       игра: escapeHtml(gameLabel(details.game)),
       армия: escapeHtml(armyLine(details.game, details.army)),
-      очки: details.points != null ? String(details.points) : '',
+      очки: details.points != null && gameHasPoints(details.game) ? String(details.points) : '',
       опыт: escapeHtml(experienceLabel(details.experienceLevel)),
       покраска: '',
     };
@@ -47,7 +47,7 @@ export function detailVars(details: ReservationDetails | null | undefined) {
 export function playerLine(user: Brief, details: ReservationDetails | null | undefined): string {
   const name = escapeHtml(formatUserName({ firstName: user.firstName, lastName: user.lastName ?? null, username: user.username ?? null }));
   if (details?.kind !== 'wh_player') return name;
-  const parts = [details.army, details.points != null ? `${details.points} очков` : '', experienceLabel(details.experienceLevel)].filter((p) => p && p !== '—');
+  const parts = [details.army, details.points != null && gameHasPoints(details.game) ? `${details.points} очков` : '', experienceLabel(details.experienceLevel)].filter((p) => p && p !== '—');
   return `${name} — ${escapeHtml(parts.join(', '))}`;
 }
 

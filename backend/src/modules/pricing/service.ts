@@ -23,6 +23,7 @@ const GROUP_TRAINING_SLUG = 'wh_group_training';
 const WH_SERVICE_SLUGS = new Set(['wh_game', 'wh_group_training', 'wh_solo_training']);
 export const TRAINING_GAMES_LIMIT = 3;
 export const DEFAULT_ARMY_RENTAL_PRICE_PER_1000 = 1000;
+/** Kill Team и Warcry: команда/варбанда клуба без очков — аренда по цене 1000 очков (решение владельца 15.11.2026). */
 const DEFAULT_KILL_TEAM_RENTAL_POINTS = 1000;
 const ACTIVE_RESERVATION_STATUSES = ['pending', 'confirmed'] as const;
 

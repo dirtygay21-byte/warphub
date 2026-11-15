@@ -1,4 +1,4 @@
-import { experienceLabelOf, gameLabelOf, killTeamWithFaction, type SessionPlayer } from "@/apiUtils/booking";
+import { experienceLabelOf, gameLabelOf, killTeamWithFaction, type SessionPlayer, gameHasPoints } from "@/apiUtils/booking";
 import { useBookingOptions } from "@/hooks/useBookingOptions";
 import { haptic } from "@/utils/haptic";
 import { Check, Copy, UserRound } from "lucide-react";
@@ -60,7 +60,7 @@ export function PlayerInfo({ player, note }: { player: SessionPlayer; note?: str
           <dd className="text-fg">{player.gameLabel ?? gameLabelOf(options, game)}</dd>
           <dt className="text-fg-3">{armyLabel}</dt>
           <dd className="text-fg">{army}</dd>
-          {player.points != null && (
+          {player.points != null && gameHasPoints(game) && (
             <>
               <dt className="text-fg-3">Очки</dt>
               <dd className="text-fg">{player.points}</dd>

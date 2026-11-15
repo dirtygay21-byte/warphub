@@ -3,7 +3,7 @@
  * что забронировано, когда, кто (имя, @username, Telegram ID) и все выбранные варианты.
  * Чистая функция без БД и окружения — покрыта tests/booking-notify.test.ts.
  */
-import { armyLine, experienceLabel, gameLabel, paintSourceLabel } from '../../config/booking';
+import { armyLine, clubArmyLabel, experienceLabel, gameHasPoints, gameLabel, paintSourceLabel } from '../../config/booking';
 import { escapeHtml, formatClubDateTime, formatUserName } from '../../lib/telegram/format';
 import type { ReservationDetails } from './rules';
 
@@ -70,7 +70,7 @@ export function bookingNoticeText(n: BookingNotice): string {
     lines.push(
       `Игра: ${escapeHtml(gameLabel(d.game))}`,
       escapeHtml(armyLine(d.game, d.army)),
-      d.points != null ? `Очки: ${d.points}` : '',
+      d.points != null && gameHasPoints(d.game) ? `Очки: ${d.points}` : '',
       `Опыт: ${escapeHtml(experienceLabel(d.experienceLevel))}`,
     );
   } else if (d?.kind === 'painting') {
@@ -83,7 +83,8 @@ export function bookingNoticeText(n: BookingNotice): string {
     );
   }
   const clubArmy = seatsWith(n.seatClubArmyOptions);
-  if (clubArmy) lines.push(`Армия клуба: ${clubArmy}${d?.kind === 'wh_player' && d.clubArmyPoints ? ` · ${d.clubArmyPoints} очков` : ''}`);
+  const playerGame = d?.kind === 'wh_player' ? d.game : undefined;
+  if (clubArmy) lines.push(`${clubArmyLabel(playerGame)}: ${clubArmy}${d?.kind === 'wh_player' && d.clubArmyPoints && gameHasPoints(playerGame) ? ` · ${d.clubArmyPoints} очков` : ''}`);
   const buyArmy = seatsWith(n.buyArmyOptions);
   if (buyArmy) lines.push(`Покупка армии: ${buyArmy}`);
   lines.push(`Оформлено: ${formatClubDateTime(n.createdAt)}`);

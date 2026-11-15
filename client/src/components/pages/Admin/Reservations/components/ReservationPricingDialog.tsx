@@ -243,7 +243,7 @@ export function ReservationPricingDialog({
                 </div>
                 {pricing.armyRentalPoints > 0 && (
                   <p className="mb-3 rounded-xl bg-accent/5 px-3 py-2 text-xs leading-5 text-fg-2">
-                    Аренда армии: {pricing.armyRentalPoints} очков × {money.format(pricing.armyRentalPricePer1000)} / 1000 = {money.format(pricing.armyRentalAmount)}
+                    Аренда армии клуба (Kill Team и Warcry — как 1000 очков): {pricing.armyRentalPoints} очков × {money.format(pricing.armyRentalPricePer1000)} / 1000 = {money.format(pricing.armyRentalAmount)}
                   </p>
                 )}
                 {pricing.billingMode === "per_table" && pricing.baseAmount < pricing.unitPrice && (

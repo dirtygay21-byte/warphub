@@ -1,3 +1,4 @@
+import { clubArmyLabel, isWhPlayerDetails } from "@/apiUtils/booking";
 import { STATUS_LABELS, formatReservationDateTime, getStatusLabel, getStatusStyle } from "@/utils/reservationDisplay";
 import { formatClub } from "@/utils/clubTime";
 import { useDialogExit } from "@/components/ui/ds/useDialogExit";
@@ -273,7 +274,7 @@ function BookingCard({
         <Field label="Выбор" warn={row.needsHelp}>
           {row.detailsLabel || "—"}
         </Field>
-        <Field label="Армия клуба">{row.clubArmyCount > 0 ? row.clubArmyCount : "—"}</Field>
+        <Field label={clubArmyLabel(isWhPlayerDetails(row.details) ? row.details.game : null)}>{row.clubArmyCount > 0 ? row.clubArmyCount : "—"}</Field>
         <Field label="Создана">{formatReservationDateTime(row.createdAt)}</Field>
       </dl>
       <button

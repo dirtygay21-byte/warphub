@@ -207,6 +207,19 @@ export function isWhGame(value: unknown): value is WhGame {
   return bookingOptions.games.some((g) => g.value === value);
 }
 
+/**
+ * Очки есть только у 40K и AoS (решение владельца 15.11.2026): у Kill Team и Warcry очков в записи нет —
+ * ни у своей команды/варбанды, ни у команды/варбанды клуба. Старые записи без игры — 40K.
+ */
+export function gameHasPoints(game: string | null | undefined): boolean {
+  return game !== 'kt' && game !== 'warcry';
+}
+
+/** «Армия клуба» / «Команда клуба» (Kill Team) / «Варбанда клуба» (Warcry). */
+export function clubArmyLabel(game: string | null | undefined): string {
+  return game === 'kt' ? 'Команда клуба' : game === 'warcry' ? 'Варбанда клуба' : 'Армия клуба';
+}
+
 /** «Warhammer 40,000» / «Age of Sigmar» / «Kill Team»; старые записи без игры — 40K */
 export function gameLabel(value: string | null | undefined): string {
   return bookingOptions.games.find((g) => g.value === (value ?? '40k'))?.label ?? bookingOptions.games[0].label;

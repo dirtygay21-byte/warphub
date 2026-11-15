@@ -98,12 +98,22 @@ export const killTeamWithFaction = (options: BookingOptions, team: string) => {
 export const gameLabelOf = (options: BookingOptions, game: string | null | undefined) =>
   options.games.find((g) => g.value === (game ?? "40k"))?.label ?? "Warhammer 40,000";
 
+/**
+ * Очки есть только у 40K и AoS (решение владельца 15.11.2026): у Kill Team и Warcry очков в записи нет —
+ * ни у своей команды/варбанды, ни у команды/варбанды клуба. Старые записи без игры — 40K.
+ */
+export const gameHasPoints = (game: string | null | undefined) => game !== "kt" && game !== "warcry";
+
+/** «Армия клуба» / «Команда клуба» (Kill Team) / «Варбанда клуба» (Warcry). */
+export const clubArmyLabel = (game: string | null | undefined) =>
+  game === "kt" ? "Команда клуба" : game === "warcry" ? "Варбанда клуба" : "Армия клуба";
+
 /** «Kill Team · Pathfinders · Игрок» / «Warhammer 40,000 · Orks · 1000 оч. · Игрок» */
 export const playerLine = (
   d: { game?: string | null; army: string | null; points: number | null; experienceLevel?: string | null },
   options: BookingOptions,
 ) =>
-  [gameLabelOf(options, d.game), d.game === "kt" && d.army ? killTeamWithFaction(options, d.army) : d.army, d.points != null ? `${d.points} оч.` : null, d.experienceLevel ? experienceLabelOf(options, d.experienceLevel) : null]
+  [gameLabelOf(options, d.game), d.game === "kt" && d.army ? killTeamWithFaction(options, d.army) : d.army, d.points != null && gameHasPoints(d.game) ? `${d.points} оч.` : null, d.experienceLevel ? experienceLabelOf(options, d.experienceLevel) : null]
     .filter(Boolean)
     .join(" · ");
 

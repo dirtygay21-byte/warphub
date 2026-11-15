@@ -1,4 +1,4 @@
-import { createBooking, detailsKindForSlug } from "@/apiUtils/booking";
+import { clubArmyLabel, createBooking, detailsKindForSlug, gameHasPoints } from "@/apiUtils/booking";
 import { getDisciplines, getServiceById } from "@/apiUtils/disciplines";
 import { FieldLabel, NumberChips } from "@/components/booking/FormControls";
 import { DayBar, TimeChips } from "@/components/booking/TimeChips";
@@ -134,7 +134,9 @@ export default function ServiceDetailsStage() {
   // армия клуба (решение владельца 14.11.2026): обучающая игра — всегда 1000 очков, обычная игра — игрок выбирает очки
   const isTraining = TRAINING_SLUGS.has(service?.slug ?? "");
   const [clubArmyPointsDraft, setClubArmyPoints] = useState("");
-  const pickArmyPoints = clubArmy && !isTraining && player.game !== "kt";
+  // Kill Team и Warcry — без очков: команда/варбанда клуба стандартная (решение владельца 15.11.2026)
+  const hasPoints = gameHasPoints(player.game);
+  const pickArmyPoints = clubArmy && !isTraining && hasPoints;
   const clubArmyPoints = isTraining ? CLUB_ARMY_TRAINING_POINTS : Number(clubArmyPointsDraft || player.points || 0);
   const clubArmyError =
     pickArmyPoints && (!Number.isInteger(clubArmyPoints) || clubArmyPoints < 1 || clubArmyPoints > options.maxPoints)
@@ -165,7 +167,7 @@ export default function ServiceDetailsStage() {
         seatClubArmyOptions: detailsKind === "wh_player" ? [clubArmy] : undefined,
         details:
           detailsKind === "wh_player"
-            ? { ...playerFormToDetails(player), ...(clubArmy && player.game !== "kt" ? { clubArmyPoints } : {}) }
+            ? { ...playerFormToDetails(player), ...(clubArmy && hasPoints ? { clubArmyPoints } : {}) }
             : detailsKind === "painting"
               ? paintingFormToDetails(painting)
               : undefined,
@@ -307,14 +309,16 @@ export default function ServiceDetailsStage() {
             playerName={user ? [user.firstName, user.lastName].filter(Boolean).join(" ") : undefined}
           />
           <ToggleRow
-            title="Нужна армия клуба"
+            title={`Нужна ${clubArmyLabel(player.game).toLowerCase()}`}
             subtitle={
               clubArmy
-                ? isTraining
-                  ? `Обучающая игра: армия клуба на ${CLUB_ARMY_TRAINING_POINTS} очков`
-                  : player.game === "kt"
-                    ? "Команда клуба для Kill Team"
-                    : "Выберите, на сколько очков нужна армия"
+                ? player.game === "kt"
+                  ? "Стандартная команда клуба для Kill Team"
+                  : player.game === "warcry"
+                    ? "Стандартная варбанда клуба для Warcry"
+                    : isTraining
+                      ? `Обучающая игра: армия клуба на ${CLUB_ARMY_TRAINING_POINTS} очков`
+                      : "Выберите, на сколько очков нужна армия"
                 : undefined
             }
             checked={clubArmy}

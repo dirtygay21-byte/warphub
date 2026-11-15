@@ -25,7 +25,7 @@ import { CopyNick, PlayerInfo } from "@/components/booking/PlayerInfo";
 import { useBookingOptions } from "@/hooks/useBookingOptions";
 import { BookingDetailsRows } from "./BookingDetailsRows";
 import { DateTile, DsButton } from "@/components/ui/ds";
-import { detailsKindForSlug, gameLabelOf, isWhPlayerDetails } from "@/apiUtils/booking";
+import { detailsKindForSlug, gameLabelOf, isWhPlayerDetails, clubArmyLabel } from "@/apiUtils/booking";
 import type { Reservation } from "@/types";
 import { getSkeletonColors } from "@/theme/colors";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
@@ -155,7 +155,7 @@ export function ReservationCard({
           {clubArmyCount > 0 && (
             <DetailRow
               icon={<UsersRound className="size-4" />}
-              label="Армия клуба"
+              label={clubArmyLabel(isWhPlayerDetails(reservation.details) ? reservation.details.game : null)}
               value={`${clubArmyCount} ${getSeatsLabel(clubArmyCount)}`}
               isLoading={isServiceLoading}
             />

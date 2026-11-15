@@ -5,11 +5,7 @@ import {
   type AdminPlayer,
   type AdminSession,
 } from "@/apiUtils/adminWarhammer";
-import {
-  experienceLabelOf,
-  isPaintingDetails,
-  isWhPlayerDetails,
-} from "@/apiUtils/booking";
+import { experienceLabelOf, isPaintingDetails, isWhPlayerDetails, clubArmyLabel, gameHasPoints } from "@/apiUtils/booking";
 import { useBookingOptions } from "@/hooks/useBookingOptions";
 import { dateKeyOf, formatClubTimeRange, getClubToday } from "@/utils/clubTime";
 import { formatCalendarDate } from "@/utils/date";
@@ -389,8 +385,8 @@ function PlayerRow({
           {details ? (
             <p className="mt-1 text-xs text-fg-2">
               {details.game === "kt" ? "Kill Team" : details.game === "warcry" ? "Warcry" : details.game === "aos" ? "Age of Sigmar" : "Warhammer 40,000"} · {details.army}
-              {details.points != null ? ` · ${details.points} очков` : ""} · {experienceLabel(details.experienceLevel)}
-              {clubArmy ? " · армия клуба" : ""}
+              {details.points != null && gameHasPoints(details.game) ? ` · ${details.points} очков` : ""} · {experienceLabel(details.experienceLevel)}
+              {clubArmy ? ` · ${clubArmyLabel(details.game).toLowerCase()}` : ""}
             </p>
           ) : (
             <p className="mt-1 text-xs text-fg-3">

@@ -16,6 +16,7 @@ import {
   poolFreeSeats,
   toLocalDateParts,
   validateDetails,
+  clubArmyPointsFor,
   DetailsValidationError,
   formatLocalIso,
   type TableBooking,
@@ -308,15 +309,17 @@ describe('details validation', () => {
       experienceLevel: 'beginner',
     });
     expect(validateDetails('wh_player', { game: 'kt', army: 'Kasrkin', experienceLevel: 'player' })).toMatchObject({ points: null });
-    // Warcry (W6): очки нужны, как у 40K и AoS
+    // Warcry (решение владельца 15.11.2026): очков нет, как у Kill Team — не нужны и не сохраняются
     expect(validateDetails('wh_player', { game: 'warcry', army: 'Skaven', points: 1000, experienceLevel: 'player' })).toEqual({
       kind: 'wh_player',
       game: 'warcry',
       army: 'Skaven',
-      points: 1000,
+      points: null,
       experienceLevel: 'player',
     });
-    expect(() => validateDetails('wh_player', { game: 'warcry', army: 'Skaven', experienceLevel: 'player' })).toThrow(DetailsValidationError);
+    expect(validateDetails('wh_player', { game: 'warcry', army: 'Skaven', experienceLevel: 'player' })).toMatchObject({ points: null });
+    // очки армии клуба у Kill Team и Warcry не сохраняются
+    expect(validateDetails('wh_player', { game: 'kt', army: 'Kasrkin', experienceLevel: 'player', clubArmyPoints: 1000 })).not.toHaveProperty('clubArmyPoints');
     expect(() => validateDetails('wh_player', { game: 'aos', army: 'Seraphon', experienceLevel: 'player' })).toThrow(DetailsValidationError);
     expect(() => validateDetails('wh_player', { game: 'necromunda', army: 'X', points: 100, experienceLevel: 'player' })).toThrow(DetailsValidationError);
   });
@@ -417,5 +420,19 @@ describe('категории столов (Full-scale Wargaming / Tactical Games
     expect(gameFitsTable('kt', 'wh')).toBe(false);
     expect(gameFitsTable('warcry', 'small')).toBe(true);
     expect(gameFitsTable('warcry', 'wh')).toBe(false);
+  });
+});
+
+describe('армия клуба: очки только у 40K и AoS (решение владельца 15.11.2026)', () => {
+  const base = { kind: 'wh_player' as const, army: 'X', experienceLevel: 'player' as const };
+  test('обучение 40K — 1000, игра — выбор игрока или очки игры', () => {
+    expect(clubArmyPointsFor('wh_group_training', { ...base, game: '40k', points: 2000 }, true)).toBe(1000);
+    expect(clubArmyPointsFor('wh_game', { ...base, game: 'aos', points: 2000, clubArmyPoints: 1500 }, true)).toBe(1500);
+    expect(clubArmyPointsFor('wh_game', { ...base, game: '40k', points: 2000 }, true)).toBe(2000);
+    expect(clubArmyPointsFor('wh_game', { ...base, game: '40k', points: 2000 }, false)).toBeNull();
+  });
+  test('Kill Team и Warcry — без очков, даже на обучении', () => {
+    expect(clubArmyPointsFor('wh_group_training', { ...base, game: 'kt', points: null }, true)).toBeNull();
+    expect(clubArmyPointsFor('wh_game', { ...base, game: 'warcry', points: null }, true)).toBeNull();
   });
 });
