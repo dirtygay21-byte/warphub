@@ -81,7 +81,7 @@ export default function NearestEventBanner() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-sm text-white/85">{formatEventPeriod(event.startsAt, event.endsAt)}</span>
             {canRegister ? (
-              <Badge tone="accent" className="bg-accent/20">
+              <Badge tone="accent">
                 Свободно {freeSeats} {getSeatsLabel(freeSeats)}
               </Badge>
             ) : (

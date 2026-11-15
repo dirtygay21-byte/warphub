@@ -25,7 +25,7 @@ export default function AdminSupporters() {
 
   return (
     <div className="px-4 py-3 pb-28 text-fg sm:px-6">
-      <h1 className="text-2xl font-semibold">Поддержка клуба</h1>
+      <h1 className="font-display text-[28px] font-bold uppercase leading-none">Поддержка клуба</h1>
       <p className="mt-1 text-sm text-fg-2">Особое звание для тех, кто поддерживает клуб: рамка аватара и значок в профиле игрока.</p>
 
       <form

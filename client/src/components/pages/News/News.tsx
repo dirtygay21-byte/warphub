@@ -25,7 +25,7 @@ export default function News() {
     return (
       <div className="px-6 pb-3 pt-6 text-white lg:pt-8">
         <div className="mb-4">
-          <h1 className="text-2xl font-semibold">Новости</h1>
+          <h1 className="font-display text-[28px] font-bold uppercase leading-none">Новости</h1>
           <p className="mt-1 text-sm text-fg-3">Загружаем новости…</p>
         </div>
 
@@ -60,7 +60,7 @@ export default function News() {
     <div className="px-6 pb-3 pt-6 text-white lg:pt-8">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Новости</h1>
+          <h1 className="font-display text-[28px] font-bold uppercase leading-none">Новости</h1>
           <p className="mt-1 text-sm text-fg-3">
             {newsItems.length > 0
               ? `${newsItems.length} ${getNewsCountLabel(newsItems.length)}`

@@ -95,7 +95,7 @@ export function LimeHero({
   return (
     <section className={clsx("relative isolate overflow-hidden rounded-[22px] text-[#111110]", TONE_BG[tone], size === "lg" ? "p-5" : "p-4", className)}>
       <CornerWorms size={size} />
-      <div className="relative flex flex-col gap-1.5 pr-14">
+      <div className={clsx("relative flex flex-col gap-1.5", size === "lg" ? "pr-20" : "pr-14")}>
         {kicker && <span className="font-display text-[13px] font-semibold uppercase tracking-[0.12em]">{kicker}</span>}
         <h2 className={clsx("font-display font-bold uppercase leading-[0.98]", size === "lg" ? "text-[32px]" : "text-[24px]")}>{title}</h2>
       </div>

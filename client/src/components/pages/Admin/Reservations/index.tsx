@@ -354,7 +354,7 @@ export default function AdminReservations() {
       )}
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Все записи</h1>
+          <h1 className="font-display text-[28px] font-bold uppercase leading-none">Все записи</h1>
           <p className="mt-1 text-sm text-fg-3">
             {reservations.length > 0
               ? totalCount != null

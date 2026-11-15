@@ -61,7 +61,7 @@ export default function AdminNotifications() {
   return (
     <div className="px-4 py-3 pb-28 text-fg sm:px-6">
       <div className="mb-4">
-        <h1 className="text-2xl font-semibold">Уведомления</h1>
+        <h1 className="font-display text-[28px] font-bold uppercase leading-none">Уведомления</h1>
         <p className="mt-1 text-sm text-fg-3">Рассылки, автоматические сообщения бота, журнал и настройки</p>
         {catalog.data && !canEdit && <p className="mt-2 rounded-xl bg-white/5 px-3 py-2 text-[13px] text-fg-2">Просмотр: менять уведомления может только владелец.</p>}
       </div>

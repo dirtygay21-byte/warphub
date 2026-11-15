@@ -133,10 +133,10 @@ export default function Profile() {
       {/* лаймовый концепт (15.11.2026): шапка — лаймовый блок с червяками, аватар в чёрном кольце; переключатель эффектов — снизу справа */}
       <section className="relative isolate overflow-hidden rounded-[26px] bg-accent text-[#111110] lg:sticky lg:top-8">
         <svg aria-hidden="true" width="150" height="150" viewBox="0 0 150 150" className="pointer-events-none absolute right-0 top-0">
-          <Worm x={112} y={30} angle={40} period={150} amp={16} width={22} seconds={7} />
+          <Worm x={128} y={18} angle={40} period={150} amp={16} width={22} seconds={7} />
         </svg>
         <EffectsToggle />
-        <div className="relative flex items-center gap-4 pb-14 pl-5 pr-12 pt-5 lg:flex-col lg:px-6 lg:pb-16 lg:pt-8 lg:text-center">
+        <div className="relative flex items-center gap-4 pb-14 pl-5 pr-16 pt-5 lg:flex-col lg:px-6 lg:pb-16 lg:pt-8 lg:text-center">
           <div className="flex shrink-0 justify-center rounded-full bg-[#111110] p-1">
             {supporter ? (
               <SupporterFrame inline title={supporter} size={72} label={`Поддерживает клуб: ${SUPPORTER_LABELS[supporter]}`}>
