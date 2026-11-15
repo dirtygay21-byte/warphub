@@ -8,7 +8,7 @@ import { addUnit, duplicateRoster, duplicateUnit, removeUnit, touch, updateUnit 
 import { dispositionsOf, factionCredit, OUTDATED_RULE_NOTE, ruleLabel, visibleStratagem } from '../engine/source';
 import type { DataIndex, Datasheet, Detachment, FactionData, Roster } from '../engine/types';
 import { confirmAsk, haptic } from '../telegram';
-import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag } from './kit';
+import { Button, Empty, Field, Icon, IconButton, PointsBar, Segmented, Sheet, Tag } from './kit';
 import { cx, fmtPts } from './util';
 import { UnitCard } from './UnitCard';
 import { sortRosterUnits } from '../engine/sort';
@@ -182,7 +182,6 @@ function Editor({
     window.setTimeout(() => document.getElementById('u-' + uid)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60);
   };
 
-  const pct = Math.min(100, (cr.points / size.points) * 100);
   const over = cr.points > size.points;
 
   return (
@@ -236,9 +235,7 @@ function Editor({
             </button>
           </div>
         </div>
-        <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
-          <div className={cx('h-full rounded-full transition-[width] duration-300', over ? 'bg-danger' : 'bg-accent')} style={{ width: `${pct}%` }} />
-        </div>
+        <PointsBar used={cr.points} limit={size.points} />
       </div>
 
       <div className="space-y-6 px-4 pt-4">

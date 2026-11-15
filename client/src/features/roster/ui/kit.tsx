@@ -217,3 +217,27 @@ export function Empty({ title, children }: { title: string; children?: ReactNode
   );
 }
 
+
+
+/**
+ * Полоса очков ростера (перестройка 15.11.2026): толще, и под ней — сколько осталось или на сколько перебор.
+ * Общая для редакторов 40K, AoS, Kill Team и Warcry.
+ */
+export function PointsBar({ used, limit, unit = 'очк.' }: { used: number; limit: number; unit?: string }) {
+  const over = used > limit;
+  const pct = limit ? Math.min(100, Math.round((used / limit) * 100)) : 0;
+  const left = Math.abs(limit - used).toLocaleString('ru-RU');
+  return (
+    <div className="mt-2.5">
+      <div className="h-2 overflow-hidden rounded-full bg-white/[0.07]">
+        <div className={cx('h-full rounded-full transition-[width] duration-300', over ? 'bg-danger' : 'bg-accent')} style={{ width: `${pct}%` }} />
+      </div>
+      <p className="mt-1.5 flex justify-between text-[12px] font-semibold tabular-nums">
+        <span className={over ? 'text-danger' : used === limit ? 'text-accent' : 'text-fg-2'}>
+          {over ? `Перебор на ${left} ${unit}` : used === limit ? 'Ровно в лимит' : `Осталось ${left} ${unit}`}
+        </span>
+        <span className="text-fg-3">{pct}%</span>
+      </p>
+    </div>
+  );
+}

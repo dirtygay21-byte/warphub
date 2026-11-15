@@ -5,7 +5,7 @@
 import { UnitPhotoBlock, UnitThumb } from './UnitPhoto';
 import { useRef, useState, type ReactNode } from 'react';
 import { haptic } from '../../telegram';
-import { Button, Icon, IconButton, Sheet, Tag } from '../kit';
+import { Button, Icon, IconButton, PointsBar, Sheet, Tag } from '../kit';
 import { cx, fmtPts } from '../util';
 
 /** Карточка ростера в списке: название, подпись, метки, очки справа, меню. */
@@ -216,7 +216,6 @@ export function EditorHeader({
   const errors = issues.filter((i) => i.level === 'error').length;
   const warnings = issues.length - errors;
   const over = bigLimit != null && big > bigLimit;
-  const pct = bigLimit ? Math.min(100, Math.round((big / bigLimit) * 100)) : null;
   return (
     <div className="sticky top-0 z-30 border-b border-white/[0.06] bg-app/95 px-4 pb-3 pt-3 backdrop-blur">
       <div className="flex items-center gap-2">
@@ -246,11 +245,7 @@ export function EditorHeader({
           </button>
         </div>
       </div>
-      {pct != null && (
-        <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
-          <div className={cx('h-full rounded-full transition-[width] duration-300', over ? 'bg-danger' : 'bg-accent')} style={{ width: `${pct}%` }} />
-        </div>
-      )}
+      {bigLimit != null && <PointsBar used={big} limit={bigLimit} unit={bigUnit ?? 'очк.'} />}
       <Sheet open={open} onClose={() => setOpen(false)} title="Проверка ростера">
         {!issues.length ? (
           <p className="flex items-center gap-2 text-sm text-accent">

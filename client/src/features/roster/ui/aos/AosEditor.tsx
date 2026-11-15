@@ -21,7 +21,7 @@ import {
 import { AOS_RULES, LORE_LABEL, POINTS_LIMIT_LABEL, auxiliarySurcharge } from '../../aos/rules';
 import type { AosFactionData, AosIndex, AosRegiment, AosRoster, AosUnit, AosWarscroll, LoreKind } from '../../aos/types';
 import { confirmAsk, haptic } from '../../telegram';
-import { Button, Empty, Field, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
+import { Button, Empty, Field, Icon, IconButton, PointsBar, Segmented, Sheet, Tag } from '../kit';
 import { cx, fmtPts } from '../util';
 import { HeaderStat, NameInput } from '../common/BuilderKit';
 import { AosExportSheet } from './AosExportSheet';
@@ -120,7 +120,6 @@ function Editor({
   const toastTimer = useRef<number | undefined>(undefined);
   const f = L.faction;
   const over = cr.points.total > roster.pointsLimit;
-  const pct = Math.min(100, (cr.points.total / roster.pointsLimit) * 100);
 
   const flash = (text: string, bad = false) => {
     setToast({ text, bad });
@@ -229,9 +228,7 @@ function Editor({
             </button>
           </div>
         </div>
-        <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
-          <div className={cx('h-full rounded-full transition-[width] duration-300', over ? 'bg-danger' : 'bg-accent')} style={{ width: `${pct}%` }} />
-        </div>
+        <PointsBar used={cr.points.total} limit={roster.pointsLimit} />
       </div>
 
       <div className="space-y-5 px-4 pt-4">
