@@ -888,7 +888,7 @@ export function createFakeBackend({ users }) {
       opponent: { firstName: other?.firstName ?? 'Игрок', lastName: other?.lastName ?? null, username: other?.username ?? null },
       status: r.status, result, reportedByMe: byMe,
       action: r.status === 'awaiting' || (r.status === 'reported' && byMe) ? 'report' : r.status === 'reported' ? 'confirm' : 'none',
-      season: '2026-Q4',
+      season: '2026-Q4', side: isA ? 'a' : 'b',
     };
   }
 

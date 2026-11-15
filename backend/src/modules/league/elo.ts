@@ -89,6 +89,15 @@ export function computeLeague(results: LeagueResult[]): LeagueRow[] {
     .sort((x, y) => y.rating - x.rating || y.games - x.games || x.userId.localeCompare(y.userId));
 }
 
+/** Рейтинг игрока сразу после партии gameId (по партиям сезона до неё включительно) и его изменение. */
+export function ratingAfter(results: LeagueResult[], gameId: string, userId: string): { rating: number; delta: number } | null {
+  const ordered = [...results].sort((x, y) => x.startsAt.getTime() - y.startsAt.getTime() || x.id.localeCompare(y.id));
+  const idx = ordered.findIndex((r) => r.id === gameId);
+  if (idx < 0) return null;
+  const row = computeLeague(ordered.slice(0, idx + 1)).find((r) => r.userId === userId);
+  return row ? { rating: row.rating, delta: row.lastDelta } : null;
+}
+
 /** Результат с точки зрения игрока: 'win' | 'loss' | 'draw' → исход партии для пары (A, B). */
 export function outcomeFor(isA: boolean, mine: 'win' | 'loss' | 'draw'): 'a' | 'b' | 'draw' {
   if (mine === 'draw') return 'draw';

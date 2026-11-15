@@ -8,6 +8,7 @@ import { gameResultsTable, reservationsTable, servicesTable, tablesTable, usersT
 import { gameLabel } from '../../config/booking';
 import { escapeHtml, formatClubDateTime, formatUserName } from '../../lib/telegram/format';
 import type { ReservationDetails } from '../booking/rules';
+import { buildResultCard } from './card';
 import { notifyKind, notifyKindAdmins } from '../notifications/hub';
 import {
   ASK_AFTER_MS,
@@ -16,6 +17,7 @@ import {
   isLeagueGame,
   mineOf,
   outcomeFor,
+  ratingAfter,
   seasonLabel,
   seasonOf,
   type LeagueGame,
@@ -143,6 +145,8 @@ export type MyResultView = {
   /** что может сделать игрок: report — внести, confirm — подтвердить/оспорить, none */
   action: 'report' | 'confirm' | 'none';
   season: string;
+  /** сторона игрока в партии — для картинки результата */
+  side: 'a' | 'b';
 };
 
 export async function listMyResults(userId: string, limit = 30): Promise<MyResultView[]> {
@@ -172,6 +176,7 @@ export async function listMyResults(userId: string, limit = 30): Promise<MyResul
       reportedByMe,
       action,
       season: seasonOf(r.startsAt),
+      side: isA ? 'a' : 'b',
     };
   });
 }
@@ -243,6 +248,7 @@ export async function disputeResult(userId: string, id: string, note: unknown) {
 let cache: { at: number; rows: (typeof gameResultsTable.$inferSelect)[] } | null = null;
 function invalidateLeague() {
   cache = null;
+  cardCache.clear();
 }
 async function confirmedResults() {
   if (cache && Date.now() - cache.at < 60_000) return cache.rows;
@@ -375,3 +381,44 @@ export async function pendingResultsCount(userId: string) {
   return list.filter((r) => r.action !== 'none').length;
 }
 
+
+// ------------------------------------------------------------------ карточка результата (этап 3b, 15.11.2026)
+
+const cardCache = new Map<string, Uint8Array>();
+
+/**
+ * Картинка результата для «поделиться» (история Telegram, чат, файл): тот же стиль, что у карточек уведомлений.
+ * Только подтверждённые партии; side — чьими глазами (a / b). Ссылка открывается без входа (по неугадываемому id).
+ */
+export async function resultCardPng(id: string, sideRaw: unknown): Promise<Uint8Array> {
+  const side = sideRaw === 'b' ? 'b' : 'a';
+  const key = `${id}:${side}`;
+  const cached = cardCache.get(key);
+  if (cached) return cached;
+  const [r] = await db.select().from(gameResultsTable).where(eq(gameResultsTable.id, id)).limit(1);
+  if (!r || r.status !== 'confirmed' || !r.outcome) throw new LeagueError('NOT_FOUND', 'Результат не найден или ещё не подтверждён');
+  const isA = side === 'a';
+  const me = isA ? r.playerA : r.playerB;
+  const users = await usersByIds([r.playerA, r.playerB]);
+  const other = users.get(isA ? r.playerB : r.playerA);
+  const result = mineOf(isA, r.outcome);
+  const season = seasonOf(r.startsAt);
+  const seasonResults = (await confirmedResults())
+    .filter((x) => x.game === r.game && seasonOf(x.startsAt) === season)
+    .map((x) => ({ id: x.id, playerA: x.playerA, playerB: x.playerB, outcome: x.outcome!, startsAt: x.startsAt }));
+  const after = ratingAfter(seasonResults, r.id, me);
+  const { renderCardPng } = await import('../notifications/card/render');
+  const png = await renderCardPng(
+    buildResultCard({
+      result,
+      gameLabel: gameLabel(r.game),
+      when: formatClubDateTime(r.startsAt).split(', ').slice(0, 2).join(', '),
+      opponent: other ? nameOf({ firstName: other.firstName, lastName: other.lastName, username: null }) : 'Игрок',
+      season,
+      rating: after,
+    }),
+  );
+  if (cardCache.size > 200) cardCache.clear();
+  cardCache.set(key, png);
+  return png;
+}

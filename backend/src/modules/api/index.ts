@@ -42,7 +42,7 @@ import {
 import { handleMinigame } from '../minigames/http';
 import { testUserNotification } from '../notifications/service';
 import { joinWaitlist, leaveWaitlist, myWaitlist, WaitlistError } from '../booking/waitlist';
-import { confirmResult, disputeResult, getLeagueTable, LeagueError, listMyResults, myLeagueStats, reportResult } from '../league/service';
+import { confirmResult, disputeResult, getLeagueTable, LeagueError, listMyResults, myLeagueStats, reportResult, resultCardPng } from '../league/service';
 
 function mapLeagueError(error: unknown) {
   if (error instanceof LeagueError) {
@@ -425,6 +425,24 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
     {
       params: t.Object({ id: t.String({ format: 'uuid' }) }),
       detail: { summary: 'Файл календаря для записи (.ics)' },
+    },
+  )
+  // картинка результата лиги (этап 3b, 15.11.2026): для истории Telegram и «скачать» — без входа, по id партии
+  .get(
+    '/results/:id/card.png',
+    async ({ params, query }) => {
+      try {
+        const png = await resultCardPng(params.id, query.side);
+        return new Response(png, { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=300' } });
+      } catch (error) {
+        if (error instanceof LeagueError) return status(404, { error: error.message });
+        throw error;
+      }
+    },
+    {
+      params: t.Object({ id: t.String({ format: 'uuid' }) }),
+      query: t.Object({ side: t.Optional(t.String()) }),
+      detail: { summary: 'Картинка результата партии лиги (PNG)' },
     },
   )
   .use(authMiddleware)

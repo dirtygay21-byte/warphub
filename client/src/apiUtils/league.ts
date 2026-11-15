@@ -23,6 +23,7 @@ export type MyResult = {
   reportedByMe: boolean;
   action: "report" | "confirm" | "none";
   season: string;
+  side: "a" | "b";
 };
 
 export type LeagueRow = {
@@ -79,3 +80,6 @@ export type AdminResult = {
 export const getAdminResults = (status: "disputed" | "reported" | "all" = "disputed") => apiRequest<AdminResult[]>(`/admin/results?status=${status}`);
 export const resolveAdminResult = (id: string, outcome: "a" | "b" | "draw" | "void") =>
   apiRequest<{ ok: true }>(`/admin/results/${id}/resolve`, { method: "POST", body: JSON.stringify({ outcome }) });
+
+/** Публичная ссылка на картинку результата (этап 3b). */
+export const resultCardUrl = (r: Pick<MyResult, "id" | "side">) => `${import.meta.env.VITE_BACKEND_API_URL}/results/${r.id}/card.png?side=${r.side}`;
