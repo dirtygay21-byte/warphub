@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { NOTIFICATION_KINDS, renderTemplate } from '../src/modules/notifications/catalog';
 import { cardCaption, parseNotificationCard } from '../src/modules/notifications/card/parse';
-import { CARD_H, CARD_W, renderCardPng } from '../src/modules/notifications/card/render';
+import { CARD_H, CARD_W, factValue, renderCardPng } from '../src/modules/notifications/card/render';
 
 describe('карточка уведомления: разбор текста (14.11.2026)', () => {
   test('заголовок «Метка: игра» → надзаголовок и крупный заголовок; строки 🗓 / 🎲 и «Метка: значение»', () => {
@@ -85,3 +85,22 @@ describe('анимированная карточка (GIF, 15.11.2026)', () => 
     }, 60_000);
   }
 });
+
+test('факт на картинке — главная часть значения, без «—…» (15.11.2026)', () => {
+  expect(factValue('Иван Петров (@ivan) — Kommandos, Игрок')).toBe('Иван Петров (@ivan)');
+  expect(factValue('5 · ждут подтверждения: 2')).toBe('5');
+  expect(factValue('Константин Константинопольский (@konstantin)')).toBe('Константин');
+  expect(factValue('Стол 1')).toBe('Стол 1');
+  for (const v of ['Иван Петров (@ivan) — Kommandos, Игрок', 'Очень-очень-длинное-значение-без-пробелов']) expect(factValue(v)).not.toContain('…');
+});
+
+test('анимация MP4 (H.264) — чёткая, 1280×720 (15.11.2026)', async () => {
+  const { renderCardMp4 } = await import('../src/modules/notifications/card/render');
+  const kind = NOTIFICATION_KINDS.find((k) => k.id === 'booking_created')!;
+  const mp4 = await renderCardMp4(parseNotificationCard(renderTemplate(kind.defaultText, kind.vars), kind.title));
+  expect(new TextDecoder().decode(mp4.slice(4, 8))).toBe('ftyp');
+  expect(mp4.length).toBeLessThan(5_000_000);
+  console.log(`mp4 booking_created: ${mp4.length} bytes`);
+  const out = process.env.CARD_SAMPLES_DIR;
+  if (out) writeFileSync(`${out}/anim-booking_created.mp4`, mp4);
+}, 120_000);

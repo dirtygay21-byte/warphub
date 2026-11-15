@@ -21,6 +21,7 @@
     "drizzle-typebox": "^0.3.3",
     "elysia": "1.4.28",
     "gifenc": "^1.0.3",
+    "h264-mp4-encoder": "^1.0.12",
     "satori": "^0.63.2"
   },
   "devDependencies": {

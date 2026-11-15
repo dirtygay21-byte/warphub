@@ -70,6 +70,27 @@ const WHEN_LABELS = new Set(['Когда', 'Теперь', 'Время']);
 const FACT_PRIORITY = ['Стол', 'Соперник', 'Игрок', 'Отменил', 'За столом', 'Записей', 'Сыграно игр', 'Мест', 'Команда', 'Армия', 'Варбанда', 'Очки'];
 const MAX_FACTS = 2;
 
+/**
+ * Значение факта на картинке (15.11.2026, владелец: «тире и многоточие выглядят неправильно»): одинаково для всех
+ * карточек — только главная часть значения, без обрезки посередине. «Иван Петров (@ivan) — Kommandos, Игрок» →
+ * «Иван Петров (@ivan)»; «5 · ждут подтверждения: 2» → «5». Слишком длинное — без «(…)», затем по словам.
+ * Подробности остаются в подписи под картинкой.
+ */
+export function factValue(value: string, max = 22): string {
+  let v = value.split(/\s[—·]\s/)[0]!.trim();
+  if (v.length > max) v = v.replace(/\s*\([^)]*\)\s*$/, '').trim();
+  if (v.length > max) {
+    const words = v.split(/\s+/);
+    v = '';
+    for (const w of words) {
+      if ((v ? `${v} ${w}` : w).length > max) break;
+      v = v ? `${v} ${w}` : w;
+    }
+    v ||= words[0]!.slice(0, max);
+  }
+  return v;
+}
+
 function pick(card: NotificationCard): { when: string; facts: CardRow[]; text: string } {
   const rows = card.blocks.flatMap((b: CardBlock) => (b.type === 'rows' ? b.rows : []));
   const when = rows.find((r) => WHEN_LABELS.has(r.label))?.value ?? '';
@@ -85,37 +106,33 @@ function titleSize(title: string) {
 }
 
 /**
- * Фон: толстые чёрные «червяки» из правых углов (стиль мерча, выбор владельца). 15.11.2026: в анимации каждый
- * червяк плавно ездит туда-сюда вдоль своего направления (заезжает за край и выезжает обратно), у каждого свой
- * сдвиг по времени; к концам добавлены прямые «хвосты» за краем, чтобы при движении концы не показывались.
- * phase 0…1 — кадр (синус, поэтому цикл бесшовный); статичная картинка — phase 0.
+ * Фон: толстые чёрные «червяки» из правых углов (стиль мерча, выбор владельца). 15.11.2026 (владелец):
+ * червяки бесконечно «прокручиваются» вперёд вдоль своего направления. Каждый червяк — волна той же формы,
+ * что и на прежней картинке (S-изгиб из угла), на месте прежнего; за цикл волна сдвигается ровно на свою длину,
+ * поэтому цикл бесшовный, а движение — только вперёд. phase 0…1 — кадр; статичная картинка — phase 0.
  */
-const WORM_SWING = 60;
-
-type Worm = { d: string; dir: [number, number]; k: number };
+type Worm = { x: number; y: number; angle: number; lambda: number; amp: number; half: number };
 const WORMS: Worm[] = [
-  {
-    d: `M${W - 454} -206 L${W - 420} -60 C${W - 380} 110 ${W - 230} 60 ${W - 190} 200 S${W - 80} 360 ${W + 60} 320 L${W + 204} 279`,
-    dir: [0.78, 0.62],
-    k: 0,
-  },
-  {
-    d: `M${W - 290} -205 L${W - 250} -60 C${W - 220} 50 ${W - 110} 20 ${W - 70} 120 S${W + 10} 200 ${W + 70} 170 L${W + 204} 103`,
-    dir: [0.81, 0.58],
-    k: 1 / 3,
-  },
-  {
-    d: `M${W + 206} ${H - 214} L${W + 60} ${H - 250} C${W - 100} ${H - 290} ${W - 130} ${H - 120} ${W - 270} ${H - 110} S${W - 400} ${H + 10} ${W - 430} ${H + 60} L${W - 507} ${H + 189}`,
-    dir: [-0.85, 0.53],
-    k: 2 / 3,
-  },
+  { x: W - 180, y: 130, angle: 38, lambda: 620, amp: 52, half: 760 },
+  { x: W - 80, y: 50, angle: 36, lambda: 420, amp: 38, half: 560 },
+  { x: W - 190, y: H - 95, angle: 148, lambda: 600, amp: 52, half: 760 },
 ];
 
+function wormPath({ lambda, amp, half }: Worm, shift: number) {
+  const step = lambda / 2;
+  let x = -half - lambda * 2 + shift;
+  let d = `M${x.toFixed(1)} 0`;
+  for (let i = 0; x < half + lambda; i++, x += step) {
+    const dy = (i % 2 ? 1 : -1) * amp * 1.33;
+    d += ` C${(x + step * 0.35).toFixed(1)} ${dy.toFixed(1)} ${(x + step * 0.65).toFixed(1)} ${dy.toFixed(1)} ${(x + step).toFixed(1)} 0`;
+  }
+  return d;
+}
+
 function backdrop(tone: string, phase = 0) {
-  const worms = WORMS.map(({ d, dir, k }) => {
-    const s = WORM_SWING * Math.sin(2 * Math.PI * (phase + k));
-    return `<path transform="translate(${(dir[0] * s).toFixed(1)} ${(dir[1] * s).toFixed(1)})" d="${d}" fill="none" stroke="${INK}" stroke-width="62" stroke-linecap="round" stroke-linejoin="round"/>`;
-  }).join('');
+  const worms = WORMS.map((w) =>
+    `<g transform="translate(${w.x} ${w.y}) rotate(${w.angle})"><path d="${wormPath(w, phase * w.lambda)}" fill="none" stroke="${INK}" stroke-width="62" stroke-linecap="round"/></g>`,
+  ).join('');
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="${tone}"/>${worms}</svg>`;
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }
@@ -138,7 +155,7 @@ export function cardTree(card: NotificationCard, logoSrc: string, background?: s
       ...facts.map((r) =>
         el('div', { alignItems: 'baseline', padding: '12px 28px', marginRight: 16, marginTop: 16, borderRadius: 22, backgroundColor: COLORS.panel }, [
           el('div', { fontFamily: INTER, fontWeight: 600, fontSize: 30, textTransform: 'uppercase', color: COLORS.fg3 }, clamp(r.label, 14)),
-          el('div', { marginLeft: 16, fontFamily: INTER, fontWeight: 600, fontSize: 46, color: COLORS.fg }, clamp(r.value, 22)),
+          el('div', { marginLeft: 16, fontFamily: INTER, fontWeight: 600, fontSize: 46, color: COLORS.fg }, factValue(r.value)),
         ]),
       ),
     ]),
@@ -162,7 +179,7 @@ export async function renderCardPng(card: NotificationCard): Promise<Uint8Array>
  * Анимированная карточка (GIF, 15.11.2026). Текст рисуется один раз (satori), для кадров подменяется только фон.
  * Качество (владелец: «стало хуже»): полный размер 1280×720, палитра 255 цветов по первому кадру; в следующих
  * кадрах неизменившиеся точки прозрачные (остаётся предыдущий кадр) — меняются только червяки,
- * поэтому файл небольшой. 36 кадров по 60 мс (≈2,2 с), червяки ездят туда-сюда, повтор бесконечный.
+ * поэтому файл небольшой. 36 кадров по 60 мс (≈2,2 с), червяки прокручиваются вперёд, повтор бесконечный.
  */
 export const GIF_W = W;
 export const GIF_FRAMES = 36;
@@ -200,4 +217,39 @@ export async function renderCardGif(card: NotificationCard): Promise<Uint8Array>
   }
   gif.finish();
   return gif.bytes();
+}
+
+/**
+ * Анимация в MP4 (H.264), 15.11.2026 (владелец: «анимация выглядит размытой»). GIF Telegram сам пережимает в
+ * видео с низким качеством; готовый MP4 высокого качества он показывает как есть. 1280×720, 24 кадра/с,
+ * 48 кадров = 2 с, цикл бесшовный (червяки сдвигаются ровно на длину волны), Telegram повторяет его сам.
+ * h264-mp4-encoder — кодировщик на WebAssembly, без внешних программ.
+ */
+export const MP4_FPS = 24;
+export const MP4_FRAMES = 48;
+
+export async function renderCardMp4(card: NotificationCard): Promise<Uint8Array> {
+  const { fonts: fl, logo: l } = assets();
+  const [{ default: satori }, { Resvg }, hme] = await Promise.all([import('satori'), import('@resvg/resvg-js'), import('h264-mp4-encoder')]);
+  const tone = TONE[card.tone];
+  const first = backdrop(tone, 0);
+  const svg = await satori(cardTree(card, l, first) as never, { width: W, height: H, fonts: fl });
+  if (!svg.includes(first)) throw new Error('animation: background not found in svg');
+  const encoder = await ((hme as { default?: typeof hme }).default ?? hme).createH264MP4Encoder();
+  try {
+    encoder.width = W;
+    encoder.height = H;
+    encoder.frameRate = MP4_FPS;
+    encoder.quantizationParameter = 16; // 10 — лучшее, 51 — худшее; 16 — текст чёткий, файл небольшой
+    encoder.initialize();
+    for (let i = 0; i < MP4_FRAMES; i++) {
+      const frame = i === 0 ? svg : svg.replace(first, backdrop(tone, i / MP4_FRAMES));
+      const image = new Resvg(frame, { fitTo: { mode: 'width', value: W } }).render();
+      encoder.addFrameRgba(new Uint8Array(image.pixels.buffer, image.pixels.byteOffset, image.pixels.length));
+    }
+    encoder.finalize();
+    return encoder.FS.readFile(encoder.outputFilename);
+  } finally {
+    encoder.delete();
+  }
 }

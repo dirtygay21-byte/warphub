@@ -34,7 +34,7 @@ export const testNotificationTemplate = (kind: string, text: string | null) =>
   apiRequest<{ ok: boolean; error?: string }>(`/admin/notifications/templates/${kind}/test`, { method: "POST", body: JSON.stringify({ text }) });
 /** Картинка уведомления с примерами переменных (14.11.2026). */
 export const previewNotificationImage = (kind: string, text: string | null) =>
-  apiRequest<{ image: string; caption: string; animated?: boolean }>(`/admin/notifications/templates/${kind}/preview`, { method: "POST", body: JSON.stringify({ text }) });
+  apiRequest<{ image: string; caption: string; animated?: boolean; format?: "png" | "gif" | "mp4" }>(`/admin/notifications/templates/${kind}/preview`, { method: "POST", body: JSON.stringify({ text }) });
 export const saveNotificationConfig = (input: NotificationConfig) =>
   apiRequest<NotificationConfig>("/admin/notifications/config", { method: "PUT", body: JSON.stringify(input) });
 

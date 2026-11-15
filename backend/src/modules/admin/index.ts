@@ -1306,8 +1306,8 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       const text = renderTemplate(body.text?.trim() ? body.text : kind.defaultText, kind.vars) || '—';
       const card = await notificationImage(kind.id, text, (await getNotificationConfig()).animated);
       if (!card) return status(500, { error: 'Не удалось нарисовать картинку' });
-      const type = card.animated ? 'image/gif' : 'image/png';
-      return { image: `data:${type};base64,${Buffer.from(card.data).toString('base64')}`, caption: card.caption, animated: card.animated };
+      const type = card.format === 'mp4' ? 'video/mp4' : card.format === 'gif' ? 'image/gif' : 'image/png';
+      return { image: `data:${type};base64,${Buffer.from(card.data).toString('base64')}`, caption: card.caption, animated: card.animated, format: card.format };
     },
     {
       body: t.Object({ text: t.Optional(t.Nullable(t.String({ maxLength: 4000 }))) }),
