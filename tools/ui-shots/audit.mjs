@@ -95,6 +95,22 @@ for (const width of [390, 360]) {
       await page.screenshot({ path: path.join(OUT, file), fullPage: true, type: 'jpeg', quality: 60 });
       log.push(`${width} ${name} (${route} → ${r.path}): высота ${r.h}${r.over > 1 ? `; ШИРЕ ЭКРАНА на ${r.over}px` : ''}${r.clipped.length ? `; за краем: ${r.clipped.join(' | ')}` : ''}${r.small.length ? `; мелкие цели: ${r.small.join(' | ')}` : ''}${errs.length ? `; ошибки консоли: ${[...new Set(errs)].filter((e) => !e.startsWith('Failed to load resource')).slice(0, 6).join(' | ')}` : ''}`);
       console.log('📸', file);
+      // итог записи (лаймовый дизайн, 15.11.2026): демо-сборка открывает шаги записи через window.__warphubStages
+      if (name === 'home') {
+        const ok = await page.evaluate(() => {
+          const st = window.__warphubStages;
+          if (!st) return false;
+          for (let i = 0; i < 4; i++) st.getState().nextStage();
+          return true;
+        });
+        if (ok) {
+          await page.waitForTimeout(900);
+          const f3 = `${String(++n).padStart(2, '0')}-${width}-booking-done.jpg`;
+          await page.screenshot({ path: path.join(OUT, f3), fullPage: true, type: 'jpeg', quality: 60 });
+          console.log('📸', f3);
+          await page.evaluate(() => window.__warphubStages.getState().resetStages());
+        } else log.push(`${width} booking-done: нет window.__warphubStages`);
+      }
       // админка: окно игры за столом (14.11.2026)
       if (name === 'admin') {
         const game = page.getByRole('button', { name: /Игра за столом/ }).first();
