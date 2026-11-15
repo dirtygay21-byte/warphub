@@ -28,7 +28,7 @@ export function GameTopBar({
   // «Назад» Telegram — туда же, куда стрелка в шапке (U1)
   useTelegramBack(() => navigate(back));
   return (
-    <div className="sticky top-0 z-20 flex h-[60px] items-center gap-3 bg-app-bg/95 px-4 backdrop-blur">
+    <div className="sticky top-0 z-20 flex h-[60px] items-center gap-3 bg-app/95 px-4 backdrop-blur">
       <button
         type="button"
         onClick={() => {
@@ -55,7 +55,7 @@ export function GameTopBar({
  */
 export function StickyActions({ children }: { children: ReactNode }) {
   return (
-    <div className="sticky top-[60px] z-10 -mx-4 mb-3 border-b border-white/10 bg-app-bg/95 px-4 py-2.5 backdrop-blur">
+    <div className="sticky top-[60px] z-10 -mx-4 mb-3 border-b border-white/10 bg-app/95 px-4 py-2.5 backdrop-blur">
       {children}
     </div>
   );

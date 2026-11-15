@@ -25,7 +25,7 @@ export function ReservationsPagination({
 
   // одна строка и на телефоне (C2): раньше полоса в две строки закрывала последние записи
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/[0.08] bg-app-bg/95 px-4 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:px-6">
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/[0.08] bg-app/95 px-4 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:px-6">
       <div className="mx-auto flex max-w-screen-xl items-center justify-between gap-2">
         <label className="flex items-center gap-2 text-sm text-fg-2">
           <span className="hidden sm:inline">На странице</span>

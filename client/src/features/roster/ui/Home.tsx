@@ -5,7 +5,7 @@ import type { WarcryRoster } from '../warcry/roster';
 import { haptic } from '../telegram';
 import { Icon, IconButton } from './kit';
 import { cx, fmtPts, plural } from './util';
-import { LimeHero, Worm } from '@/components/ui/ds/Lime';
+import { LimeHero, WormField } from '@/components/ui/ds/Lime';
 import { BATTLE_SIZES } from '../engine/rules';
 import { WARCRY_LIMITS } from '../warcry/roster';
 
@@ -72,9 +72,7 @@ export function Home({
           className="ds-press relative mb-3 flex min-h-16 w-full items-center gap-3 overflow-hidden rounded-2xl bg-accent px-3.5 py-3 text-left text-[#111110]"
         >
           {/* лаймовый концепт (15.11.2026): «Продолжить» — главный блок экрана, лаймовый с червяком */}
-          <svg aria-hidden="true" width="110" height="80" viewBox="0 0 110 80" className="pointer-events-none absolute right-0 top-0">
-            <Worm x={104} y={0} angle={46} period={120} amp={10} width={10} seconds={9} />
-          </svg>
+          <WormField />
           <span className="relative flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-[#111110] text-accent">
             <Icon name="play" className="size-5" />
           </span>

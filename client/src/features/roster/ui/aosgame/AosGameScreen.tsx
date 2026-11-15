@@ -76,7 +76,7 @@ function StartCard({ game, onStart, onStartOnline }: { game: AosGameHook; onStar
       <div className="relative overflow-hidden rounded-[20px] bg-accent p-4 text-[#111110]">
         <HeroWorm />
         <p className="relative font-display text-xl font-semibold uppercase">Новая игра</p>
-        <p className="relative mt-1 pr-6 text-sm leading-snug text-[#111110]/80">
+        <p className="relative mt-1 pr-16 text-sm leading-snug text-[#111110]/80">
           Подготовка по General’s Handbook 2026-27: игроки и ростеры, батлплан, атакующий и защитник, территория, карты боевых тактик. Затем — трекер раундов: priority,
           CP, кубы ярости, батлплан и тактики в конце хода. Игра сохраняется на этом телефоне после каждого действия.
         </p>

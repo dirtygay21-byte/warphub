@@ -22,7 +22,7 @@ function useBack(fallback: string) {
 function TopBar({ onBack, kicker, title, right }: { onBack: () => void; kicker?: string; title: string; right?: ReactNode }) {
   useTelegramBack(onBack);
   return (
-    <div className="sticky top-0 z-20 flex h-[64px] items-center gap-3 bg-app-bg/95 px-4 backdrop-blur">
+    <div className="sticky top-0 z-20 flex h-[64px] items-center gap-3 bg-app/95 px-4 backdrop-blur">
       <button
         type="button"
         onClick={() => (haptic.tap(), onBack())}
@@ -269,7 +269,7 @@ export function TutorialViewer() {
         )}
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-white/[0.08] bg-app-bg/95 px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-white/[0.08] bg-app/95 px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
         <div className="mx-auto flex max-w-xl gap-2.5">
           <DsButton size="lg" className="flex-1" disabled={step === 0} onClick={() => go(step - 1)}>
             Назад
@@ -530,7 +530,7 @@ export function TutorialRound() {
           </>
         )}
       </div>
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-white/[0.08] bg-app-bg/95 px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-white/[0.08] bg-app/95 px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
         <div className="mx-auto flex max-w-xl gap-2.5">
           <DsButton size="lg" className="flex-1" disabled={page === 0} onClick={() => go(page - 1)}>
             Назад

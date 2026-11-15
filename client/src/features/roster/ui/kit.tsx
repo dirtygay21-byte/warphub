@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { haptic, pushOverlay } from '../telegram';
 import { cx } from './util';
-import { Worm } from '@/components/ui/ds/Lime';
+import { WormField } from '@/components/ui/ds/Lime';
 
 
 const paths: Record<string, string> = {
@@ -247,9 +247,5 @@ export function PointsBar({ used, limit, unit = 'очк.' }: { used: number; lim
 
 /** Червяк в углу цветного блока WarpBuilder (блок — relative overflow-hidden, цвет «Варп»). */
 export function HeroWorm() {
-  return (
-    <svg aria-hidden="true" width="130" height="110" viewBox="0 0 130 110" className="pointer-events-none absolute right-0 top-0">
-      <Worm x={92} y={26} angle={32} period={130} amp={11} width={10} seconds={9} />
-    </svg>
-  );
+  return <WormField />;
 }

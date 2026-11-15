@@ -377,7 +377,7 @@ export default function TableSelectionStage() {
 
   return (
     <div className="ds-enter h-full w-full space-y-6 px-5 py-3 text-fg">
-      <div className="sticky top-[60px] z-40 -mx-5 bg-app-bg/95 px-5 pb-3 pt-2 backdrop-blur">
+      <div className="sticky top-[60px] z-40 -mx-5 bg-app/95 px-5 pb-3 pt-2 backdrop-blur">
         <DateSelector
           selectedDate={selectedDate}
           scheduleWeekdays={allowedWeekdays}
