@@ -180,7 +180,7 @@ const toLocal = (iso: string) => {
 };
 
 const adminDay = (date: string) => ({
-  date, tables: [{ id: 1, name: "Стол 1" }, { id: 2, name: "Стол 2" }], paintingCapacity: 5,
+  date, tables: [{ id: 1, name: "Стол 1" }, { id: 2, name: "Стол 2" }], paintingCapacity: 5, holds: [],
   sessions: availability(2, date).sessions.map((s) => ({
     serviceId: 2, serviceSlug: "wh_game", serviceTitle: "Игра", hasTrainer: false, ...s,
     players: s.players.map((p, i) => ({ reservationId: `${s.tableId}-${i}`, status: i ? "pending" : "confirmed", partySize: 1, seatClubArmyOptions: [false], details: { kind: "wh_player", army: p.army, points: p.points, experienceLevel: p.experienceLevel }, user: u(p.firstName, p.firstName.toLowerCase(), 1000 + i) })),
@@ -194,6 +194,20 @@ const trials: Trial[] = [
 ];
 
 type Result = { status?: number; body: unknown };
+
+// этап 2 (15.11.2026): доска «Ищут соперника», лист ожидания, календарь армий клуба
+const openGames = () =>
+  Array.from({ length: 7 }, (_, i) => dayKey(i)).flatMap((date) =>
+    availability(2, date)
+      .sessions.filter((s) => (s.occupied ?? 0) >= 1 && (s.freeSeats ?? 0) >= 1)
+      .map((s) => ({ ...s, serviceId: 2, serviceTitle: "Игра", disciplineId: 2, date, hasTrainer: false })),
+  );
+const waitlist: { serviceId: number; date: string }[] = [];
+const clubArmies = () => [
+  { reservationId: "ca1", startsAt: at(FRI, 18), endsAt: at(FRI, 22), status: "confirmed", service: "Игра Warhammer", tableName: "Стол 1", player: { firstName: "Иван", lastName: null, username: "ivan" }, label: "Армия клуба", game: "40k", army: "Necrons", points: 1000, seats: 1 },
+  { reservationId: "ca2", startsAt: at(FRI, 19), endsAt: at(FRI, 23), status: "pending", service: "Игра Warhammer", tableName: "Стол 2", player: { firstName: "Катя", lastName: null, username: "katya" }, label: "Армия клуба", game: "40k", army: "Orks", points: 1000, seats: 1 },
+  { reservationId: "ca3", startsAt: at(SAT, 15), endsAt: at(SAT, 18), status: "confirmed", service: "Игра Warhammer", tableName: "Стол 3", player: { firstName: "Паша", lastName: null, username: "pasha" }, label: "Команда клуба", game: "kt", army: "Kommandos", points: null, seats: 2 },
+];
 
 function handle(method: string, url: URL, bodyText: string | null): Result {
   const path = url.pathname.replace(/^.*\/api/, "");
@@ -216,6 +230,9 @@ function handle(method: string, url: URL, bodyText: string | null): Result {
     if (path === "/reservations/my") return { body: { event: null, reservations: myReservations } };
     if (path === "/me") return { body: user };
     if (path === "/news") return { body: [] };
+    if (path === "/open-games") return { body: openGames() };
+    if (path === "/waitlist/my") return { body: waitlist };
+    if (path === "/admin/club-armies") return { body: clubArmies() };
     if (path === "/admin/warhammer/day") return { body: adminDay(q.get("date")!) };
     if (path === "/admin/dnd/games") return { body: dndGames.map((g) => ({ ...gameView(g), bookingsCount: g.occupied ? 2 : 0, trialRequestsCount: 0, createdAt: "", updatedAt: "" })) };
     if ((m = path.match(/^\/admin\/dnd\/games\/(\d+)\/bookings$/))) return { body: [
@@ -228,6 +245,15 @@ function handle(method: string, url: URL, bodyText: string | null): Result {
     if (path === "/admin/events" || path === "/admin/news" || path === "/events") return { body: [] };
   }
 
+  if (method === "POST" && path === "/waitlist") {
+    if (!waitlist.some((w) => w.serviceId === body.serviceId && w.date === body.date)) waitlist.push({ serviceId: body.serviceId, date: body.date });
+    return { body: { serviceId: body.serviceId, date: body.date, waiting: true } };
+  }
+  if (method === "DELETE" && path === "/waitlist") {
+    const i = waitlist.findIndex((w) => w.serviceId === Number(q.get("serviceId")) && w.date === q.get("date"));
+    if (i >= 0) waitlist.splice(i, 1);
+    return { body: { serviceId: Number(q.get("serviceId")), date: q.get("date"), waiting: false } };
+  }
   if (method === "POST" && path === "/reservations") {
     const service = services.find((s) => s.id === body.serviceId)!;
     const start = new Date(body.startsAt);

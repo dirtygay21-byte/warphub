@@ -287,3 +287,26 @@ export const updateBookingDetails = (
     method: "PATCH",
     body: JSON.stringify({ details }),
   });
+
+// -------------------------- Доска «Ищут соперника» (этап 2, 15.11.2026) --------------------------
+
+export type OpenGame = TableSession & {
+  serviceId: number;
+  serviceTitle: string | null;
+  disciplineId: number;
+  /** день клуба, YYYY-MM-DD */
+  date: string;
+  hasTrainer: boolean;
+};
+
+export const getOpenGames = () => apiRequest<OpenGame[]>("/open-games");
+
+// -------------------------- Лист ожидания (этап 2, 15.11.2026) --------------------------
+
+export type WaitlistEntry = { serviceId: number; date: string };
+
+export const getMyWaitlist = () => apiRequest<WaitlistEntry[]>("/waitlist/my");
+export const joinWaitlist = (serviceId: number, date: string) =>
+  apiRequest<WaitlistEntry & { waiting: boolean }>("/waitlist", { method: "POST", body: JSON.stringify({ serviceId, date }) });
+export const leaveWaitlist = (serviceId: number, date: string) =>
+  apiRequest<WaitlistEntry & { waiting: boolean }>(`/waitlist?serviceId=${serviceId}&date=${encodeURIComponent(date)}`, { method: "DELETE" });

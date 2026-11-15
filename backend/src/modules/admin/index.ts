@@ -11,6 +11,7 @@ import {
 import { handleMinigame } from '../minigames/http';
 import { adminAdjustPoints, adminFindPlayers, getPointsHistory } from '../minigames/cards';
 import { adminMiddleware } from '../../plugins/admin-middleware';
+import { getClubArmyCalendar } from '../booking/club-armies';
 import {
   BookingError,
   confirmReservation,
@@ -517,6 +518,9 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       },
     },
   )
+  .get('/club-armies', async () => getClubArmyCalendar(), {
+    detail: { tags: ['Admin'], summary: 'Календарь армий клуба на 14 дней (кто и когда берёт армию / команду / варбанду клуба)' },
+  })
   .get(
     '/warhammer/day',
     async ({ query }) => {

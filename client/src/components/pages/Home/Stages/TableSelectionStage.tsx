@@ -18,6 +18,7 @@ import {
   SectionTitle,
 } from "./TableSelection/SessionCards";
 import TableStateMessage from "./TableSelection/TableStateMessage";
+import WaitlistToggle from "./TableSelection/WaitlistToggle";
 import { getDateKey, getToday, isDateInSchedule } from "./TableSelection/utils";
 import { getWindowLimit, maxFreeSeats } from "@/utils/slots";
 import { DsButton, Skeleton } from "@/components/ui/ds";
@@ -419,6 +420,10 @@ export default function TableSelectionStage() {
             </div>
           ))}
           {renderContent()}
+          {/* лист ожидания (этап 2): есть полностью занятые столы или свободного времени нет */}
+          {serviceId !== null && service?.mode === "table" && availability?.dateAllowed && (freeSlots.length === 0 || fullSessions.length > 0) && (
+            <WaitlistToggle serviceId={serviceId} date={selectedDateKey} full={freeSlots.length === 0} />
+          )}
         </>
       )}
 

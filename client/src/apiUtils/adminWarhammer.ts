@@ -60,3 +60,21 @@ export const moveAdminReservation = (reservationId: string, tableId: number) =>
     method: "PATCH",
     body: JSON.stringify({ tableId }),
   });
+
+/** Календарь армий клуба на 14 дней (этап 2, 15.11.2026). */
+export type ClubArmyBooking = {
+  reservationId: string;
+  startsAt: string;
+  endsAt: string | null;
+  status: string;
+  service: string;
+  tableName: string | null;
+  player: { firstName: string; lastName: string | null; username: string | null };
+  label: string;
+  game: string | null;
+  army: string | null;
+  points: number | null;
+  seats: number;
+};
+
+export const getClubArmyCalendar = () => apiRequest<ClubArmyBooking[]>("/admin/club-armies");

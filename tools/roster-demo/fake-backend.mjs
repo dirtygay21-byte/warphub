@@ -975,6 +975,54 @@ export function createFakeBackend({ users }) {
     }],
 
     // --- пользователь ---
+    // этап 2 (15.11.2026): доска «Ищут соперника», лист ожидания (как backend/src/modules/booking/{service,waitlist}.ts)
+    ['GET', /^\/open-games$/, 'user', () => {
+      const out = [];
+      const day = (i) => new Date(Date.now() + 5 * 3600e3 + i * 86400e3).toISOString().slice(0, 10);
+      for (let i = 0; i < 7; i++) {
+        const date = day(i);
+        for (const s of S.services.filter((x) => x.isActive)) {
+          const a = availability(s.id, date);
+          if (!a || !a.dateAllowed || a.service.mode !== 'table') continue;
+          for (const session of a.sessions) {
+            if (session.occupied < 1 || session.freeSeats < 1 || Date.parse(session.startsAt) <= Date.now()) continue;
+            out.push({ ...session, serviceId: s.id, serviceTitle: s.title, disciplineId: s.disciplineId, date, hasTrainer: a.service.hasTrainer });
+          }
+        }
+      }
+      return out.sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));
+    }],
+    ['GET', /^\/waitlist\/my$/, 'user', ({ user }) => (S.waitlist ??= []).filter((w) => w.userId === user.id).map(({ serviceId, date }) => ({ serviceId, date }))],
+    ['POST', /^\/waitlist$/, 'user', ({ user, body }) => {
+      if (typeof body.serviceId !== 'number' || !/^\d{4}-\d{2}-\d{2}$/.test(body.date ?? '')) invalid('Expected serviceId and date');
+      S.waitlist ??= [];
+      if (!S.waitlist.some((w) => w.userId === user.id && w.serviceId === body.serviceId && w.date === body.date)) S.waitlist.push({ userId: user.id, serviceId: body.serviceId, date: body.date });
+      return { serviceId: body.serviceId, date: body.date, waiting: true };
+    }],
+    ['DELETE', /^\/waitlist$/, 'user', ({ user, q }) => {
+      S.waitlist = (S.waitlist ?? []).filter((w) => !(w.userId === user.id && w.serviceId === Number(q.serviceId) && w.date === q.date));
+      return { serviceId: Number(q.serviceId), date: q.date, waiting: false };
+    }],
+    ['GET', /^\/admin\/club-armies$/, 'admin', () => {
+      const now = new Date();
+      const until = new Date(now.getTime() + 14 * 86400e3);
+      const LABEL = { kt: 'Команда клуба', warcry: 'Варбанда клуба' };
+      return S.reservations
+        .filter((r) => isActiveRes(r) && r.startsAt && r.endsAt > now && r.startsAt < until && (r.seatClubArmyOptions ?? []).some(Boolean))
+        .sort((a, b) => a.startsAt - b.startsAt)
+        .map((r) => {
+          const s = service(r.serviceId);
+          const d = r.details?.kind === 'wh_player' ? r.details : null;
+          const u = userInfo(r.userId);
+          return {
+            reservationId: r.id, startsAt: r.startsAt.toISOString(), endsAt: r.endsAt?.toISOString() ?? null, status: r.status,
+            service: s?.title ?? s?.slug ?? '', tableName: activeTables().find((t) => t.id === r.tableId)?.name ?? null,
+            player: { firstName: u?.firstName ?? '', lastName: u?.lastName ?? null, username: u?.username ?? null },
+            label: LABEL[d?.game] ?? 'Армия клуба', game: d?.game ?? null, army: d?.army ?? null, points: d?.clubArmyPoints ?? null,
+            seats: (r.seatClubArmyOptions ?? []).filter(Boolean).length,
+          };
+        });
+    }],
     ['GET', /^\/reservations\/my$/, 'user', ({ user }) => {
       const e = nearestEvent();
       const reg = e && S.registrations.find((r) => r.eventId === e.id && r.userId === user.id);
@@ -1189,7 +1237,7 @@ export function createFakeBackend({ users }) {
         }
       }
       sessions.sort((a, b) => a.startsAt.localeCompare(b.startsAt) || a.tableId - b.tableId);
-      return { date: q.date, tables, sessions, painting, paintingCapacity };
+      return { date: q.date, tables, sessions, painting, paintingCapacity, holds: [] };
     }],
     ['GET', /^\/admin\/users$/, 'admin', ({ q }) => {
       const name = String(q.username ?? '').trim().replace(/^@/, '').toLowerCase();
