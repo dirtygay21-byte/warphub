@@ -298,11 +298,12 @@ export default function EggGame() {
                 style={{ background: `radial-gradient(circle at 50% 55%, ${RARITY_COLORS[creature.rarity] ?? "#ffffff"}33, #0b0709 70%)` }}
               >
                 {visual?.kind === "image" ? (
+                  // 16.11.2026: картинка уже обрезана и с запечённым контуром (tools/design/incubator/result-art.py);
+                  // CSS drop-shadow в Android WebView рисовал чёрный прямоугольник с рамкой и полосой
                   <img
-                    src={visual.src}
+                    src={visual.src.replace("/games/incubator/", "/games/incubator/result/")}
                     alt={creature.name}
                     className="size-44 object-contain [image-rendering:pixelated]"
-                    style={{ filter: "drop-shadow(3px 0 0 #f4ecd8) drop-shadow(-3px 0 0 #f4ecd8) drop-shadow(0 3px 0 #f4ecd8) drop-shadow(0 -3px 0 #f4ecd8) drop-shadow(0 6px 10px rgba(0,0,0,0.7))" }}
                   />
                 ) : (
                   <PixelSprite sprite={visual!.sprite} scale={4} title={creature.name} />
