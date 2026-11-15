@@ -79,7 +79,7 @@ describe('анимированная карточка (GIF, 15.11.2026)', () => 
       expect(new TextDecoder().decode(gif.slice(0, 6))).toBe('GIF89a');
       const view = new DataView(gif.buffer, gif.byteOffset);
       expect([view.getUint16(6, true), view.getUint16(8, true)]).toEqual([GIF_W, GIF_W * 9 / 16]);
-      expect(gif.length).toBeLessThan(2_000_000);
+      expect(gif.length).toBeLessThan(5_000_000);
       console.log(`gif ${id}: ${gif.length} bytes`);
       if (out) writeFileSync(`${out}/anim-${id}.gif`, gif);
     }, 60_000);

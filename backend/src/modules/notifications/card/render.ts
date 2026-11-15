@@ -18,7 +18,7 @@ export const CARD_H = 720;
 const W = CARD_W;
 const H = CARD_H;
 const PAD = 60;
-const TEXT_W = W - PAD * 2 - 280; // справа — узор
+const TEXT_W = W - PAD * 2 - 340; // справа — узор
 const OSWALD = "'Oswald', 'Oswald Cyr', 'Inter Tight', 'Inter Tight Cyr'";
 const INTER = "'Inter Tight', 'Inter Tight Cyr'";
 const INK = '#111110';
@@ -85,18 +85,32 @@ function titleSize(title: string) {
 }
 
 /**
- * Фон с «червяками». phase 0…1 — кадр анимации (15.11.2026): изгибы червяков плавно покачиваются по кругу,
- * у каждого со своим сдвигом; концы за краем картинки, поэтому движение выглядит как ползание.
+ * Фон: три толстые чёрные волнистые линии справа (стиль мерча). 15.11.2026 (владелец): в анимации линии
+ * текут вдоль себя — уходят за край картинки и появляются с другой стороны, бесконечно. Линия — синусоида,
+ * за цикл она сдвигается ровно на длину волны, поэтому последний кадр переходит в первый без скачка.
+ * phase 0…1 — кадр; статичная картинка — phase 0.
  */
+const FLOW = { angle: 74, lambda: 320, amp: 34, gap: 118, cx: W - 120, cy: H / 2, half: 900, stroke: 56 };
+
+function strand(offset: number, shift: number) {
+  const { lambda, amp, half } = FLOW;
+  const step = lambda / 2;
+  let x = -half - lambda * 2 + shift;
+  let d = `M${x.toFixed(1)} ${offset}`;
+  for (let i = 0; x < half + lambda; i++, x += step) {
+    const dy = (i % 2 ? 1 : -1) * amp * 1.33;
+    d += ` C${(x + step * 0.35).toFixed(1)} ${(offset + dy).toFixed(1)} ${(x + step * 0.65).toFixed(1)} ${(offset + dy).toFixed(1)} ${(x + step).toFixed(1)} ${offset}`;
+  }
+  return `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${FLOW.stroke}" stroke-linecap="round"/>`;
+}
+
 function backdrop(tone: string, phase = 0) {
-  const worm = (d: string) => `<path d="${d}" fill="none" stroke="${INK}" stroke-width="62" stroke-linecap="round"/>`;
-  const a = (k: number, amp: number) => (amp * Math.sin(2 * Math.PI * (phase + k))).toFixed(1);
-  const b = (k: number, amp: number) => (amp * Math.cos(2 * Math.PI * (phase + k))).toFixed(1);
+  const shift = phase * FLOW.lambda;
+  // у линий разный сдвиг по фазе, чтобы гребни не шли «строем»
+  const lines = [-FLOW.gap, 0, FLOW.gap].map((off, k) => strand(off, (shift + (k * FLOW.lambda) / 3) % FLOW.lambda)).join('');
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
 <rect width="${W}" height="${H}" fill="${tone}"/>
-<g transform="translate(${a(0, 6)} ${b(0, 4)})">${worm(`M${W - 420} -60 C${W - 380} ${110} ${W - 230 + +a(0.1, 26)} ${60 + +b(0.1, 22)} ${W - 190 + +a(0.25, 18)} ${200 + +b(0.25, 14)} S${W - 80 + +a(0.4, 24)} ${360 + +b(0.4, 20)} ${W + 60} 320`)}</g>
-<g transform="translate(${a(0.33, 6)} ${b(0.33, 4)})">${worm(`M${W - 250} -60 C${W - 220} 50 ${W - 110 + +a(0.45, 22)} ${20 + +b(0.45, 18)} ${W - 70 + +a(0.6, 16)} ${120 + +b(0.6, 14)} S${W + 10} 200 ${W + 70} 170`)}</g>
-<g transform="translate(${a(0.66, 6)} ${b(0.66, 4)})">${worm(`M${W + 60} ${H - 250} C${W - 100 + +a(0.7, 24)} ${H - 290 + +b(0.7, 20)} ${W - 130 + +a(0.85, 22)} ${H - 120 + +b(0.85, 18)} ${W - 270 + +a(0.95, 18)} ${H - 110 + +b(0.95, 14)} S${W - 400} ${H + 10} ${W - 430} ${H + 60}`)}</g>
+<g transform="translate(${FLOW.cx} ${FLOW.cy}) rotate(${FLOW.angle})">${lines}</g>
 </svg>`;
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }
@@ -140,13 +154,14 @@ export async function renderCardPng(card: NotificationCard): Promise<Uint8Array>
 }
 
 /**
- * Анимированная карточка (GIF, 15.11.2026): текст рисуется один раз (satori), меняется только фон-узор —
- * его картинка подменяется в готовом SVG для каждого кадра. 640×360 (в чате показывается ещё меньше),
- * 20 кадров по 80 мс, бесконечный повтор; палитра по первому кадру (цвета во всех кадрах одни и те же).
+ * Анимированная карточка (GIF, 15.11.2026). Текст рисуется один раз (satori), для кадров подменяется только фон.
+ * Качество (владелец: «стало хуже»): полный размер 1280×720, палитра 255 цветов по первому кадру; в следующих
+ * кадрах неизменившиеся точки прозрачные (остаётся предыдущий кадр) — меняется только полоса с линиями,
+ * поэтому файл небольшой. 30 кадров по 50 мс, линии проходят одну длину волны за цикл, повтор бесконечный.
  */
-export const GIF_W = 640;
-export const GIF_FRAMES = 20;
-const GIF_DELAY = 80;
+export const GIF_W = W;
+export const GIF_FRAMES = 30;
+const GIF_DELAY = 50;
 
 export async function renderCardGif(card: NotificationCard): Promise<Uint8Array> {
   const { fonts: fl, logo: l } = assets();
@@ -157,12 +172,26 @@ export async function renderCardGif(card: NotificationCard): Promise<Uint8Array>
   if (!svg.includes(first)) throw new Error('animation: background not found in svg');
   const gif = gifenc.GIFEncoder();
   let palette: number[][] | null = null;
+  let transparentIndex = 0;
+  let previous: Uint8Array | null = null;
   for (let i = 0; i < GIF_FRAMES; i++) {
     const frame = i === 0 ? svg : svg.replace(first, backdrop(tone, i / GIF_FRAMES));
     const image = new Resvg(frame, { fitTo: { mode: 'width', value: GIF_W } }).render();
     const rgba = new Uint8Array(image.pixels.buffer, image.pixels.byteOffset, image.pixels.length);
-    palette ??= gifenc.quantize(rgba, 64);
-    gif.writeFrame(gifenc.applyPalette(rgba, palette), image.width, image.height, { palette: i === 0 ? palette : undefined, delay: GIF_DELAY });
+    if (!palette) {
+      palette = gifenc.quantize(rgba, 255);
+      transparentIndex = palette.length;
+      palette.push([255, 0, 255]); // служебный «прозрачный» цвет, в картинке не встречается
+    }
+    const index = gifenc.applyPalette(rgba, palette.slice(0, transparentIndex));
+    if (!previous) {
+      gif.writeFrame(index, image.width, image.height, { palette, delay: GIF_DELAY, dispose: 1 });
+    } else {
+      const delta = new Uint8Array(index.length);
+      for (let p = 0; p < index.length; p++) delta[p] = index[p] === previous[p] ? transparentIndex : index[p]!;
+      gif.writeFrame(delta, image.width, image.height, { delay: GIF_DELAY, transparent: true, transparentIndex, dispose: 1 });
+    }
+    previous = index;
   }
   gif.finish();
   return gif.bytes();
