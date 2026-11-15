@@ -67,7 +67,7 @@ export default function NearestEventBanner() {
           {event.bannerUrl && <ContentImage src={event.bannerUrl} alt="" crop={event.bannerCrop} className="absolute inset-0 size-full" />}
         </span>
         <span className="min-w-0 flex-1 py-0.5">
-          <span className="line-clamp-2 block text-[15px] font-bold leading-tight text-fg">{event.title}</span>
+          <span className="line-clamp-2 text-[15px] font-bold leading-tight text-fg">{event.title}</span>
           <span className="mt-1 block text-[13px] text-fg-2">{formatEventPeriod(event.startsAt, event.endsAt)}</span>
           <span className="mt-1.5 block">
             {canRegister ? (

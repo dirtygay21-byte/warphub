@@ -87,9 +87,7 @@ export function TutorialHub() {
                         <span className="min-w-0 flex-1 text-[13.5px] font-semibold text-accent">Обучающая игра: раунд по шагам · {walk.steps.length} шагов</span>
                         <ChevronRight className="size-4 shrink-0 text-accent" />
                       </button>
-                    ) : (
-                      <p className="border-t border-white/[0.06] py-1.5 pl-[66px] pr-3.5 text-[12px] text-fg-3">Обучающая игра откроется после карточек</p>
-                    ))}
+                    ) : null)}
                 </div>
               );
             })}

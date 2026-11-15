@@ -51,7 +51,7 @@ export default function NewsCard({ title, coverUrl, coverCrop, text, publishedAt
           <span className="block p-4">
             {date && <span className="block text-[12px] font-semibold uppercase tracking-[0.08em] text-fg-3">{date}</span>}
             <span className="mt-1 block text-[18px] font-bold leading-tight text-fg">{title}</span>
-            {lead && <span className="mt-1.5 line-clamp-2 block text-[14px] leading-snug text-fg-2">{lead}</span>}
+            {lead && <span className="mt-1.5 line-clamp-2 text-[14px] leading-snug text-fg-2">{lead}</span>}
           </span>
         </>
       ) : (
@@ -59,8 +59,8 @@ export default function NewsCard({ title, coverUrl, coverCrop, text, publishedAt
           <span className="relative aspect-[4/3] w-[96px] shrink-0 overflow-hidden rounded-[12px]">{cover}</span>
           <span className="min-w-0 flex-1 py-0.5">
             {date && <span className="block text-[12px] font-semibold uppercase tracking-[0.08em] text-fg-3">{date}</span>}
-            <span className="mt-0.5 line-clamp-2 block text-[15px] font-bold leading-tight text-fg">{title}</span>
-            {lead && <span className="mt-1 line-clamp-1 block text-[13px] text-fg-2">{lead}</span>}
+            <span className="mt-0.5 line-clamp-2 text-[15px] font-bold leading-tight text-fg">{title}</span>
+            {lead && <span className="mt-1 line-clamp-1 text-[13px] text-fg-2">{lead}</span>}
           </span>
         </>
       )}

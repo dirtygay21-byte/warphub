@@ -1,6 +1,6 @@
 import type { NewsItem } from "@/types";
 import ContentImage from "@/components/ui/ContentImage";
-import { CalendarDays } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { formatNewsDate } from "../newsUtils";
 
 type NewsCardProps = {
@@ -8,39 +8,25 @@ type NewsCardProps = {
   onClick: () => void;
 };
 
+/** Новость в админке строкой (перестройка 15.11.2026): обложка миниатюрой, дата, заголовок, начало текста. */
 export default function NewsCard({ news, onClick }: NewsCardProps) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="w-full overflow-hidden rounded-2xl border border-white/10 bg-app-elevated text-left transition-colors hover:cursor-pointer hover:border-accent/40 active:bg-white/5"
+      className="ds-press flex w-full items-center gap-3 rounded-[18px] border border-white/10 bg-app-elevated p-2.5 text-left"
     >
       {news.coverUrl ? (
-        <ContentImage
-          src={news.coverUrl}
-          alt={news.title}
-          crop={news.coverCrop}
-          className="aspect-[16/7] w-full"
-        />
+        <ContentImage src={news.coverUrl} alt="" crop={news.coverCrop} className="aspect-[4/3] w-[88px] shrink-0 overflow-hidden rounded-[12px]" />
       ) : (
-        <div className="flex aspect-[16/7] w-full items-center justify-center bg-white/5 text-sm text-fg-3">
-          Без обложки
-        </div>
+        <span className="flex aspect-[4/3] w-[88px] shrink-0 items-center justify-center rounded-[12px] bg-white/5 text-center text-[11px] text-fg-3">Без обложки</span>
       )}
-
-      <div className="space-y-3 p-4">
-        <div>
-          <h3 className="text-lg font-semibold text-white">{news.title}</h3>
-          {news.text && (
-            <p className="mt-1 line-clamp-2 text-sm text-fg-2">{news.text}</p>
-          )}
-        </div>
-
-        <p className="flex items-start gap-2 text-sm text-fg-2">
-          <CalendarDays className="mt-0.5 size-4 shrink-0 text-accent" />
-          <span>{formatNewsDate(news.publishedAt)}</span>
-        </p>
-      </div>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[12px] font-semibold uppercase tracking-[0.08em] text-fg-3">{formatNewsDate(news.publishedAt)}</span>
+        <span className="mt-0.5 line-clamp-2 text-[15px] font-bold leading-tight text-fg">{news.title}</span>
+        {news.text && <span className="mt-1 line-clamp-1 text-[13px] text-fg-2">{news.text}</span>}
+      </span>
+      <ChevronRight className="size-5 shrink-0 text-fg-3" />
     </button>
   );
 }
