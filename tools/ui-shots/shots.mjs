@@ -199,6 +199,27 @@ await step('open', async () => {
   await shot('roster-home');
 });
 
+// 40K: переключатель RU/EN (16.11.2026) — список, редактор, открытая карточка юнита и «Правила» на обоих языках
+for (const lang of ['ru', 'en']) {
+  await step(`40k-lang-${lang}`, async () => {
+    await page.evaluate((l) => localStorage.setItem('warphub:roster-40k-lang', l), lang);
+    await page.goto(BASE + '/roster', { waitUntil: 'networkidle' });
+    await page.getByRole('button', { name: /Warhammer 40/ }).filter({ hasNotText: /Продолжить|Continue/ }).first().click({ timeout: 5000 });
+    await page.waitForTimeout(800);
+    await shot(`40k-${lang}-list`, true);
+    await clickText(w40.name);
+    await page.waitForTimeout(1500);
+    await shot(`40k-${lang}-editor`, true);
+    const card = page.locator('[id^="u-"] > button[aria-expanded]').nth(1);
+    await card.scrollIntoViewIfNeeded();
+    await card.click({ timeout: 5000 });
+    await page.waitForTimeout(500);
+    await page.locator('[id^="u-"] details summary').first().click({ timeout: 5000 }).catch(() => {});
+    await shot(`40k-${lang}-card`, true);
+  });
+}
+await page.evaluate(() => localStorage.setItem('warphub:roster-40k-lang', 'ru'));
+
 for (const [label, name] of [
   ['kt', kt.name],
   ['warcry', wc.name],

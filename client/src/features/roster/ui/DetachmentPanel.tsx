@@ -10,6 +10,12 @@ import { useGlossary } from './common/useGlossary';
 import { useRu } from './common/useRu';
 import { isWarphub, ruDetachmentName, ruDetachmentRule, ruEnhancement, ruName, ruStratagem, WARPHUB_LABEL, type RuText } from '../ru';
 import { cx } from './util';
+import { useEn, useT } from './common/i18n';
+
+const INCOMPLETE_EN: Record<IncompleteKind, string> = {
+  truncated: 'The text is cut off in the Wahapedia export (1024-character limit) — the end of the rule is not shown.',
+  table: 'The rule has a table or diagram that is not in the Wahapedia export.',
+};
 
 const TURN_RU: Record<string, string> = { 'Your turn': 'ваш ход', 'Opponent’s turn': 'ход противника', 'Either player’s turn': 'любой ход' };
 
@@ -44,6 +50,7 @@ export function RuleText({
   /** где прочитать полный текст */
   link?: string | null;
 }) {
+  const en = useEn();
   const subText = [cleanRuleText(sub), isWarphub(ru) ? WARPHUB_LABEL : ''].filter(Boolean).join(' · ');
   const missing = ru ? null : (incomplete ?? rawIncomplete(text));
   return (
@@ -61,12 +68,12 @@ export function RuleText({
         {ru ? <RuRuleBody text={ru.text} /> : <p className="whitespace-pre-line text-[12px] leading-relaxed text-fg-2">{cleanRuleText(text)}</p>}
         {missing && (
           <p className="mt-2 rounded-lg bg-warn/10 px-2.5 py-1.5 text-[12px] leading-snug text-amber-100">
-            {INCOMPLETE_TEXT[missing]}
+            {en ? INCOMPLETE_EN[missing] : INCOMPLETE_TEXT[missing]}
             {link && (
               <>
                 {' '}
                 <button type="button" onClick={() => openExternal(link)} className="font-semibold text-accent underline underline-offset-2">
-                  Полный текст на Wahapedia
+                  {en ? 'Full text on Wahapedia' : 'Полный текст на Wahapedia'}
                 </button>
               </>
             )}
@@ -85,24 +92,25 @@ function RuRuleBody({ text }: { text: string }) {
 }
 
 const title = (s: string) => s.toLowerCase().replace(/(^|[\s-])\S/g, (c) => c.toUpperCase());
-const matcherText = (m: UnitMatcher) =>
-  [...m.names.map(title), ...m.keywords.map((k) => k.map(title).join(' '))].join(', ') + (m.exclude.length ? ` (кроме ${m.exclude.map(title).join(', ')})` : '');
+const matcherText = (m: UnitMatcher, en = false) =>
+  [...m.names.map(title), ...m.keywords.map((k) => k.map(title).join(' '))].join(', ') + (m.exclude.length ? ` (${en ? 'except' : 'кроме'} ${m.exclude.map(title).join(', ')})` : '');
 
 /** Особые условия детачмента, которые знает конструктор: Battleline, разрешённые и запрещённые юниты, лимиты. */
-function conditions(d: Detachment): string[] {
+function conditions(d: Detachment, en = false): string[] {
+  const T = (ru: string, e: string) => (en ? e : ru);
   const out: string[] = [];
-  if (d.battleline.length) out.push(`Получают Battleline: ${d.battleline.map(title).join(', ')}`);
+  if (d.battleline.length) out.push(T(`Получают Battleline: ${d.battleline.map(title).join(', ')}`, `Gain Battleline: ${d.battleline.map(title).join(', ')}`));
   for (const g of d.grants) {
-    let s = `Можно взять: ${matcherText(g)}`;
-    if (g.caps) s += ` — до ${g.caps.join(' / ')} очк. (Incursion / Strike Force / Onslaught)`;
+    let s = T(`Можно взять: ${matcherText(g)}`, `Can include: ${matcherText(g, true)}`);
+    if (g.caps) s += T(` — до ${g.caps.join(' / ')} очк. (Incursion / Strike Force / Onslaught)`, ` — up to ${g.caps.join(' / ')} pts (Incursion / Strike Force / Onslaught)`);
     out.push(s);
-    if (g.noWarlord) out.push(`Модели ${title(g.noWarlord)} не могут быть Warlord`);
-    if (g.warlordMust) out.push(`Warlord должен быть ${title(g.warlordMust)}`);
+    if (g.noWarlord) out.push(T(`Модели ${title(g.noWarlord)} не могут быть Warlord`, `${title(g.noWarlord)} models cannot be the Warlord`));
+    if (g.warlordMust) out.push(T(`Warlord должен быть ${title(g.warlordMust)}`, `The Warlord must be ${title(g.warlordMust)}`));
   }
-  if (d.forbid) out.push(`Нельзя брать: ${matcherText(d.forbid)}`);
-  for (const r of d.requires) out.push(`Обязательно: не меньше ${r.min} — ${matcherText(r.matcher)}${r.warlord ? ' (Warlord — один из них)' : ''}`);
-  if (d.limitOverride) out.push(`До ${d.limitOverride.max} копий: ${d.limitOverride.names.map(title).join(', ')}`);
-  if (d.disablesArmyRule) out.push(`Отключает правило армии: ${d.disablesArmyRule}`);
+  if (d.forbid) out.push(T(`Нельзя брать: ${matcherText(d.forbid)}`, `Cannot include: ${matcherText(d.forbid, true)}`));
+  for (const r of d.requires) out.push(T(`Обязательно: не меньше ${r.min} — ${matcherText(r.matcher)}${r.warlord ? ' (Warlord — один из них)' : ''}`, `Required: at least ${r.min} — ${matcherText(r.matcher, true)}${r.warlord ? ' (the Warlord is one of them)' : ''}`));
+  if (d.limitOverride) out.push(T(`До ${d.limitOverride.max} копий: ${d.limitOverride.names.map(title).join(', ')}`, `Up to ${d.limitOverride.max} copies: ${d.limitOverride.names.map(title).join(', ')}`));
+  if (d.disablesArmyRule) out.push(T(`Отключает правило армии: ${d.disablesArmyRule}`, `Disables the army rule: ${d.disablesArmyRule}`));
   return out;
 }
 
@@ -141,6 +149,8 @@ export function DetachmentPanel({
   onSwitch: (id: string) => void;
   onClose: () => void;
 }) {
+  const t = useT();
+  const en = useEn();
   useEffect(() => pushOverlay(onClose), [onClose]);
   const ru = useRu(L.faction.id);
   const d = cr.detachments.find((x) => x.id === id);
@@ -148,12 +158,12 @@ export function DetachmentPanel({
   // у действующего детачмента — только записи текущего источника; у устаревшего — сохранённые прежние
   const strats = L.faction.stratagems.filter((s) => s.detachment === d.id && visibleStratagem(s, L.det));
   const enh = L.faction.enhancements.filter((e) => e.detachment === d.id && (!e.outdated || !!d.outdated));
-  const cond = conditions(d);
+  const cond = conditions(d, en);
   return (
     <section id="detachment-panel" className="sheet-enter rounded-2xl border border-accent/30 bg-app-elevated">
       <div className="flex items-start gap-2 px-4 pb-2 pt-3">
         <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent/80">Детачмент</p>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent/80">{t('Детачмент', 'Detachment')}</p>
           <h2 className="font-display mt-0.5 text-xl font-semibold uppercase leading-tight">{ruleLabel(d)}</h2>
           {ruDetachmentName(ru, d.id) && (
             <p className="text-[13px] text-fg-3">
@@ -161,9 +171,9 @@ export function DetachmentPanel({
               {ru?.detachments?.[d.id]?.nameSrc === 'warphub' && <span className="text-[12px]"> · {WARPHUB_LABEL}</span>}
             </p>
           )}
-          {d.outdated && <p className="mt-1 text-xs text-amber-200">{OUTDATED_RULE_NOTE}</p>}
+          {d.outdated && <p className="mt-1 text-xs text-amber-200">{en ? '* Not in the current source — kept for rosters already built, not available for new ones.' : OUTDATED_RULE_NOTE}</p>}
         </div>
-        <IconButton icon="close" label="Закрыть" onClick={onClose} className="size-9" />
+        <IconButton icon="close" label={t('Закрыть', 'Close')} onClick={onClose} className="size-9" />
       </div>
       {cr.detachments.length > 1 && (
         <div className="no-scrollbar flex gap-1.5 overflow-x-auto px-4 pb-2">
@@ -188,36 +198,36 @@ export function DetachmentPanel({
         {d.chapter && <Tag tone="warn">{d.chapter}</Tag>}
       </div>
       <div className="space-y-2 border-t border-white/[0.06] px-4 pb-4 pt-3">
-        <Section label="Правила детачмента" count={d.abilities.length} open>
+        <Section label={t('Правила детачмента', 'Detachment rules')} count={d.abilities.length} open>
           {d.abilities.map((a) => (
             <RuleText key={a.id} name={a.name} text={a.text} ru={ruDetachmentRule(ru, d.id, a.id)} />
           ))}
         </Section>
-        <Section label="Стратагемы" count={strats.length}>
+        <Section label={t('Стратагемы', 'Stratagems')} count={strats.length}>
           {strats.map((s) => (
             <RuleText
               key={s.id}
               name={s.name}
-              sub={[s.type.replace(/ Stratagem$/, ''), TURN_RU[s.turn] ?? s.turn, s.phase].filter(Boolean).join(' · ')}
+              sub={[s.type.replace(/ Stratagem$/, ''), (en ? s.turn : TURN_RU[s.turn] ?? s.turn), s.phase].filter(Boolean).join(' · ')}
               right={<span className="shrink-0 rounded-md bg-accent/15 px-1.5 py-0.5 text-[12px] font-semibold text-accent">{s.cp} CP</span>}
               text={s.text}
               ru={ruStratagem(ru, s.id)}
             />
           ))}
         </Section>
-        <Section label="Улучшения" count={enh.length}>
+        <Section label={t('Улучшения', 'Enhancements')} count={enh.length}>
           {enh.map((e) => (
             <RuleText
               key={e.id}
               name={e.name}
-              sub={[e.upgrade ? 'Upgrade · до 3 юнитов' : '', e.restriction].filter(Boolean).join(' · ') || undefined}
-              right={<span className="shrink-0 text-xs font-semibold tabular-nums text-fg-2">{e.cost} очк.</span>}
+              sub={[e.upgrade ? t('Upgrade · до 3 юнитов', 'Upgrade · up to 3 units') : '', e.restriction].filter(Boolean).join(' · ') || undefined}
+              right={<span className="shrink-0 text-xs font-semibold tabular-nums text-fg-2">{e.cost} {t('очк.', 'pts')}</span>}
               text={e.text}
               ru={ruEnhancement(ru, e.id)}
             />
           ))}
         </Section>
-        <Section label="Особые условия" count={cond.length}>
+        <Section label={t('Особые условия', 'Special conditions')} count={cond.length}>
           <ul className="space-y-1 text-[12.5px] leading-relaxed text-fg-2">
             {cond.map((c, i) => (
               <li key={i}>• {c}</li>

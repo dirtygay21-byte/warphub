@@ -11,8 +11,11 @@ import { Button, Empty, Field, Icon, Segmented, Sheet, Tag } from './kit';
 import { ListHeader, ToolMenus } from './common/BuilderKit';
 import { cx, fmtPts } from './util';
 import { indexCredit, indexCreditDetails } from '../engine/source';
+import { useEn, useT } from './common/i18n';
+import { LangSwitch } from './common/LangSwitch';
 
 const ALLEGIANCE_RU: Record<string, string> = { Imperium: 'Империум', Chaos: 'Хаос', Xenos: 'Ксеносы' };
+const ALLEGIANCE_EN: Record<string, string> = { Imperium: 'Imperium', Chaos: 'Chaos', Xenos: 'Xenos' };
 
 export function RosterList({
   onExit,
@@ -39,6 +42,8 @@ export function RosterList({
   onDuplicate: (r: Roster) => void;
   onDelete: (id: string) => void;
 }) {
+  const t = useT();
+  const en = useEn();
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -48,24 +53,24 @@ export function RosterList({
 
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-28 pt-5 lg:max-w-4xl lg:pt-8">
-      <ListHeader kicker="WarpBuilder · 40K 11-я редакция" title="Warhammer 40,000" onBack={onExit} onImport={() => setImporting(true)} />
+      <ListHeader kicker={t('WarpBuilder · 40K 11-я редакция', 'WarpBuilder · 40K 11th edition')} title="Warhammer 40,000" onBack={onExit} onImport={() => setImporting(true)} extra={<LangSwitch />} />
       {switcher}
 
       <ToolMenus
         rules={[
-          { icon: 'book', title: 'Правила', sub: 'Стратагемы · Core Rules', onClick: onRules },
-          { icon: 'spark', title: 'Как играть', sub: 'Обучение для новичков: ход, стрельба, бой', onClick: () => navigate('/learn/40k') },
+          { icon: 'book', title: t('Правила', 'Rules'), sub: t('Стратагемы · Core Rules', 'Stratagems · Core Rules'), onClick: onRules },
+          { icon: 'spark', title: t('Как играть', 'How to play'), sub: t('Обучение для новичков: ход, стрельба, бой', 'A beginner’s guide: turn, shooting, combat'), onClick: () => navigate('/learn/40k') },
           // обучающая игра — после карточек «Как играть» (13.11.2026)
-          ...(learnDone('40k') ? [{ icon: 'shield', title: 'Обучающая игра', sub: 'Раунд по шагам за столом', onClick: () => navigate('/learn/40k/round') }] : []),
+          ...(learnDone('40k') ? [{ icon: 'shield', title: t('Обучающая игра', 'Training game'), sub: t('Раунд по шагам за столом', 'A round step by step at the table'), onClick: () => navigate('/learn/40k/round') }] : []),
         ]}
         game={[
-          { icon: 'map', title: 'Начать игру', sub: 'Миссии · раскладки · трекер', onClick: onStartGame },
-          { icon: 'shield', title: 'Test Army', sub: 'Расставить армию на поле · построения · линейка', onClick: onTestArmy },
+          { icon: 'map', title: t('Начать игру', 'Start a game'), sub: t('Миссии · раскладки · трекер', 'Missions · layouts · tracker'), onClick: onStartGame },
+          { icon: 'shield', title: 'Test Army', sub: t('Расставить армию на поле · построения · линейка', 'Place your army on the table · formations · ruler'), onClick: onTestArmy },
         ]}
       />
 
       {rosters.length === 0 ? (
-        <Empty title="Пока пусто">Соберите первый ростер — очки, детачменты и правила проверяются на лету.</Empty>
+        <Empty title={t('Пока пусто', 'Nothing here yet')}>{t('Соберите первый ростер — очки, детачменты и правила проверяются на лету.', 'Build your first roster — points, Detachments and rules are checked as you go.')}</Empty>
       ) : (
         <ul className="ds-stagger space-y-2.5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-2.5 lg:space-y-0">
           {rosters.map((r) => (
@@ -76,15 +81,15 @@ export function RosterList({
 
       <p className="mt-8 text-center text-xs leading-relaxed text-fg-3">
         <button type="button" onClick={() => setSources(true)} className="underline decoration-white/20 underline-offset-2 active:text-fg-2">
-          {indexCredit(index)}
+          {indexCredit(index, en ? 'en' : 'ru')}
         </button>
         <br />
-        {cloudEnabled() ? 'Ростеры синхронизируются через Telegram' : 'Ростеры хранятся в этом браузере'}
+        {cloudEnabled() ? t('Ростеры синхронизируются через Telegram', 'Rosters sync through Telegram') : t('Ростеры хранятся в этом браузере', 'Rosters are stored in this browser')}
       </p>
 
-      <Sheet open={sources} onClose={() => setSources(false)} title="Версия данных">
+      <Sheet open={sources} onClose={() => setSources(false)} title={t('Версия данных', 'Data version')}>
         <ul className="space-y-3 text-sm">
-          {indexCreditDetails(index).map((x) => (
+          {indexCreditDetails(index, en ? 'en' : 'ru').map((x) => (
             <li key={x.title}>
               <p className="font-semibold">{x.title}</p>
               <p className="text-xs leading-relaxed text-fg-3">{x.text}</p>
@@ -96,7 +101,7 @@ export function RosterList({
       <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
         <div className="mx-auto max-w-lg lg:flex lg:max-w-4xl lg:justify-end lg:px-4">
           <Button variant="primary" className="h-12 w-full text-base lg:w-auto lg:px-8" onClick={() => setCreating(true)}>
-            <Icon name="plus" /> Новый ростер
+            <Icon name="plus" /> {t('Новый ростер', 'New roster')}
           </Button>
         </div>
       </div>
@@ -108,19 +113,19 @@ export function RosterList({
         {menu && (
           <div className="space-y-2 pb-2">
             <Button className="w-full justify-start" onClick={() => (onDuplicate(duplicateRoster(menu)), setMenu(null))}>
-              <Icon name="copy" /> Дублировать
+              <Icon name="copy" /> {t('Дублировать', 'Duplicate')}
             </Button>
             <Button
               variant="danger"
               className="w-full justify-start"
               onClick={async () => {
-                if (await confirmAsk(`Удалить ростер «${menu.name}»?`)) {
+                if (await confirmAsk(t(`Удалить ростер «${menu.name}»?`, `Delete roster “${menu.name}”?`))) {
                   onDelete(menu.id);
                   setMenu(null);
                 }
               }}
             >
-              <Icon name="trash" /> Удалить
+              <Icon name="trash" /> {t('Удалить', 'Delete')}
             </Button>
           </div>
         )}
@@ -130,8 +135,10 @@ export function RosterList({
 }
 
 function RosterCard({ roster, faction, onOpen, onMenu }: { roster: Roster; faction: string; onOpen: () => void; onMenu: () => void }) {
+  const t = useT();
+  const en = useEn();
   const size = BATTLE_SIZES[roster.battleSize];
-  const date = new Date(roster.updatedAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+  const date = new Date(roster.updatedAt).toLocaleDateString(en ? 'en-GB' : 'ru-RU', { day: 'numeric', month: 'short' });
   return (
     <li className="flex items-stretch overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
       <span aria-hidden="true" className="w-1 shrink-0" style={{ background: factionColor('40k', roster.factionId) }} />
@@ -143,10 +150,10 @@ function RosterCard({ roster, faction, onOpen, onMenu }: { roster: Roster; facti
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
           <Tag>{size.label}</Tag>
-          <Tag>{roster.units.length} юн.</Tag>
+          <Tag>{roster.units.length} {t('юн.', 'units')}</Tag>
           {roster.summary && (
             <Tag tone={roster.summary.errors ? 'danger' : roster.summary.warnings ? 'warn' : 'accent'}>
-              {roster.summary.errors ? `${roster.summary.errors} ош.` : roster.summary.warnings ? `${roster.summary.warnings} пред.` : 'OK'}
+              {roster.summary.errors ? `${roster.summary.errors} ${t('ош.', 'err.')}` : roster.summary.warnings ? `${roster.summary.warnings} ${t('пред.', 'warn.')}` : 'OK'}
             </Tag>
           )}
           <span className="text-xs text-fg-3">{date}</span>
@@ -157,10 +164,10 @@ function RosterCard({ roster, faction, onOpen, onMenu }: { roster: Roster; facti
           <span className={cx('font-display text-xl font-semibold leading-none tabular-nums', roster.summary.points > size.points ? 'text-danger' : 'text-white')}>
             {fmtPts(roster.summary.points)}
           </span>
-          <span className="mt-1 text-[12px] text-fg-3">из {fmtPts(size.points)}</span>
+          <span className="mt-1 text-[12px] text-fg-3">{t('из', 'of')} {fmtPts(size.points)}</span>
         </div>
       )}
-      <button type="button" aria-label="Действия" onClick={() => (haptic.tap(), onMenu())} className="flex w-12 items-center justify-center text-fg-3 active:bg-white/5">
+      <button type="button" aria-label={t('Действия', 'Actions')} onClick={() => (haptic.tap(), onMenu())} className="flex w-12 items-center justify-center text-fg-3 active:bg-white/5">
         <Icon name="more" className="size-6" strokeWidth={3} />
       </button>
     </li>
@@ -168,6 +175,8 @@ function RosterCard({ roster, faction, onOpen, onMenu }: { roster: Roster; facti
 }
 
 function CreateSheet({ open, index, onClose, onCreate }: { open: boolean; index: DataIndex; onClose: () => void; onCreate: (r: Roster) => void }) {
+  const t = useT();
+  const en = useEn();
   const [size, setSize] = useState<BattleSize>('strike');
   const [faction, setFaction] = useState<string | null>(null);
   const [name, setName] = useState('');
@@ -190,32 +199,32 @@ function CreateSheet({ open, index, onClose, onCreate }: { open: boolean; index:
     <Sheet
       open={open}
       onClose={onClose}
-      title="Новый ростер"
+      title={t('Новый ростер', 'New roster')}
       tall
       footer={
         <Button variant="primary" className="h-12 w-full text-base" disabled={!faction} onClick={create}>
-          Создать
+          {t('Создать', 'Create')}
         </Button>
       }
     >
       <div className="space-y-5">
-        <Field label="Название">
+        <Field label={t('Название', 'Name')}>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Например: Турнир в субботу"
+            placeholder={t('Например: Турнир в субботу', 'For example: Saturday tournament')}
             className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-white outline-none placeholder:text-fg-3 focus:border-accent"
           />
         </Field>
-        <Field label="Размер боя">
+        <Field label={t('Размер боя', 'Battle size')}>
           <Segmented
             value={size}
             onChange={setSize}
-            options={BATTLE_SIZE_ORDER.map((s) => ({ value: s, label: BATTLE_SIZES[s].label, hint: `${fmtPts(BATTLE_SIZES[s].points)} очк.` }))}
+            options={BATTLE_SIZE_ORDER.map((s) => ({ value: s, label: BATTLE_SIZES[s].label, hint: `${fmtPts(BATTLE_SIZES[s].points)} ${t('очк.', 'pts')}` }))}
           />
         </Field>
         {groups.map(([alg, list]) => (
-          <Field key={alg} label={ALLEGIANCE_RU[alg] ?? alg}>
+          <Field key={alg} label={(en ? ALLEGIANCE_EN : ALLEGIANCE_RU)[alg] ?? alg}>
             <div className="grid grid-cols-2 gap-1.5">
               {list.map((f) => (
                 <button
@@ -229,7 +238,7 @@ function CreateSheet({ open, index, onClose, onCreate }: { open: boolean; index:
                 >
                   {f.name}
                   <span className={cx('mt-0.5 block text-[12px] font-medium', faction === f.id ? 'text-accent/70' : 'text-fg-3')}>
-                    {f.units} инфолистов
+                    {f.units} {t('инфолистов', 'datasheets')}
                   </span>
                 </button>
               ))}
@@ -242,13 +251,14 @@ function CreateSheet({ open, index, onClose, onCreate }: { open: boolean; index:
 }
 
 function ImportSheet({ open, onClose, onImport, factions }: { open: boolean; onClose: () => void; onImport: (r: Roster) => void; factions: string[] }) {
+  const t = useT();
   const [code, setCode] = useState('');
   const [err, setErr] = useState<string | null>(null);
   return (
     <Sheet
       open={open}
       onClose={onClose}
-      title="Импорт ростера"
+      title={t('Импорт ростера', 'Import roster')}
       footer={
         <Button
           variant="primary"
@@ -256,7 +266,7 @@ function ImportSheet({ open, onClose, onImport, factions }: { open: boolean; onC
           disabled={!code.trim()}
           onClick={() => {
             if (code.trim().startsWith('AOS1.')) {
-              setErr('Это код ростера Age of Sigmar — импортируйте его на вкладке Age of Sigmar.');
+              setErr(t('Это код ростера Age of Sigmar — импортируйте его на вкладке Age of Sigmar.', 'This is an Age of Sigmar roster code — import it on the Age of Sigmar tab.'));
               haptic.error();
               return;
             }
@@ -266,17 +276,17 @@ function ImportSheet({ open, onClose, onImport, factions }: { open: boolean; onC
               setErr(null);
               haptic.ok();
             } catch (e) {
-              const msg = e instanceof Error && e.message.startsWith('Ростер для') ? e.message : null;
-              setErr(msg ?? 'Не получилось прочитать код. Скопируйте его целиком (начинается с WH1.).');
+              const msg = e instanceof Error && e.message.startsWith('Ростер для') ? t(e.message, 'The roster is for an unknown faction — update the data') : null;
+              setErr(msg ?? t('Не получилось прочитать код. Скопируйте его целиком (начинается с WH1.).', 'Could not read the code. Copy it in full (it starts with WH1.).'));
               haptic.error();
             }
           }}
         >
-          Импортировать
+          {t('Импортировать', 'Import')}
         </Button>
       }
     >
-      <p className="mb-3 text-sm text-fg-3">Вставьте код ростера из раздела «Экспорт → Код» на другом устройстве.</p>
+      <p className="mb-3 text-sm text-fg-3">{t('Вставьте код ростера из раздела «Экспорт → Код» на другом устройстве.', 'Paste the roster code from “Export → Code” on another device.')}</p>
       <textarea
         value={code}
         onChange={(e) => setCode(e.target.value)}

@@ -11,6 +11,18 @@ import { glossaryEntries, GLOSSARY_GROUPS, matchGlossary, type Glossary, type Gl
 import { RuleRichText } from './common/RulePopover';
 import { useGlossary } from './common/useGlossary';
 import { useRu } from './common/useRu';
+import { useEn, useT } from './common/i18n';
+import { LangSwitch } from './common/LangSwitch';
+
+const PART_EN: Record<string, string> = {
+  'Базовые правила': 'Basics',
+  'Раунд битвы': 'The battle round',
+  'Поле боя и тактика': 'Battlefield and tactics',
+  'Продвинутые правила': 'Advanced rules',
+  'Справочник': 'Reference',
+};
+const PHASE_EN: Record<string, string> = { all: 'All', Command: 'Command', Movement: 'Move', Shooting: 'Shoot', Charge: 'Charge', Fight: 'Fight' };
+const GROUP_EN: Record<string, string> = { unit: 'Abilities', weapon: 'Weapons', faction: 'Faction weapons', terms: 'Terms' };
 
 const CORE_URL = 'https://wahapedia.ru/wh40k11ed/the-rules/core-rules/';
 
@@ -93,6 +105,8 @@ export function Rules({
   factionId?: string;
   detachmentIds?: string[];
 }) {
+  const t = useT();
+  const en = useEn();
   const [tab, setTab] = useState<'strats' | 'terms' | 'core'>('strats');
   const [fid, setFid] = useState(factionId ?? '');
   const [loaded, setLoaded] = useState<{ id: string; faction?: FactionData; error?: string } | null>(null);
@@ -122,7 +136,7 @@ export function Rules({
   const groups = useMemo(() => {
     if (!faction) return [];
     const list = faction.stratagems.filter((s) => inPhase(s, phase));
-    const out: { title: string; sub?: string; items: Stratagem[] }[] = [{ title: 'Основные стратагемы', sub: 'Core', items: list.filter((s) => !s.detachment) }];
+    const out: { title: string; sub?: string; items: Stratagem[] }[] = [{ title: en ? 'Core Stratagems' : 'Основные стратагемы', sub: 'Core', items: list.filter((s) => !s.detachment) }];
     if (fid) {
       // устаревшие детачменты (нет в текущем источнике) — только если выбраны в ростере
       const dets = faction.detachments.filter((d) =>
@@ -131,28 +145,29 @@ export function Rules({
       const byId = new Map<string, Detachment>(faction.detachments.map((d: Detachment) => [d.id, d]));
       for (const d of dets) {
         const items = list.filter((s) => s.detachment === d.id && visibleStratagem(s, byId));
-        if (items.length) out.push({ title: ruName(ruDetachmentName(ru, d.id), ruleLabel(d)), sub: 'Детачмент', items });
+        if (items.length) out.push({ title: ruName(ruDetachmentName(ru, d.id), ruleLabel(d)), sub: en ? 'Detachment' : 'Детачмент', items });
       }
     }
     return out.filter((g) => g.items.length);
-  }, [faction, phase, fid, det, detachmentIds, ru]);
+  }, [faction, phase, fid, det, detachmentIds, ru, en]);
 
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-10 pt-5 lg:max-w-3xl lg:pt-8">
       <header className="mb-4 flex items-end gap-3">
-        <IconButton icon="back" label="Назад" onClick={onBack} className="mb-0.5 size-9" />
+        <IconButton icon="back" label={t('Назад', 'Back')} onClick={onBack} className="mb-0.5 size-9" />
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">11-я редакция</p>
-          <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">Правила</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{t('11-я редакция', '11th edition')}</p>
+          <h1 className="font-display mt-1 text-3xl font-semibold uppercase leading-none">{t('Правила', 'Rules')}</h1>
         </div>
+        <LangSwitch />
       </header>
 
       <Segmented
         value={tab}
         onChange={setTab}
         options={[
-          { value: 'strats', label: 'Стратагемы' },
-          { value: 'terms', label: 'Термины' },
+          { value: 'strats', label: t('Стратагемы', 'Stratagems') },
+          { value: 'terms', label: t('Термины', 'Terms') },
           { value: 'core', label: 'Core Rules' },
         ]}
       />
@@ -162,11 +177,11 @@ export function Rules({
       ) : tab === 'core' ? (
         <div className="mt-4 space-y-5">
           <p className="text-sm leading-relaxed text-fg-3">
-            Полный текст основных правил — на Wahapedia. Глава откроется сразу на нужном месте и всегда в актуальной версии.
+            {t('Полный текст основных правил — на Wahapedia. Глава откроется сразу на нужном месте и всегда в актуальной версии.', 'The full Core Rules are on Wahapedia. Each chapter opens at the right place and is always up to date.')}
           </p>
           {CORE_RULES.map((part) => (
             <section key={part.part}>
-              <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">{part.part}</p>
+              <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">{en ? PART_EN[part.part] ?? part.part : part.part}</p>
               <ul className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
                 {part.chapters.map(([n, title, anchor], i) => (
                   <li key={anchor}>
@@ -177,8 +192,8 @@ export function Rules({
                     >
                       <span className="font-display w-6 text-sm font-semibold text-accent/80 tabular-nums">{n}</span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[15px] font-semibold text-white/90">{title}</span>
-                        <span className="block text-[12px] text-fg-3">{anchor.replace(/-1$/, '').replace(/-/g, ' ')}</span>
+                        <span className="block text-[15px] font-semibold text-white/90">{en ? anchor.replace(/-1$/, '').replace(/-/g, ' ') : title}</span>
+                        {!en && <span className="block text-[12px] text-fg-3">{anchor.replace(/-1$/, '').replace(/-/g, ' ')}</span>}
                       </span>
                       <span className="text-fg-3">↗</span>
                     </button>
@@ -187,13 +202,13 @@ export function Rules({
               </ul>
             </section>
           ))}
-          <p className="text-center text-[12px] text-fg-3">Текст правил — Games Workshop, публикация: Wahapedia</p>
+          <p className="text-center text-[12px] text-fg-3">{t('Текст правил — Games Workshop, публикация: Wahapedia', 'Rules text — Games Workshop, published by Wahapedia')}</p>
         </div>
       ) : (
         <div className="mt-4">
           <div className="grid grid-cols-1 gap-2">
             <Select value={fid} onChange={(v) => (setFid(v), setDet('all'))}>
-              <option value="">Только основные стратагемы</option>
+              <option value="">{t('Только основные стратагемы', 'Core Stratagems only')}</option>
               {index.factions.map((f) => (
                 <option key={f.id} value={f.id}>
                   {f.name}
@@ -202,8 +217,8 @@ export function Rules({
             </Select>
             {fid && faction && faction.id === fid && faction.detachments.length > 0 && (
               <Select value={det} onChange={setDet}>
-                {fid === factionId && detachmentIds?.length ? <option value="mine">Детачменты ростера</option> : null}
-                <option value="all">Все детачменты</option>
+                {fid === factionId && detachmentIds?.length ? <option value="mine">{t('Детачменты ростера', 'Roster Detachments')}</option> : null}
+                <option value="all">{t('Все детачменты', 'All Detachments')}</option>
                 {faction.detachments
                   .filter((d) => !d.outdated || detachmentIds?.includes(d.id))
                   .map((d) => (
@@ -226,7 +241,7 @@ export function Rules({
                     phase === p.value ? 'border-accent bg-accent/15 text-white' : 'border-white/10 text-fg-2 active:bg-white/10',
                   )}
                 >
-                  {p.label}
+                  {en ? PHASE_EN[p.value] : p.label}
                 </button>
               ))}
             </div>
@@ -237,7 +252,7 @@ export function Rules({
           ) : !faction ? (
             <div className="mx-auto mt-12 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
           ) : groups.length === 0 ? (
-            <p className="mt-8 text-center text-sm text-fg-3">В этой фазе стратагем нет.</p>
+            <p className="mt-8 text-center text-sm text-fg-3">{t('В этой фазе стратагем нет.', 'No Stratagems in this phase.')}</p>
           ) : (
             <div className="mt-4 space-y-5">
               {groups.map((g) => (
@@ -255,7 +270,7 @@ export function Rules({
                   </ul>
                 </section>
               ))}
-              <p className="text-center text-[12px] text-fg-3">{factionCredit(faction, index)}</p>
+              <p className="text-center text-[12px] text-fg-3">{factionCredit(faction, index, en ? 'en' : 'ru')}</p>
             </div>
           )}
         </div>
@@ -266,6 +281,8 @@ export function Rules({
 
 /** Термины (07.11.2026): основные способности, способности оружия (в т. ч. фракций) и термины правил — поиск и группы. */
 function GlossaryTab({ g }: { g: Glossary | null }) {
+  const t = useT();
+  const en = useEn();
   const [q, setQ] = useState('');
   const [group, setGroup] = useState<GlossaryGroup | 'all'>('all');
   const all = useMemo(() => (g ? glossaryEntries(g) : []), [g]);
@@ -279,11 +296,11 @@ function GlossaryTab({ g }: { g: Glossary | null }) {
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Поиск: Deep Strike, Lethal Hits, укрытие…"
+        placeholder={t('Поиск: Deep Strike, Lethal Hits, укрытие…', 'Search: Deep Strike, Lethal Hits, cover…')}
         className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-white outline-none placeholder:text-fg-3 focus:border-accent"
       />
       <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4">
-        {[{ key: 'all' as const, label: 'Все' }, ...GLOSSARY_GROUPS].map((x) => (
+        {[{ key: 'all' as const, label: t('Все', 'All') }, ...GLOSSARY_GROUPS.map((x) => ({ ...x, label: en ? GROUP_EN[x.key] ?? x.label : x.label }))].map((x) => (
           <button
             key={x.key}
             type="button"
@@ -301,7 +318,7 @@ function GlossaryTab({ g }: { g: Glossary | null }) {
             <details key={e.id} className="group rounded-xl border border-white/10 bg-white/[0.03]">
               <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2.5">
                 <span className="min-w-0 flex-1 text-sm font-semibold">{e.name}</span>
-                <span className="shrink-0 text-[11px] text-fg-3">{[e.num, GLOSSARY_GROUPS.find((x) => x.key === e.group)!.label].filter(Boolean).join(' · ')}</span>
+                <span className="shrink-0 text-[11px] text-fg-3">{[e.num, (en ? GROUP_EN[e.group] : GLOSSARY_GROUPS.find((x) => x.key === e.group)!.label)].filter(Boolean).join(' · ')}</span>
               </summary>
               <div className="space-y-2 border-t border-white/[0.06] px-3 py-2.5">
                 {e.texts.map((t, i) => (
@@ -312,10 +329,10 @@ function GlossaryTab({ g }: { g: Glossary | null }) {
           ))}
         </div>
       ) : (
-        <p className="py-10 text-center text-sm text-fg-3">Ничего не найдено</p>
+        <p className="py-10 text-center text-sm text-fg-3">{t('Ничего не найдено', 'Nothing found')}</p>
       )}
       <p className="text-[11px] leading-snug text-fg-3">
-        Тексты — wh-rules.ru, данные {g.source.dataVersion}
+        {t('Тексты — wh-rules.ru, данные', 'Texts — wh-rules.ru, data')} {g.source.dataVersion}
         {g.source.mfm ? ` (MFM ${g.source.mfm})` : ''}.
       </p>
     </div>
@@ -323,6 +340,8 @@ function GlossaryTab({ g }: { g: Glossary | null }) {
 }
 
 function StratCard({ s, ru, g }: { s: Stratagem; ru: RuText | null; g: Glossary | null }) {
+  const t = useT();
+  const en = useEn();
   const [open, setOpen] = useState(false);
   return (
     <li className="rounded-2xl border border-white/10 bg-white/[0.03]">
@@ -330,7 +349,7 @@ function StratCard({ s, ru, g }: { s: Stratagem; ru: RuText | null; g: Glossary 
         <span className="min-w-0 flex-1">
           <span className="block text-[15px] font-semibold leading-tight text-white/90">{ru ? ruName(ru.name, s.name) : s.name}</span>
           <span className="mt-0.5 block text-[12px] text-fg-3">
-            {[TURN_RU[s.turn] ?? s.turn, s.phase, isWarphub(ru) ? WARPHUB_LABEL : ''].filter(Boolean).join(' · ')}
+            {[en ? s.turn : TURN_RU[s.turn] ?? s.turn, s.phase, isWarphub(ru) ? WARPHUB_LABEL : ''].filter(Boolean).join(' · ')}
           </span>
         </span>
         <Tag tone={s.detachment ? 'accent' : 'muted'}>{s.cp} CP</Tag>

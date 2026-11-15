@@ -1,3 +1,4 @@
+import { tr, withLang, type EngineLang } from './lang';
 /**
  * Варианты снаряжения (Wargear Options) как правила, а не свободный текст.
  *
@@ -748,26 +749,26 @@ export function applyPicks(ds: Datasheet, base: Record<string, number>, picks: P
     const total = sum(counts);
     if (!total) continue;
     const name = shortText(o);
-    if (o.requires.some((r) => have(r.weapon) < 1)) problems.push(`«${name}»: нужно ${o.requires.map((r) => r.weapon).join(' + ')}`);
-    if (o.forbids.some((r) => have(r.weapon) > 0)) problems.push(`«${name}»: нельзя вместе с ${o.forbids.map((r) => r.weapon).join(' + ')}`);
+    if (o.requires.some((r) => have(r.weapon) < 1)) problems.push(tr(`«${name}»: нужно ${o.requires.map((r) => r.weapon).join(' + ')}`, `“${name}”: requires ${o.requires.map((r) => r.weapon).join(' + ')}`));
+    if (o.forbids.some((r) => have(r.weapon) > 0)) problems.push(tr(`«${name}»: нельзя вместе с ${o.forbids.map((r) => r.weapon).join(' + ')}`, `“${name}”: cannot be combined with ${o.forbids.map((r) => r.weapon).join(' + ')}`));
     const cap = limits[o.key]! * o.perModel;
-    if (total > cap) problems.push(`«${name}»: выбрано ${total}, можно не больше ${cap}`);
-    if (o.noDup && counts.some((n) => n > limits[o.key]!)) problems.push(`«${name}»: один и тот же вариант — не больше ${limits[o.key]}`);
-    if (o.oncePerUnit && counts.some((n) => n > 1)) problems.push(`«${name}»: каждый вариант — не больше одного раза на отряд`);
+    if (total > cap) problems.push(tr(`«${name}»: выбрано ${total}, можно не больше ${cap}`, `“${name}”: ${total} chosen, maximum ${cap}`));
+    if (o.noDup && counts.some((n) => n > limits[o.key]!)) problems.push(tr(`«${name}»: один и тот же вариант — не больше ${limits[o.key]}`, `“${name}”: the same option no more than ${limits[o.key]} times`));
+    if (o.oncePerUnit && counts.some((n) => n > 1)) problems.push(tr(`«${name}»: каждый вариант — не больше одного раза на отряд`, `“${name}”: each option at most once per unit`));
     counts.forEach((n, ci) => {
       const choice = o.choices[ci];
       if (!n || !choice) return;
       for (const f of o.from) {
         const need = f.qty * n;
-        if (have(f.weapon) >= need && free(o, f.weapon) < need) problems.push(`«${name}»: ${f.weapon} заменить нельзя — его оставляет другой выбранный вариант`);
-        if (!take(f.weapon, need)) problems.push(`«${name}»: в отряде нет ${need}× ${f.weapon} для замены`);
+        if (have(f.weapon) >= need && free(o, f.weapon) < need) problems.push(tr(`«${name}»: ${f.weapon} заменить нельзя — его оставляет другой выбранный вариант`, `“${name}”: ${f.weapon} cannot be swapped — another chosen option keeps it`));
+        if (!take(f.weapon, need)) problems.push(tr(`«${name}»: в отряде нет ${need}× ${f.weapon} для замены`, `“${name}”: the unit has no ${need}× ${f.weapon} to swap`));
       }
       for (const it of choice) give(it.weapon, it.qty * n);
     });
   }
-  for (const [sh, used] of shareUsed) if (used > shareLimit.get(sh)!) problems.push(`Можно выбрать только один из взаимоисключающих вариантов (выбрано ${used})`);
+  for (const [sh, used] of shareUsed) if (used > shareLimit.get(sh)!) problems.push(tr(`Можно выбрать только один из взаимоисключающих вариантов (выбрано ${used})`, `Only one of the mutually exclusive options can be chosen (${used} chosen)`));
   // закреплённые предметы должны остаться в снаряжении («Storm Bolter этой модели нельзя заменить»)
-  for (const w of lockedNames.values()) if (locked(w) > have(w)) problems.push(`${w}: нужно ${locked(w)} шт. для выбранных вариантов (его нельзя заменить), в отряде ${have(w)}`);
+  for (const w of lockedNames.values()) if (locked(w) > have(w)) problems.push(tr(`${w}: нужно ${locked(w)} шт. для выбранных вариантов (его нельзя заменить), в отряде ${have(w)}`, `${w}: ${locked(w)} needed for the chosen options (it cannot be swapped), the unit has ${have(w)}`));
 
   // максимум для каждого счётчика (с учётом остальных выборов)
   const max: Record<string, number[]> = {};
@@ -805,12 +806,18 @@ export function shortText(o: ParsedOption): string {
 }
 
 /** Подпись «кто»: «любая модель», «1 на каждые 10 моделей», «Nob». */
-export function whoText(o: ParsedOption): string {
+export function whoText(o: ParsedOption, lang: EngineLang = 'ru'): string {
+  return withLang(lang, () => whoTextIn(o));
+}
+function whoTextIn(o: ParsedOption): string {
   const g = o.group ? ` (${o.group})` : '';
-  if (o.share) return 'один из вариантов' + g;
-  if (o.limit.kind === 'each') return `любое число моделей${g}`;
-  if (o.limit.kind === 'perN') return `${o.limit.n} на каждые ${o.limit.per} моделей${g}`;
-  return (o.limit.n === 1 ? '1 модель' : `до ${o.limit.n} моделей`) + g + (o.minModels ? `, если в отряде ${o.minModels}+` : '');
+  if (o.share) return tr('один из вариантов', 'one of the options') + g;
+  if (o.limit.kind === 'each') return tr(`любое число моделей${g}`, `any number of models${g}`);
+  if (o.limit.kind === 'perN') return tr(`${o.limit.n} на каждые ${o.limit.per} моделей${g}`, `${o.limit.n} per ${o.limit.per} models${g}`);
+  return tr(
+    (o.limit.n === 1 ? '1 модель' : `до ${o.limit.n} моделей`) + g + (o.minModels ? `, если в отряде ${o.minModels}+` : ''),
+    (o.limit.n === 1 ? '1 model' : `up to ${o.limit.n} models`) + g + (o.minModels ? `, if the unit has ${o.minModels}+` : ''),
+  );
 }
 
 /** Есть ли хоть одна замена. */

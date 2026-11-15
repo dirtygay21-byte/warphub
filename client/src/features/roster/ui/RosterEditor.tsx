@@ -21,16 +21,17 @@ import { ruDetachmentRule, ruName, ruRule, ruStratagem } from '../ru';
 import { RuleRichText } from './common/RulePopover';
 import { useGlossary } from './common/useGlossary';
 import { LangSwitch } from './common/LangSwitch';
+import { useEn, useT } from './common/i18n';
 import { cleanRuleText } from '../text';
 import { w40kPointSystems } from '../points';
 import { PointsSheet } from './PointsSheet';
 
-const GROUPS: { key: ReturnType<typeof roleGroup>; title: string }[] = [
-  { key: 'characters', title: 'Персонажи' },
-  { key: 'battleline', title: 'Боевая линия' },
-  { key: 'transports', title: 'Выделенный транспорт' },
-  { key: 'other', title: 'Прочие' },
-  { key: 'allies', title: 'Союзники' },
+const GROUPS: { key: ReturnType<typeof roleGroup>; title: string; en: string }[] = [
+  { key: 'characters', title: 'Персонажи', en: 'Characters' },
+  { key: 'battleline', title: 'Боевая линия', en: 'Battleline' },
+  { key: 'transports', title: 'Выделенный транспорт', en: 'Dedicated Transports' },
+  { key: 'other', title: 'Прочие', en: 'Other units' },
+  { key: 'allies', title: 'Союзники', en: 'Allies' },
 ];
 
 export function RosterEditor({
@@ -57,6 +58,8 @@ export function RosterEditor({
   /** только просмотр (режим мастера в игре): без редактирования, меню и переключателя режима */
   viewOnly?: boolean;
 }) {
+  const t = useT();
+  const en = useEn();
   const [faction, setFaction] = useState<FactionData | null>(null);
   const [loadErr, setLoadErr] = useState<string | null>(null);
   useEffect(() => {
@@ -64,7 +67,7 @@ export function RosterEditor({
   }, [roster.factionId]);
 
   const L = useMemo(() => (faction ? makeLookup(faction) : null), [faction]);
-  const cr = useMemo(() => (L ? computeRoster(roster, L) : null), [roster, L]);
+  const cr = useMemo(() => (L ? computeRoster(roster, L, en ? 'en' : 'ru') : null), [roster, L, en]);
 
   // перевод сохранённого ростера на обновлённые данные (замены id из FactionData.migrations)
   useEffect(() => {
@@ -85,12 +88,12 @@ export function RosterEditor({
   if (loadErr) {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
-        <p className="font-display text-xl uppercase">Не удалось открыть ростер</p>
+        <p className="font-display text-xl uppercase">{t('Не удалось открыть ростер', 'Could not open the roster')}</p>
         <p className="mt-2 text-sm text-fg-3">{loadErr}</p>
         <div className="mt-5 flex gap-2">
-          <Button onClick={onBack}>К списку</Button>
+          <Button onClick={onBack}>{t('К списку', 'Back to list')}</Button>
           <Button variant="primary" onClick={() => (setLoadErr(null), loadFaction(roster.factionId).then(setFaction, (e) => setLoadErr(String(e.message ?? e))))}>
-            Повторить
+            {t('Повторить', 'Retry')}
           </Button>
         </div>
       </div>
@@ -134,6 +137,7 @@ function Editor({
   /** только просмотр (режим мастера в игре): без редактирования, меню и переключателя режима */
   viewOnly?: boolean;
 }) {
+  const t = useT();
   const [expanded, setExpanded] = useState<string | null>(null);
   const ru = useRu(L.faction.id);
   const [picker, setPicker] = useState(false);
@@ -194,7 +198,7 @@ function Editor({
           style={{ background: `linear-gradient(90deg, ${factionColor('40k', roster.factionId)}, transparent 85%)` }}
         />
         <div className="flex items-center gap-2">
-          <IconButton icon="back" label="К списку" onClick={onBack} className="size-9" />
+          <IconButton icon="back" label={t('К списку', 'Back to list')} onClick={onBack} className="size-9" />
           {view ? (
             <p className="font-display min-w-0 flex-1 truncate px-1.5 py-1 text-lg font-semibold uppercase">{roster.name}</p>
           ) : (
@@ -204,15 +208,15 @@ function Editor({
           {!viewOnly && (
             <IconButton
               icon={view ? 'edit' : 'eye'}
-              label={view ? 'Редактировать' : 'Режим просмотра'}
+              label={view ? t('Редактировать', 'Edit') : t('Режим просмотра', 'View mode')}
               onClick={() => (setView((v) => !v), setExpanded(null))}
               className={cx('size-9', view && 'bg-accent/15 text-accent')}
             />
           )}
-          {!view && <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />}
+          {!view && <IconButton icon="more" label={t('Меню', 'Menu')} onClick={() => setMenu(true)} className="size-9" />}
         </div>
         <div className="mt-3 flex items-end justify-between gap-3">
-          <button type="button" onClick={() => (haptic.tap(), setPointsInfo(true))} aria-label="Очки: сборка армии и партия" className="min-w-0 rounded-lg text-left active:opacity-70">
+          <button type="button" onClick={() => (haptic.tap(), setPointsInfo(true))} aria-label={t('Очки: сборка армии и партия', 'Points: army building and game')} className="min-w-0 rounded-lg text-left active:opacity-70">
             <div className="flex items-baseline gap-1.5">
               <span className={cx('font-display text-[32px] font-semibold leading-none tabular-nums', over ? 'text-danger' : 'text-white')}>{fmtPts(cr.points)}</span>
               <span className="text-sm text-fg-3">/ {fmtPts(size.points)}</span>
@@ -221,7 +225,7 @@ function Editor({
           </button>
           <div className="flex gap-1.5">
             <Stat label="DP" value={`${cr.dp}/${cr.dpLimit}`} bad={cr.issues.some((i) => i.code === 'dp')} />
-            <Stat label="Улучш." value={`${cr.enhancementsUsed}/${cr.enhancementsLimit}`} bad={cr.issues.some((i) => i.code === 'enh-cap')} />
+            <Stat label={t('Улучш.', 'Enh.')} value={`${cr.enhancementsUsed}/${cr.enhancementsLimit}`} bad={cr.issues.some((i) => i.code === 'enh-cap')} />
             <button
               type="button"
               onClick={() => (haptic.tap(), setProblems(true))}
@@ -248,7 +252,7 @@ function Editor({
                 {cr.chapter ? ` · ${cr.chapter}` : ''} · {size.label}
               </p>
               <p className="mt-0.5 truncate text-[15px] font-semibold">
-                {cr.detachments.length ? cr.detachments.map((d) => d.name).join(' + ') : <span className="text-accent">Выберите детачмент</span>}
+                {cr.detachments.length ? cr.detachments.map((d) => d.name).join(' + ') : <span className="text-accent">{t('Выберите детачмент', 'Choose a Detachment')}</span>}
               </p>
               {roster.forceDisposition && <p className="mt-0.5 text-sm text-fg-3">{roster.forceDisposition}</p>}
             </div>
@@ -258,9 +262,9 @@ function Editor({
             <div className="space-y-4 border-t border-white/[0.06] px-4 pb-4 pt-3">
               <div>
                 {[
-                  ['Размер боя', `${size.label} · ${fmtPts(size.points)}`],
-                  ['Орден', L.faction.chapters.length ? roster.chapter ?? cr.chapter ?? '—' : null],
-                  ['Детачменты', cr.detachments.map((d) => d.name).join(' + ') || '—'],
+                  [t('Размер боя', 'Battle size'), `${size.label} · ${fmtPts(size.points)}`],
+                  [t('Орден', 'Chapter'), L.faction.chapters.length ? roster.chapter ?? cr.chapter ?? '—' : null],
+                  [t('Детачменты', 'Detachments'), cr.detachments.map((d) => d.name).join(' + ') || '—'],
                   ['Force Disposition', roster.forceDisposition],
                 ]
                   .filter((x): x is [string, string] => !!x[1])
@@ -273,7 +277,7 @@ function Editor({
               </div>
               {L.faction.armyRules.length > 0 && (
                 <div className="space-y-1.5">
-                  <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Правила армии</p>
+                  <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{t('Правила армии', 'Army rules')}</p>
                   {L.faction.armyRules.map((id) => {
                     const r = L.faction.rules[id];
                     return r ? <RuleText key={id} name={r.name} text={r.text} ru={ruRule(ru, id)} /> : null;
@@ -284,7 +288,7 @@ function Editor({
           )}
           {settingsOpen && !view && (
             <div className="space-y-5 border-t border-white/[0.06] px-4 pb-4 pt-4">
-              <Field label="Размер боя">
+              <Field label={t('Размер боя', 'Battle size')}>
                 <Segmented
                   value={roster.battleSize}
                   onChange={(battleSize) => set({ battleSize })}
@@ -292,13 +296,13 @@ function Editor({
                 />
               </Field>
               {L.faction.chapters.length > 0 && (
-                <Field label="Орден" hint="Space Marines">
+                <Field label={t('Орден', 'Chapter')} hint="Space Marines">
                   <select
                     value={roster.chapter ?? ''}
                     onChange={(e) => set({ chapter: e.target.value || null })}
                     className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm font-semibold text-white outline-none focus:border-accent"
                   >
-                    <option value="">Без ордена / определить автоматически</option>
+                    <option value="">{t('Без ордена / определить автоматически', 'No Chapter / detect automatically')}</option>
                     {L.faction.chapters.map((c) => (
                       <option key={c} value={c}>
                         {c}
@@ -307,14 +311,14 @@ function Editor({
                   </select>
                 </Field>
               )}
-              <Field label="Детачменты" hint={`${cr.dp} из ${cr.dpLimit} DP`}>
+              <Field label={t('Детачменты', 'Detachments')} hint={t(`${cr.dp} из ${cr.dpLimit} DP`, `${cr.dp} of ${cr.dpLimit} DP`)}>
                 <div className="space-y-1.5">
                   {cr.detachments.map((d) => (
                     <div key={d.id} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] py-1.5 pl-3 pr-1.5">
                       <button type="button" onClick={() => toggleDetInfo(d.id)} className="min-w-0 flex-1 text-left">
                         <p className="truncate text-sm font-semibold">
                           {ruleLabel(d)}
-                          <span className="ml-1.5 text-xs font-semibold text-accent">подробнее</span>
+                          <span className="ml-1.5 text-xs font-semibold text-accent">{t('подробнее', 'details')}</span>
                         </p>
                         <p className="text-xs text-fg-3">
                           {dpOf(d, cr.chapter)} DP · {dispositionsOf(d).join(' / ') || '—'}
@@ -323,7 +327,7 @@ function Editor({
                       </button>
                       <IconButton
                         icon="close"
-                        label="Убрать детачмент"
+                        label={t('Убрать детачмент', 'Remove Detachment')}
                         className="size-8 border-0"
                         onClick={() => {
                           const ids = roster.detachmentIds.filter((x) => x !== d.id);
@@ -334,14 +338,14 @@ function Editor({
                     </div>
                   ))}
                   <Button variant="outline" className="w-full border-dashed" onClick={() => setDetSheet(true)}>
-                    <Icon name="plus" className="size-4" /> {cr.detachments.length ? 'Добавить детачмент' : 'Выбрать детачмент'}
+                    <Icon name="plus" className="size-4" /> {cr.detachments.length ? t('Добавить детачмент', 'Add Detachment') : t('Выбрать детачмент', 'Choose Detachment')}
                   </Button>
                 </div>
               </Field>
               {L.faction.armyRules.length > 0 && (
                 <details className="group">
                   <summary className="flex cursor-pointer list-none items-baseline justify-between gap-2">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-fg-3">Правила армии</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-fg-3">{t('Правила армии', 'Army rules')}</span>
                     <span className="flex items-center gap-1 text-xs text-fg-3">
                       {L.faction.armyRules.length}
                       <Icon name="down" className="size-3.5 transition group-open:rotate-180" />
@@ -378,7 +382,7 @@ function Editor({
                     className="flex min-h-9 max-w-full shrink-0 items-center gap-1.5 rounded-xl border border-accent/25 bg-accent/10 px-3 py-1.5 text-left text-xs font-semibold text-accent transition active:scale-[0.98]"
                   >
                     <Icon name="book" className="size-3.5 shrink-0" />
-                    {cr.detachments.length === 1 && <span className="text-accent/70">Детачмент:</span>}
+                    {cr.detachments.length === 1 && <span className="text-accent/70">{t('Детачмент:', 'Detachment:')}</span>}
                     <span className="truncate text-white/90">{d.name}</span>
                     <Icon name="down" className="size-3.5 shrink-0" />
                   </button>
@@ -391,13 +395,13 @@ function Editor({
 
         {/* ---- юниты ---- */}
         {grouped.length === 0 ? (
-          <Empty title="Нет юнитов">Нажмите «Добавить юнит» внизу.</Empty>
+          <Empty title={t('Нет юнитов', 'No units')}>{t('Нажмите «Добавить юнит» внизу.', 'Tap “Add unit” below.')}</Empty>
         ) : (
           grouped.map((g) => (
             <section key={g.key}>
               <div className="mb-2.5 flex items-baseline justify-between px-1">
                 <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-fg-2">
-                  {g.title}
+                  {t(g.title, g.en)}
                   <span className="ml-2 font-sans text-xs font-semibold text-fg-3">{g.list.reduce((n, c) => n + 1 + c.attached.length, 0)}</span>
                 </h2>
                 <span className="text-xs font-semibold tabular-nums text-fg-3">{fmtPts(g.list.reduce((s, c) => s + c.total + c.attached.reduce((a, u) => a + (cr.byUid.get(u.uid)?.total ?? 0), 0), 0))}</span>
@@ -430,24 +434,24 @@ function Editor({
         <div className="mx-auto flex max-w-lg gap-2 lg:max-w-3xl lg:px-4">
           {viewOnly ? (
             <Button variant="outline" className="h-12 flex-1 text-base" onClick={onBack}>
-              <Icon name="back" /> <span className="whitespace-nowrap">К игре</span>
+              <Icon name="back" /> <span className="whitespace-nowrap">{t('К игре', 'Back to game')}</span>
             </Button>
           ) : view ? (
             <Button variant="outline" className="h-12 flex-1 text-base" onClick={() => setView(false)}>
-              <Icon name="edit" /> <span className="whitespace-nowrap">Редактировать</span>
+              <Icon name="edit" /> <span className="whitespace-nowrap">{t('Редактировать', 'Edit')}</span>
             </Button>
           ) : (
             <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => setPicker(true)}>
-              <Icon name="plus" /> <span className="whitespace-nowrap">Добавить юнит</span>
+              <Icon name="plus" /> <span className="whitespace-nowrap">{t('Добавить юнит', 'Add unit')}</span>
             </Button>
           )}
           {(view || viewOnly) && (
             <Button variant="ghost" className="h-12 px-4" onClick={() => (haptic.tap(), setBattle(true))}>
-              <Icon name="book" /> <span className="max-[359px]:sr-only">Лист</span>
+              <Icon name="book" /> <span className="max-[359px]:sr-only">{t('Лист', 'Sheet')}</span>
             </Button>
           )}
           <Button variant="ghost" className="h-12 px-4" onClick={() => setExporting(true)}>
-            <Icon name="share" /> <span className="max-[359px]:sr-only">Экспорт</span>
+            <Icon name="share" /> <span className="max-[359px]:sr-only">{t('Экспорт', 'Export')}</span>
           </Button>
         </div>
       </div>
@@ -458,7 +462,7 @@ function Editor({
         </div>
       )}
 
-      <PointsSheet open={pointsInfo} onClose={() => setPointsInfo(false)} systems={w40kPointSystems(roster, L, cr)} />
+      <PointsSheet open={pointsInfo} onClose={() => setPointsInfo(false)} systems={w40kPointSystems(roster, L, cr, t('ru', 'en') as 'ru' | 'en')} />
       <UnitPicker open={picker} onClose={() => setPicker(false)} roster={roster} L={L} cr={cr} onAdd={add} onToggleLegends={() => set({ showLegends: !roster.showLegends })} ru={ru} />
 
       <DetachmentSheet open={detSheet} onClose={() => setDetSheet(false)} roster={roster} L={L} cr={cr} onPick={(d) => {
@@ -472,14 +476,14 @@ function Editor({
         haptic.ok();
       }} />
 
-      <Sheet open={problems} onClose={() => setProblems(false)} title={cr.issues.length ? `Проверка · ${cr.issues.length}` : 'Проверка'}>
+      <Sheet open={problems} onClose={() => setProblems(false)} title={cr.issues.length ? `${t('Проверка', 'Validation')} · ${cr.issues.length}` : t('Проверка', 'Validation')}>
         {cr.issues.length === 0 ? (
           <div className="flex flex-col items-center py-8 text-center">
             <div className="flex size-12 items-center justify-center rounded-full bg-accent/15 text-accent">
               <Icon name="check" className="size-6" />
             </div>
-            <p className="mt-3 font-semibold">Ростер соответствует правилам</p>
-            <p className="mt-1 text-sm text-fg-3">Очки, детачменты, улучшения, лимиты и присоединения в порядке.</p>
+            <p className="mt-3 font-semibold">{t('Ростер соответствует правилам', 'The roster is valid')}</p>
+            <p className="mt-1 text-sm text-fg-3">{t('Очки, детачменты, улучшения, лимиты и присоединения в порядке.', 'Points, Detachments, Enhancements, limits and attachments are all fine.')}</p>
           </div>
         ) : (
           <ul className="space-y-2 pb-2">
@@ -506,7 +510,7 @@ function Editor({
             {!!roster.migrationNotes?.length && (
               <li>
                 <Button variant="outline" className="w-full" onClick={() => set({ migrationNotes: undefined })}>
-                  Скрыть сообщения о заменённых детачментах и улучшениях
+                  {t('Скрыть сообщения о заменённых детачментах и улучшениях', 'Hide messages about replaced Detachments and Enhancements')}
                 </Button>
               </li>
             )}
@@ -518,36 +522,36 @@ function Editor({
 
       <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} L={L} cr={cr} dataVersion={index.lastUpdate} credit={factionCredit(L.faction, index, 'en')} />
 
-      <Sheet open={menu} onClose={() => setMenu(false)} title="Ростер">
+      <Sheet open={menu} onClose={() => setMenu(false)} title={t('Ростер', 'Roster')}>
         <div className="space-y-2 pb-2">
           <Button className="w-full justify-start" onClick={() => (setMenu(false), onRules())}>
-            <Icon name="book" /> Стратагемы армии и правила
+            <Icon name="book" /> {t('Стратагемы армии и правила', 'Army stratagems and rules')}
           </Button>
           <Button className="w-full justify-start" onClick={() => (setMenu(false), setBattle(true))}>
-            <Icon name="book" /> Боевой лист: стратагемы по фазам и юниты
+            <Icon name="book" /> {t('Боевой лист: стратагемы по фазам и юниты', 'Battle sheet: stratagems by phase and units')}
           </Button>
           <Button className="w-full justify-start" onClick={() => (setMenu(false), onStartGame())}>
-            <Icon name="map" /> Начать игру с этим ростером
+            <Icon name="map" /> {t('Начать игру с этим ростером', 'Start a game with this roster')}
           </Button>
           {onTestArmy && (
             <Button className="w-full justify-start" onClick={() => (setMenu(false), onTestArmy())}>
-              <Icon name="shield" /> Test Army с этим ростером
+              <Icon name="shield" /> {t('Test Army с этим ростером', 'Test Army with this roster')}
             </Button>
           )}
           <Button className="w-full justify-start" onClick={() => (setMenu(false), onDuplicate(duplicateRoster(roster)))}>
-            <Icon name="copy" /> Дублировать ростер
+            <Icon name="copy" /> {t('Дублировать ростер', 'Duplicate roster')}
           </Button>
           <Button className="w-full justify-start" onClick={() => (setMenu(false), setExporting(true))}>
-            <Icon name="share" /> Экспорт / поделиться
+            <Icon name="share" /> {t('Экспорт / поделиться', 'Export / share')}
           </Button>
           <Button
             variant="danger"
             className="w-full justify-start"
             onClick={async () => {
-              if (await confirmAsk(`Удалить ростер «${roster.name}»?`)) onDelete();
+              if (await confirmAsk(t(`Удалить ростер «${roster.name}»?`, `Delete roster “${roster.name}”?`))) onDelete();
             }}
           >
-            <Icon name="trash" /> Удалить ростер
+            <Icon name="trash" /> {t('Удалить ростер', 'Delete roster')}
           </Button>
         </div>
       </Sheet>
@@ -567,6 +571,7 @@ function Stat({ label, value, bad }: { label: string; value: string; bad?: boole
 }
 
 function NameInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const t = useT();
   const [v, setV] = useState(value);
   const [prev, setPrev] = useState(value);
   const ref = useRef<HTMLInputElement>(null);
@@ -586,7 +591,7 @@ function NameInput({ value, onChange }: { value: string; onChange: (v: string) =
       }}
       onBlur={() => (v.trim() ? v !== v.trim() && onChange(v.trim()) : setV(value))}
       onKeyDown={(e) => e.key === 'Enter' && ref.current?.blur()}
-      aria-label="Название ростера"
+      aria-label={t('Название ростера', 'Roster name')}
       className="font-display min-w-0 flex-1 truncate rounded-lg border border-transparent bg-transparent px-1.5 py-1 text-lg font-semibold uppercase outline-none focus:border-white/10 focus:bg-white/[0.04]"
     />
   );
@@ -613,6 +618,7 @@ function UnitGroup({
   onChange: (r: Roster) => void;
   readOnly?: boolean;
 }) {
+  const t = useT();
   const card = (x: ComputedUnit, nested: boolean) => (
     <UnitCard
       key={x.unit.uid}
@@ -644,8 +650,8 @@ function UnitGroup({
   return (
     <div className="overflow-hidden rounded-2xl border border-accent/25 bg-app-elevated">
       <div className="flex items-baseline justify-between bg-accent/[0.06] px-4 py-2">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent/85">Отряд</p>
-        <p className="text-[12px] font-semibold tabular-nums text-accent/85">{fmtPts(total)} очк.</p>
+        <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent/85">{t('Отряд', 'Combined unit')}</p>
+        <p className="text-[12px] font-semibold tabular-nums text-accent/85">{fmtPts(total)} {t('очк.', 'pts')}</p>
       </div>
       <div className="divide-y divide-white/[0.06]">
         {chars.map((x) => card(x, true))}
@@ -656,6 +662,7 @@ function UnitGroup({
 }
 
 function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boolean; onClose: () => void; roster: Roster; L: DataLookup; cr: ComputedRoster; onPick: (d: Detachment) => void }) {
+  const t = useT();
   const [info, setInfo] = useState<string | null>(null);
   const ru = useRu(L.faction.id);
   const g = useGlossary();
@@ -664,9 +671,9 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
   const left = cr.dpLimit - cr.dp;
   const sorted = [...list].sort((a, b) => a.dp - b.dp || a.name.localeCompare(b.name));
   return (
-    <Sheet open={open} onClose={onClose} title="Детачменты" tall>
+    <Sheet open={open} onClose={onClose} title={t('Детачменты', 'Detachments')} tall>
       <p className="mb-3 text-sm text-fg-3">
-        Осталось <b className="text-white">{Math.max(0, left)} DP</b>. Детачменты с одинаковым тегом взять вместе нельзя.
+        {t('Осталось', 'Left:')} <b className="text-white">{Math.max(0, left)} DP</b>. {t('Детачменты с одинаковым тегом взять вместе нельзя.', 'Detachments with the same tag cannot be taken together.')}
       </p>
       <ul className="space-y-1.5 pb-2">
         {sorted.map((d) => {
@@ -680,7 +687,7 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
               <div className="flex items-center gap-2 py-2 pl-3 pr-2">
                 <button type="button" className="min-w-0 flex-1 text-left" onClick={() => setInfo(open_ ? null : d.id)}>
                   <p className={cx('text-sm font-semibold', (tooMuch || tagClash) && 'text-fg-3')}>{ruleLabel(d)}</p>
-                  {d.outdated && <p className="mt-0.5 text-xs text-amber-200">{OUTDATED_RULE_NOTE} Был в этом ростере — можно вернуть.</p>}
+                  {d.outdated && <p className="mt-0.5 text-xs text-amber-200">{t(`${OUTDATED_RULE_NOTE} Был в этом ростере — можно вернуть.`, '* Not in the current source — it was in this roster and can be restored.')}</p>}
                   <div className="mt-1 flex flex-wrap gap-1">
                     <Tag tone={tooMuch ? 'danger' : 'accent'}>{dp} DP</Tag>
                     {dispositionsOf(d).map((fd) => (
@@ -691,7 +698,7 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
                   </div>
                 </button>
                 <Button variant={tooMuch || tagClash ? 'ghost' : 'primary'} className="h-9 min-h-0 px-3" onClick={() => onPick(d)}>
-                  Взять
+                  {t('Взять', 'Take')}
                 </Button>
               </div>
               {open_ && (
@@ -707,7 +714,7 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
                   })}
                   {L.faction.stratagems.some((st) => st.detachment === d.id && visibleStratagem(st, L.det)) && (
                     <div>
-                      <p className="font-semibold text-white/85">Стратагемы</p>
+                      <p className="font-semibold text-white/85">{t('Стратагемы', 'Stratagems')}</p>
                       <div className="mt-1 space-y-1.5">
                         {L.faction.stratagems
                           .filter((st) => st.detachment === d.id && visibleStratagem(st, L.det))
@@ -719,11 +726,11 @@ function DetachmentSheet({ open, onClose, roster, L, cr, onPick }: { open: boole
                   )}
                   {enh.length > 0 && (
                     <div>
-                      <p className="font-semibold text-white/85">Улучшения</p>
+                      <p className="font-semibold text-white/85">{t('Улучшения', 'Enhancements')}</p>
                       <ul className="mt-1 space-y-1 text-fg-2">
                         {enh.map((e) => (
                           <li key={e.id}>
-                            {e.name} — {e.cost} очк.{e.upgrade ? ' · Upgrade' : ''}
+                            {e.name} — {e.cost} {t('очк.', 'pts')}{e.upgrade ? ' · Upgrade' : ''}
                           </li>
                         ))}
                       </ul>

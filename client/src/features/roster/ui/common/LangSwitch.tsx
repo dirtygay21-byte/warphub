@@ -1,18 +1,20 @@
 import { haptic } from '@/utils/haptic';
 import { cx } from '../util';
 import { useRosterLang, type RosterLang } from './useRosterLang';
+import { useT } from './i18n';
 
 const OPTIONS: { value: RosterLang; label: string; aria: string }[] = [
-  { value: 'ru', label: 'RU', aria: 'Тексты правил на русском' },
-  { value: 'en', label: 'EN', aria: 'Тексты правил на английском' },
+  { value: 'ru', label: 'RU', aria: 'Русский' },
+  { value: 'en', label: 'EN', aria: 'English' },
 ];
 
-/** Переключатель языка текстов 40K (RU / EN) — в шапке редактора ростера. */
+/** Переключатель языка 40K (RU / EN): интерфейс и тексты правил (16.11.2026) — в шапке списка, редактора и «Правил». */
 export function LangSwitch() {
+  const t = useT();
   const lang = useRosterLang((s) => s.lang);
   const setLang = useRosterLang((s) => s.setLang);
   return (
-    <div role="radiogroup" aria-label="Язык текстов правил" className="flex h-9 shrink-0 items-center rounded-lg bg-white/[0.06] p-0.5">
+    <div role="radiogroup" aria-label={t('Язык', 'Language')} className="flex h-9 shrink-0 items-center rounded-lg bg-white/[0.06] p-0.5">
       {OPTIONS.map((o) => (
         <button
           key={o.value}
