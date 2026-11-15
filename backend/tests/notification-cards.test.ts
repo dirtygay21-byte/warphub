@@ -51,6 +51,32 @@ describe('карточка результата лиги (этап 3b)', () => {
   }, 20_000);
 });
 
+describe('карточка для сообщений вне каталога (16.11.2026: картинка на каждое уведомление)', () => {
+  const samples: [string, string][] = [
+    ['reward', '🎁 <b>Награда за мини-игру!</b>\nРой: инкубатор: Скидка 3%\nКод: <code>WH-7M28QP</code>\nДействует до: вс, 30 ноября, 04:25\nПокажите код администратору в клубе.'],
+    ['legendary', '🌟 <b>Легендарная карта!</b>\nПылающий страж — +1000 очков.\nВаш счёт: 2400 очков.'],
+    ['points', '💠 Начислено 150 очков (турнир). Ваш счёт: 1650.'],
+    ['moved', '🔁 <b>Администратор пересадил вас за другой стол</b>\nИгра Warhammer — сб, 15 ноября, 18:00–21:00\nВремя игры не изменилось. Подробности — в разделе «Мои записи».'],
+    ['dnd-admin', '🐉 <b>D&D: новая запись на игру</b>\nЗатерянный храм — чт, 20 ноября, 18:00\nИгрок: Иван Петров (@ivan)\nМест: 2\nЗанято: 4/5'],
+  ];
+  for (const [name, text] of samples) {
+    test(name, async () => {
+      const { cardTitleOf } = await import('../src/modules/notifications/card/index');
+      const png = await renderCardPng(parseNotificationCard(text, cardTitleOf(name === 'dnd-admin' ? 'admin' : 'user').title));
+      expect(Array.from(png.slice(0, 4))).toEqual([0x89, 0x50, 0x4e, 0x47]);
+      const out = process.env.CARD_SAMPLES_DIR;
+      if (out) (mkdirSync(out, { recursive: true }), writeFileSync(`${out}/extra-${name}.png`, png));
+    }, 20_000);
+  }
+  test('тип вне каталога получает заголовок, рассылки — тоже', async () => {
+    const { cardTitleOf } = await import('../src/modules/notifications/card/index');
+    expect(cardTitleOf('admin').title).toBe('Администраторам');
+    expect(cardTitleOf('user').title).toBe('WarpHub');
+    expect(cardTitleOf('broadcast:12').title).toBe('WarpHub');
+    expect(cardTitleOf('opponent_joined').id).toBe('opponent_joined');
+  });
+});
+
 describe('карточка уведомления: PNG по всем стандартным текстам', () => {
   const out = process.env.CARD_SAMPLES_DIR;
   if (out) mkdirSync(out, { recursive: true });
