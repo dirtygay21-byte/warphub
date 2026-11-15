@@ -96,7 +96,7 @@ export function LimeHero({
         {kicker && <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#111110]/70">{kicker}</span>}
         <h2 className={clsx("font-display font-semibold uppercase leading-[1.05]", size === "lg" ? "text-[24px]" : "text-[20px]")}>{title}</h2>
       </div>
-      {children && <div className="relative mt-2.5 flex flex-col gap-2.5 text-[14px] leading-snug">{children}</div>}
+      {children && <div className="relative mt-2.5 flex flex-col gap-2.5 text-[14px] leading-snug [&>p]:pr-14">{children}</div>}
     </section>
   );
 }
