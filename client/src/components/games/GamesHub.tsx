@@ -46,33 +46,28 @@ export default function GamesHub() {
       />
 
       <div className="px-4">
-        {/* лаймовый концепт (15.11.2026): описание наград — лаймовым блоком с червяками */}
+        {/* награды одним блоком (15.11.2026): правило и «Мои награды» вместе — нажатие открывает награды */}
         <LimeHero kicker="Награды" title="Играйте — получайте скидки" size="sm">
-          <p className="text-[14px] leading-snug">
-            Лучший результат недели даёт награду, а за каждые 25 000 накопленных очков карт — одноразовый промокод 25%.
-          </p>
+          <p>Лучший результат недели даёт награду, за каждые 25 000 очков карт — промокод 25%.</p>
+          <button
+            type="button"
+            onClick={() => navigate("/games/rewards")}
+            className="ds-press flex min-h-12 w-full items-center gap-3 rounded-[14px] bg-[#111110] px-3.5 text-left text-fg"
+          >
+            <Gift className="size-5 shrink-0 text-accent" />
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-semibold">Мои награды</span>
+              <span className="block truncate text-[12.5px] text-fg-2">
+                {rewards.isLoading
+                  ? "Загружаем…"
+                  : activeRewards.length
+                    ? `Активных: ${activeRewards.length} — покажите код администратору`
+                    : "Пока нет активных наград"}
+              </span>
+            </span>
+            <ChevronRight className="size-5 shrink-0 text-accent" />
+          </button>
         </LimeHero>
-
-        <button
-          type="button"
-          onClick={() => navigate("/games/rewards")}
-          className="ds-press mt-4 flex min-h-16 w-full items-center gap-3 rounded-[18px] border border-accent/50 bg-accent/10 px-4 py-3 text-left"
-        >
-          <Gift className="size-6 shrink-0 text-accent" />
-          <div className="flex-1">
-            <p className={`text-base uppercase tracking-wide text-accent ${oswald}`}>
-              Мои награды
-            </p>
-            <p className="text-[13px] text-fg-2">
-              {rewards.isLoading
-                ? "Загружаем…"
-                : activeRewards.length
-                  ? `Активных: ${activeRewards.length} — покажите код администратору`
-                  : "Пока нет активных наград"}
-            </p>
-          </div>
-          <ChevronRight className="size-5 text-accent" />
-        </button>
 
         {games.isLoading && (
           <div className="mt-5 space-y-4" aria-busy="true" aria-label="Загружаем игры">

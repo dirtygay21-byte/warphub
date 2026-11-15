@@ -251,3 +251,23 @@ export function DateTile({ date, tone = "plain", className }: { date: string; to
     </span>
   );
 }
+
+/**
+ * Плитка-переход (15.11.2026): иконка, название, подпись — по две в ряд вместо длинных строк.
+ * accent — лаймовая плашка иконки (главный раздел), иначе мягкая.
+ */
+export function ActionTile({ icon, title, subtitle, onClick, accent, className }: { icon: ReactNode; title: ReactNode; subtitle?: ReactNode; onClick: () => void; accent?: boolean; className?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={() => (haptic.tap(), onClick())}
+      className={clsx("ds-press fx-press flex min-h-[104px] flex-col justify-between gap-3 rounded-[18px] border border-white/10 bg-app-elevated p-3.5 text-left text-fg", className)}
+    >
+      <span className={clsx("flex size-10 items-center justify-center rounded-xl", accent ? "bg-accent text-accent-foreground" : "bg-accent/15 text-accent")}>{icon}</span>
+      <span className="block">
+        <span className="block text-[15px] font-bold leading-tight">{title}</span>
+        {subtitle && <span className="mt-0.5 block text-[12.5px] leading-snug text-fg-2">{subtitle}</span>}
+      </span>
+    </button>
+  );
+}
