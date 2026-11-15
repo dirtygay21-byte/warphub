@@ -1,3 +1,4 @@
+import { gameHasPoints } from "@/apiUtils/booking";
 import type { PaintingDetails, WhGame, WhPlayerDetails } from "@/apiUtils/booking";
 
 export type PlayerFormValue = {
@@ -31,8 +32,8 @@ export const validatePlayerForm = (
   maxPoints: number,
 ): string | null => {
   if (!value.army.trim()) return value.game === "kt" ? "Укажите команду" : value.game === "warcry" ? "Укажите варбанду" : "Укажите армию";
-  // у Kill Team лимита очков нет
-  if (value.game !== "kt") {
+  // у Kill Team и Warcry очков нет (15.11.2026)
+  if (gameHasPoints(value.game)) {
     const points = Number(value.points);
     if (!value.points || !Number.isInteger(points) || points < 1) {
       return "Укажите количество очков";
@@ -46,7 +47,7 @@ export const validatePlayerForm = (
 export const playerFormToDetails = (value: PlayerFormValue): WhPlayerDetails => ({
   game: value.game,
   army: value.army.trim(),
-  points: value.game === "kt" ? null : Number(value.points),
+  points: gameHasPoints(value.game) ? Number(value.points) : null,
   experienceLevel: value.experienceLevel,
 });
 

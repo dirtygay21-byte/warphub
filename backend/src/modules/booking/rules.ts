@@ -5,6 +5,7 @@
 import {
   bookingConfig,
   bookingOptions,
+  gameHasPoints,
   isExperienceLevel,
   isPaintSource,
   isWhGame,
@@ -446,9 +447,12 @@ export type WhPlayerDetails = {
 export const TRAINING_CLUB_ARMY_POINTS = 1000;
 export const TRAINING_SLUGS = new Set(['wh_group_training', 'wh_solo_training']);
 
-/** Очки армии клуба для записи: обучение — 1000, игра — выбор игрока, иначе очки игры, у Kill Team — 1000. */
+/**
+ * Очки армии клуба для записи: обучение — 1000, игра — выбор игрока, иначе очки игры.
+ * Kill Team и Warcry — без очков (null): команда/варбанда клуба стандартная, аренда считается как 1000 очков (pricing).
+ */
 export function clubArmyPointsFor(slug: string, details: WhPlayerDetails, wantsClubArmy: boolean): number | null {
-  if (!wantsClubArmy) return null;
+  if (!wantsClubArmy || !gameHasPoints(details.game)) return null;
   if (TRAINING_SLUGS.has(slug)) return TRAINING_CLUB_ARMY_POINTS;
   return details.clubArmyPoints ?? details.points ?? TRAINING_CLUB_ARMY_POINTS;
 }
@@ -527,9 +531,9 @@ export function validateDetails(
   if (kind === 'wh_player') {
     const game = data.game === undefined || data.game === null ? '40k' : data.game;
     if (!isWhGame(game)) throw new DetailsValidationError('game must be 40k, aos, kt or warcry');
-    // у Kill Team нет лимита очков — поле не нужно и не сохраняется
+    // у Kill Team и Warcry очков нет — поле не нужно и не сохраняется (Warcry — решение владельца 15.11.2026)
     let points: number | null = null;
-    if (game !== 'kt') {
+    if (gameHasPoints(game)) {
       points = Number(data.points);
       if (
         !Number.isInteger(points) ||
@@ -546,7 +550,7 @@ export function validateDetails(
     }
 
     let clubArmyPoints: number | null = null;
-    if (data.clubArmyPoints !== undefined && data.clubArmyPoints !== null && data.clubArmyPoints !== '') {
+    if (gameHasPoints(game) && data.clubArmyPoints !== undefined && data.clubArmyPoints !== null && data.clubArmyPoints !== '') {
       clubArmyPoints = Number(data.clubArmyPoints);
       if (!Number.isInteger(clubArmyPoints) || clubArmyPoints < 1 || clubArmyPoints > bookingOptions.maxPoints) {
         throw new DetailsValidationError(`clubArmyPoints must be a whole number from 1 to ${bookingOptions.maxPoints}`);

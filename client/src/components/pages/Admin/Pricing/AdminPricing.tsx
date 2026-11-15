@@ -181,7 +181,7 @@ function ServicePriceCard({ service }: { service: ServicePrice }) {
           {billingMode === "per_guest" && "Итог = цена × число гостей."}
           {billingMode === "per_table" && "Итог = цена за стол; если за столом несколько игроков — делится между ними поровну."}
           {billingMode === "per_pair" && "Итог = цена × число пар; нечётный гость считается как пара."}
-          {isWarhammer && ` Аренда = очки × ${armyRentalPrice || "0"} / 1000.`}
+          {isWarhammer && ` Аренда = очки × ${armyRentalPrice || "0"} / 1000; команда Kill Team и варбанда Warcry — как 1000 очков.`}
         </p>
         <button
           type="submit"

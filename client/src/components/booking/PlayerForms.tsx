@@ -1,4 +1,4 @@
-import type { BookingOptions } from "@/apiUtils/booking";
+import { gameHasPoints, type BookingOptions } from "@/apiUtils/booking";
 import type { PaintingFormValue, PlayerFormValue } from "./formValues";
 import clsx from "clsx";
 import { useState } from "react";
@@ -137,7 +137,7 @@ export function PlayerInfoForm({
             value={value.game}
             onChange={(game) =>
               // другая игра — другой список армий; очки у Kill Team не нужны
-              set({ game: game as PlayerFormValue["game"], army: "", points: game === "kt" ? "" : value.points })
+              set({ game: game as PlayerFormValue["game"], army: "", points: gameHasPoints(game) ? value.points : "" })
             }
           />
         )}
@@ -148,7 +148,7 @@ export function PlayerInfoForm({
         game={value.game}
         onPick={(r) => {
           setPicked((n) => n + 1);
-          set({ army: r.army.slice(0, 80), ...(r.points != null && !kt ? { points: String(r.points) } : {}) });
+          set({ army: r.army.slice(0, 80), ...(r.points != null && gameHasPoints(value.game) ? { points: String(r.points) } : {}) });
         }}
       />
 
@@ -163,7 +163,7 @@ export function PlayerInfoForm({
         />
       </Field>
 
-      {!kt && (
+      {gameHasPoints(value.game) && (
       <Field label="Очки">
         <div className="space-y-2">
           <div className="flex flex-wrap gap-2">
