@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { NOTIFICATION_KINDS, renderTemplate } from '../src/modules/notifications/catalog';
 import { cardCaption, parseNotificationCard } from '../src/modules/notifications/card/parse';
-import { renderCardPng } from '../src/modules/notifications/card/render';
+import { CARD_STYLES, renderCardPng } from '../src/modules/notifications/card/render';
 
 describe('карточка уведомления: разбор текста (14.11.2026)', () => {
   test('заголовок «Метка: игра» → надзаголовок и крупный заголовок; строки 🗓 / 🎲 и «Метка: значение»', () => {
@@ -44,6 +44,18 @@ describe('карточка уведомления: PNG по всем станд�
       expect(Array.from(png.slice(0, 4))).toEqual([0x89, 0x50, 0x4e, 0x47]);
       expect(png.length).toBeGreaterThan(10_000);
       if (out) writeFileSync(`${out}/${kind.id}.png`, png);
+    }, 20_000);
+  }
+});
+
+describe('карточка уведомления: варианты оформления на одном примере (15.11.2026)', () => {
+  const out = process.env.CARD_SAMPLES_DIR;
+  const kind = NOTIFICATION_KINDS.find((k) => k.id === 'admin_booking')!;
+  for (const style of CARD_STYLES) {
+    test(style, async () => {
+      const png = await renderCardPng(parseNotificationCard(renderTemplate(kind.defaultText, kind.vars), kind.title), style);
+      expect(Array.from(png.slice(0, 4))).toEqual([0x89, 0x50, 0x4e, 0x47]);
+      if (out) writeFileSync(`${out}/style-${style}.png`, png);
     }, 20_000);
   }
 });
