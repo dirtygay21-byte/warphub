@@ -85,19 +85,38 @@ function titleSize(title: string) {
 }
 
 /**
- * Фон с «червяками». phase 0…1 — кадр анимации (15.11.2026): изгибы червяков плавно покачиваются по кругу,
- * у каждого со своим сдвигом; концы за краем картинки, поэтому движение выглядит как ползание.
+ * Фон: толстые чёрные «червяки» из правых углов (стиль мерча, выбор владельца). 15.11.2026: в анимации каждый
+ * червяк плавно ездит туда-сюда вдоль своего направления (заезжает за край и выезжает обратно), у каждого свой
+ * сдвиг по времени; к концам добавлены прямые «хвосты» за краем, чтобы при движении концы не показывались.
+ * phase 0…1 — кадр (синус, поэтому цикл бесшовный); статичная картинка — phase 0.
  */
+const WORM_SWING = 60;
+
+type Worm = { d: string; dir: [number, number]; k: number };
+const WORMS: Worm[] = [
+  {
+    d: `M${W - 454} -206 L${W - 420} -60 C${W - 380} 110 ${W - 230} 60 ${W - 190} 200 S${W - 80} 360 ${W + 60} 320 L${W + 204} 279`,
+    dir: [0.78, 0.62],
+    k: 0,
+  },
+  {
+    d: `M${W - 290} -205 L${W - 250} -60 C${W - 220} 50 ${W - 110} 20 ${W - 70} 120 S${W + 10} 200 ${W + 70} 170 L${W + 204} 103`,
+    dir: [0.81, 0.58],
+    k: 1 / 3,
+  },
+  {
+    d: `M${W + 206} ${H - 214} L${W + 60} ${H - 250} C${W - 100} ${H - 290} ${W - 130} ${H - 120} ${W - 270} ${H - 110} S${W - 400} ${H + 10} ${W - 430} ${H + 60} L${W - 507} ${H + 189}`,
+    dir: [-0.85, 0.53],
+    k: 2 / 3,
+  },
+];
+
 function backdrop(tone: string, phase = 0) {
-  const worm = (d: string) => `<path d="${d}" fill="none" stroke="${INK}" stroke-width="62" stroke-linecap="round"/>`;
-  const a = (k: number, amp: number) => (amp * Math.sin(2 * Math.PI * (phase + k))).toFixed(1);
-  const b = (k: number, amp: number) => (amp * Math.cos(2 * Math.PI * (phase + k))).toFixed(1);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-<rect width="${W}" height="${H}" fill="${tone}"/>
-<g transform="translate(${a(0, 6)} ${b(0, 4)})">${worm(`M${W - 420} -60 C${W - 380} ${110} ${W - 230 + +a(0.1, 26)} ${60 + +b(0.1, 22)} ${W - 190 + +a(0.25, 18)} ${200 + +b(0.25, 14)} S${W - 80 + +a(0.4, 24)} ${360 + +b(0.4, 20)} ${W + 60} 320`)}</g>
-<g transform="translate(${a(0.33, 6)} ${b(0.33, 4)})">${worm(`M${W - 250} -60 C${W - 220} 50 ${W - 110 + +a(0.45, 22)} ${20 + +b(0.45, 18)} ${W - 70 + +a(0.6, 16)} ${120 + +b(0.6, 14)} S${W + 10} 200 ${W + 70} 170`)}</g>
-<g transform="translate(${a(0.66, 6)} ${b(0.66, 4)})">${worm(`M${W + 60} ${H - 250} C${W - 100 + +a(0.7, 24)} ${H - 290 + +b(0.7, 20)} ${W - 130 + +a(0.85, 22)} ${H - 120 + +b(0.85, 18)} ${W - 270 + +a(0.95, 18)} ${H - 110 + +b(0.95, 14)} S${W - 400} ${H + 10} ${W - 430} ${H + 60}`)}</g>
-</svg>`;
+  const worms = WORMS.map(({ d, dir, k }) => {
+    const s = WORM_SWING * Math.sin(2 * Math.PI * (phase + k));
+    return `<path transform="translate(${(dir[0] * s).toFixed(1)} ${(dir[1] * s).toFixed(1)})" d="${d}" fill="none" stroke="${INK}" stroke-width="62" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }).join('');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="${tone}"/>${worms}</svg>`;
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }
 
@@ -140,13 +159,14 @@ export async function renderCardPng(card: NotificationCard): Promise<Uint8Array>
 }
 
 /**
- * Анимированная карточка (GIF, 15.11.2026): текст рисуется один раз (satori), меняется только фон-узор —
- * его картинка подменяется в готовом SVG для каждого кадра. 640×360 (в чате показывается ещё меньше),
- * 20 кадров по 80 мс, бесконечный повтор; палитра по первому кадру (цвета во всех кадрах одни и те же).
+ * Анимированная карточка (GIF, 15.11.2026). Текст рисуется один раз (satori), для кадров подменяется только фон.
+ * Качество (владелец: «стало хуже»): полный размер 1280×720, палитра 255 цветов по первому кадру; в следующих
+ * кадрах неизменившиеся точки прозрачные (остаётся предыдущий кадр) — меняются только червяки,
+ * поэтому файл небольшой. 36 кадров по 60 мс (≈2,2 с), червяки ездят туда-сюда, повтор бесконечный.
  */
-export const GIF_W = 640;
-export const GIF_FRAMES = 20;
-const GIF_DELAY = 80;
+export const GIF_W = W;
+export const GIF_FRAMES = 36;
+const GIF_DELAY = 60;
 
 export async function renderCardGif(card: NotificationCard): Promise<Uint8Array> {
   const { fonts: fl, logo: l } = assets();
@@ -157,12 +177,26 @@ export async function renderCardGif(card: NotificationCard): Promise<Uint8Array>
   if (!svg.includes(first)) throw new Error('animation: background not found in svg');
   const gif = gifenc.GIFEncoder();
   let palette: number[][] | null = null;
+  let transparentIndex = 0;
+  let previous: Uint8Array | null = null;
   for (let i = 0; i < GIF_FRAMES; i++) {
     const frame = i === 0 ? svg : svg.replace(first, backdrop(tone, i / GIF_FRAMES));
     const image = new Resvg(frame, { fitTo: { mode: 'width', value: GIF_W } }).render();
     const rgba = new Uint8Array(image.pixels.buffer, image.pixels.byteOffset, image.pixels.length);
-    palette ??= gifenc.quantize(rgba, 64);
-    gif.writeFrame(gifenc.applyPalette(rgba, palette), image.width, image.height, { palette: i === 0 ? palette : undefined, delay: GIF_DELAY });
+    if (!palette) {
+      palette = gifenc.quantize(rgba, 255);
+      transparentIndex = palette.length;
+      palette.push([255, 0, 255]); // служебный «прозрачный» цвет, в картинке не встречается
+    }
+    const index = gifenc.applyPalette(rgba, palette.slice(0, transparentIndex));
+    if (!previous) {
+      gif.writeFrame(index, image.width, image.height, { palette, delay: GIF_DELAY, dispose: 1 });
+    } else {
+      const delta = new Uint8Array(index.length);
+      for (let p = 0; p < index.length; p++) delta[p] = index[p] === previous[p] ? transparentIndex : index[p]!;
+      gif.writeFrame(delta, image.width, image.height, { delay: GIF_DELAY, transparent: true, transparentIndex, dispose: 1 });
+    }
+    previous = index;
   }
   gif.finish();
   return gif.bytes();
