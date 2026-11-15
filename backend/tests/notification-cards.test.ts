@@ -29,8 +29,12 @@ describe('карточка уведомления: разбор текста (14
       { type: 'list', items: ['18:00 Kill Team — Иван & Ко', '19:00 AoS'] },
     ]);
   });
-  test('подпись — первые две строки', () => {
-    expect(cardCaption('✅ <b>Вы записаны: Kill Team</b>\n🗓 сб, 15 ноября\n🎲 Стол 1')).toBe('✅ <b>Вы записаны: Kill Team</b>\n🗓 сб, 15 ноября');
+  test('подпись — весь текст; длинный обрезается по строкам до 1024', () => {
+    expect(cardCaption('✅ <b>Вы записаны: Kill Team</b>\n🗓 сб, 15 ноября\n🎲 Стол 1')).toBe('✅ <b>Вы записаны: Kill Team</b>\n🗓 сб, 15 ноября\n🎲 Стол 1');
+    const long = cardCaption(['<b>Заголовок</b>', ...Array.from({ length: 80 }, (_, i) => `• строка номер ${i} <b>жирная</b>`)].join('\n'));
+    expect(long.length).toBeLessThanOrEqual(1024);
+    expect(long.startsWith('<b>Заголовок</b>')).toBe(true);
+    expect(long.endsWith('</b>')).toBe(true);
   });
 });
 

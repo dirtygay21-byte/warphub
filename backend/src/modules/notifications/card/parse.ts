@@ -128,9 +128,14 @@ export function parseNotificationCard(html: string, fallbackKicker = 'WarpHub'):
   return { kicker: kicker || fallbackKicker, title: title || fallbackKicker, subtitle, tone, blocks, note };
 }
 
-/** Подпись под картинкой: 1–2 первые строки текста (заголовок и время), не длиннее лимита Telegram. */
+/**
+ * Подпись под картинкой (15.11.2026, владелец: «не нужно открывать картинку, чтобы прочитать текст»):
+ * весь текст уведомления; картинка — крупно главное. Не длиннее лимита подписи Telegram (1024): лишние строки
+ * с конца отбрасываются целиком, чтобы не резать HTML-теги.
+ */
 export function cardCaption(html: string, limit = 1024): string {
-  const lines = html.split('\n').filter((l) => decode(l).trim());
-  const caption = lines.slice(0, 2).join('\n');
-  return caption.length <= limit ? caption : lines[0]!.slice(0, limit);
+  const lines = html.split('\n');
+  while (lines.length > 1 && lines.join('\n').length > limit) lines.pop();
+  const caption = lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  return caption.length <= limit ? caption : decode(caption).slice(0, limit - 1) + '…';
 }
