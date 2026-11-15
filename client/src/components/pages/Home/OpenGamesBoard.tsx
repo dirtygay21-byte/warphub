@@ -3,22 +3,14 @@ import type { Discipline } from "@/types";
 import { DateTile, SectionLabel } from "@/components/ui/ds";
 import { useRegistrationStageStore } from "@/stores/useRegistrationStageStore";
 import { useReservationStore } from "@/stores/useReservationStore";
-import { formatClubDate, formatClubTimeRange } from "@/utils/clubTime";
+import { formatClubTimeRange } from "@/utils/clubTime";
+import { openGameShareText } from "@/utils/openGameShare";
 import { haptic } from "@/utils/haptic";
 import { s3Url } from "@/utils/s3utils";
 import { shareToChat } from "@/utils/telegramApp";
 import { useQuery } from "@tanstack/react-query";
 import { Send } from "lucide-react";
 import { useState } from "react";
-
-/** Текст приглашения для чата: игра, день, время, кто ждёт. */
-export function openGameShareText(g: Pick<OpenGame, "serviceTitle" | "startsAt" | "endsAt" | "players">) {
-  const p = g.players[0];
-  const who = [p?.gameLabel, p?.army].filter(Boolean).join(", ");
-  return `Ищу соперника в WarpHub: ${g.serviceTitle ?? "игра"}, ${formatClubDate(g.startsAt)}, ${formatClubTimeRange(g.startsAt, g.endsAt)}${
-    who ? ` (${who})` : ""
-  }. Записаться — в боте:`;
-}
 
 /**
  * Доска «Ищут соперника» (этап 2, 15.11.2026): все столы на 7 дней, где один игрок ждёт пару, — по всем играм сразу.

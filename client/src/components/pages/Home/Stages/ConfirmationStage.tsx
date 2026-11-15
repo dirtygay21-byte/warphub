@@ -18,7 +18,7 @@ import { formatSelectedDate } from "@/utils/date";
 import { Badge, DsButton, LimeHero } from "@/components/ui/ds";
 import type { ReactNode } from "react";
 import { downloadFile, shareToChat } from "@/utils/telegramApp";
-import { openGameShareText } from "@/components/pages/Home/OpenGamesBoard";
+import { openGameShareText } from "@/utils/openGameShare";
 
 type ConfirmationStatus = "Success" | "Succes" | "Error";
 
