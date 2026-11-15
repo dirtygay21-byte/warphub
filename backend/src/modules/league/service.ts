@@ -412,7 +412,7 @@ export async function resultCardPng(id: string, sideRaw: unknown): Promise<Uint8
     buildResultCard({
       result,
       gameLabel: gameLabel(r.game),
-      when: formatClubDateTime(r.startsAt, r.endsAt),
+      when: formatClubDateTime(r.startsAt).split(', ').slice(0, 2).join(', '),
       opponent: other ? nameOf({ firstName: other.firstName, lastName: other.lastName, username: null }) : 'Игрок',
       season,
       rating: after,

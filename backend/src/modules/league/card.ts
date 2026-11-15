@@ -2,6 +2,8 @@
 import type { NotificationCard } from '../notifications/card/parse';
 import { seasonLabel } from './elo';
 
+const SHORT: Record<string, string> = { 'Warhammer 40,000': 'Warhammer 40K', 'Age of Sigmar': 'Age of Sigmar', 'Kill Team': 'Kill Team', Warcry: 'Warcry' };
+
 export function buildResultCard(p: {
   result: 'win' | 'loss' | 'draw';
   gameLabel: string;
@@ -11,9 +13,10 @@ export function buildResultCard(p: {
   rating: { rating: number; delta: number } | null;
 }): NotificationCard {
   return {
-    kicker: p.result === 'win' ? 'Победа' : p.result === 'draw' ? 'Ничья' : 'Клубная лига',
-    title: p.gameLabel,
-    subtitle: seasonLabel(p.season).split(' · ')[0]!,
+    // на картинке тесно (проверено по образцу в CI): сезон — в надзаголовке, игра — коротко, дата без времени
+    kicker: `${p.result === 'win' ? 'Победа' : p.result === 'draw' ? 'Ничья' : 'Лига'} · ${seasonLabel(p.season).split(' · ')[0]!}`,
+    title: SHORT[p.gameLabel] ?? p.gameLabel,
+    subtitle: '',
     tone: p.result === 'win' ? 'accent' : 'neutral',
     blocks: [
       {
