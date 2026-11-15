@@ -1,0 +1,42 @@
+# Одноразовый: добавить h264-mp4-encoder (чёткая анимация уведомлений в MP4) и обновить bun.lock. Удаляется следующим коммитом.
+name: deps-notify-mp4
+on:
+  push:
+    branches: [fix/notify-anim-forward]
+    paths: [.github/workflows/deps-notify-mp4.yml]
+permissions:
+  contents: write
+jobs:
+  add:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/notify-anim-forward
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+      - name: bun add
+        working-directory: backend
+        run: |
+          bun add h264-mp4-encoder
+          grep -n '"h264-mp4-encoder"' package.json
+          cat > /tmp/t.ts <<'TS'
+          const HME = await import('h264-mp4-encoder');
+          const enc = await (HME.default ?? HME).createH264MP4Encoder();
+          enc.width = 64; enc.height = 64; enc.frameRate = 24; enc.quantizationParameter = 18;
+          enc.initialize();
+          for (let i = 0; i < 24; i++) enc.addFrameRgba(new Uint8Array(64 * 64 * 4).fill(i * 10));
+          enc.finalize();
+          const out = enc.FS.readFile(enc.outputFilename);
+          console.log('mp4 ok', out.length);
+          enc.delete();
+          TS
+          cp /tmp/t.ts ./mp4-probe.ts && bun run ./mp4-probe.ts && rm mp4-probe.ts
+      - name: commit lock
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add backend/package.json backend/bun.lock
+          git commit -m "backend: h264-mp4-encoder для чёткой анимации уведомлений"
+          git push origin HEAD:fix/notify-anim-forward
