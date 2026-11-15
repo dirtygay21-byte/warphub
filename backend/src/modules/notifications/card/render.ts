@@ -85,37 +85,33 @@ function titleSize(title: string) {
 }
 
 /**
- * Фон: толстые чёрные «червяки» из правых углов (стиль мерча, выбор владельца). 15.11.2026: в анимации каждый
- * червяк плавно ездит туда-сюда вдоль своего направления (заезжает за край и выезжает обратно), у каждого свой
- * сдвиг по времени; к концам добавлены прямые «хвосты» за краем, чтобы при движении концы не показывались.
- * phase 0…1 — кадр (синус, поэтому цикл бесшовный); статичная картинка — phase 0.
+ * Фон: толстые чёрные «червяки» из правых углов (стиль мерча, выбор владельца). 15.11.2026 (владелец):
+ * червяки бесконечно «прокручиваются» вперёд вдоль своего направления. Каждый червяк — волна той же формы,
+ * что и на прежней картинке (S-изгиб из угла), на месте прежнего; за цикл волна сдвигается ровно на свою длину,
+ * поэтому цикл бесшовный, а движение — только вперёд. phase 0…1 — кадр; статичная картинка — phase 0.
  */
-const WORM_SWING = 60;
-
-type Worm = { d: string; dir: [number, number]; k: number };
+type Worm = { x: number; y: number; angle: number; lambda: number; amp: number; half: number };
 const WORMS: Worm[] = [
-  {
-    d: `M${W - 454} -206 L${W - 420} -60 C${W - 380} 110 ${W - 230} 60 ${W - 190} 200 S${W - 80} 360 ${W + 60} 320 L${W + 204} 279`,
-    dir: [0.78, 0.62],
-    k: 0,
-  },
-  {
-    d: `M${W - 290} -205 L${W - 250} -60 C${W - 220} 50 ${W - 110} 20 ${W - 70} 120 S${W + 10} 200 ${W + 70} 170 L${W + 204} 103`,
-    dir: [0.81, 0.58],
-    k: 1 / 3,
-  },
-  {
-    d: `M${W + 206} ${H - 214} L${W + 60} ${H - 250} C${W - 100} ${H - 290} ${W - 130} ${H - 120} ${W - 270} ${H - 110} S${W - 400} ${H + 10} ${W - 430} ${H + 60} L${W - 507} ${H + 189}`,
-    dir: [-0.85, 0.53],
-    k: 2 / 3,
-  },
+  { x: W - 180, y: 130, angle: 38, lambda: 620, amp: 52, half: 760 },
+  { x: W - 80, y: 50, angle: 36, lambda: 420, amp: 38, half: 560 },
+  { x: W - 190, y: H - 95, angle: 148, lambda: 600, amp: 52, half: 760 },
 ];
 
+function wormPath({ lambda, amp, half }: Worm, shift: number) {
+  const step = lambda / 2;
+  let x = -half - lambda * 2 + shift;
+  let d = `M${x.toFixed(1)} 0`;
+  for (let i = 0; x < half + lambda; i++, x += step) {
+    const dy = (i % 2 ? 1 : -1) * amp * 1.33;
+    d += ` C${(x + step * 0.35).toFixed(1)} ${dy.toFixed(1)} ${(x + step * 0.65).toFixed(1)} ${dy.toFixed(1)} ${(x + step).toFixed(1)} 0`;
+  }
+  return d;
+}
+
 function backdrop(tone: string, phase = 0) {
-  const worms = WORMS.map(({ d, dir, k }) => {
-    const s = WORM_SWING * Math.sin(2 * Math.PI * (phase + k));
-    return `<path transform="translate(${(dir[0] * s).toFixed(1)} ${(dir[1] * s).toFixed(1)})" d="${d}" fill="none" stroke="${INK}" stroke-width="62" stroke-linecap="round" stroke-linejoin="round"/>`;
-  }).join('');
+  const worms = WORMS.map((w) =>
+    `<g transform="translate(${w.x} ${w.y}) rotate(${w.angle})"><path d="${wormPath(w, phase * w.lambda)}" fill="none" stroke="${INK}" stroke-width="62" stroke-linecap="round"/></g>`,
+  ).join('');
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="${tone}"/>${worms}</svg>`;
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }
@@ -162,7 +158,7 @@ export async function renderCardPng(card: NotificationCard): Promise<Uint8Array>
  * Анимированная карточка (GIF, 15.11.2026). Текст рисуется один раз (satori), для кадров подменяется только фон.
  * Качество (владелец: «стало хуже»): полный размер 1280×720, палитра 255 цветов по первому кадру; в следующих
  * кадрах неизменившиеся точки прозрачные (остаётся предыдущий кадр) — меняются только червяки,
- * поэтому файл небольшой. 36 кадров по 60 мс (≈2,2 с), червяки ездят туда-сюда, повтор бесконечный.
+ * поэтому файл небольшой. 36 кадров по 60 мс (≈2,2 с), червяки прокручиваются вперёд, повтор бесконечный.
  */
 export const GIF_W = W;
 export const GIF_FRAMES = 36;
