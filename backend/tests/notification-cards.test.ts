@@ -40,7 +40,7 @@ describe('карточка уведомления: PNG по всем станд�
   for (const kind of NOTIFICATION_KINDS) {
     test(kind.id, async () => {
       const text = renderTemplate(kind.defaultText, kind.vars);
-      const png = await renderCardPng(parseNotificationCard(text, kind.title), 'date-compact');
+      const png = await renderCardPng(parseNotificationCard(text, kind.title), 'date-band');
       expect(Array.from(png.slice(0, 4))).toEqual([0x89, 0x50, 0x4e, 0x47]);
       expect(png.length).toBeGreaterThan(10_000);
       if (out) writeFileSync(`${out}/${kind.id}.png`, png);

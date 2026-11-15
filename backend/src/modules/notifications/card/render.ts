@@ -14,12 +14,15 @@ import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import type { CardBlock, CardRow, NotificationCard } from './parse';
 
-export const CARD_STYLES = ['base', 'date', 'tiles', 'stripe', 'date-compact', 'date-mini'] as const;
+export const CARD_STYLES = ['base', 'date', 'tiles', 'stripe', 'date-compact', 'date-mini', 'date-band', 'date-grey', 'date-lime'] as const;
 export type CardStyle = (typeof CARD_STYLES)[number];
 const DEFAULT_STYLE: CardStyle = 'date';
 /** compact: 0 — обычно; 1 — логотип и надзаголовок в одну строку, строки данных «метка — значение» в одну линию;
  *  2 — то же без панели вокруг данных, меньше поля и кегли (самый низкий). */
-type Flags = { date: boolean; tiles: boolean; stripe: boolean; compact: 0 | 1 | 2 };
+/** pattern — узоры мерча WarpHub (15.11.2026): band — лаймовая волна внизу; grey — серые волны на тёмном;
+ *  lime — лаймовый фон и чёрные «червячки» справа. Заголовок в узорных вариантах — цветом смысла, без полоски. */
+type Pattern = 'band' | 'grey' | 'lime';
+type Flags = { date: boolean; tiles: boolean; stripe: boolean; compact: 0 | 1 | 2; pattern?: Pattern };
 const FLAGS: Record<CardStyle, Flags> = {
   base: { date: false, tiles: false, stripe: false, compact: 0 },
   date: { date: true, tiles: false, stripe: false, compact: 0 },
@@ -27,7 +30,44 @@ const FLAGS: Record<CardStyle, Flags> = {
   stripe: { date: false, tiles: false, stripe: true, compact: 0 },
   'date-compact': { date: true, tiles: false, stripe: false, compact: 1 },
   'date-mini': { date: true, tiles: false, stripe: false, compact: 2 },
+  'date-band': { date: true, tiles: false, stripe: false, compact: 0, pattern: 'band' },
+  'date-grey': { date: true, tiles: false, stripe: false, compact: 0, pattern: 'grey' },
+  'date-lime': { date: true, tiles: false, stripe: false, compact: 0, pattern: 'lime' },
 };
+
+const BAND = 190;
+
+/** Волна из полуволн-кубиков: x0…x1 на высоте y, размах amp, длина полуволны len. */
+function wave(x0: number, x1: number, y: number, amp: number, len: number) {
+  let d = `M${x0} ${y}`;
+  for (let x = x0, i = 0; x < x1; x += len, i++) {
+    const dy = (i % 2 ? 1 : -1) * amp * 1.33;
+    d += ` C${(x + len * 0.35).toFixed(1)} ${(y + dy).toFixed(1)} ${(x + len * 0.65).toFixed(1)} ${(y + dy).toFixed(1)} ${x + len} ${y}`;
+  }
+  return d;
+}
+
+function patternSvg(pattern: Pattern, height: number, tone: string) {
+  let body = '';
+  if (pattern === 'band') {
+    const top = height - BAND + 40;
+    body =
+      `<path d="${wave(-60, W + 260, top, 34, 240)} L${W + 260} ${height + 10} L-60 ${height + 10} Z" fill="${tone}"/>` +
+      `<path d="${wave(-80, W + 300, height - 70, 30, 280)}" fill="none" stroke="#111110" stroke-width="34" stroke-linecap="round"/>`;
+  } else if (pattern === 'grey') {
+    body = [0.3, 0.62, 0.94]
+      .map((k) => `<path d="${wave(-120, W + 320, height * k, 60, 330)}" fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="64" stroke-linecap="round"/>`)
+      .join('');
+    body = `<g transform="rotate(-8 ${W / 2} ${height / 2})">${body}</g>`;
+  } else {
+    body = `<rect width="${W}" height="${height}" fill="${tone}"/>`;
+    for (let y = 40; y < height + 80; y += 150) {
+      body += `<path d="M${W - 230} ${y} C${W - 150} ${y - 60} ${W - 90} ${y + 70} ${W + 10} ${y} S${W + 130} ${y - 40} ${W + 200} ${y}" fill="none" stroke="#111110" stroke-width="44" stroke-linecap="round"/>`;
+    }
+  }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${height}" viewBox="0 0 ${W} ${height}"><rect width="${W}" height="${height}" fill="#111110"/>${body}</svg>`;
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
+}
 
 const W = 1280;
 const MIN_H = 720;
@@ -138,7 +178,7 @@ function heights(card: NotificationCard, f: Flags, when: string, blocks: CardBlo
     if (b.type === 'list') right += 16 + b.items.reduce((s, i) => s + 12 + lineCount(i, 30, 0.52, RIGHT - 40) * 42, 0);
     if (b.type === 'text') right += 24 + lineCount(b.text, 30, 0.52, RIGHT) * 42;
   }
-  return Math.round(Math.min(2400, Math.max(MIN_H, Math.max(left, right) + PAD * 2 + 48)));
+  return Math.round(Math.min(2400, Math.max(MIN_H, Math.max(left, right) + PAD * 2 + 48)) + (f.pattern === 'band' ? BAND - 40 : 0));
 }
 
 const C = {
@@ -211,7 +251,7 @@ function tiles(rows: CardRow[], tone: string): Node {
   );
 }
 
-function block(b: CardBlock, tone: string, f: Flags, first: boolean): Node {
+function block(b: CardBlock, tone: string, f: Flags, first: boolean, onLime = false): Node {
   const top = first ? 0 : 28;
   if (b.type === 'rows' && f.tiles) return el('div', { marginTop: top }, tiles(b.rows, tone));
   if (b.type === 'rows' && f.compact) return inlineRows(b.rows, f, first);
@@ -228,7 +268,7 @@ function block(b: CardBlock, tone: string, f: Flags, first: boolean): Node {
     );
   }
   if (b.type === 'heading') {
-    return el('div', { marginTop: first ? 0 : 32, fontFamily: OSWALD, fontWeight: 600, fontSize: 34, textTransform: 'uppercase', letterSpacing: 1, color: COLORS.fg }, b.text);
+    return el('div', { marginTop: first ? 0 : 32, fontFamily: OSWALD, fontWeight: 600, fontSize: 34, textTransform: 'uppercase', letterSpacing: 1, color: onLime ? COLORS.bg : COLORS.fg }, b.text);
   }
   if (b.type === 'list') {
     return el(
@@ -236,13 +276,13 @@ function block(b: CardBlock, tone: string, f: Flags, first: boolean): Node {
       { flexDirection: 'column', marginTop: first ? 0 : 16 },
       b.items.map((item) =>
         el('div', { alignItems: 'flex-start', marginTop: 12 }, [
-          el('div', { width: 12, height: 12, marginTop: 14, marginRight: 20, borderRadius: 6, backgroundColor: tone, flexShrink: 0 }),
-          el('div', { flex: 1, fontFamily: INTER, fontWeight: 400, fontSize: 30, lineHeight: 1.4, color: COLORS.fg }, item),
+          el('div', { width: 12, height: 12, marginTop: 14, marginRight: 20, borderRadius: 6, backgroundColor: onLime ? COLORS.bg : tone, flexShrink: 0 }),
+          el('div', { flex: 1, fontFamily: INTER, fontWeight: 400, fontSize: 30, lineHeight: 1.4, color: onLime ? COLORS.bg : COLORS.fg }, item),
         ]),
       ),
     );
   }
-  return el('div', { marginTop: first ? 0 : 24, fontFamily: INTER, fontWeight: 400, fontSize: 30, lineHeight: 1.4, color: COLORS.fg2 }, b.text);
+  return el('div', { marginTop: first ? 0 : 24, fontFamily: INTER, fontWeight: 400, fontSize: 30, lineHeight: 1.4, color: onLime ? 'rgba(17,17,16,0.8)' : COLORS.fg2 }, b.text);
 }
 
 export function cardTree(card: NotificationCard, logoSrc: string, height: number, style: CardStyle = DEFAULT_STYLE): Node {
@@ -251,21 +291,27 @@ export function cardTree(card: NotificationCard, logoSrc: string, height: number
   const { when, blocks } = splitWhen(card, f.date);
   if (f.compact) return compactTree(card, logoSrc, height, f, tone, when, blocks);
   const ts = titleSize(card.title);
+  const onLime = f.pattern === 'lime';
+  const ink = onLime ? COLORS.bg : COLORS.fg; // основной текст
+  const accentText = onLime ? COLORS.bg : tone; // надзаголовок
+  const muted = onLime ? 'rgba(17,17,16,0.72)' : COLORS.fg3;
   const left = el('div', { flexDirection: 'column', width: LEFT, flexShrink: 0 }, [
     el('div', { alignItems: 'center', justifyContent: 'space-between' }, [
       el('img', { width: 72, height: 72 }, undefined, { src: logoSrc, width: 72, height: 72 }),
-      el('div', { fontFamily: INTER, fontWeight: 600, fontSize: 20, letterSpacing: 8, color: COLORS.fg3 }, 'WARPHUB'),
+      el('div', { fontFamily: INTER, fontWeight: 600, fontSize: 20, letterSpacing: 8, color: muted }, 'WARPHUB'),
     ]),
-    el('div', { marginTop: 48, fontFamily: INTER, fontWeight: 600, fontSize: 26, letterSpacing: 5, textTransform: 'uppercase', color: tone }, f.stripe ? `${card.kicker} · WarpHub` : card.kicker),
-    el('div', { marginTop: 14, fontFamily: OSWALD, fontWeight: 700, fontSize: ts, lineHeight: 1.04, textTransform: 'uppercase', color: COLORS.fg }, card.title),
-    el('div', { marginTop: 22, width: f.stripe ? 200 : 130, height: 10, borderRadius: 5, backgroundColor: tone }),
-    ...(when ? [el('div', { marginTop: 26, fontFamily: OSWALD, fontWeight: 600, fontSize: 40, lineHeight: 1.2, textTransform: 'uppercase', color: COLORS.fg }, when)] : []),
+    el('div', { marginTop: 48, fontFamily: INTER, fontWeight: 600, fontSize: 26, letterSpacing: 5, textTransform: 'uppercase', color: accentText }, f.stripe ? `${card.kicker} · WarpHub` : card.kicker),
+    el('div', { marginTop: 14, fontFamily: OSWALD, fontWeight: 700, fontSize: ts, lineHeight: 1.04, textTransform: 'uppercase', color: f.pattern && !onLime ? tone : ink }, card.title),
+    ...(f.pattern ? [] : [el('div', { marginTop: 22, width: f.stripe ? 200 : 130, height: 10, borderRadius: 5, backgroundColor: tone })]),
+    ...(when ? [el('div', { marginTop: 26, fontFamily: OSWALD, fontWeight: 600, fontSize: 40, lineHeight: 1.2, textTransform: 'uppercase', color: ink }, when)] : []),
     ...(card.subtitle && f.date
       ? [
           el('div', { marginTop: 24 }, [
             el(
               'div',
-              { padding: '8px 24px', border: `3px solid ${tone}`, borderRadius: 40, fontFamily: OSWALD, fontWeight: 600, fontSize: 26, letterSpacing: 1, textTransform: 'uppercase', color: tone },
+              onLime
+                ? { padding: '8px 24px', borderRadius: 40, backgroundColor: COLORS.bg, fontFamily: OSWALD, fontWeight: 600, fontSize: 26, letterSpacing: 1, textTransform: 'uppercase', color: tone }
+                : { padding: '8px 24px', border: `3px solid ${tone}`, borderRadius: 40, fontFamily: OSWALD, fontWeight: 600, fontSize: 26, letterSpacing: 1, textTransform: 'uppercase', color: tone },
               card.subtitle,
             ),
           ]),
@@ -273,10 +319,23 @@ export function cardTree(card: NotificationCard, logoSrc: string, height: number
       : []),
     ...(card.subtitle && !f.date ? [el('div', { marginTop: 22, fontFamily: INTER, fontWeight: 400, fontSize: 32, lineHeight: 1.35, color: COLORS.fg2 }, card.subtitle)] : []),
     el('div', { flexDirection: 'column', marginTop: 'auto', paddingTop: 48 }, [
-      ...(card.note ? [el('div', { marginBottom: 16, fontFamily: INTER, fontWeight: 400, fontSize: 26, lineHeight: 1.4, color: COLORS.fg3 }, card.note)] : []),
-      el('div', { fontFamily: OSWALD, fontWeight: 600, fontSize: 22, letterSpacing: 8, color: COLORS.fg3 }, '• WARPHUB.RU •'),
+      ...(card.note ? [el('div', { marginBottom: 16, fontFamily: INTER, fontWeight: 400, fontSize: 26, lineHeight: 1.4, color: onLime ? muted : COLORS.fg3 }, card.note)] : []),
+      el('div', { fontFamily: OSWALD, fontWeight: 600, fontSize: 22, letterSpacing: 8, color: muted }, '• WARPHUB.RU •'),
     ]),
   ]);
+  if (f.pattern) {
+    const right = el(
+      'div',
+      { flexDirection: 'column', width: RIGHT, marginLeft: GAP, justifyContent: 'center' },
+      blocks.map((b, i) => block(b, tone, f, i === 0, onLime)),
+    );
+    const contentH = height - PAD * 2 - (f.pattern === 'band' ? BAND - 40 : 0);
+    // фон-узор картинкой; содержимое — абсолютно и после фона, иначе satori рисует фон поверх текста
+    return el('div', { width: W, height, position: 'relative', backgroundColor: COLORS.bg }, [
+      el('img', { position: 'absolute', top: 0, left: 0, width: W, height }, undefined, { src: patternSvg(f.pattern, height, tone), width: W, height }),
+      el('div', { position: 'absolute', top: PAD, left: PAD, width: W - PAD * 2, height: contentH }, [left, right]),
+    ]);
+  }
   const right = el(
     'div',
     { flexDirection: 'column', width: RIGHT, marginLeft: GAP, justifyContent: 'center' },
