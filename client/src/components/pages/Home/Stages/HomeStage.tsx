@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { s3Url } from "@/utils/s3utils";
 import { getRosterAccess } from "@/apiUtils/roster";
 import { BookOpen, ChevronRight, Swords } from "lucide-react";
-import { DateTile, LimeHero, SectionLabel, Skeleton } from "@/components/ui/ds";
+import { DateTile, LimeHero, SectionLabel } from "@/components/ui/ds";
 import { haptic } from "@/utils/haptic";
 import { isInactiveReservation, sortReservationsForDisplay } from "@/utils/reservation";
 import { formatTimeRange, getStatusLabel } from "@/utils/reservationDisplay";
