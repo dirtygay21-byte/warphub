@@ -42,6 +42,7 @@ import {
 import { handleMinigame } from '../minigames/http';
 import { testUserNotification } from '../notifications/service';
 import { joinWaitlist, leaveWaitlist, myWaitlist, WaitlistError } from '../booking/waitlist';
+import { getTournament } from '../tournaments/service';
 import { confirmResult, disputeResult, getLeagueTable, LeagueError, listMyResults, myLeagueStats, reportResult, resultCardPng } from '../league/service';
 
 function mapLeagueError(error: unknown) {
@@ -489,6 +490,11 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
   })
   .get('/open-games', async () => listOpenGamesCached(), {
     detail: { summary: 'Игры, где ждут соперника, на 7 дней (доска «Ищут соперника»)' },
+  })
+  // турнир ивента (этап 4, 15.11.2026): пары и таблица; null — у ивента нет турнира
+  .get('/events/:id/tournament', async ({ user, params }) => (await getTournament(params.id, user.id)) ?? null, {
+    params: t.Object({ id: t.Numeric() }),
+    detail: { tags: ['Events'], summary: 'Турнир ивента: участники, пары по раундам, таблица' },
   })
   // клубная лига (этап 3, 15.11.2026): результаты партий и таблица Эло
   .get('/league', async ({ user, query }) => getLeagueTable(user.id, query.game, query.season), {

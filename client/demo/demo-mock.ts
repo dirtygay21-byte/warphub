@@ -236,6 +236,8 @@ function handle(method: string, url: URL, bodyText: string | null): Result {
     if (path === "/league") return { body: { game: q.get("game") ?? "40k", season: "2026-Q4", seasonLabel: "IV квартал 2026 · окт–дек", seasons: [{ id: "2026-Q4", label: "IV квартал 2026 · окт–дек" }], rows: [] } };
     if (path === "/league/my-stats") return { body: { season: "2026-Q4", seasonLabel: "IV квартал 2026 · окт–дек", games: [] } };
     if (path === "/admin/results") return { body: [] };
+    // этап 4: турниры — в этом демо нет
+    if (/^\/(admin\/)?events\/\d+\/tournament$/.test(path)) return { body: null };
     if (path === "/waitlist/my") return { body: waitlist };
     if (path === "/admin/club-armies") return { body: clubArmies() };
     if (path === "/admin/warhammer/day") return { body: adminDay(q.get("date")!) };

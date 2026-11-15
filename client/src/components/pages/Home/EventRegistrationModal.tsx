@@ -4,6 +4,8 @@ import ContentImage from "@/components/ui/ContentImage";
 import SeatCountControl from "@/components/pages/Home/Stages/TableSelection/SeatCountControl";
 import { formatEventDateTime, formatEventPeriod } from "@/utils/eventDisplay";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getEventTournament } from "@/apiUtils/tournaments";
+import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import {
   CalendarDays,
@@ -36,6 +38,11 @@ export default function EventRegistrationModal({
     queryKey: ["event", eventId],
     queryFn: () => getEventById(eventId),
   });
+
+  // турнир ивента (этап 4): пары и таблица
+  const navigate = useNavigate();
+  const tournamentQuery = useQuery({ queryKey: ["tournament", eventId], queryFn: () => getEventTournament(eventId), retry: false });
+  const tournament = tournamentQuery.data;
 
   const freeSeats = eventQuery.data?.freeSeats ?? initialFreeSeats ?? 0;
   const maxPartySize = Math.max(freeSeats, 0);
@@ -200,6 +207,15 @@ export default function EventRegistrationModal({
 
         {eventQuery.data && (
           <div className="shrink-0 space-y-3 border-t border-white/10 px-5 py-4">
+            {tournament && (
+              <button
+                type="button"
+                onClick={() => (onClose(), navigate(`/tournament/${eventId}`))}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-accent/60 px-4 py-3 text-sm font-semibold text-accent active:scale-95"
+              >
+                {tournament.status === "setup" ? "Турнир: участники" : tournament.status === "finished" ? "Турнир: итоги" : `Турнир: раунд ${tournament.currentRound} — пары и таблица`}
+              </button>
+            )}
             {errorMessage && (
               <div className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
                 {errorMessage}

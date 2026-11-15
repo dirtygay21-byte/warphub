@@ -19,3 +19,4 @@ export * from './point-promos';
 export * from './notifications';
 export * from './waitlist';
 export * from './game-results';
+export * from './tournaments';
