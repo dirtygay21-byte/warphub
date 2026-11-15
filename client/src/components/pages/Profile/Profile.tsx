@@ -15,7 +15,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { getFullName, getInitials } from "@/utils/user";
 import { useQuery } from "@tanstack/react-query";
 import { AtSign, Bell, BookOpen, Check, Copy, Gamepad2, Hash, LayoutGrid, RefreshCw, ShieldCheck, Sparkles, Store, Swords, UserRound } from "lucide-react";
-import { DsButton, GroupCard, NavRow, SectionLabel, Skeleton } from "@/components/ui/ds";
+import { DsButton, GroupCard, LimeCorner, NavRow, SectionLabel, Skeleton } from "@/components/ui/ds";
 import clsx from "clsx";
 import { useEffectsStore } from "@/stores/useEffectsStore";
 import { haptic } from "@/utils/haptic";
@@ -132,8 +132,10 @@ export default function Profile() {
       {/* шапка: аватар с рамкой, имя, username — компактно (переработка профиля 14.11.2026) */}
       <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.35)] lg:sticky lg:top-8">
         <div className="absolute inset-x-0 top-0 h-20 bg-linear-to-b from-accent/15 to-transparent" />
+        {/* лаймовый концепт (15.11.2026): уголок с червяком — справа снизу, сверху переключатель эффектов */}
+        <LimeCorner size={72} className="bottom-0 top-auto rotate-90" />
         <EffectsToggle />
-        <div className="relative flex items-center gap-4 px-4 pb-4 pt-5 lg:flex-col lg:px-6 lg:pb-6 lg:pt-8 lg:text-center">
+        <div className="relative flex items-center gap-4 py-4 pl-4 pr-16 pt-5 lg:flex-col lg:px-6 lg:pb-6 lg:pt-8 lg:text-center">
           <div className="flex shrink-0 justify-center">
             {supporter ? (
               <SupporterFrame inline title={supporter} size={72} label={`Поддерживает клуб: ${SUPPORTER_LABELS[supporter]}`}>

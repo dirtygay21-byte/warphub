@@ -5,18 +5,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
   CalendarDays,
-  CheckCircle2,
   Clock3,
   RotateCcw,
   UsersRound,
-  XCircle,
 } from "lucide-react";
 import { formatClubTime, formatClubTimeRange } from "@/utils/clubTime";
 import { hoursLabel } from "@/utils/slots";
 import type { ReactNode } from "react";
 import { getServiceDetailsMeta } from "./ServiceDetails/utils";
 import { formatSelectedDate } from "@/utils/date";
-import { DsButton } from "@/components/ui/ds";
+import { DsButton, LimeHero } from "@/components/ui/ds";
 
 type ConfirmationStatus = "Success" | "Succes" | "Error";
 
@@ -105,40 +103,19 @@ export default function ConfirmationStage({
       )}
 
       <div className="relative mx-auto flex max-w-sm flex-col items-center">
-        <div
-          className={`ds-pop relative mb-5 flex size-24 items-center justify-center rounded-full border shadow-[0_0_36px_currentColor] ${
-            isSuccess
-              ? "border-accent/70 bg-accent/15 text-accent"
-              : "border-danger/70 bg-danger/15 text-danger"
-          }`}
+        {/* лаймовый концепт (15.11.2026): итог — цветной блок с червяками (лайм — записан, красный — ошибка) */}
+        <LimeHero
+          tone={isSuccess ? "lime" : "danger"}
+          kicker={isSuccess ? "Готово" : "Ошибка"}
+          title={!isSuccess ? "Запись не создана" : lastBooking?.joined ? "Ты в игре!" : "Ты записан!"}
+          className="ds-pop w-full text-left"
         >
-          {isSuccess && (
-            <>
-              <span aria-hidden="true" className="fx-strong-only fx-burst" />
-              <span aria-hidden="true" className="fx-strong-only fx-burst fx-burst-late" />
-            </>
-          )}
-          {isSuccess ? (
-            <CheckCircle2 className="size-14" />
-          ) : (
-            <XCircle className="size-14" />
-          )}
-        </div>
+          <p className="text-base font-medium">
+            {isSuccess ? "Мы ждем тебя в клубе" : "Не удалось подтвердить запись. Попробуй еще раз."}
+          </p>
+        </LimeHero>
 
-        <h2 className="font-display text-[28px] font-semibold uppercase leading-none">
-          {!isSuccess
-            ? "Запись не создана"
-            : lastBooking?.joined
-              ? "Ты в игре!"
-              : "Ты записан!"}
-        </h2>
-        <p className="mt-2 text-base text-fg-2">
-          {isSuccess
-            ? "Мы ждем тебя в клубе"
-            : "Не удалось подтвердить запись. Попробуй еще раз."}
-        </p>
-
-        <div className="mt-6 w-full rounded-[18px] border border-white/10 bg-app-elevated p-4 text-left">
+        <div className="mt-4 w-full rounded-[18px] border border-white/10 bg-app-elevated p-4 text-left">
           <div className="mb-3 flex items-start justify-between gap-3">
             <h3 className="text-[17px] font-bold leading-tight">
               {serviceQuery.isLoading

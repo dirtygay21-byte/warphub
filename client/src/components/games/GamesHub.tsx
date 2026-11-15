@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Gift, Sparkles, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ErrorNote, GameTopBar, RewardCodeCard, TierStrip } from "./common";
-import { DsButton, Skeleton } from "@/components/ui/ds";
+import { DsButton, LimeHero, Skeleton } from "@/components/ui/ds";
 import { errorText, useMinigames, oswald } from "./helpers";
 import { PixelSprite } from "./pixel/PixelSprite";
 import { eggSprite } from "./eggScene";
@@ -46,9 +46,12 @@ export default function GamesHub() {
       />
 
       <div className="px-4">
-        <p className="text-sm text-fg-2">
-          Получайте скидки в клубе: лучший результат недели даёт награду, а за каждые 25 000 накопленных очков карт — одноразовый промокод 25%.
-        </p>
+        {/* лаймовый концепт (15.11.2026): описание наград — лаймовым блоком с червяками */}
+        <LimeHero kicker="Награды" title="Играйте — получайте скидки" size="sm">
+          <p className="text-[14px] leading-snug">
+            Лучший результат недели даёт награду, а за каждые 25 000 накопленных очков карт — одноразовый промокод 25%.
+          </p>
+        </LimeHero>
 
         <button
           type="button"

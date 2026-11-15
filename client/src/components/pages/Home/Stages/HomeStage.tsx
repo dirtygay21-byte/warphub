@@ -6,7 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { s3Url } from "@/utils/s3utils";
 import { getRosterAccess } from "@/apiUtils/roster";
 import { BookOpen, Calendar, Swords } from "lucide-react";
-import { DsButton, NavRow, Skeleton } from "@/components/ui/ds";
+import { LimeHero, NavRow, Skeleton } from "@/components/ui/ds";
+import { haptic } from "@/utils/haptic";
 import { useNavigate } from "react-router-dom";
 
 export default function HomeStage() {
@@ -33,11 +34,19 @@ export default function HomeStage() {
         <div className="event-banner-glow aspect-[16/9] w-full overflow-hidden rounded-[18px]">
           <NearestEventBanner />
         </div>
-        {/* «Записаться» — в потоке страницы под ивентом (A1); на компьютере — в боковой панели */}
-        <DsButton variant="primary" size="lg" onClick={() => handleRegistartionClick(null)} className="register-btn-glow w-full lg:hidden">
-          <Calendar className="size-5" />
-          Записаться
-        </DsButton>
+        {/* «Записаться» — в потоке страницы под ивентом (A1); на компьютере — в боковой панели.
+            Лаймовый концепт (15.11.2026): кнопка в лаймовом блоке с червяками — главный блок экрана. */}
+        <LimeHero kicker="Запись в клуб" title="Играем?" size="sm" className="lg:hidden">
+          <p className="text-[15px] leading-snug">Выберите игру, стол и время.</p>
+          <button
+            type="button"
+            onClick={() => (haptic.tap(), handleRegistartionClick(null))}
+            className="ds-press flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[14px] bg-[#111110] font-display text-[18px] font-semibold uppercase tracking-[0.06em] text-accent"
+          >
+            <Calendar className="size-5" />
+            Записаться
+          </button>
+        </LimeHero>
       </section>
 
       <section className="flex w-full flex-col gap-3">

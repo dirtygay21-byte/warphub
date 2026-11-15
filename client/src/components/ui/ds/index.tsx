@@ -225,3 +225,4 @@ export function StepBar({ step, total }: { step: number; total: number }) {
     </div>
   );
 }
+export { LimeHero, LimeChip, LimeCorner, Worm, type LimeTone } from "./Lime";

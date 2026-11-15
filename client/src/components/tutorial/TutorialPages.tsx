@@ -1,4 +1,4 @@
-import { DsButton, SectionLabel } from "@/components/ui/ds";
+import { DsButton, LimeHero, SectionLabel } from "@/components/ui/ds";
 import { useTelegramBack } from "@/hooks/useTelegramBack";
 import { useRegistrationStageStore } from "@/stores/useRegistrationStageStore";
 import { useReservationStore } from "@/stores/useReservationStore";
@@ -48,10 +48,10 @@ export function TutorialHub() {
     <div className="ds-enter pb-10 text-fg">
       <TopBar onBack={back} title="Как играть" />
       <div className="flex flex-col gap-5 px-5 pt-1">
-        <section className="rounded-[16px] border border-accent/30 bg-gradient-to-br from-accent/[0.16] to-accent/[0.02] px-4 py-3">
-          <h1 className="font-display text-[20px] font-semibold uppercase leading-tight">Первая игра без паники</h1>
-          <p className="mt-1 text-[13.5px] leading-snug text-fg-2">Карточки со схемами: ход, стрельба, бой. После карточек откроется обучающая игра — раунд по шагам за столом.</p>
-        </section>
+        {/* лаймовый концепт (15.11.2026): тот же блок — лаймовым, с червяками */}
+        <LimeHero title="Первая игра без паники" size="sm">
+          <p className="text-[14px] leading-snug">Карточки со схемами: ход, стрельба, бой. После карточек откроется обучающая игра — раунд по шагам за столом.</p>
+        </LimeHero>
 
         <section>
           <SectionLabel>Выберите игру</SectionLabel>

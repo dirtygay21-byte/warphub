@@ -466,3 +466,17 @@ body {
 @media (prefers-reduced-motion: reduce) {
   [class^="sp-"], [class*=" sp-"] { animation: none !important; }
 }
+
+/* Лаймовый слой (концепт 15.11.2026): червяк ползёт вперёд на один период и бесшовно повторяется (см. ds/Lime.tsx). */
+.lime-flow {
+  animation: lime-flow 6s linear infinite;
+}
+@keyframes lime-flow {
+  to { transform: translateX(var(--lime-shift, 160px)); }
+}
+:root[data-fx="reduced"] .lime-flow {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lime-flow { animation: none; }
+}
