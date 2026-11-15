@@ -60,6 +60,12 @@
   --color-warn: 251 191 36;
 }
 
+/* WarpBuilder — свой вариант дизайна (15.11.2026): тот же лаймовый концепт, но цвет «Варп» вместо лайма.
+   Включается на <html data-product="warpbuilder"> (RosterPage), поэтому действует и на всплывающие окна. */
+:root[data-product="warpbuilder"] {
+  --color-accent: 108 240 230;
+}
+
 body {
   font-family: 'Inter Tight', sans-serif;
   background: var(--color-bg);

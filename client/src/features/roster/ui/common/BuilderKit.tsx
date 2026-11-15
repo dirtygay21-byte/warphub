@@ -238,7 +238,7 @@ export function EditorHeader({
             onClick={() => (haptic.tap(), setOpen(true))}
             className={cx(
               'flex min-w-12 flex-col items-center justify-center rounded-lg px-2 py-1 transition active:scale-95',
-              errors ? 'bg-danger/15 text-danger' : warnings ? 'bg-warn/15 text-warn' : 'bg-accent/15 text-accent',
+              errors ? 'bg-danger text-accent-foreground' : warnings ? 'bg-warn text-accent-foreground' : 'bg-accent text-accent-foreground',
             )}
           >
             <Icon name={errors || warnings ? 'alert' : 'check'} className="size-4" />

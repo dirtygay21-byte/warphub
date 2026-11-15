@@ -62,7 +62,7 @@ export function Home({
         <IconButton icon="back" label="Назад в WarpHub" onClick={onExit} className="mb-0.5" />
         <div className="min-w-0 flex-1">
           <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">Ростеры и игры</p>
-          <h1 className="font-display mt-1 text-[32px] font-semibold uppercase leading-none">WarpBuilder</h1>
+          <h1 className="font-display mt-1 text-[32px] font-bold uppercase leading-none">Warp<span className="text-accent">Builder</span></h1>
         </div>
       </header>
       {resume && (

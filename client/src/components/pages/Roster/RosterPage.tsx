@@ -3,7 +3,7 @@ import { RosterBuilder } from "@/features/roster/ui/App";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useQuery } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
-import { Component, type ReactNode } from "react";
+import { Component, useEffect, type ReactNode } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
 /** Скрытый раздел: открывается только тем, у кого есть доступ (код или админ). */
@@ -14,6 +14,14 @@ export default function RosterPage() {
   const authChecked = useAuthStore((s) => s.authChecked);
   // откуда пришли (профиль или админка) — туда и вернёмся
   const from = (location.state as { from?: string } | null)?.from ?? "/profile";
+
+  // свой цвет WarpBuilder (бирюзовый «Варп») — на всё время, пока открыт раздел, включая всплывающие окна
+  useEffect(() => {
+    document.documentElement.dataset.product = "warpbuilder";
+    return () => {
+      delete document.documentElement.dataset.product;
+    };
+  }, []);
 
   const access = useQuery({
     queryKey: ["roster-access"],
