@@ -11,6 +11,7 @@ import { formatClub, formatClubTimeRange } from "@/utils/clubTime";
 import clsx from "clsx";
 import {
   CalendarDays,
+  ChevronDown,
   Clock3,
   LoaderCircle,
   Medal,
@@ -63,6 +64,8 @@ export function DndBookingCard({
   errorMessage?: string | null;
   onCancel: () => void;
 }) {
+  // свёрнута, как остальные записи (15.11.2026)
+  const [open, setOpen] = useState(false);
   const inactive = isDndBookingInactive(booking);
   const gameCancelled = booking.game.status === "cancelled";
   const statusLabel =
@@ -82,11 +85,16 @@ export function DndBookingCard({
       )}
     >
       {/* дата плиткой, как у остальных записей (15.11.2026) */}
-      <div className="flex items-center gap-3 border-b border-white/[0.06] p-3">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="ds-press flex w-full items-center gap-3 p-3 text-left"
+      >
         {booking.game.startsAt && <DateTile date={booking.game.startsAt} tone={inactive ? "muted" : "lime"} />}
-        <div className="min-w-0 flex-1">
-          <h2 className="truncate text-[16px] font-bold leading-tight">{booking.game.title}</h2>
-          <p className="mt-1 flex items-center gap-2">
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-[16px] font-bold leading-tight">{booking.game.title}</span>
+          <span className="mt-1 flex items-center gap-2">
             <span className="truncate text-[14px] text-fg-2">D&D · {booking.game.gameType}</span>
             <span
               className={clsx(
@@ -96,10 +104,13 @@ export function DndBookingCard({
             >
               {statusLabel}
             </span>
-          </p>
-        </div>
-      </div>
+          </span>
+        </span>
+        <ChevronDown className={clsx("size-5 shrink-0 text-fg-3 transition-transform duration-200", open && "rotate-180")} />
+      </button>
 
+      {open && (
+      <div className="ds-fade border-t border-white/[0.06]">
       <div className="space-y-3 px-4 py-4 text-sm">
         {booking.game.startsAt ? (
           <>
@@ -163,6 +174,8 @@ export function DndBookingCard({
             onConfirm={onCancel}
           />
         </div>
+      )}
+      </div>
       )}
     </article>
   );
