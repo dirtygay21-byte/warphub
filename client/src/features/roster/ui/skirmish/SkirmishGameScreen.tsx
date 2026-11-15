@@ -123,7 +123,7 @@ function SkirmishGameScreen({ system, onBack, rosters, index, initialRosterId }:
         <section className="relative overflow-hidden rounded-[20px] bg-accent p-4 text-[#111110]">
           <HeroWorm />
           <p className="relative font-display text-xl font-semibold uppercase">Новая игра</p>
-          <p className="relative mt-1 pr-6 text-sm leading-snug text-[#111110]/80">Ростеры, официальная последовательность подготовки, инициатива и раунды. Игра сохраняется на этом устройстве.</p>
+          <p className="relative mt-1 pr-16 text-sm leading-snug text-[#111110]/80">Ростеры, официальная последовательность подготовки, инициатива и раунды. Игра сохраняется на этом устройстве.</p>
           <Button variant="ink" className="relative mt-3 w-full" onClick={newGame}><Icon name="spark" /> Начать подготовку</Button>
         </section>
       )}

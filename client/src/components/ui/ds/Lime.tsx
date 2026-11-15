@@ -57,17 +57,16 @@ export function Worm({
   );
 }
 
-/** Червяки в правом верхнем углу цветного блока. */
-function CornerWorms({ size }: { size: "lg" | "sm" }) {
-  // мягкий вариант (15.11.2026): один тонкий червяк, медленнее — блок легче и не спорит с текстом
-  const [w, h] = size === "lg" ? [200, 160] : [140, 120];
+/**
+ * Червяки на цветном блоке (15.11.2026, по замечанию «червяка не видно»): поле 360×200, прижатое к правому верхнему углу
+ * и растянутое на весь блок (slice) — первый червяк спускается вдоль правого края, второй (count=2, высокие блоки)
+ * пересекает нижний правый угол. Текст блока держит отступ справа.
+ */
+export function WormField({ count = 1 }: { count?: 1 | 2 }) {
   return (
-    <svg aria-hidden="true" width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="pointer-events-none absolute right-0 top-0">
-      {size === "lg" ? (
-        <Worm x={140} y={34} angle={30} period={160} amp={13} width={12} seconds={10} />
-      ) : (
-        <Worm x={100} y={30} angle={32} period={130} amp={11} width={10} seconds={9} />
-      )}
+    <svg aria-hidden="true" viewBox="0 0 360 200" preserveAspectRatio="xMaxYMin slice" className="pointer-events-none absolute inset-0 size-full">
+      <Worm x={286} y={0} angle={62} period={150} amp={13} width={12} seconds={10} />
+      {count === 2 && <Worm x={360} y={118} angle={152} period={110} amp={10} width={9} seconds={8} />}
     </svg>
   );
 }
@@ -92,12 +91,12 @@ export function LimeHero({
 }) {
   return (
     <section className={clsx("relative isolate overflow-hidden rounded-[20px] p-4 text-[#111110]", TONE_BG[tone], className)}>
-      <CornerWorms size={size} />
-      <div className={clsx("relative flex flex-col gap-1", size === "lg" ? "pr-16" : "pr-12")}>
+      <WormField count={size === "lg" ? 2 : 1} />
+      <div className="relative flex flex-col gap-1 pr-16">
         {kicker && <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#111110]/70">{kicker}</span>}
         <h2 className={clsx("font-display font-semibold uppercase leading-[1.05]", size === "lg" ? "text-[24px]" : "text-[20px]")}>{title}</h2>
       </div>
-      {children && <div className="relative mt-2.5 flex flex-col gap-2.5 text-[14px] leading-snug">{children}</div>}
+      {children && <div className="relative mt-2.5 flex flex-col gap-2.5 text-[14px] leading-snug [&>p]:pr-14">{children}</div>}
     </section>
   );
 }

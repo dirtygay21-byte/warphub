@@ -200,7 +200,7 @@ function StartCard({ game, onStart, onStartOnline, starting }: { game: GameHook;
       <div className="relative overflow-hidden rounded-[20px] bg-accent p-4 text-[#111110]">
         <HeroWorm />
         <p className="relative font-display text-xl font-semibold uppercase">Новая игра</p>
-        <p className="relative mt-1 pr-6 text-sm leading-snug text-[#111110]/80">
+        <p className="relative mt-1 pr-16 text-sm leading-snug text-[#111110]/80">
           Сначала выберите режим: обычная партия 11-й редакции (Chapter Approved 2026–27) или битва кампании Dominatus. Дальше — подготовка по шагам правил: игроки и ростеры, типы армий, раскладка, атакующий и защитник, вторичные миссии, первый ход.
           Затем — трекер партии. Игра сохраняется на этом телефоне после каждого действия и появляется в «Сохранённых играх».
         </p>

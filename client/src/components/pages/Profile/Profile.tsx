@@ -15,7 +15,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { getFullName, getInitials } from "@/utils/user";
 import { useQuery } from "@tanstack/react-query";
 import { AtSign, Bell, BookOpen, Check, Copy, Gamepad2, Hash, LayoutGrid, RefreshCw, ShieldCheck, Sparkles, Store, Swords, UserRound } from "lucide-react";
-import { ActionTile, DsButton, GroupCard, Worm, SectionLabel, Skeleton } from "@/components/ui/ds";
+import { ActionTile, DsButton, GroupCard, WormField, SectionLabel, Skeleton } from "@/components/ui/ds";
 import clsx from "clsx";
 import { useEffectsStore } from "@/stores/useEffectsStore";
 import { haptic } from "@/utils/haptic";
@@ -132,9 +132,7 @@ export default function Profile() {
       {/* шапка: аватар с рамкой, имя, username — компактно (переработка профиля 14.11.2026) */}
       {/* лаймовый концепт (15.11.2026): шапка — лаймовый блок с червяками, аватар в чёрном кольце; переключатель эффектов — снизу справа */}
       <section className="relative isolate overflow-hidden rounded-[20px] bg-accent text-[#111110] lg:sticky lg:top-8">
-        <svg aria-hidden="true" width="150" height="150" viewBox="0 0 150 150" className="pointer-events-none absolute right-0 top-0">
-          <Worm x={128} y={18} angle={36} period={150} amp={12} width={11} seconds={10} />
-        </svg>
+        <WormField count={2} />
         <EffectsToggle />
         <div className="relative flex items-center gap-4 pb-14 pl-4 pr-14 pt-4 lg:flex-col lg:px-6 lg:pb-16 lg:pt-8 lg:text-center">
           <div className="flex shrink-0 justify-center rounded-full bg-[#111110] p-1">
@@ -177,7 +175,7 @@ export default function Profile() {
         {/* меню разделов: закреплено сверху при прокрутке, выбранный раздел — в адресе (?tab=) */}
         <nav
           aria-label="Разделы профиля"
-          className="sticky top-[60px] z-40 -mx-5 mt-4 bg-app-bg/95 px-5 py-2 backdrop-blur lg:top-0 lg:mx-0 lg:mt-0 lg:px-0"
+          className="sticky top-[60px] z-40 -mx-5 mt-4 bg-app/95 px-5 py-2 backdrop-blur lg:top-0 lg:mx-0 lg:mt-0 lg:px-0"
         >
           <div role="tablist" className="grid grid-cols-4 gap-1 rounded-[16px] border border-white/10 bg-app-elevated p-1">
             {tabs.map((t) => {

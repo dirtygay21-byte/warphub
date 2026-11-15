@@ -226,7 +226,7 @@ export function StepBar({ step, total }: { step: number; total: number }) {
     </div>
   );
 }
-export { LimeHero, LimeChip, LimeCorner, Worm, type LimeTone } from "./Lime";
+export { LimeHero, LimeChip, LimeCorner, Worm, WormField, type LimeTone } from "./Lime";
 
 /**
  * Дата плиткой (15.11.2026): день недели, число крупно, месяц — список записей читается по датам.
