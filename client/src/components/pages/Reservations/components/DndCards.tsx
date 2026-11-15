@@ -11,6 +11,7 @@ import { formatClub, formatClubTimeRange } from "@/utils/clubTime";
 import clsx from "clsx";
 import {
   CalendarDays,
+  ChevronDown,
   Clock3,
   LoaderCircle,
   Medal,
@@ -21,6 +22,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { DetailRow } from "./DetailRow";
+import { DateTile } from "@/components/ui/ds";
 
 function CancelButton({
   label,
@@ -62,6 +64,8 @@ export function DndBookingCard({
   errorMessage?: string | null;
   onCancel: () => void;
 }) {
+  // свёрнута, как остальные записи (15.11.2026)
+  const [open, setOpen] = useState(false);
   const inactive = isDndBookingInactive(booking);
   const gameCancelled = booking.game.status === "cancelled";
   const statusLabel =
@@ -80,21 +84,36 @@ export function DndBookingCard({
         inactive ? "border-white/[0.08] opacity-60" : "border-white/10",
       )}
     >
-      <div className="flex items-start justify-between gap-3 border-b border-white/[0.06] px-4 py-4">
-        <div className="min-w-0">
-          <h2 className="truncate text-[17px] font-bold">{booking.game.title}</h2>
-          <p className="mt-1 text-sm text-fg-3">D&D · {booking.game.gameType}</p>
-        </div>
-        <span
-          className={clsx(
-            "inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg px-2 text-[12px] font-semibold",
-            inactive ? "bg-white/[0.08] text-fg-2" : "bg-accent/15 text-accent",
-          )}
-        >
-          {statusLabel}
+      {/* дата плиткой, как у остальных записей (15.11.2026) */}
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="ds-press flex w-full items-center gap-3 p-3 text-left"
+      >
+        {booking.game.startsAt && <DateTile date={booking.game.startsAt} tone={inactive ? "muted" : "lime"} />}
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-[16px] font-bold leading-tight">{booking.game.title}</span>
+          <span className="mt-1 flex items-center gap-2">
+            <span className="truncate text-[14px] text-fg">
+              {booking.game.startsAt ? formatClubTimeRange(booking.game.startsAt, booking.game.endsAt) : `D&D · ${booking.game.gameType}`}
+            </span>
+            <span
+              className={clsx(
+                "inline-flex h-[22px] shrink-0 items-center whitespace-nowrap rounded-[8px] px-2 text-[11.5px] font-semibold",
+                inactive ? "bg-white/[0.08] text-fg-2" : "bg-accent text-accent-foreground",
+              )}
+            >
+              {statusLabel}
+            </span>
+          </span>
+          {booking.game.startsAt && <span className="mt-0.5 block truncate text-[13px] text-fg-2">D&D · {booking.game.gameType}</span>}
         </span>
-      </div>
+        <ChevronDown className={clsx("size-5 shrink-0 text-fg-3 transition-transform duration-200", open && "rotate-180")} />
+      </button>
 
+      {open && (
+      <div className="ds-fade border-t border-white/[0.06]">
       <div className="space-y-3 px-4 py-4 text-sm">
         {booking.game.startsAt ? (
           <>
@@ -159,6 +178,8 @@ export function DndBookingCard({
           />
         </div>
       )}
+      </div>
+      )}
     </article>
   );
 }
@@ -194,8 +215,8 @@ export function TrialRequestCard({
         <span
           className={clsx(
             "inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg px-2 text-[12px] font-semibold",
-            request.status === "new" && "bg-warn/15 text-warn",
-            request.status === "grouped" && "bg-accent/15 text-accent",
+            request.status === "new" && "bg-warn text-accent-foreground",
+            request.status === "grouped" && "bg-accent text-accent-foreground",
             request.status === "cancelled" && "bg-white/[0.08] text-fg-2",
           )}
         >

@@ -9,7 +9,7 @@ import { usePersistentGameData } from '../skirmish/useSkirmishData';
 import { autoGroups, decodeWarcryRoster, neededFactions, type WarcryRoster } from '../../warcry/roster';
 import type { WarcryAbility, WarcryFaction, WarcryIndex } from '../../warcry/types';
 import { haptic, openExternal } from '../../telegram';
-import { Button, Icon, Segmented } from '../kit';
+import { Button, Icon, Segmented, HeroWorm } from '../kit';
 import { cx } from '../util';
 import { useSkirmishOnline } from '../skirmish/useSkirmishOnline';
 import { OnlineBar, OnlineStart } from '../game/Online';
@@ -218,10 +218,11 @@ function StartCard({ library, game, onNew, onOnline, onList }: { library: WcSave
         <span className="min-w-0 flex-1"><span className="block font-display text-lg font-semibold uppercase leading-tight">Сохранённые игры ({library.length})</span><span className="block text-[12px] text-fg-3">{unfinished ? `Незаконченных: ${unfinished}` : 'Все законченные'}</span></span>
         <Icon name="chevron" className="size-4 text-fg-3" />
       </button>
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
-        <p className="mt-1 text-sm leading-snug text-fg-2">Battleplan, официальная расстановка, initiative и wild dice, резервы, пошаговые активации, реальные способности бойцов и victory condition.</p>
-        <Button variant="primary" className="mt-3 w-full" onClick={onNew}><Icon name="spark" /> Начать подготовку</Button>
+      <div className="relative overflow-hidden rounded-[20px] bg-accent p-4 text-[#111110]">
+        <HeroWorm />
+        <p className="relative font-display text-xl font-semibold uppercase">Новая игра</p>
+        <p className="relative mt-1 pr-6 text-sm leading-snug text-[#111110]/80">Battleplan, официальная расстановка, initiative и wild dice, резервы, пошаговые активации, реальные способности бойцов и victory condition.</p>
+        <Button variant="ink" className="relative mt-3 w-full" onClick={onNew}><Icon name="spark" /> Начать подготовку</Button>
       </div>
       <OnlineStart game={game} onCreate={async () => { await onOnline(); }} busy={false} />
     </section>

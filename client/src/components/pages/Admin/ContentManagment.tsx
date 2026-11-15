@@ -25,7 +25,7 @@ export default function ContentManagment() {
   return (
     <div className="px-4 py-3 pb-8 text-white sm:px-6">
       <div className="mb-4">
-        <h1 className="text-2xl font-semibold">Управление контентом</h1>
+        <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Управление контентом</h1>
         <p className="mt-1 text-sm text-fg-3">
           Редактирование ивентов, новостей и другого контента клуба
         </p>

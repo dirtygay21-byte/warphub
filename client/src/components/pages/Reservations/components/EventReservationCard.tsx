@@ -1,16 +1,18 @@
 import { DetailRow } from "./DetailRow";
 import ContentImage from "@/components/ui/ContentImage";
-import { formatReservationDate } from "@/utils/date";
 import { formatTimeRange } from "@/utils/reservationDisplay";
 import clsx from "clsx";
-import { DsButton } from "@/components/ui/ds";
+import { DateTile, DsButton } from "@/components/ui/ds";
 import {
   LoaderCircle,
   Table2,
   UsersRound,
   XCircle,
+  ChevronDown,
 } from "lucide-react";
 import type { RegisteredEvent } from "@/types";
+import { useState } from "react";
+import { haptic } from "@/utils/haptic";
 
 type EventReservationCardProps = {
   event: RegisteredEvent;
@@ -25,36 +27,43 @@ export function EventReservationCard({
   isCancelling,
   onCancel,
 }: EventReservationCardProps) {
+  // свёрнута, как остальные записи: нажатие раскрывает гостей, столы и отмену
+  const [open, setOpen] = useState(false);
   return (
     <article
       className={clsx(
         "ds-enter overflow-hidden rounded-[18px] border bg-app-elevated",
-        isPast && "pointer-events-none border-white/[0.08] opacity-60",
+        isPast && "border-white/[0.08] opacity-60",
         !isPast && "border-white/10",
       )}
     >
-      {event.bannerUrl && (
-        <ContentImage
-          src={event.bannerUrl}
-          alt={event.title}
-          crop={event.bannerCrop}
-          className="aspect-[2/1] w-full"
-        />
-      )}
-
-      <div className="space-y-1 px-4 pt-4">
-        <div className="flex items-center justify-between gap-2">
-          <span className="min-w-0 truncate text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">Ивент · {event.title}</span>
-          <span className="inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg bg-accent/15 px-2 text-[12px] font-semibold text-accent">
-            Записан
+      {/* как остальные записи (15.11.2026): дата плиткой, название и время; картинка ивента — маленькой справа */}
+      <button
+        type="button"
+        onClick={() => (haptic.tap(), setOpen((v) => !v))}
+        aria-expanded={open}
+        className="ds-press flex w-full items-center gap-3 p-3 text-left"
+      >
+        <DateTile date={event.startsAt} tone={isPast ? "muted" : "lime"} />
+        <span className="min-w-0 flex-1">
+          <span className="line-clamp-2 text-[16px] font-bold leading-tight">{event.title}</span>
+          <span className="mt-1 flex items-center gap-2">
+            <span className="whitespace-nowrap text-[14px] text-fg">{formatTimeRange(event.startsAt, event.endsAt)}</span>
+            <span className="inline-flex h-[22px] shrink-0 items-center whitespace-nowrap rounded-[8px] bg-accent px-2 text-[11.5px] font-semibold text-accent-foreground">
+              Ивент
+            </span>
           </span>
-        </div>
-        <p className="text-lg font-bold leading-snug">
-          {formatReservationDate(event.startsAt)} · <span className="whitespace-nowrap">{formatTimeRange(event.startsAt, event.endsAt)}</span>
-        </p>
-      </div>
+        </span>
+        {event.bannerUrl && (
+          <ContentImage src={event.bannerUrl} alt="" crop={event.bannerCrop} className="aspect-[4/3] w-[64px] shrink-0 overflow-hidden rounded-[10px]" />
+        )}
+        <ChevronDown className={clsx("size-5 shrink-0 text-fg-3 transition-transform duration-200", open && "rotate-180")} />
+      </button>
 
-      <div className="space-y-2.5 px-4 py-3 text-sm">
+      {open && (
+      <div className="ds-fade">
+
+      <div className="space-y-2.5 border-t border-white/[0.06] px-4 py-3 text-sm">
         <DetailRow
           icon={<UsersRound className="size-4" />}
           label="Гостей"
@@ -82,6 +91,8 @@ export function EventReservationCard({
             {isCancelling ? "Отменяем…" : "Не смогу посетить"}
           </DsButton>
         </div>
+      )}
+      </div>
       )}
     </article>
   );

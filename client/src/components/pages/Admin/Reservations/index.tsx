@@ -2,6 +2,7 @@ import {
   confirmAdminReservation,
   extendAdminReservation,
   getAdminReservations,
+  getAdminReservationsCount,
   getUserById,
   rejectAdminReservation,
 } from "@/apiUtils/admin";
@@ -24,6 +25,8 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import clsx from "clsx";
+import { LimeHero } from "@/components/ui/ds";
+import { getRecordsLabel } from "@/utils/plural";
 import { Filter, LoaderCircle, RefreshCw, Shield } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ExtendReservationDialog } from "./components/ExtendReservationDialog";
@@ -92,6 +95,13 @@ export default function AdminReservations() {
     queryFn: () => getAdminReservations(queryParams),
     placeholderData: keepPreviousData,
   });
+
+  // лаймовый концепт (15.11.2026): сколько записей ждёт подтверждения — цветной блок над списком (жёлтый — есть, лайм — нет)
+  const pendingQuery = useQuery({
+    queryKey: ["admin-reservations", "pending-count"],
+    queryFn: () => getAdminReservationsCount("pending"),
+  });
+  const pendingTotal = pendingQuery.data ?? null;
 
   const servicesQuery = useQuery({
     queryKey: ["services"],
@@ -322,10 +332,28 @@ export default function AdminReservations() {
 
   return (
     <div className="px-4 py-3 pb-28 text-white sm:px-6">
-      <NotificationCheck />
+      {pendingTotal != null && (
+        <LimeHero
+          tone={pendingTotal > 0 ? "warn" : "lime"}
+          kicker="Ждут подтверждения"
+          title={pendingTotal > 0 ? `${pendingTotal} ${getRecordsLabel(pendingTotal)}` : "Новых заявок нет"}
+          size="sm"
+          className="mb-4"
+        >
+          {pendingTotal > 0 && !(categories.length === 1 && categories[0] === "pending") && (
+            <button
+              type="button"
+              onClick={() => (setCategories(["pending"]), setPage(0))}
+              className="ds-press min-h-11 self-start rounded-[12px] bg-[#111110] px-4 text-[14px] font-semibold text-accent"
+            >
+              Показать
+            </button>
+          )}
+        </LimeHero>
+      )}
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Все записи</h1>
+          <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Все записи</h1>
           <p className="mt-1 text-sm text-fg-3">
             {reservations.length > 0
               ? totalCount != null
@@ -422,6 +450,11 @@ export default function AdminReservations() {
           setPage(0);
         }}
       />
+
+      {/* проверка уведомлений — внизу (15.11.2026): нужна редко, сверху занимала место над записями */}
+      <div className="mt-6">
+        <NotificationCheck />
+      </div>
 
       <AnimatePresence>
         {pendingStatusAction?.action === "extend" && (

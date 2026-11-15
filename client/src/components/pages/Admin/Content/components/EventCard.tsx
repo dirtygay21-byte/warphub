@@ -1,7 +1,8 @@
 import type { Event } from "@/types";
 import ContentImage from "@/components/ui/ContentImage";
 import { getSeatsLabel } from "@/utils/plural";
-import { CalendarDays, Table2, UsersRound } from "lucide-react";
+import { DateTile } from "@/components/ui/ds";
+import { ChevronRight } from "lucide-react";
 import { formatEventPeriod } from "../utils";
 
 type EventCardProps = {
@@ -9,58 +10,30 @@ type EventCardProps = {
   onClick: () => void;
 };
 
+/** Ивент в админке строкой (перестройка 15.11.2026): дата плиткой, название, время, места и столы; баннер — миниатюрой. */
 export default function EventCard({ event, onClick }: EventCardProps) {
-  const tablesLabel =
-    event.tableIds.length > 0 ? event.tableIds.join(", ") : "—";
+  const tablesLabel = event.tableIds.length > 0 ? event.tableIds.join(", ") : "—";
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className="w-full overflow-hidden rounded-2xl border border-white/10 bg-app-elevated text-left transition-colors hover:cursor-pointer hover:border-accent/40 active:bg-white/5"
+      className="ds-press flex w-full items-center gap-3 rounded-[18px] border border-white/10 bg-app-elevated p-3 text-left"
     >
+      <DateTile date={event.startsAt} />
+      <span className="min-w-0 flex-1">
+        <span className="line-clamp-2 text-[15px] font-bold leading-tight text-fg">{event.title}</span>
+        <span className="mt-1 block text-[13px] text-fg-2">{formatEventPeriod(event.startsAt, event.endsAt)}</span>
+        <span className="mt-0.5 block truncate text-[12.5px] text-fg-3">
+          {event.seatsPerTable} {getSeatsLabel(event.seatsPerTable)} · столы: {tablesLabel}
+        </span>
+      </span>
       {event.bannerUrl ? (
-        <ContentImage
-          src={event.bannerUrl}
-          alt={event.title}
-          crop={event.bannerCrop}
-          className="aspect-[16/7] w-full"
-        />
+        <ContentImage src={event.bannerUrl} alt="" crop={event.bannerCrop} className="aspect-[4/3] w-[64px] shrink-0 overflow-hidden rounded-[10px]" />
       ) : (
-        <div className="flex aspect-[16/7] w-full items-center justify-center bg-white/5 text-sm text-fg-3">
-          Без баннера
-        </div>
+        <span className="flex aspect-[4/3] w-[64px] shrink-0 items-center justify-center rounded-[10px] bg-white/5 text-center text-[11px] text-fg-3">Без баннера</span>
       )}
-
-      <div className="space-y-3 p-4">
-        <div>
-          <h3 className="text-lg font-semibold text-white">{event.title}</h3>
-          {event.description && (
-            <p className="mt-1 line-clamp-2 text-sm text-fg-2">
-              {event.description}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2 text-sm text-fg-2">
-          <p className="flex items-start gap-2">
-            <CalendarDays className="mt-0.5 size-4 shrink-0 text-accent" />
-            <span>{formatEventPeriod(event.startsAt, event.endsAt)}</span>
-          </p>
-
-          <p className="flex items-center gap-2">
-            <UsersRound className="size-4 shrink-0 text-accent" />
-            <span>
-              {event.seatsPerTable} {getSeatsLabel(event.seatsPerTable)}
-            </span>
-          </p>
-
-          <p className="flex items-center gap-2">
-            <Table2 className="size-4 shrink-0 text-accent" />
-            <span>Столы: {tablesLabel}</span>
-          </p>
-        </div>
-      </div>
+      <ChevronRight className="size-5 shrink-0 text-fg-3" />
     </button>
   );
 }

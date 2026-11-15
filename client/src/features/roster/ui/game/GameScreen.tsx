@@ -3,7 +3,7 @@ import type { DataIndex, Roster } from '../../engine/types';
 import { currentSetupStep, setupSteps, type EventBody, type GameMode, type Seat, type SetupStepId } from '../../game';
 import { pushOverlay } from '../../telegram';
 import { Battlefield } from '../Battlefield';
-import { Button, Icon, Sheet } from '../kit';
+import { Button, Icon, Sheet, HeroWorm } from '../kit';
 import { cx } from '../util';
 import { GameErrorBar } from '../common/GameErrorBar';
 import { GameShell } from '../common/GameShell';
@@ -197,13 +197,14 @@ function StartCard({ game, onStart, onStartOnline, starting }: { game: GameHook;
           <Icon name="chevron" className="size-4 text-fg-3" />
         </button>
       )}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
-        <p className="mt-1 text-sm leading-snug text-fg-2">
+      <div className="relative overflow-hidden rounded-[20px] bg-accent p-4 text-[#111110]">
+        <HeroWorm />
+        <p className="relative font-display text-xl font-semibold uppercase">Новая игра</p>
+        <p className="relative mt-1 pr-6 text-sm leading-snug text-[#111110]/80">
           Сначала выберите режим: обычная партия 11-й редакции (Chapter Approved 2026–27) или битва кампании Dominatus. Дальше — подготовка по шагам правил: игроки и ростеры, типы армий, раскладка, атакующий и защитник, вторичные миссии, первый ход.
           Затем — трекер партии. Игра сохраняется на этом телефоне после каждого действия и появляется в «Сохранённых играх».
         </p>
-        <Button variant="primary" className="mt-3 w-full" disabled={starting} onClick={() => setPicking('local')}>
+        <Button variant="ink" className="relative mt-3 w-full" disabled={starting} onClick={() => setPicking('local')}>
           Начать подготовку
         </Button>
       </div>

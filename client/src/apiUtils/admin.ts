@@ -508,3 +508,9 @@ export type NotificationDiagnostics = {
   since: string;
 };
 export const getNotificationDiagnostics = () => apiRequest<NotificationDiagnostics>("/admin/notifications/diagnostics");
+
+/** Число записей по категориям (`pending`, …) — для блока «Ждут подтверждения» (лаймовый концепт, 15.11.2026). */
+export const getAdminReservationsCount = async (categories: string): Promise<number> => {
+  const data = await apiRequest<{ count?: number }>(`/admin/reservations/count?${new URLSearchParams({ categories })}`);
+  return typeof data?.count === "number" ? data.count : 0;
+};

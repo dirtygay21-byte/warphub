@@ -60,6 +60,12 @@
   --color-warn: 251 191 36;
 }
 
+/* WarpBuilder — свой вариант дизайна (15.11.2026): тот же лаймовый концепт, но цвет «Варп» вместо лайма.
+   Включается на <html data-product="warpbuilder"> (RosterPage), поэтому действует и на всплывающие окна. */
+:root[data-product="warpbuilder"] {
+  --color-accent: 108 240 230;
+}
+
 body {
   font-family: 'Inter Tight', sans-serif;
   background: var(--color-bg);
@@ -122,28 +128,19 @@ body {
     display: none;
   }
 
+  /* лаймовый концепт (15.11.2026): плоская лаймовая полоска над выбранным разделом, без свечения */
   .nav-indicator {
-    box-shadow: 0 0 20px 0 rgb(var(--color-accent));
-    background: linear-gradient(
-      to left,
-      transparent 5%,
-      rgb(var(--color-accent)) 50%,
-      transparent 95%
-    );
+    background: rgb(var(--color-accent));
+    border-radius: 999px;
   }
 
+  /* лаймовый концепт: без свечения — плоский лайм */
   .register-btn-glow {
-    box-shadow:
-      0 0 24px rgb(var(--color-accent) / 0.45),
-      0 0 56px rgb(var(--color-accent) / 0.28),
-      0 12px 32px rgba(0, 0, 0, 0.35);
+    box-shadow: none;
   }
 
   .event-banner-glow {
-    box-shadow:
-      0 14px 36px rgba(255, 255, 255, 0.07),
-      0 8px 20px rgba(255, 255, 255, 0.04),
-      0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: none;
   }
 }
 
@@ -169,7 +166,7 @@ body {
   }
   /* выбранный вариант: короткое свечение */
   .ds-selected-glow {
-    box-shadow: 0 0 18px rgb(var(--color-accent) / 0.35);
+    box-shadow: none;
   }
   /* заготовка загрузки с бегущим бликом */
   .ds-shimmer {
@@ -465,4 +462,18 @@ body {
 .sp-wave{animation:sp-wave 3.2s ease-in-out infinite}
 @media (prefers-reduced-motion: reduce) {
   [class^="sp-"], [class*=" sp-"] { animation: none !important; }
+}
+
+/* Лаймовый слой (концепт 15.11.2026): червяк ползёт вперёд на один период и бесшовно повторяется (см. ds/Lime.tsx). */
+.lime-flow {
+  animation: lime-flow 6s linear infinite;
+}
+@keyframes lime-flow {
+  to { transform: translateX(var(--lime-shift, 160px)); }
+}
+:root[data-fx="reduced"] .lime-flow {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lime-flow { animation: none; }
 }

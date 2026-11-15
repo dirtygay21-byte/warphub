@@ -6,7 +6,7 @@ import type { SkirmishGameData, SkirmishSystem } from '../../skirmish/types';
 import type { WarcryRoster } from '../../warcry/roster';
 import type { WarcryIndex } from '../../warcry/types';
 import { haptic, openExternal } from '../../telegram';
-import { Button, Icon, IconButton, Segmented } from '../kit';
+import { Button, Icon, IconButton, Segmented, HeroWorm } from '../kit';
 
 export type SkirmishRoster = KtRoster | WarcryRoster;
 type Seat = 'p1' | 'p2';
@@ -120,10 +120,11 @@ function SkirmishGameScreen({ system, onBack, rosters, index, initialRosterId }:
       {error && <p className="mt-10 text-center text-sm text-fg-3">{error}</p>}
       {!error && !data && <Spinner />}
       {data && !state && (
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-          <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
-          <p className="mt-1 text-sm leading-snug text-fg-2">Ростеры, официальная последовательность подготовки, инициатива и раунды. Игра сохраняется на этом устройстве.</p>
-          <Button variant="primary" className="mt-3 w-full" onClick={newGame}><Icon name="spark" /> Начать подготовку</Button>
+        <section className="relative overflow-hidden rounded-[20px] bg-accent p-4 text-[#111110]">
+          <HeroWorm />
+          <p className="relative font-display text-xl font-semibold uppercase">Новая игра</p>
+          <p className="relative mt-1 pr-6 text-sm leading-snug text-[#111110]/80">Ростеры, официальная последовательность подготовки, инициатива и раунды. Игра сохраняется на этом устройстве.</p>
+          <Button variant="ink" className="relative mt-3 w-full" onClick={newGame}><Icon name="spark" /> Начать подготовку</Button>
         </section>
       )}
       {data && state && (

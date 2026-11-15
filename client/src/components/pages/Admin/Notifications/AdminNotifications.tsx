@@ -47,7 +47,7 @@ type TabId = (typeof TABS)[number]["id"];
 
 const input = "w-full rounded-xl border border-white/[0.14] bg-field px-3 py-2.5 text-sm text-fg outline-none focus:border-accent/60";
 const chip = (on: boolean) =>
-  clsx("min-h-10 rounded-xl border px-3 text-[13px] font-semibold", on ? "border-accent/60 bg-accent/15 text-accent" : "border-white/[0.14] text-fg-2");
+  clsx("min-h-10 rounded-xl border px-3 text-[13px] font-semibold", on ? "border-accent bg-accent text-accent-foreground" : "border-white/[0.14] text-fg-2");
 const btn = "ds-press inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold disabled:opacity-50";
 const btnPrimary = clsx(btn, "bg-accent text-accent-foreground");
 const btnGhost = clsx(btn, "border border-white/[0.14] text-fg");
@@ -61,7 +61,7 @@ export default function AdminNotifications() {
   return (
     <div className="px-4 py-3 pb-28 text-fg sm:px-6">
       <div className="mb-4">
-        <h1 className="text-2xl font-semibold">Уведомления</h1>
+        <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Уведомления</h1>
         <p className="mt-1 text-sm text-fg-3">Рассылки, автоматические сообщения бота, журнал и настройки</p>
         {catalog.data && !canEdit && <p className="mt-2 rounded-xl bg-white/5 px-3 py-2 text-[13px] text-fg-2">Просмотр: менять уведомления может только владелец.</p>}
       </div>

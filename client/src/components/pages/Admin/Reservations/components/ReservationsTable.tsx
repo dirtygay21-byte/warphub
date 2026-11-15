@@ -66,7 +66,8 @@ export function ReservationsTable({
   return (
     <div className="overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
       <div className="border-b border-white/10 px-4 py-3">
-        <div className="grid grid-cols-2 gap-2" role="group" aria-label="Какие записи показать">
+        {/* фильтры одной строкой (15.11.2026): меньше места над списком, листается пальцем */}
+        <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4" role="group" aria-label="Какие записи показать">
           {RESERVATION_CATEGORIES.map((category) => {
             const on = categories.includes(category.id);
             return (
@@ -76,8 +77,8 @@ export function ReservationsTable({
                 aria-pressed={on}
                 onClick={() => onCategoriesChange(on ? categories.filter((c) => c !== category.id) : [...categories, category.id])}
                 className={clsx(
-                  "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border px-2 text-[13px] font-semibold transition-colors",
-                  on ? "border-accent/60 bg-accent/15 text-accent" : "border-white/[0.14] text-fg-2 hover:text-fg",
+                  "inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[13px] font-semibold transition-colors",
+                  on ? "border-accent bg-accent text-accent-foreground" : "border-white/[0.14] text-fg-2 hover:text-fg",
                 )}
               >
                 {category.label}
@@ -111,7 +112,7 @@ export function ReservationsTable({
               {item.game ? (
                 <GameRow row={item.rows[0]!} onOpen={() => setOpen(item.key)} />
               ) : (
-                <BookingRow row={item.rows[0]!} onOpen={() => setOpen(item.key)} />
+                <BookingRow row={item.rows[0]!} onOpen={() => setOpen(item.key)} onConfirm={(row) => onStatusActionSelect(row, "confirm")} />
               )}
             </li>
           ))}
@@ -164,9 +165,12 @@ function SeatsBadge({ occupied, seats }: { occupied: number; seats: number }) {
 
 const rowClass = "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-white/[0.03] active:bg-white/[0.05]";
 
-function BookingRow({ row, onOpen }: { row: AdminReservationRow; onOpen: () => void }) {
+/** Строка записи; у ожидающих — «Подтвердить» прямо в строке (15.11.2026), без открытия окна. */
+function BookingRow({ row, onOpen, onConfirm }: { row: AdminReservationRow; onOpen: () => void; onConfirm: (row: AdminReservationRow) => void }) {
+  const pending = row.status === "pending";
   return (
-    <button type="button" onClick={onOpen} className={rowClass}>
+    <div className="flex items-center">
+    <button type="button" onClick={onOpen} className={clsx(rowClass, "min-w-0 flex-1")}>
       <CalendarClock className="size-5 shrink-0 text-fg-3" />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-semibold text-white/90">{row.userLabel}</span>
@@ -183,8 +187,19 @@ function BookingRow({ row, onOpen }: { row: AdminReservationRow; onOpen: () => v
           <span className={clsx("mt-0.5 block truncate text-[12px]", row.needsHelp ? "text-yellow-200" : "text-fg-3")}>{row.detailsLabel}</span>
         )}
       </span>
-      <ChevronRight className="size-5 shrink-0 text-fg-3" />
+      {!pending && <ChevronRight className="size-5 shrink-0 text-fg-3" />}
     </button>
+    {pending && (
+      <button
+        type="button"
+        onClick={() => onConfirm(row)}
+        aria-label={`Подтвердить запись: ${row.userLabel}`}
+        className="ds-press mr-3 inline-flex min-h-11 shrink-0 items-center rounded-xl bg-accent px-3 text-[13px] font-semibold text-accent-foreground"
+      >
+        Подтвердить
+      </button>
+    )}
+    </div>
   );
 }
 

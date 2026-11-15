@@ -10,8 +10,8 @@ export default function Navigation() {
   const activePage = getActivePageFromPath(pathname);
 
   return (
-    <div className="w-full overflow-hidden border-t border-white/5 bg-[rgb(var(--color-nav-bg)/0.72)] backdrop-blur-xl backdrop-saturate-150">
-      <div className="relative mx-auto flex w-full items-center justify-around !py-3 md:max-w-2xl">
+    <div className="w-full overflow-hidden border-t border-white/[0.08] bg-app-bg">
+      <div className="relative mx-auto flex w-full items-center justify-around pb-3 pt-4 md:max-w-2xl">
         <NavigationIndicator activePage={activePage} />
 
         {items.map((item) => (

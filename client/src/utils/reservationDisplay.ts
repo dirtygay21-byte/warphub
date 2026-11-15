@@ -8,9 +8,9 @@ export const STATUS_LABELS: Record<string, string> = {
 };
 
 export const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-warn/15 text-warn",
-  confirmed: "bg-accent/15 text-accent",
-  cancelled: "bg-danger/15 text-danger",
+  pending: "bg-warn text-accent-foreground",
+  confirmed: "bg-accent text-accent-foreground",
+  cancelled: "bg-danger text-accent-foreground",
   completed: "bg-white/[0.08] text-fg-2",
 };
 

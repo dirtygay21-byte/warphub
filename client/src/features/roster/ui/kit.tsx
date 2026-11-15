@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { haptic, pushOverlay } from '../telegram';
 import { cx } from './util';
+import { Worm } from '@/components/ui/ds/Lime';
 
 
 const paths: Record<string, string> = {
@@ -56,7 +57,7 @@ export function Button({
 }: {
   children: ReactNode;
   onClick?: () => void;
-  variant?: 'primary' | 'ghost' | 'danger' | 'outline';
+  variant?: 'primary' | 'ghost' | 'danger' | 'outline' | 'ink';
   className?: string;
   disabled?: boolean;
   type?: 'button' | 'submit';
@@ -75,6 +76,7 @@ export function Button({
         variant === 'ghost' && 'bg-white/[0.05] text-white/85 hover:bg-white/[0.09] active:bg-white/10',
         variant === 'outline' && 'border border-white/10 text-white/85 hover:bg-white/[0.04] active:bg-white/5',
         variant === 'danger' && 'bg-danger/10 text-danger hover:bg-danger/15 active:bg-danger/20',
+        variant === 'ink' && 'min-h-12 bg-[#111110] text-[15px] text-accent',
         className,
       )}
     >
@@ -217,3 +219,37 @@ export function Empty({ title, children }: { title: string; children?: ReactNode
   );
 }
 
+
+
+/**
+ * Полоса очков ростера (перестройка 15.11.2026): толще, и под ней — сколько осталось или на сколько перебор.
+ * Общая для редакторов 40K, AoS, Kill Team и Warcry.
+ */
+export function PointsBar({ used, limit, unit = 'очк.' }: { used: number; limit: number; unit?: string }) {
+  const over = used > limit;
+  const pct = limit ? Math.min(100, Math.round((used / limit) * 100)) : 0;
+  const left = Math.abs(limit - used).toLocaleString('ru-RU');
+  return (
+    <div className="mt-2.5">
+      <div className="h-2 overflow-hidden rounded-full bg-white/[0.07]">
+        <div className={cx('h-full rounded-full transition-[width] duration-300', over ? 'bg-danger' : 'bg-accent')} style={{ width: `${pct}%` }} />
+      </div>
+      <p className="mt-1.5 flex justify-between text-[12px] font-semibold tabular-nums">
+        <span className={over ? 'text-danger' : used === limit ? 'text-accent' : 'text-fg-2'}>
+          {over ? `Перебор на ${left} ${unit}` : used === limit ? 'Ровно в лимит' : `Осталось ${left} ${unit}`}
+        </span>
+        <span className="text-fg-3">{pct}%</span>
+      </p>
+    </div>
+  );
+}
+
+
+/** Червяк в углу цветного блока WarpBuilder (блок — relative overflow-hidden, цвет «Варп»). */
+export function HeroWorm() {
+  return (
+    <svg aria-hidden="true" width="130" height="110" viewBox="0 0 130 110" className="pointer-events-none absolute right-0 top-0">
+      <Worm x={92} y={26} angle={32} period={130} amp={11} width={10} seconds={9} />
+    </svg>
+  );
+}

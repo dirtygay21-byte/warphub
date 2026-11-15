@@ -259,7 +259,8 @@ export default function TableSelectionStage() {
 
     return (
       <div className="space-y-7">
-        {isMultiplayer && (
+        {/* перестройка 15.11.2026: пустой блок «Ищут соперника» не показываем — сразу свободное время */}
+        {isMultiplayer && openSessions.length > 0 && (
           <section>
             <SectionTitle
               icon={<Swords className="size-5 text-accent" />}
@@ -304,7 +305,9 @@ export default function TableSelectionStage() {
           <SectionTitle
             hint={
               isMultiplayer
-                ? "Вы будете первым игроком, второй сможет присоединиться"
+                ? openSessions.length > 0
+                  ? "Вы будете первым игроком, второй сможет присоединиться"
+                  : "Пока никто не ждёт соперника. Вы будете первым игроком — второй сможет присоединиться."
                 : undefined
             }
           >

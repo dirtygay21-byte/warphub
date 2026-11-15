@@ -5,6 +5,7 @@ import type { WarcryRoster } from '../warcry/roster';
 import { haptic } from '../telegram';
 import { Icon, IconButton } from './kit';
 import { cx, fmtPts, plural } from './util';
+import { LimeHero, Worm } from '@/components/ui/ds/Lime';
 import { BATTLE_SIZES } from '../engine/rules';
 import { WARCRY_LIMITS } from '../warcry/roster';
 
@@ -61,24 +62,27 @@ export function Home({
         <IconButton icon="back" label="Назад в WarpHub" onClick={onExit} className="mb-0.5" />
         <div className="min-w-0 flex-1">
           <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">Ростеры и игры</p>
-          <h1 className="font-display mt-1 text-[32px] font-semibold uppercase leading-none">WarpBuilder</h1>
+          <h1 className="font-display mt-1 text-[32px] font-bold uppercase leading-none">Warp<span className="text-accent">Builder</span></h1>
         </div>
       </header>
       {resume && (
         <button
           type="button"
           onClick={() => (haptic.tap(), resume.onClick())}
-          className="ds-press mb-3 flex min-h-16 w-full items-center gap-3 rounded-2xl border border-accent/30 bg-accent/[0.08] px-3.5 py-3 text-left"
+          className="ds-press relative mb-3 flex min-h-16 w-full items-center gap-3 overflow-hidden rounded-2xl bg-accent px-3.5 py-3 text-left text-[#111110]"
         >
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-accent text-accent-foreground">
+          {/* лаймовый концепт (15.11.2026): «Продолжить» — главный блок экрана, лаймовый с червяком */}
+          <svg aria-hidden="true" width="110" height="80" viewBox="0 0 110 80" className="pointer-events-none absolute right-0 top-0">
+            <Worm x={104} y={0} angle={46} period={120} amp={10} width={10} seconds={9} />
+          </svg>
+          <span className="relative flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-[#111110] text-accent">
             <Icon name="play" className="size-5" />
           </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[12px] font-semibold uppercase tracking-[0.08em] text-accent">Продолжить</span>
-            <span className="block truncate text-base font-semibold">{resume.title}</span>
-            <span className="block truncate text-[13px] text-fg-2">{resume.sub}</span>
+          <span className="relative min-w-0 flex-1 pr-10">
+            <span className="block text-[12px] font-semibold uppercase tracking-[0.08em] text-[#111110]/70">Продолжить</span>
+            <span className="block truncate text-base font-bold">{resume.title}</span>
+            <span className="block truncate text-[13px] text-[#111110]/75">{resume.sub}</span>
           </span>
-          <Icon name="chevron" className="size-4 shrink-0 text-fg-3" />
         </button>
       )}
       <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
@@ -108,7 +112,13 @@ export function Home({
       </div>
       <p className="mb-2.5 mt-6 text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">Недавние</p>
       {!recent.length ? (
-        <p className="text-sm text-fg-2">Ростеров пока нет — выберите игру и соберите первую армию.</p>
+        resume ? (
+          <p className="text-sm text-fg-2">Ростеров пока нет — выберите игру и соберите первую армию.</p>
+        ) : (
+          <LimeHero kicker="Ростеров пока нет" title="Соберите первую армию" size="sm">
+            <p className="text-[14px] leading-snug">Выберите игру выше — ростер появится здесь.</p>
+          </LimeHero>
+        )
       ) : (
         <ul className="ds-stagger space-y-2.5">
           {recent.map((r) => {

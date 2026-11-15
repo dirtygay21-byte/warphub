@@ -23,9 +23,9 @@ export default function News() {
 
   if (newsQuery.isLoading) {
     return (
-      <div className="px-6 pb-3 pt-6 text-white lg:pt-8">
+      <div className="px-5 pb-3 pt-6 text-white lg:pt-8">
         <div className="mb-4">
-          <h1 className="text-2xl font-semibold">Новости</h1>
+          <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Новости</h1>
           <p className="mt-1 text-sm text-fg-3">Загружаем новости…</p>
         </div>
 
@@ -57,10 +57,10 @@ export default function News() {
   }
 
   return (
-    <div className="px-6 pb-3 pt-6 text-white lg:pt-8">
+    <div className="px-5 pb-3 pt-6 text-white lg:pt-8">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Новости</h1>
+          <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Новости</h1>
           <p className="mt-1 text-sm text-fg-3">
             {newsItems.length > 0
               ? `${newsItems.length} ${getNewsCountLabel(newsItems.length)}`
@@ -92,16 +92,19 @@ export default function News() {
       ) : (
         <div
           className={clsx(
-            "ds-stagger flex flex-col gap-4 lg:grid lg:grid-cols-2",
+            "ds-stagger flex flex-col gap-2.5 lg:grid lg:grid-cols-2",
             newsQuery.isFetching && "opacity-70"
           )}
         >
-          {newsItems.map((news) => (
+          {newsItems.map((news, index) => (
             <NewsCard
               key={news.id}
               title={news.title}
               coverUrl={news.coverUrl}
               coverCrop={news.coverCrop}
+              text={news.text}
+              publishedAt={news.publishedAt}
+              featured={index === 0}
               onClick={() => setSelectedNewsId(news.id)}
             />
           ))}

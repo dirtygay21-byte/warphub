@@ -204,7 +204,7 @@ export default function AdminPricing() {
     <div className="px-4 py-3 pb-28 text-white sm:px-6">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Цены и скидки</h1>
+          <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Цены и скидки</h1>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-fg-3">
             Тарифы по услугам. Новая цена сохраняется в истории и применяется к новым записям; уже рассчитанные счета не меняются.
           </p>

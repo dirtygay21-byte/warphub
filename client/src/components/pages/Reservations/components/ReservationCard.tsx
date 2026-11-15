@@ -1,7 +1,6 @@
 import { useNow } from "@/hooks/useNow";
 import { DetailRow } from "./DetailRow";
 import { hoursLabel } from "@/utils/slots";
-import { formatReservationDate } from "@/utils/date";
 import { getSeatsLabel } from "@/utils/plural";
 import { isInactiveReservation } from "@/utils/reservation";
 import {
@@ -25,7 +24,7 @@ import { haptic } from "@/utils/haptic";
 import { CopyNick, PlayerInfo } from "@/components/booking/PlayerInfo";
 import { useBookingOptions } from "@/hooks/useBookingOptions";
 import { BookingDetailsRows } from "./BookingDetailsRows";
-import { DsButton } from "@/components/ui/ds";
+import { DateTile, DsButton } from "@/components/ui/ds";
 import { detailsKindForSlug, gameLabelOf, isWhPlayerDetails } from "@/apiUtils/booking";
 import type { Reservation } from "@/types";
 import { getSkeletonColors } from "@/theme/colors";
@@ -111,27 +110,28 @@ export function ReservationCard({
             setOpen((value) => !value);
           }}
           aria-expanded={open}
-          className="ds-press block w-full space-y-1 px-4 py-4 text-left"
+          className="ds-press flex w-full items-center gap-3 p-3 text-left"
         >
-          <span className="flex items-center justify-between gap-2">
-            <span className="min-w-0 truncate text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">
-              {isServiceLoading ? <Skeleton width={140} height={14} /> : [disciplineTitle, serviceTitle].filter(Boolean).join(" · ")}
+          {/* дата плиткой слева (15.11.2026): список читается по датам; цвет плитки = статус */}
+          <DateTile
+            date={reservation.startsAt}
+            tone={isPast ? "muted" : cancelled ? "danger" : reservation.status.toLowerCase() === "pending" ? "warn" : "lime"}
+          />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[16px] font-bold leading-tight">
+              {isServiceLoading ? <Skeleton width={140} height={16} /> : serviceTitle ?? disciplineTitle ?? "Запись"}
             </span>
-            {isServiceLoading ? (
-              <Skeleton width={80} height={24} />
-            ) : (
-              <span className={clsx("inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg px-2 text-[12px] font-semibold", getStatusStyle(reservation.status))}>
-                {getStatusLabel(reservation.status)}
-              </span>
-            )}
+            <span className="mt-1 flex items-center gap-2">
+              <span className="whitespace-nowrap text-[14px] text-fg">{formatTimeRange(reservation.startsAt, reservation.endsAt)}</span>
+              {!isServiceLoading && (
+                <span className={clsx("inline-flex h-[22px] shrink-0 items-center whitespace-nowrap rounded-[8px] px-2 text-[11.5px] font-semibold", getStatusStyle(reservation.status))}>
+                  {reservation.status.toLowerCase() === "pending" ? "Ждёт" : getStatusLabel(reservation.status)}
+                </span>
+              )}
+            </span>
+            <span className="mt-0.5 block truncate text-[13px] text-fg-2">{summary || disciplineTitle || "Подробности"}</span>
           </span>
-          <span className="block text-lg font-bold leading-snug">
-            {formatReservationDate(reservation.startsAt)} · <span className="whitespace-nowrap">{formatTimeRange(reservation.startsAt, reservation.endsAt)}</span>
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="min-w-0 flex-1 truncate text-sm text-fg-2">{summary || "Подробности"}</span>
-            <ChevronDown className={clsx("size-5 shrink-0 text-accent transition-transform duration-200", open && "rotate-180")} />
-          </span>
+          <ChevronDown className={clsx("size-5 shrink-0 text-fg-3 transition-transform duration-200", open && "rotate-180")} />
         </button>
 
         {open && (

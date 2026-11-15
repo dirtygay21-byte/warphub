@@ -3,7 +3,7 @@ import type { AosIndex, AosRoster } from '../../aos/types';
 import type { AosEventBody, AosSavedEntry } from '../../aosgame';
 import { haptic } from '../../telegram';
 import { OnlineBar, OnlineStart } from '../game/Online';
-import { Button, Icon } from '../kit';
+import { Button, Icon, HeroWorm } from '../kit';
 import { cx } from '../util';
 import { GameErrorBar } from '../common/GameErrorBar';
 import { GameShell } from '../common/GameShell';
@@ -73,13 +73,14 @@ function StartCard({ game, onStart, onStartOnline }: { game: AosGameHook; onStar
         </span>
         <Icon name="chevron" className="size-4 text-fg-3" />
       </button>
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <p className="font-display text-xl font-semibold uppercase">Новая игра</p>
-        <p className="mt-1 text-sm leading-snug text-fg-2">
+      <div className="relative overflow-hidden rounded-[20px] bg-accent p-4 text-[#111110]">
+        <HeroWorm />
+        <p className="relative font-display text-xl font-semibold uppercase">Новая игра</p>
+        <p className="relative mt-1 pr-6 text-sm leading-snug text-[#111110]/80">
           Подготовка по General’s Handbook 2026-27: игроки и ростеры, батлплан, атакующий и защитник, территория, карты боевых тактик. Затем — трекер раундов: priority,
           CP, кубы ярости, батлплан и тактики в конце хода. Игра сохраняется на этом телефоне после каждого действия.
         </p>
-        <Button variant="primary" className="mt-3 w-full" onClick={onStart}>
+        <Button variant="ink" className="relative mt-3 w-full" onClick={onStart}>
           Начать подготовку
         </Button>
       </div>

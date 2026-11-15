@@ -41,7 +41,7 @@ export default function AdminAdmins() {
     <div className="px-4 py-3 pb-28 text-white sm:px-6">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Администраторы</h1>
+          <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Администраторы</h1>
           <p className="mt-1 text-sm text-fg-3">Доступ к админке по Telegram ID.</p>
         </div>
         <button

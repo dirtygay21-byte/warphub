@@ -15,7 +15,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { getFullName, getInitials } from "@/utils/user";
 import { useQuery } from "@tanstack/react-query";
 import { AtSign, Bell, BookOpen, Check, Copy, Gamepad2, Hash, LayoutGrid, RefreshCw, ShieldCheck, Sparkles, Store, Swords, UserRound } from "lucide-react";
-import { DsButton, GroupCard, NavRow, SectionLabel, Skeleton } from "@/components/ui/ds";
+import { ActionTile, DsButton, GroupCard, Worm, SectionLabel, Skeleton } from "@/components/ui/ds";
 import clsx from "clsx";
 import { useEffectsStore } from "@/stores/useEffectsStore";
 import { haptic } from "@/utils/haptic";
@@ -130,11 +130,14 @@ export default function Profile() {
   return (
     <div className="ds-enter px-5 py-3 text-fg lg:grid lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start lg:gap-x-6 lg:pt-8">
       {/* шапка: аватар с рамкой, имя, username — компактно (переработка профиля 14.11.2026) */}
-      <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-app-elevated shadow-[0_12px_40px_rgba(0,0,0,0.35)] lg:sticky lg:top-8">
-        <div className="absolute inset-x-0 top-0 h-20 bg-linear-to-b from-accent/15 to-transparent" />
+      {/* лаймовый концепт (15.11.2026): шапка — лаймовый блок с червяками, аватар в чёрном кольце; переключатель эффектов — снизу справа */}
+      <section className="relative isolate overflow-hidden rounded-[20px] bg-accent text-[#111110] lg:sticky lg:top-8">
+        <svg aria-hidden="true" width="150" height="150" viewBox="0 0 150 150" className="pointer-events-none absolute right-0 top-0">
+          <Worm x={128} y={18} angle={36} period={150} amp={12} width={11} seconds={10} />
+        </svg>
         <EffectsToggle />
-        <div className="relative flex items-center gap-4 px-4 pb-4 pt-5 lg:flex-col lg:px-6 lg:pb-6 lg:pt-8 lg:text-center">
-          <div className="flex shrink-0 justify-center">
+        <div className="relative flex items-center gap-4 pb-14 pl-4 pr-14 pt-4 lg:flex-col lg:px-6 lg:pb-16 lg:pt-8 lg:text-center">
+          <div className="flex shrink-0 justify-center rounded-full bg-[#111110] p-1">
             {supporter ? (
               <SupporterFrame inline title={supporter} size={72} label={`Поддерживает клуб: ${SUPPORTER_LABELS[supporter]}`}>
                 {avatar}
@@ -151,18 +154,18 @@ export default function Profile() {
               </AvatarFrame>
             )}
           </div>
-          <div className="min-w-0 flex-1 pr-14 lg:pr-0">
-            <h1 className="truncate text-xl font-semibold leading-tight lg:text-2xl">{fullName || "Пользователь"}</h1>
-            <p className={clsx("mt-1 truncate text-[15px]", user?.username ? "text-fg-2" : "text-fg-3")}>
+          <div className="min-w-0 flex-1 lg:pr-0">
+            <h1 className="line-clamp-2 text-[20px] font-bold leading-tight lg:text-[22px]">{fullName || "Пользователь"}</h1>
+            <p className={clsx("mt-1 truncate text-[15px] font-medium", user?.username ? "text-[#111110]" : "text-[#111110]/60")}>
               {user?.username ? `@${user.username}` : "Username не указан"}
             </p>
             {frame && !supporter && (
-              <p className="mt-1 truncate text-[13px] text-fg-3">
+              <p className="mt-1 truncate text-[13px] text-[#111110]/70">
                 {CATEGORY_LABELS[frame.category]} · {frame.rankLabel}
               </p>
             )}
             {supporter && (
-              <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-[0.04em] text-accent-foreground">
+              <p className="mt-2 inline-flex items-center gap-1.5 rounded-[9px] bg-[#111110] px-2.5 py-1 text-[12px] font-semibold text-accent">
                 ★ {SUPPORTER_LABELS[supporter]}
               </p>
             )}
@@ -176,7 +179,7 @@ export default function Profile() {
           aria-label="Разделы профиля"
           className="sticky top-[60px] z-40 -mx-5 mt-4 bg-app-bg/95 px-5 py-2 backdrop-blur lg:top-0 lg:mx-0 lg:mt-0 lg:px-0"
         >
-          <div role="tablist" className="grid grid-cols-4 gap-1 rounded-[14px] border border-white/10 bg-app-elevated p-1">
+          <div role="tablist" className="grid grid-cols-4 gap-1 rounded-[16px] border border-white/10 bg-app-elevated p-1">
             {tabs.map((t) => {
               const on = t.value === tab;
               return (
@@ -189,7 +192,7 @@ export default function Profile() {
                   aria-controls={`profile-panel-${t.value}`}
                   onClick={() => selectTab(t.value)}
                   className={clsx(
-                    "ds-press flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-[10px] px-1 text-[11.5px] font-semibold leading-tight",
+                    "ds-press flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-[12px] px-1 text-[11.5px] font-semibold leading-tight",
                     on ? "bg-accent text-accent-foreground" : "text-fg-2",
                   )}
                 >
@@ -217,39 +220,15 @@ export default function Profile() {
 
               <section>
                 <SectionLabel>Разделы</SectionLabel>
-                <div className="space-y-3">
-                  <NavRow
-                    tone="accent-outline"
-                    bareIcon
-                    icon={<Gamepad2 className="size-7" />}
-                    title="Мини-игры"
-                    subtitle="Играйте и получайте скидки в клубе"
-                    onClick={() => navigate("/games")}
-                  />
-                  <NavRow
-                    icon={<BookOpen className="size-5" />}
-                    title="Как играть"
-                    subtitle="Обучение для новичков: схемы и короткие правила"
-                    onClick={() => navigate("/learn")}
-                  />
+                {/* разделы плитками по две (15.11.2026) — всё видно без прокрутки */}
+                <div className="grid grid-cols-2 gap-2.5 [&>*:last-child:nth-child(odd)]:col-span-2">
+                  <ActionTile accent icon={<Gamepad2 className="size-5" />} title="Мини-игры" subtitle="Скидки за игры" onClick={() => navigate("/games")} />
+                  <ActionTile icon={<BookOpen className="size-5" />} title="Как играть" subtitle="Схемы и правила" onClick={() => navigate("/learn")} />
                   {hasRosterAccess && (
-                    <NavRow
-                      tone="accent"
-                      iconTone="solid"
-                      icon={<Swords className="size-[22px]" />}
-                      title="WarpBuilder"
-                      subtitle="40K, Age of Sigmar, Kill Team, Warcry"
-                      onClick={() => navigate("/roster")}
-                    />
+                    <ActionTile icon={<Swords className="size-5" />} title="WarpBuilder" subtitle="Ростеры и игры" onClick={() => navigate("/roster")} />
                   )}
                   {isAdmin && (
-                    <NavRow
-                      iconTone="neutral"
-                      icon={<ShieldCheck className="size-[22px]" />}
-                      title="Админ-панель"
-                      subtitle="Записи, столы, контент, доступы"
-                      onClick={() => navigate("/admin")}
-                    />
+                    <ActionTile icon={<ShieldCheck className="size-5" />} title="Админ-панель" subtitle="Записи, столы, контент" onClick={() => navigate("/admin")} />
                   )}
                 </div>
                 {isAuthenticated && rosterAccess.isSuccess && !hasRosterAccess && (
@@ -395,7 +374,7 @@ function EffectsToggle() {
         setStrongEnabled(!strongEnabled);
         toast.info(strongEnabled ? "Яркие эффекты выключены" : "Яркие эффекты включены");
       }}
-      className="ds-press absolute right-1.5 top-1.5 z-[2] flex min-h-11 items-center gap-1.5 rounded-full px-2.5"
+      className="ds-press absolute bottom-3 right-3 z-[2] flex min-h-11 items-center gap-1.5 rounded-full bg-[#111110] px-3"
     >
       <Sparkles aria-hidden="true" className={clsx("size-4 transition-colors duration-200", on ? "text-accent" : "text-fg-3")} />
       <span

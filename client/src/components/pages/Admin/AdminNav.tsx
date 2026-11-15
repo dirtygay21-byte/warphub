@@ -73,6 +73,11 @@ export default function AdminNav({ open, onOpenChange }: { open: boolean; onOpen
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onOpenChange]);
 
+  // выбранный раздел — в видимой части ленты
+  useEffect(() => {
+    document.querySelector("[data-admin-tab-active]")?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [current.path]);
+
   const go = (path: string) => {
     haptic.select();
     onOpenChange(false);
@@ -81,9 +86,9 @@ export default function AdminNav({ open, onOpenChange }: { open: boolean; onOpen
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-white/[0.08] bg-app-bg px-4 pb-3 pt-3 text-fg lg:px-6">
-        <span className="text-[13px] font-semibold uppercase tracking-[0.08em] text-fg-3">Админ-панель</span>
-        <div className="mt-2 flex items-center gap-2">
+      {/* шапка админки (перестройка 15.11.2026): одна строка + лента разделов — переход в одно нажатие */}
+      <header className="sticky top-0 z-50 border-b border-white/[0.08] bg-app-bg pt-2.5 text-fg">
+        <div className="flex items-center gap-2 px-4 lg:px-6">
           <button
             type="button"
             onClick={() => {
@@ -91,7 +96,7 @@ export default function AdminNav({ open, onOpenChange }: { open: boolean; onOpen
               navigate("/profile");
             }}
             aria-label="Выйти из админ-панели"
-            className="ds-press flex size-[52px] shrink-0 items-center justify-center rounded-[14px] border border-white/[0.14] bg-app-elevated text-fg"
+            className="ds-press flex size-11 shrink-0 items-center justify-center rounded-[12px] border border-white/[0.14] bg-app-elevated text-fg"
           >
             <ChevronLeft className="size-5" />
           </button>
@@ -103,18 +108,38 @@ export default function AdminNav({ open, onOpenChange }: { open: boolean; onOpen
             }}
             aria-haspopup="dialog"
             aria-expanded={open}
-            className="ds-press flex h-[52px] min-w-0 flex-1 items-center gap-2.5 rounded-[14px] border border-white/[0.14] bg-app-elevated px-3.5 text-left"
+            className="ds-press flex h-11 min-w-0 flex-1 items-center gap-2.5 rounded-[12px] border border-white/[0.14] bg-app-elevated px-3 text-left"
           >
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-[9px] bg-accent text-accent-foreground">
-              <CurrentIcon className="size-[18px]" />
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-[8px] bg-accent text-accent-foreground">
+              <CurrentIcon className="size-4" />
             </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate font-display text-xl font-semibold uppercase leading-tight">{current.label}</span>
-              <span className="block text-[12px] text-fg-3">Раздел · нажмите, чтобы сменить</span>
+            <span className="min-w-0 flex-1 truncate text-[15px] font-semibold">
+              <span className="text-fg-3">Админка · </span>
+              {current.label}
             </span>
             <ChevronDown className="size-5 shrink-0 text-fg-3" />
           </button>
         </div>
+        <nav aria-label="Разделы админ-панели" className="no-scrollbar mt-2.5 flex gap-1.5 overflow-x-auto px-4 pb-2.5 lg:px-6">
+          {SECTIONS.map((item) => {
+            const active = item.path === current.path;
+            return (
+              <button
+                key={item.path}
+                type="button"
+                data-admin-tab-active={active ? "" : undefined}
+                onClick={() => go(item.path)}
+                aria-current={active ? "page" : undefined}
+                className={clsx(
+                  "ds-press min-h-9 shrink-0 whitespace-nowrap rounded-[10px] px-3 text-[13px] font-semibold",
+                  active ? "bg-accent text-accent-foreground" : "bg-white/[0.06] text-fg-2",
+                )}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
       </header>
 
       {open && (

@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 import TelegramOnly from "@/components/ui/TelegramOnly/TelegramOnly";
 import { isOutsideTelegram } from "@/utils/telegramEnv";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState, type ReactNode } from "react";
 import { AnimatePresence } from "motion/react";
 import { toast } from "@/stores/useToastStore";
 
@@ -258,6 +258,85 @@ export default function Reservation() {
     );
   }
 
+  // одна лента по времени (15.11.2026): ивенты, D&D и записи вперемешку по дате; прошедшие — сначала последние.
+  // Заявки «Хочу попробовать» без даты — сверху, D&D без даты — после датированных.
+  const timeline: { key: string; at: number; el: ReactNode }[] = [];
+  if (visibleEvent) {
+    timeline.push({ key: "event", at: Date.parse(visibleEvent.startsAt), el: (
+      <EventReservationCard
+        event={visibleEvent}
+        isPast={isPastEvent(visibleEvent)}
+        isCancelling={cancelEventMutation.isPending}
+        onCancel={() => setShowEventCancelDialog(true)}
+      />
+    ) });
+  }
+  for (const request of visibleTrials) {
+    timeline.push({ key: `trial:${request.id}`, at: showPast ? Infinity : -Infinity, el: (
+      <TrialRequestCard
+      request={request}
+      isCancelling={
+        cancelTrialMutation.isPending &&
+        cancelTrialMutation.variables === request.id
+      }
+      errorMessage={
+        cancelTrialMutation.isError &&
+        cancelTrialMutation.variables === request.id
+          ? cancelTrialMutation.error.message
+          : null
+      }
+      onCancel={() => cancelTrialMutation.mutate(request.id)}
+    />
+    ) });
+  }
+  for (const booking of visibleDndBookings) {
+    timeline.push({ key: `dnd:${booking.id}`, at: booking.game.startsAt ? Date.parse(booking.game.startsAt) : showPast ? -Infinity : Infinity, el: (
+      <DndBookingCard
+      booking={booking}
+      isCancelling={
+        cancelDndBookingMutation.isPending &&
+        cancelDndBookingMutation.variables === booking.id
+      }
+      errorMessage={
+        cancelDndBookingMutation.isError &&
+        cancelDndBookingMutation.variables === booking.id
+          ? cancelDndBookingMutation.error.message
+          : null
+      }
+      onCancel={() => cancelDndBookingMutation.mutate(booking.id)}
+    />
+    ) });
+  }
+  for (const reservation of visibleReservations) {
+    timeline.push({ key: `res:${reservation.id}`, at: Date.parse(reservation.startsAt), el: (
+      <ReservationCard
+      reservation={reservation}
+      isPast={isPastReservation(reservation)}
+      onEdit={() => setReservationToEdit(reservation.id)}
+      serviceDuration={servicesById.get(reservation.serviceId)?.duration ?? null}
+      serviceTitle={
+        servicesById.get(reservation.serviceId)?.title ??
+        reservation.serviceTitle ??
+        undefined
+      }
+      isServiceLoading={loadingServiceIds.has(reservation.serviceId)}
+      disciplineTitle={
+        servicesById.get(reservation.serviceId)
+          ? disciplinesById.get(
+              servicesById.get(reservation.serviceId)!.disciplineId
+            )
+          : undefined
+      }
+      isCancelling={
+        cancelMutation.isPending &&
+        cancelMutation.variables === reservation.id
+      }
+      onCancel={() => setReservationToCancel(reservation.id)}
+    />
+    ) });
+  }
+  timeline.sort((a, b) => (showPast ? b.at - a.at : a.at - b.at));
+
   return (
     <div className="ds-enter px-5 pb-3 pt-6 text-fg lg:pt-8">
       <div className="mb-4 flex flex-col gap-3.5">
@@ -298,74 +377,8 @@ export default function Reservation() {
         </div>
       ) : (
         <div className="ds-stagger flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start">
-          {visibleEvent && (
-            <EventReservationCard
-              event={visibleEvent}
-              isPast={isPastEvent(visibleEvent)}
-              isCancelling={cancelEventMutation.isPending}
-              onCancel={() => setShowEventCancelDialog(true)}
-            />
-          )}
-          {visibleTrials.map((request) => (
-            <TrialRequestCard
-              key={request.id}
-              request={request}
-              isCancelling={
-                cancelTrialMutation.isPending &&
-                cancelTrialMutation.variables === request.id
-              }
-              errorMessage={
-                cancelTrialMutation.isError &&
-                cancelTrialMutation.variables === request.id
-                  ? cancelTrialMutation.error.message
-                  : null
-              }
-              onCancel={() => cancelTrialMutation.mutate(request.id)}
-            />
-          ))}
-          {visibleDndBookings.map((booking) => (
-            <DndBookingCard
-              key={booking.id}
-              booking={booking}
-              isCancelling={
-                cancelDndBookingMutation.isPending &&
-                cancelDndBookingMutation.variables === booking.id
-              }
-              errorMessage={
-                cancelDndBookingMutation.isError &&
-                cancelDndBookingMutation.variables === booking.id
-                  ? cancelDndBookingMutation.error.message
-                  : null
-              }
-              onCancel={() => cancelDndBookingMutation.mutate(booking.id)}
-            />
-          ))}
-          {visibleReservations.map((reservation) => (
-            <ReservationCard
-              key={reservation.id}
-              reservation={reservation}
-              isPast={isPastReservation(reservation)}
-              onEdit={() => setReservationToEdit(reservation.id)}
-              serviceDuration={servicesById.get(reservation.serviceId)?.duration ?? null}
-              serviceTitle={
-                servicesById.get(reservation.serviceId)?.title ??
-                reservation.serviceTitle ??
-                undefined
-              }
-              isServiceLoading={loadingServiceIds.has(reservation.serviceId)}
-              disciplineTitle={
-                servicesById.get(reservation.serviceId)
-                  ? disciplinesById.get(
-                      servicesById.get(reservation.serviceId)!.disciplineId
-                    )
-                  : undefined
-              }
-              isCancelling={
-                cancelMutation.isPending &&
-                cancelMutation.variables === reservation.id
-              }
-              onCancel={() => setReservationToCancel(reservation.id)}
-            />
+          {timeline.map((item) => (
+            <Fragment key={item.key}>{item.el}</Fragment>
           ))}
         </div>
       )}

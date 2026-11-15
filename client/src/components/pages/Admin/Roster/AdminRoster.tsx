@@ -20,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 const when = (value: string) => formatClub(value, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
 const STATUS: Record<RosterCode["status"], { label: string; className: string }> = {
-  active: { label: "Активен", className: "bg-accent/15 text-accent" },
+  active: { label: "Активен", className: "bg-accent text-accent-foreground" },
   used: { label: "Использован", className: "bg-white/10 text-fg-2" },
   expired: { label: "Истёк", className: "bg-white/5 text-fg-3" },
   revoked: { label: "Отозван", className: "bg-red-400/10 text-red-300" },
@@ -57,7 +57,7 @@ export default function AdminRoster() {
     <div className="px-4 py-3 pb-28 text-white sm:px-6">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">WarpBuilder</h1>
+          <h1 className="font-display text-[28px] font-semibold uppercase leading-none">WarpBuilder</h1>
           <p className="mt-1 text-sm text-fg-3">
             Скрытый раздел. Открывается по одноразовому коду из 4 цифр.
           </p>

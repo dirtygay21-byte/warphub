@@ -8,6 +8,7 @@ import clsx from "clsx";
 import { ChevronRight } from "lucide-react";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { haptic } from "@/utils/haptic";
+import { formatClub } from "@/utils/clubTime";
 
 /** Заголовок раздела внутри экрана: мелкие заглавные, цвет подписей. */
 export function SectionLabel({ children, right, className }: { children: ReactNode; right?: ReactNode; className?: string }) {
@@ -33,8 +34,8 @@ type Tone = "plain" | "accent" | "accent-outline";
 
 const TONE: Record<Tone, string> = {
   plain: "border border-white/10 bg-app-elevated",
-  accent: "border border-accent/35 bg-accent/[0.08]",
-  "accent-outline": "border-[1.5px] border-accent/70 bg-accent/[0.08]",
+  accent: "border-[1.5px] border-accent/70 bg-accent/[0.06]",
+  "accent-outline": "border-[1.5px] border-accent/70 bg-accent/[0.06]",
 };
 
 /**
@@ -83,7 +84,7 @@ export function NavRow({
           </span>
         ))}
       <span className="min-w-0 flex-1">
-        <span className="block text-[17px] font-bold leading-tight">{title}</span>
+        <span className="block text-[16px] font-bold leading-tight">{title}</span>
         {subtitle && <span className="mt-0.5 block text-sm leading-snug text-fg-2">{subtitle}</span>}
       </span>
       <ChevronRight className={clsx("size-5 shrink-0", tone === "plain" ? "text-fg-3" : "text-accent")} />
@@ -101,11 +102,11 @@ export function Badge({ children, tone = "muted", className }: { children: React
   return (
     <span
       className={clsx(
-        "inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-lg px-2 text-xs font-semibold",
+        "inline-flex h-[26px] shrink-0 items-center whitespace-nowrap rounded-[9px] px-2.5 text-xs font-semibold",
         tone === "muted" && "bg-white/[0.08] text-fg-2",
-        tone === "accent" && "bg-accent/15 text-accent",
-        tone === "warn" && "bg-warn/15 text-warn",
-        tone === "danger" && "bg-danger/15 text-danger",
+        tone === "accent" && "bg-accent text-accent-foreground",
+        tone === "warn" && "bg-warn text-accent-foreground",
+        tone === "danger" && "bg-danger text-accent-foreground",
         className,
       )}
     >
@@ -137,7 +138,7 @@ export function DsButton({
         "ds-press inline-flex items-center justify-center gap-2 rounded-[14px] font-semibold disabled:opacity-50",
         size === "lg" ? "h-[54px] px-5 text-[17px]" : "h-11 px-4 text-[15px]",
         variant === "primary" && "bg-accent text-accent-foreground",
-        variant === "secondary" && "border border-white/[0.16] bg-app-elevated text-fg",
+        variant === "secondary" && "border-[1.5px] border-white/[0.18] bg-transparent text-fg",
         variant === "danger" && "border border-danger/40 bg-transparent text-danger",
         variant === "ghost" && "bg-transparent text-fg-2",
         className,
@@ -161,7 +162,7 @@ export function Segmented<T extends string>({
   className?: string;
 }) {
   return (
-    <div className={clsx("grid gap-1 rounded-[14px] bg-app-elevated p-1", className)} style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
+    <div className={clsx("grid gap-1 rounded-[16px] border border-white/10 bg-app-elevated p-1", className)} style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
       {options.map((o) => (
         <button
           key={o.value}
@@ -169,7 +170,7 @@ export function Segmented<T extends string>({
           aria-pressed={o.value === value}
           onClick={() => (haptic.select(), onChange(o.value))}
           className={clsx(
-            "ds-press h-10 rounded-[10px] text-[15px] font-semibold",
+            "ds-press min-h-11 rounded-[12px] px-1 text-[15px] font-semibold",
             o.value === value ? "bg-accent text-accent-foreground" : "bg-transparent text-fg-2",
           )}
         >
@@ -223,5 +224,50 @@ export function StepBar({ step, total }: { step: number; total: number }) {
         </div>
       ))}
     </div>
+  );
+}
+export { LimeHero, LimeChip, LimeCorner, Worm, type LimeTone } from "./Lime";
+
+/**
+ * Дата плиткой (15.11.2026): день недели, число крупно, месяц — список записей читается по датам.
+ * tone: "lime"/"warn"/"danger" — сплошная плитка цвета статуса, "plain" — тёмная, "muted" — прошедшая.
+ */
+export function DateTile({ date, tone = "plain", className }: { date: string; tone?: "lime" | "warn" | "danger" | "plain" | "muted"; className?: string }) {
+  return (
+    <span
+      className={clsx(
+        "flex w-[56px] shrink-0 flex-col items-center justify-center rounded-[14px] py-1.5 leading-none",
+        tone === "lime" && "bg-accent text-accent-foreground",
+        tone === "warn" && "bg-warn text-accent-foreground",
+        tone === "danger" && "bg-danger text-accent-foreground",
+        tone === "plain" && "bg-white/[0.08] text-fg",
+        tone === "muted" && "bg-white/[0.05] text-fg-3",
+        className,
+      )}
+    >
+      <span className="text-[11px] font-semibold uppercase">{formatClub(date, { weekday: "short" })}</span>
+      <span className="font-display mt-1 text-[24px] font-semibold tabular-nums">{formatClub(date, { day: "numeric" })}</span>
+      <span className="mt-1 text-[11px] font-semibold">{formatClub(date, { month: "short" }).replace(".", "")}</span>
+    </span>
+  );
+}
+
+/**
+ * Плитка-переход (15.11.2026): иконка, название, подпись — по две в ряд вместо длинных строк.
+ * accent — лаймовая плашка иконки (главный раздел), иначе мягкая.
+ */
+export function ActionTile({ icon, title, subtitle, onClick, accent, className }: { icon: ReactNode; title: ReactNode; subtitle?: ReactNode; onClick: () => void; accent?: boolean; className?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={() => (haptic.tap(), onClick())}
+      className={clsx("ds-press fx-press flex min-h-[104px] flex-col justify-between gap-3 rounded-[18px] border border-white/10 bg-app-elevated p-3.5 text-left text-fg", className)}
+    >
+      <span className={clsx("flex size-10 items-center justify-center rounded-xl", accent ? "bg-accent text-accent-foreground" : "bg-accent/15 text-accent")}>{icon}</span>
+      <span className="block">
+        <span className="block text-[15px] font-bold leading-tight">{title}</span>
+        {subtitle && <span className="mt-0.5 block text-[12.5px] leading-snug text-fg-2">{subtitle}</span>}
+      </span>
+    </button>
   );
 }
