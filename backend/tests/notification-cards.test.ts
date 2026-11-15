@@ -93,3 +93,14 @@ test('факт на картинке — главная часть значен�
   expect(factValue('Стол 1')).toBe('Стол 1');
   for (const v of ['Иван Петров (@ivan) — Kommandos, Игрок', 'Очень-очень-длинное-значение-без-пробелов']) expect(factValue(v)).not.toContain('…');
 });
+
+test('анимация MP4 (H.264) — чёткая, 1280×720 (15.11.2026)', async () => {
+  const { renderCardMp4 } = await import('../src/modules/notifications/card/render');
+  const kind = NOTIFICATION_KINDS.find((k) => k.id === 'booking_created')!;
+  const mp4 = await renderCardMp4(parseNotificationCard(renderTemplate(kind.defaultText, kind.vars), kind.title));
+  expect(new TextDecoder().decode(mp4.slice(4, 8))).toBe('ftyp');
+  expect(mp4.length).toBeLessThan(5_000_000);
+  console.log(`mp4 booking_created: ${mp4.length} bytes`);
+  const out = process.env.CARD_SAMPLES_DIR;
+  if (out) writeFileSync(`${out}/anim-booking_created.mp4`, mp4);
+}, 120_000);

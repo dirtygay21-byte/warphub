@@ -73,7 +73,7 @@ export type MessageExtra = { imageUrl?: string | null; buttons?: MessageButton[]
  * Картинка вместо текста (14.11.2026): подключается из notifications/hub.ts (настройка в базе), чтобы этот модуль
  * не зависел от базы. null — отправить обычный текст.
  */
-type CardImageProvider = (kind: string, text: string) => Promise<{ data: Uint8Array; animated: boolean; caption: string } | null>;
+type CardImageProvider = (kind: string, text: string) => Promise<{ data: Uint8Array; animated: boolean; format: 'png' | 'gif' | 'mp4'; caption: string } | null>;
 let cardImages: CardImageProvider | null = null;
 export function setCardImageProvider(fn: CardImageProvider | null) {
   cardImages = fn;
@@ -158,14 +158,18 @@ async function readFailure(response: Response, chatId: number | string): Promise
   return { ok: false, reason: 'telegram', status: response.status, description };
 }
 
-async function sendCard(chatId: number | string, card: { data: Uint8Array; animated: boolean; caption: string }, extra: MessageExtra): Promise<SendResult> {
+async function sendCard(chatId: number | string, card: { data: Uint8Array; animated: boolean; format: 'png' | 'gif' | 'mp4'; caption: string }, extra: MessageExtra): Promise<SendResult> {
   if (!notificationsEnabled()) return { ok: false, reason: 'disabled' };
   const markup = replyMarkup(extra.buttons);
   try {
     const form = new FormData();
     form.append('chat_id', String(chatId));
     // анимация (GIF) — sendAnimation: в чате проигрывается сама и по кругу
-    if (card.animated) form.append('animation', new Blob([card.data], { type: 'image/gif' }), 'warphub.gif');
+    if (card.format === 'mp4') {
+      form.append('animation', new Blob([card.data], { type: 'video/mp4' }), 'warphub.mp4');
+      form.append('width', '1280');
+      form.append('height', '720');
+    } else if (card.animated) form.append('animation', new Blob([card.data], { type: 'image/gif' }), 'warphub.gif');
     else form.append('photo', new Blob([card.data], { type: 'image/png' }), 'warphub.png');
     form.append('caption', card.caption);
     form.append('parse_mode', 'HTML');

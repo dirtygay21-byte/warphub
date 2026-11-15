@@ -648,7 +648,11 @@ function CardPreview({ kind, text }: { kind: string; text: string }) {
       {preview.isError && <p className="mt-2 text-sm text-red-300">{(preview.error as Error).message}</p>}
       {preview.data && (
         <div className="mt-2 max-w-sm overflow-hidden rounded-2xl rounded-bl-md bg-[#2b5278]/40">
-          <img src={preview.data.image} alt="Картинка уведомления" className="w-full" />
+          {preview.data.format === "mp4" ? (
+            <video src={preview.data.image} autoPlay loop muted playsInline className="w-full" aria-label="Анимация уведомления" />
+          ) : (
+            <img src={preview.data.image} alt="Картинка уведомления" className="w-full" />
+          )}
           <div className="px-3 py-2 text-[14px] leading-snug text-white" dangerouslySetInnerHTML={{ __html: telegramHtml(preview.data.caption) }} />
         </div>
       )}

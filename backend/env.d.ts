@@ -43,3 +43,19 @@ declare module 'gifenc' {
   export function quantize(rgba: Uint8Array | Uint8ClampedArray, maxColors: number): number[][];
   export function applyPalette(rgba: Uint8Array | Uint8ClampedArray, palette: number[][]): Uint8Array;
 }
+
+/** h264-mp4-encoder (MP4-анимация картинок уведомлений) — используемая часть. */
+declare module 'h264-mp4-encoder' {
+  export function createH264MP4Encoder(): Promise<{
+    width: number;
+    height: number;
+    frameRate: number;
+    quantizationParameter: number;
+    outputFilename: string;
+    FS: { readFile(path: string): Uint8Array };
+    initialize(): void;
+    addFrameRgba(rgba: Uint8Array): void;
+    finalize(): void;
+    delete(): void;
+  }>;
+}

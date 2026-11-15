@@ -218,3 +218,38 @@ export async function renderCardGif(card: NotificationCard): Promise<Uint8Array>
   gif.finish();
   return gif.bytes();
 }
+
+/**
+ * Анимация в MP4 (H.264), 15.11.2026 (владелец: «анимация выглядит размытой»). GIF Telegram сам пережимает в
+ * видео с низким качеством; готовый MP4 высокого качества он показывает как есть. 1280×720, 24 кадра/с,
+ * 48 кадров = 2 с, цикл бесшовный (червяки сдвигаются ровно на длину волны), Telegram повторяет его сам.
+ * h264-mp4-encoder — кодировщик на WebAssembly, без внешних программ.
+ */
+export const MP4_FPS = 24;
+export const MP4_FRAMES = 48;
+
+export async function renderCardMp4(card: NotificationCard): Promise<Uint8Array> {
+  const { fonts: fl, logo: l } = assets();
+  const [{ default: satori }, { Resvg }, hme] = await Promise.all([import('satori'), import('@resvg/resvg-js'), import('h264-mp4-encoder')]);
+  const tone = TONE[card.tone];
+  const first = backdrop(tone, 0);
+  const svg = await satori(cardTree(card, l, first) as never, { width: W, height: H, fonts: fl });
+  if (!svg.includes(first)) throw new Error('animation: background not found in svg');
+  const encoder = await ((hme as { default?: typeof hme }).default ?? hme).createH264MP4Encoder();
+  try {
+    encoder.width = W;
+    encoder.height = H;
+    encoder.frameRate = MP4_FPS;
+    encoder.quantizationParameter = 16; // 10 — лучшее, 51 — худшее; 16 — текст чёткий, файл небольшой
+    encoder.initialize();
+    for (let i = 0; i < MP4_FRAMES; i++) {
+      const frame = i === 0 ? svg : svg.replace(first, backdrop(tone, i / MP4_FRAMES));
+      const image = new Resvg(frame, { fitTo: { mode: 'width', value: W } }).render();
+      encoder.addFrameRgba(new Uint8Array(image.pixels.buffer, image.pixels.byteOffset, image.pixels.length));
+    }
+    encoder.finalize();
+    return encoder.FS.readFile(encoder.outputFilename);
+  } finally {
+    encoder.delete();
+  }
+}
