@@ -95,7 +95,9 @@ export function DndBookingCard({
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[16px] font-bold leading-tight">{booking.game.title}</span>
           <span className="mt-1 flex items-center gap-2">
-            <span className="truncate text-[14px] text-fg-2">D&D · {booking.game.gameType}</span>
+            <span className="truncate text-[14px] text-fg">
+              {booking.game.startsAt ? formatClubTimeRange(booking.game.startsAt, booking.game.endsAt) : `D&D · ${booking.game.gameType}`}
+            </span>
             <span
               className={clsx(
                 "inline-flex h-[22px] shrink-0 items-center whitespace-nowrap rounded-[8px] px-2 text-[11.5px] font-semibold",
@@ -105,6 +107,7 @@ export function DndBookingCard({
               {statusLabel}
             </span>
           </span>
+          {booking.game.startsAt && <span className="mt-0.5 block truncate text-[13px] text-fg-2">D&D · {booking.game.gameType}</span>}
         </span>
         <ChevronDown className={clsx("size-5 shrink-0 text-fg-3 transition-transform duration-200", open && "rotate-180")} />
       </button>

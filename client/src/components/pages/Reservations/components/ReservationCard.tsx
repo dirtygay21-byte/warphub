@@ -125,7 +125,7 @@ export function ReservationCard({
               <span className="whitespace-nowrap text-[14px] text-fg">{formatTimeRange(reservation.startsAt, reservation.endsAt)}</span>
               {!isServiceLoading && (
                 <span className={clsx("inline-flex h-[22px] shrink-0 items-center whitespace-nowrap rounded-[8px] px-2 text-[11.5px] font-semibold", getStatusStyle(reservation.status))}>
-                  {getStatusLabel(reservation.status)}
+                  {reservation.status.toLowerCase() === "pending" ? "Ждёт" : getStatusLabel(reservation.status)}
                 </span>
               )}
             </span>
