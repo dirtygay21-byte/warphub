@@ -209,7 +209,8 @@ export function cardTree(card: NotificationCard, height: number): Node {
   // поля — отступом внутреннего блока: у корня satori считает padding сверх ширины
   return el('div', { width: W, height, position: 'relative', backgroundColor: COLORS.bg }, [
     el('img', { position: 'absolute', top: 0, left: 0, width: W, height }, undefined, { src: bg, width: W, height }),
-    el('div', { flexDirection: 'column', flexGrow: 1, margin: PAD, width: INNER }, [
+    // содержимое тоже абсолютное и после фона — иначе satori рисует фон поверх текста
+    el('div', { position: 'absolute', top: PAD, left: PAD, flexDirection: 'column', width: INNER, height: height - PAD * 2 }, [
       el('div', { flexDirection: 'column', height: TOP - PAD + 40, maxWidth: 560 }, [
         el('div', { fontFamily: OSWALD, fontWeight: 600, fontSize: 26, letterSpacing: 6, color: COLORS.fg3 }, 'WARP BOYS & GIRLS'),
         el('div', { marginTop: 18, fontFamily: OSWALD, fontWeight: 600, fontSize: 32, letterSpacing: 5, textTransform: 'uppercase', color: tone }, `${card.kicker} · WarpHub`),
