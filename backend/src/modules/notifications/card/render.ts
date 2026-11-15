@@ -53,7 +53,7 @@ function wave(x0: number, x1: number, y: number, amp: number, len: number) {
   return d;
 }
 
-function patternSvg(pattern: Pattern, height: number, tone: string) {
+function patternSvg(pattern: Pattern, height: number, tone: string, single = false) {
   let body = '';
   if (pattern === 'band') {
     const top = height - BAND + 40;
@@ -82,7 +82,10 @@ function patternSvg(pattern: Pattern, height: number, tone: string) {
     body = `<rect width="${W}" height="${height}" fill="${tone}"/>` +
       `<path d="M${W - 520} -60 C${W - 470} 120 ${W - 300} 60 ${W - 250} 210 S${W - 120} 380 ${W + 60} 330" fill="none" stroke="#111110" stroke-width="58" stroke-linecap="round"/>` +
       `<path d="M${W - 340} -60 C${W - 300} 60 ${W - 170} 20 ${W - 120} 130 S${W - 20} 210 ${W + 60} 170" fill="none" stroke="#111110" stroke-width="58" stroke-linecap="round"/>` +
-      `<path d="M-60 ${height - 170} C120 ${height - 230} 180 ${height - 60} 330 ${height - 90} S520 ${height + 10} 600 ${height + 60}" fill="none" stroke="#111110" stroke-width="58" stroke-linecap="round"/>`;
+      // третий «червяк» — у правого края внизу: слева внизу подсказка и адрес, им нельзя мешать
+      (single
+        ? `<path d="M${W + 60} ${height - 260} C${W - 120} ${height - 300} ${W - 160} ${height - 120} ${W - 330} ${height - 110} S${W - 480} ${height + 10} ${W - 520} ${height + 60}" fill="none" stroke="#111110" stroke-width="58" stroke-linecap="round"/>`
+        : '');
   } else {
     body = `<rect width="${W}" height="${height}" fill="${tone}"/>`;
     for (let y = 40; y < height + 80; y += 150) {
@@ -197,7 +200,7 @@ function isSingle(f: Flags, blocks: CardBlock[]) {
   const rows = blocks.reduce((n, b) => n + (b.type === 'rows' ? b.rows.length : 0), 0);
   return rows <= 2;
 }
-const SINGLE_W = W - PAD * 2 - 300;
+const SINGLE_W = W - PAD * 2 - 420;
 
 function heights(card: NotificationCard, f: Flags, when: string, blocks: CardBlock[]) {
   if (f.compact) return compactHeight(card, f, when, blocks);
@@ -346,7 +349,8 @@ export function cardTree(card: NotificationCard, logoSrc: string, height: number
   const left = el('div', { flexDirection: 'column', width: LEFT, flexShrink: 0 }, [
     el('div', { alignItems: 'center', justifyContent: 'space-between' }, [
       el('img', { width: 72, height: 72 }, undefined, { src: logoSrc, width: 72, height: 72 }),
-      el('div', { fontFamily: INTER, fontWeight: 600, fontSize: 20, letterSpacing: 8, color: muted }, 'WARPHUB'),
+      // в узорных вариантах подпись справа от логотипа уходит под узор — достаточно логотипа и адреса внизу
+      ...(f.pattern ? [] : [el('div', { fontFamily: INTER, fontWeight: 600, fontSize: 20, letterSpacing: 8, color: muted }, 'WARPHUB')]),
     ]),
     el('div', { marginTop: 48, fontFamily: INTER, fontWeight: 600, fontSize: 26, letterSpacing: 5, textTransform: 'uppercase', color: accentText }, f.stripe ? `${card.kicker} · WarpHub` : card.kicker),
     el('div', { marginTop: 14, fontFamily: OSWALD, fontWeight: 700, fontSize: ts, lineHeight: 1.04, textTransform: 'uppercase', color: f.pattern && !onLime ? tone : ink }, card.title),
@@ -397,7 +401,7 @@ export function cardTree(card: NotificationCard, logoSrc: string, height: number
     const single = el('div', { flexDirection: 'column', width: SINGLE_W, flexShrink: 0 }, [...children.slice(0, -1), ...items, children.at(-1)]);
     const contentH = height - PAD * 2 - (hasBand(f.pattern) ? BAND - 40 : 0);
     return el('div', { width: W, height, position: 'relative', backgroundColor: COLORS.bg }, [
-      el('img', { position: 'absolute', top: 0, left: 0, width: W, height }, undefined, { src: patternSvg(f.pattern, height, tone), width: W, height }),
+      el('img', { position: 'absolute', top: 0, left: 0, width: W, height }, undefined, { src: patternSvg(f.pattern, height, tone, true), width: W, height }),
       el('div', { position: 'absolute', top: PAD, left: PAD, width: W - PAD * 2, height: contentH }, [single]),
     ]);
   }
