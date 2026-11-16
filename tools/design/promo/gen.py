@@ -52,7 +52,7 @@ def page(s: dict, screens: pathlib.Path) -> str:
 *{{margin:0;padding:0;box-sizing:border-box}}
 body{{width:1080px;height:1350px;background:{th['bg']};font-family:'Inter Display','Inter',sans-serif;color:{INK};position:relative;overflow:hidden}}
 svg.bg{{position:absolute;inset:0}}
-.left{{position:absolute;left:64px;top:64px;bottom:64px;width:{s.get('leftW', 500)}px;display:flex;flex-direction:column}}
+.left{{position:absolute;left:64px;top:64px;bottom:64px;width:{s.get('leftW', 470 if not s.get('screen2') else 440)}px;display:flex;flex-direction:column}}
 .top{{display:flex;align-items:center;gap:18px}}
 .top img{{width:80px;height:80px}}
 .kick{{font-weight:800;font-size:28px;letter-spacing:.12em;text-transform:uppercase;line-height:1.1}}
@@ -64,12 +64,12 @@ h1{{margin-top:44px;font-weight:900;font-size:96px;line-height:.92;text-transfor
 .num{{flex:none;width:56px;height:56px;border-radius:16px;background:{th['acc']};color:{INK};display:grid;place-items:center;font-weight:900;font-size:30px}}
 .ct{{color:#F4F4F0;font-weight:800;font-size:27px;line-height:1.12}}
 .cs{{color:#B8B8B0;font-weight:500;font-size:20px;line-height:1.3;margin-top:5px}}
-.foot{{position:absolute;right:64px;bottom:64px;display:flex;gap:14px;align-items:center}}
-.pill{{background:{INK};color:{th['acc']};border-radius:999px;padding:14px 28px;font-weight:800;font-size:28px}}
-.phone{{position:absolute;right:{s.get('phoneR', 64)}px;top:{s.get('phoneT', 64)}px;width:420px;border-radius:62px;background:{INK};padding:12px;
+.foot{{margin-top:26px;display:flex;gap:16px;align-items:center;font-weight:800;font-size:24px;letter-spacing:.06em;text-transform:uppercase}}
+.pill{{background:{INK};color:{th['acc']};border-radius:999px;padding:12px 26px;font-weight:800;font-size:26px;letter-spacing:.02em;text-transform:none}}
+.phone{{position:absolute;right:{s.get('phoneR', 64 if not s.get('screen2') else 100)}px;top:{s.get('phoneT', 210 if not s.get('screen2') else 300)}px;width:420px;border-radius:62px;background:{INK};padding:12px;
   box-shadow:0 40px 80px rgba(17,17,16,.35),0 0 0 2px rgba(255,255,255,.08) inset}}
 .phone img{{display:block;width:396px;border-radius:50px}}
-.phone.back{{right:auto;left:{s.get('backL', 470)}px;top:{s.get('backT', 250)}px;transform:rotate(-7deg) scale(.86);transform-origin:top left;opacity:.97}}
+.phone.back{{right:-190px;top:30px;transform:rotate(9deg) scale(.82);transform-origin:top right;box-shadow:0 30px 60px rgba(17,17,16,.3)}}
 </style></head><body>
 <svg class="bg" width="1080" height="1350" viewBox="0 0 1080 1350">{worm(wx, wy, wr)}</svg>
 {back}
@@ -79,6 +79,7 @@ h1{{margin-top:44px;font-weight:900;font-size:96px;line-height:.92;text-transfor
  <h1>{s['title']}</h1>
  <div class="sub">{s['sub']}</div>
  <div class="steps">{steps}</div>
+ <div class="foot"><span>Клуб WBG</span><span class="pill">@WarpHubBot</span></div>
 </div>
 <script>
 // заголовок не шире колонки: уменьшать, пока не поместится
@@ -107,7 +108,7 @@ def main() -> None:
             bad = pg.evaluate("""() => { const L=document.querySelector('.left').getBoundingClientRect(); const r=[];
               for (const e of document.querySelectorAll('.left *')) { const b=e.getBoundingClientRect(); if (b.right>L.right+1||b.bottom>L.bottom+1) r.push(e.className||e.tagName); }
               const st=document.querySelector('.steps').getBoundingClientRect(), sb=document.querySelector('.sub').getBoundingClientRect();
-              if (sb.bottom>st.top-12) r.push('sub overlaps steps'); return r; }""")
+              if (sb.bottom>st.top-12) r.push('sub overlaps steps'); const ph=document.querySelector('.phone:not(.back)').getBoundingClientRect(); if (L.right>ph.left-24) r.push('column hits phone'); return r; }""")
             pg.screenshot(path=str(out / f"{s['id']}.png"))
             html.unlink()
             print(s['id'], 'OK' if not bad else f'CHECK: {bad}')
