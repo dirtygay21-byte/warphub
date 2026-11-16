@@ -8,6 +8,7 @@ Python sources of the generated design files. Rules and audit: `docs/design-code
 | `frames/supporter.py` | supporter frames: canvas board `Supporter.dc.html` + `supporters.generated.ts` |
 | `promo/gen.py` (texts in `slides.py`) | promo images WarpHub / WarpBuilder, 2160×2700 PNG, from demo screens of `tools/ui-shots/promo.mjs` (PR label `ui-promo`) |
 | `posters/gen.py` | A3 club posters (WarpHub, WarpBuilder, «Как начать») as PDF + PNG, vector QR codes checked by decoding |
+| `announce/birthday.py` | club birthday announcement (3 years, 28.11): animated 2:1 GIF + MP4 (news cover, channel), static 2:1 PNG (bot broadcast), 4:3 PNG (event banner) |
 | `tutorial/gen.py` (40K), `aos.py`, `kt.py`, `wc.py` | canvas boards `Tutorial*.dc.html` (the app drawings are hand-ported to `client/src/components/tutorial/TutorialDiagram.tsx`) |
 
 Output paths inside the scripts point at the design session's working folders; adjust them before running.
