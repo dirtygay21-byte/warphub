@@ -295,11 +295,11 @@ function Editor({
             )}
           </section>
 
+          <PhotoStrip />
+
           <SpellsPanel roster={roster} L={L} open={spellsOpen} onToggle={toggleSpells} />
           <ManifestationsPanel roster={roster} L={L} open={manifOpen} onToggle={() => setManifOpen((o) => !o)} />
           <EnhancementsPanel roster={roster} L={L} onUnit={scrollTo} />
-
-          <PhotoStrip />
 
           {/* ---- полки ---- */}
           {roster.regiments.length === 0 && <Empty title="Нет полков">Армия собирается из полков: герой-лидер и до 3 юнитов. Нажмите «Новый полк».</Empty>}
