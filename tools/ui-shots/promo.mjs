@@ -64,6 +64,8 @@ const log = [];
 page.on('pageerror', (e) => log.push(`pageerror: ${e.message}`));
 const shot = async (name) => {
   await page.waitForTimeout(700);
+  // в демо нет хранилища картинок: битые картинки не показываются
+  await page.evaluate(() => document.querySelectorAll('img').forEach((i) => { if (i.complete && !i.naturalWidth) i.style.visibility = 'hidden'; })).catch(() => {});
   await page.screenshot({ path: path.join(OUT, `${name}.jpg`), type: 'jpeg', quality: 90 });
   console.log('📸', name);
 };
@@ -180,7 +182,11 @@ await step('wb-kt-game', async () => {
 
 await step('wb-testarmy', async () => {
   const tap = async (fx, fy) => {
-    const box = await page.locator('svg').last().boundingBox();
+    // поле — самый большой svg на экране
+    const box = await page.evaluate(() => {
+      const b = [...document.querySelectorAll('svg')].map((e) => e.getBoundingClientRect()).sort((a, c) => c.width * c.height - a.width * a.height)[0];
+      return { x: b.x, y: b.y, width: b.width, height: b.height };
+    });
     await page.mouse.click(box.x + box.width * fx, box.y + box.height * fy);
     await page.waitForTimeout(350);
   };
@@ -198,7 +204,7 @@ await step('wb-testarmy', async () => {
   await page.getByRole('button', { name: 'Расставить армии' }).click({ timeout: 5000 });
   await page.waitForTimeout(900);
   const place = async (tab, unit, fx, fy) => {
-    if (!(await page.getByText('Test Army', { exact: true }).count())) await page.getByRole('button', { name: 'Отряды' }).first().click({ timeout: 5000 });
+    if (!(await page.getByRole('button', { name: /^Поставить$|К списку отрядов|Моя армия/ }).count())) await page.getByRole('button', { name: 'Отряды' }).first().click({ timeout: 5000 });
     const back = page.getByRole('button', { name: 'К списку отрядов' });
     if (await back.count()) await back.first().click({ timeout: 5000 });
     if (tab) await page.getByRole('button', { name: new RegExp(tab) }).first().click({ timeout: 5000 });
@@ -220,9 +226,7 @@ await step('wb-testarmy', async () => {
   await tap(0.5, 0.33);
   await page.waitForTimeout(700);
   await shot('wb-ta-attack');
-  const dlg = page.getByRole('dialog').last();
-  await dlg.evaluate((el) => { const s = [...el.querySelectorAll('*')].find((x) => x.scrollHeight > x.clientHeight + 40 && /(auto|scroll)/.test(getComputedStyle(x).overflowY)) ?? el; s.scrollTop = s.scrollHeight; });
-  await shot('wb-ta-attack-result');
+
 });
 
 fs.writeFileSync(path.join(OUT, 'log.txt'), log.join('\n') + '\n');

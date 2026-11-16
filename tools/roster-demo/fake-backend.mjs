@@ -890,6 +890,16 @@ export function createFakeBackend({ users }) {
   }
 
   // ---------- клубная лига (этап 3): образцовые партии и таблица Эло
+  // награды мини-игр демо-пользователя (16.11.2026)
+  function demoRewards() {
+    const d = (days) => new Date(Date.now() + days * 86_400_000).toISOString();
+    const r = (id, game, gameTitle, value, code, score, status, created, expires, used) => ({ id, game, gameTitle, label: `Скидка ${value}%`, rewardType: 'percent_discount', rewardValue: value, code, score, status, createdAt: d(created), expiresAt: d(expires), usedAt: used == null ? null : d(used) });
+    return [
+      r('rw1', 'egg', 'Рой: инкубатор', 3, 'WH-7M28QP', 112, 'active', -1, 13, null),
+      r('rw2', 'dice', 'Кости войны', 7, 'WH-K4D9TX', 3, 'active', -3, 11, null),
+      r('rw3', 'runner', 'Зелёный рывок', 3, 'WH-R2N6BW', 1240, 'used', -9, 5, -6),
+    ];
+  }
   function leagueSeed(user) {
     if (S.results) return S.results;
     const others = allUsers().filter((u) => u.id !== user.id);
@@ -1139,6 +1149,18 @@ export function createFakeBackend({ users }) {
         rows: rows.map((r, i) => ({ ...r, rank: i + 1, name: userById(r.userId)?.firstName ?? 'Игрок', username: userById(r.userId)?.username ?? null, me: r.userId === user.id })),
       };
     }],
+    // мини-игры (16.11.2026, для промо-снимков): названия и пороги наград — как в backend/src/config/minigames.ts
+    ['GET', /^\/minigames$/, 'user', () => {
+      const t = (pairs) => pairs.map(([minScore, value]) => ({ minScore, rewardType: 'percent_discount', value, label: `Скидка ${value}%` }));
+      return [
+        { key: 'runner', title: 'Зелёный рывок', description: 'Орк несётся через горящие руины Warhammer 40,000. Прыгайте через наземных врагов и заграждения, уклоняйтесь от воздушных препятствий и бегите всё быстрее ради награды.', scoreUnit: 'м', tiers: t([[500, 2], [1000, 3], [2000, 5]]), bestScore: 1240, plays: 6, weekReward: null },
+        { key: 'dice', title: 'Кости войны', description: 'Империум, Ксеносы и Хаос сходятся в ближнем бою. Следите за пулами кубов обеих сторон, выбирайте обычную или критическую атаку и снимайте успехи врага защитой. Ульта доступна один раз за попытку.', scoreUnit: 'побед', tiers: t([[1, 5], [3, 7], [5, 10]]), bestScore: 2, plays: 3, weekReward: null },
+        { key: 'egg', title: 'Рой: инкубатор', description: 'В тиранидском инкубаторе зреет кладка. Стучите по яйцу, пока идёт время: чем больше ударов, тем опаснее тварь, что вылупится.', scoreUnit: 'нажатий', tiers: t([[10, 1], [50, 2], [100, 3], [500, 5]]), bestScore: 112, plays: 4, weekReward: demoRewards()[0] },
+        { key: 'cards', title: 'Легенды Warp Hub', description: 'Коллекция из 261 карты по мотивам Age of Sigmar: эльфы, гномы, скавены, орки, нежить, Хаос, людоящеры и Великий Катай. Открывайте пакеты, копите очки и получайте промокод 25% за каждые 25 000 накопленных очков.', scoreUnit: 'очков', tiers: [], bestScore: null, plays: 9, weekReward: null },
+      ];
+    }],
+    ['GET', /^\/minigames\/rewards\/my$/, 'user', () => demoRewards()],
+    ['GET', /^\/me\/notifications\/prefs$/, 'user', () => ({ opponentGames: ['40k', 'kt'], news: true, events: true, promos: true, eveReminder: true })],
     ['GET', /^\/league\/my-stats$/, 'user', ({ user }) => {
       leagueSeed(user);
       const games = ['40k', 'kt'].map((game) => {
