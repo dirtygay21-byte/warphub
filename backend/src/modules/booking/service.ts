@@ -2251,8 +2251,9 @@ export async function moveReservationToTable(
     notifyUser(
       booker.user.telegramId,
       [
-        `🔁 <b>Администратор пересадил вас за другой стол</b>`,
-        `${serviceTitle(service)} — ${formatClubDateTime(startsAt, endsAt)}`,
+        `🔁 <b>Новый стол: ${serviceTitle(service)}</b>`,
+        `🗓 ${formatClubDateTime(startsAt, endsAt)}`,
+        'Администратор пересадил вас за другой стол.',
         'Время игры не изменилось. Подробности — в разделе «Мои записи».',
       ].join('\n'),
     );

@@ -12,10 +12,23 @@ export type CardFile = { data: Uint8Array; animated: boolean; format: 'png' | 'g
 
 const cache = new Map<string, Promise<Uint8Array>>();
 
-/** Тип уведомления для картинки: тип каталога или проверка «Тест себе» (`test:<тип>`); рассылки владельца — нет. */
+/** Тип уведомления для картинки: тип каталога или проверка «Тест себе» (`test:<тип>`). */
 export function cardKindOf(kind: string) {
   const id = kind.startsWith('test:') ? kind.slice(5) : kind;
   return KIND_BY_ID.get(id) ?? null;
+}
+
+/**
+ * Надзаголовок для сообщений вне каталога (16.11.2026, владелец: «картинка — на каждое уведомление»): награды мини-игр,
+ * очки и промокоды, D&D, пересадка за другой стол, доступ к админке, рассылки и т. п. отправляются старыми помощниками
+ * (notifyUser / notifyAdmins) с типами user / admin / message — у них тоже картинка; заголовок берётся из первой строки.
+ */
+const FALLBACK_TITLE: Record<string, string> = { admin: 'Администраторам', user: 'WarpHub', message: 'WarpHub', test: 'Проверка' };
+export function cardTitleOf(kind: string): { id: string; title: string } {
+  const def = cardKindOf(kind);
+  if (def) return { id: def.id, title: def.title };
+  const base = kind.startsWith('broadcast') ? 'broadcast' : kind;
+  return { id: base, title: FALLBACK_TITLE[base] ?? 'WarpHub' };
 }
 
 function cached(key: string, render: () => Promise<Uint8Array>) {
@@ -35,8 +48,7 @@ function cached(key: string, render: () => Promise<Uint8Array>) {
  */
 export async function notificationImage(kind: string, text: string, animated = false): Promise<CardFile | null> {
   if (process.env.NOTIFICATION_IMAGES === 'off') return null;
-  const def = cardKindOf(kind);
-  if (!def) return null;
+  const def = cardTitleOf(kind);
   const caption = cardCaption(text);
   const card = () => parseNotificationCard(text, def.title);
   if (animated && process.env.NOTIFICATION_ANIMATION !== 'off') {

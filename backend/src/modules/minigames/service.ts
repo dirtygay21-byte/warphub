@@ -304,10 +304,11 @@ async function notifyReward(
     notifyUser(
       user?.telegramId,
       [
+        // 16.11.2026: заголовок «Награда: …» и строки «Метка: значение» — так их понимает картинка уведомления
         outcome === 'new'
-          ? '🎁 <b>Награда за мини-игру!</b>'
-          : '⬆️ <b>Ваша награда улучшена!</b>',
-        `${escapeHtml(MINIGAME_INFO[game]?.title ?? game)}: ${escapeHtml(reward.label)}`,
+          ? `🎁 <b>Награда: ${escapeHtml(reward.label)}</b>`
+          : `⬆️ <b>Награда улучшена: ${escapeHtml(reward.label)}</b>`,
+        `Игра: ${escapeHtml(MINIGAME_INFO[game]?.title ?? game)}`,
         `Код: <code>${escapeHtml(reward.code)}</code>`,
         `Действует до: ${formatClubDateTime(reward.expiresAt)}`,
         'Покажите код администратору в клубе.',
@@ -903,7 +904,7 @@ export async function redeemReward(rewardId: string, adminUserId: string) {
       .limit(1);
     notifyUser(
       user?.telegramId,
-      `✅ Награда <b>${escapeHtml(updated.label)}</b> (код ${escapeHtml(updated.code)}) использована. Спасибо, что играете!`,
+      `✅ <b>Награда использована: ${escapeHtml(updated.label)}</b>\nКод: <code>${escapeHtml(updated.code)}</code>\nСпасибо, что играете!`,
     );
   })().catch((error) => console.warn('[notify] redeem notification failed', error));
 
