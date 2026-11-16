@@ -10,6 +10,7 @@ import { Badge, Skeleton } from "@/components/ui/ds";
 import { haptic } from "@/utils/haptic";
 import { getSeatsLabel } from "@/utils/plural";
 import { AnimatePresence } from "motion/react";
+import { ChevronRight } from "lucide-react";
 
 export default function NearestEventBanner() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,7 +22,7 @@ export default function NearestEventBanner() {
 
   if (nearestEventQuery.isLoading) {
     return (
-      <Skeleton className="h-[96px] w-full rounded-[18px]" />
+      <Skeleton className="aspect-[2/1] w-full rounded-[18px]" />
     );
   }
 
@@ -58,26 +59,35 @@ export default function NearestEventBanner() {
         disabled={!canRegister}
         aria-label={canRegister ? `Записаться на ивент «${event.title}»` : "Мест нет"}
         className={clsx(
-          // компактная карточка (15.11.2026): картинка слева, название, дата и места справа — меньше прокрутки
-          "flex w-full items-center gap-3 rounded-[18px] border border-white/10 bg-app-elevated p-2.5 text-left",
+          // баннер во всю ширину, 2:1 — как обложки новостей (16.11.2026): картинка видна целиком, GIF играет на главной
+          "block w-full overflow-hidden rounded-[18px] border border-white/10 bg-app-elevated text-left",
           canRegister ? "ds-press cursor-pointer" : "cursor-not-allowed"
         )}
       >
-        <span className="relative aspect-[4/3] w-[104px] shrink-0 overflow-hidden rounded-[12px] bg-app-surface">
-          {event.bannerUrl && <ContentImage src={event.bannerUrl} alt="" crop={event.bannerCrop} className="absolute inset-0 size-full" />}
+        <span className="relative block aspect-[2/1] w-full overflow-hidden bg-accent">
+          {event.bannerUrl ? (
+            <ContentImage src={event.bannerUrl} alt="" crop={event.bannerCrop} className="absolute inset-0 size-full" />
+          ) : (
+            <span className="absolute inset-0 flex items-end p-4">
+              <span className="line-clamp-2 font-display text-[28px] uppercase leading-none text-accent-foreground">{event.title}</span>
+            </span>
+          )}
         </span>
-        <span className="min-w-0 flex-1 py-0.5">
-          <span className="line-clamp-2 text-[15px] font-bold leading-tight text-fg">{event.title}</span>
-          <span className="mt-1 block text-[13px] text-fg-2">{formatEventPeriod(event.startsAt, event.endsAt)}</span>
-          <span className="mt-1.5 block">
-            {canRegister ? (
-              <Badge tone="accent">
-                Свободно {freeSeats} {getSeatsLabel(freeSeats)}
-              </Badge>
-            ) : (
-              <Badge tone="danger">Мест нет</Badge>
-            )}
+        <span className="flex items-center gap-3 px-4 pb-3.5 pt-3">
+          <span className="min-w-0 flex-1">
+            <span className="line-clamp-2 text-[17px] font-bold leading-tight text-fg">{event.title}</span>
+            <span className="mt-1 block text-[13px] text-fg-2">{formatEventPeriod(event.startsAt, event.endsAt)}</span>
+            <span className="mt-2 block">
+              {canRegister ? (
+                <Badge tone="accent">
+                  Свободно {freeSeats} {getSeatsLabel(freeSeats)}
+                </Badge>
+              ) : (
+                <Badge tone="danger">Мест нет</Badge>
+              )}
+            </span>
           </span>
+          {canRegister && <ChevronRight aria-hidden className="size-5 shrink-0 text-fg-3" />}
         </span>
       </button>
 
