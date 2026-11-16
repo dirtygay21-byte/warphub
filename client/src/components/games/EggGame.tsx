@@ -33,7 +33,7 @@ const INCUBATOR_ART: Record<string, string[]> = {
 
 function visualFor(creature: SwarmCreature, taps: number): EggCreatureVisual {
   const art = INCUBATOR_ART[creature.id];
-  if (art?.length) return { kind: "image", src: `/games/incubator/${art[taps % art.length]}.png` };
+  if (art?.length) return { kind: "image", src: `/games/incubator/result/${art[taps % art.length]}.png` };
   return { kind: "sprite", sprite: creatureFrame(creature.id) };
 }
 
@@ -301,7 +301,7 @@ export default function EggGame() {
                   // 16.11.2026: картинка уже обрезана и с запечённым контуром (tools/design/incubator/result-art.py);
                   // CSS drop-shadow в Android WebView рисовал чёрный прямоугольник с рамкой и полосой
                   <img
-                    src={visual.src.replace("/games/incubator/", "/games/incubator/result/")}
+                    src={visual.src}
                     alt={creature.name}
                     className="size-44 object-contain [image-rendering:pixelated]"
                   />

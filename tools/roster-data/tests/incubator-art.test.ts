@@ -33,5 +33,8 @@ describe('картинки существ инкубатора на экране
     const src = fs.readFileSync(path.join(ROOT, 'src', 'components', 'games', 'EggGame.tsx'), 'utf8');
     expect(src).not.toContain('drop-shadow(');
     expect(src).toContain('/games/incubator/result/');
+    // сцена вылупления — та же картинка (без старого тонированного контура)
+    const scene = fs.readFileSync(path.join(ROOT, 'src', 'components', 'games', 'eggScene.ts'), 'utf8');
+    expect(scene).not.toContain('tint: glow');
   });
 });
