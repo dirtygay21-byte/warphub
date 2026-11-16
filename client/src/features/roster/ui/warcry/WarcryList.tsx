@@ -1,4 +1,5 @@
 import { learnDone } from '@/components/tutorial/progress';
+import { photoKey } from '../../photos';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadWarcryFaction } from '../../data';
@@ -77,6 +78,7 @@ export function WarcryList({
                 updatedAt={r.updatedAt}
                 onOpen={() => onOpen(r.id)}
                 onMenu={() => setMenu(r)}
+                photos={r.fighters.map((x) => ({ key: photoKey('warcry', x.fighterId), name: r.name }))}
               />
             );
           })}

@@ -33,6 +33,7 @@ const paths: Record<string, string> = {
   edit: 'M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4',
   lock: 'M6 11h12v10H6zM8 11V7a4 4 0 018 0v4',
   camera: 'M4 8h3l2-3h6l2 3h3v11H4zM12 17a3.5 3.5 0 100-7 3.5 3.5 0 000 7z',
+  expand: 'M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7',
   play: 'M8 5l11 7-11 7z',
   move: 'M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3',
   ruler: 'M3 17L17 3l4 4L7 21zM7 13l2 2M10 10l2 2M13 7l2 2',

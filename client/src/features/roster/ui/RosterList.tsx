@@ -13,6 +13,9 @@ import { cx, fmtPts } from './util';
 import { indexCredit, indexCreditDetails } from '../engine/source';
 import { useEn, useT } from './common/i18n';
 import { LangSwitch } from './common/LangSwitch';
+import { RosterCardPhotos } from './common/UnitPhoto';
+import { photoKey } from '../photos';
+import type { PhotoItem } from '../photoList';
 
 const ALLEGIANCE_RU: Record<string, string> = { Imperium: 'Империум', Chaos: 'Хаос', Xenos: 'Ксеносы' };
 const ALLEGIANCE_EN: Record<string, string> = { Imperium: 'Imperium', Chaos: 'Chaos', Xenos: 'Xenos' };
@@ -139,37 +142,41 @@ function RosterCard({ roster, faction, onOpen, onMenu }: { roster: Roster; facti
   const en = useEn();
   const size = BATTLE_SIZES[roster.battleSize];
   const date = new Date(roster.updatedAt).toLocaleDateString(en ? 'en-GB' : 'ru-RU', { day: 'numeric', month: 'short' });
+  const photos = useMemo<PhotoItem[]>(() => roster.units.map((u) => ({ key: photoKey('40k', u.datasheetId), name: roster.name })), [roster.units, roster.name]);
   return (
-    <li className="flex items-stretch overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
-      <span aria-hidden="true" className="w-1 shrink-0" style={{ background: factionColor('40k', roster.factionId) }} />
-      <button type="button" onClick={() => (haptic.tap(), onOpen())} className="min-w-0 flex-1 px-4 py-3.5 text-left active:bg-white/[0.03]">
-        <p className="truncate text-base font-semibold">{roster.name}</p>
-        <p className="mt-0.5 truncate text-sm text-fg-3">
-          {faction}
-          {roster.chapter ? ` · ${roster.chapter}` : ''}
-        </p>
-        <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          <Tag>{size.label}</Tag>
-          <Tag>{roster.units.length} {t('юн.', 'units')}</Tag>
-          {roster.summary && (
-            <Tag tone={roster.summary.errors ? 'danger' : roster.summary.warnings ? 'warn' : 'accent'}>
-              {roster.summary.errors ? `${roster.summary.errors} ${t('ош.', 'err.')}` : roster.summary.warnings ? `${roster.summary.warnings} ${t('пред.', 'warn.')}` : 'OK'}
-            </Tag>
-          )}
-          <span className="text-xs text-fg-3">{date}</span>
-        </div>
-      </button>
-      {roster.summary && (
-        <div className="flex flex-col items-end justify-center pr-1 text-right">
-          <span className={cx('font-display text-xl font-semibold leading-none tabular-nums', roster.summary.points > size.points ? 'text-danger' : 'text-white')}>
-            {fmtPts(roster.summary.points)}
-          </span>
-          <span className="mt-1 text-[12px] text-fg-3">{t('из', 'of')} {fmtPts(size.points)}</span>
-        </div>
-      )}
-      <button type="button" aria-label={t('Действия', 'Actions')} onClick={() => (haptic.tap(), onMenu())} className="flex w-12 items-center justify-center text-fg-3 active:bg-white/5">
-        <Icon name="more" className="size-6" strokeWidth={3} />
-      </button>
+    <li className="relative overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
+      <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1" style={{ background: factionColor('40k', roster.factionId) }} />
+      <div className="flex items-stretch pl-1">
+        <button type="button" onClick={() => (haptic.tap(), onOpen())} className="min-w-0 flex-1 px-4 py-3.5 text-left active:bg-white/[0.03]">
+          <p className="truncate text-base font-semibold">{roster.name}</p>
+          <p className="mt-0.5 truncate text-sm text-fg-3">
+            {faction}
+            {roster.chapter ? ` · ${roster.chapter}` : ''}
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            <Tag>{size.label}</Tag>
+            <Tag>{roster.units.length} {t('юн.', 'units')}</Tag>
+            {roster.summary && (
+              <Tag tone={roster.summary.errors ? 'danger' : roster.summary.warnings ? 'warn' : 'accent'}>
+                {roster.summary.errors ? `${roster.summary.errors} ${t('ош.', 'err.')}` : roster.summary.warnings ? `${roster.summary.warnings} ${t('пред.', 'warn.')}` : 'OK'}
+              </Tag>
+            )}
+            <span className="text-xs text-fg-3">{date}</span>
+          </div>
+        </button>
+        {roster.summary && (
+          <div className="flex flex-col items-end justify-center pr-1 text-right">
+            <span className={cx('font-display text-xl font-semibold leading-none tabular-nums', roster.summary.points > size.points ? 'text-danger' : 'text-white')}>
+              {fmtPts(roster.summary.points)}
+            </span>
+            <span className="mt-1 text-[12px] text-fg-3">{t('из', 'of')} {fmtPts(size.points)}</span>
+          </div>
+        )}
+        <button type="button" aria-label={t('Действия', 'Actions')} onClick={() => (haptic.tap(), onMenu())} className="flex w-12 items-center justify-center text-fg-3 active:bg-white/5">
+          <Icon name="more" className="size-6" strokeWidth={3} />
+        </button>
+      </div>
+      <RosterCardPhotos items={photos} onOpenRoster={onOpen} className="-mt-1 pb-3.5 pl-5 pr-4" />
     </li>
   );
 }

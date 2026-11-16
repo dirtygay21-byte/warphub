@@ -1,5 +1,5 @@
 import { photoKey } from '../photos';
-import { UnitPhotoBlock, UnitThumb } from './common/UnitPhoto';
+import { UnitPhotoBlock, UnitThumbButton } from './common/UnitPhoto';
 import { useState, type ReactNode } from 'react';
 import { optionalWargear, paidWargear, type ComputedRoster, type ComputedUnit, type DataLookup, type Issue } from '../engine/compute';
 import type { Datasheet, Roster, RosterUnit, Weapon } from '../engine/types';
@@ -113,46 +113,48 @@ export function UnitCard({
       )}
     >
       {(hasErr || hasWarn) && <span className={cx('absolute inset-y-0 left-0 w-[3px]', hasErr ? 'bg-danger' : 'bg-warn')} aria-hidden />}
-      <button type="button" onClick={onToggle} className="flex w-full items-center gap-3 px-4 py-3.5 text-left active:bg-white/[0.02]">
-        <UnitThumb photoKey={photoKey('40k', ds.id)} />
-        <div className="min-w-0 flex-1">
-          {role && <p className="mb-0.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-accent/70">{role}</p>}
-          <p className="text-[15px] font-semibold leading-tight">
-            {isWarlord && <Icon name="crown" className="-mt-0.5 mr-1 inline size-[15px] text-accent" />}
-            {ds.name}
-            {ds.outdated && (
-              <span className="text-warn" title={outdatedNote(ds) ?? undefined}>
-                {OUTDATED_MARK}
-              </span>
-            )}
-            {c.copy > 1 && <span className="ml-1.5 text-xs font-semibold text-fg-3">#{c.copy}</span>}
-          </p>
-          {(meta.length > 0 || tags.length > 0 || (!attachedTo && ds.support)) && (
-            // 01.11.2026: метки (Epic Hero, Legends, союзник…) — в той же строке, что и состав, а не отдельной строкой
-            <p className="mt-1 line-clamp-2 text-[12.5px] leading-[1.6] text-fg-3">
-              {!attachedTo && ds.support && <span className="text-danger">{t('Нужно присоединить · ', 'Must be attached · ')}</span>}
-              {meta.map((m, i) => (
-                <span key={i} className={cx(c.enhancement && m === c.enhancement.name && 'text-accent/80')}>
-                  {i > 0 && ' · '}
-                  {m}
+      <div className="flex items-center">
+        <UnitThumbButton photoKey={photoKey('40k', ds.id)} name={ds.name} onEmpty={onToggle} className="pl-4" />
+        <button type="button" onClick={onToggle} className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3.5 text-left active:bg-white/[0.02]">
+          <div className="min-w-0 flex-1">
+            {role && <p className="mb-0.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-accent/70">{role}</p>}
+            <p className="text-[15px] font-semibold leading-tight">
+              {isWarlord && <Icon name="crown" className="-mt-0.5 mr-1 inline size-[15px] text-accent" />}
+              {ds.name}
+              {ds.outdated && (
+                <span className="text-warn" title={outdatedNote(ds) ?? undefined}>
+                  {OUTDATED_MARK}
                 </span>
-              ))}
-              {tags.map((t, i) => (
-                <span key={t.label} className={cx('align-[1px]', (i > 0 || meta.length > 0) && 'ml-1.5')}>
-                  <Tag tone={t.tone}>{t.label}</Tag>
-                </span>
-              ))}
+              )}
+              {c.copy > 1 && <span className="ml-1.5 text-xs font-semibold text-fg-3">#{c.copy}</span>}
             </p>
-          )}
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <div className="text-right">
-            <p className="font-display text-[19px] font-semibold leading-none tabular-nums">{fmtPts(c.total)}</p>
-            <p className="mt-0.5 text-[12px] font-medium uppercase tracking-wide text-fg-3">{t('очк.', 'pts')}</p>
+            {(meta.length > 0 || tags.length > 0 || (!attachedTo && ds.support)) && (
+              // 01.11.2026: метки (Epic Hero, Legends, союзник…) — в той же строке, что и состав, а не отдельной строкой
+              <p className="mt-1 line-clamp-2 text-[12.5px] leading-[1.6] text-fg-3">
+                {!attachedTo && ds.support && <span className="text-danger">{t('Нужно присоединить · ', 'Must be attached · ')}</span>}
+                {meta.map((m, i) => (
+                  <span key={i} className={cx(c.enhancement && m === c.enhancement.name && 'text-accent/80')}>
+                    {i > 0 && ' · '}
+                    {m}
+                  </span>
+                ))}
+                {tags.map((t, i) => (
+                  <span key={t.label} className={cx('align-[1px]', (i > 0 || meta.length > 0) && 'ml-1.5')}>
+                    <Tag tone={t.tone}>{t.label}</Tag>
+                  </span>
+                ))}
+              </p>
+            )}
           </div>
-          <Icon name="down" className={cx('size-4 text-fg-3 transition', expanded && 'rotate-180')} />
-        </div>
-      </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <div className="text-right">
+              <p className="font-display text-[19px] font-semibold leading-none tabular-nums">{fmtPts(c.total)}</p>
+              <p className="mt-0.5 text-[12px] font-medium uppercase tracking-wide text-fg-3">{t('очк.', 'pts')}</p>
+            </div>
+            <Icon name="down" className={cx('size-4 text-fg-3 transition', expanded && 'rotate-180')} />
+          </div>
+        </button>
+      </div>
 
       {expanded && (
         <div className="space-y-5 border-t border-white/[0.06] bg-black/20 px-4 pb-4 pt-4">

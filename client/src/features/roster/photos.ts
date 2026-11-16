@@ -4,7 +4,7 @@
  * не отправляется. Ключ — «игра:идентификатор инфолиста» («40k:000000123»). Хранилище недоступно (частный режим,
  * нет места) — фото просто нет, ростеры работают как раньше.
  */
-import { useSyncExternalStore } from 'react';
+import { useMemo, useSyncExternalStore } from 'react';
 
 const DB = 'warphub-unit-photos';
 const STORE = 'photos';
@@ -82,6 +82,21 @@ export function useUnitThumb(key: string | null): string | null {
     () => version,
   );
   return key ? (thumbs.get(key) ?? null) : null;
+}
+
+/** Поиск миниатюр по ключу для списка юнитов (лента «Фото армии», карточка ростера); обновляется при добавлении и удалении фото. */
+export function useThumbLookup(): (key: string) => string | null {
+  const v = useSyncExternalStore(
+    (l) => {
+      listeners.add(l);
+      void load();
+      return () => listeners.delete(l);
+    },
+    () => version,
+  );
+  // новая функция при каждом изменении хранилища — зависимые useMemo пересчитываются
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- v — версия хранилища, а не значение внутри функции
+  return useMemo(() => (key: string) => thumbs.get(key) ?? null, [v]);
 }
 
 async function bitmap(file: Blob): Promise<{ w: number; h: number; draw: (ctx: CanvasRenderingContext2D, w: number, h: number) => void; close: () => void }> {

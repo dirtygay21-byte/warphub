@@ -1,5 +1,5 @@
 import { photoKey } from '../../photos';
-import { UnitPhotoBlock, UnitThumb } from '../common/UnitPhoto';
+import { UnitPhotoBlock, UnitThumbButton } from '../common/UnitPhoto';
 import { useState } from 'react';
 import { eligibleFor, enhancementFit, generalFit, reinforceFit, unitBaseCost, unitTotal, type AosComputed, type AosIssue, type AosLookup } from '../../aos/engine';
 import type { AosRegiment, AosRoster, AosRule, AosUnit, AosWarscroll, AosWeapon } from '../../aos/types';
@@ -68,27 +68,29 @@ export function AosUnitCard({
   const enh = enhRefs.map((e) => e.item.name);
   return (
     <div id={'u-' + unit.uid} className={cx('overflow-hidden rounded-2xl border bg-app-elevated transition', errors.length ? 'border-danger/40' : expanded ? 'border-white/20' : 'border-white/10')}>
-      <button type="button" onClick={() => (haptic.tap(), actions.onToggle())} className="flex w-full items-center gap-3 px-3.5 py-3 text-left">
-        <UnitThumb photoKey={photoKey('aos', ws.id)} />
-        <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-1.5 text-[15px] font-semibold leading-snug">
-            {isGeneral && <Icon name="crown" className="size-4 shrink-0 text-accent" />}
-            <span className="min-w-0 break-words">{ws.name}</span>
-          </p>
-          <p className="mt-0.5 text-[12px] leading-snug text-fg-3">
-            {[leader ? 'Лидер полка' : ws.hero ? 'Герой' : null, models > 1 ? `${models} мод.` : null, unit.reinforced ? 'усилен' : null, seasonLabel(ws.season), ws.legends ? 'Legends' : null]
-              .filter(Boolean)
-              .join(' · ')}
-          </p>
-          {enh.length > 0 && <p className="mt-1 text-[12px] font-semibold leading-snug text-accent/90">{enh.join(' · ')}</p>}
-        </div>
-        {errors.length > 0 && <Icon name="alert" className="size-4 shrink-0 text-danger" />}
-        <span className="shrink-0 text-right">
-          <span className="font-display block text-[19px] font-semibold leading-none tabular-nums">{unitTotal(unit, L)}</span>
-          <span className="text-[12px] uppercase text-fg-3">очк.</span>
-        </span>
-        <Icon name="down" className={cx('size-4 shrink-0 text-fg-3 transition', expanded && 'rotate-180')} />
-      </button>
+      <div className="flex items-center">
+        <UnitThumbButton photoKey={photoKey('aos', ws.id)} name={ws.name} onEmpty={actions.onToggle} className="pl-3.5" />
+        <button type="button" onClick={() => (haptic.tap(), actions.onToggle())} className="flex min-w-0 flex-1 items-center gap-3 px-3.5 py-3 text-left">
+          <div className="min-w-0 flex-1">
+            <p className="flex items-center gap-1.5 text-[15px] font-semibold leading-snug">
+              {isGeneral && <Icon name="crown" className="size-4 shrink-0 text-accent" />}
+              <span className="min-w-0 break-words">{ws.name}</span>
+            </p>
+            <p className="mt-0.5 text-[12px] leading-snug text-fg-3">
+              {[leader ? 'Лидер полка' : ws.hero ? 'Герой' : null, models > 1 ? `${models} мод.` : null, unit.reinforced ? 'усилен' : null, seasonLabel(ws.season), ws.legends ? 'Legends' : null]
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
+            {enh.length > 0 && <p className="mt-1 text-[12px] font-semibold leading-snug text-accent/90">{enh.join(' · ')}</p>}
+          </div>
+          {errors.length > 0 && <Icon name="alert" className="size-4 shrink-0 text-danger" />}
+          <span className="shrink-0 text-right">
+            <span className="font-display block text-[19px] font-semibold leading-none tabular-nums">{unitTotal(unit, L)}</span>
+            <span className="text-[12px] uppercase text-fg-3">очк.</span>
+          </span>
+          <Icon name="down" className={cx('size-4 shrink-0 text-fg-3 transition', expanded && 'rotate-180')} />
+        </button>
+      </div>
       {expanded && (
         <div className="space-y-3 border-t border-white/[0.06] px-3.5 pb-3.5 pt-3">
           {issues.map((i, n) => (

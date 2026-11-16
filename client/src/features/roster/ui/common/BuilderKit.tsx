@@ -2,7 +2,8 @@
  * Общие элементы WarpBuilder (R1 30.10.2026): одинаковый вид списков, шапок редакторов и карточек для всех игр
  * (AoS, Kill Team, Warcry). Разметка — как в разделе AoS; данные игр сюда не попадают — только отображение.
  */
-import { UnitPhotoBlock, UnitThumb } from './UnitPhoto';
+import { RosterCardPhotos, UnitPhotoBlock, UnitThumbButton } from './UnitPhoto';
+import type { PhotoItem } from '../../photoList';
 import { useRef, useState, type ReactNode } from 'react';
 import { haptic } from '../../telegram';
 import { Button, Icon, IconButton, PointsBar, Sheet, Tag } from '../kit';
@@ -21,9 +22,12 @@ export function RosterCard({
   onOpen,
   onMenu,
   accent,
+  photos,
 }: {
   name: string;
   sub: string;
+  /** юниты ростера для ряда фото (16.11.2026); фото нет — карточка как раньше */
+  photos?: PhotoItem[];
   /** цвет фракции — полоса слева (14.11.2026) */
   accent?: string;
   tags?: ReactNode;
@@ -36,30 +40,33 @@ export function RosterCard({
 }) {
   const date = new Date(updatedAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
   return (
-    <li className="flex items-stretch overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
-      {accent && <span aria-hidden="true" className="w-1 shrink-0" style={{ background: accent }} />}
-      <button type="button" onClick={() => (haptic.tap(), onOpen())} className="min-w-0 flex-1 px-4 py-3.5 text-left active:bg-white/[0.03]">
-        <p className="truncate text-base font-semibold">{name}</p>
-        <p className="mt-0.5 truncate text-sm text-fg-2">{sub}</p>
-        <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          {tags}
-          {status && (
-            <Tag tone={status.errors ? 'danger' : status.warnings ? 'warn' : 'accent'}>
-              {status.errors ? `${status.errors} ош.` : status.warnings ? `${status.warnings} пред.` : 'OK'}
-            </Tag>
-          )}
-          <span className="text-xs text-fg-3">{date}</span>
-        </div>
-      </button>
-      {points != null && (
-        <div className="flex flex-col items-end justify-center pr-1 text-right">
-          <span className={cx('font-display text-xl font-semibold leading-none tabular-nums', limit != null && points > limit ? 'text-danger' : 'text-white')}>{fmtPts(points)}</span>
-          {limit != null && <span className="mt-1 text-[12px] text-fg-3">из {fmtPts(limit)}</span>}
-        </div>
-      )}
-      <button type="button" aria-label="Действия" onClick={() => (haptic.tap(), onMenu())} className="flex w-12 items-center justify-center text-fg-3 active:bg-white/5">
-        <Icon name="more" className="size-6" strokeWidth={3} />
-      </button>
+    <li className="relative overflow-hidden rounded-2xl border border-white/10 bg-app-elevated">
+      {accent && <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1" style={{ background: accent }} />}
+      <div className={cx('flex items-stretch', accent && 'pl-1')}>
+        <button type="button" onClick={() => (haptic.tap(), onOpen())} className="min-w-0 flex-1 px-4 py-3.5 text-left active:bg-white/[0.03]">
+          <p className="truncate text-base font-semibold">{name}</p>
+          <p className="mt-0.5 truncate text-sm text-fg-2">{sub}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            {tags}
+            {status && (
+              <Tag tone={status.errors ? 'danger' : status.warnings ? 'warn' : 'accent'}>
+                {status.errors ? `${status.errors} ош.` : status.warnings ? `${status.warnings} пред.` : 'OK'}
+              </Tag>
+            )}
+            <span className="text-xs text-fg-3">{date}</span>
+          </div>
+        </button>
+        {points != null && (
+          <div className="flex flex-col items-end justify-center pr-1 text-right">
+            <span className={cx('font-display text-xl font-semibold leading-none tabular-nums', limit != null && points > limit ? 'text-danger' : 'text-white')}>{fmtPts(points)}</span>
+            {limit != null && <span className="mt-1 text-[12px] text-fg-3">из {fmtPts(limit)}</span>}
+          </div>
+        )}
+        <button type="button" aria-label="Действия" onClick={() => (haptic.tap(), onMenu())} className="flex w-12 items-center justify-center text-fg-3 active:bg-white/5">
+          <Icon name="more" className="size-6" strokeWidth={3} />
+        </button>
+      </div>
+      {photos && <RosterCardPhotos items={photos} onOpenRoster={onOpen} className={cx('-mt-1 pb-3.5 pr-4', accent ? 'pl-5' : 'pl-4')} />}
     </li>
   );
 }
@@ -559,25 +566,27 @@ export function UnitRowCard({
   const line = (meta ?? []).filter(Boolean).join(' · ');
   return (
     <div id={id} className={cx('overflow-hidden rounded-2xl border bg-app-elevated transition', errors ? 'border-danger/40' : open ? 'border-white/20' : 'border-white/10')}>
-      <button type="button" onClick={() => (haptic.tap(), onToggle())} aria-expanded={open} className="flex w-full items-center gap-3 px-3.5 py-3 text-left">
-        {photo && <UnitThumb photoKey={photo.key} />}
-        <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-1.5 text-[15px] font-semibold leading-snug">
-            {crown && <Icon name="crown" className="size-4 shrink-0 text-accent" />}
-            <span className="min-w-0 break-words">{title}</span>
-          </p>
-          {line && <p className="mt-0.5 text-[12px] leading-snug text-fg-3">{line}</p>}
-          {accentLine && <p className="mt-1 text-[12px] font-semibold leading-snug text-accent/90">{accentLine}</p>}
-        </div>
-        {errors > 0 && <Icon name="alert" className="size-4 shrink-0 text-danger" />}
-        {value != null && (
-          <span className="shrink-0 text-right">
-            <span className="font-display block text-[19px] font-semibold leading-none tabular-nums">{value}</span>
-            {valueLabel && <span className="text-[12px] uppercase text-fg-3">{valueLabel}</span>}
-          </span>
-        )}
-        <Icon name="down" className={cx('size-4 shrink-0 text-fg-3 transition', open && 'rotate-180')} />
-      </button>
+      <div className="flex items-center">
+        {photo && <UnitThumbButton photoKey={photo.key} name={title} onEmpty={onToggle} className="pl-3.5" />}
+        <button type="button" onClick={() => (haptic.tap(), onToggle())} aria-expanded={open} className="flex min-w-0 flex-1 items-center gap-3 px-3.5 py-3 text-left">
+          <div className="min-w-0 flex-1">
+            <p className="flex items-center gap-1.5 text-[15px] font-semibold leading-snug">
+              {crown && <Icon name="crown" className="size-4 shrink-0 text-accent" />}
+              <span className="min-w-0 break-words">{title}</span>
+            </p>
+            {line && <p className="mt-0.5 text-[12px] leading-snug text-fg-3">{line}</p>}
+            {accentLine && <p className="mt-1 text-[12px] font-semibold leading-snug text-accent/90">{accentLine}</p>}
+          </div>
+          {errors > 0 && <Icon name="alert" className="size-4 shrink-0 text-danger" />}
+          {value != null && (
+            <span className="shrink-0 text-right">
+              <span className="font-display block text-[19px] font-semibold leading-none tabular-nums">{value}</span>
+              {valueLabel && <span className="text-[12px] uppercase text-fg-3">{valueLabel}</span>}
+            </span>
+          )}
+          <Icon name="down" className={cx('size-4 shrink-0 text-fg-3 transition', open && 'rotate-180')} />
+        </button>
+      </div>
       {open && (
         <div className="space-y-3 border-t border-white/[0.06] px-3.5 pb-3.5 pt-3">
           {issues.map((i, n) => (
