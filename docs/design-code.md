@@ -133,3 +133,26 @@ Recorded 06.11.2026 (owner's decision): subtle base animations for everyone, str
 - Closing dialogs (stage 4): call `useDialogExit()` in the dialog (returns `true` while closing → add `ds-leaving` to the backdrop root) and wrap the place that shows it — `{open && <Dialog/>}` — in `<AnimatePresence>`. The dialog stays 180 ms: backdrop fades, `.ds-sheet` panel slides down; no clicks while closing; immediate at reduced motion. Done for News, access code, event registration, edit booking, cancel booking, cancel event, the Boosty info sheet and Admin (table hold, event, news, D&D game editor, booking status, booking extension). Still instant: the D&D trial dialog (inline in `AdminDnd`) and the small confirmations inside the Admin event/news dialogs.
 - Stage 4 coverage: skeletons + stagger in Games (games, rewards, card game, collection), WarpBuilder roster lists (40K, AoS, Kill Team, Warcry, WarpBuilder home), Admin lists (events, news, table holds, Warhammer day).
 - Toasts (06.11.2026): `toast.success | error | info(message)` from `client/src/stores/useToastStore.ts`, shown by `Toaster` (mounted once in `App` inside `EffectsRoot`). Bottom, above the section bar (wide screens with the sidebar: bottom edge); max 2; success/info 3 s, error 5 s; tap ✕ to close; `role="status"` / `role="alert"`; haptic ok/error; the same message is not shown twice. Use a toast only for an action that otherwise ends silently (cancel, save, register, profile refresh, access granted). Keep errors inside an open dialog inline, keep copy buttons' own «copied» state, keep full result screens (booking confirmation, D&D «done»). Mutations can declare toasts instead of calling them: `meta: { success: "…", error: true | "text" }`, handled once by the `MutationCache` in `apiUtils/provider.tsx` (all Admin actions use this). Set `error` only where the screen has no inline error for that action.
+
+## 8. Colour roles (owner's decision 17.11.2026)
+
+Every colour has exactly one role. A colour never encodes a table type, a game, a category or decoration — only the role below. Types and categories are shown with words and patterns (booking: honeycomb = wargame table, square grid = tactical table).
+
+| Colour | Token | Role | Where it is allowed |
+|---|---|---|---|
+| Lime `#ECFE46` | `--color-accent` (WarpHub) | WarpHub brand and «yes / your choice» | the one primary button of a screen; selected state (date, time, table, tab); «free / you can play»; brand blocks with the worm (home «Во что играем?», announcements, cards) |
+| Turquoise «Варп» `#6CF0E6` | `--color-accent` under `html[data-product="warpbuilder"]` | WarpBuilder | the roster builder itself and everything that leads into it: the WarpBuilder tile, roster choice in booking, «из WarpBuilder» badges. Never in booking, events, profile or other WarpHub screens |
+| Amber `#FBBF24` | `--color-warn` | «possible, with a condition» | shortened time («2 ч вместо 3»), waiting for confirmation, roster warnings. Labels, icons and text only — never a card or block background |
+| Red `#F87171` | `--color-danger` | «not allowed / error» | no seats, cancellation, conflict, error text, destructive buttons. Labels and text only — never a background; enemy models in tutorial drawings |
+| Neutrals | `--color-bg` `#111110`, `--color-bg-elevated` `#1A1A18`, `--color-bg-field` `#242422`, text `#F4F4F0` / `#B8B8B0` / `#8E8E86` | everything else | backgrounds, cards, fields, text. Diagonal hatching = «busy / unavailable» |
+
+Rules:
+
+1. At most one large lime fill per screen — the primary action or the selected item. Secondary actions are lime outline or neutral.
+2. Amber and red appear only as labels, icons and text, never as backgrounds.
+3. WarpHub and WarpBuilder accents never mix on one screen; the turquoise appears in WarpHub only as the entry into WarpBuilder.
+4. A new colour is added only when it has a role none of these five covers; the role is recorded in this table before the colour is used.
+
+Exceptions already in the code (kept): tutorial drawings use gold `#E8B84A` for objectives (§5); supporter frames use their own gold (§3); faction colours (`factionColors.ts`) mark armies in WarpBuilder lists only.
+
+Reference board: design canvas «WarpHub Booking Redesign» (claude.ai artifact `5TSMHCduj7mxyieBZkvs4A`), board «Цвета и роли».
