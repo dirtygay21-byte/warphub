@@ -25,6 +25,9 @@ import { useEn, useT } from './common/i18n';
 import { cleanRuleText } from '../text';
 import { w40kPointSystems } from '../points';
 import { PointsSheet } from './PointsSheet';
+import { PhotoStrip, RosterPhotos } from './common/UnitPhoto';
+import { photoKey } from '../photos';
+import type { PhotoItem } from '../photoList';
 
 const GROUPS: { key: ReturnType<typeof roleGroup>; title: string; en: string }[] = [
   { key: 'characters', title: 'Персонажи', en: 'Characters' },
@@ -187,375 +190,391 @@ function Editor({
   };
 
   const over = cr.points > size.points;
+  // фото армии (16.11.2026): юниты в порядке списка, присоединённые — сразу после своего отряда
+  const photoList = useMemo<PhotoItem[]>(
+    () =>
+      grouped.flatMap((g) =>
+        g.list.flatMap((c) =>
+          [c, ...c.attached.map((u) => cr.byUid.get(u.uid))].flatMap((x) =>
+            x?.ds ? [{ key: photoKey('40k', x.ds.id), name: x.ds.name, sub: `${fmtPts(x.total)} ${t('очк.', 'pts')}`, uid: x.unit.uid }] : [],
+          ),
+        ),
+      ),
+    [grouped, cr, t],
+  );
 
   return (
-    <div className="mx-auto min-h-dvh max-w-lg pb-32 lg:max-w-3xl">
-      {/* ---- шапка ---- */}
-      <div className="sticky top-0 z-30 border-b border-white/[0.06] bg-app/95 px-4 pb-3 pt-3 backdrop-blur">
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-[3px]"
-          style={{ background: `linear-gradient(90deg, ${factionColor('40k', roster.factionId)}, transparent 85%)` }}
-        />
-        <div className="flex items-center gap-2">
-          <IconButton icon="back" label={t('К списку', 'Back to list')} onClick={onBack} className="size-9" />
-          {view ? (
-            <p className="font-display min-w-0 flex-1 truncate px-1.5 py-1 text-lg font-semibold uppercase">{roster.name}</p>
-          ) : (
-            <NameInput value={roster.name} onChange={(name) => set({ name })} />
-          )}
-          <LangSwitch />
-          {!viewOnly && (
-            <IconButton
-              icon={view ? 'edit' : 'eye'}
-              label={view ? t('Редактировать', 'Edit') : t('Режим просмотра', 'View mode')}
-              onClick={() => (setView((v) => !v), setExpanded(null))}
-              className={cx('size-9', view && 'bg-accent/15 text-accent')}
-            />
-          )}
-          {!view && <IconButton icon="more" label={t('Меню', 'Menu')} onClick={() => setMenu(true)} className="size-9" />}
-        </div>
-        <div className="mt-3 flex items-end justify-between gap-3">
-          <button type="button" onClick={() => (haptic.tap(), setPointsInfo(true))} aria-label={t('Очки: сборка армии и партия', 'Points: army building and game')} className="min-w-0 rounded-lg text-left active:opacity-70">
-            <div className="flex items-baseline gap-1.5">
-              <span className={cx('font-display text-[32px] font-semibold leading-none tabular-nums', over ? 'text-danger' : 'text-white')}>{fmtPts(cr.points)}</span>
-              <span className="text-sm text-fg-3">/ {fmtPts(size.points)}</span>
-              <Icon name="info" className="size-3.5 shrink-0 self-center text-fg-3" />
-            </div>
-          </button>
-          <div className="flex gap-1.5">
-            <Stat label="DP" value={`${cr.dp}/${cr.dpLimit}`} bad={cr.issues.some((i) => i.code === 'dp')} />
-            <Stat label={t('Улучш.', 'Enh.')} value={`${cr.enhancementsUsed}/${cr.enhancementsLimit}`} bad={cr.issues.some((i) => i.code === 'enh-cap')} />
-            <button
-              type="button"
-              onClick={() => (haptic.tap(), setProblems(true))}
-              className={cx(
-                'flex min-w-12 flex-col items-center justify-center rounded-lg px-2 py-1 transition active:scale-95',
-                cr.errors ? 'bg-danger text-accent-foreground' : cr.warnings ? 'bg-warn text-accent-foreground' : 'bg-accent text-accent-foreground',
-              )}
-            >
-              <Icon name={cr.errors || cr.warnings ? 'alert' : 'check'} className="size-4" />
-              <span className="text-[12px] font-semibold leading-tight">{cr.errors ? cr.errors : cr.warnings ? cr.warnings : 'OK'}</span>
-            </button>
+    <RosterPhotos items={photoList} onOpenCard={(it) => it.uid && scrollToUnit(it.uid)} readOnly={view}>
+      <div className="mx-auto min-h-dvh max-w-lg pb-32 lg:max-w-3xl">
+        {/* ---- шапка ---- */}
+        <div className="sticky top-0 z-30 border-b border-white/[0.06] bg-app/95 px-4 pb-3 pt-3 backdrop-blur">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-[3px]"
+            style={{ background: `linear-gradient(90deg, ${factionColor('40k', roster.factionId)}, transparent 85%)` }}
+          />
+          <div className="flex items-center gap-2">
+            <IconButton icon="back" label={t('К списку', 'Back to list')} onClick={onBack} className="size-9" />
+            {view ? (
+              <p className="font-display min-w-0 flex-1 truncate px-1.5 py-1 text-lg font-semibold uppercase">{roster.name}</p>
+            ) : (
+              <NameInput value={roster.name} onChange={(name) => set({ name })} />
+            )}
+            <LangSwitch />
+            {!viewOnly && (
+              <IconButton
+                icon={view ? 'edit' : 'eye'}
+                label={view ? t('Редактировать', 'Edit') : t('Режим просмотра', 'View mode')}
+                onClick={() => (setView((v) => !v), setExpanded(null))}
+                className={cx('size-9', view && 'bg-accent/15 text-accent')}
+              />
+            )}
+            {!view && <IconButton icon="more" label={t('Меню', 'Menu')} onClick={() => setMenu(true)} className="size-9" />}
           </div>
-        </div>
-        <PointsBar used={cr.points} limit={size.points} />
-      </div>
-
-      <div className="space-y-6 px-4 pt-4">
-        {/* ---- армия ---- */}
-        <section className="rounded-2xl border border-white/10 bg-app-elevated">
-          <button type="button" onClick={() => setSettingsOpen((o) => !o)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-fg-3">
-                {L.faction.name}
-                {cr.chapter ? ` · ${cr.chapter}` : ''} · {size.label}
-              </p>
-              <p className="mt-0.5 truncate text-[15px] font-semibold">
-                {cr.detachments.length ? cr.detachments.map((d) => d.name).join(' + ') : <span className="text-accent">{t('Выберите детачмент', 'Choose a Detachment')}</span>}
-              </p>
-              {roster.forceDisposition && <p className="mt-0.5 text-sm text-fg-3">{roster.forceDisposition}</p>}
-            </div>
-            <Icon name="down" className={cx('size-5 shrink-0 text-fg-3 transition', settingsOpen && 'rotate-180')} />
-          </button>
-          {settingsOpen && view && (
-            <div className="space-y-4 border-t border-white/[0.06] px-4 pb-4 pt-3">
-              <div>
-                {[
-                  [t('Размер боя', 'Battle size'), `${size.label} · ${fmtPts(size.points)}`],
-                  [t('Орден', 'Chapter'), L.faction.chapters.length ? roster.chapter ?? cr.chapter ?? '—' : null],
-                  [t('Детачменты', 'Detachments'), cr.detachments.map((d) => d.name).join(' + ') || '—'],
-                  ['Force Disposition', roster.forceDisposition],
-                ]
-                  .filter((x): x is [string, string] => !!x[1])
-                  .map(([k, v]) => (
-                    <div key={k} className="flex items-baseline justify-between gap-3 border-b border-white/[0.05] py-1.5 last:border-0">
-                      <span className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{k}</span>
-                      <span className="text-right text-[13.5px] font-semibold text-white/85">{v}</span>
-                    </div>
-                  ))}
+          <div className="mt-3 flex items-end justify-between gap-3">
+            <button type="button" onClick={() => (haptic.tap(), setPointsInfo(true))} aria-label={t('Очки: сборка армии и партия', 'Points: army building and game')} className="min-w-0 rounded-lg text-left active:opacity-70">
+              <div className="flex items-baseline gap-1.5">
+                <span className={cx('font-display text-[32px] font-semibold leading-none tabular-nums', over ? 'text-danger' : 'text-white')}>{fmtPts(cr.points)}</span>
+                <span className="text-sm text-fg-3">/ {fmtPts(size.points)}</span>
+                <Icon name="info" className="size-3.5 shrink-0 self-center text-fg-3" />
               </div>
-              {L.faction.armyRules.length > 0 && (
-                <div className="space-y-1.5">
-                  <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{t('Правила армии', 'Army rules')}</p>
-                  {L.faction.armyRules.map((id) => {
-                    const r = L.faction.rules[id];
-                    return r ? <RuleText key={id} name={r.name} text={r.text} ru={ruRule(ru, id)} /> : null;
-                  })}
-                </div>
-              )}
+            </button>
+            <div className="flex gap-1.5">
+              <Stat label="DP" value={`${cr.dp}/${cr.dpLimit}`} bad={cr.issues.some((i) => i.code === 'dp')} />
+              <Stat label={t('Улучш.', 'Enh.')} value={`${cr.enhancementsUsed}/${cr.enhancementsLimit}`} bad={cr.issues.some((i) => i.code === 'enh-cap')} />
+              <button
+                type="button"
+                onClick={() => (haptic.tap(), setProblems(true))}
+                className={cx(
+                  'flex min-w-12 flex-col items-center justify-center rounded-lg px-2 py-1 transition active:scale-95',
+                  cr.errors ? 'bg-danger text-accent-foreground' : cr.warnings ? 'bg-warn text-accent-foreground' : 'bg-accent text-accent-foreground',
+                )}
+              >
+                <Icon name={cr.errors || cr.warnings ? 'alert' : 'check'} className="size-4" />
+                <span className="text-[12px] font-semibold leading-tight">{cr.errors ? cr.errors : cr.warnings ? cr.warnings : 'OK'}</span>
+              </button>
             </div>
-          )}
-          {settingsOpen && !view && (
-            <div className="space-y-5 border-t border-white/[0.06] px-4 pb-4 pt-4">
-              <Field label={t('Размер боя', 'Battle size')}>
-                <Segmented
-                  value={roster.battleSize}
-                  onChange={(battleSize) => set({ battleSize })}
-                  options={BATTLE_SIZE_ORDER.map((s) => ({ value: s, label: BATTLE_SIZES[s].label, hint: `${fmtPts(BATTLE_SIZES[s].points)} · ${BATTLE_SIZES[s].dp} DP` }))}
-                />
-              </Field>
-              {L.faction.chapters.length > 0 && (
-                <Field label={t('Орден', 'Chapter')} hint="Space Marines">
-                  <select
-                    value={roster.chapter ?? ''}
-                    onChange={(e) => set({ chapter: e.target.value || null })}
-                    className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm font-semibold text-white outline-none focus:border-accent"
-                  >
-                    <option value="">{t('Без ордена / определить автоматически', 'No Chapter / detect automatically')}</option>
-                    {L.faction.chapters.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
+          </div>
+          <PointsBar used={cr.points} limit={size.points} />
+        </div>
+
+        <div className="space-y-6 px-4 pt-4">
+          {/* ---- армия ---- */}
+          <section className="rounded-2xl border border-white/10 bg-app-elevated">
+            <button type="button" onClick={() => setSettingsOpen((o) => !o)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold uppercase tracking-wider text-fg-3">
+                  {L.faction.name}
+                  {cr.chapter ? ` · ${cr.chapter}` : ''} · {size.label}
+                </p>
+                <p className="mt-0.5 truncate text-[15px] font-semibold">
+                  {cr.detachments.length ? cr.detachments.map((d) => d.name).join(' + ') : <span className="text-accent">{t('Выберите детачмент', 'Choose a Detachment')}</span>}
+                </p>
+                {roster.forceDisposition && <p className="mt-0.5 text-sm text-fg-3">{roster.forceDisposition}</p>}
+              </div>
+              <Icon name="down" className={cx('size-5 shrink-0 text-fg-3 transition', settingsOpen && 'rotate-180')} />
+            </button>
+            {settingsOpen && view && (
+              <div className="space-y-4 border-t border-white/[0.06] px-4 pb-4 pt-3">
+                <div>
+                  {[
+                    [t('Размер боя', 'Battle size'), `${size.label} · ${fmtPts(size.points)}`],
+                    [t('Орден', 'Chapter'), L.faction.chapters.length ? roster.chapter ?? cr.chapter ?? '—' : null],
+                    [t('Детачменты', 'Detachments'), cr.detachments.map((d) => d.name).join(' + ') || '—'],
+                    ['Force Disposition', roster.forceDisposition],
+                  ]
+                    .filter((x): x is [string, string] => !!x[1])
+                    .map(([k, v]) => (
+                      <div key={k} className="flex items-baseline justify-between gap-3 border-b border-white/[0.05] py-1.5 last:border-0">
+                        <span className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{k}</span>
+                        <span className="text-right text-[13.5px] font-semibold text-white/85">{v}</span>
+                      </div>
                     ))}
-                  </select>
-                </Field>
-              )}
-              <Field label={t('Детачменты', 'Detachments')} hint={t(`${cr.dp} из ${cr.dpLimit} DP`, `${cr.dp} of ${cr.dpLimit} DP`)}>
-                <div className="space-y-1.5">
-                  {cr.detachments.map((d) => (
-                    <div key={d.id} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] py-1.5 pl-3 pr-1.5">
-                      <button type="button" onClick={() => toggleDetInfo(d.id)} className="min-w-0 flex-1 text-left">
-                        <p className="truncate text-sm font-semibold">
-                          {ruleLabel(d)}
-                          <span className="ml-1.5 text-xs font-semibold text-accent">{t('подробнее', 'details')}</span>
-                        </p>
-                        <p className="text-xs text-fg-3">
-                          {dpOf(d, cr.chapter)} DP · {dispositionsOf(d).join(' / ') || '—'}
-                          {d.tag ? ` · ${d.tag}` : ''}
-                        </p>
-                      </button>
-                      <IconButton
-                        icon="close"
-                        label={t('Убрать детачмент', 'Remove Detachment')}
-                        className="size-8 border-0"
-                        onClick={() => {
-                          const ids = roster.detachmentIds.filter((x) => x !== d.id);
-                          const fds = ids.flatMap((x) => { const dd = L.det.get(x); return dd ? dispositionsOf(dd) : []; });
-                          set({ detachmentIds: ids, forceDisposition: roster.forceDisposition && fds.includes(roster.forceDisposition) ? roster.forceDisposition : null });
-                        }}
-                      />
-                    </div>
-                  ))}
-                  <Button variant="outline" className="w-full border-dashed" onClick={() => setDetSheet(true)}>
-                    <Icon name="plus" className="size-4" /> {cr.detachments.length ? t('Добавить детачмент', 'Add Detachment') : t('Выбрать детачмент', 'Choose Detachment')}
-                  </Button>
                 </div>
-              </Field>
-              {L.faction.armyRules.length > 0 && (
-                <details className="group">
-                  <summary className="flex cursor-pointer list-none items-baseline justify-between gap-2">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-fg-3">{t('Правила армии', 'Army rules')}</span>
-                    <span className="flex items-center gap-1 text-xs text-fg-3">
-                      {L.faction.armyRules.length}
-                      <Icon name="down" className="size-3.5 transition group-open:rotate-180" />
-                    </span>
-                  </summary>
-                  <div className="mt-2 space-y-1.5">
+                {L.faction.armyRules.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">{t('Правила армии', 'Army rules')}</p>
                     {L.faction.armyRules.map((id) => {
                       const r = L.faction.rules[id];
                       return r ? <RuleText key={id} name={r.name} text={r.text} ru={ruRule(ru, id)} /> : null;
                     })}
                   </div>
-                </details>
-              )}
-              {cr.dispositions.length > 0 && (
-                <Field label="Force Disposition">
-                  <Segmented value={roster.forceDisposition} onChange={(forceDisposition) => set({ forceDisposition })} options={cr.dispositions.map((d) => ({ value: d, label: d }))} />
-                </Field>
-              )}
-            </div>
-          )}
-        </section>
-
-        {/* ---- детачмент: кнопки и раскрывающаяся карточка ---- */}
-        {cr.detachments.length > 0 && (
-          <div className="-mt-3 space-y-3">
-            {!shownDet && (
-              // переносятся на новую строку, а не уезжают за край экрана (UI-аудит B10); при нескольких — без подписи
-              <div className="flex flex-wrap gap-1.5">
-                {cr.detachments.map((d) => (
-                  <button
-                    key={d.id}
-                    type="button"
-                    onClick={() => toggleDetInfo(d.id)}
-                    className="flex min-h-9 max-w-full shrink-0 items-center gap-1.5 rounded-xl border border-accent/25 bg-accent/10 px-3 py-1.5 text-left text-xs font-semibold text-accent transition active:scale-[0.98]"
-                  >
-                    <Icon name="book" className="size-3.5 shrink-0" />
-                    {cr.detachments.length === 1 && <span className="text-accent/70">{t('Детачмент:', 'Detachment:')}</span>}
-                    <span className="truncate text-white/90">{d.name}</span>
-                    <Icon name="down" className="size-3.5 shrink-0" />
-                  </button>
-                ))}
+                )}
               </div>
             )}
-            {shownDet && <DetachmentPanel id={shownDet} cr={cr} L={L} dp={(d) => dpOf(d, cr.chapter)} onSwitch={setDetInfo} onClose={closeDetInfo} />}
-          </div>
-        )}
-
-        {/* ---- юниты ---- */}
-        {grouped.length === 0 ? (
-          <Empty title={t('Нет юнитов', 'No units')}>{t('Нажмите «Добавить юнит» внизу.', 'Tap “Add unit” below.')}</Empty>
-        ) : (
-          grouped.map((g) => (
-            <section key={g.key}>
-              <div className="mb-2.5 flex items-baseline justify-between px-1">
-                <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-fg-2">
-                  {t(g.title, g.en)}
-                  <span className="ml-2 font-sans text-xs font-semibold text-fg-3">{g.list.reduce((n, c) => n + 1 + c.attached.length, 0)}</span>
-                </h2>
-                <span className="text-xs font-semibold tabular-nums text-fg-3">{fmtPts(g.list.reduce((s, c) => s + c.total + c.attached.reduce((a, u) => a + (cr.byUid.get(u.uid)?.total ?? 0), 0), 0))}</span>
-              </div>
-              <div className="space-y-2.5">
-                {g.list.map((c) => (
-                  <UnitGroup
-                    key={c.unit.uid}
-                    c={c}
-                    cr={cr}
-                    roster={roster}
-                    L={L}
-                    issuesByUid={issuesByUid}
-                    expanded={expanded}
-                    setExpanded={setExpanded}
-                    onChange={onChange}
-                    readOnly={view}
+            {settingsOpen && !view && (
+              <div className="space-y-5 border-t border-white/[0.06] px-4 pb-4 pt-4">
+                <Field label={t('Размер боя', 'Battle size')}>
+                  <Segmented
+                    value={roster.battleSize}
+                    onChange={(battleSize) => set({ battleSize })}
+                    options={BATTLE_SIZE_ORDER.map((s) => ({ value: s, label: BATTLE_SIZES[s].label, hint: `${fmtPts(BATTLE_SIZES[s].points)} · ${BATTLE_SIZES[s].dp} DP` }))}
                   />
-                ))}
+                </Field>
+                {L.faction.chapters.length > 0 && (
+                  <Field label={t('Орден', 'Chapter')} hint="Space Marines">
+                    <select
+                      value={roster.chapter ?? ''}
+                      onChange={(e) => set({ chapter: e.target.value || null })}
+                      className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm font-semibold text-white outline-none focus:border-accent"
+                    >
+                      <option value="">{t('Без ордена / определить автоматически', 'No Chapter / detect automatically')}</option>
+                      {L.faction.chapters.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                )}
+                <Field label={t('Детачменты', 'Detachments')} hint={t(`${cr.dp} из ${cr.dpLimit} DP`, `${cr.dp} of ${cr.dpLimit} DP`)}>
+                  <div className="space-y-1.5">
+                    {cr.detachments.map((d) => (
+                      <div key={d.id} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] py-1.5 pl-3 pr-1.5">
+                        <button type="button" onClick={() => toggleDetInfo(d.id)} className="min-w-0 flex-1 text-left">
+                          <p className="truncate text-sm font-semibold">
+                            {ruleLabel(d)}
+                            <span className="ml-1.5 text-xs font-semibold text-accent">{t('подробнее', 'details')}</span>
+                          </p>
+                          <p className="text-xs text-fg-3">
+                            {dpOf(d, cr.chapter)} DP · {dispositionsOf(d).join(' / ') || '—'}
+                            {d.tag ? ` · ${d.tag}` : ''}
+                          </p>
+                        </button>
+                        <IconButton
+                          icon="close"
+                          label={t('Убрать детачмент', 'Remove Detachment')}
+                          className="size-8 border-0"
+                          onClick={() => {
+                            const ids = roster.detachmentIds.filter((x) => x !== d.id);
+                            const fds = ids.flatMap((x) => { const dd = L.det.get(x); return dd ? dispositionsOf(dd) : []; });
+                            set({ detachmentIds: ids, forceDisposition: roster.forceDisposition && fds.includes(roster.forceDisposition) ? roster.forceDisposition : null });
+                          }}
+                        />
+                      </div>
+                    ))}
+                    <Button variant="outline" className="w-full border-dashed" onClick={() => setDetSheet(true)}>
+                      <Icon name="plus" className="size-4" /> {cr.detachments.length ? t('Добавить детачмент', 'Add Detachment') : t('Выбрать детачмент', 'Choose Detachment')}
+                    </Button>
+                  </div>
+                </Field>
+                {L.faction.armyRules.length > 0 && (
+                  <details className="group">
+                    <summary className="flex cursor-pointer list-none items-baseline justify-between gap-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-fg-3">{t('Правила армии', 'Army rules')}</span>
+                      <span className="flex items-center gap-1 text-xs text-fg-3">
+                        {L.faction.armyRules.length}
+                        <Icon name="down" className="size-3.5 transition group-open:rotate-180" />
+                      </span>
+                    </summary>
+                    <div className="mt-2 space-y-1.5">
+                      {L.faction.armyRules.map((id) => {
+                        const r = L.faction.rules[id];
+                        return r ? <RuleText key={id} name={r.name} text={r.text} ru={ruRule(ru, id)} /> : null;
+                      })}
+                    </div>
+                  </details>
+                )}
+                {cr.dispositions.length > 0 && (
+                  <Field label="Force Disposition">
+                    <Segmented value={roster.forceDisposition} onChange={(forceDisposition) => set({ forceDisposition })} options={cr.dispositions.map((d) => ({ value: d, label: d }))} />
+                  </Field>
+                )}
               </div>
-            </section>
-          ))
-        )}
-
-        <p className="pt-2 text-center text-xs text-fg-3">{factionCredit(L.faction, index, t('ru', 'en') as 'ru' | 'en')}</p>
-      </div>
-
-      {/* ---- нижняя панель ---- */}
-      <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
-        <div className="mx-auto flex max-w-lg gap-2 lg:max-w-3xl lg:px-4">
-          {viewOnly ? (
-            <Button variant="outline" className="h-12 flex-1 text-base" onClick={onBack}>
-              <Icon name="back" /> <span className="whitespace-nowrap">{t('К игре', 'Back to game')}</span>
-            </Button>
-          ) : view ? (
-            <Button variant="outline" className="h-12 flex-1 text-base" onClick={() => setView(false)}>
-              <Icon name="edit" /> <span className="whitespace-nowrap">{t('Редактировать', 'Edit')}</span>
-            </Button>
-          ) : (
-            <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => setPicker(true)}>
-              <Icon name="plus" /> <span className="whitespace-nowrap">{t('Добавить юнит', 'Add unit')}</span>
-            </Button>
-          )}
-          {(view || viewOnly) && (
-            <Button variant="ghost" className="h-12 px-4" onClick={() => (haptic.tap(), setBattle(true))}>
-              <Icon name="book" /> <span className="max-[359px]:sr-only">{t('Лист', 'Sheet')}</span>
-            </Button>
-          )}
-          <Button variant="ghost" className="h-12 px-4" onClick={() => setExporting(true)}>
-            <Icon name="share" /> <span className="max-[359px]:sr-only">{t('Экспорт', 'Export')}</span>
-          </Button>
-        </div>
-      </div>
-
-      {flash && (
-        <div className="fade-enter pointer-events-none fixed inset-x-0 bottom-24 z-[60] flex justify-center px-4">
-          <div className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black shadow-lg">+ {flash}</div>
-        </div>
-      )}
-
-      <PointsSheet open={pointsInfo} onClose={() => setPointsInfo(false)} systems={w40kPointSystems(roster, L, cr, t('ru', 'en') as 'ru' | 'en')} />
-      <UnitPicker open={picker} onClose={() => setPicker(false)} roster={roster} L={L} cr={cr} onAdd={add} onToggleLegends={() => set({ showLegends: !roster.showLegends })} ru={ru} />
-
-      <DetachmentSheet open={detSheet} onClose={() => setDetSheet(false)} roster={roster} L={L} cr={cr} onPick={(d) => {
-        const ids = [...roster.detachmentIds, d.id];
-        const patch: Partial<Roster> = { detachmentIds: ids };
-        const fds = dispositionsOf(d);
-        if (!roster.forceDisposition && fds.length === 1) patch.forceDisposition = fds[0];
-        if (d.chapter && !roster.chapter) patch.chapter = d.chapter;
-        set(patch);
-        setDetSheet(false);
-        haptic.ok();
-      }} />
-
-      <Sheet open={problems} onClose={() => setProblems(false)} title={cr.issues.length ? `${t('Проверка', 'Validation')} · ${cr.issues.length}` : t('Проверка', 'Validation')}>
-        {cr.issues.length === 0 ? (
-          <div className="flex flex-col items-center py-8 text-center">
-            <div className="flex size-12 items-center justify-center rounded-full bg-accent/15 text-accent">
-              <Icon name="check" className="size-6" />
-            </div>
-            <p className="mt-3 font-semibold">{t('Ростер соответствует правилам', 'The roster is valid')}</p>
-            <p className="mt-1 text-sm text-fg-3">{t('Очки, детачменты, улучшения, лимиты и присоединения в порядке.', 'Points, Detachments, Enhancements, limits and attachments are all fine.')}</p>
-          </div>
-        ) : (
-          <ul className="space-y-2 pb-2">
-            {cr.issues.map((i, n) => (
-              <li key={n}>
-                <button
-                  type="button"
-                  disabled={!i.unitUids?.length}
-                  onClick={() => {
-                    setProblems(false);
-                    if (i.unitUids?.[0]) scrollToUnit(i.unitUids[0]);
-                  }}
-                  className={cx(
-                    'flex w-full gap-3 rounded-xl border px-3 py-2.5 text-left text-sm',
-                    i.level === 'error' ? 'border-danger/25 bg-danger/[0.07] text-red-100' : 'border-warn/25 bg-warn/[0.07] text-amber-100',
-                  )}
-                >
-                  <Icon name={i.level === 'error' ? 'alert' : 'info'} className={cx('mt-0.5 size-4 shrink-0', i.level === 'error' ? 'text-danger' : 'text-warn')} />
-                  <span className="flex-1">{i.message}</span>
-                  {!!i.unitUids?.length && <Icon name="chevron" className="mt-0.5 size-4 shrink-0 opacity-50" />}
-                </button>
-              </li>
-            ))}
-            {!!roster.migrationNotes?.length && (
-              <li>
-                <Button variant="outline" className="w-full" onClick={() => set({ migrationNotes: undefined })}>
-                  {t('Скрыть сообщения о заменённых детачментах и улучшениях', 'Hide messages about replaced Detachments and Enhancements')}
-                </Button>
-              </li>
             )}
-          </ul>
-        )}
-      </Sheet>
+          </section>
 
-      <BattleSheet open={battle} onClose={() => setBattle(false)} L={L} cr={cr} detachmentIds={roster.detachmentIds} />
-
-      <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} L={L} cr={cr} dataVersion={index.lastUpdate} credit={factionCredit(L.faction, index, 'en')} />
-
-      <Sheet open={menu} onClose={() => setMenu(false)} title={t('Ростер', 'Roster')}>
-        <div className="space-y-2 pb-2">
-          <Button className="w-full justify-start" onClick={() => (setMenu(false), onRules())}>
-            <Icon name="book" /> {t('Стратагемы армии и правила', 'Army stratagems and rules')}
-          </Button>
-          <Button className="w-full justify-start" onClick={() => (setMenu(false), setBattle(true))}>
-            <Icon name="book" /> {t('Боевой лист: стратагемы по фазам и юниты', 'Battle sheet: stratagems by phase and units')}
-          </Button>
-          <Button className="w-full justify-start" onClick={() => (setMenu(false), onStartGame())}>
-            <Icon name="map" /> {t('Начать игру с этим ростером', 'Start a game with this roster')}
-          </Button>
-          {onTestArmy && (
-            <Button className="w-full justify-start" onClick={() => (setMenu(false), onTestArmy())}>
-              <Icon name="shield" /> {t('Test Army с этим ростером', 'Test Army with this roster')}
-            </Button>
+          {/* ---- детачмент: кнопки и раскрывающаяся карточка ---- */}
+          {cr.detachments.length > 0 && (
+            <div className="-mt-3 space-y-3">
+              {!shownDet && (
+                // переносятся на новую строку, а не уезжают за край экрана (UI-аудит B10); при нескольких — без подписи
+                <div className="flex flex-wrap gap-1.5">
+                  {cr.detachments.map((d) => (
+                    <button
+                      key={d.id}
+                      type="button"
+                      onClick={() => toggleDetInfo(d.id)}
+                      className="flex min-h-9 max-w-full shrink-0 items-center gap-1.5 rounded-xl border border-accent/25 bg-accent/10 px-3 py-1.5 text-left text-xs font-semibold text-accent transition active:scale-[0.98]"
+                    >
+                      <Icon name="book" className="size-3.5 shrink-0" />
+                      {cr.detachments.length === 1 && <span className="text-accent/70">{t('Детачмент:', 'Detachment:')}</span>}
+                      <span className="truncate text-white/90">{d.name}</span>
+                      <Icon name="down" className="size-3.5 shrink-0" />
+                    </button>
+                  ))}
+                </div>
+              )}
+              {shownDet && <DetachmentPanel id={shownDet} cr={cr} L={L} dp={(d) => dpOf(d, cr.chapter)} onSwitch={setDetInfo} onClose={closeDetInfo} />}
+            </div>
           )}
-          <Button className="w-full justify-start" onClick={() => (setMenu(false), onDuplicate(duplicateRoster(roster)))}>
-            <Icon name="copy" /> {t('Дублировать ростер', 'Duplicate roster')}
-          </Button>
-          <Button className="w-full justify-start" onClick={() => (setMenu(false), setExporting(true))}>
-            <Icon name="share" /> {t('Экспорт / поделиться', 'Export / share')}
-          </Button>
-          <Button
-            variant="danger"
-            className="w-full justify-start"
-            onClick={async () => {
-              if (await confirmAsk(t(`Удалить ростер «${roster.name}»?`, `Delete roster “${roster.name}”?`))) onDelete();
-            }}
-          >
-            <Icon name="trash" /> {t('Удалить ростер', 'Delete roster')}
-          </Button>
+
+          <PhotoStrip />
+
+          {/* ---- юниты ---- */}
+          {grouped.length === 0 ? (
+            <Empty title={t('Нет юнитов', 'No units')}>{t('Нажмите «Добавить юнит» внизу.', 'Tap “Add unit” below.')}</Empty>
+          ) : (
+            grouped.map((g) => (
+              <section key={g.key}>
+                <div className="mb-2.5 flex items-baseline justify-between px-1">
+                  <h2 className="font-display text-[15px] font-semibold uppercase tracking-wider text-fg-2">
+                    {t(g.title, g.en)}
+                    <span className="ml-2 font-sans text-xs font-semibold text-fg-3">{g.list.reduce((n, c) => n + 1 + c.attached.length, 0)}</span>
+                  </h2>
+                  <span className="text-xs font-semibold tabular-nums text-fg-3">{fmtPts(g.list.reduce((s, c) => s + c.total + c.attached.reduce((a, u) => a + (cr.byUid.get(u.uid)?.total ?? 0), 0), 0))}</span>
+                </div>
+                <div className="space-y-2.5">
+                  {g.list.map((c) => (
+                    <UnitGroup
+                      key={c.unit.uid}
+                      c={c}
+                      cr={cr}
+                      roster={roster}
+                      L={L}
+                      issuesByUid={issuesByUid}
+                      expanded={expanded}
+                      setExpanded={setExpanded}
+                      onChange={onChange}
+                      readOnly={view}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))
+          )}
+
+          <p className="pt-2 text-center text-xs text-fg-3">{factionCredit(L.faction, index, t('ru', 'en') as 'ru' | 'en')}</p>
         </div>
-      </Sheet>
-    </div>
+
+        {/* ---- нижняя панель ---- */}
+        <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
+          <div className="mx-auto flex max-w-lg gap-2 lg:max-w-3xl lg:px-4">
+            {viewOnly ? (
+              <Button variant="outline" className="h-12 flex-1 text-base" onClick={onBack}>
+                <Icon name="back" /> <span className="whitespace-nowrap">{t('К игре', 'Back to game')}</span>
+              </Button>
+            ) : view ? (
+              <Button variant="outline" className="h-12 flex-1 text-base" onClick={() => setView(false)}>
+                <Icon name="edit" /> <span className="whitespace-nowrap">{t('Редактировать', 'Edit')}</span>
+              </Button>
+            ) : (
+              <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => setPicker(true)}>
+                <Icon name="plus" /> <span className="whitespace-nowrap">{t('Добавить юнит', 'Add unit')}</span>
+              </Button>
+            )}
+            {(view || viewOnly) && (
+              <Button variant="ghost" className="h-12 px-4" onClick={() => (haptic.tap(), setBattle(true))}>
+                <Icon name="book" /> <span className="max-[359px]:sr-only">{t('Лист', 'Sheet')}</span>
+              </Button>
+            )}
+            <Button variant="ghost" className="h-12 px-4" onClick={() => setExporting(true)}>
+              <Icon name="share" /> <span className="max-[359px]:sr-only">{t('Экспорт', 'Export')}</span>
+            </Button>
+          </div>
+        </div>
+
+        {flash && (
+          <div className="fade-enter pointer-events-none fixed inset-x-0 bottom-24 z-[60] flex justify-center px-4">
+            <div className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black shadow-lg">+ {flash}</div>
+          </div>
+        )}
+
+        <PointsSheet open={pointsInfo} onClose={() => setPointsInfo(false)} systems={w40kPointSystems(roster, L, cr, t('ru', 'en') as 'ru' | 'en')} />
+        <UnitPicker open={picker} onClose={() => setPicker(false)} roster={roster} L={L} cr={cr} onAdd={add} onToggleLegends={() => set({ showLegends: !roster.showLegends })} ru={ru} />
+
+        <DetachmentSheet open={detSheet} onClose={() => setDetSheet(false)} roster={roster} L={L} cr={cr} onPick={(d) => {
+          const ids = [...roster.detachmentIds, d.id];
+          const patch: Partial<Roster> = { detachmentIds: ids };
+          const fds = dispositionsOf(d);
+          if (!roster.forceDisposition && fds.length === 1) patch.forceDisposition = fds[0];
+          if (d.chapter && !roster.chapter) patch.chapter = d.chapter;
+          set(patch);
+          setDetSheet(false);
+          haptic.ok();
+        }} />
+
+        <Sheet open={problems} onClose={() => setProblems(false)} title={cr.issues.length ? `${t('Проверка', 'Validation')} · ${cr.issues.length}` : t('Проверка', 'Validation')}>
+          {cr.issues.length === 0 ? (
+            <div className="flex flex-col items-center py-8 text-center">
+              <div className="flex size-12 items-center justify-center rounded-full bg-accent/15 text-accent">
+                <Icon name="check" className="size-6" />
+              </div>
+              <p className="mt-3 font-semibold">{t('Ростер соответствует правилам', 'The roster is valid')}</p>
+              <p className="mt-1 text-sm text-fg-3">{t('Очки, детачменты, улучшения, лимиты и присоединения в порядке.', 'Points, Detachments, Enhancements, limits and attachments are all fine.')}</p>
+            </div>
+          ) : (
+            <ul className="space-y-2 pb-2">
+              {cr.issues.map((i, n) => (
+                <li key={n}>
+                  <button
+                    type="button"
+                    disabled={!i.unitUids?.length}
+                    onClick={() => {
+                      setProblems(false);
+                      if (i.unitUids?.[0]) scrollToUnit(i.unitUids[0]);
+                    }}
+                    className={cx(
+                      'flex w-full gap-3 rounded-xl border px-3 py-2.5 text-left text-sm',
+                      i.level === 'error' ? 'border-danger/25 bg-danger/[0.07] text-red-100' : 'border-warn/25 bg-warn/[0.07] text-amber-100',
+                    )}
+                  >
+                    <Icon name={i.level === 'error' ? 'alert' : 'info'} className={cx('mt-0.5 size-4 shrink-0', i.level === 'error' ? 'text-danger' : 'text-warn')} />
+                    <span className="flex-1">{i.message}</span>
+                    {!!i.unitUids?.length && <Icon name="chevron" className="mt-0.5 size-4 shrink-0 opacity-50" />}
+                  </button>
+                </li>
+              ))}
+              {!!roster.migrationNotes?.length && (
+                <li>
+                  <Button variant="outline" className="w-full" onClick={() => set({ migrationNotes: undefined })}>
+                    {t('Скрыть сообщения о заменённых детачментах и улучшениях', 'Hide messages about replaced Detachments and Enhancements')}
+                  </Button>
+                </li>
+              )}
+            </ul>
+          )}
+        </Sheet>
+
+        <BattleSheet open={battle} onClose={() => setBattle(false)} L={L} cr={cr} detachmentIds={roster.detachmentIds} />
+
+        <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} L={L} cr={cr} dataVersion={index.lastUpdate} credit={factionCredit(L.faction, index, 'en')} />
+
+        <Sheet open={menu} onClose={() => setMenu(false)} title={t('Ростер', 'Roster')}>
+          <div className="space-y-2 pb-2">
+            <Button className="w-full justify-start" onClick={() => (setMenu(false), onRules())}>
+              <Icon name="book" /> {t('Стратагемы армии и правила', 'Army stratagems and rules')}
+            </Button>
+            <Button className="w-full justify-start" onClick={() => (setMenu(false), setBattle(true))}>
+              <Icon name="book" /> {t('Боевой лист: стратагемы по фазам и юниты', 'Battle sheet: stratagems by phase and units')}
+            </Button>
+            <Button className="w-full justify-start" onClick={() => (setMenu(false), onStartGame())}>
+              <Icon name="map" /> {t('Начать игру с этим ростером', 'Start a game with this roster')}
+            </Button>
+            {onTestArmy && (
+              <Button className="w-full justify-start" onClick={() => (setMenu(false), onTestArmy())}>
+                <Icon name="shield" /> {t('Test Army с этим ростером', 'Test Army with this roster')}
+              </Button>
+            )}
+            <Button className="w-full justify-start" onClick={() => (setMenu(false), onDuplicate(duplicateRoster(roster)))}>
+              <Icon name="copy" /> {t('Дублировать ростер', 'Duplicate roster')}
+            </Button>
+            <Button className="w-full justify-start" onClick={() => (setMenu(false), setExporting(true))}>
+              <Icon name="share" /> {t('Экспорт / поделиться', 'Export / share')}
+            </Button>
+            <Button
+              variant="danger"
+              className="w-full justify-start"
+              onClick={async () => {
+                if (await confirmAsk(t(`Удалить ростер «${roster.name}»?`, `Delete roster “${roster.name}”?`))) onDelete();
+              }}
+            >
+              <Icon name="trash" /> {t('Удалить ростер', 'Delete roster')}
+            </Button>
+          </div>
+        </Sheet>
+      </div>
+    </RosterPhotos>
   );
 }
 

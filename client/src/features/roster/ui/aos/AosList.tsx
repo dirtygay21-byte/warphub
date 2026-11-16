@@ -1,4 +1,5 @@
 import { learnDone } from '@/components/tutorial/progress';
+import { photoKey } from '../../photos';
 import { factionColor } from '../common/factionColors';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -134,6 +135,7 @@ function Card({ roster, faction, onOpen, onMenu }: { roster: AosRoster; faction:
       updatedAt={roster.updatedAt}
       onOpen={onOpen}
       onMenu={onMenu}
+      photos={[...roster.regiments.flatMap((g) => [g.leader, ...g.units]), ...roster.auxiliaries].map((u) => ({ key: photoKey('aos', u.warscrollId), name: roster.name }))}
     />
   );
 }

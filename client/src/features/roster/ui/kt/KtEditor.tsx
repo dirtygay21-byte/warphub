@@ -1,4 +1,6 @@
 import { photoKey } from '../../photos';
+import type { PhotoItem } from '../../photoList';
+import { PhotoStrip, RosterPhotos } from '../common/UnitPhoto';
 import { useEffect, useMemo, useState } from 'react';
 import { loadKtTeam } from '../../data';
 import { uid } from '../../engine/roster';
@@ -97,223 +99,233 @@ export function KtEditor({
     window.setTimeout(() => document.getElementById(`u-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60);
   };
 
+  // фото команды (16.11.2026): оперативники по порядку
+  const photoList: PhotoItem[] = roster.operatives.flatMap((x) => {
+    const o = opOf(x);
+    return o ? [{ key: photoKey('kt', o.id), name: x.name || o.name, sub: [x.name ? o.name : null, `APL ${o.stats.apl}`, `${o.stats.wounds} W`].filter(Boolean).join(' · '), uid: x.uid }] : [];
+  });
+
   return (
-    <div className="mx-auto min-h-dvh max-w-lg pb-32 lg:max-w-3xl">
-      <EditorHeader
-        name={roster.name}
-        onName={(name) => onChange(touchKt({ ...roster, name: name.slice(0, 80) }))}
-        onBack={onBack}
-        actions={
-          viewOnly ? undefined : (
-          <>
-            <IconButton
-              icon={view ? 'edit' : 'eye'}
-              label={view ? 'Редактировать' : 'Режим просмотра'}
-              onClick={() => (setView((v) => !v), setExpanded(null), setAdding(false))}
-              className={cx('size-9', view && 'bg-accent/15 text-accent')}
+    <RosterPhotos items={photoList} onOpenCard={(it) => it.uid && scrollToOperative(it.uid)} readOnly={view}>
+      <div className="mx-auto min-h-dvh max-w-lg pb-32 lg:max-w-3xl">
+        <EditorHeader
+          name={roster.name}
+          onName={(name) => onChange(touchKt({ ...roster, name: name.slice(0, 80) }))}
+          onBack={onBack}
+          actions={
+            viewOnly ? undefined : (
+            <>
+              <IconButton
+                icon={view ? 'edit' : 'eye'}
+                label={view ? 'Редактировать' : 'Режим просмотра'}
+                onClick={() => (setView((v) => !v), setExpanded(null), setAdding(false))}
+                className={cx('size-9', view && 'bg-accent/15 text-accent')}
+              />
+              {!view && (
+                <>
+                  <IconButton icon="share" label="Экспорт" onClick={() => setExporting(true)} className="size-9" />
+                  <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />
+                </>
+              )}
+            </>
+            )
+          }
+          big={selections}
+          bigLimit={total}
+          bigUnit={total == null ? 'оперативн.' : 'выборов'}
+          stats={
+            <>
+              <HeaderStat label="Лидер" value={leader ? '✓' : '—'} bad={!leader && roster.operatives.length > 0} />
+              <HeaderStat label="Снаряж." value={String(roster.equipment.length)} />
+            </>
+          }
+          issues={issues}
+          readOnly={view}
+          onOpenIssue={(issue) => issue.uids?.[0] && scrollToOperative(issue.uids[0])}
+        />
+
+        <div className="space-y-5 px-4 pt-4">
+          {/* ---- команда (как блок армии AoS) ---- */}
+          <ArmyBlock
+            kicker={`Kill Team · ${meta ? ktTeamGroup(index, meta) : team.factionId}`}
+            title={team.name}
+            line={team.archetypes.join(' · ') || undefined}
+            open={teamOpen}
+            onToggle={() => setTeamOpen((o) => !o)}
+          >
+            {team.description && <Md text={team.description} className="text-[12.5px] italic leading-snug text-fg-2" />}
+            <div>
+              <SectionTitle>Состав команды</SectionTitle>
+              {team.composition ? <Md text={team.composition} className="text-[12.5px] leading-snug text-fg-2" /> : <p className="text-sm text-fg-3">Нет данных о составе.</p>}
+            </div>
+            <PickRow
+              label="Снаряжение команды"
+              value={team.equipment.filter((e) => roster.equipment.includes(e.id)).map((e) => e.name).join(', ')}
+              empty={team.equipment.length ? (view ? 'Не выбрано' : 'Выбрать') : 'Нет в данных'}
+              right={roster.equipment.length > 0 ? <Tag>{roster.equipment.length}</Tag> : undefined}
+              onClick={team.equipment.length ? () => setEquipOpen(true) : undefined}
             />
-            {!view && (
-              <>
-                <IconButton icon="share" label="Экспорт" onClick={() => setExporting(true)} className="size-9" />
-                <IconButton icon="more" label="Меню" onClick={() => setMenu(true)} className="size-9" />
-              </>
-            )}
-          </>
-          )
-        }
-        big={selections}
-        bigLimit={total}
-        bigUnit={total == null ? 'оперативн.' : 'выборов'}
-        stats={
-          <>
-            <HeaderStat label="Лидер" value={leader ? '✓' : '—'} bad={!leader && roster.operatives.length > 0} />
-            <HeaderStat label="Снаряж." value={String(roster.equipment.length)} />
-          </>
-        }
-        issues={issues}
-        readOnly={view}
-        onOpenIssue={(issue) => issue.uids?.[0] && scrollToOperative(issue.uids[0])}
-      />
+            <p className="text-[12px] text-fg-3">
+              Данные: {index.source.name}, {index.source.date} ({index.source.commit}).
+            </p>
+          </ArmyBlock>
 
-      <div className="space-y-5 px-4 pt-4">
-        {/* ---- команда (как блок армии AoS) ---- */}
-        <ArmyBlock
-          kicker={`Kill Team · ${meta ? ktTeamGroup(index, meta) : team.factionId}`}
-          title={team.name}
-          line={team.archetypes.join(' · ') || undefined}
-          open={teamOpen}
-          onToggle={() => setTeamOpen((o) => !o)}
-        >
-          {team.description && <Md text={team.description} className="text-[12.5px] italic leading-snug text-fg-2" />}
-          <div>
-            <SectionTitle>Состав команды</SectionTitle>
-            {team.composition ? <Md text={team.composition} className="text-[12.5px] leading-snug text-fg-2" /> : <p className="text-sm text-fg-3">Нет данных о составе.</p>}
-          </div>
-          <PickRow
-            label="Снаряжение команды"
-            value={team.equipment.filter((e) => roster.equipment.includes(e.id)).map((e) => e.name).join(', ')}
-            empty={team.equipment.length ? (view ? 'Не выбрано' : 'Выбрать') : 'Нет в данных'}
-            right={roster.equipment.length > 0 ? <Tag>{roster.equipment.length}</Tag> : undefined}
-            onClick={team.equipment.length ? () => setEquipOpen(true) : undefined}
-          />
-          <p className="text-[12px] text-fg-3">
-            Данные: {index.source.name}, {index.source.date} ({index.source.commit}).
-          </p>
-        </ArmyBlock>
-
-        {/* ---- правила и уловки (как панели лоров AoS) ---- */}
-        <RulesPanel
-          label={`Правила команды · ${factionRules.length + teamRules.length}`}
-          line={[...factionRules.map((a) => a.name), ...teamRules.map((p) => p.name)].join(' · ') || 'Нет в данных'}
-          open={rulesOpen}
-          onToggle={() => setRulesOpen((o) => !o)}
-        >
-          <div className="space-y-1.5">
-            {factionRules.map((a) => (
-              <RuleCard key={a.id} name={a.name} badge={a.ap != null ? <CostBadge>{a.ap} AP</CostBadge> : undefined}>
-                <Md text={a.text} className="text-[12.5px] leading-relaxed text-fg-2" />
-              </RuleCard>
-            ))}
-            {teamRules.map((p) => (
-              <RuleCard key={p.id} name={p.name}>
-                <Md text={p.text} className="text-[12.5px] leading-relaxed text-fg-2" />
-              </RuleCard>
-            ))}
-            {!factionRules.length && !teamRules.length && <p className="text-sm text-fg-3">В данных нет правил фракции.</p>}
-          </div>
-          <WeaponRules index={index} />
-        </RulesPanel>
-        {ploys.length > 0 && (
-          <RulesPanel label={`Уловки · ${ploys.length}`} line={ploys.map((p) => p.name).join(' · ')} open={ploysOpen} onToggle={() => setPloysOpen((o) => !o)}>
-            {(['strategy', 'firefight'] as const).map((type) => {
-              const list = ploys.filter((p) => p.type === type);
-              if (!list.length) return null;
-              return (
-                <div key={type} className="space-y-1.5">
-                  <SectionTitle>{type === 'strategy' ? 'Стратегические уловки' : 'Боевые уловки'}</SectionTitle>
-                  {list.map((p) => (
-                    <RuleCard key={p.id} name={p.name} badge={<CostBadge tone={type === 'strategy' ? 'accent' : 'warn'}>{type === 'strategy' ? 'Strategy' : 'Firefight'}</CostBadge>}>
-                      <Md text={p.text} className="text-[12.5px] leading-relaxed text-fg-2" />
-                    </RuleCard>
-                  ))}
-                </div>
-              );
-            })}
-            <p className="text-[12px] text-fg-3">Стоимость уловок в CP в данных источника не записана — смотрите правила редакции.</p>
+          {/* ---- правила и уловки (как панели лоров AoS) ---- */}
+          <RulesPanel
+            label={`Правила команды · ${factionRules.length + teamRules.length}`}
+            line={[...factionRules.map((a) => a.name), ...teamRules.map((p) => p.name)].join(' · ') || 'Нет в данных'}
+            open={rulesOpen}
+            onToggle={() => setRulesOpen((o) => !o)}
+          >
+            <div className="space-y-1.5">
+              {factionRules.map((a) => (
+                <RuleCard key={a.id} name={a.name} badge={a.ap != null ? <CostBadge>{a.ap} AP</CostBadge> : undefined}>
+                  <Md text={a.text} className="text-[12.5px] leading-relaxed text-fg-2" />
+                </RuleCard>
+              ))}
+              {teamRules.map((p) => (
+                <RuleCard key={p.id} name={p.name}>
+                  <Md text={p.text} className="text-[12.5px] leading-relaxed text-fg-2" />
+                </RuleCard>
+              ))}
+              {!factionRules.length && !teamRules.length && <p className="text-sm text-fg-3">В данных нет правил фракции.</p>}
+            </div>
+            <WeaponRules index={index} />
           </RulesPanel>
-        )}
+          {ploys.length > 0 && (
+            <RulesPanel label={`Уловки · ${ploys.length}`} line={ploys.map((p) => p.name).join(' · ')} open={ploysOpen} onToggle={() => setPloysOpen((o) => !o)}>
+              {(['strategy', 'firefight'] as const).map((type) => {
+                const list = ploys.filter((p) => p.type === type);
+                if (!list.length) return null;
+                return (
+                  <div key={type} className="space-y-1.5">
+                    <SectionTitle>{type === 'strategy' ? 'Стратегические уловки' : 'Боевые уловки'}</SectionTitle>
+                    {list.map((p) => (
+                      <RuleCard key={p.id} name={p.name} badge={<CostBadge tone={type === 'strategy' ? 'accent' : 'warn'}>{type === 'strategy' ? 'Strategy' : 'Firefight'}</CostBadge>}>
+                        <Md text={p.text} className="text-[12.5px] leading-relaxed text-fg-2" />
+                      </RuleCard>
+                    ))}
+                  </div>
+                );
+              })}
+              <p className="text-[12px] text-fg-3">Стоимость уловок в CP в данных источника не записана — смотрите правила редакции.</p>
+            </RulesPanel>
+          )}
 
-        {/* ---- оперативники (как полк AoS) ---- */}
-        <section>
-          <GroupHeading
-            title="Оперативники"
-            count={total == null ? roster.operatives.length : `${roster.operatives.length} моделей · ${selections}/${total} выборов`}
-            right={<span className={cx('text-xs font-semibold', leader ? 'text-fg-3' : 'text-warn')}>{leader ? 'лидер есть' : roster.operatives.length ? 'нет лидера' : ''}</span>}
-          />
-          <div className="space-y-2">
-            {!roster.operatives.length && <Empty title="Нет оперативников">Добавьте оперативников — первым обычно берут лидера команды.</Empty>}
-            {roster.operatives.map((x, n) => {
-              const o = opOf(x);
-              return o ? (
-                <OpCard
-                  key={x.uid}
-                  n={n + 1}
-                  x={x}
-                  o={o}
-                  team={team}
-                  isLeader={isLeaderOperative(team, o)}
-                  issues={issues.filter((i) => i.uids?.includes(x.uid))}
-                  open={expanded === x.uid}
-                  onToggle={() => setExpanded((e) => (e === x.uid ? null : x.uid))}
-                  onChange={(p) => onChange(updateOperative(roster, x.uid, p))}
-                  onRemove={() => onChange(removeOperative(roster, x.uid))}
-                  readOnly={view}
-                  findRule={findRule}
-                />
-              ) : (
-                <div key={x.uid} className="flex items-center justify-between rounded-2xl border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-danger">
-                  Нет в данных: {x.opTypeId}
-                  {!view && (
-                    <Button variant="danger" className="text-xs" onClick={() => onChange(removeOperative(roster, x.uid))}>
-                      Убрать
-                    </Button>
-                  )}
+          <PhotoStrip />
+
+          {/* ---- оперативники (как полк AoS) ---- */}
+          <section>
+            <GroupHeading
+              title="Оперативники"
+              count={total == null ? roster.operatives.length : `${roster.operatives.length} моделей · ${selections}/${total} выборов`}
+              right={<span className={cx('text-xs font-semibold', leader ? 'text-fg-3' : 'text-warn')}>{leader ? 'лидер есть' : roster.operatives.length ? 'нет лидера' : ''}</span>}
+            />
+            <div className="space-y-2">
+              {!roster.operatives.length && <Empty title="Нет оперативников">Добавьте оперативников — первым обычно берут лидера команды.</Empty>}
+              {roster.operatives.map((x, n) => {
+                const o = opOf(x);
+                return o ? (
+                  <OpCard
+                    key={x.uid}
+                    n={n + 1}
+                    x={x}
+                    o={o}
+                    team={team}
+                    isLeader={isLeaderOperative(team, o)}
+                    issues={issues.filter((i) => i.uids?.includes(x.uid))}
+                    open={expanded === x.uid}
+                    onToggle={() => setExpanded((e) => (e === x.uid ? null : x.uid))}
+                    onChange={(p) => onChange(updateOperative(roster, x.uid, p))}
+                    onRemove={() => onChange(removeOperative(roster, x.uid))}
+                    readOnly={view}
+                    findRule={findRule}
+                  />
+                ) : (
+                  <div key={x.uid} className="flex items-center justify-between rounded-2xl border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-danger">
+                    Нет в данных: {x.opTypeId}
+                    {!view && (
+                      <Button variant="danger" className="text-xs" onClick={() => onChange(removeOperative(roster, x.uid))}>
+                        Убрать
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
+              {!view && roster.operatives.length > 0 && <AddRow onClick={() => setAdding(true)}>Оперативник{total != null ? ` · ${roster.operatives.length}/${total}` : ''}</AddRow>}
+            </div>
+          </section>
+        </div>
+        {!viewOnly && (
+        <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
+          <div className="mx-auto flex max-w-lg gap-2 lg:max-w-3xl lg:px-4">
+            {view ? (
+              <Button variant="outline" className="h-12 flex-1 text-base" onClick={() => setView(false)}>
+                <Icon name="edit" /> <span className="whitespace-nowrap">Редактировать</span>
+              </Button>
+            ) : (
+              <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => setAdding(true)}>
+                <Icon name="plus" /> <span className="whitespace-nowrap">Добавить оперативника</span>
+              </Button>
+            )}
+            <Button variant="ghost" className="h-12 px-4" onClick={() => setExporting(true)}>
+              <Icon name="share" /> <span className="max-[359px]:sr-only">Экспорт</span>
+            </Button>
+          </div>
+        </div>
+        )}
+        <AddSheet open={adding} team={team} roster={roster} onClose={() => setAdding(false)} onAdd={(o) => (haptic.tap(), onChange(addOperative(roster, o)), setAdding(false))} />
+        <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} team={team} />
+        <Sheet open={equipOpen} onClose={() => setEquipOpen(false)} title={`Снаряжение · выбрано ${roster.equipment.length}`} tall>
+          <div className="space-y-2 pb-2">
+            {team.equipment.map((e) => {
+              const on = roster.equipment.includes(e.id);
+              return (
+                <div key={e.id} className={cx('overflow-hidden rounded-2xl border', on ? 'border-accent/50 bg-accent/[0.06]' : 'border-white/10 bg-app-elevated')}>
+                  <button type="button" disabled={view} onClick={() => (haptic.select(), onChange(toggleEquipment(roster, e.id)))} className="flex min-h-11 w-full items-center gap-3 px-3.5 py-3 text-left disabled:cursor-default">
+                    <span className={cx('flex size-5 shrink-0 items-center justify-center rounded-md border', on ? 'border-accent bg-accent text-black' : 'border-white/30')}>{on && <Icon name="check" className="size-3.5" />}</span>
+                    <span className="min-w-0 flex-1 text-[14px] font-semibold">{e.name}</span>
+                    {on && <Tag tone="accent">Взято</Tag>}
+                  </button>
+                  <div className="border-t border-white/[0.06] px-3.5 py-2">
+                    <Md text={e.text} className="text-[12.5px] leading-relaxed text-fg-2" />
+                  </div>
                 </div>
               );
             })}
-            {!view && roster.operatives.length > 0 && <AddRow onClick={() => setAdding(true)}>Оперативник{total != null ? ` · ${roster.operatives.length}/${total}` : ''}</AddRow>}
+            <p className="text-[12px] text-fg-3">Лимит снаряжения в данных источника не записан — смотрите правила редакции.</p>
           </div>
-        </section>
-      </div>
-      {!viewOnly && (
-      <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-app via-app/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
-        <div className="mx-auto flex max-w-lg gap-2 lg:max-w-3xl lg:px-4">
-          {view ? (
-            <Button variant="outline" className="h-12 flex-1 text-base" onClick={() => setView(false)}>
-              <Icon name="edit" /> <span className="whitespace-nowrap">Редактировать</span>
+        </Sheet>
+        <Sheet open={menu} onClose={() => setMenu(false)} title="Команда">
+          <div className="space-y-2 pb-2">
+            <Button className="w-full justify-start" onClick={() => (setMenu(false), onStartGame())}>
+              <Icon name="spark" /> Начать игру с этой командой
             </Button>
-          ) : (
-            <Button variant="primary" className="h-12 flex-1 text-base" onClick={() => setAdding(true)}>
-              <Icon name="plus" /> <span className="whitespace-nowrap">Добавить оперативника</span>
+            <Button className="w-full justify-start" onClick={() => (setMenu(false), onTestArmy())}>
+              <Icon name="map" /> Test Army: расставить оперативников
             </Button>
-          )}
-          <Button variant="ghost" className="h-12 px-4" onClick={() => setExporting(true)}>
-            <Icon name="share" /> <span className="max-[359px]:sr-only">Экспорт</span>
-          </Button>
-        </div>
+            <Button
+              className="w-full justify-start"
+              onClick={() => (setMenu(false), onDuplicate({ ...roster, id: uid(), name: `${roster.name} (копия)`, createdAt: Date.now(), updatedAt: Date.now() }))}
+            >
+              <Icon name="copy" /> Дублировать команду
+            </Button>
+            <Button className="w-full justify-start" onClick={() => openExternal('https://wahapedia.ru/kill-team3/')}>
+              <Icon name="book" /> Правила Kill Team на Wahapedia
+            </Button>
+            <Button
+              variant="danger"
+              className="w-full justify-start"
+              onClick={async () => {
+                if (await confirmAsk(`Удалить команду «${roster.name}»?`)) onDelete();
+              }}
+            >
+              <Icon name="trash" /> Удалить команду
+            </Button>
+          </div>
+        </Sheet>
       </div>
-      )}
-      <AddSheet open={adding} team={team} roster={roster} onClose={() => setAdding(false)} onAdd={(o) => (haptic.tap(), onChange(addOperative(roster, o)), setAdding(false))} />
-      <ExportSheet open={exporting} onClose={() => setExporting(false)} roster={roster} team={team} />
-      <Sheet open={equipOpen} onClose={() => setEquipOpen(false)} title={`Снаряжение · выбрано ${roster.equipment.length}`} tall>
-        <div className="space-y-2 pb-2">
-          {team.equipment.map((e) => {
-            const on = roster.equipment.includes(e.id);
-            return (
-              <div key={e.id} className={cx('overflow-hidden rounded-2xl border', on ? 'border-accent/50 bg-accent/[0.06]' : 'border-white/10 bg-app-elevated')}>
-                <button type="button" disabled={view} onClick={() => (haptic.select(), onChange(toggleEquipment(roster, e.id)))} className="flex min-h-11 w-full items-center gap-3 px-3.5 py-3 text-left disabled:cursor-default">
-                  <span className={cx('flex size-5 shrink-0 items-center justify-center rounded-md border', on ? 'border-accent bg-accent text-black' : 'border-white/30')}>{on && <Icon name="check" className="size-3.5" />}</span>
-                  <span className="min-w-0 flex-1 text-[14px] font-semibold">{e.name}</span>
-                  {on && <Tag tone="accent">Взято</Tag>}
-                </button>
-                <div className="border-t border-white/[0.06] px-3.5 py-2">
-                  <Md text={e.text} className="text-[12.5px] leading-relaxed text-fg-2" />
-                </div>
-              </div>
-            );
-          })}
-          <p className="text-[12px] text-fg-3">Лимит снаряжения в данных источника не записан — смотрите правила редакции.</p>
-        </div>
-      </Sheet>
-      <Sheet open={menu} onClose={() => setMenu(false)} title="Команда">
-        <div className="space-y-2 pb-2">
-          <Button className="w-full justify-start" onClick={() => (setMenu(false), onStartGame())}>
-            <Icon name="spark" /> Начать игру с этой командой
-          </Button>
-          <Button className="w-full justify-start" onClick={() => (setMenu(false), onTestArmy())}>
-            <Icon name="map" /> Test Army: расставить оперативников
-          </Button>
-          <Button
-            className="w-full justify-start"
-            onClick={() => (setMenu(false), onDuplicate({ ...roster, id: uid(), name: `${roster.name} (копия)`, createdAt: Date.now(), updatedAt: Date.now() }))}
-          >
-            <Icon name="copy" /> Дублировать команду
-          </Button>
-          <Button className="w-full justify-start" onClick={() => openExternal('https://wahapedia.ru/kill-team3/')}>
-            <Icon name="book" /> Правила Kill Team на Wahapedia
-          </Button>
-          <Button
-            variant="danger"
-            className="w-full justify-start"
-            onClick={async () => {
-              if (await confirmAsk(`Удалить команду «${roster.name}»?`)) onDelete();
-            }}
-          >
-            <Icon name="trash" /> Удалить команду
-          </Button>
-        </div>
-      </Sheet>
-    </div>
+    </RosterPhotos>
   );
 }
 
