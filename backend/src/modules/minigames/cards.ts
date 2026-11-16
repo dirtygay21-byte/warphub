@@ -262,7 +262,7 @@ export async function openPack(userId: string) {
         .limit(1);
       notifyUser(
         user?.telegramId,
-        `🌟 <b>Легендарная карта!</b>\n${legendary.map((c) => escapeHtml(c.name)).join(', ')} — +${legendary.length * legendary[0]!.points} очков.\nВаш счёт: ${result.balance} очков.`,
+        `🌟 <b>Легендарная карта: ${legendary.map((c) => escapeHtml(c.name)).join(', ')}</b>\nНачислено: +${legendary.length * legendary[0]!.points} очков\nСчёт: ${result.balance} очков`,
       );
     })().catch((error) => console.warn('[notify] legendary card notification failed', error));
   }
@@ -272,7 +272,7 @@ export async function openPack(userId: string) {
       const [user] = await db.select({ telegramId: usersTable.telegramId }).from(usersTable).where(eq(usersTable.id, userId)).limit(1);
       notifyUser(
         user?.telegramId,
-        `🎁 <b>Накоплено ${promo.milestone.toLocaleString('ru-RU')} очков!</b>\nВаш промокод на скидку 25%: <b>${escapeHtml(promo.code)}</b>\nПокажите его администратору при записи. Действует до ${promo.expiresAt.toLocaleDateString('ru-RU')}.`,
+        `🎁 <b>Промокод: скидка 25%</b>\nНакоплено: ${promo.milestone.toLocaleString('ru-RU')} очков\nКод: <code>${escapeHtml(promo.code)}</code>\nДействует до: ${promo.expiresAt.toLocaleDateString('ru-RU')}\nПокажите его администратору при записи.`,
       );
     })().catch((error) => console.warn('[notify] milestone promo notification failed', error));
   }
@@ -379,15 +379,15 @@ export async function adminAdjustPoints(
     notifyUser(
       user?.telegramId,
       delta < 0
-        ? `💠 Списано ${-delta} очков${note ? ` (${escapeHtml(note)})` : ''}. Остаток: ${balance}.`
-        : `💠 Начислено ${delta} очков${note ? ` (${escapeHtml(note)})` : ''}. Ваш счёт: ${balance}.`,
+        ? `💠 <b>Списано ${-delta} очков</b>${note ? `\nПричина: ${escapeHtml(note)}` : ''}\nСчёт: ${balance} очков`
+        : `💠 <b>Начислено ${delta} очков</b>${note ? `\nПричина: ${escapeHtml(note)}` : ''}\nСчёт: ${balance} очков`,
     );
   })().catch((error) => console.warn('[notify] points notification failed', error));
 
   for (const promo of promos) {
     void (async () => {
       const [user] = await db.select({ telegramId: usersTable.telegramId }).from(usersTable).where(eq(usersTable.id, userId)).limit(1);
-      notifyUser(user?.telegramId, `🎁 Накоплено ${promo.milestone.toLocaleString('ru-RU')} очков! Промокод на скидку 25%: <b>${escapeHtml(promo.code)}</b>`);
+      notifyUser(user?.telegramId, `🎁 <b>Промокод: скидка 25%</b>\nНакоплено: ${promo.milestone.toLocaleString('ru-RU')} очков\nКод: <code>${escapeHtml(promo.code)}</code>`);
     })().catch((error) => console.warn('[notify] milestone promo notification failed', error));
   }
 
