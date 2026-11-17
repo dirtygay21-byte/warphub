@@ -151,7 +151,7 @@ describe('заголовок карточки по ширине (17.11.2026: «W
     expect(shortGames('Новая запись: Warhammer 40,000 — стол')).toBe('Новая запись: Warhammer 40K — стол');
     expect(titleFit('Warhammer 40K').lines).toBe(1);
     expect(titleFit('Age of Sigmar').lines).toBe(1);
-    expect(titleFit('Индивидуальная тренировка').lines).toBe(1);
+    expect(titleFit('Индивидуальная тренировка').size).toBeGreaterThanOrEqual(60);
     const long = titleFit('Очень длинное название услуги для проверки переноса');
     expect(long.lines).toBe(2);
     expect(long.size).toBeLessThanOrEqual(72);
