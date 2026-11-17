@@ -39,9 +39,10 @@ export function RosterPick({ game, onPick }: { game: BookingGame; onPick: (r: Bo
       <button
         type="button"
         onClick={() => void load()}
-        className="ds-press flex min-h-11 w-full items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-3.5 py-2 text-left text-[15px] font-semibold text-fg"
+        // бирюзовый — цвет WarpBuilder (правила цветов, docs/design-code.md §8): вход в WarpBuilder из записи
+        className="ds-press flex min-h-11 w-full items-center gap-2 rounded-xl border border-[#6CF0E6]/35 bg-[#6CF0E6]/10 px-3.5 py-2 text-left text-[15px] font-semibold text-fg"
       >
-        <Swords className="size-4 text-accent" />
+        <Swords className="size-4 text-[#6CF0E6]" />
         <span className="flex-1">Взять из WarpBuilder</span>
         <span className="text-[13px] font-normal text-fg-2">{open ? "Скрыть" : "мои ростеры"}</span>
       </button>
