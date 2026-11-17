@@ -1,7 +1,8 @@
 /**
  * Автоматические уведомления по расписанию (14.11.2026). Раз в 5 минут сервер проверяет, что пора отправить;
  * каждое событие отправляется один раз (notification_marks). Время — клуба (UTC+5).
- *   накануне (с 19:00) · соперник не нашёлся (за сутки) · запись ждёт подтверждения > 3 ч · утренняя сводка (с 10:00)
+ *   накануне (с 19:00) · соперник не нашёлся (за сутки) · запись ждёт подтверждения > 3 ч (в игровой день) ·
+ *   сводки администраторам в 12:00 и 20:00 (17.11.2026)
  *   · игры на выходных (пятница с 12:00) · новости / ивенты / D&D (после публикации) · напоминания об ивенте
  *   (за сутки и за 3 ч) · мало мест · новый ранг и «давно не заходили» (раз в день с 12:00).
  * Первый запуск помечает уже существующие новости, ивенты и ранги, чтобы не разослать старое.
@@ -28,6 +29,8 @@ import type { ReservationDetails } from '../booking/rules';
 import { curatorAreasById, getAdminTelegramIds } from '../../config/admin';
 import { canSeeArea, reservationArea, type AdminArea } from '../../config/admin-areas';
 import { sendTelegramMessageDetailed } from './service';
+import { isUrgentForAdmins, summarySlot } from './admin-schedule';
+import { confirmReservation } from '../booking/service';
 import {
   allRecipients,
   announce,
@@ -222,7 +225,9 @@ async function pendingTooLong(now: Date) {
     .innerJoin(servicesTable, eq(reservationsTable.serviceId, servicesTable.id))
     .leftJoin(tablesTable, eq(reservationsTable.tableId, tablesTable.id))
     .where(and(eq(reservationsTable.status, 'pending'), lte(reservationsTable.createdAt, new Date(now.getTime() - 3 * HOUR)), gt(reservationsTable.startsAt, now)));
+  // 17.11.2026: ожидающие (услуги без автоподтверждения) — в сводках 12:00 и 20:00; отдельно — только в игровой день
   for (const r of rows) {
+    if (!isUrgentForAdmins(r.startsAt, now)) continue;
     if (!(await markOnce(`pending:${r.id}`))) continue;
     await notifyKindAdmins('admin_pending', {
       ...bookingVars({ service: { title: r.service, slug: r.slug }, details: r.details as ReservationDetails | null, startsAt: r.startsAt, endsAt: r.endsAt, tableName: r.tableName }),
@@ -232,46 +237,82 @@ async function pendingTooLong(now: Date) {
   }
 }
 
-async function morningDigest(now: Date) {
-  if (clubHour(now) < 10) return;
-  if (!(await markOnce(`digest:${clubDateKey(now)}`))) return;
-  const start = clubDayStart(now);
-  const rows = await db
-    .select({
-      status: reservationsTable.status,
-      startsAt: reservationsTable.startsAt,
-      service: servicesTable.title,
-      slug: servicesTable.slug,
-      firstName: usersTable.firstName,
-      lastName: usersTable.lastName,
-      username: usersTable.username,
-      details: reservationsTable.details,
-      clubArmy: reservationsTable.seatClubArmyOptions,
-    })
-    .from(reservationsTable)
-    .innerJoin(usersTable, eq(reservationsTable.userId, usersTable.id))
-    .innerJoin(servicesTable, eq(reservationsTable.serviceId, servicesTable.id))
-    .where(and(inArray(reservationsTable.status, [...ACTIVE]), gte(reservationsTable.startsAt, start), lt(reservationsTable.startsAt, new Date(start.getTime() + DAY))))
+/**
+ * Сводки администраторам в 12:00 и 20:00 (17.11.2026, вместо утренней в 10:00): новые записи и отмены с прошлой
+ * сводки, ждущие подтверждения, и расписание — в 12:00 на сегодня, в 20:00 на завтра. Сводка, пропущенная из-за
+ * простоя сервера, уходит в течение 3 часов. Кураторы — только свои направления (нет ничего — не пишем).
+ */
+async function adminSummary(now: Date) {
+  const slot = summarySlot(now);
+  if (now.getTime() - slot.at.getTime() > 3 * HOUR) return;
+  if (!(await markOnce(`summary:${clubDateKey(slot.at)}:${slot.hour}`))) return;
+  const scheduleDay = slot.hour === 12 ? clubDayStart(slot.at) : new Date(clubDayStart(slot.at).getTime() + DAY);
+  const base = {
+    id: reservationsTable.id,
+    status: reservationsTable.status,
+    startsAt: reservationsTable.startsAt,
+    createdAt: reservationsTable.createdAt,
+    cancelledAt: reservationsTable.cancelledAt,
+    service: servicesTable.title,
+    slug: servicesTable.slug,
+    firstName: usersTable.firstName,
+    lastName: usersTable.lastName,
+    username: usersTable.username,
+    details: reservationsTable.details,
+    clubArmy: reservationsTable.seatClubArmyOptions,
+  };
+  const query = () =>
+    db
+      .select(base)
+      .from(reservationsTable)
+      .innerJoin(usersTable, eq(reservationsTable.userId, usersTable.id))
+      .innerJoin(servicesTable, eq(reservationsTable.serviceId, servicesTable.id));
+  const schedule = await query()
+    .where(and(inArray(reservationsTable.status, [...ACTIVE]), gte(reservationsTable.startsAt, scheduleDay), lt(reservationsTable.startsAt, new Date(scheduleDay.getTime() + DAY))))
     .orderBy(asc(reservationsTable.startsAt));
+  const changes = await query()
+    .where(
+      sql`(${reservationsTable.createdAt} >= ${slot.previous} and ${reservationsTable.createdAt} < ${slot.at}) or (${reservationsTable.cancelledAt} >= ${slot.previous} and ${reservationsTable.cancelledAt} < ${slot.at})`,
+    )
+    .orderBy(asc(reservationsTable.startsAt));
+  const waiting = await query()
+    .where(and(eq(reservationsTable.status, 'pending'), gt(reservationsTable.startsAt, now)))
+    .orderBy(asc(reservationsTable.startsAt));
+  type Row = (typeof schedule)[number];
+  const inWindow = (d: Date | null) => !!d && d >= slot.previous && d < slot.at;
   const time = (d: Date | null) => (d ? formatClubDateTime(d).split(', ').pop() : '—');
-  // армия / команда / варбанда клуба на сегодня (15.11.2026): сколько записей её просят — подготовить заранее
-  const wantsArmy = (r: (typeof rows)[number]) => (r.clubArmy ?? []).some(Boolean);
-  // кураторы направлений (17.11.2026): полный доступ — вся сводка, куратор — только свои направления (пусто — не пишем)
-  const areaOf = (r: (typeof rows)[number]) => reservationArea(r.slug, r.details as ReservationDetails | null);
-  const digestVars = (list: typeof rows) => {
-    const armies = list.filter(wantsArmy).length;
+  const when = (d: Date | null) => (d ? formatClubDateTime(d) : '—');
+  // армия / команда / варбанда клуба (15.11.2026): сколько записей её просят — подготовить заранее
+  const wantsArmy = (r: Row) => (r.clubArmy ?? []).some(Boolean);
+  const areaOf = (r: Row) => reservationArea(r.slug, r.details as ReservationDetails | null);
+  const line = (r: Row, at: string) => {
+    const d = r.details as ReservationDetails | null;
+    const army = wantsArmy(r) ? ` · ${d?.kind === 'wh_player' ? clubArmyLabel(d.game).toLowerCase() : 'армия клуба'}` : '';
+    return `• ${at} <b>${escapeHtml(whatOf({ title: r.service, slug: r.slug }, d))}</b> — ${playerLine(r, d)}${army}${r.status === 'pending' ? ' ⏳' : ''}`;
+  };
+  const block = (title: string, list: string[]) => (list.length ? `<b>${title} (${list.length}):</b>\n${list.slice(0, 25).join('\n')}${list.length > 25 ? `\n… и ещё ${list.length - 25}` : ''}` : '');
+  const vars = (areas: AdminArea[] | null) => {
+    const mine = (r: Row) => !areas || canSeeArea(areas, areaOf(r));
+    const day = schedule.filter(mine);
+    const created = changes.filter((r) => mine(r) && inWindow(r.createdAt) && !(r.status === 'cancelled' && inWindow(r.cancelledAt)));
+    const cancelled = changes.filter((r) => mine(r) && r.status === 'cancelled' && inWindow(r.cancelledAt) && !inWindow(r.createdAt));
+    const pending = waiting.filter(mine);
+    const armies = day.filter(wantsArmy).length;
     return {
-      всего: list.length,
-      ждут: list.filter((r) => r.status === 'pending').length,
-      армия: armies > 0 ? armies : '',
-      список: list
-        .slice(0, 25)
-        .map((r) => {
-          const d = r.details as ReservationDetails | null;
-          const army = wantsArmy(r) ? ` · ${d?.kind === 'wh_player' ? clubArmyLabel(d.game).toLowerCase() : 'армия клуба'}` : '';
-          return `• ${time(r.startsAt)} <b>${escapeHtml(whatOf({ title: r.service, slug: r.slug }, d))}</b> — ${playerLine(r, d)}${army}${r.status === 'pending' ? ' ⏳' : ''}`;
-        })
-        .join('\n'),
+      empty: !day.length && !created.length && !cancelled.length && !pending.length,
+      vars: {
+        сводка: `${String(slot.hour).padStart(2, '0')}:00`,
+        новых: created.length,
+        отмен: cancelled.length,
+        новые: block('🆕 Новые записи', created.map((r) => line(r, when(r.startsAt)))),
+        отмены: block('❌ Отмены', cancelled.map((r) => line(r, when(r.startsAt)))),
+        ждут_список: block('⏳ Ждут подтверждения', pending.map((r) => line(r, when(r.startsAt)))),
+        день: slot.hour === 12 ? 'Сегодня' : `Завтра, ${formatClubDateTime(scheduleDay).split(', ').slice(0, 2).join(', ')}`,
+        всего: day.length,
+        ждут: pending.length,
+        армия: armies > 0 ? armies : '',
+        список: day.length ? day.slice(0, 25).map((r) => line(r, time(r.startsAt) ?? '—')).join('\n') : 'Записей нет.',
+      },
     };
   };
   const groups = new Map<string, string[]>();
@@ -281,12 +322,33 @@ async function morningDigest(now: Date) {
   }
   for (const [key, ids] of groups) {
     const areas = key ? (key.split(',') as AdminArea[]) : null;
-    const list = areas ? rows.filter((r) => canSeeArea(areas, areaOf(r))) : rows;
-    if (areas && !list.length) continue;
-    const text = await renderKind('admin_digest', digestVars(list));
+    const built = vars(areas);
+    if (areas && built.empty) continue;
+    const text = await renderKind('admin_digest', built.vars);
     if (!text) continue;
     for (const id of ids) void sendTelegramMessageDetailed(id, text, 'admin_digest');
   }
+}
+
+/**
+ * Автоподтверждение (17.11.2026): один раз после обновления — подтвердить будущие записи, которые ждут подтверждения,
+ * у услуг с автоподтверждением; игроку уходит обычное «Запись подтверждена».
+ */
+async function confirmWaitingOnce(now: Date) {
+  if (!(await markOnce('auto-confirm:backfill:2026-11-17'))) return;
+  const rows = await db
+    .select({ id: reservationsTable.id })
+    .from(reservationsTable)
+    .innerJoin(servicesTable, eq(reservationsTable.serviceId, servicesTable.id))
+    .where(and(eq(reservationsTable.status, 'pending'), eq(servicesTable.autoConfirm, true), gt(reservationsTable.startsAt, now)));
+  for (const r of rows) {
+    try {
+      await confirmReservation(r.id);
+    } catch (error) {
+      console.warn('[auto-confirm] backfill failed', r.id, (error as Error).message);
+    }
+  }
+  if (rows.length) console.info(`[auto-confirm] confirmed ${rows.length} waiting reservations`);
 }
 
 async function weeklyDigest(now: Date) {
@@ -456,7 +518,8 @@ export async function runScheduledJobs(now = new Date()) {
     ['eve', eveReminders],
     ['still-free', stillFree],
     ['pending', pendingTooLong],
-    ['digest', morningDigest],
+    ['summary', adminSummary],
+    ['auto-confirm', confirmWaitingOnce],
     ['weekly', weeklyDigest],
     ['content', contentAnnouncements],
     ['event-reminders', eventReminders],

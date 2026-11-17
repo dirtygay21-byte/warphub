@@ -15,6 +15,8 @@ export type ServicePrice = {
   clubMaterialsPrice: number;
   thirdGameDiscountPercent: number;
   effectiveFrom: string | null;
+  /** автоподтверждение записей (17.11.2026) */
+  autoConfirm?: boolean;
 };
 
 export type PublicServicePricing = {
@@ -87,6 +89,13 @@ export const getServicePricing = (serviceId: number) =>
 
 export const getAdminServicePrices = () =>
   apiRequest<ServicePrice[]>("/admin/pricing/services");
+
+/** Автоподтверждение записей услуги (17.11.2026): вкл. — запись сразу подтверждена, выкл. — ждёт администратора. */
+export const setAdminServiceAutoConfirm = (serviceId: number, autoConfirm: boolean) =>
+  apiRequest<{ id: number; autoConfirm: boolean }>(`/admin/services/${serviceId}/auto-confirm`, {
+    method: "PUT",
+    body: JSON.stringify({ autoConfirm }),
+  });
 
 export const saveAdminServicePrice = (
   serviceId: number,

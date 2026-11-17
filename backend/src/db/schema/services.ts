@@ -45,6 +45,8 @@ export const servicesTable = pgTable(
     /** На записи присутствует тренер (не занимает место игрока) */
     hasTrainer: boolean('has_trainer').notNull().default(false),
     isActive: boolean('is_active').notNull().default(true),
+    /** Подтверждать запись автоматически (17.11.2026): новая запись сразу «подтверждена»; выкл. — ждёт администратора */
+    autoConfirm: boolean('auto_confirm').notNull().default(true),
     sortOrder: integer('sort_order').notNull().default(0),
     description: text('description'),
   },

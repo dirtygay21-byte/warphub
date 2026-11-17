@@ -50,6 +50,7 @@ import {
 } from '../notifications/service';
 import { notifyKind, notifyKindAdmins } from '../notifications/hub';
 import { announceMatch } from '../notifications/jobs';
+import { isUrgentForAdmins } from '../notifications/admin-schedule';
 import { notifyWaitlist } from './waitlist';
 import { bookingVars, playerLine } from '../notifications/booking-vars';
 import {
@@ -193,6 +194,8 @@ type ServiceRow = {
   poolCapacity: number | null;
   hasTrainer: boolean;
   isActive: boolean;
+  /** автоподтверждение записи (17.11.2026) */
+  autoConfirm: boolean;
   scheduleWeekdays: number[] | null;
   disciplineActive: boolean | null;
 };
@@ -241,6 +244,7 @@ async function loadService(
       poolCapacity: servicesTable.poolCapacity,
       hasTrainer: servicesTable.hasTrainer,
       isActive: servicesTable.isActive,
+      autoConfirm: servicesTable.autoConfirm,
       scheduleWeekdays: disciplinesTable.scheduleWeekdays,
       disciplineActive: disciplinesTable.isActive,
     })
@@ -971,6 +975,7 @@ export async function createReservation(
           details,
           startsAt,
           endsAt,
+          status: service.autoConfirm ? 'confirmed' : 'pending',
         })
         .returning();
 
@@ -1080,6 +1085,7 @@ export async function createReservation(
         details,
         startsAt,
         endsAt,
+        status: service.autoConfirm ? 'confirmed' : 'pending',
       })
       .returning();
 
@@ -1253,6 +1259,8 @@ async function notifyAfterCreate(
       fullMinutes: serviceDuration(service),
     });
     const playersAtTable = others.map((other) => describePlayer(other.user, other.details));
+    // 17.11.2026: сразу — только если игра сегодня или раньше следующей сводки; остальное — в сводках 12:00 и 20:00
+    if (!isUrgentForAdmins(reservation.startsAt, new Date())) return;
     void notifyKindAdmins('admin_booking', { текст: playersAtTable.length ? `${text}\n— за столом также:\n${playersAtTable.join('\n')}` : text }, reservationArea(service.slug, details));
   } catch (error) {
     console.warn('[notify] booking notification failed', error);
@@ -1323,6 +1331,8 @@ async function notifyAfterCancel(
       });
     }
 
+    // 17.11.2026: сразу — только игра сегодня или раньше следующей сводки; остальное — в сводках 12:00 и 20:00
+    if (!isUrgentForAdmins(reservation.startsAt, new Date())) return;
     void notifyKindAdmins('admin_booking', {
       текст: [
         `❌ <b>Отмена: ${cancelGame ? escapeHtml(cancelGame) : serviceTitle(service)}</b>${
