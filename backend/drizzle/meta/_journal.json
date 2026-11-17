@@ -232,6 +232,13 @@
       "when": 1795700000000,
       "tag": "0032_admin_areas",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1795710000000,
+      "tag": "0033_services_auto_confirm",
+      "breakpoints": true
     }
   ]
 }
