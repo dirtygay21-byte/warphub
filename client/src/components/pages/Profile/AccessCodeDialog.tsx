@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { KeyRound, LoaderCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDialogExit } from "@/components/ui/ds/useDialogExit";
+import { BOOSTY_GENERAL_URL, openBoostySubscription } from "@/components/booking/boosty";
 
 const LENGTH = 4;
 
@@ -63,6 +64,14 @@ export function AccessCodeDialog({
         </h2>
         <p className="mt-1 text-sm text-fg-2">
           Введите 4 цифры, которые вам передал администратор клуба.
+        </p>
+        {/* подписчики Boosty (17.11.2026): доступ открывается сам после вступления в группу подписчиков */}
+        <p className="mt-2 text-xs text-fg-3">
+          Подписчикам клуба на{" "}
+          <button type="button" onClick={() => openBoostySubscription(BOOSTY_GENERAL_URL)} className="font-semibold text-fg-2 underline">
+            Boosty
+          </button>{" "}
+          код не нужен: WarpBuilder откроется сам после вступления в группу подписчиков.
         </p>
 
         <label className="relative mx-auto mt-5 flex w-fit gap-2.5">

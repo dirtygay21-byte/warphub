@@ -184,6 +184,17 @@ async function api(req, res, p) {
       return send(res, 200, { ok: true });
     }
     if (p === '/admin/roster/access') return send(res, 200, listAccess());
+    // группа подписчиков Boosty (17.11.2026) — демо: две группы, выбрана WBG Boosty
+    if (p === '/admin/roster/group')
+      return send(res, 200, {
+        updates: { mode: 'polling', detail: null, lastUpdateAt: new Date().toISOString() },
+        groups: [
+          { chatId: -1001, title: 'WBG · Boosty', botIsAdmin: true, selected: true },
+          { chatId: -1002, title: 'Клуб WBG — общий чат', botIsAdmin: true, selected: false },
+        ],
+      });
+    if (p === '/admin/roster/group/members')
+      return send(res, 200, [{ telegramId: 5005, since: new Date().toISOString(), firstName: 'Ольга', lastName: null, username: 'olga_paints' }]);
     r = /^\/admin\/roster\/access\/(.+)$/.exec(p);
     if (r && m === 'DELETE') {
       if (!access.delete(r[1])) return send(res, 404, { error: 'У пользователя нет доступа' });

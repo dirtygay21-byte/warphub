@@ -11,11 +11,13 @@ import {
   isRosterOwner,
   listAccess,
   listCodes,
+  listGroupAccess,
   readRosterData,
   redeemCode,
   revokeAccess,
   revokeCode,
 } from './service';
+import { listGroups, selectBoostyGroup } from './group';
 
 function mapRosterError(error: RosterError) {
   switch (error.code) {
@@ -128,6 +130,19 @@ export const rosterAdminModule = new Elysia({ prefix: '/admin/roster', tags: ['A
     detail: { summary: 'Отозвать неиспользованный код' },
   })
   .get('/access', () => listAccess(), { detail: { summary: 'Кому открыт Roster Builder' } })
+  .get('/group', () => listGroups(), { detail: { summary: 'Группы бота и группа подписчиков Boosty (доступ к WarpBuilder)' } })
+  .get('/group/members', () => listGroupAccess(), { detail: { summary: 'Кому открыт WarpBuilder через группу Boosty' } })
+  .put(
+    '/group',
+    ({ user, body }) => {
+      if (!isRosterOwner(user)) return status(403, { error: 'Группу выбирает основной администратор' });
+      return selectBoostyGroup(body.chatId);
+    },
+    {
+      body: t.Object({ chatId: t.Union([t.Number(), t.Null()]) }),
+      detail: { summary: 'Выбрать группу подписчиков Boosty (null — отключить)' },
+    },
+  )
   .delete('/access/:userId', ({ params }) => guard(async () => (await revokeAccess(params.userId), { ok: true })), {
     params: t.Object({ userId: t.String({ format: 'uuid' }) }),
     detail: { summary: 'Закрыть доступ пользователю' },

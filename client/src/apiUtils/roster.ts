@@ -54,3 +54,15 @@ export const revokeRosterAccess = (userId: string) =>
   apiRequest<{ ok: boolean }>(`/admin/roster/access/${userId}`, {
     method: "DELETE",
   });
+
+/** Группа подписчиков Boosty (17.11.2026): её участникам WarpBuilder открыт, пока они в группе. */
+export type BoostyGroups = {
+  updates: { mode: "off" | "polling" | "webhook-elsewhere" | "error"; detail: string | null; lastUpdateAt: string | null };
+  groups: { chatId: number; title: string; botIsAdmin: boolean; selected: boolean }[];
+};
+export type BoostyMember = { telegramId: number; since: string; firstName: string | null; lastName: string | null; username: string | null };
+
+export const getBoostyGroups = () => apiRequest<BoostyGroups>("/admin/roster/group");
+export const getBoostyMembers = () => apiRequest<BoostyMember[]>("/admin/roster/group/members");
+export const selectBoostyGroup = (chatId: number | null) =>
+  apiRequest<BoostyGroups>("/admin/roster/group", { method: "PUT", body: JSON.stringify({ chatId }) });
