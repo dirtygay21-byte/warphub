@@ -11,6 +11,7 @@ import { formatSelectedDate } from "@/utils/date";
 import { DsButton, LimeHero } from "@/components/ui/ds";
 import { ConfirmTicket } from "@/components/booking/ConfirmTicket";
 import { s3Url } from "@/utils/s3utils";
+import { pluralizeRu } from "@/utils/plural";
 import { downloadFile, shareToChat } from "@/utils/telegramApp";
 import { openGameShareText } from "@/utils/openGameShare";
 
@@ -62,7 +63,7 @@ export default function ConfirmationStage({
   const placeLabel = selectedSlot?.kind === "new" ? selectedSlot.label : selectedSlot?.kind === "join" ? "игра с соперником" : null;
   const placesLabel = lastBooking?.joined
     ? "Стол собран — вы играете вдвоём"
-    : `Мест: ${lastBooking?.partySize ?? 1}`;
+    : `${lastBooking?.partySize ?? 1} ${pluralizeRu(lastBooking?.partySize ?? 1, { one: "место", few: "места", many: "мест" })}`;
 
   const resetRegistrationFlow = () => {
     resetStages();
@@ -101,7 +102,7 @@ export default function ConfirmationStage({
                 lastBooking?.startsAt ? (
                   <>
                     <span className="text-[10.5px] font-extrabold uppercase tracking-[0.12em] opacity-60">Начало</span>
-                    <span className="mt-1 font-display text-[28px] font-bold leading-none tabular-nums">{formatClubTime(lastBooking.startsAt)}</span>
+                    <span className="mt-1 font-display text-[26px] font-bold leading-none tabular-nums">{formatClubTime(lastBooking.startsAt)}</span>
                     {lastBooking.endsAt && <span className="mt-1 text-[12px] font-bold">до {formatClubTime(lastBooking.endsAt)}</span>}
                   </>
                 ) : (
