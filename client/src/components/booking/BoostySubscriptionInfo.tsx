@@ -1,4 +1,4 @@
-import { BOOSTY_GENERAL_URL, BOOSTY_SUBSCRIPTION_URL, type BoostyKind } from "./boosty";
+import { BOOSTY_GENERAL_URL, BOOSTY_SUBSCRIPTION_URL, openBoostySubscription, type BoostyKind } from "./boosty";
 import clsx from "clsx";
 import { DsButton } from "@/components/ui/ds";
 import { CircleAlert, X } from "lucide-react";
@@ -16,14 +16,6 @@ function nextCloseLabel(previous: string) {
   return options[Math.floor(Math.random() * options.length)] ?? "Понятно";
 }
 
-function openBoostySubscription(url: string) {
-  const webApp = typeof window !== "undefined" ? window.Telegram?.WebApp : undefined;
-  if (webApp && typeof webApp.openLink === "function") {
-    webApp.openLink(url);
-    return;
-  }
-  window.open(url, "_blank", "noopener,noreferrer");
-}
 
 const COPY: Record<BoostyKind, Record<BoostyContext, string>> = {
   warhammer: {

@@ -239,6 +239,13 @@
       "when": 1795710000000,
       "tag": "0033_services_auto_confirm",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1795720000000,
+      "tag": "0034_telegram_groups",
+      "breakpoints": true
     }
   ]
 }

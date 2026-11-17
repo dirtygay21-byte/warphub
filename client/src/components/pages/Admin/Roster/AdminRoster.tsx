@@ -15,6 +15,7 @@ import clsx from "clsx";
 import { KeyRound, LoaderCircle, RefreshCw, Send, Swords, UserX, X } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import BoostyGroup from "./BoostyGroup";
 
 /** «6 окт., 14:30» во времени клуба */
 const when = (value: string) => formatClub(value, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -135,6 +136,8 @@ export default function AdminRoster() {
           </div>
         </div>
       )}
+
+      <BoostyGroup isOwner={!!me.data?.isOwner} />
 
       <section className="mb-6">
         <h2 className="mb-3 flex items-baseline justify-between text-sm font-semibold uppercase tracking-wide text-fg-3">

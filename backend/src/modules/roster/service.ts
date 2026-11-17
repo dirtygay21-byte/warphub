@@ -2,7 +2,8 @@ import { and, desc, eq, gt, isNull, sql } from 'drizzle-orm';
 import { getBuiltinAdminIds, isAdminUser } from '../../config/admin';
 import { env } from '../../config/env';
 import { db } from '../../db';
-import { rosterAccessCodesTable, rosterAccessTable, rosterCodeAttemptsTable, usersTable } from '../../db/schema';
+import { rosterAccessCodesTable, rosterAccessTable, rosterCodeAttemptsTable, telegramGroupMembersTable, usersTable } from '../../db/schema';
+import { boostyChatId, isBoostyMember } from './group';
 import { escapeHtml, formatUserName, sendTelegramMessage } from '../notifications/service';
 import type { User } from '../users/service';
 import {
@@ -43,7 +44,39 @@ export function isRosterOwner(user: Pick<User, 'telegramId'>): boolean {
 export async function hasRosterAccess(user: User): Promise<boolean> {
   if (isAdminUser(user)) return true;
   const [row] = await db.select({ id: rosterAccessTable.userId }).from(rosterAccessTable).where(eq(rosterAccessTable.userId, user.id)).limit(1);
+  if (row) return true;
+  // подписчики Boosty (17.11.2026): пока человек в группе подписчиков
+  return isBoostyMember(Number(user.telegramId));
+}
+
+/** Доступ не через группу (администратор или код) — по Telegram ID; для сообщений «доступ открыт / закрыт». */
+export async function hasNonGroupAccess(telegramId: number): Promise<boolean> {
+  if (isAdminUser({ telegramId } as Pick<User, 'telegramId'>)) return true;
+  const [row] = await db
+    .select({ id: rosterAccessTable.userId })
+    .from(rosterAccessTable)
+    .innerJoin(usersTable, eq(usersTable.id, rosterAccessTable.userId))
+    .where(eq(usersTable.telegramId, telegramId))
+    .limit(1);
   return !!row;
+}
+
+/** Кому открыт WarpBuilder через группу Boosty (для админки). */
+export async function listGroupAccess() {
+  const chatId = await boostyChatId();
+  if (!chatId) return [];
+  return db
+    .select({
+      telegramId: telegramGroupMembersTable.telegramId,
+      since: telegramGroupMembersTable.updatedAt,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      username: usersTable.username,
+    })
+    .from(telegramGroupMembersTable)
+    .leftJoin(usersTable, eq(usersTable.telegramId, telegramGroupMembersTable.telegramId))
+    .where(and(eq(telegramGroupMembersTable.chatId, chatId), eq(telegramGroupMembersTable.isMember, true)))
+    .orderBy(desc(telegramGroupMembersTable.updatedAt));
 }
 
 async function activeCodes() {

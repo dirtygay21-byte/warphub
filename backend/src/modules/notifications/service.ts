@@ -40,7 +40,7 @@ export function describeRoute() {
 }
 
 /** Запрос к Bot API по выбранному маршруту. */
-function telegramFetch(method: string, init: RequestInit & { timeoutMs?: number } = {}) {
+export function telegramFetch(method: string, init: RequestInit & { timeoutMs?: number } = {}) {
   const { base, proxy } = telegramRoute();
   const { timeoutMs = 10_000, ...rest } = init;
   return fetch(`${base}/bot${env.telegramBotToken}/${method}`, {
