@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { NOTIFICATION_KINDS, renderTemplate } from '../src/modules/notifications/catalog';
 import { cardCaption, parseNotificationCard } from '../src/modules/notifications/card/parse';
-import { CARD_H, CARD_W, factValue, renderCardPng } from '../src/modules/notifications/card/render';
+import { CARD_H, CARD_W, factValue, renderCardPng, shortGames, titleFit } from '../src/modules/notifications/card/render';
 
 describe('карточка уведомления: разбор текста (14.11.2026)', () => {
   test('заголовок «Метка: игра» → надзаголовок и крупный заголовок; строки 🗓 / 🎲 и «Метка: значение»', () => {
@@ -144,3 +144,29 @@ test('анимация MP4 (H.264) — чёткая, 1280×720 (15.11.2026)', as
   const out = process.env.CARD_SAMPLES_DIR;
   if (out) writeFileSync(`${out}/anim-booking_created.mp4`, mp4);
 }, 120_000);
+
+describe('заголовок карточки по ширине (17.11.2026: «WARHAMMER 40,000» наезжал на дату)', () => {
+  test('на картинке — Warhammer 40K, одной строкой', () => {
+    expect(shortGames('Warhammer 40,000')).toBe('Warhammer 40K');
+    expect(shortGames('Новая запись: Warhammer 40,000 — стол')).toBe('Новая запись: Warhammer 40K — стол');
+    expect(titleFit('Warhammer 40K').lines).toBe(1);
+    expect(titleFit('Age of Sigmar').lines).toBe(1);
+    expect(titleFit('Индивидуальная тренировка').size).toBeGreaterThanOrEqual(60);
+    const long = titleFit('Очень длинное название услуги для проверки переноса');
+    expect(long.lines).toBe(2);
+    expect(long.size).toBeLessThanOrEqual(72);
+  });
+  const samples: [string, string][] = [
+    ['admin-new-40k', '♟ <b>Новая запись: Warhammer 40,000 — стол ждёт соперника (1/2)</b>\nУслуга: Сыграть\nКогда: пт, 20 ноября, 20:00–00:00\nСтол: Стол 1\nКто: Егор Коренев (@KorenevEgor) · Telegram ID: 1\nИгра: Warhammer 40,000\nАрмия: Agents of the Imperium\nОчки: 1500\nОпыт: Новичок'],
+    ['admin-new-aos', '♟ <b>Новая запись: Age of Sigmar — стол собран (2/2)</b>\nУслуга: Сыграть\nКогда: воскресенье, 22 ноября, 16:00–19:00\nСтол: Стол 2\nИгра: Age of Sigmar'],
+    ['admin-new-training', '♟ <b>Новая запись: Индивидуальная тренировка</b>\nКогда: сб, 21 ноября, 12:00–13:30\nСтол: Стол 2\nИгра: Warhammer 40,000'],
+  ];
+  for (const [name, text] of samples) {
+    test(name, async () => {
+      const png = await renderCardPng(parseNotificationCard(text, 'Администраторам'));
+      expect(Array.from(png.slice(0, 4))).toEqual([0x89, 0x50, 0x4e, 0x47]);
+      const out = process.env.CARD_SAMPLES_DIR;
+      if (out) (mkdirSync(out, { recursive: true }), writeFileSync(`${out}/${name}.png`, png));
+    }, 20_000);
+  }
+});
