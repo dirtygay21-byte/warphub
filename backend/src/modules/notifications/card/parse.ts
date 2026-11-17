@@ -10,7 +10,7 @@
  * Чистая функция без зависимостей — проверяется юнит-тестами.
  */
 
-export type CardTone = 'accent' | 'warn' | 'danger' | 'neutral';
+export type CardTone = 'accent' | 'warn' | 'danger' | 'neutral' | 'dnd';
 export type CardRow = { label: string; value: string };
 export type CardBlock =
   | { type: 'rows'; rows: CardRow[] }
@@ -60,7 +60,8 @@ export function parseNotificationCard(html: string, fallbackKicker = 'WarpHub'):
   const lines = html.split('\n');
   const firstIndex = lines.findIndex((l) => decode(l).trim());
   const headRaw = firstIndex >= 0 ? decode(lines[firstIndex]!).trim() : '';
-  const tone = TONE_BY_EMOJI.find(([re]) => re.test(headRaw))?.[1] ?? 'accent';
+  // D&D (17.11.2026, решение владельца): свой цвет — фиолетовый вместо лайма; отмена и перенос — как у всех
+  const tone = TONE_BY_EMOJI.find(([re]) => re.test(headRaw))?.[1] ?? (/D&(amp;)?D/.test(headRaw) ? 'dnd' : 'accent');
   let head = clean(headRaw.replace(LEADING_EMOJI, ''));
 
   let subtitle = '';
