@@ -142,11 +142,13 @@ export default function AdminWarhammer() {
               value={waiting.length}
               highlight={waiting.length > 0}
             />
-            <SummaryTile
-              label="Покраска · нужна помощь"
-              value={`${day.painting.length} · ${helpNeeded.length}`}
-              highlight={helpNeeded.length > 0}
-            />
+            {has("painting") && (
+              <SummaryTile
+                label="Покраска · нужна помощь"
+                value={`${day.painting.length} · ${helpNeeded.length}`}
+                highlight={helpNeeded.length > 0}
+              />
+            )}
           </div>
 
           {day.holds.length > 0 && (
