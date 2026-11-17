@@ -170,3 +170,13 @@ describe('заголовок карточки по ширине (17.11.2026: «W
     }, 20_000);
   }
 });
+
+describe('цвет D&D (17.11.2026)', () => {
+  test('D&D — фиолетовый, отмена и перенос — как у всех', () => {
+    expect(parseNotificationCard('🐉 <b>D&D: новая запись на игру</b>\nИгра: Шахты').tone).toBe('dnd');
+    expect(parseNotificationCard('🎲 <b>Новая игра D&amp;D</b>').tone).toBe('dnd');
+    expect(parseNotificationCard('❌ <b>Игра D&D отменена</b>').tone).toBe('danger');
+    expect(parseNotificationCard('🕒 <b>Игра D&D перенесена</b>').tone).toBe('warn');
+    expect(parseNotificationCard('♟ <b>Новая запись: Kill Team</b>').tone).toBe('accent');
+  });
+});

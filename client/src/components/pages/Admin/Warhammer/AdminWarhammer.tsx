@@ -29,6 +29,7 @@ import LeagueDisputes from "./LeagueDisputes";
 import TableHoldSheet from "@/components/pages/Admin/TableHolds/TableHoldSheet";
 import { DsButton, Skeleton } from "@/components/ui/ds";
 import { useMemo, useState } from "react";
+import { useAdminMe } from "@/hooks/useAdminMe";
 import { AnimatePresence } from "motion/react";
 
 const shiftDate = (dateKey: string, days: number) => {
@@ -45,6 +46,7 @@ export default function AdminWarhammer() {
   const [dateKey, setDateKey] = useState(() => dateKeyOf(getClubToday()));
   const [holdOpen, setHoldOpen] = useState(false);
   const options = useBookingOptions();
+  const { full, has, hasGames } = useAdminMe();
 
   const dayQuery = useQuery({
     queryKey: ["admin-warhammer-day", dateKey],
@@ -110,15 +112,17 @@ export default function AdminWarhammer() {
       <p className="-mt-3 mb-4 text-sm capitalize text-fg-2">
         {formatCalendarDate(keyToDate(dateKey))}
       </p>
-      <DsButton variant="secondary" onClick={() => setHoldOpen(true)} className="mb-5 w-full">
-        <Lock className="size-4" />
-        Забронировать стол
-      </DsButton>
+      {hasGames && (
+        <DsButton variant="secondary" onClick={() => setHoldOpen(true)} className="mb-5 w-full">
+          <Lock className="size-4" />
+          Забронировать стол
+        </DsButton>
+      )}
       <AnimatePresence>
         {holdOpen && <TableHoldSheet prefill={{ dateKey }} onClose={() => setHoldOpen(false)} />}
       </AnimatePresence>
-      <ClubArmyCalendar />
-      <LeagueDisputes />
+      {hasGames && <ClubArmyCalendar />}
+      {full && <LeagueDisputes />}
 
       {dayQuery.isLoading ? (
         <div className="flex flex-col gap-3" aria-busy="true" aria-label="Загружаем день">
@@ -138,11 +142,13 @@ export default function AdminWarhammer() {
               value={waiting.length}
               highlight={waiting.length > 0}
             />
-            <SummaryTile
-              label="Покраска · нужна помощь"
-              value={`${day.painting.length} · ${helpNeeded.length}`}
-              highlight={helpNeeded.length > 0}
-            />
+            {has("painting") && (
+              <SummaryTile
+                label="Покраска · нужна помощь"
+                value={`${day.painting.length} · ${helpNeeded.length}`}
+                highlight={helpNeeded.length > 0}
+              />
+            )}
           </div>
 
           {day.holds.length > 0 && (
@@ -175,13 +181,15 @@ export default function AdminWarhammer() {
             )}
           </section>
 
-          <section>
-            <h2 className="mb-1 text-lg font-semibold">Ближайшие брони столов</h2>
-            <p className="mb-3 text-xs text-fg-3">Все брони, которые ещё не закончились, — по всем дням</p>
-            <UpcomingHolds />
-          </section>
+          {hasGames && (
+            <section>
+              <h2 className="mb-1 text-lg font-semibold">Ближайшие брони столов</h2>
+              <p className="mb-3 text-xs text-fg-3">Все брони, которые ещё не закончились, — по всем дням</p>
+              <UpcomingHolds />
+            </section>
+          )}
 
-          <section>
+          {has("painting") && (<section>
             <h2 className="mb-1 text-lg font-semibold">Покраска миниатюр</h2>
             <p className="mb-3 text-xs text-fg-3">
               Вместимость: {day.paintingCapacity ?? "—"} человек одновременно
@@ -245,7 +253,7 @@ export default function AdminWarhammer() {
                 })}
               </div>
             )}
-          </section>
+          </section>)}
         </div>
       )}
     </div>

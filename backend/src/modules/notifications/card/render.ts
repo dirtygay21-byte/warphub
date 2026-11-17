@@ -23,8 +23,8 @@ const OSWALD = "'Oswald', 'Oswald Cyr', 'Inter Tight', 'Inter Tight Cyr'";
 const INTER = "'Inter Tight', 'Inter Tight Cyr'";
 const INK = '#111110';
 const MUTED = 'rgba(17,17,16,0.7)';
-const COLORS = { panel: '#111110', fg: '#F4F4F0', fg3: '#9A9A92', accent: '#ECFE46', warn: '#FBBF24', danger: '#F87171', neutral: '#B8B8B0' };
-const TONE: Record<NotificationCard['tone'], string> = { accent: COLORS.accent, warn: COLORS.warn, danger: COLORS.danger, neutral: COLORS.neutral };
+const COLORS = { panel: '#111110', fg: '#F4F4F0', fg3: '#9A9A92', accent: '#ECFE46', warn: '#FBBF24', danger: '#F87171', neutral: '#B8B8B0', dnd: '#B49CFF' };
+const TONE: Record<NotificationCard['tone'], string> = { accent: COLORS.accent, warn: COLORS.warn, danger: COLORS.danger, neutral: COLORS.neutral, dnd: COLORS.dnd };
 
 type Font = { name: string; data: Buffer; weight: 400 | 600 | 700; style: 'normal' };
 let fonts: Font[] | null = null;

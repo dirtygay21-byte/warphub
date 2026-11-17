@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAdminMe } from "@/hooks/useAdminMe";
 
 type Section = { path: string; label: string; sub: string; icon: LucideIcon };
 
@@ -66,6 +67,12 @@ export default function AdminNav({ open, onOpenChange }: { open: boolean; onOpen
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const current = sectionOf(pathname);
+  // куратор направлений (17.11.2026): только записи, столы (игры, покраска) и D&D — по его направлениям
+  const { full, has, hasGames, areaLabels } = useAdminMe();
+  const visible = (path: string) =>
+    full || path === "/admin" || (path === "/admin/warhammer" && (hasGames || has("painting"))) || (path === "/admin/dnd" && has("dnd"));
+  const groups = GROUPS.map((g) => ({ ...g, items: g.items.filter((i) => visible(i.path)) })).filter((g) => g.items.length);
+  const sections = groups.flatMap((g) => g.items);
   const CurrentIcon = current.icon;
 
   useEffect(() => {
@@ -123,7 +130,7 @@ export default function AdminNav({ open, onOpenChange }: { open: boolean; onOpen
           </button>
         </div>
         <nav aria-label="Разделы админ-панели" className="no-scrollbar mt-2.5 flex gap-1.5 overflow-x-auto px-4 pb-2.5 lg:px-6">
-          {SECTIONS.map((item) => {
+          {sections.map((item) => {
             const active = item.path === current.path;
             return (
               <button
@@ -142,6 +149,11 @@ export default function AdminNav({ open, onOpenChange }: { open: boolean; onOpen
             );
           })}
         </nav>
+        {areaLabels.length > 0 && (
+          <p className="border-t border-white/[0.06] px-4 py-2 text-[13px] text-fg-2 lg:px-6">
+            Ваши направления: <span className="font-semibold text-fg">{areaLabels.join(", ")}</span>
+          </p>
+        )}
       </header>
 
       {open && (
@@ -155,7 +167,7 @@ export default function AdminNav({ open, onOpenChange }: { open: boolean; onOpen
           >
             <div className="h-1 w-10 self-center rounded bg-white/20" />
             <h2 className="px-1 font-display text-[22px] font-semibold uppercase leading-none">Разделы</h2>
-            {GROUPS.map((group) => (
+            {groups.map((group) => (
               <div key={group.title} className="flex flex-col gap-1">
                 <span className="px-1 text-[12px] font-bold uppercase tracking-[0.08em] text-fg-3">{group.title}</span>
                 <div className="flex flex-col overflow-hidden rounded-[14px] bg-field">

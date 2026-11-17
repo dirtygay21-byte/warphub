@@ -9,6 +9,7 @@ import {
   inArray,
   isNotNull,
   isNull,
+  like,
   lt,
   lte,
   ne,
@@ -77,7 +78,9 @@ import {
   tableGameKey,
   parseCategories,
   clubArmyPointsFor,
+  WH_PLAYER_SERVICE_SLUGS,
 } from './rules';
+import { GAME_AREAS, reservationArea, type AdminArea } from '../../config/admin-areas';
 
 export { parseDateParam } from './rules';
 import { getAdminTelegramIds } from '../../config/admin';
@@ -1250,7 +1253,7 @@ async function notifyAfterCreate(
       fullMinutes: serviceDuration(service),
     });
     const playersAtTable = others.map((other) => describePlayer(other.user, other.details));
-    void notifyKindAdmins('admin_booking', { текст: playersAtTable.length ? `${text}\n— за столом также:\n${playersAtTable.join('\n')}` : text });
+    void notifyKindAdmins('admin_booking', { текст: playersAtTable.length ? `${text}\n— за столом также:\n${playersAtTable.join('\n')}` : text }, reservationArea(service.slug, details));
   } catch (error) {
     console.warn('[notify] booking notification failed', error);
   }
@@ -1335,7 +1338,7 @@ async function notifyAfterCancel(
       ]
         .filter(Boolean)
         .join('\n'),
-    });
+    }, reservationArea(service.slug, (reservation.details as ReservationDetails | null) ?? null));
   } catch (error) {
     console.warn('[notify] cancel notification failed', error);
   }
@@ -1396,7 +1399,27 @@ export type ListReservationsFilters = {
   limit?: number;
   /** Смещение от начала выборки */
   offset?: number;
+  /** Направления куратора (17.11.2026): только записи этих направлений; не задано — все */
+  areas?: AdminArea[] | null;
 };
+
+/** SQL-условие «запись одного из направлений» — то же, что reservationArea (config/admin-areas.ts). Нужен join услуг. */
+function areasCondition(areas: AdminArea[]): SQL {
+  const parts: SQL[] = [];
+  const games = areas.filter((a) => GAME_AREAS.includes(a));
+  if (games.length) {
+    parts.push(
+      and(
+        inArray(servicesTable.slug, [...WH_PLAYER_SERVICE_SLUGS]),
+        inArray(sql`coalesce(${reservationsTable.details}->>'game', '40k')`, games),
+      )!,
+    );
+  }
+  if (areas.includes('painting')) parts.push(eq(servicesTable.slug, 'wh_painting'));
+  if (areas.includes('club')) parts.push(like(servicesTable.slug, 'club%'));
+  if (areas.includes('dnd')) parts.push(like(servicesTable.slug, 'dnd%'));
+  return parts.length ? or(...parts)! : sql`false`;
+}
 
 export function toReservationResponse(reservation: Reservation) {
   return {
@@ -1415,6 +1438,8 @@ export function toReservationResponse(reservation: Reservation) {
 
 function buildReservationFilters(filters: ListReservationsFilters): SQL[] {
   const conditions: SQL[] = [];
+
+  if (filters.areas) conditions.push(areasCondition(filters.areas));
 
   if (filters.serviceId !== undefined) {
     conditions.push(eq(reservationsTable.serviceId, filters.serviceId));
@@ -1557,6 +1582,7 @@ export async function countReservations(
   const [row] = await db
     .select({ value: count() })
     .from(reservationsTable)
+    .innerJoin(servicesTable, eq(reservationsTable.serviceId, servicesTable.id))
     .where(conditions.length > 0 ? and(...conditions) : undefined);
 
   return Number(row?.value ?? 0);

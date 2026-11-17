@@ -25,6 +25,9 @@ import { escapeHtml, formatClubDateTime, formatUserName } from '../../lib/telegr
 import { getPlayerProgress } from '../progress/service';
 import { runLeagueJobs } from '../league/service';
 import type { ReservationDetails } from '../booking/rules';
+import { curatorAreasById, getAdminTelegramIds } from '../../config/admin';
+import { canSeeArea, reservationArea, type AdminArea } from '../../config/admin-areas';
+import { sendTelegramMessageDetailed } from './service';
 import {
   allRecipients,
   announce,
@@ -225,7 +228,7 @@ async function pendingTooLong(now: Date) {
       ...bookingVars({ service: { title: r.service, slug: r.slug }, details: r.details as ReservationDetails | null, startsAt: r.startsAt, endsAt: r.endsAt, tableName: r.tableName }),
       часов: Math.floor((now.getTime() - r.createdAt.getTime()) / HOUR),
       игрок: who(r),
-    });
+    }, reservationArea(r.slug, r.details as ReservationDetails | null));
   }
 }
 
@@ -253,20 +256,37 @@ async function morningDigest(now: Date) {
   const time = (d: Date | null) => (d ? formatClubDateTime(d).split(', ').pop() : '—');
   // армия / команда / варбанда клуба на сегодня (15.11.2026): сколько записей её просят — подготовить заранее
   const wantsArmy = (r: (typeof rows)[number]) => (r.clubArmy ?? []).some(Boolean);
-  const armies = rows.filter(wantsArmy).length;
-  await notifyKindAdmins('admin_digest', {
-    всего: rows.length,
-    ждут: rows.filter((r) => r.status === 'pending').length,
-    армия: armies > 0 ? armies : '',
-    список: rows
-      .slice(0, 25)
-      .map((r) => {
-        const d = r.details as ReservationDetails | null;
-        const army = wantsArmy(r) ? ` · ${d?.kind === 'wh_player' ? clubArmyLabel(d.game).toLowerCase() : 'армия клуба'}` : '';
-        return `• ${time(r.startsAt)} <b>${escapeHtml(whatOf({ title: r.service, slug: r.slug }, d))}</b> — ${playerLine(r, d)}${army}${r.status === 'pending' ? ' ⏳' : ''}`;
-      })
-      .join('\n'),
-  });
+  // кураторы направлений (17.11.2026): полный доступ — вся сводка, куратор — только свои направления (пусто — не пишем)
+  const areaOf = (r: (typeof rows)[number]) => reservationArea(r.slug, r.details as ReservationDetails | null);
+  const digestVars = (list: typeof rows) => {
+    const armies = list.filter(wantsArmy).length;
+    return {
+      всего: list.length,
+      ждут: list.filter((r) => r.status === 'pending').length,
+      армия: armies > 0 ? armies : '',
+      список: list
+        .slice(0, 25)
+        .map((r) => {
+          const d = r.details as ReservationDetails | null;
+          const army = wantsArmy(r) ? ` · ${d?.kind === 'wh_player' ? clubArmyLabel(d.game).toLowerCase() : 'армия клуба'}` : '';
+          return `• ${time(r.startsAt)} <b>${escapeHtml(whatOf({ title: r.service, slug: r.slug }, d))}</b> — ${playerLine(r, d)}${army}${r.status === 'pending' ? ' ⏳' : ''}`;
+        })
+        .join('\n'),
+    };
+  };
+  const groups = new Map<string, string[]>();
+  for (const id of getAdminTelegramIds()) {
+    const key = (curatorAreasById(id) ?? []).join(',');
+    groups.set(key, [...(groups.get(key) ?? []), id]);
+  }
+  for (const [key, ids] of groups) {
+    const areas = key ? (key.split(',') as AdminArea[]) : null;
+    const list = areas ? rows.filter((r) => canSeeArea(areas, areaOf(r))) : rows;
+    if (areas && !list.length) continue;
+    const text = await renderKind('admin_digest', digestVars(list));
+    if (!text) continue;
+    for (const id of ids) void sendTelegramMessageDetailed(id, text, 'admin_digest');
+  }
 }
 
 async function weeklyDigest(now: Date) {
