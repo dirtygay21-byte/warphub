@@ -100,10 +100,24 @@ function pick(card: NotificationCard): { when: string; facts: CardRow[]; text: s
   return { when, facts, text };
 }
 
-function titleSize(title: string) {
+/**
+ * Подгонка текста под ширину (17.11.2026, владелец: «WARHAMMER 40,000» переносился и наезжал на дату).
+ * Ширина строки Oswald (заглавные, жирный) ≈ 0,58 кегля на знак — с запасом. Заголовок: одна строка, если влезает
+ * кеглем ≥ 64; иначе две строки кеглем ≤ 72 (так карточка всегда помещается по высоте).
+ */
+const OSWALD_EM = 0.58;
+const fitSize = (text: string, width: number, max: number) => Math.min(max, Math.floor(width / (Math.max(1, text.length) * OSWALD_EM)));
+
+export function titleFit(title: string): { size: number; lines: 1 | 2 } {
   const n = title.length;
-  return n <= 12 ? 128 : n <= 18 ? 108 : n <= 28 ? 88 : 72;
+  const tier = n <= 12 ? 128 : n <= 18 ? 108 : n <= 28 ? 88 : 72;
+  const one = fitSize(title, TEXT_W, tier);
+  if (one >= 64) return { size: one, lines: 1 };
+  return { size: Math.min(72, fitSize(title, TEXT_W * 2, tier)), lines: 2 };
 }
+
+/** На картинке — короткие названия игр (как в карточке лиги): «Warhammer 40,000» → «Warhammer 40K». Подпись не меняется. */
+export const shortGames = (text: string) => text.replace(/Warhammer 40[,.\s]?000/g, 'Warhammer 40K');
 
 /**
  * Фон: толстые чёрные «червяки» из правых углов (стиль мерча, выбор владельца). 15.11.2026 (владелец):
@@ -139,18 +153,24 @@ function backdrop(tone: string, phase = 0) {
 
 export function cardTree(card: NotificationCard, logoSrc: string, background?: string): Node {
   const tone = TONE[card.tone];
-  const { when, facts, text } = pick(card);
+  const picked = pick(card);
+  const when = shortGames(picked.when);
+  const text = picked.text;
+  const facts = picked.facts.map((r) => ({ ...r, value: shortGames(r.value) }));
+  const title = shortGames(card.title);
+  const fit = titleFit(title);
+  const subtitle = shortGames(card.subtitle);
   const content = el('div', { flexDirection: 'column', width: TEXT_W, height: H - PAD * 2 }, [
     el('div', { alignItems: 'center' }, [
       el('img', { width: 76, height: 76 }, undefined, { src: logoSrc, width: 76, height: 76 }),
       lines({ marginLeft: 22, flex: 1, fontFamily: OSWALD, fontWeight: 600, fontSize: 44, letterSpacing: 2, textTransform: 'uppercase', color: INK }, 1, card.kicker, 30),
     ]),
-    lines({ marginTop: 26, fontFamily: OSWALD, fontWeight: 700, fontSize: titleSize(card.title), lineHeight: 1.0, textTransform: 'uppercase', color: INK }, 2, card.title, 40),
-    ...(when ? [lines({ marginTop: 18, fontFamily: OSWALD, fontWeight: 600, fontSize: 60, lineHeight: 1.1, textTransform: 'uppercase', color: INK }, 1, when, 34)] : []),
+    lines({ marginTop: 26, flexShrink: 0, fontFamily: OSWALD, fontWeight: 700, fontSize: fit.size, lineHeight: 1.0, textTransform: 'uppercase', color: INK }, fit.lines, title, 40),
+    ...(when ? [lines({ marginTop: 18, flexShrink: 0, fontFamily: OSWALD, fontWeight: 600, fontSize: fitSize(when, TEXT_W, 60), lineHeight: 1.1, textTransform: 'uppercase', color: INK }, 1, when, 34)] : []),
     ...(text ? [lines({ marginTop: 20, fontFamily: INTER, fontWeight: 600, fontSize: 46, lineHeight: 1.25, color: MUTED }, 3, text, 110)] : []),
     el('div', { flexWrap: 'wrap', marginTop: 'auto' }, [
-      ...(card.subtitle
-        ? [el('div', { padding: '12px 28px', marginRight: 16, marginTop: 16, borderRadius: 50, backgroundColor: COLORS.panel, fontFamily: OSWALD, fontWeight: 600, fontSize: 42, textTransform: 'uppercase', color: tone }, clamp(card.subtitle, 30))]
+      ...(subtitle
+        ? [el('div', { padding: '12px 28px', marginRight: 16, marginTop: 16, borderRadius: 50, backgroundColor: COLORS.panel, fontFamily: OSWALD, fontWeight: 600, fontSize: 42, textTransform: 'uppercase', color: tone }, clamp(subtitle, 30))]
         : []),
       ...facts.map((r) =>
         el('div', { alignItems: 'baseline', padding: '12px 28px', marginRight: 16, marginTop: 16, borderRadius: 22, backgroundColor: COLORS.panel }, [
