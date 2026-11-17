@@ -47,14 +47,14 @@ export function Ticket({
   const part = final ? "bg-accent text-[#111110]" : busy ? "text-fg-3" : "bg-app-elevated text-fg";
   const inner = (
     <>
-      <span className={clsx("relative block min-w-0 flex-1 overflow-hidden rounded-l-[20px]", part)} style={busy ? HATCH : undefined}>
+      <span className={clsx("relative block min-w-0 overflow-hidden rounded-l-[20px]", part)} style={busy ? HATCH : undefined}>
         {image && <img src={image} alt="" className="block w-full object-cover" style={{ height: imageHeight }} draggable={false} />}
         <span className="block px-4 py-3.5">{children}</span>
         {mainOverlay}
       </span>
       <span
         className={clsx(
-          "flex shrink-0 flex-col items-center justify-center rounded-r-[20px] border-l-2 border-dashed px-1.5 py-3 text-center",
+          "flex flex-col items-center justify-center self-stretch rounded-r-[20px] border-l-2 border-dashed px-1.5 py-3 text-center",
           final ? "border-[#111110]" : busy ? "border-white/10" : "border-white/15",
           part,
           stubClassName,
@@ -68,7 +68,7 @@ export function Ticket({
       <span aria-hidden="true" className="pointer-events-none absolute -bottom-2 size-4 rounded-full bg-app-bg" style={{ right: stubWidth - 8 }} />
     </>
   );
-  if (!onClick) return <div className={clsx("relative flex w-full", className)}>{inner}</div>;
+  if (!onClick) return <div className={clsx("relative grid w-full grid-cols-[minmax(0,1fr)_auto]", className)}>{inner}</div>;
   return (
     <button
       type="button"
@@ -78,7 +78,7 @@ export function Ticket({
         haptic.tap();
         onClick();
       }}
-      className={clsx("relative flex w-full text-left", disabled ? "cursor-not-allowed opacity-60" : "ds-press fx-press", className)}
+      className={clsx("relative grid w-full grid-cols-[minmax(0,1fr)_auto] text-left", disabled ? "cursor-not-allowed opacity-60" : "ds-press fx-press", className)}
     >
       {inner}
     </button>
