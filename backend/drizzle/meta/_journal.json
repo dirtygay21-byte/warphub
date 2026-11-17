@@ -225,6 +225,13 @@
       "when": 1795600000000,
       "tag": "0031_tournaments",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1795700000000,
+      "tag": "0032_admin_areas",
+      "breakpoints": true
     }
   ]
 }

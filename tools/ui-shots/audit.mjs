@@ -169,6 +169,27 @@ for (const width of [390, 360]) {
       log.push(`${width} ${name}: НЕ ОТКРЫЛОСЬ — ${String(e.message ?? e).split('\n')[0]}`);
     }
   }
+  // куратор направлений (17.11.2026): демо переключается на куратора Kill Team / Warcry — разделы админки и баннер
+  if (width === 390 && (!only || only.has('curator'))) {
+    try {
+      await page.evaluate((base) => fetch(base + '/api/demo/curator', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ on: true }) }), BASE);
+      for (const [name, route] of [['curator-admin', '/admin'], ['curator-warhammer', '/admin/warhammer']]) {
+        await page.goto(BASE + route, { waitUntil: 'networkidle', timeout: 20000 });
+        await page.waitForTimeout(900);
+        const f = `${String(++n).padStart(2, '0')}-${width}-${name}.jpg`;
+        await page.screenshot({ path: path.join(OUT, f), fullPage: false, type: 'jpeg', quality: 60 });
+        console.log('📸', f);
+      }
+      await page.getByRole('button', { name: /Админка/ }).first().click({ timeout: 5000 });
+      await page.waitForTimeout(500);
+      const f = `${String(++n).padStart(2, '0')}-${width}-curator-menu.jpg`;
+      await page.screenshot({ path: path.join(OUT, f), type: 'jpeg', quality: 60 });
+      console.log('📸', f);
+    } catch (e) {
+      log.push(`${width} куратор: ${String(e.message).split('\n')[0].slice(0, 160)}`);
+    }
+    await page.evaluate((base) => fetch(base + '/api/demo/curator', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ on: false }) }), BASE);
+  }
   await ctx.close();
 }
 fs.writeFileSync(path.join(OUT, 'log.txt'), log.join('\n') + '\n');

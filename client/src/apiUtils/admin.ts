@@ -485,6 +485,8 @@ export type AdminEntry = {
   username: string | null;
   addedAt: string | null;
   addedByTelegramId: number | null;
+  /** направления куратора (17.11.2026); пусто — полный доступ */
+  areas?: AdminArea[];
 };
 export type AdminsList = { admins: AdminEntry[]; canManage: boolean };
 
@@ -495,6 +497,15 @@ export const addAdmin = (telegramId: string, note: string) =>
 
 export const removeAdmin = (telegramId: number) =>
   apiRequest<{ admins: AdminEntry[] }>(`/admin/admins/${telegramId}`, { method: "DELETE" });
+
+/** Направления кураторов (17.11.2026): от них зависят разделы админки и уведомления. */
+export type AdminArea = "40k" | "aos" | "kt" | "warcry" | "painting" | "dnd" | "club";
+export type AdminMe = { telegramId: number; builtin: boolean; full: boolean; areas: AdminArea[]; areaOptions: { value: AdminArea; label: string }[] };
+
+export const getAdminMe = () => apiRequest<AdminMe>("/admin/me");
+
+export const setAdminAreas = (telegramId: number, areas: AdminArea[]) =>
+  apiRequest<{ admins: AdminEntry[] }>(`/admin/admins/${telegramId}/areas`, { method: "PUT", body: JSON.stringify({ areas }) });
 
 /** Диагностика уведомлений (14.11.2026): GET /admin/notifications/diagnostics */
 export type NotificationSendLog = { at: string; chatId: string; kind: string; ok: boolean; reason?: string; status?: number; description?: string; ms: number };
