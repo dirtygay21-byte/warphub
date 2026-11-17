@@ -302,6 +302,8 @@ async function adminSummary(now: Date) {
       empty: !day.length && !created.length && !cancelled.length && !pending.length,
       vars: {
         сводка: `${String(slot.hour).padStart(2, '0')}:00`,
+        новых: created.length,
+        отмен: cancelled.length,
         новые: block('🆕 Новые записи', created.map((r) => line(r, when(r.startsAt)))),
         отмены: block('❌ Отмены', cancelled.map((r) => line(r, when(r.startsAt)))),
         ждут_список: block('⏳ Ждут подтверждения', pending.map((r) => line(r, when(r.startsAt)))),
