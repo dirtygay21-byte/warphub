@@ -23,12 +23,11 @@ import { formatSelectedDate } from "@/utils/date";
 import { s3Url } from "@/utils/s3utils";
 import { getSlotEnd, getStartTimeOptions, getWindowLimit, hoursLabel, minFreeSeats } from "@/utils/slots";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarDays, Clock3, Dice6, Swords, UsersRound } from "lucide-react";
+import { Dice6, Swords } from "lucide-react";
 import { useMemo, useState } from "react";
-import type { ReactNode } from "react";
 import { TrainerBadge } from "./TableSelection/SessionCards";
-import ServiceDetailsHeader from "./ServiceDetails/ServiceDetailsHeader";
-import ServiceDetailsImage from "./ServiceDetails/ServiceDetailsImage";
+import { StubTime, Ticket, TicketKicker } from "@/components/booking/Ticket";
+import BoostySubscriptionInfo from "@/components/booking/BoostySubscriptionInfo";
 import { boostyKindForService } from "@/components/booking/boosty";
 import { GAMES_BY_CATEGORY } from "@/components/booking/tableCategory";
 
@@ -205,43 +204,44 @@ export default function ServiceDetailsStage() {
   }
 
   const isJoin = selectedSlot.kind === "join";
+  const placeLabel = selectedSlot.kind === "new" ? selectedSlot.label : isJoin ? "игра с соперником" : null;
   const partySize = selectedSlot.kind === "pool" ? partyCount : 1;
 
   return (
     <div className="ds-enter h-full w-full space-y-6 px-5 py-3 pb-10 text-fg">
-      <article className="overflow-hidden rounded-[18px] border border-white/10 bg-app-elevated">
-        <ServiceDetailsImage
-          imageUrl={service?.slug ? s3Url(`services/${service.slug}.webp`) : undefined}
-          alt={service?.title ?? ""}
-        />
-        <div className="space-y-3 p-4">
-          <ServiceDetailsHeader
-            activity={service?.title ?? undefined}
-            discipline={discipline?.title}
-            description={service?.description ?? undefined}
-            boostyKind={boostyKind}
-          />
-          <div className="space-y-2 border-t border-white/[0.06] pt-3 text-[15px]">
-            <InfoLine icon={<CalendarDays className="size-4" />}>{formatSelectedDate(selectedDate)}</InfoLine>
-            {startsAt && (
-              <InfoLine icon={<Clock3 className="size-4" />}>
-                {formatClubTimeRange(startsAt, endsAt)}
-                {endsAt && <span className="text-fg-2"> · {hoursLabel(minutesOf(startsAt, endsAt))}</span>}
-              </InfoLine>
-            )}
-            {selectedSlot.kind === "pool" && !isClubVisit && (
-              <InfoLine icon={<UsersRound className="size-4" />}>
-                Свободно мест: {minFreeSeats(selectedSlot.segments)} из {selectedSlot.capacity}
-              </InfoLine>
-            )}
-            {service?.hasTrainer ? (
-              <div className="pt-1">
-                <TrainerBadge players={selectedSlot.kind === "pool" ? 1 : selectedSlot.capacity} />
-              </div>
-            ) : null}
+      {/* сводка — билет (17.11.2026): фото услуги, «услуга · стол», дата и время; корешок — начало */}
+      <div className="relative">
+        <Ticket
+          image={service?.slug ? s3Url(`services/${service.slug}.webp`) : null}
+          imageHeight={96}
+          stub={
+            startsAt ? (
+              <StubTime time={formatClubTime(startsAt)} note={endsAt ? hoursLabel(minutesOf(startsAt, endsAt)) : undefined} />
+            ) : (
+              <StubTime time="—" note="время ниже" />
+            )
+          }
+        >
+          <TicketKicker>{[service?.title ?? discipline?.title, placeLabel].filter(Boolean).join(" · ")}</TicketKicker>
+          <span className="mt-1 block text-base font-extrabold first-letter:uppercase">{formatSelectedDate(selectedDate)}</span>
+          {startsAt && <span className="mt-0.5 block text-sm tabular-nums text-fg-2">{formatClubTimeRange(startsAt, endsAt)}</span>}
+          {selectedSlot.kind === "pool" && !isClubVisit && (
+            <span className="mt-0.5 block text-sm text-fg-2">
+              Свободно мест: {minFreeSeats(selectedSlot.segments)} из {selectedSlot.capacity}
+            </span>
+          )}
+          {service?.hasTrainer ? (
+            <span className="mt-2 block">
+              <TrainerBadge players={selectedSlot.kind === "pool" ? 1 : selectedSlot.capacity} />
+            </span>
+          ) : null}
+        </Ticket>
+        {boostyKind && (
+          <div className="absolute top-2" style={{ right: 112 }}>
+            <BoostySubscriptionInfo kind={boostyKind} context="booking" className="bg-black/55 text-fg backdrop-blur-sm" />
           </div>
-        </div>
-      </article>
+        )}
+      </div>
 
       {limited && <LimitedTimeBanner minutes={limited.minutes} until={limited.until} fullMinutes={durationMinutes} place={selectedSlot.kind === "pool" ? "место" : "стол"} />}
 
@@ -391,14 +391,14 @@ export default function ServiceDetailsStage() {
 }
 
 /**
- * Красное предупреждение (B1): время доступно, но короче полной длительности. Показывается вверху формы и у кнопки
+ * Предупреждение (B1; по цветам 17.11.2026 — янтарная метка на нейтральной карточке, не красная рамка): время доступно, но короче полной длительности. Показывается вверху формы и у кнопки
  * записи, чтобы его было видно на всём шаге.
  */
 function LimitedTimeBanner({ minutes, until, fullMinutes, place, compact = false }: { minutes: number; until: string; fullMinutes: number; place: string; compact?: boolean }) {
   return (
-    <div role="status" className="rounded-[14px] border border-danger/50 bg-danger/10 px-4 py-3 text-sm text-fg">
-      <p className="font-semibold text-danger">
-        ⚠️ Время ограничено: только {hoursLabel(minutes)} вместо {hoursLabel(fullMinutes)} — до {formatClubTime(until)}
+    <div role="status" className="rounded-[14px] border border-white/10 bg-app-elevated px-4 py-3 text-sm text-fg">
+      <p className="font-semibold text-warn">
+        Время ограничено: только {hoursLabel(minutes)} вместо {hoursLabel(fullMinutes)} — до {formatClubTime(until)}
       </p>
       {!compact && (
         <p className="mt-1 text-fg-2">
@@ -406,14 +406,5 @@ function LimitedTimeBanner({ minutes, until, fullMinutes, place, compact = false
         </p>
       )}
     </div>
-  );
-}
-
-function InfoLine({ icon, children }: { icon: ReactNode; children: ReactNode }) {
-  return (
-    <p className="flex items-center gap-2.5 text-fg">
-      <span className="text-accent">{icon}</span>
-      {children}
-    </p>
   );
 }

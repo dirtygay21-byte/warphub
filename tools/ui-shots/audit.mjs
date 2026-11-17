@@ -108,7 +108,8 @@ for (const width of [390, 360]) {
           return true;
         });
         if (ok) {
-          await page.waitForTimeout(900);
+          // анимация «Ты записан!» (билет, корешок, штамп) заканчивается к ~3,5 с
+          await page.waitForTimeout(3800);
           const f3 = `${String(++n).padStart(2, '0')}-${width}-booking-done.jpg`;
           await page.screenshot({ path: path.join(OUT, f3), fullPage: true, type: 'jpeg', quality: 60 });
           console.log('📸', f3);
@@ -128,6 +129,13 @@ for (const width of [390, 360]) {
           await shot('booking-1-service');
           await page.locator('ul.ds-stagger li button').first().click({ timeout: 5000 });
           await shot('booking-2-time');
+          // «Ищут соперника» (17.11.2026): раскрыть первую карточку
+          const opp = page.locator('article > button[aria-expanded]').first();
+          if (await opp.count()) {
+            await opp.click({ timeout: 5000 });
+            await shot('booking-2-opponent-open');
+            await opp.click({ timeout: 5000 });
+          } else log.push(`${width} шаг 2: карточек «Ищут соперника» в демо нет`);
           await page.locator('.ds-stagger button:not([disabled])').first().click({ timeout: 5000 });
           await shot('booking-3-details');
         } catch (e) {

@@ -3,20 +3,14 @@ import { useRegistrationStageStore } from "@/stores/useRegistrationStageStore";
 import { useReservationStore } from "@/stores/useReservationStore";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import {
-  CalendarDays,
-  CalendarPlus,
-  Clock3,
-  RotateCcw,
-  Send,
-  UsersRound,
-} from "lucide-react";
+import { CalendarPlus, RotateCcw, Send } from "lucide-react";
 import { formatClubTime, formatClubTimeRange } from "@/utils/clubTime";
 import { hoursLabel } from "@/utils/slots";
 import { getServiceDetailsMeta } from "./ServiceDetails/utils";
 import { formatSelectedDate } from "@/utils/date";
-import { Badge, DsButton, LimeHero } from "@/components/ui/ds";
-import type { ReactNode } from "react";
+import { DsButton, LimeHero } from "@/components/ui/ds";
+import { ConfirmTicket } from "@/components/booking/ConfirmTicket";
+import { s3Url } from "@/utils/s3utils";
 import { downloadFile, shareToChat } from "@/utils/telegramApp";
 import { openGameShareText } from "@/utils/openGameShare";
 
@@ -65,6 +59,7 @@ export default function ConfirmationStage({
       ? Math.round((new Date(lastBooking.endsAt).getTime() - new Date(lastBooking.startsAt).getTime()) / 60_000)
       : null;
   const limited = fullMinutes && bookedMinutes && bookedMinutes < fullMinutes ? bookedMinutes : null;
+  const placeLabel = selectedSlot?.kind === "new" ? selectedSlot.label : selectedSlot?.kind === "join" ? "игра с соперником" : null;
   const placesLabel = lastBooking?.joined
     ? "Стол собран — вы играете вдвоём"
     : `Мест: ${lastBooking?.partySize ?? 1}`;
@@ -85,33 +80,47 @@ export default function ConfirmationStage({
   };
 
   return (
-    <div className="ds-enter mx-auto flex max-w-sm flex-col gap-3 px-5 pb-8 pt-3 text-fg">
-      {/* мягкий лаймовый вариант (15.11.2026): итог — лаймовый блок сверху, ниже обычная карточка и кнопки */}
-      <LimeHero
-        tone={isSuccess ? "lime" : "danger"}
-        kicker={isSuccess ? "Готово" : "Ошибка"}
-        title={!isSuccess ? "Запись не создана" : lastBooking?.joined ? "Ты в игре!" : "Ты записан!"}
-        className="ds-pop"
-      >
-        <p>{isSuccess ? "Мы ждем тебя в клубе" : "Не удалось подтвердить запись. Попробуй еще раз."}</p>
-      </LimeHero>
-
-      <div className="rounded-[18px] border border-white/10 bg-app-elevated p-4">
-        <div className="mb-3 flex items-start justify-between gap-3">
-          <h3 className="text-[17px] font-bold leading-tight">{serviceQuery.isLoading ? "Загрузка…" : (activity ?? "Услуга")}</h3>
-          {discipline && <Badge>{discipline}</Badge>}
-        </div>
-        <div className="space-y-3">
-          <InfoRow icon={<CalendarDays className="size-5" />} value={formatSelectedDate(selectedDate)} />
-          <InfoRow icon={<Clock3 className="size-5" />} value={time} />
-          <InfoRow icon={<UsersRound className="size-5" />} value={placesLabel} />
-        </div>
-      </div>
+    <div className="ds-enter mx-auto flex max-w-sm flex-col gap-3 overflow-hidden px-5 pb-8 pt-3 text-fg">
+      {isSuccess ? (
+        <>
+          {/* итоговый билет (17.11.2026): падает, корешок отрывается, штамп клуба — см. booking/ConfirmTicket.tsx */}
+          <div className="pt-3 text-center">
+            <h2 className="font-display text-[34px] font-bold uppercase leading-none">{lastBooking?.joined ? "Ты в игре!" : "Ты записан!"}</h2>
+            <p className="cf-late mt-2 text-sm text-fg-2">Мы напомним тебе за 1 час до начала игры.</p>
+          </div>
+          <div className="mt-4">
+            <ConfirmTicket
+              image={apiService?.slug ? s3Url(`services/${apiService.slug}.webp`) : null}
+              kicker={[serviceQuery.isLoading ? "Загрузка…" : (activity ?? discipline ?? "Запись"), placeLabel].filter(Boolean).join(" · ")}
+              title={formatSelectedDate(selectedDate)}
+              facts={[
+                { label: "Время", value: time },
+                { label: lastBooking?.joined ? "Игроки" : "Места", value: placesLabel },
+              ]}
+              stub={
+                lastBooking?.startsAt ? (
+                  <>
+                    <span className="text-[10.5px] font-extrabold uppercase tracking-[0.12em] opacity-60">Начало</span>
+                    <span className="mt-1 font-display text-[28px] font-bold leading-none tabular-nums">{formatClubTime(lastBooking.startsAt)}</span>
+                    {lastBooking.endsAt && <span className="mt-1 text-[12px] font-bold">до {formatClubTime(lastBooking.endsAt)}</span>}
+                  </>
+                ) : (
+                  <span className="text-[12px] font-bold">Готово</span>
+                )
+              }
+            />
+          </div>
+        </>
+      ) : (
+        <LimeHero tone="danger" kicker="Ошибка" title="Запись не создана" className="ds-pop">
+          <p>Не удалось подтвердить запись. Попробуй еще раз.</p>
+        </LimeHero>
+      )}
 
       {isSuccess && limited && fullMinutes && lastBooking?.endsAt && (
-        <div role="status" className="rounded-[14px] border border-danger/50 bg-danger/10 px-4 py-3 text-sm text-fg">
-          <p className="font-semibold text-danger">
-            ⚠️ Время ограничено: {hoursLabel(limited)} вместо {hoursLabel(fullMinutes)} — до {formatClubTime(lastBooking.endsAt)}
+        <div role="status" className="cf-late rounded-[14px] border border-white/10 bg-app-elevated px-4 py-3 text-sm text-fg">
+          <p className="font-semibold text-warn">
+            Время ограничено: {hoursLabel(limited)} вместо {hoursLabel(fullMinutes)} — до {formatClubTime(lastBooking.endsAt)}
           </p>
           <p className="mt-1 text-fg-2">
             Если не успеете, попросим освободить место к следующей записи; если будет свободно — постараемся продлить.
@@ -119,11 +128,10 @@ export default function ConfirmationStage({
         </div>
       )}
 
-      {isSuccess && <p className="rounded-[14px] bg-white/[0.05] px-4 py-3 text-sm text-fg-2">Мы напомним тебе за 1 час до начала игры.</p>}
-
-      <div className="mt-2 flex flex-col gap-2.5">
+      <div className="mt-3 flex flex-col gap-2.5">
         {isSuccess ? (
-          <DsButton variant="primary" size="lg" onClick={handleMyRecordsClick} className="w-full">
+          // на экране уже есть лаймовый билет — кнопка не лаймовая (правило «одна большая лаймовая заливка»)
+          <DsButton variant="secondary" size="lg" onClick={handleMyRecordsClick} className="w-full">
             Мои записи
           </DsButton>
         ) : (
@@ -161,15 +169,6 @@ export default function ConfirmationStage({
           На главную
         </DsButton>
       </div>
-    </div>
-  );
-}
-
-function InfoRow({ icon, value }: { icon: ReactNode; value: string }) {
-  return (
-    <div className="flex items-center gap-3 text-[15px] text-fg">
-      <span className="text-fg-2">{icon}</span>
-      <span>{value}</span>
     </div>
   );
 }

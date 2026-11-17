@@ -478,6 +478,28 @@ body {
   .lime-flow { animation: none; }
 }
 
+/* «Ты записан!» (макет 17.11.2026, см. booking/ConfirmTicket.tsx): билет падает, надрез, корешок отрывают, штамп. */
+@keyframes cf-in{0%{opacity:0;transform:translateY(-120px) rotate(-6deg) scale(.96)}55%{opacity:1;transform:translateY(10px) rotate(1.2deg)}75%{transform:translateY(-4px) rotate(-.4deg)}100%{opacity:1;transform:none}}
+@keyframes cf-zip{0%{top:-6px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:calc(100% - 6px);opacity:0}}
+@keyframes cf-tug{0%,100%{transform:none}30%{transform:translateX(5px) rotate(2.5deg)}60%{transform:translateX(1px) rotate(-.6deg)}}
+@keyframes cf-tear{0%{transform:none;opacity:1}18%{transform:translate(14px,-10px) rotate(9deg)}100%{transform:translate(120px,560px) rotate(78deg);opacity:0}}
+@keyframes cf-stamp{0%{opacity:0;transform:scale(2.6) rotate(-30deg);filter:blur(2px)}62%{opacity:1;transform:scale(.9) rotate(-14deg);filter:none}80%{transform:scale(1.04) rotate(-14deg)}100%{opacity:.92;transform:scale(1) rotate(-14deg)}}
+@keyframes cf-ink{0%{opacity:.5;transform:scale(.7)}100%{opacity:0;transform:scale(1.7)}}
+@keyframes cf-hit{0%,100%{transform:none}30%{transform:translateY(3px)}60%{transform:translateY(-1px)}}
+@keyframes cf-fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.cf-ticket{animation:cf-in .8s cubic-bezier(.2,.8,.2,1) both,cf-hit .25s ease-out 2.78s}
+.cf-zip{opacity:0;animation:cf-zip .55s ease-in .95s both}
+.cf-stub{transform-origin:0 0;animation:cf-tug .3s ease-in-out 1.5s 2 both,cf-tear 1s cubic-bezier(.45,0,.75,.35) 2.1s forwards;pointer-events:none}
+.cf-stamp{opacity:0;transform:rotate(-14deg);animation:cf-stamp .45s cubic-bezier(.3,.9,.3,1) 2.4s forwards}
+.cf-ink{opacity:0;animation:cf-ink .6s ease-out 2.68s}
+.cf-late{opacity:0;animation:cf-fade .45s ease-out 3.05s forwards}
+:root[data-fx="reduced"] :is(.cf-ticket,.cf-zip,.cf-stub,.cf-stamp,.cf-ink,.cf-late){animation:none}
+:root[data-fx="reduced"] :is(.cf-stamp,.cf-late){opacity:.92}
+@media (prefers-reduced-motion: reduce){
+  :is(.cf-ticket,.cf-zip,.cf-stub,.cf-stamp,.cf-ink,.cf-late){animation:none}
+  :is(.cf-stamp,.cf-late){opacity:.92}
+}
+
 /* Полноэкранный режим Telegram (15.11.2026): экраны битв и Test Army отступают от кнопок Telegram сверху.
    Вне полноэкранного режима переменные равны 0 — отступ прежний (pt-5). */
 .tg-safe-top {
