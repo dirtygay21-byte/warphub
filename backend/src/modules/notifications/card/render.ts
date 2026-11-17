@@ -102,11 +102,16 @@ function pick(card: NotificationCard): { when: string; facts: CardRow[]; text: s
 
 /**
  * Подгонка текста под ширину (17.11.2026, владелец: «WARHAMMER 40,000» переносился и наезжал на дату).
- * Ширина строки Oswald (заглавные, жирный) ≈ 0,58 кегля на знак — с запасом. Заголовок: одна строка, если влезает
- * кеглем ≥ 64; иначе две строки кеглем ≤ 72 (так карточка всегда помещается по высоте).
+ * Ширина строки Oswald (заглавные, жирный) в долях кегля, с запасом: широкие буквы (Ш, Щ, Ж, Ю, М, W…) шире прочих.
+ * Заголовок: одна строка, если влезает кеглем ≥ 64; иначе две строки кеглем ≤ 72 (карточка всегда помещается по высоте).
  */
-const OSWALD_EM = 0.58;
-const fitSize = (text: string, width: number, max: number) => Math.min(max, Math.floor(width / (Math.max(1, text.length) * OSWALD_EM)));
+const WIDE = new Set([...'ШЩЖЮМФЫWMДЦ']);
+export function textEm(text: string): number {
+  let em = 0;
+  for (const ch of text.toUpperCase()) em += ch === ' ' ? 0.25 : /[0-9]/.test(ch) ? 0.5 : /[.,:·–—()]/.test(ch) ? 0.3 : WIDE.has(ch) ? 0.8 : 0.58;
+  return Math.max(1, em);
+}
+const fitSize = (text: string, width: number, max: number) => Math.min(max, Math.floor(width / textEm(text)));
 
 export function titleFit(title: string): { size: number; lines: 1 | 2 } {
   const n = title.length;
@@ -163,10 +168,10 @@ export function cardTree(card: NotificationCard, logoSrc: string, background?: s
   const content = el('div', { flexDirection: 'column', width: TEXT_W, height: H - PAD * 2 }, [
     el('div', { alignItems: 'center' }, [
       el('img', { width: 76, height: 76 }, undefined, { src: logoSrc, width: 76, height: 76 }),
-      lines({ marginLeft: 22, flex: 1, fontFamily: OSWALD, fontWeight: 600, fontSize: 44, letterSpacing: 2, textTransform: 'uppercase', color: INK }, 1, card.kicker, 30),
+      lines({ marginLeft: 22, flex: 1, fontFamily: OSWALD, fontWeight: 600, fontSize: 44, letterSpacing: 2, textTransform: 'uppercase', color: INK }, 1, shortGames(card.kicker), 30),
     ]),
     lines({ marginTop: 26, flexShrink: 0, fontFamily: OSWALD, fontWeight: 700, fontSize: fit.size, lineHeight: 1.0, textTransform: 'uppercase', color: INK }, fit.lines, title, 40),
-    ...(when ? [lines({ marginTop: 18, flexShrink: 0, fontFamily: OSWALD, fontWeight: 600, fontSize: fitSize(when, TEXT_W, 60), lineHeight: 1.1, textTransform: 'uppercase', color: INK }, 1, when, 34)] : []),
+    ...(when ? [lines({ marginTop: 18, flexShrink: 0, fontFamily: OSWALD, fontWeight: 600, fontSize: fitSize(when, TEXT_W, 60), lineHeight: 1.1, textTransform: 'uppercase', color: INK }, 1, when, 48)] : []),
     ...(text ? [lines({ marginTop: 20, fontFamily: INTER, fontWeight: 600, fontSize: 46, lineHeight: 1.25, color: MUTED }, 3, text, 110)] : []),
     el('div', { flexWrap: 'wrap', marginTop: 'auto' }, [
       ...(subtitle
