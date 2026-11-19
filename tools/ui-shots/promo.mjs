@@ -86,8 +86,19 @@ await step('hub-booking', async () => {
   await shot('hub-booking-time');
   await page.locator('.ds-stagger button:not([disabled])').first().click({ timeout: 5000 });
   await shot('hub-booking-details');
-  await page.evaluate(() => window.__warphubStages?.getState().resetStages());
-  await page.evaluate(() => { const st = window.__warphubStages; if (st) for (let i = 0; i < 4; i++) st.getState().nextStage(); });
+  // 20.11.2026: настоящая запись в демо — на шаге «Ты записан!» время и места; ждём конца анимации (билет, штамп)
+  const submit = page.getByRole('button', { name: /^Записаться$/ }).first();
+  let done = false;
+  if (await submit.count()) {
+    await submit.click({ timeout: 5000 }).catch(() => {});
+    done = await page.getByText('Ты записан!').first().waitFor({ timeout: 6000 }).then(() => true).catch(() => false);
+  }
+  if (!done) {
+    log.push('hub-booking-done: запись в демо не прошла — шаг открыт без данных записи');
+    await page.evaluate(() => window.__warphubStages?.getState().resetStages());
+    await page.evaluate(() => { const st = window.__warphubStages; if (st) for (let i = 0; i < 4; i++) st.getState().nextStage(); });
+  }
+  await page.waitForTimeout(3800);
   await shot('hub-booking-done');
   await page.evaluate(() => window.__warphubStages?.getState().resetStages());
 });
