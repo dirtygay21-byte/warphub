@@ -2,12 +2,14 @@ import {
   BILLING_MODE_LABELS,
   getAdminServicePrices,
   saveAdminServicePrice,
+  setAdminServiceAutoConfirm,
   type BillingMode,
   type ServicePrice,
 } from "@/apiUtils/pricing";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LoaderCircle, RefreshCw, RussianRuble, Save } from "lucide-react";
 import { useState, type FormEvent } from "react";
+import { ToggleRow } from "@/components/ui/ds";
 
 const inputClass =
   "mt-1.5 min-h-11 w-full rounded-xl border border-white/10 bg-field px-3 py-2.5 text-sm text-white outline-none transition-colors focus:border-accent/60";
@@ -41,6 +43,12 @@ function ServicePriceCard({ service }: { service: ServicePrice }) {
         ...(isWarhammer ? { armyRentalPricePer1000: Number(armyRentalPrice) } : {}),
         ...(isGroupTraining ? { thirdGameDiscountPercent: Number(thirdDiscount) } : {}),
       }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-service-prices"] }),
+  });
+
+  const autoConfirm = useMutation({
+    meta: { success: "Подтверждение записей сохранено", error: true },
+    mutationFn: (value: boolean) => setAdminServiceAutoConfirm(service.id, value),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-service-prices"] }),
   });
 
@@ -79,6 +87,19 @@ function ServicePriceCard({ service }: { service: ServicePrice }) {
         <span className="rounded-lg bg-accent/10 px-2.5 py-1 text-xs font-semibold text-accent">
           {BILLING_MODE_LABELS[billingMode]}
         </span>
+      </div>
+
+      <div className="mb-3">
+        <ToggleRow
+          title="Подтверждать автоматически"
+          subtitle={
+            (autoConfirm.isPending ? autoConfirm.variables : (service.autoConfirm ?? true))
+              ? "Новая запись сразу подтверждена"
+              : "Новая запись ждёт подтверждения администратора"
+          }
+          checked={autoConfirm.isPending ? !!autoConfirm.variables : (service.autoConfirm ?? true)}
+          onChange={(value) => autoConfirm.mutate(value)}
+        />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">

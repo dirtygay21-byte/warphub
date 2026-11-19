@@ -32,6 +32,13 @@ const CFG = {
 
 // Справочники форм записи — из настоящего конфига сервера (backend/src/config/booking.ts → bookingOptions), чтобы демо
 // не отставало от приложения (13.11.2026: без games / killTeamGroups экран записей падал).
+const DEMO_CURATOR = { on: false, areas: ['kt', 'warcry'] };
+const DEMO_ADMINS = [
+  { telegramId: 1001, builtin: true, note: null, name: 'Егор Коренев', username: 'egor', addedAt: null, addedByTelegramId: null, areas: [] },
+  { telegramId: 4004, builtin: false, note: 'куратор тактических', name: 'Дмитрий Волков', username: 'volk_40k', addedAt: '2026-11-10T12:00:00Z', addedByTelegramId: 1001, areas: ['kt', 'warcry'] },
+  { telegramId: 5005, builtin: false, note: 'покраска', name: 'Ольга Кузнецова', username: 'olga_paints', addedAt: '2026-11-12T12:00:00Z', addedByTelegramId: 1001, areas: [] },
+];
+
 function realBookingOptions() {
   const src = fs.readFileSync(new URL('../../backend/src/config/booking.ts', import.meta.url), 'utf8');
   const from = src.indexOf('export const bookingOptions = {');
@@ -1406,6 +1413,22 @@ export function createFakeBackend({ users }) {
       }
       sessions.sort((a, b) => a.startsAt.localeCompare(b.startsAt) || a.tableId - b.tableId);
       return { date: q.date, tables, sessions, painting, paintingCapacity, holds: [] };
+    }],
+    // кураторы направлений (17.11.2026): «кто я» и список администраторов; POST /demo/curator — переключить демо-куратора
+    ['GET', /^\/admin\/me$/, 'admin', ({ user }) => ({
+      telegramId: user.telegramId, builtin: !DEMO_CURATOR.on, full: !DEMO_CURATOR.on, areas: DEMO_CURATOR.on ? DEMO_CURATOR.areas : [],
+      areaOptions: [['40k', 'Warhammer 40K'], ['aos', 'Age of Sigmar'], ['kt', 'Kill Team'], ['warcry', 'Warcry'], ['painting', 'Покраска'], ['dnd', 'D&D'], ['club', 'Посещение клуба']].map(([value, label]) => ({ value, label })),
+    })],
+    ['GET', /^\/admin\/admins$/, 'admin', () => ({ admins: DEMO_ADMINS, canManage: !DEMO_CURATOR.on })],
+    ['PUT', /^\/admin\/admins\/(\d+)\/areas$/, 'admin', ({ m, body }) => {
+      const a = DEMO_ADMINS.find((x) => String(x.telegramId) === m[1] && !x.builtin);
+      if (!a) fail(404, 'Такого администратора нет');
+      a.areas = (body?.areas ?? []).filter((x) => ['40k', 'aos', 'kt', 'warcry', 'painting', 'dnd', 'club'].includes(x));
+      return { admins: DEMO_ADMINS };
+    }],
+    ['POST', /^\/demo\/curator$/, 'public', ({ body }) => {
+      DEMO_CURATOR.on = !!body?.on;
+      return DEMO_CURATOR;
     }],
     ['GET', /^\/admin\/users$/, 'admin', ({ q }) => {
       const name = String(q.username ?? '').trim().replace(/^@/, '').toLowerCase();

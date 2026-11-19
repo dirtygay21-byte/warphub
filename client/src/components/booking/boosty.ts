@@ -12,3 +12,13 @@ export const boostyKindForService = (
   if (service.slug === "wh_painting") return "painting";
   return service.slug.startsWith("wh_") ? "warhammer" : null;
 };
+
+/** Открыть Boosty: внутри Telegram — openLink, иначе новая вкладка. */
+export function openBoostySubscription(url: string) {
+  const webApp = typeof window !== "undefined" ? window.Telegram?.WebApp : undefined;
+  if (webApp && typeof webApp.openLink === "function") {
+    webApp.openLink(url);
+    return;
+  }
+  window.open(url, "_blank", "noopener,noreferrer");
+}

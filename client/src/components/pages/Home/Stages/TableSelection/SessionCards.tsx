@@ -1,31 +1,17 @@
-import type { AvailabilitySegment, TableSession } from "@/apiUtils/booking";
 import { formatClubTime, formatClubTimeRange } from "@/utils/clubTime";
 import { getWindowLimit, hoursLabel } from "@/utils/slots";
-import { formatDurationLabel } from "@/utils/duration";
 import clsx from "clsx";
-import { ChevronDown, ChevronRight, GraduationCap, Swords, UsersRound } from "lucide-react";
-import { PlayerInfo } from "@/components/booking/PlayerInfo";
+import { ChevronDown, GraduationCap, UsersRound } from "lucide-react";
+import { CopyNick, PlayerInfo } from "@/components/booking/PlayerInfo";
+import { StubTime, Ticket, TicketKicker, TicketTag } from "@/components/booking/Ticket";
+import { gameHasPoints, gameLabelOf, killTeamWithFaction, type AvailabilitySegment, type TableSession } from "@/apiUtils/booking";
+import { useBookingOptions } from "@/hooks/useBookingOptions";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { Badge, DsButton } from "@/components/ui/ds";
+import { Worm } from "@/components/ui/ds";
 import { haptic } from "@/utils/haptic";
 
 type WindowLimit = ReturnType<typeof getWindowLimit>;
-
-function OccupancyBadge({
-  occupied,
-  capacity,
-}: {
-  occupied: number;
-  capacity: number;
-}) {
-  const full = occupied >= capacity;
-  return (
-    <Badge tone={full ? "danger" : occupied > 0 ? "warn" : "muted"} className="tabular-nums" >
-      {occupied}/{capacity}
-    </Badge>
-  );
-}
 
 export function TrainerBadge({ players }: { players: number }) {
   return (
@@ -36,7 +22,10 @@ export function TrainerBadge({ players }: { players: number }) {
   );
 }
 
-/** Игра 1/2: свёрнутая карточка (время, игрок, игра); по нажатию — игроки (ник, армия, очки, опыт) и «Присоединиться» */
+/**
+ * «Ищут соперника» (макет 17.11.2026): не билет, а раскрывающаяся карточка. Свёрнуто — лаймовая шапка с червяком:
+ * кто, армия и очки, когда. Развёрнуто (плавно, остальное сдвигается вниз) — строка VS, 4 факта и одна кнопка.
+ */
 export function OpenSessionCard({
   session,
   hasTrainer,
@@ -47,13 +36,20 @@ export function OpenSessionCard({
   onJoin: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const options = useBookingOptions();
   const first = session.players[0];
-  const summary = [first?.firstName, first?.experienceLabel, first?.army ? first.gameLabel ?? "Warhammer 40,000" : null]
-    .filter(Boolean)
-    .join(" · ");
+  const others = session.players.slice(1);
+  const game = first?.game ?? (first?.army ? "40k" : null);
+  const army = first?.army ? (game === "kt" ? killTeamWithFaction(options, first.army) : first.army) : null;
+  const points = first?.points != null && gameHasPoints(game) ? first.points : null;
+  const level = first?.experienceLevel ? options.experienceLevels.find((l) => l.value === first.experienceLevel) : undefined;
+  const experienceLabel = first?.experienceLabel ?? level?.label ?? null;
+  const experience = experienceLabel ? [experienceLabel, level?.hint].filter(Boolean).join(" · ") : null;
+  const name = first?.firstName || "Игрок";
+  const subtitle = [army, points != null ? `${points} очк.` : null].filter(Boolean).join(" · ") || experienceLabel || "Армия не указана";
 
   return (
-    <article className={clsx("overflow-hidden rounded-[16px] border bg-app-elevated transition-colors duration-200", open ? "border-accent" : "border-accent/40")}>
+    <article className={clsx("overflow-hidden rounded-[22px] border bg-app-elevated transition-colors duration-200", open ? "border-accent" : "border-accent/35")}>
       <button
         type="button"
         onClick={() => {
@@ -61,81 +57,97 @@ export function OpenSessionCard({
           setOpen((value) => !value);
         }}
         aria-expanded={open}
-        className="ds-press flex min-h-[64px] w-full items-center gap-3 px-4 py-3 text-left"
+        className="ds-press relative isolate flex min-h-[68px] w-full items-center gap-3 overflow-hidden bg-accent px-3.5 py-3 text-left text-[#111110]"
       >
-        <span className="min-w-0 flex-1">
-          <span className="block text-base font-bold">{formatClubTimeRange(session.startsAt, session.endsAt)}</span>
-          {summary && <span className="mt-0.5 block truncate text-sm text-fg-2">{summary}</span>}
+        <svg aria-hidden="true" width="190" height="90" viewBox="0 0 190 90" className="pointer-events-none absolute -right-[30px] -top-[14px] -z-10 opacity-[0.16]">
+          <Worm x={20} y={70} angle={-24} period={120} amp={12} width={16} seconds={9} />
+        </svg>
+        <span className="grid size-[42px] shrink-0 place-items-center rounded-full bg-[#111110] text-base font-extrabold text-accent">
+          {name.slice(0, 1).toUpperCase()}
         </span>
-        <OccupancyBadge occupied={session.occupied} capacity={session.capacity} />
-        <ChevronDown className={clsx("size-5 shrink-0 text-accent transition-transform duration-200", open && "rotate-180")} />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-base font-extrabold">{name}</span>
+          <span className="mt-0.5 block truncate text-[13px] font-semibold opacity-75">{subtitle}</span>
+        </span>
+        <span className="shrink-0 text-right">
+          <span className="block font-display text-[18px] font-bold leading-none tabular-nums">{formatClubTime(session.startsAt)}</span>
+          <span className="mt-[3px] block text-[12px] font-semibold opacity-75">до {formatClubTime(session.endsAt)}</span>
+        </span>
+        <ChevronDown className={clsx("size-[18px] shrink-0 transition-transform duration-300", open && "rotate-180")} strokeWidth={2.4} />
       </button>
 
-      {open && (
-        <div className="ds-fade border-t border-white/[0.06] px-4 pb-4 pt-3">
-          {hasTrainer && (
-            <div className="mb-3">
-              <TrainerBadge players={session.capacity} />
+      <div className={clsx("grid transition-[grid-template-rows] duration-[350ms] ease-[cubic-bezier(.2,.8,.2,1)] motion-reduce:transition-none", open ? "grid-rows-[1fr]" : "grid-rows-[0fr]")}>
+        <div className="min-h-0 overflow-hidden" inert={!open}>
+          <div className="border-t border-white/[0.06] p-3.5">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2.5 rounded-2xl bg-app-bg p-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-extrabold">{army ?? "Армия не указана"}</p>
+                {points != null && <p className="mt-0.5 font-display text-[20px] font-bold leading-none tabular-nums">{points}</p>}
+              </div>
+              <span className="font-display text-[22px] font-bold text-accent">VS</span>
+              <div className="min-w-0 text-right">
+                <p className="text-sm font-extrabold text-accent">Вы</p>
+                <p className="mt-0.5 text-[12px] text-fg-3">армия — на след. шаге</p>
+              </div>
             </div>
-          )}
-          <ul className="space-y-2">
-            {session.players.map((player, index) => (
-              <li key={index}>
-                <PlayerInfo player={player} />
-              </li>
-            ))}
-          </ul>
-          <p className="mt-3 text-[13px] text-fg-2">
-            {session.freeSeats === 1 ? "Свободно 1 место" : `Свободно мест: ${session.freeSeats}`}
-          </p>
-          <DsButton variant="primary" onClick={onJoin} className="mt-3 w-full">
-            <Swords className="size-4" />
-            Присоединиться к игре
-          </DsButton>
+            <dl className="mt-3.5 grid grid-cols-2 gap-x-3.5 gap-y-3">
+              <Fact label="Опыт">{experience ?? "—"}</Fact>
+              <Fact label="Стол">
+                {session.tableName} · {session.occupied} из {session.capacity}
+              </Fact>
+              <Fact label="Игра">{first?.gameLabel ?? gameLabelOf(options, game)}</Fact>
+              <Fact label="Telegram">
+                <CopyNick username={first?.username} />
+              </Fact>
+            </dl>
+            {hasTrainer && (
+              <div className="mt-3">
+                <TrainerBadge players={session.capacity} />
+              </div>
+            )}
+            {others.length > 0 && (
+              <ul className="mt-3 space-y-2">
+                {others.map((player, index) => (
+                  <li key={index}>
+                    <PlayerInfo player={player} />
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                haptic.tap();
+                onJoin();
+              }}
+              className="ds-press fx-press mt-3.5 grid h-12 w-full place-items-center rounded-[14px] border-[1.5px] border-accent text-[15px] font-extrabold text-accent"
+            >
+              Играть с игроком {name}
+            </button>
+          </div>
         </div>
-      )}
+      </div>
     </article>
   );
 }
 
-/** Строка-выбор: вся карточка нажимается (концепт «Начать новую игру»). */
-function PickCard({
-  disabled,
-  tone,
-  onSelect,
-  children,
-  aside,
-}: {
-  disabled: boolean;
-  tone: "normal" | "limited" | "none";
-  onSelect: () => void;
-  children: ReactNode;
-  aside: ReactNode;
-}) {
+function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={() => {
-        haptic.tap();
-        onSelect();
-      }}
-      className={clsx(
-        "flex min-h-[64px] w-full items-center gap-3.5 rounded-[16px] border bg-app-elevated px-4 py-3.5 text-left",
-        disabled ? "cursor-not-allowed border-white/[0.08] opacity-60" : "ds-press fx-press active:border-accent",
-        !disabled && (tone === "limited" ? "border-danger/50" : "border-white/[0.14]"),
-      )}
-    >
-      <span className="min-w-0 flex-1">{children}</span>
-      <span className="flex shrink-0 items-center gap-2">
-        {aside}
-        {!disabled && <ChevronRight className="size-5 text-fg-3" />}
-      </span>
-    </button>
+    <div className="min-w-0">
+      <dt className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-fg-3">{label}</dt>
+      <dd className="mt-[3px] min-w-0 truncate text-sm font-bold">{children}</dd>
+    </div>
   );
 }
 
-/** Свободное время за столом — начать новую игру */
+/** Корешок: время начала и «и позже» (окно длиннее брони) или «до HH:MM». */
+function startStub(segment: AvailabilitySegment, durationMinutes: number, limit: WindowLimit) {
+  if (limit.state === "limited") return <StubTime time={formatClubTime(segment.startsAt)} note={`до ${formatClubTime(limit.until)}`} />;
+  const windowMinutes = (new Date(segment.endsAt).getTime() - new Date(segment.startsAt).getTime()) / 60000;
+  return <StubTime time={formatClubTime(segment.startsAt)} note={windowMinutes > durationMinutes ? "и позже" : `до ${formatClubTime(segment.endsAt)}`} />;
+}
+
+/** Свободное время за столом — начать новую игру (билет: подпись стола, окно, метки; корешок — начало). */
 export function FreeSlotCard({
   label,
   segment,
@@ -153,53 +165,50 @@ export function FreeSlotCard({
   hasTrainer: boolean;
   onSelect: () => void;
 }) {
-  const duration = formatDurationLabel(durationMinutes);
+  const none = limit.state === "none";
   return (
-    <PickCard
-      disabled={limit.state === "none"}
-      tone={limit.state === "limited" ? "limited" : limit.state === "none" ? "none" : "normal"}
-      onSelect={onSelect}
-      aside={<OccupancyBadge occupied={0} capacity={capacity} />}
+    <Ticket
+      tone={none ? "busy" : "normal"}
+      disabled={none}
+      onClick={onSelect}
+      ariaLabel={`${label}, свободно ${formatClubTimeRange(segment.startsAt, segment.endsAt)}`}
+      stub={none ? <span className="text-[12.5px] font-bold text-fg-2">Не хватает времени</span> : startStub(segment, durationMinutes, limit)}
     >
-      <span className="block text-base font-bold">{label}</span>
-      <span className="mt-0.5 block text-sm text-fg-2">
-        Свободно {formatClubTimeRange(segment.startsAt, segment.endsAt)}
-        {duration && <span className="whitespace-nowrap"> · {duration}</span>}
+      <TicketKicker>{label}</TicketKicker>
+      <span className="mt-1 block text-base font-extrabold">Свободно {formatClubTimeRange(segment.startsAt, segment.endsAt)}</span>
+      <span className="mt-2 flex flex-wrap gap-1.5">
+        <LimitNote limit={limit} durationMinutes={durationMinutes} />
+        {capacity >= 2 && <TicketTag>0/{capacity}</TicketTag>}
+        {hasTrainer && <TrainerBadge players={capacity} />}
       </span>
-      {hasTrainer && (
-        <span className="mt-2 block">
-          <TrainerBadge players={capacity} />
-        </span>
-      )}
-      <LimitNote limit={limit} durationMinutes={durationMinutes} />
-    </PickCard>
+    </Ticket>
   );
 }
 
 /**
- * Предупреждение красным (B1): окно короче полной длительности — запись возможна, но только на N часов;
- * короче минимума — записаться нельзя.
+ * Метка длительности (B1, по цветам 17.11.2026 — янтарь вместо красной рамки): окно короче полной длительности —
+ * «2 ч вместо 3 ч»; короче минимума — записаться нельзя; иначе «Полные 3 ч».
  */
 export function LimitNote({ limit, durationMinutes }: { limit: WindowLimit; durationMinutes: number }) {
-  if (limit.state === "full") return null;
-  if (limit.state === "none")
-    return <span className="mt-1.5 block text-[13px] font-semibold text-danger">Свободного времени не хватает даже на укороченную запись</span>;
-  return (
-    <span className="mt-1.5 block rounded-lg border border-danger/40 bg-danger/10 px-2 py-1 text-[13px] font-semibold text-danger">
-      Только {hoursLabel(limit.maxMinutes)} вместо {hoursLabel(durationMinutes)} — до {formatClubTime(limit.until)}
-    </span>
-  );
+  if (limit.state === "none") return <TicketTag tone="warn">Не хватает даже на укороченную запись</TicketTag>;
+  if (limit.state === "limited")
+    return (
+      <TicketTag tone="warn">
+        {hoursLabel(limit.maxMinutes)} вместо {hoursLabel(durationMinutes)}
+      </TicketTag>
+    );
+  return <TicketTag>Полные {hoursLabel(durationMinutes)}</TicketTag>;
 }
 
+/** Занятый стол — штриховка (правило цветов: штриховка = занято). */
 export function FullSessionRow({ session }: { session: TableSession }) {
   return (
-    <div className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-fg-2">
-      <span>{formatClubTimeRange(session.startsAt, session.endsAt)}</span>
-      <span className="flex items-center gap-2">
-        <span className="text-[13px]">Мест нет</span>
-        <OccupancyBadge occupied={session.occupied} capacity={session.capacity} />
+    <Ticket tone="busy" stub={<span className="text-[12.5px] font-bold text-fg-2">Мест нет</span>}>
+      <TicketKicker>{session.tableName}</TicketKicker>
+      <span className="mt-1 block text-sm font-bold">
+        Занято {formatClubTimeRange(session.startsAt, session.endsAt)} · {session.occupied}/{session.capacity}
       </span>
-    </div>
+    </Ticket>
   );
 }
 
@@ -219,22 +228,26 @@ export function PoolSlotCard({
 }) {
   const occupied = capacity - segment.freeSeats;
   const full = segment.freeSeats <= 0 || limit.state === "none";
-  const duration = formatDurationLabel(durationMinutes);
 
   return (
-    <PickCard
+    <Ticket
+      tone={full ? "busy" : "normal"}
       disabled={full}
-      tone={limit.state === "limited" ? "limited" : "normal"}
-      onSelect={onSelect}
-      aside={<OccupancyBadge occupied={occupied} capacity={capacity} />}
+      onClick={onSelect}
+      ariaLabel={`Свободно ${formatClubTimeRange(segment.startsAt, segment.endsAt)}`}
+      stub={full ? <span className="text-[12.5px] font-bold text-fg-2">Мест нет</span> : startStub(segment, durationMinutes, limit)}
     >
-      <span className="block text-base font-bold">{formatClubTimeRange(segment.startsAt, segment.endsAt)}</span>
-      <span className="mt-0.5 block text-sm text-fg-2">
-        {full ? "Мест нет" : `Занято ${occupied} из ${capacity} · свободно ${segment.freeSeats}`}
-        {!full && duration && <span className="whitespace-nowrap"> · {duration}</span>}
+      <TicketKicker>Общий зал</TicketKicker>
+      <span className="mt-1 block text-base font-extrabold">
+        {full ? "Занято" : "Свободно"} {formatClubTimeRange(segment.startsAt, segment.endsAt)}
       </span>
-      {segment.freeSeats > 0 && <LimitNote limit={limit} durationMinutes={durationMinutes} />}
-    </PickCard>
+      <span className="mt-2 flex flex-wrap gap-1.5">
+        {segment.freeSeats > 0 && <LimitNote limit={limit} durationMinutes={durationMinutes} />}
+        <TicketTag>
+          {occupied}/{capacity}
+        </TicketTag>
+      </span>
+    </Ticket>
   );
 }
 

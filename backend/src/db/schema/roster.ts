@@ -1,4 +1,4 @@
-import { boolean, index, integer, pgTable, serial, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { bigint, boolean, index, integer, pgTable, primaryKey, serial, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { usersTable } from './users';
 
 /**
@@ -42,4 +42,30 @@ export const rosterCodeAttemptsTable = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [index('roster_code_attempts_user_time_idx').on(table.userId, table.createdAt)],
+);
+
+/**
+ * Группы Telegram, в которых состоит бот WarpHub (17.11.2026): узнаём из событий бота. purpose = 'boosty' — группа
+ * подписчиков Boosty: её участникам WarpBuilder открыт, пока они в группе (выбирает основной администратор).
+ */
+export const telegramGroupsTable = pgTable('telegram_groups', {
+  chatId: bigint('chat_id', { mode: 'number' }).primaryKey(),
+  title: text('title').notNull().default(''),
+  type: text('type').notNull().default('group'),
+  /** статус бота в группе: administrator / member / left / kicked */
+  botStatus: text('bot_status').notNull().default('member'),
+  purpose: text('purpose'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+/** Участники группы Boosty (по событиям бота и проверке при входе в WarpBuilder). */
+export const telegramGroupMembersTable = pgTable(
+  'telegram_group_members',
+  {
+    chatId: bigint('chat_id', { mode: 'number' }).notNull(),
+    telegramId: bigint('telegram_id', { mode: 'number' }).notNull(),
+    isMember: boolean('is_member').notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.chatId, table.telegramId] })],
 );

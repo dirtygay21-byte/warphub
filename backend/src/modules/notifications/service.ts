@@ -5,7 +5,8 @@
  * Отключить все уведомления (например, на тестовом сервере):
  *   TELEGRAM_NOTIFICATIONS=off
  */
-import { getAdminTelegramIds } from '../../config/admin';
+import { adminRecipientsFor, getAdminTelegramIds } from '../../config/admin';
+import type { AdminArea } from '../../config/admin-areas';
 import { env } from '../../config/env';
 import { describeSendResult, escapeHtml, formatClubDateTime, formatUserName, type SendResult } from '../../lib/telegram/format';
 
@@ -39,7 +40,7 @@ export function describeRoute() {
 }
 
 /** Запрос к Bot API по выбранному маршруту. */
-function telegramFetch(method: string, init: RequestInit & { timeoutMs?: number } = {}) {
+export function telegramFetch(method: string, init: RequestInit & { timeoutMs?: number } = {}) {
   const { base, proxy } = telegramRoute();
   const { timeoutMs = 10_000, ...rest } = init;
   return fetch(`${base}/bot${env.telegramBotToken}/${method}`, {
@@ -231,9 +232,9 @@ export async function sendTelegramMessage(chatId: number | string, text: string,
   return (await sendTelegramMessageDetailed(chatId, text, kind)).ok;
 }
 
-/** Отправить сообщение всем администраторам (не ждёт результата) */
-export function notifyAdmins(text: string): void {
-  for (const adminId of getAdminTelegramIds()) {
+/** Сообщение администраторам (не ждёт результата): с полным доступом и кураторам направления `area` (17.11.2026). */
+export function notifyAdmins(text: string, area: AdminArea | null = null): void {
+  for (const adminId of adminRecipientsFor(area)) {
     void sendTelegramMessage(adminId, text, 'admin');
   }
 }

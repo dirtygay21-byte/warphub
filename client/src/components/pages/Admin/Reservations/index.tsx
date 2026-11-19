@@ -78,7 +78,8 @@ export default function AdminReservations() {
   const queryClient = useQueryClient();
   const bookingOptions = useBookingOptions();
   // Категории и порядок (14.11.2026): по умолчанию — только ожидающие подтверждения
-  const [categories, setCategories] = useState<string[]>(["pending"]);
+  // автоподтверждение (17.11.2026): по умолчанию — ждущие и подтверждённые (ждущих почти не бывает)
+  const [categories, setCategories] = useState<string[]>(["pending", "confirmed"]);
   const [sortIndex, setSortIndex] = useState(0);
   const queryParams = useMemo(() => {
     const sort = RESERVATION_SORTS[sortIndex] ?? RESERVATION_SORTS[0]!;
@@ -332,7 +333,7 @@ export default function AdminReservations() {
 
   return (
     <div className="px-4 py-3 pb-28 text-white sm:px-6">
-      {pendingTotal != null && (
+      {pendingTotal != null && pendingTotal > 0 && (
         <LimeHero
           tone={pendingTotal > 0 ? "warn" : "lime"}
           kicker="Ждут подтверждения"

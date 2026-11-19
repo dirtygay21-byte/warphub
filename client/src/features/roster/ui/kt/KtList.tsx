@@ -1,4 +1,5 @@
 import { learnDone } from '@/components/tutorial/progress';
+import { photoKey } from '../../photos';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadKtTeam } from '../../data';
@@ -75,6 +76,7 @@ export function KtList({
                 updatedAt={r.updatedAt}
                 onOpen={() => onOpen(r.id)}
                 onMenu={() => setMenu(r)}
+                photos={r.operatives.map((x) => ({ key: photoKey('kt', x.opTypeId), name: r.name }))}
               />
             );
           })}

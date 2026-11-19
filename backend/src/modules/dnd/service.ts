@@ -409,6 +409,7 @@ export async function bookDndGame(
         `Опыт: ${escapeHtml(experienceLabel(booking.experienceLevel))}`,
         `Занято: ${occupied}/${game.capacity}`,
       ].join('\n'),
+      'dnd',
     );
   })().catch((error) => console.warn('[notify] dnd booking failed', error));
 
@@ -453,6 +454,7 @@ export async function cancelDndBooking(
         `Игрок: ${escapeHtml(user ? formatUserName(user) : '—')}`,
         `Освободилось мест: ${row.booking.quantity}`,
       ].join('\n'),
+      'dnd',
     );
   })().catch((error) => console.warn('[notify] dnd cancel failed', error));
 
@@ -544,6 +546,7 @@ export async function createTrialRequest(
       ]
         .filter(Boolean)
         .join('\n'),
+      'dnd',
     );
   })().catch((error) => console.warn('[notify] trial request failed', error));
 

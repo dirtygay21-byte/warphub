@@ -4,7 +4,8 @@
  * объявления (поиск соперника, новости, ивенты, рассылки) — через очередь notification_outbox.
  */
 import { and, asc, count, eq, gte, inArray, lte, sql } from 'drizzle-orm';
-import { getAdminTelegramIds } from '../../config/admin';
+import { adminRecipientsFor } from '../../config/admin';
+import type { AdminArea } from '../../config/admin-areas';
 import { bookingConfig } from '../../config/booking';
 import { db } from '../../db';
 import {
@@ -169,11 +170,14 @@ export async function notifyKind(
   await sendTelegramMessageDetailed(telegramId, text, kindId, extra);
 }
 
-/** Всем администраторам. */
-export async function notifyKindAdmins(kindId: string, vars: Record<string, string | number | null | undefined>) {
+/**
+ * Администраторам (17.11.2026, кураторы направлений): всем с полным доступом и кураторам направления `area`.
+ * Без направления (null) — только администраторам с полным доступом (системные сообщения).
+ */
+export async function notifyKindAdmins(kindId: string, vars: Record<string, string | number | null | undefined>, area: AdminArea | null = null) {
   const text = await renderKind(kindId, vars);
   if (!text) return;
-  for (const id of getAdminTelegramIds()) void sendTelegramMessageDetailed(id, text, kindId);
+  for (const id of adminRecipientsFor(area)) void sendTelegramMessageDetailed(id, text, kindId);
 }
 
 /** Типы, на которые действует дневной лимит (автоматические объявления; рассылки владельца — нет). */

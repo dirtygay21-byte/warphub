@@ -79,8 +79,9 @@ function broadcastError(error: unknown) {
   if (error instanceof BroadcastError) return status(error.code === 'NOT_FOUND' ? 404 : error.code === 'FORBIDDEN' ? 403 : 400, { error: error.message });
   return status(500, { error: (error as Error).message });
 }
-import { addAdmin, AdminsError, listAdmins, removeAdmin } from '../admins/service';
+import { addAdmin, AdminsError, listAdmins, removeAdmin, setAdminAreas } from '../admins/service';
 import { isBuiltinAdmin } from '../../config/admin';
+import { ADMIN_AREAS, AREA_LABELS, canSeeArea, reservationArea } from '../../config/admin-areas';
 import {
   createEvent,
   deleteEvent,
@@ -124,6 +125,7 @@ import {
   applyTrainingDiscount,
   ensureReservationPricing,
   listServicePrices,
+  setServiceAutoConfirm,
   PricingError,
   removeManualDiscount,
   upsertServicePrice,
@@ -290,9 +292,9 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
   })
   .get(
     '/reservations/count',
-    async ({ query }) => {
+    async ({ query, adminAreas }) => {
       try {
-        const total = await countReservations(query);
+        const total = await countReservations({ ...query, areas: adminAreas });
         return { count: total };
       } catch (error) {
         if (error instanceof BookingError) return mapBookingError(error);
@@ -311,9 +313,9 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
   )
   .get(
     '/reservations',
-    async ({ query }) => {
+    async ({ query, adminAreas }) => {
       try {
-        return await withTableGames(await listReservations(query));
+        return await withTableGames(await listReservations({ ...query, areas: adminAreas }));
       } catch (error) {
         if (error instanceof BookingError) return mapBookingError(error);
 
@@ -331,6 +333,18 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
   )
   .get('/pricing/services', async () => listServicePrices(), {
     detail: { tags: ['Admin'], summary: 'Тарифы всех услуг' },
+  })
+  .put('/services/:serviceId/auto-confirm', async ({ params, body }) => {
+    try {
+      return await setServiceAutoConfirm(params.serviceId, body.autoConfirm);
+    } catch (error) {
+      if (error instanceof PricingError) return mapPricingError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    params: t.Object({ serviceId: t.Number() }),
+    body: t.Object({ autoConfirm: t.Boolean() }),
+    detail: { tags: ['Admin'], summary: 'Автоподтверждение записей услуги (вкл. — запись сразу подтверждена)' },
   })
   .put('/pricing/services/:serviceId', async ({ params, body, user }) => {
     try {
@@ -592,9 +606,17 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
   })
   .get(
     '/warhammer/day',
-    async ({ query }) => {
+    async ({ query, adminAreas }) => {
       try {
-        return await getAdminWarhammerDay(query.date);
+        const day = await getAdminWarhammerDay(query.date);
+        if (!adminAreas) return day;
+        // куратор (17.11.2026): игры только своих направлений, покраска — если она его направление
+        const mine = (p: { details: unknown }, slug: string) => canSeeArea(adminAreas, reservationArea(slug, p.details as { kind?: string; game?: string } | null));
+        return {
+          ...day,
+          sessions: day.sessions.filter((session) => session.players.some((p) => mine(p, session.serviceSlug))),
+          painting: day.painting.filter((p) => mine(p, p.serviceSlug)),
+        };
       } catch (error) {
         if (error instanceof BookingError) return mapBookingError(error);
         return status(400, { error: (error as Error).message });
@@ -1516,6 +1538,19 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
       summary: 'Проверить уведомления: тестовое сообщение от бота себе',
       description: 'Возвращает, доставлено ли сообщение, а если нет — причину (не нажат «Старт», неверный токен, уведомления выключены, нет связи).',
     },
+  })
+  .get('/me', ({ user, adminAreas }) => ({
+    telegramId: user.telegramId,
+    builtin: isBuiltinAdmin(user),
+    full: adminAreas === null,
+    areas: adminAreas ?? [],
+    areaOptions: ADMIN_AREAS.map((value) => ({ value, label: AREA_LABELS[value] })),
+  }), {
+    detail: { tags: ['Admin'], summary: 'Кто я в админке: полный доступ или направления куратора' },
+  })
+  .put('/admins/:telegramId/areas', ({ user, params, body }) => adminsGuard(() => setAdminAreas(user, params.telegramId, body.areas)), {
+    body: t.Object({ areas: t.Array(t.String({ maxLength: 20 }), { maxItems: 20 }) }),
+    detail: { tags: ['Admin'], summary: 'Направления куратора (только основные администраторы); пустой список — полный доступ' },
   })
   .get('/admins', async ({ user }) => ({ ...(await listAdmins()), canManage: isBuiltinAdmin(user) }), {
     detail: { tags: ['Admin'], summary: 'Администраторы: основные и добавленные по Telegram ID' },

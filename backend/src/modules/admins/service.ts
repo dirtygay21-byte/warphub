@@ -4,7 +4,8 @@
  * прав оставалась мгновенной; копия обновляется при старте сервера, раз в 5 минут и после каждого изменения.
  */
 import { eq, inArray } from 'drizzle-orm';
-import { getBuiltinAdminIds, isBuiltinAdmin, setAddedAdminIds } from '../../config/admin';
+import { getBuiltinAdminIds, isBuiltinAdmin, setAddedAdmins } from '../../config/admin';
+import { type AdminArea, AREA_LABELS, cleanAreas } from '../../config/admin-areas';
 import { db } from '../../db';
 import { adminUsersTable, usersTable } from '../../db/schema';
 import { notifyUser } from '../notifications/service';
@@ -23,8 +24,12 @@ export class AdminsError extends Error {
 /** Перечитать добавленных администраторов в память. Ошибка (например, нет таблицы до миграции) — только в лог. */
 export async function refreshAddedAdmins(): Promise<void> {
   try {
-    const rows = await db.select({ id: adminUsersTable.telegramId }).from(adminUsersTable);
-    setAddedAdminIds(rows.map((r) => r.id));
+    const rows = await db
+      .select({ id: adminUsersTable.telegramId, areas: adminUsersTable.areas })
+      .from(adminUsersTable)
+      // до миграции 0032 колонки areas нет — администраторы остаются с полным доступом
+      .catch(async () => (await db.select({ id: adminUsersTable.telegramId }).from(adminUsersTable)).map((r) => ({ ...r, areas: [] as string[] })));
+    setAddedAdmins(rows);
   } catch (error) {
     console.warn('[admins] could not load admin_users:', (error as Error).message);
   }
@@ -38,6 +43,8 @@ export type AdminEntry = {
   username: string | null;
   addedAt: string | null;
   addedByTelegramId: number | null;
+  /** направления куратора; пусто — полный доступ */
+  areas: AdminArea[];
 };
 
 /** Все администраторы: встроенные (удалить нельзя) и добавленные; имя — если человек уже входил в приложение. */
@@ -58,7 +65,7 @@ export async function listAdmins(): Promise<{ admins: AdminEntry[] }> {
   };
   return {
     admins: [
-      ...builtin.map((id) => ({ telegramId: id, builtin: true, note: null, name: name(id), username: who(id)?.username ?? null, addedAt: null, addedByTelegramId: null })),
+      ...builtin.map((id) => ({ telegramId: id, builtin: true, note: null, name: name(id), username: who(id)?.username ?? null, addedAt: null, addedByTelegramId: null, areas: [] })),
       ...added
         .filter((a) => !builtin.includes(a.telegramId))
         .map((a) => ({
@@ -69,6 +76,7 @@ export async function listAdmins(): Promise<{ admins: AdminEntry[] }> {
           username: who(a.telegramId)?.username ?? null,
           addedAt: a.addedAt.toISOString(),
           addedByTelegramId: a.addedByTelegramId,
+          areas: cleanAreas(a.areas),
         })),
     ],
   };
@@ -102,5 +110,24 @@ export async function removeAdmin(by: User, rawId: unknown) {
   const removed = await db.delete(adminUsersTable).where(eq(adminUsersTable.telegramId, telegramId)).returning();
   if (!removed.length) throw new AdminsError('NOT_FOUND', 'Такого администратора нет');
   await refreshAddedAdmins();
+  return listAdmins();
+}
+
+/** Направления куратора (17.11.2026): задают только основные администраторы; пустой список — полный доступ. */
+export async function setAdminAreas(by: User, rawId: unknown, rawAreas: unknown) {
+  requireBuiltin(by);
+  const telegramId = parseTelegramId(rawId);
+  if (telegramId === null) throw new AdminsError('BAD_ID', 'Telegram ID — положительное число до 15 цифр');
+  if (getBuiltinAdminIds().includes(String(telegramId))) throw new AdminsError('BUILTIN', 'У основного администратора всегда полный доступ');
+  const areas = cleanAreas(rawAreas);
+  const updated = await db.update(adminUsersTable).set({ areas }).where(eq(adminUsersTable.telegramId, telegramId)).returning();
+  if (!updated.length) throw new AdminsError('NOT_FOUND', 'Такого администратора нет');
+  await refreshAddedAdmins();
+  notifyUser(
+    telegramId,
+    areas.length
+      ? `🛡 <b>Ваши направления в админке WarpHub:</b> ${areas.map((a) => AREA_LABELS[a]).join(', ')}.\nУведомления и разделы админки — по этим направлениям.`
+      : '🛡 <b>Вам открыт полный доступ к админке WarpHub.</b>',
+  );
   return listAdmins();
 }

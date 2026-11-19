@@ -1,10 +1,27 @@
-import { addAdmin, getAdmins, removeAdmin, type AdminEntry } from "@/apiUtils/admin";
+import { addAdmin, getAdmins, removeAdmin, setAdminAreas, type AdminArea, type AdminEntry } from "@/apiUtils/admin";
 import { confirmAsk } from "@/features/roster/telegram";
 import { formatClub } from "@/utils/clubTime";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { LoaderCircle, RefreshCw, ShieldCheck, ShieldPlus, UserX } from "lucide-react";
 import { useState } from "react";
+
+/** Направления кураторов (17.11.2026): группы для быстрого выбора и отдельные направления. */
+const AREA_OPTIONS: { value: AdminArea; label: string }[] = [
+  { value: "40k", label: "40K" },
+  { value: "aos", label: "AoS" },
+  { value: "kt", label: "Kill Team" },
+  { value: "warcry", label: "Warcry" },
+  { value: "painting", label: "Покраска" },
+  { value: "dnd", label: "D&D" },
+  { value: "club", label: "Посещение клуба" },
+];
+const AREA_GROUPS: { label: string; areas: AdminArea[] }[] = [
+  { label: "Масштабные", areas: ["40k", "aos"] },
+  { label: "Тактические", areas: ["kt", "warcry"] },
+];
+const areaText = (areas: AdminArea[] | undefined) =>
+  areas?.length ? areas.map((a) => AREA_OPTIONS.find((o) => o.value === a)?.label ?? a).join(", ") : "полный доступ";
 
 /** «6 окт., 14:30» во времени клуба */
 const when = (value: string) => formatClub(value, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -30,6 +47,11 @@ export default function AdminAdmins() {
     },
   });
   const remove = useMutation({ meta: { success: "Администратор удалён", error: true }, mutationFn: removeAdmin, onSuccess: refresh });
+  const areasMutation = useMutation({
+    meta: { success: "Направления сохранены", error: true },
+    mutationFn: ({ id, areas }: { id: number; areas: AdminArea[] }) => setAdminAreas(id, areas),
+    onSuccess: refresh,
+  });
   const idOk = /^\d{1,15}$/.test(telegramId.trim()) && Number(telegramId) > 0;
   const canManage = list.data?.canManage ?? false;
 
@@ -98,7 +120,7 @@ export default function AdminAdmins() {
         </p>
       )}
 
-      {[add, remove].map((m, i) =>
+      {[add, remove, areasMutation].map((m, i) =>
         m.isError ? (
           <div key={i} className="mb-4 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
             {m.error.message}
@@ -111,7 +133,8 @@ export default function AdminAdmins() {
 
       <ul className="grid gap-2">
         {list.data?.admins.map((a) => (
-          <li key={a.telegramId} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/3 px-3 py-3">
+          <li key={a.telegramId} className="rounded-2xl border border-white/10 bg-white/3 px-3 py-3">
+            <div className="flex items-center gap-3">
             <div className={clsx("flex size-10 shrink-0 items-center justify-center rounded-full", a.builtin ? "bg-accent/15 text-accent" : "bg-white/10 text-white/80")}>
               <ShieldCheck className="size-5" />
             </div>
@@ -125,6 +148,7 @@ export default function AdminAdmins() {
                 {a.builtin ? " · основной" : a.addedAt ? ` · добавлен ${when(a.addedAt)}` : ""}
                 {a.note ? ` · ${a.note}` : ""}
               </p>
+              {!a.builtin && <p className="mt-0.5 text-xs text-fg-2">Направления: {areaText(a.areas)}</p>}
             </div>
             {canManage && !a.builtin && (
               <button
@@ -137,9 +161,49 @@ export default function AdminAdmins() {
                 Убрать
               </button>
             )}
+            </div>
+            {canManage && !a.builtin && (
+              <AreaPicker value={a.areas ?? []} disabled={areasMutation.isPending} onChange={(areas) => areasMutation.mutate({ id: a.telegramId, areas })} />
+            )}
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+/**
+ * Направления куратора: ничего не выбрано — полный доступ; выбрано — только эти записи, разделы и уведомления.
+ * Каждое нажатие сразу сохраняется.
+ */
+function AreaPicker({ value, disabled, onChange }: { value: AdminArea[]; disabled: boolean; onChange: (areas: AdminArea[]) => void }) {
+  const toggle = (areas: AdminArea[]) => {
+    const all = areas.every((a) => value.includes(a));
+    onChange(all ? value.filter((v) => !areas.includes(v)) : [...new Set([...value, ...areas])]);
+  };
+  const chip = (key: string, label: string, on: boolean, areas: AdminArea[]) => (
+    <button
+      key={key}
+      type="button"
+      aria-pressed={on}
+      disabled={disabled}
+      onClick={() => toggle(areas)}
+      className={clsx(
+        "min-h-9 rounded-[10px] px-3 text-[13px] font-semibold disabled:opacity-60",
+        on ? "bg-accent text-accent-foreground" : "bg-white/[0.06] text-fg-2 active:bg-white/10",
+      )}
+    >
+      {label}
+    </button>
+  );
+  return (
+    <div className="mt-3 border-t border-white/[0.06] pt-3">
+      <p className="mb-2 text-xs text-fg-3">Направления куратора — ничего не выбрано: полный доступ</p>
+      <div className="flex flex-wrap gap-1.5">
+        {AREA_GROUPS.map((g) => chip(`g-${g.label}`, g.label, g.areas.every((a) => value.includes(a)), g.areas))}
+        <span className="mx-0.5 w-px self-stretch bg-white/10" aria-hidden="true" />
+        {AREA_OPTIONS.map((o) => chip(o.value, o.label, value.includes(o.value), [o.value]))}
+      </div>
     </div>
   );
 }

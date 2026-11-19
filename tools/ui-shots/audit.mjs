@@ -108,7 +108,8 @@ for (const width of [390, 360]) {
           return true;
         });
         if (ok) {
-          await page.waitForTimeout(900);
+          // анимация «Ты записан!» (билет, корешок, штамп) заканчивается к ~3,5 с
+          await page.waitForTimeout(3800);
           const f3 = `${String(++n).padStart(2, '0')}-${width}-booking-done.jpg`;
           await page.screenshot({ path: path.join(OUT, f3), fullPage: true, type: 'jpeg', quality: 60 });
           console.log('📸', f3);
@@ -128,6 +129,13 @@ for (const width of [390, 360]) {
           await shot('booking-1-service');
           await page.locator('ul.ds-stagger li button').first().click({ timeout: 5000 });
           await shot('booking-2-time');
+          // «Ищут соперника» (17.11.2026): раскрыть первую карточку
+          const opp = page.locator('article > button[aria-expanded]').first();
+          if (await opp.count()) {
+            await opp.click({ timeout: 5000 });
+            await shot('booking-2-opponent-open');
+            await opp.click({ timeout: 5000 });
+          } else log.push(`${width} шаг 2: карточек «Ищут соперника» в демо нет`);
           await page.locator('.ds-stagger button:not([disabled])').first().click({ timeout: 5000 });
           await shot('booking-3-details');
         } catch (e) {
@@ -160,6 +168,27 @@ for (const width of [390, 360]) {
     } catch (e) {
       log.push(`${width} ${name}: НЕ ОТКРЫЛОСЬ — ${String(e.message ?? e).split('\n')[0]}`);
     }
+  }
+  // куратор направлений (17.11.2026): демо переключается на куратора Kill Team / Warcry — разделы админки и баннер
+  if (width === 390 && (!only || only.has('curator'))) {
+    try {
+      await page.evaluate((base) => fetch(base + '/api/demo/curator', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ on: true }) }), BASE);
+      for (const [name, route] of [['curator-admin', '/admin'], ['curator-warhammer', '/admin/warhammer']]) {
+        await page.goto(BASE + route, { waitUntil: 'networkidle', timeout: 20000 });
+        await page.waitForTimeout(900);
+        const f = `${String(++n).padStart(2, '0')}-${width}-${name}.jpg`;
+        await page.screenshot({ path: path.join(OUT, f), fullPage: false, type: 'jpeg', quality: 60 });
+        console.log('📸', f);
+      }
+      await page.getByRole('button', { name: /Админка/ }).first().click({ timeout: 5000 });
+      await page.waitForTimeout(500);
+      const f = `${String(++n).padStart(2, '0')}-${width}-curator-menu.jpg`;
+      await page.screenshot({ path: path.join(OUT, f), type: 'jpeg', quality: 60 });
+      console.log('📸', f);
+    } catch (e) {
+      log.push(`${width} куратор: ${String(e.message).split('\n')[0].slice(0, 160)}`);
+    }
+    await page.evaluate((base) => fetch(base + '/api/demo/curator', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ on: false }) }), BASE);
   }
   await ctx.close();
 }

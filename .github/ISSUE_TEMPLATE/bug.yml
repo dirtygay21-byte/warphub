@@ -1,0 +1,25 @@
+name: Ошибка
+description: Что-то работает не так
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Что случилось
+      description: Что делали и что увидели. Скриншот очень помогает.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Как должно быть
+  - type: dropdown
+    id: area
+    attributes:
+      label: Где
+      options: [Запись, WarpBuilder, Лига и турниры, Мини-игры, Профиль, Админка, Уведомления бота, Другое]
+  - type: input
+    id: device
+    attributes:
+      label: Устройство
+      placeholder: Android / iPhone / Telegram Desktop
