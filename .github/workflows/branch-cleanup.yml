@@ -1,0 +1,36 @@
+# Удаление веток, полностью влитых в main (20.11.2026). Запуск вручную: Actions → Branch cleanup → Run workflow.
+# По умолчанию — только список (dry_run). Никогда не трогает main, roster-builder и резервные ветки
+# (release/*, aos/data-recovery, feature/*) — они хранятся по правилам проекта (CLAUDE.md).
+name: Branch cleanup
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Только показать список (true) или удалить (false)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Find and delete merged branches
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+          keep='^(main|roster-builder|aos/data-recovery|release/.*|feature/.*)$'
+          git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin | grep -v '^HEAD$' | while read -r b; do
+            [[ "$b" =~ $keep ]] && continue
+            git merge-base --is-ancestor "origin/$b" origin/main || continue
+            if [ "$DRY_RUN" = "true" ]; then echo "would delete: $b"; else git push origin --delete "$b" && echo "deleted: $b"; fi
+          done | tee result.txt
+          { echo "### Branch cleanup (dry_run=$DRY_RUN)"; echo; echo '```'; cat result.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
