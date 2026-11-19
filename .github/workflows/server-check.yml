@@ -1,6 +1,8 @@
 # Read-only production check. Started by hand (Actions → Server check → Run workflow).
 # Connects with a key that the server allows to run only /usr/local/bin/warphub-check
 # (ops/server/warphub-check) and posts the output as a comment on the "Server check" issue.
+# Public repository (19.11.2026): issues and run logs are visible to everyone, so the sections about the server's
+# processes, Docker, Nginx and open ports are removed from the output before it is posted or summarised.
 name: Server check
 
 on:
@@ -24,6 +26,7 @@ jobs:
           SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_KNOWN_HOSTS: ${{ secrets.SERVER_KNOWN_HOSTS }}
+          REPO_PRIVATE: ${{ github.event.repository.private }}
         run: |
           for v in SERVER_SSH_KEY SERVER_HOST SERVER_KNOWN_HOSTS; do
             [ -n "${!v}" ] || { echo "::error::Repository secret $v is not set"; exit 1; }
@@ -37,6 +40,11 @@ jobs:
               "root@$SERVER_HOST" warphub-check > output.txt 2>&1
           echo "SSH_EXIT=$?" >> "$GITHUB_ENV"
           rm -f ~/.ssh/warphub_check
+          if [ "$REPO_PRIVATE" != "true" ]; then
+            awk '/^== [0-9]+ /{skip = ($0 ~ /^== (5 pm2|7 docker|9 nginx|10 open ports)/)} !skip' output.txt > output.safe
+            mv output.safe output.txt
+            echo "(public repository: pm2, docker, nginx and open-ports sections are not shown)" >> output.txt
+          fi
 
       - name: Post the output on the "Server check" issue
         if: ${{ always() && hashFiles('output.txt') != '' }}

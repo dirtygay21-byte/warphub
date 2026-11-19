@@ -69,7 +69,7 @@ build, PM2, migrations, Nginx, ports, disk) appears in the issue **"Server check
 ## 3. Manual fallback (only if GitHub Actions is unavailable)
 
 Commands marked **PC** run in PowerShell on your computer; commands marked **server** run after
-`ssh root@81.177.159.105` (the prompt shows `root@nv-143060:~#`).
+`ssh root@<server-ip>`.
 
 1. **PC** — build the packages from the commit to deploy (needs git; the client build needs `bun` and the
    production client `.env`):
@@ -77,7 +77,7 @@ Commands marked **PC** run in PowerShell on your computer; commands marked **ser
    git archive --format=zip -o warphub-roster-data.zip <commit>:backend/roster-data
    git archive --format=zip -o warphub-client-src.zip <commit>:client
    ```
-   then upload with `scp -i <your key> <file> root@81.177.159.105:/root/`.
+   then upload with `scp -i <your key> <file> root@<server-ip>:/root/`.
 2. **server** — back up what you replace:
    ```bash
    mkdir -p /root/warphub-backup/manual-$(date +%F)
