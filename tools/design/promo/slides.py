@@ -1,4 +1,4 @@
-"""Texts and screens of the promo images (16.11.2026). Facts only from the app: see the screens in tools/ui-shots/promo.mjs."""
+"""Texts and screens of the promo images (16.11.2026; 20.11 — booking tickets, auto-confirm). Facts only from the app: see the screens in tools/ui-shots/promo.mjs."""
 
 SLIDES = [
     # ---------------- WarpHub ----------------
@@ -6,7 +6,7 @@ SLIDES = [
         'id': 'hub-1-booking', 'product': 'hub', 'kicker': 'Запись на игру',
         'title': 'Стол за минуту',
         'sub': 'Свободные столы и время видно сразу — без звонков и переписки.',
-        'steps': [('Выберите игру', 'Warhammer, D&D, тренировки, покраска'), ('День и слот', 'Свободные столы — на экране'), ('Готово', 'Бот напомнит за час до игры')],
+        'steps': [('Выберите игру', 'Warhammer, D&D, тренировки, покраска'), ('День и слот', 'Свободные столы — на экране'), ('Готово', 'Запись подтверждена сразу, бот напомнит за час')],
         'screen': 'hub-booking-time', 'screen2': 'hub-booking-done',
     },
     {
