@@ -96,7 +96,16 @@ await step('hub-booking', async () => {
   if (!done) {
     log.push('hub-booking-done: запись в демо не прошла — шаг открыт без данных записи');
     await page.evaluate(() => window.__warphubStages?.getState().resetStages());
-    await page.evaluate(() => { const st = window.__warphubStages; if (st) for (let i = 0; i < 4; i++) st.getState().nextStage(); });
+    await page.evaluate(() => {
+      // итог записи: время из выбранного слота (как после настоящей записи)
+      const r = window.__warphubReservation?.getState();
+      const slot = r?.selectedSlot;
+      const startsAt = r?.startsAt ?? slot?.startsAt ?? slot?.window?.startsAt ?? null;
+      const endsAt = startsAt ? new Date(new Date(startsAt).getTime() + 3 * 3600_000).toISOString() : null;
+      r?.setLastBooking?.({ id: 'demo', startsAt, endsAt, joined: false, partySize: 1 });
+      const st = window.__warphubStages;
+      if (st) for (let i = 0; i < 4; i++) st.getState().nextStage();
+    });
   }
   await page.waitForTimeout(3800);
   await shot('hub-booking-done');
