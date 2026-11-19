@@ -17,7 +17,7 @@ concurrency:
 jobs:
   shots:
     name: Screenshots (demo build)
-    if: ${{ contains(github.event.pull_request.labels.*.name, 'ui-shots') || contains(github.event.pull_request.labels.*.name, 'ui-audit') || contains(github.event.pull_request.labels.*.name, 'ui-ta') || contains(github.event.pull_request.labels.*.name, 'ui-photos') }}
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'ui-shots') || contains(github.event.pull_request.labels.*.name, 'ui-audit') || contains(github.event.pull_request.labels.*.name, 'ui-ta') || contains(github.event.pull_request.labels.*.name, 'ui-photos') || contains(github.event.pull_request.labels.*.name, 'ui-promo') }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -44,6 +44,7 @@ jobs:
           if [ "${{ contains(github.event.pull_request.labels.*.name, 'ui-audit') }}" = "true" ]; then node tools/ui-shots/audit.mjs ui-shots;
           elif [ "${{ contains(github.event.pull_request.labels.*.name, 'ui-ta') }}" = "true" ]; then node tools/ui-shots/testarmy.mjs ui-shots;
           elif [ "${{ contains(github.event.pull_request.labels.*.name, 'ui-photos') }}" = "true" ]; then node tools/ui-shots/photos.mjs ui-shots;
+          elif [ "${{ contains(github.event.pull_request.labels.*.name, 'ui-promo') }}" = "true" ]; then node tools/ui-shots/promo.mjs ui-shots;
           else node tools/ui-shots/shots.mjs ui-shots; fi
           cp /tmp/server.log ui-shots/server.log || true
       - name: Print screenshots (base64, for readers without artifact access)
