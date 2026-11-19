@@ -1,0 +1,19 @@
+name: Идея
+description: Новая функция или улучшение
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Что хочется
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Зачем — кому и чем поможет
+  - type: dropdown
+    id: area
+    attributes:
+      label: Раздел
+      options: [Запись, WarpBuilder, Лига и турниры, Мини-игры, Профиль, Админка, Уведомления бота, Другое]

@@ -18,7 +18,7 @@ Output goes to the issues "Server check" and "Deploys".
   `/var/www/warphub.ru/server` is an unused old copy.
 - Roster data: `/var/www/warphub.ru/server-new/roster-data` (read per request; no restart needed for data).
 - Mini App: `/var/www/warphub.ru/client/dist` (Nginx root of `warphub.ru`; `/api` → `127.0.0.1:4000`).
-- Other sites share the server (`reflectahome.ru`, `questa-ekb.online`, PM2 `reflecta:3000`): never touched.
+- Other projects on the same server are never touched.
 
 ## Deploy workflow
 
