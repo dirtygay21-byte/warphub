@@ -19,7 +19,7 @@ describe('bot replies', () => {
   test('/start: имя экранировано, кнопки в приложение; ссылка ?start=my — кнопка на «Мои записи»', () => {
     const r = replyFor('start', '', { firstName: '<Иван>', isAdmin: false })!;
     expect(r.text).toContain('Привет, &lt;Иван&gt;!');
-    expect(r.buttons!.flat().map((b) => b.path ?? b.data)).toEqual(['/', '/reservations', 'club']);
+    expect(r.buttons!.flat().map((b) => b.path ?? b.data)).toEqual(['/', 'my', 'games', 'club']);
     expect(replyFor('start', 'my', { isAdmin: false })!.buttons![0]![0]).toEqual({ text: 'Открыть в приложении', path: '/reservations' });
     expect(startPath('unknown')).toBeNull();
   });
@@ -40,5 +40,34 @@ describe('bot replies', () => {
     }
     expect(replyFor('help', '', { isAdmin: true })!.text).toContain('/today');
     expect(replyFor('help', '', { isAdmin: false })!.text).not.toContain('/today');
+  });
+});
+
+describe('bot replies — записи, соперники, лига, WarpBuilder', () => {
+  const at = new Date('2026-11-20T13:00:00Z');
+  const booking = { id: 'r1', what: 'Игра · Kill Team', when: 'пт, 20 ноября, 18:00–21:00', startsAt: at, table: 'Стол 3 · тактические игры', state: 'стол собран (2/2)', mates: [{ firstName: 'Иван', username: 'ivan' }] };
+
+  test('/my: тип и игра, стол с типом и состоянием, кто за столом; отмена — через подтверждение', async () => {
+    const { myReply, cancelAskReply } = await import('../src/modules/bot/replies');
+    const r = myReply([booking], { known: true });
+    expect(r.text).toContain('<b>Игра · Kill Team</b>');
+    expect(r.text).toContain('Стол: Стол 3 · тактические игры — стол собран (2/2)');
+    expect(r.text).toContain('За столом: Иван (@ivan)');
+    expect(r.buttons![0]![0]).toEqual({ text: 'Отменить 1: пт, 20 ноября, 18:00', data: 'cancel:r1' });
+    expect(cancelAskReply(booking).buttons![0]!.map((b) => b.data)).toEqual(['cancelok:r1', 'cancelno']);
+    expect(myReply([], { known: true }).text).toContain('Предстоящих записей нет');
+    expect(myReply([], { known: false }).text).toContain('ещё не заходили');
+  });
+
+  test('/games, /league, /builder', async () => {
+    const { gamesReply, leagueReply, builderReply, BOOSTY_URL } = await import('../src/modules/bot/replies');
+    const g = gamesReply([{ when: 'пт, 20 ноября, 18:00–21:00', table: 'Стол 1 · полномасштабный варгейм', what: 'Игра Warhammer · Warhammer 40,000', state: 'стол ждёт соперника (1/2)', players: [{ firstName: 'Сергей', username: null, army: 'Orks' }] }]);
+    expect(g.text).toContain('Ищут соперника (1)');
+    expect(g.text).toContain('• Сергей — Orks');
+    expect(gamesReply([]).text).toContain('никто не ищет');
+    const l = leagueReply({ seasonLabel: 'Зима 2026', games: [{ gameLabel: 'Kill Team', games: 5, wins: 3, draws: 1, losses: 1, rating: 1532.4, rank: 2, players: 9 }] });
+    expect(l.text).toContain('<b>Kill Team</b>: рейтинг 1532, место 2 из 9 · игр 5 (3–1–1)');
+    expect(builderReply(true).buttons![0]![0]!.path).toBe('/roster');
+    expect(builderReply(false).buttons![0]![0]!.url).toBe(BOOSTY_URL);
   });
 });

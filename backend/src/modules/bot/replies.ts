@@ -3,7 +3,7 @@
  * Чистые функции без БД и сети — tests/bot-replies.test.ts. Отправка и разбор обновлений — bot/index.ts.
  */
 import { bookingConfig } from '../../config/booking';
-import { escapeHtml } from '../../lib/telegram/format';
+import { escapeHtml, formatClubDateTime } from '../../lib/telegram/format';
 
 /** Кнопка под сообщением: path — страница приложения (web_app), url — ссылка, data — ответ боту (callback). */
 export type BotButton = { text: string; path?: string; url?: string; data?: string };
@@ -16,6 +16,10 @@ export const CLUB_VK_URL = 'https://vk.ru/warpboysandgirls';
 export const USER_COMMANDS = [
   { command: 'start', description: 'Главное меню' },
   { command: 'book', description: 'Записаться на игру' },
+  { command: 'my', description: 'Мои записи' },
+  { command: 'games', description: 'Кто ищет соперника' },
+  { command: 'league', description: 'Мой рейтинг в лиге' },
+  { command: 'builder', description: 'Доступ к WarpBuilder' },
   { command: 'club', description: 'Когда открыт клуб и как нас найти' },
   { command: 'help', description: 'Что умеет бот' },
 ] as const;
@@ -69,7 +73,7 @@ export function startReply(firstName: string | null | undefined, opts: { path?: 
       '',
       'Напоминания о записях придут сюда, в этот чат.',
     ].join('\n'),
-    buttons: [...open, [{ text: 'Записаться', path: '/' }, { text: 'Мои записи', path: '/reservations' }], [{ text: 'Клуб и контакты', data: 'club' }]],
+    buttons: [...open, [{ text: 'Записаться', path: '/' }, { text: 'Мои записи', data: 'my' }], [{ text: 'Ищут соперника', data: 'games' }, { text: 'Клуб и контакты', data: 'club' }]],
   };
 }
 
@@ -107,7 +111,7 @@ export function notAdminReply(): BotReply {
 
 export function unknownReply(): BotReply {
   return {
-    text: 'Я понимаю команды из меню: /book, /club, /help. Записаться и всё остальное — в приложении.',
+    text: 'Я понимаю команды из меню: /my, /games, /book, /club, /help. Записаться и всё остальное — в приложении.',
     buttons: [[{ text: 'Открыть WarpHub', path: '/' }]],
   };
 }
@@ -128,4 +132,81 @@ export function replyFor(command: string, arg: string, ctx: { firstName?: string
     default:
       return null;
   }
+}
+
+// ---------- этап 3 (20.11.2026): записи, соперники, лига, WarpBuilder прямо в чате ----------
+
+export const BOOSTY_URL = 'https://boosty.to/wbg';
+
+type Mate = { firstName: string; username: string | null; army?: string | null };
+const mateName = (m: Mate) => escapeHtml(m.username ? `${m.firstName} (@${m.username})` : m.firstName);
+
+/** Запись игрока для /my — уже с типом записи, игрой, подписью стола и состоянием (см. notifications/booking-vars). */
+export type MyBooking = { id: string; what: string; when: string; startsAt: Date; table: string; state: string; mates: Mate[] };
+
+const shortWhen = (d: Date) => formatClubDateTime(d);
+
+export function myReply(list: MyBooking[], opts: { known: boolean }): BotReply {
+  if (!opts.known) return { text: 'Вы ещё не заходили в WarpHub — откройте приложение, и записи появятся здесь.', buttons: [[{ text: 'Открыть WarpHub', path: '/' }]] };
+  if (!list.length) return { text: '📅 Предстоящих записей нет.', buttons: [[{ text: 'Записаться', path: '/' }]] };
+  const shown = list.slice(0, 8);
+  const blocks = shown.map((b, i) =>
+    [
+      `${i + 1}. <b>${escapeHtml(b.what)}</b>`,
+      escapeHtml(b.when),
+      b.table ? `Стол: ${escapeHtml(b.table)}${b.state ? ` — ${escapeHtml(b.state)}` : ''}` : '',
+      b.mates.length ? `За столом: ${b.mates.map(mateName).join(', ')}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n'),
+  );
+  return {
+    text: [`📅 <b>Мои записи (${list.length})</b>`, ...blocks].join('\n\n') + (list.length > shown.length ? `\n\n… и ещё ${list.length - shown.length} — в приложении` : ''),
+    buttons: [...shown.map((b, i) => [{ text: `Отменить ${i + 1}: ${shortWhen(b.startsAt)}`, data: `cancel:${b.id}` }]), [{ text: 'Открыть мои записи', path: '/reservations' }]],
+  };
+}
+
+/** Подтверждение отмены — отменить можно только второй кнопкой. */
+export function cancelAskReply(b: Pick<MyBooking, 'id' | 'what' | 'when' | 'table'>): BotReply {
+  return {
+    text: [`Отменить запись?`, `<b>${escapeHtml(b.what)}</b>`, escapeHtml(b.when), b.table ? `Стол: ${escapeHtml(b.table)}` : ''].filter(Boolean).join('\n'),
+    buttons: [[{ text: 'Да, отменить', data: `cancelok:${b.id}` }, { text: 'Нет', data: 'cancelno' }]],
+  };
+}
+
+export type OpenGame = { when: string; table: string; what: string; state: string; players: Mate[] };
+
+export function gamesReply(list: OpenGame[]): BotReply {
+  if (!list.length) return { text: '⚔️ Сейчас никто не ищет соперника. Начните свою игру — и вас увидят другие.', buttons: [[{ text: 'Записаться', path: '/' }]] };
+  const shown = list.slice(0, 10);
+  const blocks = shown.map((g) =>
+    [`<b>${escapeHtml(g.when)}</b> · ${escapeHtml(g.table)}`, `${escapeHtml(g.what)} — ${escapeHtml(g.state)}`, ...g.players.map((p) => `• ${mateName(p)}${p.army ? ` — ${escapeHtml(p.army)}` : ''}`)].join('\n'),
+  );
+  return {
+    text: [`⚔️ <b>Ищут соперника (${list.length})</b>`, ...blocks].join('\n\n') + (list.length > shown.length ? `\n\n… и ещё ${list.length - shown.length} — в приложении` : ''),
+    buttons: [[{ text: 'Присоединиться в приложении', path: '/' }]],
+  };
+}
+
+export type LeagueLine = { gameLabel: string; games: number; wins: number; draws: number; losses: number; rating: number | null; rank: number | null; players: number };
+
+export function leagueReply(stats: { seasonLabel: string; games: LeagueLine[] } | null): BotReply {
+  const open = [[{ text: 'Таблица лиги', path: '/league' }]];
+  if (!stats) return { text: 'Вы ещё не заходили в WarpHub — откройте приложение.', buttons: open };
+  if (!stats.games.length) return { text: `🏆 <b>Лига · ${escapeHtml(stats.seasonLabel)}</b>\nПока нет засчитанных игр. Результат засчитывается, когда его подтвердят оба игрока.`, buttons: open };
+  const lines = stats.games.map(
+    (g) =>
+      `<b>${escapeHtml(g.gameLabel)}</b>: ${g.rating !== null ? `рейтинг ${Math.round(g.rating)}, место ${g.rank} из ${g.players}` : 'в этом сезоне игр нет'} · игр ${g.games} (${g.wins}–${g.draws}–${g.losses})`,
+  );
+  return { text: [`🏆 <b>Лига · ${escapeHtml(stats.seasonLabel)}</b>`, ...lines, '', 'Победы–ничьи–поражения за всё время.'].join('\n'), buttons: open };
+}
+
+export function builderReply(access: boolean | null): BotReply {
+  if (access === null) return { text: 'Вы ещё не заходили в WarpHub — откройте приложение.', buttons: [[{ text: 'Открыть WarpHub', path: '/' }]] };
+  return access
+    ? { text: '📜 <b>WarpBuilder открыт</b>\nРостеры 40K, AoS, Kill Team и Warcry — в приложении.', buttons: [[{ text: 'Открыть WarpBuilder', path: '/roster' }]] }
+    : {
+        text: '📜 <b>WarpBuilder</b> — для подписчиков клуба на Boosty. Доступ откроется сам, как только вы окажетесь в группе подписчиков.',
+        buttons: [[{ text: 'Подписка на Boosty', url: BOOSTY_URL }]],
+      };
 }

@@ -62,7 +62,7 @@ export function playerVars(user: Brief, details: ReservationDetails | null) {
   return { ...detailVars(details), игрок: who(user) };
 }
 
-function seatsOf(service: { seatsPerTable: number | null; tableCapacityProfile: string | null }) {
+export function seatsOf(service: { seatsPerTable: number | null; tableCapacityProfile: string | null }) {
   if (service.seatsPerTable !== null) return service.seatsPerTable;
   if (service.tableCapacityProfile) return (bookingConfig.tableCapacityByProfile as Record<string, number>)[service.tableCapacityProfile] ?? 0;
   return 0;
