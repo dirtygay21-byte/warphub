@@ -109,10 +109,10 @@ describe('уведомления', () => {
     expect(cat.status).toBe(200);
     expect(cat.json.canEdit).toBe(true);
     expect(cat.json.kinds.find((k: { id: string }) => k.id === 'match_new')).toBeTruthy();
-    expect((await api('PUT', '/admin/notifications/templates/booking_confirmed', T.seeker, { enabled: false })).status).toBe(403);
-    const off = await api('PUT', '/admin/notifications/templates/booking_confirmed', T.owner, { enabled: false, text: '👍 {услуга}' });
+    expect((await api('PUT', '/admin/notifications/templates/booking_time_changed', T.seeker, { enabled: false })).status).toBe(403);
+    const off = await api('PUT', '/admin/notifications/templates/booking_time_changed', T.owner, { enabled: false, text: '👍 {услуга}' });
     expect(off.json).toMatchObject({ enabled: false, text: '👍 {услуга}' });
-    const back = await api('PUT', '/admin/notifications/templates/booking_confirmed', T.owner, { enabled: true, text: null });
+    const back = await api('PUT', '/admin/notifications/templates/booking_time_changed', T.owner, { enabled: true, text: null });
     expect(back.json).toMatchObject({ enabled: true, text: null });
     const cfg = await api('PUT', '/admin/notifications/config', T.owner, { quietFrom: 23, quietTo: 10, dailyLimit: 2 });
     expect(cfg.status).toBe(200);

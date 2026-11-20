@@ -8,7 +8,7 @@ const svc = { title: 'Игра Warhammer', slug: 'wh_game' };
 describe('переменные записи: игра везде (14.11.2026)', () => {
   test('Kill Team: игра, команда с фракцией, без очков', () => {
     const v = bookingVars({ service: svc, details: { kind: 'wh_player', game: 'kt', army: 'Kommandos', points: null, experienceLevel: 'player' }, ...when, tableName: 'Стол 2' });
-    expect(v.что).toBe('Kill Team');
+    expect(v.что).toBe('Игра · Kill Team');
     expect(v.игра).toBe('Kill Team');
     expect(v.армия).toStartWith('Команда: Kommandos');
     expect(v.очки).toBe('');
@@ -36,7 +36,7 @@ describe('стандартные тексты', () => {
     }
   });
   test('о записях к игре — игра в заголовке', () => {
-    for (const id of ['booking_created', 'booking_confirmed', 'opponent_joined', 'opponent_cancelled', 'booking_cancelled_admin', 'booking_time_changed', 'reminder_3h', 'reminder_eve', 'admin_pending']) {
+    for (const id of ['booking_created', 'opponent_joined', 'opponent_cancelled', 'booking_cancelled_admin', 'booking_time_changed', 'reminder_3h', 'reminder_eve']) {
       const k = NOTIFICATION_KINDS.find((x) => x.id === id)!;
       expect(k.defaultText.split('\n')[0], id).toContain('{что}');
     }

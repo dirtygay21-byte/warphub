@@ -405,9 +405,6 @@ function PlayerRow({
               Данных игрока нет (запись до обновления)
             </p>
           )}
-          {player.status === "pending" && (
-            <p className="mt-1 text-[12px] text-yellow-300">Ожидает подтверждения</p>
-          )}
         </div>
 
         {isFuture && otherTables.length > 0 && !moving && (

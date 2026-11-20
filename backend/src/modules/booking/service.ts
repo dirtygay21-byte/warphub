@@ -52,7 +52,7 @@ import { notifyKind, notifyKindAdmins } from '../notifications/hub';
 import { announceMatch } from '../notifications/jobs';
 import { isUrgentForAdmins } from '../notifications/admin-schedule';
 import { notifyWaitlist } from './waitlist';
-import { bookingVars, playerLine } from '../notifications/booking-vars';
+import { bookingVars, playerLine, tableLabel, tableState, whatOf } from '../notifications/booking-vars';
 import {
   checkTableSession,
   DetailsValidationError,
@@ -194,8 +194,6 @@ type ServiceRow = {
   poolCapacity: number | null;
   hasTrainer: boolean;
   isActive: boolean;
-  /** автоподтверждение записи (17.11.2026) */
-  autoConfirm: boolean;
   scheduleWeekdays: number[] | null;
   disciplineActive: boolean | null;
 };
@@ -244,7 +242,6 @@ async function loadService(
       poolCapacity: servicesTable.poolCapacity,
       hasTrainer: servicesTable.hasTrainer,
       isActive: servicesTable.isActive,
-      autoConfirm: servicesTable.autoConfirm,
       scheduleWeekdays: disciplinesTable.scheduleWeekdays,
       disciplineActive: disciplinesTable.isActive,
     })
@@ -975,7 +972,8 @@ export async function createReservation(
           details,
           startsAt,
           endsAt,
-          status: service.autoConfirm ? 'confirmed' : 'pending',
+          // подтверждение автоматическое (20.11.2026, решение владельца): запись сразу подтверждена
+          status: 'confirmed',
         })
         .returning();
 
@@ -1085,7 +1083,7 @@ export async function createReservation(
         details,
         startsAt,
         endsAt,
-        status: service.autoConfirm ? 'confirmed' : 'pending',
+        status: 'confirmed',
       })
       .returning();
 
@@ -1168,14 +1166,15 @@ async function loadUsersForReservations(
   }));
 }
 
+/** Подпись стола для уведомлений: «Стол 1 · полномасштабный варгейм» (20.11.2026 — тип стола везде). */
 async function getTableName(tableId: number | null): Promise<string> {
   if (tableId === null) return '—';
   const [table] = await db
-    .select({ name: tablesTable.name })
+    .select({ name: tablesTable.name, category: tablesTable.category })
     .from(tablesTable)
     .where(eq(tablesTable.id, tableId))
     .limit(1);
-  return table?.name ?? `#${tableId}`;
+  return table ? tableLabel(table.name, table.category) : `#${tableId}`;
 }
 
 function describePlayer(user: UserBrief, details: ReservationDetails | null) {
@@ -1226,7 +1225,13 @@ async function notifyAfterCreate(
       void notifyKind('booking_created', booker.user.telegramId, {
         ...vars,
         соперник: others.map((o) => playerLine(o.user, o.details)).join('\n'),
-        стол_статус: table ? (table.occupied >= table.seats ? 'Соперник уже есть — стол собран.' : 'Стол ждёт соперника — напишем, когда он запишется.') : '',
+        стол_статус: !table
+          ? ''
+          : service.hasTrainer
+            ? `За столом: ${table.occupied}/${table.seats} + тренер${table.occupied >= table.seats ? ' — группа собрана.' : '.'}`
+            : table.occupied >= table.seats
+              ? `Соперник уже есть — стол собран (${table.occupied}/${table.seats}).`
+              : `Стол ждёт соперника (${table.occupied}/${table.seats}) — напишем, когда он запишется.`,
       });
     }
 
@@ -1246,6 +1251,8 @@ async function notifyAfterCreate(
     const text = bookingNoticeText({
       reason,
       serviceTitle: service.title ?? service.slug,
+      serviceSlug: service.slug,
+      hasTrainer: service.hasTrainer,
       startsAt: reservation.startsAt,
       endsAt: reservation.endsAt,
       createdAt: reservation.createdAt,
@@ -1268,7 +1275,7 @@ async function notifyAfterCreate(
 }
 
 /** Игроку о его записи: подтверждена / время изменено (14.11.2026). */
-async function notifyPlayerOf(reservation: Reservation, kind: 'booking_confirmed' | 'booking_time_changed') {
+async function notifyPlayerOf(reservation: Reservation, kind: 'booking_time_changed') {
   try {
     const service = await loadService(db, reservation.serviceId);
     const [booker] = await loadUsersForReservations([reservation.id]);
@@ -1299,7 +1306,6 @@ async function notifyAfterCancel(
     const seats = mode.mode === 'table' ? mode.seatsPerTable : 0;
 
     const cancelTable = reservation.tableId !== null ? await getTableName(reservation.tableId) : null;
-    const cancelGame = booker?.details?.kind === 'wh_player' ? gameLabel(booker.details.game) : '';
     let remaining: Awaited<ReturnType<typeof loadUsersForReservations>> = [];
     if (reservation.tableId !== null && seats >= 2) {
       const sessionMates = await db
@@ -1335,16 +1341,14 @@ async function notifyAfterCancel(
     if (!isUrgentForAdmins(reservation.startsAt, new Date())) return;
     void notifyKindAdmins('admin_booking', {
       текст: [
-        `❌ <b>Отмена: ${cancelGame ? escapeHtml(cancelGame) : serviceTitle(service)}</b>${
+        `❌ <b>Отмена: ${escapeHtml(whatOf(service, booker?.details ?? (reservation.details as ReservationDetails | null)))}</b>${
           cancelledBy === 'admin' ? ' (отменил администратор)' : ' (отменил игрок)'
         }`,
-        cancelGame ? `Услуга: ${serviceTitle(service)}` : '',
         `Когда: ${when}`,
         cancelTable ? `Стол: ${escapeHtml(cancelTable)}` : '',
         booker ? describePlayer(booker.user, booker.details) : '',
-        seats >= 2 && reservation.tableId !== null
-          ? `Теперь за столом: ${remaining.length}/${seats}`
-          : '',
+        seats >= 2 && reservation.tableId !== null ? `Теперь: ${tableState(remaining.length, seats, service.hasTrainer)}` : '',
+        remaining.length ? `За столом: ${remaining.map((m) => playerLine(m.user, m.details)).join('; ')}` : '',
       ]
         .filter(Boolean)
         .join('\n'),
@@ -1917,7 +1921,7 @@ export async function confirmReservation(
     .where(eq(reservationsTable.id, reservationId))
     .returning();
 
-  void notifyPlayerOf(updated!, 'booking_confirmed');
+  // 20.11.2026: подтверждение автоматическое — отдельного «Запись подтверждена» игроку больше нет
   return updated!;
 }
 

@@ -125,7 +125,6 @@ import {
   applyTrainingDiscount,
   ensureReservationPricing,
   listServicePrices,
-  setServiceAutoConfirm,
   PricingError,
   removeManualDiscount,
   upsertServicePrice,
@@ -333,18 +332,6 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
   )
   .get('/pricing/services', async () => listServicePrices(), {
     detail: { tags: ['Admin'], summary: 'Тарифы всех услуг' },
-  })
-  .put('/services/:serviceId/auto-confirm', async ({ params, body }) => {
-    try {
-      return await setServiceAutoConfirm(params.serviceId, body.autoConfirm);
-    } catch (error) {
-      if (error instanceof PricingError) return mapPricingError(error);
-      return status(500, { error: (error as Error).message });
-    }
-  }, {
-    params: t.Object({ serviceId: t.Number() }),
-    body: t.Object({ autoConfirm: t.Boolean() }),
-    detail: { tags: ['Admin'], summary: 'Автоподтверждение записей услуги (вкл. — запись сразу подтверждена)' },
   })
   .put('/pricing/services/:serviceId', async ({ params, body, user }) => {
     try {

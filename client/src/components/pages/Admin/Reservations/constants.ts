@@ -6,7 +6,6 @@ export const DEFAULT_PAGE_SIZE = 20;
 
 export const STATUS_FILTER_OPTIONS = [
   { value: "", label: "Все статусы" },
-  { value: "pending", label: "Запланирована" },
   { value: "confirmed", label: "Подтверждена" },
   { value: "cancelled", label: "Отменена" },
   { value: "completed", label: "Завершена" },
@@ -41,10 +40,12 @@ export const RESERVATION_SORTS: Array<{ key: "createdAt" | "startsAt"; desc: boo
   { key: "createdAt", desc: false, label: "Сначала старые записи" },
 ];
 
-/** Категории (флажки) «Все записи»: по умолчанию — только ожидающие подтверждения. */
-export const RESERVATION_CATEGORIES: Array<{ id: "pending" | "confirmed" | "cancelled" | "past"; label: string }> = [
-  { id: "pending", label: "Ждут подтверждения" },
-  { id: "confirmed", label: "Подтверждённые" },
+/**
+ * Категории (флажки) «Все записи». Подтверждение автоматическое (20.11.2026): «Предстоящие» — подтверждённые
+ * вместе со старыми «ожидающими» (сервер: pending,confirmed).
+ */
+export const RESERVATION_CATEGORIES: Array<{ id: "confirmed" | "cancelled" | "past"; label: string }> = [
+  { id: "confirmed", label: "Предстоящие" },
   { id: "cancelled", label: "Отменённые" },
   { id: "past", label: "Прошедшие" },
 ];

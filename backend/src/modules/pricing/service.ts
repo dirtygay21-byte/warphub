@@ -62,16 +62,8 @@ export async function listServicePrices() {
       clubMaterialsPrice: price?.clubMaterialsPrice ?? defaults.clubMaterialsPrice,
       thirdGameDiscountPercent: price?.thirdGameDiscountPercent ?? defaults.thirdGameDiscountPercent,
       effectiveFrom: price?.effectiveFrom?.toISOString() ?? null,
-      autoConfirm: service.autoConfirm,
     };
   }));
-}
-
-/** Автоподтверждение записей услуги (17.11.2026): вкл. — запись сразу подтверждена, выкл. — ждёт администратора. */
-export async function setServiceAutoConfirm(serviceId: number, autoConfirm: boolean) {
-  const [row] = await db.update(servicesTable).set({ autoConfirm }).where(eq(servicesTable.id, serviceId)).returning({ id: servicesTable.id, autoConfirm: servicesTable.autoConfirm });
-  if (!row) throw new PricingError('SERVICE_NOT_FOUND', 'Service not found');
-  return row;
 }
 
 export async function upsertServicePrice(input: {

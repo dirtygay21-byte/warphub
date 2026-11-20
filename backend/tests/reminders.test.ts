@@ -31,7 +31,7 @@ describe('dueForReminder', () => {
 });
 
 describe('reminderText', () => {
-  test('что, когда, стол, соперник с ником; ожидает подтверждения — отдельной строкой; HTML экранирован', () => {
+  test('что, когда, стол, соперник с ником; без «ждёт подтверждения» (20.11.2026); HTML экранирован', () => {
     const t = reminderText({
       serviceTitle: 'Игра <Warhammer>',
       startsAt: new Date(Date.UTC(2026, 10, 14, 13)),
@@ -43,7 +43,7 @@ describe('reminderText', () => {
     expect(t.split('\n')[0]).toBe('⏰ <b>Напоминание: Игра &lt;Warhammer&gt;</b>');
     expect(t).toContain('Стол: Стол 1');
     expect(t).toContain('Соперник: Иван (@ivan)');
-    expect(t).toContain('ждёт подтверждения');
+    expect(t).not.toContain('подтвержд');
   });
 });
 

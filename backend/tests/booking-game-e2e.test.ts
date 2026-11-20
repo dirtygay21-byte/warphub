@@ -92,7 +92,7 @@ describe('игра в записи на Warhammer', () => {
     if (right.status !== 200) console.error(`::error::join → ${right.status}: ${JSON.stringify(right.json).slice(0, 600)}`);
     expect(right.status).toBe(200);
     expect(right.json.joinedSession).toBe(true);
-    // автоподтверждение (17.11.2026): у услуги по умолчанию включено — запись сразу подтверждена
+    // подтверждение автоматическое (17.11 / 20.11.2026): запись сразу подтверждена
     expect(host.json.status).toBe('confirmed');
     expect(right.json.status).toBe('confirmed');
   });
@@ -117,21 +117,6 @@ describe('игра в записи на Warhammer', () => {
     expect((await cat('past')).length).toBe(0);
     expect((await cat('pending,confirmed')).length).toBe(2);
     expect([400, 422]).toContain((await api('GET', `/admin/reservations?categories=bogus&limit=5&offset=0`, T.admin)).status);
-  });
-
-  test('автоподтверждение выключено у услуги — запись ждёт администратора (17.11.2026)', async () => {
-    const off = await api('PUT', `/admin/services/${serviceId}/auto-confirm`, T.admin, { autoConfirm: false });
-    if (off.status !== 200) console.error(`::error::auto-confirm off → ${off.status}: ${JSON.stringify(off.json).slice(0, 600)}`);
-    expect(off.json).toMatchObject({ id: serviceId, autoConfirm: false });
-    expect((await api('PUT', `/admin/services/${serviceId}/auto-confirm`, T.host, { autoConfirm: true })).status).toBe(403);
-    const list = await api('GET', '/admin/pricing/services', T.admin);
-    expect((list.json as Array<{ id: number; autoConfirm: boolean }>).find((s) => s.id === serviceId)?.autoConfirm).toBe(false);
-    const other = Number(sql(`insert into tables (name, category) values ('E2E стол ожидания', 'small') returning id`));
-    const r = await api('POST', '/reservations', T.wrong, { serviceId, tableId: other, startsAt: local('12:00'), partySize: 1, seatClubArmyOptions: [false], details: { game: 'kt', army: 'Kommandos', experienceLevel: 'player' } });
-    if (r.status !== 200) console.error(`::error::pending booking → ${r.status}: ${JSON.stringify(r.json).slice(0, 600)}`);
-    expect(r.json.status).toBe('pending');
-    expect((await api('PUT', `/admin/services/${serviceId}/auto-confirm`, T.admin, { autoConfirm: true })).json.autoConfirm).toBe(true);
-    await api('DELETE', `/reservations/${r.json.id}/cancel`, T.wrong);
   });
 
   test('в сессиях стола видна игра игроков', async () => {

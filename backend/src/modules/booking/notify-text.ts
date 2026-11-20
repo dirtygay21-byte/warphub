@@ -6,11 +6,16 @@
 import { armyLine, clubArmyLabel, experienceLabel, gameHasPoints, gameLabel, paintSourceLabel } from '../../config/booking';
 import { escapeHtml, formatClubDateTime, formatUserName } from '../../lib/telegram/format';
 import type { ReservationDetails } from './rules';
+import { tableState, whatOf } from '../notifications/booking-vars';
 
 export type BookingNotice = {
   /** created — новая запись; help-requested — в записи на покраску позже отметили «нужна помощь» */
   reason: 'created' | 'help-requested';
   serviceTitle: string;
+  /** услуга (wh_game / wh_group_training / …) — тип записи в заголовке (20.11.2026) */
+  serviceSlug?: string;
+  /** у услуги есть тренер — «+ тренер» в состоянии стола */
+  hasTrainer?: boolean;
   startsAt: Date | null;
   endsAt: Date | null;
   /** когда запись оформлена */
@@ -44,21 +49,19 @@ function seatsWith(options: boolean[] | null | undefined): string | null {
 }
 
 export function bookingNoticeText(n: BookingNotice): string {
-  // игра — в заголовке (решение владельца 14.11.2026): «Новая запись: Kill Team», услуга — отдельной строкой
+  // заголовок — тип записи и игра (20.11.2026): «Новая запись: Групповая тренировка · Warhammer 40,000 — есть места (1/2 + тренер)»;
+  // без услуги (старые вызовы) — игра или название услуги
   const game = n.details?.kind === 'wh_player' ? gameLabel(n.details.game) : '';
-  const title = escapeHtml(game || n.serviceTitle);
+  const title = escapeHtml(n.serviceSlug ? whatOf({ title: n.serviceTitle, slug: n.serviceSlug }, n.details) : game || n.serviceTitle);
+  const state = n.table ? tableState(n.table.occupied, n.table.seats, n.hasTrainer) : '';
   let head: string;
   if (n.reason === 'help-requested') head = `🎨 <b>${title}: нужна помощь</b>`;
-  else if (n.table && n.table.seats >= 2)
-    head =
-      n.table.occupied >= n.table.seats
-        ? `✅ <b>Новая запись: ${title} — стол собран (${n.table.occupied}/${n.table.seats})</b>`
-        : `♟ <b>Новая запись: ${title} — стол ждёт соперника (${n.table.occupied}/${n.table.seats})</b>`;
+  else if (state) head = `${n.table && n.table.occupied >= n.table.seats ? '✅' : '♟'} <b>Новая запись: ${title} — ${state}</b>`;
   else head = `📅 <b>Новая запись: ${title}</b>`;
 
   const lines = [
     head,
-    game ? `Услуга: ${escapeHtml(n.serviceTitle)}` : '',
+    game && !n.serviceSlug ? `Услуга: ${escapeHtml(n.serviceTitle)}` : '',
     `Когда: ${formatClubDateTime(n.startsAt, n.endsAt)}`,
     limitedLine(n),
     n.tableName ? `Стол: ${escapeHtml(n.tableName)}` : '',
@@ -127,7 +130,6 @@ export function reminderText(n: {
     `Когда: ${formatClubDateTime(n.startsAt, n.endsAt)}`,
     n.tableName ? `Стол: ${escapeHtml(n.tableName)}` : '',
     n.opponents.length ? `Соперник: ${n.opponents.map((o) => escapeHtml(formatUserName(o))).join(', ')}` : '',
-    n.status === 'pending' ? 'Запись ещё ждёт подтверждения администратора.' : '',
     'Не получается прийти — отмените запись в приложении, раздел «Записи».',
   ];
   return lines.filter(Boolean).join('\n');

@@ -1,14 +1,15 @@
 import { formatClub, formatClubTimeRange } from "@/utils/clubTime";
 
 export const STATUS_LABELS: Record<string, string> = {
-  pending: "Ожидает подтверждения",
+  // подтверждение автоматическое (20.11.2026): старые «ожидающие» показываются как подтверждённые
+  pending: "Подтверждена",
   confirmed: "Подтверждена",
   cancelled: "Отменена",
   completed: "Завершена",
 };
 
 export const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-warn text-accent-foreground",
+  pending: "bg-accent text-accent-foreground",
   confirmed: "bg-accent text-accent-foreground",
   cancelled: "bg-danger text-accent-foreground",
   completed: "bg-white/[0.08] text-fg-2",

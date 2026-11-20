@@ -34,7 +34,6 @@ export const hasActiveFilters = (form: AdminFiltersForm) =>
 export const getAvailableStatusActions = (status: string): StatusAction[] => {
   switch (status.toLowerCase()) {
     case "pending":
-      return ["confirm", "reject"];
     case "confirmed":
       return ["reject", "extend"];
     default:

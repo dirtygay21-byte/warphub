@@ -52,6 +52,7 @@ export async function sendDueReminders(now = new Date()): Promise<number> {
           serviceTitle: servicesTable.title,
           serviceSlug: servicesTable.slug,
           tableName: tablesTable.name,
+          tableCategory: tablesTable.category,
         })
         .from(reservationsTable)
         .innerJoin(usersTable, eq(reservationsTable.userId, usersTable.id))
@@ -80,9 +81,8 @@ export async function sendDueReminders(now = new Date()): Promise<number> {
               )
               .orderBy(asc(reservationsTable.createdAt));
       await notifyKind('reminder_3h', row.telegramId, {
-        ...bookingVars({ service: { title: row.serviceTitle, slug: row.serviceSlug }, details: r.details as ReservationDetails | null, startsAt: r.startsAt, endsAt: r.endsAt, tableName: row.tableName }),
+        ...bookingVars({ service: { title: row.serviceTitle, slug: row.serviceSlug }, details: r.details as ReservationDetails | null, startsAt: r.startsAt, endsAt: r.endsAt, tableName: row.tableName, tableCategory: row.tableCategory }),
         соперник: opponents.map((o) => playerLine(o, o.details as ReservationDetails | null)).join('; '),
-        ждёт_подтверждения: r.status === 'pending' ? 'Запись ещё ждёт подтверждения администратора.' : '',
       });
       sent++;
     } catch (error) {
