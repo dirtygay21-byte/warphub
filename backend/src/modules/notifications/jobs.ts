@@ -62,7 +62,7 @@ export function playerVars(user: Brief, details: ReservationDetails | null) {
   return { ...detailVars(details), игрок: who(user) };
 }
 
-function seatsOf(service: { seatsPerTable: number | null; tableCapacityProfile: string | null }) {
+export function seatsOf(service: { seatsPerTable: number | null; tableCapacityProfile: string | null }) {
   if (service.seatsPerTable !== null) return service.seatsPerTable;
   if (service.tableCapacityProfile) return (bookingConfig.tableCapacityByProfile as Record<string, number>)[service.tableCapacityProfile] ?? 0;
   return 0;
@@ -218,6 +218,34 @@ async function adminSummary(now: Date) {
   if (now.getTime() - slot.at.getTime() > 3 * HOUR) return;
   if (!(await markOnce(`summary:${clubDateKey(slot.at)}:${slot.hour}`))) return;
   const scheduleDay = slot.hour === 12 ? clubDayStart(slot.at) : new Date(clubDayStart(slot.at).getTime() + DAY);
+  const vars = await digestBuilder({ ...slot, label: `${String(slot.hour).padStart(2, '0')}:00` }, scheduleDay, slot.hour === 12);
+  const groups = new Map<string, string[]>();
+  for (const id of getAdminTelegramIds()) {
+    const key = (curatorAreasById(id) ?? []).join(',');
+    groups.set(key, [...(groups.get(key) ?? []), id]);
+  }
+  for (const [key, ids] of groups) {
+    const areas = key ? (key.split(',') as AdminArea[]) : null;
+    const built = vars(areas);
+    if (areas && built.empty) continue;
+    const text = await renderKind('admin_digest', built.vars);
+    if (!text) continue;
+    for (const id of ids) void sendTelegramMessageDetailed(id, text, 'admin_digest');
+  }
+}
+
+/**
+ * Сводка по запросу администратора из бота (/today, /tomorrow, 20.11.2026): тот же формат, что в 12:00 / 20:00;
+ * новые записи и отмены — с последней плановой сводки до сейчас; кураторы видят только свои направления.
+ */
+export async function adminDigestNow(telegramId: number, day: 'today' | 'tomorrow', now = new Date()): Promise<string | null> {
+  const slot = summarySlot(now);
+  const scheduleDay = day === 'today' ? clubDayStart(now) : new Date(clubDayStart(now).getTime() + DAY);
+  const vars = await digestBuilder({ previous: slot.at, at: now, label: 'по запросу' }, scheduleDay, day === 'today');
+  return renderKind('admin_digest', vars(curatorAreasById(String(telegramId)) ?? null).vars);
+}
+
+async function digestBuilder(slot: { previous: Date; at: Date; label: string }, scheduleDay: Date, today: boolean) {
   const base = {
     id: reservationsTable.id,
     serviceId: reservationsTable.serviceId,
@@ -281,31 +309,19 @@ async function adminSummary(now: Date) {
     return {
       empty: !day.length && !created.length && !cancelled.length,
       vars: {
-        сводка: `${String(slot.hour).padStart(2, '0')}:00`,
+        сводка: slot.label,
         новых: created.length,
         отмен: cancelled.length,
         новые: block('🆕 Новые записи', created.map((r) => changeLine(r, sessionOf(r)))),
         отмены: block('❌ Отмены', cancelled.map((r) => changeLine(r, sessionOf(r)))),
-        день: slot.hour === 12 ? 'Сегодня' : `Завтра, ${formatClubDateTime(scheduleDay).split(', ').slice(0, 2).join(', ')}`,
+        день: today ? 'Сегодня' : `Завтра, ${formatClubDateTime(scheduleDay).split(', ').slice(0, 2).join(', ')}`,
         всего: dayTotal(day),
         армия: armies > 0 ? armies : '',
         список: scheduleText(day),
       },
     };
   };
-  const groups = new Map<string, string[]>();
-  for (const id of getAdminTelegramIds()) {
-    const key = (curatorAreasById(id) ?? []).join(',');
-    groups.set(key, [...(groups.get(key) ?? []), id]);
-  }
-  for (const [key, ids] of groups) {
-    const areas = key ? (key.split(',') as AdminArea[]) : null;
-    const built = vars(areas);
-    if (areas && built.empty) continue;
-    const text = await renderKind('admin_digest', built.vars);
-    if (!text) continue;
-    for (const id of ids) void sendTelegramMessageDetailed(id, text, 'admin_digest');
-  }
+  return vars;
 }
 
 /**
