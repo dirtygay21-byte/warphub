@@ -145,7 +145,7 @@ async function myBookings(telegramId: number, now = new Date()): Promise<MyBooki
   });
 }
 
-async function dataReply(command: string, telegramId: number): Promise<BotReply> {
+export async function dataReply(command: string, telegramId: number): Promise<BotReply> {
   if (command === 'my') {
     const list = await myBookings(telegramId);
     return myReply(list ?? [], { known: list !== null });
@@ -172,7 +172,7 @@ async function dataReply(command: string, telegramId: number): Promise<BotReply>
 }
 
 /** Отмена из чата — та же функция, что в приложении (уведомления, цены стола, лист ожидания). */
-async function cancelFromChat(telegramId: number, reservationId: string): Promise<string> {
+export async function cancelFromChat(telegramId: number, reservationId: string): Promise<string> {
   const user = await findUserByTelegramId(telegramId);
   if (!user) return 'Не нашли вас в WarpHub — откройте приложение.';
   const b = (await myBookings(telegramId))?.find((x) => x.id === reservationId);
