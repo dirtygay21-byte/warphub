@@ -128,6 +128,9 @@ import {
   PricingError,
   removeManualDiscount,
   upsertServicePrice,
+  listChargeCatalog,
+  resetReservationCharges,
+  setReservationCharges,
 } from '../pricing/service';
 import { pricingBillingModes } from '../../db/schema/pricing';
 
@@ -375,6 +378,32 @@ export const adminModule = new Elysia({ prefix: '/admin', tags: ['Admin'] })
   }, {
     params: t.Object({ id: t.String({ format: 'uuid' }) }),
     detail: { tags: ['Admin'], summary: 'Стоимость записи, скидки, оплаты и остаток' },
+  })
+  .get('/pricing/charge-catalog', async () => listChargeCatalog(), {
+    detail: { tags: ['Admin'], summary: 'Услуги для позиций счёта: аренда стола и все услуги с текущими ценами' },
+  })
+  .put('/reservations/:id/charges', async ({ params, body, user }) => {
+    try {
+      return await setReservationCharges(params.id, body.lines, user.id);
+    } catch (error) {
+      if (error instanceof PricingError) return mapPricingError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    body: t.Object({ lines: t.Array(t.Object({ catalogId: t.String({ minLength: 1 }), share: t.Number({ exclusiveMinimum: 0, maximum: 10 }) }), { minItems: 1, maxItems: 10 }) }),
+    detail: { tags: ['Admin'], summary: 'Задать позиции счёта вручную (услуга из списка и доля)' },
+  })
+  .post('/reservations/:id/charges/reset', async ({ params }) => {
+    try {
+      return await resetReservationCharges(params.id);
+    } catch (error) {
+      if (error instanceof PricingError) return mapPricingError(error);
+      return status(500, { error: (error as Error).message });
+    }
+  }, {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    detail: { tags: ['Admin'], summary: 'Вернуть автоматический расчёт позиций счёта' },
   })
   .post('/reservations/:id/discounts', async ({ params, body, user }) => {
     try {

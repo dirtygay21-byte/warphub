@@ -65,9 +65,34 @@ export type ReservationPricing = {
   status: "free" | "unpaid" | "partial" | "paid";
   /** оплачено больше суммы счёта (после пересчёта доли стола) */
   overpaidAmount?: number;
+  /** позиции счёта (20.11.2026): услуга и аренда стола; у старых счетов — пусто */
+  charges?: ReservationCharge[];
+  /** позиции поправил администратор */
+  chargesEdited?: boolean;
   discounts: ReservationDiscount[];
   payments: ReservationPayment[];
 };
+
+export type ReservationCharge = {
+  id: string;
+  kind: "service" | "table";
+  serviceId: number | null;
+  title: string;
+  unitPrice: number;
+  share: number;
+  amount: number;
+  auto: boolean;
+};
+
+export type ChargeCatalogItem = { id: string; kind: "service" | "table"; serviceId: number | null; title: string; unitPrice: number };
+
+export const getChargeCatalog = () => apiRequest<ChargeCatalogItem[]>("/admin/pricing/charge-catalog");
+
+export const setAdminReservationCharges = (reservationId: string, lines: Array<{ catalogId: string; share: number }>) =>
+  apiRequest<ReservationPricing>(`/admin/reservations/${reservationId}/charges`, { method: "PUT", body: JSON.stringify({ lines }) });
+
+export const resetAdminReservationCharges = (reservationId: string) =>
+  apiRequest<ReservationPricing>(`/admin/reservations/${reservationId}/charges/reset`, { method: "POST" });
 
 export const BILLING_MODE_LABELS: Record<BillingMode, string> = {
   per_guest: "За гостя",
