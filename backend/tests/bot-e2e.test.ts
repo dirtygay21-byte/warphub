@@ -35,9 +35,9 @@ function sql(query: string): string {
   return r.stdout.toString().trim();
 }
 
-// ближайшая суббота не раньше чем через 4 дня
+// ближайшая суббота с завтрашнего дня — в пределах недели, которую показывает «Ищут соперника»
 const day = (() => {
-  const d = new Date(Date.now() + 4 * 86400_000);
+  const d = new Date(Date.now() + 1 * 86400_000);
   while (new Date(d.getTime() + 5 * 3600_000).getUTCDay() !== 6) d.setTime(d.getTime() + 86400_000);
   return new Date(d.getTime() + 5 * 3600_000).toISOString().slice(0, 10);
 })();
