@@ -132,12 +132,16 @@ export function startTelegramUpdates(hasOtherAccess: (telegramId: number) => Pro
     }
     let offset = 0;
     state.mode = 'polling';
+    // меню команд бота (20.11.2026) — только когда бот наш (нет чужого webhook); список админов меняется — меню обновляется
+    const commands = () => import('../bot').then((bot) => bot.registerBotCommands()).catch((error) => console.warn('[bot] commands failed:', (error as Error).message));
+    setTimeout(commands, 15_000);
+    setInterval(commands, 5 * 60_000);
     for (;;) {
       try {
         const res = await telegramFetch('getUpdates', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ offset, timeout: 25, allowed_updates: ['chat_member', 'my_chat_member', 'message'] }),
+          body: JSON.stringify({ offset, timeout: 25, allowed_updates: ['chat_member', 'my_chat_member', 'message', 'callback_query'] }),
           timeoutMs: 40_000,
         });
         const json = (await res.json()) as { ok: boolean; result?: TelegramUpdate[]; description?: string; error_code?: number };
@@ -156,6 +160,10 @@ export function startTelegramUpdates(hasOtherAccess: (telegramId: number) => Pro
           offset = Math.max(offset, u.update_id + 1);
           state.lastUpdateAt = new Date().toISOString();
           await handleUpdate(u, hasOtherAccess).catch((error) => console.warn('[boosty-group] update failed:', (error as Error).message));
+          // личный чат с ботом: команды и кнопки (20.11.2026)
+          await import('../bot')
+            .then((bot) => bot.handleBotUpdate(u as import('../bot').BotUpdate))
+            .catch((error) => console.warn('[bot] update failed:', (error as Error).message));
         }
       } catch (error) {
         Object.assign(state, { mode: 'error', detail: (error as Error).message });
