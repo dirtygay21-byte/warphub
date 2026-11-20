@@ -54,13 +54,12 @@ export default function HomeStage() {
       return { title: ev.title, sub: "Ивент", startsAt: ev.startsAt, endsAt: ev.endsAt, tone: "lime" as const };
     }
     if (!res) return null;
-    const pending = res.status.toLowerCase() === "pending";
     return {
       title: res.serviceTitle ?? "Запись",
       sub: [getStatusLabel(res.status), res.tableName].filter(Boolean).join(" · "),
       startsAt: res.startsAt,
       endsAt: res.endsAt,
-      tone: pending ? ("warn" as const) : ("lime" as const),
+      tone: "lime" as const,
     };
   }, [reservationsQuery.data]);
 

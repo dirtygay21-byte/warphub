@@ -36,7 +36,7 @@ describe('стандартные тексты', () => {
     }
   });
   test('о записях к игре — игра в заголовке', () => {
-    for (const id of ['booking_created', 'booking_confirmed', 'opponent_joined', 'opponent_cancelled', 'booking_cancelled_admin', 'booking_time_changed', 'reminder_3h', 'reminder_eve', 'admin_pending']) {
+    for (const id of ['booking_created', 'opponent_joined', 'opponent_cancelled', 'booking_cancelled_admin', 'booking_time_changed', 'reminder_3h', 'reminder_eve']) {
       const k = NOTIFICATION_KINDS.find((x) => x.id === id)!;
       expect(k.defaultText.split('\n')[0], id).toContain('{что}');
     }

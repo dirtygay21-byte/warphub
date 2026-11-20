@@ -113,7 +113,7 @@ export function ReservationsTable({
               {item.game ? (
                 <GameRow row={item.rows[0]!} onOpen={() => setOpen(item.key)} />
               ) : (
-                <BookingRow row={item.rows[0]!} onOpen={() => setOpen(item.key)} onConfirm={(row) => onStatusActionSelect(row, "confirm")} />
+                <BookingRow row={item.rows[0]!} onOpen={() => setOpen(item.key)} />
               )}
             </li>
           ))}
@@ -144,7 +144,7 @@ export function ReservationsTable({
 const when = (row: AdminReservationRow) =>
   row.startsAt ? `${formatClub(row.startsAt, { day: "numeric", month: "short", weekday: "short" })} · ${row.timeRange}` : row.timeRange;
 
-const SHORT_STATUS: Record<string, string> = { pending: "Ждёт", confirmed: "Подтв.", cancelled: "Отмена" };
+const SHORT_STATUS: Record<string, string> = { pending: "Подтв.", confirmed: "Подтв.", cancelled: "Отмена" };
 
 /** Короткий статус в строке списка (полный — в окне записи). */
 function StatusPill({ status }: { status: string }) {
@@ -166,9 +166,8 @@ function SeatsBadge({ occupied, seats }: { occupied: number; seats: number }) {
 
 const rowClass = "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-white/[0.03] active:bg-white/[0.05]";
 
-/** Строка записи; у ожидающих — «Подтвердить» прямо в строке (15.11.2026), без открытия окна. */
-function BookingRow({ row, onOpen, onConfirm }: { row: AdminReservationRow; onOpen: () => void; onConfirm: (row: AdminReservationRow) => void }) {
-  const pending = row.status === "pending";
+/** Строка записи (подтверждение автоматическое с 20.11.2026 — кнопки «Подтвердить» нет). */
+function BookingRow({ row, onOpen }: { row: AdminReservationRow; onOpen: () => void }) {
   return (
     <div className="flex items-center">
     <button type="button" onClick={onOpen} className={clsx(rowClass, "min-w-0 flex-1")}>
@@ -188,18 +187,8 @@ function BookingRow({ row, onOpen, onConfirm }: { row: AdminReservationRow; onOp
           <span className={clsx("mt-0.5 block truncate text-[12px]", row.needsHelp ? "text-yellow-200" : "text-fg-3")}>{row.detailsLabel}</span>
         )}
       </span>
-      {!pending && <ChevronRight className="size-5 shrink-0 text-fg-3" />}
+      <ChevronRight className="size-5 shrink-0 text-fg-3" />
     </button>
-    {pending && (
-      <button
-        type="button"
-        onClick={() => onConfirm(row)}
-        aria-label={`Подтвердить запись: ${row.userLabel}`}
-        className="ds-press mr-3 inline-flex min-h-11 shrink-0 items-center rounded-xl bg-accent px-3 text-[13px] font-semibold text-accent-foreground"
-      >
-        Подтвердить
-      </button>
-    )}
     </div>
   );
 }

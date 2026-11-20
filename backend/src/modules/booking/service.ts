@@ -194,8 +194,6 @@ type ServiceRow = {
   poolCapacity: number | null;
   hasTrainer: boolean;
   isActive: boolean;
-  /** автоподтверждение записи (17.11.2026) */
-  autoConfirm: boolean;
   scheduleWeekdays: number[] | null;
   disciplineActive: boolean | null;
 };
@@ -244,7 +242,6 @@ async function loadService(
       poolCapacity: servicesTable.poolCapacity,
       hasTrainer: servicesTable.hasTrainer,
       isActive: servicesTable.isActive,
-      autoConfirm: servicesTable.autoConfirm,
       scheduleWeekdays: disciplinesTable.scheduleWeekdays,
       disciplineActive: disciplinesTable.isActive,
     })
@@ -975,7 +972,8 @@ export async function createReservation(
           details,
           startsAt,
           endsAt,
-          status: service.autoConfirm ? 'confirmed' : 'pending',
+          // подтверждение автоматическое (20.11.2026, решение владельца): запись сразу подтверждена
+          status: 'confirmed',
         })
         .returning();
 
@@ -1085,7 +1083,7 @@ export async function createReservation(
         details,
         startsAt,
         endsAt,
-        status: service.autoConfirm ? 'confirmed' : 'pending',
+        status: 'confirmed',
       })
       .returning();
 
@@ -1268,7 +1266,7 @@ async function notifyAfterCreate(
 }
 
 /** Игроку о его записи: подтверждена / время изменено (14.11.2026). */
-async function notifyPlayerOf(reservation: Reservation, kind: 'booking_confirmed' | 'booking_time_changed') {
+async function notifyPlayerOf(reservation: Reservation, kind: 'booking_time_changed') {
   try {
     const service = await loadService(db, reservation.serviceId);
     const [booker] = await loadUsersForReservations([reservation.id]);
@@ -1917,7 +1915,7 @@ export async function confirmReservation(
     .where(eq(reservationsTable.id, reservationId))
     .returning();
 
-  void notifyPlayerOf(updated!, 'booking_confirmed');
+  // 20.11.2026: подтверждение автоматическое — отдельного «Запись подтверждена» игроку больше нет
   return updated!;
 }
 

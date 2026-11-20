@@ -61,7 +61,7 @@ export default function ClubArmyCalendar() {
                     key={b.reservationId}
                     className={`flex items-center gap-3 rounded-[14px] border bg-app-elevated p-3 ${clash > 0 ? "border-warn/60" : "border-white/10"}`}
                   >
-                    <DateTile date={b.startsAt} tone={b.status === "pending" ? "warn" : "lime"} />
+                    <DateTile date={b.startsAt} tone="lime" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[15px] font-bold">{gameLabelOf(options, b.game)}</span>
                       <span className="mt-0.5 block text-[13.5px] text-fg">

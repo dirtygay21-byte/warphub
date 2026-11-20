@@ -127,7 +127,6 @@ export function reminderText(n: {
     `Когда: ${formatClubDateTime(n.startsAt, n.endsAt)}`,
     n.tableName ? `Стол: ${escapeHtml(n.tableName)}` : '',
     n.opponents.length ? `Соперник: ${n.opponents.map((o) => escapeHtml(formatUserName(o))).join(', ')}` : '',
-    n.status === 'pending' ? 'Запись ещё ждёт подтверждения администратора.' : '',
     'Не получается прийти — отмените запись в приложении, раздел «Записи».',
   ];
   return lines.filter(Boolean).join('\n');

@@ -115,7 +115,7 @@ export function ReservationCard({
           {/* дата плиткой слева (15.11.2026): список читается по датам; цвет плитки = статус */}
           <DateTile
             date={reservation.startsAt}
-            tone={isPast ? "muted" : cancelled ? "danger" : reservation.status.toLowerCase() === "pending" ? "warn" : "lime"}
+            tone={isPast ? "muted" : cancelled ? "danger" : "lime"}
           />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-[16px] font-bold leading-tight">
@@ -125,7 +125,7 @@ export function ReservationCard({
               <span className="whitespace-nowrap text-[14px] text-fg">{formatTimeRange(reservation.startsAt, reservation.endsAt)}</span>
               {!isServiceLoading && (
                 <span className={clsx("inline-flex h-[22px] shrink-0 items-center whitespace-nowrap rounded-[8px] px-2 text-[11.5px] font-semibold", getStatusStyle(reservation.status))}>
-                  {reservation.status.toLowerCase() === "pending" ? "Ждёт" : getStatusLabel(reservation.status)}
+                  {getStatusLabel(reservation.status)}
                 </span>
               )}
             </span>

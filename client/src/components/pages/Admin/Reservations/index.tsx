@@ -2,7 +2,6 @@ import {
   confirmAdminReservation,
   extendAdminReservation,
   getAdminReservations,
-  getAdminReservationsCount,
   getUserById,
   rejectAdminReservation,
 } from "@/apiUtils/admin";
@@ -25,8 +24,6 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import clsx from "clsx";
-import { LimeHero } from "@/components/ui/ds";
-import { getRecordsLabel } from "@/utils/plural";
 import { Filter, LoaderCircle, RefreshCw, Shield } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ExtendReservationDialog } from "./components/ExtendReservationDialog";
@@ -78,14 +75,14 @@ export default function AdminReservations() {
   const queryClient = useQueryClient();
   const bookingOptions = useBookingOptions();
   // Категории и порядок (14.11.2026): по умолчанию — только ожидающие подтверждения
-  // автоподтверждение (17.11.2026): по умолчанию — ждущие и подтверждённые (ждущих почти не бывает)
-  const [categories, setCategories] = useState<string[]>(["pending", "confirmed"]);
+  // подтверждение автоматическое (20.11.2026): по умолчанию — предстоящие («confirmed» = pending + confirmed)
+  const [categories, setCategories] = useState<string[]>(["confirmed"]);
   const [sortIndex, setSortIndex] = useState(0);
   const queryParams = useMemo(() => {
     const sort = RESERVATION_SORTS[sortIndex] ?? RESERVATION_SORTS[0]!;
     return {
       ...formToQuery(appliedFilters, pageSize, page * pageSize),
-      ...(categories.length ? { categories: categories.join(",") } : {}),
+      ...(categories.length ? { categories: categories.flatMap((c) => (c === "confirmed" ? ["pending", "confirmed"] : [c])).join(",") } : {}),
       sortBy: sort.key,
       sortOrder: sort.desc ? ("desc" as const) : ("asc" as const),
     };
@@ -97,12 +94,6 @@ export default function AdminReservations() {
     placeholderData: keepPreviousData,
   });
 
-  // лаймовый концепт (15.11.2026): сколько записей ждёт подтверждения — цветной блок над списком (жёлтый — есть, лайм — нет)
-  const pendingQuery = useQuery({
-    queryKey: ["admin-reservations", "pending-count"],
-    queryFn: () => getAdminReservationsCount("pending"),
-  });
-  const pendingTotal = pendingQuery.data ?? null;
 
   const servicesQuery = useQuery({
     queryKey: ["services"],
@@ -333,25 +324,6 @@ export default function AdminReservations() {
 
   return (
     <div className="px-4 py-3 pb-28 text-white sm:px-6">
-      {pendingTotal != null && pendingTotal > 0 && (
-        <LimeHero
-          tone={pendingTotal > 0 ? "warn" : "lime"}
-          kicker="Ждут подтверждения"
-          title={pendingTotal > 0 ? `${pendingTotal} ${getRecordsLabel(pendingTotal)}` : "Новых заявок нет"}
-          size="sm"
-          className="mb-4"
-        >
-          {pendingTotal > 0 && !(categories.length === 1 && categories[0] === "pending") && (
-            <button
-              type="button"
-              onClick={() => (setCategories(["pending"]), setPage(0))}
-              className="ds-press min-h-11 self-start rounded-[12px] bg-[#111110] px-4 text-[14px] font-semibold text-accent"
-            >
-              Показать
-            </button>
-          )}
-        </LimeHero>
-      )}
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-[28px] font-semibold uppercase leading-none">Все записи</h1>

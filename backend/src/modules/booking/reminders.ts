@@ -82,7 +82,6 @@ export async function sendDueReminders(now = new Date()): Promise<number> {
       await notifyKind('reminder_3h', row.telegramId, {
         ...bookingVars({ service: { title: row.serviceTitle, slug: row.serviceSlug }, details: r.details as ReservationDetails | null, startsAt: r.startsAt, endsAt: r.endsAt, tableName: row.tableName }),
         соперник: opponents.map((o) => playerLine(o, o.details as ReservationDetails | null)).join('; '),
-        ждёт_подтверждения: r.status === 'pending' ? 'Запись ещё ждёт подтверждения администратора.' : '',
       });
       sent++;
     } catch (error) {
