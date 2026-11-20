@@ -8,7 +8,7 @@ const svc = { title: 'Игра Warhammer', slug: 'wh_game' };
 describe('переменные записи: игра везде (14.11.2026)', () => {
   test('Kill Team: игра, команда с фракцией, без очков', () => {
     const v = bookingVars({ service: svc, details: { kind: 'wh_player', game: 'kt', army: 'Kommandos', points: null, experienceLevel: 'player' }, ...when, tableName: 'Стол 2' });
-    expect(v.что).toBe('Kill Team');
+    expect(v.что).toBe('Игра · Kill Team');
     expect(v.игра).toBe('Kill Team');
     expect(v.армия).toStartWith('Команда: Kommandos');
     expect(v.очки).toBe('');
