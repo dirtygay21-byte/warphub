@@ -1,5 +1,5 @@
-import { relations } from 'drizzle-orm';
-import { doublePrecision, index, integer, pgTable, serial, text, timestamp, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
+import { boolean, check, doublePrecision, index, integer, pgTable, serial, text, timestamp, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
 import { servicesTable } from './services';
 import { reservationsTable } from './reservations';
 import { usersTable } from './users';
@@ -42,6 +42,8 @@ export const reservationPricingTable = pgTable('reservation_pricing', {
   armyRentalPricePer1000: doublePrecision('army_rental_price_per_1000').notNull().default(0),
   armyRentalAmount: doublePrecision('army_rental_amount').notNull().default(0),
   totalAmount: doublePrecision('total_amount').notNull(),
+  /** счёт по позициям (reservation_charges): база = сумма позиций (20.11.2026); false — старый счёт по тарифу */
+  itemized: boolean('itemized').notNull().default(false),
   paidAmount: doublePrecision('paid_amount').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true })
@@ -49,6 +51,36 @@ export const reservationPricingTable = pgTable('reservation_pricing', {
     .$onUpdateFn(() => new Date())
     .notNull(),
 });
+
+/**
+ * Позиции счёта (20.11.2026): услуга и аренда стола. share — доля этой записи (½ — пополам за парной тренировкой,
+ * 2 — два места по цене за человека), amount = unitPrice × share. auto = false — поправлено администратором.
+ */
+export const reservationChargeKinds = ['service', 'table'] as const;
+export type ReservationChargeKind = (typeof reservationChargeKinds)[number];
+export const reservationChargesTable = pgTable(
+  'reservation_charges',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    reservationId: uuid('reservation_id')
+      .notNull()
+      .references(() => reservationsTable.id, { onDelete: 'cascade' }),
+    kind: varchar('kind', { enum: reservationChargeKinds }).notNull(),
+    serviceId: integer('service_id').references(() => servicesTable.id, { onDelete: 'set null' }),
+    title: text('title').notNull(),
+    unitPrice: doublePrecision('unit_price').notNull(),
+    share: doublePrecision('share').notNull().default(1),
+    amount: doublePrecision('amount').notNull(),
+    auto: boolean('auto').notNull().default(true),
+    position: integer('position').notNull().default(0),
+    createdBy: uuid('created_by').references(() => usersTable.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index('reservation_charges_reservation_index').on(table.reservationId, table.position),
+    check('reservation_charges_kind_check', sql`${table.kind} IN ('service', 'table')`),
+  ],
+);
 
 export const reservationDiscountsTable = pgTable(
   'reservation_discounts',

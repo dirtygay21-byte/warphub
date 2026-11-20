@@ -85,3 +85,52 @@ export const PAYMENT_METHOD_LABEL = {
   transfer: 'Перевод',
   other: 'Другое',
 } as const;
+
+// ---------- позиции счёта (20.11.2026, решение владельца) ----------
+
+export type ChargeLine = { kind: 'service' | 'table'; serviceId: number | null; title: string; unitPrice: number; share: number; amount: number };
+
+export const TABLE_CHARGE_TITLE = 'Аренда стола';
+const TRAINING_SLUGS = new Set(['wh_group_training', 'wh_solo_training']);
+
+export const chargeLine = (line: Omit<ChargeLine, 'amount'>): ChargeLine => ({ ...line, share: roundShare(line.share), amount: roundMoney(line.unitPrice * line.share) });
+export const roundShare = (share: number) => Math.round(share * 10_000) / 10_000;
+
+/**
+ * Позиции счёта по правилу владельца: всегда «услуга + стол».
+ * - Игра: только «Аренда стола» (тариф игры), делится между игроками за столом; один игрок платит весь стол.
+ * - Парная (групповая) тренировка: тренировка и стол делятся на места за столом — каждый платит свою долю (½),
+ *   даже пока второй не записался.
+ * - Индивидуальная тренировка: тренировка и весь стол — на одного.
+ * - Остальное (покраска, посещение, D&D): одна строка по тарифу услуги, как раньше.
+ */
+export function autoChargeLines(input: {
+  slug: string;
+  service: { id: number; title: string; unitPrice: number; billingMode: PricingBillingMode };
+  /** тариф игры за столом — цена аренды стола (решение владельца 20.11.2026) */
+  table: { serviceId: number | null; unitPrice: number } | null;
+  partySize: number;
+  /** мест за столом у услуги */
+  seats: number;
+  /** сколько мест занято за этим столом в это время (вместе с этой записью) */
+  tableGuests: number;
+  atTable: boolean;
+}): ChargeLine[] {
+  const party = Math.max(1, Math.floor(input.partySize));
+  const s = input.service;
+  if (input.slug === 'wh_game' && input.atTable) {
+    const guests = Math.max(party, input.tableGuests);
+    return [chargeLine({ kind: 'table', serviceId: s.id, title: TABLE_CHARGE_TITLE, unitPrice: s.unitPrice, share: party / guests })];
+  }
+  if (TRAINING_SLUGS.has(input.slug) && input.atTable) {
+    const seats = Math.max(1, input.seats);
+    const serviceShare = s.billingMode === 'per_guest' ? party : s.billingMode === 'per_pair' ? party / 2 : party / seats;
+    const lines = [chargeLine({ kind: 'service', serviceId: s.id, title: s.title, unitPrice: s.unitPrice, share: Math.min(serviceShare, s.billingMode === 'per_guest' ? party : 1) })];
+    if (input.table) lines.push(chargeLine({ kind: 'table', serviceId: input.table.serviceId, title: TABLE_CHARGE_TITLE, unitPrice: input.table.unitPrice, share: Math.min(1, party / seats) }));
+    return lines;
+  }
+  const share = s.billingMode === 'per_table' ? 1 : s.billingMode === 'per_pair' ? Math.ceil(party / 2) : party;
+  return [chargeLine({ kind: 'service', serviceId: s.id, title: s.title, unitPrice: s.unitPrice, share })];
+}
+
+export const sumCharges = (lines: Array<{ amount: number }>) => roundMoney(lines.reduce((sum, l) => sum + l.amount, 0));

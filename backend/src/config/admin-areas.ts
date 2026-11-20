@@ -51,7 +51,7 @@ export type CuratorRule =
   | { kind: 'discount'; id: string };
 
 const UUID = '[0-9a-fA-F-]{36}';
-const RESERVATION_ACTION = new RegExp(`^/admin/reservations/(${UUID})/(pricing|discounts|training-game|reward|payments|confirm|reject|extend|move)$`);
+const RESERVATION_ACTION = new RegExp(`^/admin/reservations/(${UUID})/(pricing|discounts|training-game|reward|payments|charges|charges/reset|confirm|reject|extend|move)$`);
 const DISCOUNT = new RegExp(`^/admin/reservations/discounts/(${UUID})$`);
 
 /**
@@ -65,6 +65,8 @@ export function curatorRule(method: string, path: string): CuratorRule {
   if (m === 'GET' && p === '/admin/me') return { kind: 'allow' };
   if (m === 'POST' && p === '/admin/notifications/test') return { kind: 'allow' };
   if (m === 'GET' && (p === '/admin/reservations' || p === '/admin/reservations/count')) return { kind: 'allow' };
+  // список услуг для позиций счёта — только чтение
+  if (m === 'GET' && p === '/admin/pricing/charge-catalog') return { kind: 'allow' };
   const discount = p.match(DISCOUNT);
   if (discount && m === 'DELETE') return { kind: 'discount', id: discount[1]! };
   const action = p.match(RESERVATION_ACTION);

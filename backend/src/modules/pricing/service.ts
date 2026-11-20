@@ -1,6 +1,7 @@
 import { and, asc, count, desc, eq, inArray, isNull, lte, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import {
+  reservationChargesTable,
   reservationDiscountsTable,
   reservationPaymentsTable,
   reservationPricingTable,
@@ -13,7 +14,8 @@ import { minigameRewardsTable } from '../../db/schema/minigames';
 import { pointPromoCodesTable } from '../../db/schema/point-promos';
 import { normalizeRewardCode } from '../minigames/rules';
 import { clubArmyPointsFor } from '../booking/rules';
-import { armyRentalPriceFor, basePriceFor, paymentStatus, roundMoney, servicePricingDefaults, totalWithDiscounts, validateManualDiscount, type PricingDiscountInput } from './rules';
+import { bookingConfig } from '../../config/booking';
+import { armyRentalPriceFor, autoChargeLines, basePriceFor, chargeLine, paymentStatus, roundMoney, servicePricingDefaults, sumCharges, TABLE_CHARGE_TITLE, totalWithDiscounts, validateManualDiscount, type ChargeLine, type PricingDiscountInput } from './rules';
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 type Executor = typeof db | Tx;
@@ -190,10 +192,21 @@ export async function refreshReservationPricing(tx: Tx, reservationId: string) {
   const parties = await sessionParties(tx, reservation);
   const tableGuests = parties.reduce((sum, row) => sum + Math.max(1, row.partySize ?? 1), 0);
   const armyRentalPoints = rentedArmyPoints(reservation, service?.slug ?? '');
+  let baseAmount = baseAmountFor(pricing.billingMode as PricingBillingMode, unitPrice, reservation, tableGuests);
+  if (pricing.itemized) {
+    // счёт по позициям: свои позиции администратора не трогаем, автоматические — по текущему столу (доли)
+    const charges = await tx.select().from(reservationChargesTable).where(eq(reservationChargesTable.reservationId, reservationId)).orderBy(asc(reservationChargesTable.position));
+    if (charges.every((c) => c.auto)) {
+      const table = charges.find((c) => c.kind === 'table');
+      const lines = await autoLinesFor(tx, reservation, { unitPrice, billingMode: pricing.billingMode as PricingBillingMode, tableGuests, tableUnitPrice: table?.unitPrice ?? null });
+      await replaceCharges(tx, reservationId, lines, { auto: true, createdBy: null });
+      baseAmount = sumCharges(lines);
+    } else baseAmount = sumCharges(charges);
+  }
   await tx.update(reservationPricingTable).set({
     priceVariant: variant,
     unitPrice,
-    baseAmount: baseAmountFor(pricing.billingMode as PricingBillingMode, unitPrice, reservation, tableGuests),
+    baseAmount,
     armyRentalPoints,
     armyRentalAmount: armyRentalPriceFor(armyRentalPoints, pricing.armyRentalPricePer1000),
     updatedAt: new Date(),
@@ -219,7 +232,11 @@ export async function createReservationPricing(tx: Tx, reservation: ReservationR
     : priceVariant === 'own_materials'
       ? price?.ownMaterialsPrice ?? defaults.ownMaterialsPrice
       : price?.unitPrice ?? defaults.unitPrice;
-  const baseAmount = basePriceFor(billingMode, unitPrice, reservation.partySize ?? 1);
+  // новые записи (20.11.2026) — счёт по позициям: услуга + аренда стола
+  const parties = reservation.tableId !== null ? await sessionParties(tx, reservation) : [];
+  const tableGuests = Math.max(Math.max(1, reservation.partySize ?? 1), parties.reduce((sum, row) => sum + Math.max(1, row.partySize ?? 1), 0));
+  const lines = await autoLinesFor(tx, reservation, { unitPrice, billingMode, tableGuests, tableUnitPrice: null });
+  const baseAmount = sumCharges(lines);
   const armyRentalPoints = rentedArmyPoints(reservation, service?.slug ?? '');
   const armyRentalPricePer1000 = price?.armyRentalPricePer1000 ?? defaults.armyRentalPricePer1000;
   const armyRentalAmount = armyRentalPriceFor(armyRentalPoints, armyRentalPricePer1000);
@@ -233,7 +250,9 @@ export async function createReservationPricing(tx: Tx, reservation: ReservationR
     armyRentalPricePer1000,
     armyRentalAmount,
     totalAmount: roundMoney(baseAmount + armyRentalAmount),
+    itemized: true,
   });
+  await replaceCharges(tx, reservation.id, lines, { auto: true, createdBy: null });
 
   const thirdPercent = price?.thirdGameDiscountPercent ?? defaults.thirdGameDiscountPercent;
   if (price && service?.slug === GROUP_TRAINING_SLUG && thirdPercent > 0) {
@@ -296,7 +315,8 @@ export async function getReservationPricing(reservationId: string, executor: Exe
     .where(eq(reservationsTable.id, reservationId))
     .limit(1);
   if (!reservation) throw new PricingError('RESERVATION_NOT_FOUND', 'Запись не найдена');
-  const [discounts, payments, trainingGamesUsed] = await Promise.all([
+  const [charges, discounts, payments, trainingGamesUsed] = await Promise.all([
+    executor.select().from(reservationChargesTable).where(eq(reservationChargesTable.reservationId, reservationId)).orderBy(asc(reservationChargesTable.position)),
     executor.select().from(reservationDiscountsTable).where(eq(reservationDiscountsTable.reservationId, reservationId)).orderBy(asc(reservationDiscountsTable.createdAt), asc(reservationDiscountsTable.id)),
     executor.select().from(reservationPaymentsTable).where(eq(reservationPaymentsTable.reservationId, reservationId)).orderBy(asc(reservationPaymentsTable.createdAt), asc(reservationPaymentsTable.id)),
     countTrainingGames(executor, reservation.userId),
@@ -309,6 +329,8 @@ export async function getReservationPricing(reservationId: string, executor: Exe
     overpaidAmount: roundMoney(Math.max(0, pricing.paidAmount - pricing.totalAmount)),
     trainingGamesUsed,
     trainingGamesRemaining: Math.max(0, TRAINING_GAMES_LIMIT - trainingGamesUsed),
+    charges,
+    chargesEdited: charges.some((c) => !c.auto),
     discounts,
     payments,
   };
@@ -480,5 +502,108 @@ export async function addReservationPayment(input: {
     });
     await tx.update(reservationPricingTable).set({ paidAmount, updatedAt: new Date() }).where(eq(reservationPricingTable.reservationId, input.reservationId));
     return getReservationPricing(input.reservationId, tx);
+  });
+}
+
+
+// ---------- позиции счёта (20.11.2026) ----------
+
+/** Мест за столом у услуги (как в записи: seats_per_table, иначе профиль стола). */
+function seatsOfService(service: { seatsPerTable: number | null; tableCapacityProfile: string | null }) {
+  if (service.seatsPerTable !== null) return service.seatsPerTable;
+  if (service.tableCapacityProfile) return (bookingConfig.tableCapacityByProfile as Record<string, number>)[service.tableCapacityProfile] ?? 0;
+  return 0;
+}
+
+/** Цена аренды стола — тариф «Игра Warhammer» (решение владельца 20.11.2026). */
+async function tableTariff(executor: Executor) {
+  const [game] = await executor.select({ id: servicesTable.id }).from(servicesTable).where(eq(servicesTable.slug, 'wh_game')).orderBy(asc(servicesTable.id)).limit(1);
+  if (!game) return { serviceId: null, unitPrice: servicePricingDefaults('wh_game').unitPrice };
+  const price = await currentServicePrice(game.id, executor);
+  return { serviceId: game.id, unitPrice: price?.unitPrice ?? servicePricingDefaults('wh_game').unitPrice };
+}
+
+async function autoLinesFor(
+  executor: Executor,
+  reservation: ReservationRow,
+  opts: { unitPrice: number; billingMode: PricingBillingMode; tableGuests: number; tableUnitPrice: number | null },
+): Promise<ChargeLine[]> {
+  const [service] = await executor
+    .select({ id: servicesTable.id, slug: servicesTable.slug, title: servicesTable.title, seatsPerTable: servicesTable.seatsPerTable, tableCapacityProfile: servicesTable.tableCapacityProfile })
+    .from(servicesTable)
+    .where(eq(servicesTable.id, reservation.serviceId))
+    .limit(1);
+  if (!service) return [];
+  const table = await tableTariff(executor);
+  return autoChargeLines({
+    slug: service.slug,
+    service: { id: service.id, title: service.title ?? service.slug, unitPrice: opts.unitPrice, billingMode: opts.billingMode },
+    table: { serviceId: table.serviceId, unitPrice: opts.tableUnitPrice ?? table.unitPrice },
+    partySize: reservation.partySize ?? 1,
+    seats: seatsOfService(service),
+    tableGuests: opts.tableGuests,
+    atTable: reservation.tableId !== null,
+  });
+}
+
+async function replaceCharges(tx: Tx, reservationId: string, lines: ChargeLine[], opts: { auto: boolean; createdBy: string | null }) {
+  await tx.delete(reservationChargesTable).where(eq(reservationChargesTable.reservationId, reservationId));
+  if (!lines.length) return;
+  await tx.insert(reservationChargesTable).values(
+    lines.map((l, i) => ({ reservationId, kind: l.kind, serviceId: l.serviceId, title: l.title, unitPrice: l.unitPrice, share: l.share, amount: l.amount, auto: opts.auto, position: i, createdBy: opts.createdBy })),
+  );
+}
+
+export type ChargeCatalogItem = { id: string; kind: 'service' | 'table'; serviceId: number | null; title: string; unitPrice: number };
+
+/** Что можно поставить в счёт: аренда стола и все услуги с их текущими ценами (у покраски — три варианта). */
+export async function listChargeCatalog(): Promise<ChargeCatalogItem[]> {
+  const [prices, table] = await Promise.all([listServicePrices(), tableTariff(db)]);
+  const items: ChargeCatalogItem[] = [{ id: 'table', kind: 'table', serviceId: table.serviceId, title: TABLE_CHARGE_TITLE, unitPrice: table.unitPrice }];
+  for (const p of prices) {
+    const title = p.title ?? p.slug;
+    items.push({ id: `svc:${p.id}`, kind: 'service', serviceId: p.id, title, unitPrice: p.unitPrice });
+    if (p.slug === 'wh_painting') {
+      items.push({ id: `svc:${p.id}:own`, kind: 'service', serviceId: p.id, title: `${title} · свои краски`, unitPrice: p.ownMaterialsPrice });
+      items.push({ id: `svc:${p.id}:club`, kind: 'service', serviceId: p.id, title: `${title} · краски клуба`, unitPrice: p.clubMaterialsPrice });
+    }
+  }
+  return items;
+}
+
+/** Администратор задаёт позиции счёта сам: услуга из списка и доля (1, ½, 2…). Цена — текущая цена из списка. */
+export async function setReservationCharges(reservationId: string, input: Array<{ catalogId: string; share: number }>, createdBy: string) {
+  if (!input.length) throw new PricingError('CHARGES_EMPTY', 'Добавьте хотя бы одну позицию');
+  if (input.length > 10) throw new PricingError('CHARGES_TOO_MANY', 'Не больше 10 позиций');
+  const catalog = await listChargeCatalog();
+  const lines = input.map((row) => {
+    const item = catalog.find((c) => c.id === row.catalogId);
+    if (!item) throw new PricingError('CHARGE_UNKNOWN', 'Такой услуги нет в списке');
+    if (!Number.isFinite(row.share) || row.share <= 0 || row.share > 10) throw new PricingError('CHARGE_SHARE', 'Доля должна быть больше 0 и не больше 10');
+    return chargeLine({ kind: item.kind, serviceId: item.serviceId, title: item.title, unitPrice: item.unitPrice, share: row.share });
+  });
+  return db.transaction(async (tx) => {
+    const reservation = await lockReservation(tx, reservationId);
+    await createReservationPricingIfMissing(tx, reservation);
+    await replaceCharges(tx, reservationId, lines, { auto: false, createdBy });
+    await tx.update(reservationPricingTable).set({ itemized: true, baseAmount: sumCharges(lines), updatedAt: new Date() }).where(eq(reservationPricingTable.reservationId, reservationId));
+    await recalculateReservationTotal(tx, reservationId, { allowBelowPaid: true });
+    return getReservationPricing(reservationId, tx);
+  });
+}
+
+/** Вернуть автоматический расчёт позиций (по текущим ценам и столу). */
+export async function resetReservationCharges(reservationId: string) {
+  return db.transaction(async (tx) => {
+    const reservation = await lockReservation(tx, reservationId);
+    await createReservationPricingIfMissing(tx, reservation);
+    const [pricing] = await tx.select().from(reservationPricingTable).where(eq(reservationPricingTable.reservationId, reservationId)).limit(1);
+    const parties = await sessionParties(tx, reservation);
+    const tableGuests = Math.max(Math.max(1, reservation.partySize ?? 1), parties.reduce((sum, row) => sum + Math.max(1, row.partySize ?? 1), 0));
+    const lines = await autoLinesFor(tx, reservation, { unitPrice: pricing!.unitPrice, billingMode: pricing!.billingMode as PricingBillingMode, tableGuests, tableUnitPrice: null });
+    await replaceCharges(tx, reservationId, lines, { auto: true, createdBy: null });
+    await tx.update(reservationPricingTable).set({ itemized: true, baseAmount: sumCharges(lines), updatedAt: new Date() }).where(eq(reservationPricingTable.reservationId, reservationId));
+    await recalculateReservationTotal(tx, reservationId, { allowBelowPaid: true });
+    return getReservationPricing(reservationId, tx);
   });
 }

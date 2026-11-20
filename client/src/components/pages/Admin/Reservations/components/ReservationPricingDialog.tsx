@@ -17,6 +17,7 @@ import clsx from "clsx";
 import { Gift, GraduationCap, LoaderCircle, Plus, ReceiptRussianRuble, Trash2, WalletCards, X } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { AdminReservationRow } from "../types";
+import { ChargesSection } from "./ChargesSection";
 
 const money = new Intl.NumberFormat("ru-RU", {
   style: "currency",
@@ -246,7 +247,7 @@ export function ReservationPricingDialog({
                     Аренда армии клуба (Kill Team и Warcry — как 1000 очков): {pricing.armyRentalPoints} очков × {money.format(pricing.armyRentalPricePer1000)} / 1000 = {money.format(pricing.armyRentalAmount)}
                   </p>
                 )}
-                {pricing.billingMode === "per_table" && pricing.baseAmount < pricing.unitPrice && (
+                {!pricing.charges?.length && pricing.billingMode === "per_table" && pricing.baseAmount < pricing.unitPrice && (
                   <p className="mb-3 rounded-xl bg-accent/5 px-3 py-2 text-xs leading-5 text-fg-2">
                     Стол делится между игроками: доля этой записи {money.format(pricing.baseAmount)} из {money.format(pricing.unitPrice)}.
                   </p>
@@ -258,7 +259,7 @@ export function ReservationPricingDialog({
                 )}
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {[
-                    { label: "Услуга", value: pricing.baseAmount },
+                    { label: pricing.charges?.length ? "Услуги и стол" : "Услуга", value: pricing.baseAmount },
                     ...(pricing.armyRentalPoints > 0 ? [{ label: `Аренда · ${pricing.armyRentalPoints} оч.`, value: pricing.armyRentalAmount }] : []),
                     { label: "Итого", value: pricing.totalAmount },
                     { label: "Оплачено", value: pricing.paidAmount },
@@ -273,6 +274,15 @@ export function ReservationPricingDialog({
                   ))}
                 </div>
               </section>
+
+              <ChargesSection
+                reservationId={reservation.id}
+                pricing={pricing}
+                onUpdated={(data) => {
+                  queryClient.setQueryData(queryKey, data);
+                  queryClient.invalidateQueries({ queryKey: ["admin-reservations"] });
+                }}
+              />
 
               {WH_SERVICE_SLUGS.has(pricing.serviceSlug) && (
                 <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-accent/20 bg-accent/5 p-4">

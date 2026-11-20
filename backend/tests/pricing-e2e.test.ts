@@ -494,4 +494,26 @@ describe('pricing: скидки, награды и оплата', () => {
     expect(old.json.unitPrice).toBe(100);
     expect(old.json.totalAmount).toBe(300);
   });
+
+  test('позиции счёта (20.11.2026): тренировка + стол пополам; администратор меняет услугу и долю; сброс возвращает расчёт', async () => {
+    const priced = await api('GET', `/admin/reservations/${reservation.training4}/pricing`, T.admin);
+    expect(priced.json.charges.map((c: any) => [c.kind, c.share, c.amount])).toEqual([['service', 0.5, 500], ['table', 0.5, 500]]);
+    expect(priced.json.chargesEdited).toBe(false);
+    const catalog = await api('GET', '/admin/pricing/charge-catalog', T.admin);
+    expect(catalog.status).toBe(200);
+    expect(catalog.json[0]).toMatchObject({ id: 'table', title: 'Аренда стола' });
+    expect((await api('GET', '/admin/pricing/charge-catalog', T.player)).status).toBe(403);
+    const painting = catalog.json.find((c: any) => c.id === `svc:${paintingServiceId}:club`);
+    expect(painting).toBeTruthy();
+    const edited = await api('PUT', `/admin/reservations/${reservation.training4}/charges`, T.admin, {
+      lines: [{ catalogId: 'table', share: 1 }, { catalogId: painting.id, share: 1 }],
+    });
+    expect(edited.status).toBe(200);
+    expect(edited.json).toMatchObject({ chargesEdited: true, baseAmount: 1000 + painting.unitPrice, totalAmount: 1000 + painting.unitPrice });
+    // пересчёт при открытии счёта ручные позиции не трогает
+    expect((await api('GET', `/admin/reservations/${reservation.training4}/pricing`, T.admin)).json.baseAmount).toBe(1000 + painting.unitPrice);
+    expect((await api('PUT', `/admin/reservations/${reservation.training4}/charges`, T.admin, { lines: [{ catalogId: 'nope', share: 1 }] })).status).toBe(400);
+    const reset = await api('POST', `/admin/reservations/${reservation.training4}/charges/reset`, T.admin);
+    expect(reset.json).toMatchObject({ chargesEdited: false, baseAmount: 1000 });
+  });
 });
