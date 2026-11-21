@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import type { KtMapData, WarcryDeployment } from '../../skirmish/types';
+import type { KtMapData, KtMapKey, WarcryDeployment } from '../../skirmish/types';
+import { KtMapImage, KtMapLegend, useKtMapState } from './KtMap';
 import { openExternal, pushOverlay } from '../../telegram';
 import { IconButton } from '../kit';
 import { cx } from '../util';
@@ -74,17 +75,37 @@ function OfficialNote({ children }: { children: ReactNode }) {
 const officialKtMapPath = (map: Pick<KtMapData, 'killzone' | 'map'>) => `/roster-maps/kt/${map.killzone.replaceAll(' ', '-')}-${map.map}.png`;
 const officialWarcryMapPath = (deployment: Pick<WarcryDeployment, 'id'>) => `/roster-maps/warcry/${deployment.id}.png`;
 
-export function KtMapPanel({ map, interactive = true }: { map: KtMapData; interactive?: boolean }) {
+/**
+ * Kill Team map: official card + WarpHub markup (drop zones, objectives, lettered terrain) and the Wahapedia map key.
+ * Without `mapKey` (or with interactive=false, e.g. as the Test Army background) only the card is shown.
+ */
+export function KtMapPanel({ map, mapKey, interactive = true }: { map: KtMapData; mapKey?: KtMapKey; interactive?: boolean }) {
+  const { markup, setMarkup, selected, setSelected } = useKtMapState();
+  const src = officialKtMapPath(map);
+  const alt = `${map.killzone}, карта ${map.map} — официальная карта Approved Ops 2025`;
+  const withKey = !!mapKey && !!map.frame;
   return (
     <SkirmishMapPanel
       title={`${map.killzone} · Map ${map.map}`}
-      subtitle="Официальная карта Approved Ops 2025 · поле 30×22″"
+      subtitle={map.frame && !map.frame.toScale ? 'Официальная карта Approved Ops 2025 · не в масштабе' : 'Официальная карта Approved Ops 2025 · поле 30×22″'}
       sourceName="Wahapedia"
       sourceUrl={map.sourceImage}
-      legend={<OfficialNote>Drop zones, стены, террейн и objective markers — непосредственно с карты Wahapedia.</OfficialNote>}
+      legend={
+        withKey ? (
+          <KtMapLegend map={map} mapKey={mapKey} selected={selected} onSelect={setSelected} markup={markup} onMarkup={setMarkup} />
+        ) : (
+          <OfficialNote>Drop zones, стены, террейн и objective markers — непосредственно с карты Wahapedia.</OfficialNote>
+        )
+      }
       interactive={interactive}
     >
-      {(large) => <OfficialImage src={officialKtMapPath(map)} alt={`${map.killzone}, карта ${map.map} — официальная карта Approved Ops 2025`} large={large} />}
+      {(large) =>
+        withKey ? (
+          <KtMapImage map={map} mapKey={mapKey} src={src} alt={alt} large={large} markup={markup} selected={selected} onSelect={large ? setSelected : undefined} />
+        ) : (
+          <OfficialImage src={src} alt={alt} large={large} />
+        )
+      }
     </SkirmishMapPanel>
   );
 }

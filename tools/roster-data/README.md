@@ -634,6 +634,17 @@ Monsters; Bladeborn; страницы фракций): 3–15 бойцов, ≤1
   опций снаряжения. Источники — Wahapedia Approved Ops / Core Rules / Appendix / Killzones, проверка 03.11.2026.
   `scripts/import-kt-maps.py` векторизует drop zones, home/centre/enemy и контуры террейна из официальных схем; Approved Ops
   оговаривает, что карты не являются точными измерениями террейна.
+- Карты, проход 3 (21.11.2026), `scripts/kt-map-fix.py` (идемпотентен): рамка поля по линиям границы карточки
+  (прежняя фиксированная обрезка ошибалась на ~0,5″ на картах Octarius), drop zones перемерены как полосы цвета зоны у края
+  (были ошибки: Bheta-Decima 2, 3, 5 — полполя, Volkus 1/4 — 6,6″/3,7″); на картах в масштабе глубина 3/4/6″.
+  Gallowdark и Tomb World на карточках не в масштабе (сетка плиток) — там глубина пропорциональная, в приложении без дюймов.
+  `features` — все буквенные метки карточки (`scripts/kt_map_labels.py`: OCR + шаблоны + ручные `OVERRIDES`, проверено
+  глазами по всем 433 меткам), без многоугольников. `keyPlayer` — какой игрок Universal Map Key (оранжевый = Player 1)
+  соответствует стороне p1/p2 данных: на всех 36 картах p1 данных = Player 2 (серый/голубой).
+  Ключ карт и типы террейна — `kt/map-keys.json` (Wahapedia Approved Ops 2025 + Killzones, 21.11.2026; ключи Volkus,
+  Gallowdark, Tomb World — картинки, переписаны вручную) → `game.json → mapKey`. Расхождение: в ключе Bheta-Decima
+  «Ferratonic Furnace», в правилах killzone — «Thermometric Condenser» (тот же элемент D); правила взяты из Thermometric Condenser.
+  `import-kt-maps-v2.py` после этого не запускать — он перезапишет метки старым форматом.
 - `backend/roster-data/warcry/game.json`: 24 deployment maps (Table A/B), 24 victory conditions и 18 актуальных twists,
   battleplan и резервы RND2/RND3. Источники — Warcrier Battleplan / Fighting the Battle / Matched Play, проверка 03.11.2026.
   `scripts/import-warcry-battleplans.py` импортирует тексты, `scripts/import-warcry-map-points.py` — группы Dagger/Shield/Hammer

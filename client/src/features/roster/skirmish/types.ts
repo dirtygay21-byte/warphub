@@ -13,17 +13,52 @@ interface BoardData {
 }
 
 export type KtPoint = [number, number];
+/** Lettered label box on the official card (centre, board inches); one entry per occurrence. */
 export interface KtMapFeature {
   label: string;
   x: number;
   y: number;
-  poly: KtPoint[];
 }
 export interface KtMapGuide {
   edge: 'left' | 'right' | 'top' | 'bottom';
   at: KtPoint;
+  /** Drop-zone depth from the edge, inches; for cards not drawn to scale (`toScale: false`) only proportional. */
   d: number;
   side: 'p1' | 'p2';
+  toScale?: false;
+}
+export type KtKeyPlayer = 'p1' | 'p2';
+export type KtKeyColour = 'p1Drop' | 'p1Territory' | 'p2Drop' | 'p2Territory' | 'p1Objective' | 'p2Objective' | 'centreObjective' | 'neutral';
+export interface KtMapKeyFeature {
+  id: string;
+  en: string;
+  ru?: string;
+  labels: string[];
+  types: string[];
+  rules?: string[];
+  note?: string;
+  hatchway?: boolean;
+  breachPoint?: boolean;
+}
+export interface KtMapKeyZone {
+  keyImages?: string[];
+  keyText?: boolean;
+  notToScale?: boolean;
+  intro?: string;
+  note?: string;
+  symbols?: { id: string; en: string; ru: string }[];
+  features?: KtMapKeyFeature[];
+  rules?: { wall?: string; hatchway?: string[]; breachPoint?: string[] };
+  areas?: { id: string; en: string; ru: string; colour: string; rules: string[] }[];
+}
+/** Wahapedia map key (Approved Ops 2025) and killzone terrain types — tools/roster-data/kt/map-keys.json. */
+export interface KtMapKey {
+  source: { approvedOpsUrl: string; killzonesUrl: string; checked: string };
+  universal: { id: string; en: string; ru: string; swatch: 'zone' | 'edge' | 'objective' | 'dots' | 'centre' | 'dashed'; colour: KtKeyColour }[];
+  lines: { id: string; en: string; ru: string }[];
+  colours: Record<string, Record<KtKeyColour, string>>;
+  terrainTypes: { id: string; ru: string; en: string }[];
+  killzones: Record<string, KtMapKeyZone>;
 }
 
 export interface KtMapData {
@@ -40,6 +75,10 @@ export interface KtMapData {
   walls: KtPoint[][];
   doors: KtPoint[][];
   guides: KtMapGuide[];
+  /** Board on the card image: inner border in px, image size; Gallowdark / Tomb World cards are not to scale. */
+  frame: { px: [number, number, number, number]; size: [number, number]; toScale: boolean };
+  /** Data side → Universal Map Key player (colour on the card: Player 1 orange, Player 2 grey / blue). */
+  keyPlayer: Record<'p1' | 'p2', KtKeyPlayer>;
 }
 
 export interface KtGameData {
@@ -72,6 +111,8 @@ export interface KtGameData {
   maps: KtMapData[];
   mapImport: { method: string; problems: string[] };
   mapImportV2: { method: string; problems: string[] };
+  mapImportV3: { date: string; method: string; notToScale: string[] };
+  mapKey: KtMapKey;
 }
 
 export type WarcryPoint = [number, number];

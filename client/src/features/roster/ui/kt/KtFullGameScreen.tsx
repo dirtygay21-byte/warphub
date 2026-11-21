@@ -368,7 +368,7 @@ function Setup({ rosters, index, initialRosterId, data, online, onSetup }: { ros
           options={data.missionPack.killzones.map((k) => ({ value: k, label: k }))}
         />
         <ChoiceField label="Карта" value={map} onChange={setMap} inlineMax={6} options={Array.from({ length: 6 }, (_, i) => ({ value: i + 1, label: String(i + 1) }))} />
-        {mapData && <KtMapPanel map={mapData} />}
+        {mapData && <KtMapPanel map={mapData} mapKey={data.mapKey} />}
       </SetupStep>
       <SetupStep n={3} title="Секретные Tac Ops" done={!!ready}>
         {SEATS.map((seat) =>
@@ -813,7 +813,7 @@ function BattleMap({ state, data }: { state: KtState; data: KtData }) {
         </span>
       </summary>
       <div className="mt-3">
-        <KtMapPanel map={map} />
+        <KtMapPanel map={map} mapKey={data.mapKey} />
       </div>
     </details>
   );
@@ -829,7 +829,7 @@ function FieldView({ data }: { data: KtData }) {
       <p className="font-display text-xl font-semibold uppercase">Поле боя</p>
       <ChoiceField label="Killzone" value={killzone} onChange={(k) => (setKillzone(k), setMap(1))} options={data.missionPack.killzones.map((k) => ({ value: k, label: k }))} />
       <ChoiceField label="Карта" value={map} onChange={setMap} inlineMax={6} options={Array.from({ length: data.missionPack.mapsPerKillzone }, (_, i) => ({ value: i + 1, label: String(i + 1) }))} />
-      {shown ? <KtMapPanel map={shown} /> : <p className="text-sm text-fg-3">Этой карты нет в данных.</p>}
+      {shown ? <KtMapPanel map={shown} mapKey={data.mapKey} /> : <p className="text-sm text-fg-3">Этой карты нет в данных.</p>}
     </section>
   );
 }
