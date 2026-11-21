@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import type { KtMapData, KtMapKey, WarcryDeployment } from '../../skirmish/types';
-import { KtMapImage, KtMapLegend, useKtMapState } from './KtMap';
+import { KtMapImage, KtMapLegend } from './KtMap';
 import { openExternal, pushOverlay } from '../../telegram';
 import { IconButton } from '../kit';
 import { cx } from '../util';
@@ -80,7 +80,8 @@ const officialWarcryMapPath = (deployment: Pick<WarcryDeployment, 'id'>) => `/ro
  * Without `mapKey` (or with interactive=false, e.g. as the Test Army background) only the card is shown.
  */
 export function KtMapPanel({ map, mapKey, interactive = true }: { map: KtMapData; mapKey?: KtMapKey; interactive?: boolean }) {
-  const { markup, setMarkup, selected, setSelected } = useKtMapState();
+  const [markup, setMarkup] = useState(true);
+  const [selected, setSelected] = useState<string | null>(null);
   const src = officialKtMapPath(map);
   const alt = `${map.killzone}, карта ${map.map} — официальная карта Approved Ops 2025`;
   const withKey = !!mapKey && !!map.frame;

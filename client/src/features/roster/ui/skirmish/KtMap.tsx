@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import type { KtKeyColour, KtMapData, KtMapKey, KtMapKeyFeature, KtMapKeyZone } from '../../skirmish/types';
 import { openExternal } from '../../telegram';
 import { cx } from '../util';
@@ -11,7 +10,7 @@ import { cx } from '../util';
 
 const pct = (v: number, of: number) => `${(v / of) * 100}%`;
 
-export function ktColours(key: KtMapKey | undefined, killzone: string): Record<KtKeyColour, string> | null {
+function ktColours(key: KtMapKey | undefined, killzone: string): Record<KtKeyColour, string> | null {
   if (!key) return null;
   return key.colours[killzone] ?? key.colours.default ?? null;
 }
@@ -250,10 +249,4 @@ export function KtMapLegend({ map, mapKey, selected, onSelect, markup, onMarkup 
       </p>
     </div>
   );
-}
-
-export function useKtMapState() {
-  const [markup, setMarkup] = useState(true);
-  const [selected, setSelected] = useState<string | null>(null);
-  return { markup, setMarkup, selected, setSelected };
 }
