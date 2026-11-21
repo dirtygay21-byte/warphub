@@ -58,7 +58,7 @@ test('Kommandos: 11 models can be 10 selections because Grot + Bomb Squig share 
 
   const withoutSquig = removeOperative(roster, roster.operatives[2]!.uid);
   assert.equal(rosterSelectionCount(withoutSquig, team), 9.5);
-  assert.ok(checkKtRoster(withoutSquig, team).some((issue) => issue.level === 'warning' && /составу/.test(issue.message)));
+  assert.ok(checkKtRoster(withoutSquig, team).some((issue) => issue.level === 'warning' && /Не хватает/.test(issue.message)));
 });
 
 test('Boss Nob wargear: only Slugga + Big Choppa or Slugga + Power Claw', () => {

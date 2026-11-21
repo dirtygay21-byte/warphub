@@ -24,7 +24,7 @@ test('проверки: нужен ровно один LEADER, численно�
   assert.ok(checkKtRoster(r, t).some((i) => i.level === 'error' && /лидер/i.test(i.message)));
   r = addOperative(r, leader);
   assert.ok(!checkKtRoster(r, t).some((i) => i.level === 'error'));
-  assert.ok(checkKtRoster(r, t).some((i) => i.level === 'warning' && /6 оперативников/.test(i.message)));
+  assert.ok(checkKtRoster(r, t).some((i) => i.level === 'warning' && /Не хватает: оперативники из списка — ещё 4/.test(i.message)));
   r = addOperative(r, leader);
   assert.ok(checkKtRoster(r, t).some((i) => /Лидеров 2/.test(i.message)));
 });

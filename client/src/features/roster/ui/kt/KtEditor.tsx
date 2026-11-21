@@ -4,7 +4,8 @@ import { PhotoStrip, RosterPhotos } from '../common/UnitPhoto';
 import { useEffect, useMemo, useState } from 'react';
 import { loadKtTeam } from '../../data';
 import { uid } from '../../engine/roster';
-import { addOperative, checkKtRoster, compositionTotal, encodeKtRoster, isLeaderOperative, ktTeamGroup, nextWeaponsForToggle, removeOperative, rosterSelectionCount, toggleEquipment, touchKt, updateOperative, type KtRoster, type KtRosterOp } from '../../kt/roster';
+import { addBlockReason, structureOf } from '../../kt/composition';
+import { addOperative, checkKtRoster, encodeKtRoster, isLeaderOperative, ktTeamGroup, ktTeamTotal, nextWeaponsForToggle, removeOperative, rosterSelectionCount, toggleEquipment, touchKt, updateOperative, type KtRoster, type KtRosterOp } from '../../kt/roster';
 import type { KtIndex, KtOperative, KtTeam, KtWeapon } from '../../kt/types';
 import { confirmAsk, haptic, openExternal, shareText } from '../../telegram';
 import { Button, Empty, Icon, IconButton, Segmented, Sheet, Tag } from '../kit';
@@ -85,7 +86,8 @@ export function KtEditor({
     );
   if (!team) return <div className="mx-auto mt-24 size-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />;
   const opOf = (x: KtRosterOp) => team.operatives.find((o) => o.id === x.opTypeId);
-  const total = compositionTotal(team.composition);
+  const total = ktTeamTotal(team);
+  const hasWeights = Object.keys(structureOf(team)?.weights ?? {}).length > 0;
   const selections = rosterSelectionCount(roster, team);
   const meta = index.teams.find((t) => t.id === team.id);
   const leader = roster.operatives.some((x) => {
@@ -132,7 +134,7 @@ export function KtEditor({
           }
           big={selections}
           bigLimit={total}
-          bigUnit={total == null ? 'оперативн.' : 'выборов'}
+          bigUnit={total == null || !hasWeights ? 'оперативн.' : 'выборов'}
           stats={
             <>
               <HeaderStat label="Лидер" value={leader ? '✓' : '—'} bad={!leader && roster.operatives.length > 0} />
@@ -568,16 +570,20 @@ function WeaponRules({ index }: { index: KtIndex }) {
 function AddSheet({ open, team, roster, onClose, onAdd }: { open: boolean; team: KtTeam; roster: KtRoster; onClose: () => void; onAdd: (o: KtOperative) => void }) {
   const leaders = team.operatives.filter((o) => isLeaderOperative(team, o));
   const others = team.operatives.filter((o) => !isLeaderOperative(team, o));
+  const structure = structureOf(team);
   const row = (o: KtOperative) => {
     const count = roster.operatives.filter((x) => x.opTypeId === o.id).length;
+    // состав по слотам (21.11.2026): больше, чем положено, не добавить — причина под названием
+    const blocked = structure ? addBlockReason(structure, team, roster.operatives, o) : null;
     return (
       <li key={o.id}>
-        <button type="button" onClick={() => onAdd(o)} className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10">
+        <button type="button" onClick={() => onAdd(o)} disabled={!!blocked} className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left active:bg-white/10 disabled:opacity-45">
           <span className="flex items-center gap-2">
             <span className="min-w-0 flex-1 text-[14px] font-semibold leading-tight">{o.name}</span>
             {count > 0 && <Tag tone="accent">×{count}</Tag>}
-            <Icon name="plus" className="size-4 text-accent" />
+            {!blocked && <Icon name="plus" className="size-4 text-accent" />}
           </span>
+          {blocked && <span className="mt-1 block text-[12px] text-fg-3">{blocked}</span>}
           <span className="mt-1.5 grid grid-cols-4 gap-1 text-center">
             {OP_STATS(o).map((s) => (
               <span key={s.label} className="rounded-md bg-black/25 py-0.5">
@@ -594,6 +600,7 @@ function AddSheet({ open, team, roster, onClose, onAdd }: { open: boolean; team:
   return (
     <Sheet open={open} onClose={onClose} title="Оперативник" tall>
       <div className="space-y-4">
+        {structure?.note && <p className="rounded-xl bg-white/[0.04] px-3 py-2 text-[12.5px] leading-snug text-fg-2">{structure.note}</p>}
         {leaders.length > 0 && (
           <div>
             <SectionTitle>Лидер</SectionTitle>
