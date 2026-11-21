@@ -69,6 +69,8 @@ export type ReservationPricing = {
   charges?: ReservationCharge[];
   /** позиции поправил администратор */
   chargesEdited?: boolean;
+  /** игрок отметил «я член клуба» в «Моих записях» (21.11.2026) */
+  membershipRequestedAt?: string | null;
   discounts: ReservationDiscount[];
   payments: ReservationPayment[];
 };
@@ -170,3 +172,32 @@ export const addAdminReservationPayment = (
     method: "POST",
     body: JSON.stringify(payload),
   });
+
+/** Счёт игрока в «Моих записях» (21.11.2026): только после записи и только свой. */
+export type PlayerBill =
+  | { reservationId: string; cancelled: true }
+  | {
+      reservationId: string;
+      cancelled: false;
+      status: ReservationPricing["status"];
+      lines: Array<{ title: string; unitPrice: number; share: number; amount: number; note: string | null }>;
+      army: { points: number; amount: number } | null;
+      subtotal: number;
+      discounts: Array<{ id: string; kind: string; title: string; note: string | null; percent: number | null; amount: number | null }>;
+      totalAmount: number;
+      paidAmount: number;
+      remainingAmount: number;
+      overpaidAmount: number;
+      offers: {
+        canApply: boolean;
+        training: { eligible: boolean; applied: boolean; remaining: number; limit: number };
+        membership: { percent: number; applied: boolean; requested: boolean };
+        rewards: Array<{ code: string; label: string; percent: number | null; amount: number | null; expiresAt: string }>;
+      };
+    };
+
+export const getMyBill = (reservationId: string) => apiRequest<PlayerBill>(`/reservations/${reservationId}/bill`);
+export const applyMyTraining = (reservationId: string) => apiRequest<PlayerBill>(`/reservations/${reservationId}/bill/training`, { method: "POST" });
+export const applyMyReward = (reservationId: string, code: string) =>
+  apiRequest<PlayerBill>(`/reservations/${reservationId}/bill/reward`, { method: "POST", body: JSON.stringify({ code }) });
+export const requestMyMembership = (reservationId: string) => apiRequest<PlayerBill>(`/reservations/${reservationId}/bill/membership`, { method: "POST" });

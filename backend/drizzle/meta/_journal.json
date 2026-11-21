@@ -253,6 +253,13 @@
       "when": 1795810000000,
       "tag": "0035_reservation_charges",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1795900000000,
+      "tag": "0036_membership_request",
+      "breakpoints": true
     }
   ]
 }

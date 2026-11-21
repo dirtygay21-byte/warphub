@@ -58,7 +58,8 @@ import { getCardsState, getPointsHistory, openPack } from '../minigames/cards';
 import { getNewsById, listPublishedNews } from '../news/service';
 import { getPartnerShowcase } from '../partners/service';
 import { reservationIcs } from '../booking/calendar';
-import { currentServicePrice } from '../pricing/service';
+import { currentServicePrice, PricingError } from '../pricing/service';
+import { getPlayerBill, playerApplyReward, playerApplyTraining, playerRequestMembership } from '../pricing/player-bill';
 import { servicePricingDefaults } from '../pricing/rules';
 import { jwtPlugin } from '../../plugins/jwt-plugin';
 import { authMiddleware, findUserFromBearer } from '../../plugins/auth-middleware';
@@ -786,6 +787,24 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
       },
     },
   )
+  // счёт в «Моих записях» (21.11.2026): только владельцу записи и только после записи
+  .get('/reservations/:id/bill', ({ user, params }) => playerBill(() => getPlayerBill(user.id, params.id)), {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    detail: { tags: ['Booking'], summary: 'Мой счёт по записи: позиции, доля стола, скидки, оплачено и остаток' },
+  })
+  .post('/reservations/:id/bill/training', ({ user, params }) => playerBill(() => playerApplyTraining(user.id, params.id)), {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    detail: { tags: ['Booking'], summary: 'Применить скидку 50% на обучающую игру (не больше трёх на игрока)' },
+  })
+  .post('/reservations/:id/bill/reward', ({ user, params, body }) => playerBill(() => playerApplyReward(user.id, params.id, body.code)), {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    body: t.Object({ code: t.String({ minLength: 1, maxLength: 64 }) }),
+    detail: { tags: ['Booking'], summary: 'Применить свой код скидки из мини-игр' },
+  })
+  .post('/reservations/:id/bill/membership', ({ user, params }) => playerBill(() => playerRequestMembership(user.id, params.id)), {
+    params: t.Object({ id: t.String({ format: 'uuid' }) }),
+    detail: { tags: ['Booking'], summary: 'Отметить «я член клуба» — скидку 10% подтверждает администратор' },
+  })
   .get('/minigames', async ({ user }) => listGamesForUser(user.id), {
     detail: {
       tags: ['Mini-games'],
@@ -865,3 +884,15 @@ export const apiModule = new Elysia({ tags: ['Booking'] })
   .get('/minigames/points/my', async ({ user }) => getPointsHistory(user.id), {
     detail: { tags: ['Mini-games'], summary: 'Мой счёт очков и история' },
   });
+
+async function playerBill<T>(run: () => Promise<T>) {
+  try {
+    return await run();
+  } catch (error) {
+    if (error instanceof PricingError) {
+      const code = error.code === 'RESERVATION_NOT_FOUND' || error.code === 'REWARD_NOT_FOUND' ? 404 : ['REWARD_USED', 'TRAINING_DISCOUNT_EXISTS', 'TRAINING_LIMIT_REACHED', 'DISCOUNT_BELOW_PAID'].includes(error.code) ? 409 : 400;
+      return status(code, { error: error.message, code: error.code });
+    }
+    return status(500, { error: (error as Error).message });
+  }
+}

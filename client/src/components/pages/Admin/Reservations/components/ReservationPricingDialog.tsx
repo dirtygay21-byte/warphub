@@ -66,6 +66,7 @@ type PricingAction =
   | { type: "reward" }
   | { type: "training" }
   | { type: "payment" }
+  | { type: "membership10" }
   | { type: "remove"; discountId: string };
 
 export function ReservationPricingDialog({
@@ -103,6 +104,7 @@ export function ReservationPricingDialog({
       }
       if (action.type === "reward") return applyAdminReservationReward(reservation.id, rewardCode.trim());
       if (action.type === "training") return applyAdminTrainingGame(reservation.id);
+      if (action.type === "membership10") return addAdminReservationDiscount(reservation.id, { kind: "membership", percent: 10, note: "Членство в клубе" });
       if (action.type === "payment") {
         return addAdminReservationPayment(reservation.id, {
           amount: paymentValue,
@@ -274,6 +276,20 @@ export function ReservationPricingDialog({
                   ))}
                 </div>
               </section>
+
+              {pricing.membershipRequestedAt && !pricing.discounts.some((d) => d.kind === "membership") && (
+                <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-yellow-400/25 bg-yellow-400/10 p-4">
+                  <p className="min-w-0 text-sm leading-5 text-yellow-100">Игрок отметил: «я член клуба». Проверьте и подтвердите скидку 10%.</p>
+                  <button
+                    type="button"
+                    onClick={() => mutation.mutate({ type: "membership10" })}
+                    disabled={mutation.isPending}
+                    className="min-h-11 rounded-xl bg-accent px-4 text-sm font-semibold text-accent-foreground disabled:opacity-40"
+                  >
+                    Подтвердить −10%
+                  </button>
+                </section>
+              )}
 
               <ChargesSection
                 reservationId={reservation.id}

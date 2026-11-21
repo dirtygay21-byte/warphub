@@ -44,6 +44,8 @@ export const reservationPricingTable = pgTable('reservation_pricing', {
   totalAmount: doublePrecision('total_amount').notNull(),
   /** счёт по позициям (reservation_charges): база = сумма позиций (20.11.2026); false — старый счёт по тарифу */
   itemized: boolean('itemized').notNull().default(false),
+  /** игрок отметил «я член клуба» в «Моих записях» (21.11.2026); скидку подтверждает администратор */
+  membershipRequestedAt: timestamp('membership_requested_at', { withTimezone: true }),
   paidAmount: doublePrecision('paid_amount').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true })
