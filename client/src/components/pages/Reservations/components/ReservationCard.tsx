@@ -15,6 +15,7 @@ import {
   ChevronDown,
   LoaderCircle,
   PencilLine,
+  ReceiptText,
   Table2,
   UsersRound,
   XCircle,
@@ -24,6 +25,7 @@ import { haptic } from "@/utils/haptic";
 import { CopyNick, PlayerInfo } from "@/components/booking/PlayerInfo";
 import { useBookingOptions } from "@/hooks/useBookingOptions";
 import { BookingDetailsRows } from "./BookingDetailsRows";
+import { BillSheet } from "./BillSheet";
 import { DateTile, DsButton } from "@/components/ui/ds";
 import { detailsKindForSlug, gameLabelOf, isWhPlayerDetails, clubArmyLabel } from "@/apiUtils/booking";
 import type { Reservation } from "@/types";
@@ -74,6 +76,7 @@ export function ReservationCard({
 
   // 31.10.2026: карточка свёрнута; нажатие раскрывает все подробности на месте (без отдельного экрана)
   const [open, setOpen] = useState(false);
+  const [billOpen, setBillOpen] = useState(false);
   const options = useBookingOptions();
   const mates = reservation.tablemates ?? [];
   const atTable = reservation.tableId != null;
@@ -189,6 +192,17 @@ export function ReservationCard({
             )}
           </section>
         )}
+
+        {/* счёт (21.11.2026): суммы — только после записи, в отдельном окне */}
+        {!cancelled && (
+          <div className="px-4 pb-2">
+            <DsButton variant="secondary" className="w-full" onClick={() => setBillOpen(true)}>
+              <ReceiptText className="size-4" />
+              Счёт и скидки
+            </DsButton>
+          </div>
+        )}
+        {billOpen && <BillSheet reservationId={reservation.id} title={serviceTitle ?? "Запись"} onClose={() => setBillOpen(false)} />}
 
         {!isInactive && (
           <div className={clsx("grid gap-2 px-4 pb-4", canEdit && !isServiceLoading ? "grid-cols-2" : "grid-cols-1")}>

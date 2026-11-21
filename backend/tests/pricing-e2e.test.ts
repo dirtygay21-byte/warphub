@@ -516,4 +516,27 @@ describe('pricing: скидки, награды и оплата', () => {
     const reset = await api('POST', `/admin/reservations/${reservation.training4}/charges/reset`, T.admin);
     expect(reset.json).toMatchObject({ chargesEdited: false, baseAmount: 1000 });
   });
+
+  test('счёт игрока (21.11.2026): только свой; обучающая игра применяется сразу, «член клуба» — просьба администратору', async () => {
+    expect((await api('GET', `/reservations/${reservation.rent40}/bill`, T.other)).status).toBe(404);
+    const bill = await api('GET', `/reservations/${reservation.rent40}/bill`, T.rent40);
+    expect(bill.status).toBe(200);
+    expect(bill.json.cancelled).toBe(false);
+    expect(bill.json.lines.length).toBeGreaterThan(0);
+    expect(bill.json.army).toMatchObject({ points: 1000, amount: 1000 });
+    expect(bill.json.offers.training).toMatchObject({ eligible: true, applied: false, remaining: 3, limit: 3 });
+    const applied = await api('POST', `/reservations/${reservation.rent40}/bill/training`, T.rent40);
+    expect(applied.status).toBe(200);
+    expect(applied.json.discounts.some((d: any) => d.kind === 'training')).toBe(true);
+    expect(applied.json.totalAmount).toBeLessThan(bill.json.totalAmount);
+    expect((await api('POST', `/reservations/${reservation.rent40}/bill/training`, T.rent40)).status).toBe(409);
+    expect((await api('POST', `/reservations/${reservation.rent40}/bill/reward`, T.rent40, { code: 'NOPE-0000' })).status).toBe(404);
+
+    const asked = await api('POST', `/reservations/${reservation.training4}/bill/membership`, T.player);
+    expect(asked.status).toBe(200);
+    expect(asked.json.offers.membership).toMatchObject({ requested: true, applied: false, percent: 10 });
+    expect(asked.json.discounts.some((d: any) => d.kind === 'membership')).toBe(false);
+    const admin = await api('GET', `/admin/reservations/${reservation.training4}/pricing`, T.admin);
+    expect(admin.json.membershipRequestedAt).toBeTruthy();
+  });
 });

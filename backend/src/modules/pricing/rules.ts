@@ -134,3 +134,16 @@ export function autoChargeLines(input: {
 }
 
 export const sumCharges = (lines: Array<{ amount: number }>) => roundMoney(lines.reduce((sum, l) => sum + l.amount, 0));
+
+/** «Стол делится на двоих — ваша половина»: подпись к доле стола или тренировки. */
+export function shareNote(kind: 'service' | 'table', share: number): string | null {
+  if (share >= 0.999) {
+    if (share <= 1.001) return null;
+    const n = Math.round(share * 100) / 100;
+    return `${n} ${[2, 3, 4].includes(n) ? 'места' : 'мест'}`;
+  }
+  const n = Math.round(1 / share);
+  const who = n === 2 ? 'двоих' : n === 3 ? 'троих' : n === 4 ? 'четверых' : `${n}`;
+  return kind === 'table' ? `Стол на ${who} — ваша доля` : `Делится на ${who} — ваша доля`;
+}
+
