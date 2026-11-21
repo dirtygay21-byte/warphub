@@ -210,7 +210,7 @@ function FieldPicker<R extends SkirmishRoster>({ data, roster, rosters, detail, 
           </div>
         )}
       </div>
-      {officialMap && <KtMapPanel map={officialMap} />}
+      {officialMap && <KtMapPanel map={officialMap} mapKey={data.system === 'kt' ? data.mapKey : undefined} />}
       {battleDeployment && <WarcryDeploymentPanel deployment={battleDeployment} color={battleColor} />}
       <div><p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-fg-3">Ваша сторона</p><Segmented<Side> value={side} onChange={onSide} options={[{ value: 'attacker', label: 'Атакующий' }, { value: 'defender', label: 'Защитник' }]} /></div>
       <div>
