@@ -35,11 +35,13 @@ function sql(query: string): string {
   return r.stdout.toString().trim();
 }
 
-// ближайшая суббота с завтрашнего дня — в пределах недели, которую показывает «Ищут соперника»
+// ближайшие сб или вс с завтрашнего дня — в пределах недели, которую показывает «Ищут соперника»
 const day = (() => {
-  const d = new Date(Date.now() + 1 * 86400_000);
-  while (new Date(d.getTime() + 5 * 3600_000).getUTCDay() !== 6) d.setTime(d.getTime() + 86400_000);
-  return new Date(d.getTime() + 5 * 3600_000).toISOString().slice(0, 10);
+  for (let i = 1; i <= 7; i++) {
+    const d = new Date(Date.now() + i * 86400_000 + 5 * 3600_000);
+    if (d.getUTCDay() === 6 || d.getUTCDay() === 0) return d.toISOString().slice(0, 10);
+  }
+  throw new Error('no weekend day');
 })();
 const local = (hh: string) => new Date(`${day}T${hh}:00+05:00`).toISOString();
 
