@@ -5,6 +5,7 @@
  * Остальные правила состава и снаряжения — текст источника на экране; неоднозначные ограничения не придумываем.
  */
 import { uid } from '../engine/roster';
+import { checkStructure, structureOf, structureTotal, weightOf } from './composition';
 import type { KtIndex, KtOperative, KtTeam, KtWeapon } from './types';
 
 export interface KtRosterOp {
@@ -47,6 +48,12 @@ export const updateOperative = (r: KtRoster, u: string, patch: Partial<Omit<KtRo
 export const toggleEquipment = (r: KtRoster, id: string): KtRoster =>
   touchKt({ ...r, equipment: r.equipment.includes(id) ? r.equipment.filter((x) => x !== id) : [...r.equipment, id] });
 
+/** Численность команды: по разобранному составу (слоты), иначе — по тексту, если он однозначен. */
+export function ktTeamTotal(team: KtTeam): number | null {
+  const s = structureOf(team);
+  return s ? structureTotal(s) : compositionTotal(team.composition);
+}
+
 /** Численность команды по тексту состава, если он однозначен; иначе null. */
 export function compositionTotal(text: string): number | null {
   if (/^or\b/im.test(text) || /^- up to/im.test(text)) return null;
@@ -79,6 +86,8 @@ function halfSelectionIds(team: KtTeam): Set<string> {
 
 /** Counts selections rather than cards: Grot and Bomb Squig together are one selection. */
 export function rosterSelectionCount(r: KtRoster, team: KtTeam): number {
+  const s = structureOf(team);
+  if (s) return r.operatives.filter((x) => team.operatives.some((o) => o.id === x.opTypeId)).reduce((sum, x) => sum + weightOf(s, x.opTypeId), 0);
   const byId = new Map(team.operatives.map((o) => [o.id, o]));
   const half = halfSelectionIds(team);
   return r.operatives.reduce((sum, op) => {
@@ -147,7 +156,9 @@ export function checkKtRoster(r: KtRoster, team: KtTeam): KtIssue[] {
   for (const keyword of requiredOperativeKeywords(team)) {
     if (!known.some((p) => p.o!.keywords.includes(keyword))) out.push({ level: 'error', message: `Обязательный оперативник: ${keyword}` });
   }
-  const total = compositionTotal(team.composition);
+  const structure = structureOf(team);
+  if (structure) for (const i of checkStructure(structure, team, r.operatives)) out.push({ level: i.level, message: i.message, uids: i.uids });
+  const total = structure ? null : compositionTotal(team.composition);
   const selections = rosterSelectionCount(r, team);
   if (total != null && Math.abs(selections - total) > 0.001) out.push({ level: 'warning', message: `По составу команды — ${total} оперативников, выбрано ${countText(selections)} выборов (${known.length} моделей)` });
   for (const { x, o } of known) {

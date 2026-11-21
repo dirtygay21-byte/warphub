@@ -43,4 +43,26 @@ export interface KtTeam {
   equipment: { id: string; name: string; text: string; effects: string }[];
   /** strategy — стратегические, firefight — боевые уловки; rule — особые правила команды */
   ploys: { id: string; type: 'strategy' | 'firefight' | 'rule'; name: string; text: string; effects: string }[];
+  /** состав по слотам (21.11.2026, tools/roster-data/kt/composition.json); null — у особых команд */
+  structure?: KtStructure | null;
+}
+
+/** Состав команды, разобранный из текста источника: слоты, лимиты, «каждый один раз», вес выбора. */
+export interface KtStructure {
+  slots: { label?: string; count: number; ops: string[]; optional?: boolean; flexible?: boolean; loose?: boolean }[];
+  /** каждый оперативник — один раз, кроме перечисленных */
+  unique?: { except: string[] };
+  maxPerOp?: Record<string, number>;
+  /** вес выбора: 0.5 — полвыбора (Grot, Bomb Squig), 2 — «считается за два» */
+  weights?: Record<string, number>;
+  groupMax?: { ops: string[]; max: number; text: string }[];
+  weaponMax?: { weapons: string[]; max: number; text: string; exact?: boolean }[];
+  keywordMax?: { keyword: string; max: number; text: string }[];
+  requires?: { op: string; needs: string[]; text: string }[];
+  requireAny?: { ops: string[]; text: string }[];
+  /** копии этих оперативников — с разным оружием */
+  distinctLoadout?: string[];
+  /** реквизиция: оперативники только из одной группы (по префиксу id) */
+  oneGroup?: { name: string; prefix: string }[];
+  note?: string;
 }

@@ -1,0 +1,2017 @@
+{
+ "source": "Составы команд Kill Team (2024) — текст «composition» из данных ktdash-v4 (= Wahapedia Kill Team), разобран вручную 21.11.2026",
+ "teams": {
+  "AEL-BOK": {
+   "slots": [
+    {
+     "label": "Экзарх",
+     "count": 1,
+     "ops": [
+      "AEL-BOK-DAX",
+      "AEL-BOK-HBX",
+      "AEL-BOK-SSX"
+     ]
+    },
+    {
+     "count": 7,
+     "ops": [
+      "AEL-BOK-DAW",
+      "AEL-BOK-HBW",
+      "AEL-BOK-SSW"
+     ]
+    }
+   ]
+  },
+  "AEL-COR": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "AEL-COR-FEL"
+     ]
+    },
+    {
+     "count": 8,
+     "ops": [
+      "AEL-COR-FD",
+      "AEL-COR-GNR",
+      "AEL-COR-HGNR",
+      "AEL-COR-KUR",
+      "AEL-COR-HNT",
+      "AEL-COR-SR",
+      "AEL-COR-SW",
+      "AEL-COR-SD",
+      "AEL-COR-WAR",
+      "AEL-COR-WS"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "AEL-COR-WAR"
+    ]
+   },
+   "weaponMax": [
+    {
+     "weapons": [
+      "blaster",
+      "wraithcannon"
+     ],
+     "exact": true,
+     "max": 1,
+     "text": "Нельзя брать и бластер, и wraithcannon"
+    }
+   ]
+  },
+  "AEL-HOTA": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "AEL-HOTA-KAS"
+     ]
+    },
+    {
+     "count": 8,
+     "ops": [
+      "AEL-HOTA-KAG",
+      "AEL-HOTA-KCD",
+      "AEL-HOTA-KDOY",
+      "AEL-HOTA-KELX",
+      "AEL-HOTA-KFLAY",
+      "AEL-HOTA-KGNR",
+      "AEL-HOTA-KHGNR",
+      "AEL-HOTA-KSA"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "AEL-HOTA-KAG"
+    ]
+   },
+   "weaponMax": [
+    {
+     "weapons": [
+      "blast pistol",
+      "blaster",
+      "dark lance"
+     ],
+     "exact": true,
+     "max": 2,
+     "text": "Не больше двух darklight-оружий (blast pistol, blaster, dark lance)"
+    }
+   ]
+  },
+  "AEL-MND": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "AEL-MND-NF"
+     ]
+    },
+    {
+     "count": 8,
+     "ops": [
+      "AEL-MND-ABS",
+      "AEL-MND-COTF",
+      "AEL-MND-DM",
+      "AEL-MND-SW",
+      "AEL-MND-WAR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "AEL-MND-WAR"
+    ]
+   }
+  },
+  "AEL-VDT": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "AEL-VDT-LPL"
+     ]
+    },
+    {
+     "count": 7,
+     "ops": [
+      "AEL-VDT-DJS",
+      "AEL-VDT-PLAY",
+      "AEL-VDT-SDS"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "AEL-VDT-PLAY"
+    ]
+   },
+   "weaponMax": [
+    {
+     "weapons": [
+      "fusion pistol"
+     ],
+     "max": 1,
+     "text": "Не больше одного fusion pistol"
+    },
+    {
+     "weapons": [
+      "neuro disruptor"
+     ],
+     "max": 1,
+     "text": "Не больше одного neuro disruptor"
+    }
+   ]
+  },
+  "CHAOS-BLD": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "CHAOS-BLD-CHF"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "CHAOS-BLD-GRN",
+      "CHAOS-BLD-BUT",
+      "CHAOS-BLD-COM",
+      "CHAOS-BLD-CRPS",
+      "CHAOS-BLD-FLN",
+      "CHAOS-BLD-GNR",
+      "CHAOS-BLD-SS",
+      "CHAOS-BLD-THUG",
+      "CHAOS-BLD-TRS",
+      "CHAOS-BLD-TRP"
+     ]
+    },
+    {
+     "count": 4,
+     "ops": [
+      "CHAOS-BLD-ENF",
+      "CHAOS-BLD-OGR",
+      "CHAOS-BLD-TRP"
+     ]
+    }
+   ],
+   "weights": {
+    "CHAOS-BLD-ENF": 2,
+    "CHAOS-BLD-OGR": 2
+   },
+   "unique": {
+    "except": [
+     "CHAOS-BLD-TRP",
+     "CHAOS-BLD-GNR"
+    ]
+   },
+   "maxPerOp": {
+    "CHAOS-BLD-GNR": 3
+   },
+   "distinctLoadout": [
+    "CHAOS-BLD-GNR"
+   ],
+   "groupMax": [
+    {
+     "ops": [
+      "CHAOS-BLD-GNR",
+      "CHAOS-BLD-SS"
+     ],
+     "max": 3,
+     "text": "Не больше трёх Gunner и Sharpshooter вместе"
+    }
+   ],
+   "weaponMax": [
+    {
+     "weapons": [
+      "plasma pistol",
+      "plasma gun"
+     ],
+     "max": 1,
+     "text": "Только один оперативник с плазмой (plasma pistol лидера или plasma gun)"
+    }
+   ]
+  },
+  "CHAOS-CULT": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "CHAOS-CULT-DEMA"
+     ]
+    },
+    {
+     "count": 2,
+     "ops": [
+      "CHAOS-CULT-BLBL"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "CHAOS-CULT-DEV"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "CHAOS-CULT-ICON"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "CHAOS-CULT-MW"
+     ]
+    },
+    {
+     "label": "Появляются в игре из Devotee (мутация)",
+     "count": 0,
+     "optional": true,
+     "ops": [
+      "CHAOS-CULT-MUT",
+      "CHAOS-CULT-TOR"
+     ]
+    }
+   ],
+   "note": "Состав фиксированный. Mutant и Torment не выбираются при сборке — Devotee превращаются в них во время игры по правилам команды"
+  },
+  "CHAOS-FELL": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "CHAOS-FELL-IH"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "CHAOS-FELL-DK",
+      "CHAOS-FELL-FB",
+      "CHAOS-FELL-GS",
+      "CHAOS-FELL-GH",
+      "CHAOS-FELL-HG",
+      "CHAOS-FELL-MNG",
+      "CHAOS-FELL-SHA",
+      "CHAOS-FELL-TOX",
+      "CHAOS-FELL-VND",
+      "CHAOS-FELL-WAR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "CHAOS-FELL-WAR"
+    ]
+   }
+  },
+  "CHAOS-GORE": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "CHAOS-GORE-BH"
+     ]
+    },
+    {
+     "count": 7,
+     "ops": [
+      "CHAOS-GORE-ASP",
+      "CHAOS-GORE-BT",
+      "CHAOS-GORE-IMP",
+      "CHAOS-GORE-INC",
+      "CHAOS-GORE-SC",
+      "CHAOS-GORE-ST"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "CHAOS-GORE-ASP"
+    ]
+   }
+  },
+  "CHAOS-GPI": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "CHAOS-GPI-VTC"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "CHAOS-GPI-BS"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "CHAOS-GPI-FS"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "CHAOS-GPI-LG"
+     ]
+    },
+    {
+     "count": 4,
+     "ops": [
+      "CHAOS-GPI-GL"
+     ]
+    },
+    {
+     "count": 3,
+     "ops": [
+      "CHAOS-GPI-GM"
+     ]
+    },
+    {
+     "label": "Mutoid Vermin (снаряжение)",
+     "count": 3,
+     "optional": true,
+     "ops": [
+      "CHAOS-GPI-CM",
+      "CHAOS-GPI-ESS",
+      "CHAOS-GPI-SG"
+     ]
+    }
+   ],
+   "note": "Состав фиксированный: все оперативники списка. Mutoid Vermin — только с этим снаряжением, число — по карточке снаряжения"
+  },
+  "CHAOS-LEG": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "CHAOS-LEG-AC",
+      "CHAOS-LEG-CHO"
+     ]
+    },
+    {
+     "count": 5,
+     "ops": [
+      "CHAOS-LEG-ANO",
+      "CHAOS-LEG-BA",
+      "CHAOS-LEG-BUT",
+      "CHAOS-LEG-IB",
+      "CHAOS-LEG-STL",
+      "CHAOS-LEG-WAR",
+      "CHAOS-LEG-GNR",
+      "CHAOS-LEG-HGNR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "CHAOS-LEG-WAR"
+    ]
+   }
+  },
+  "CHAOS-MW": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "CHAOS-MW-CL"
+     ]
+    },
+    {
+     "count": 5,
+     "ops": [
+      "CHAOS-MW-CHP",
+      "CHAOS-MW-CC",
+      "CHAOS-MW-DEP",
+      "CHAOS-MW-HM",
+      "CHAOS-MW-RAP",
+      "CHAOS-MW-SHR",
+      "CHAOS-MW-SS",
+      "CHAOS-MW-WT"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "CHAOS-MW-RAP"
+    ]
+   },
+   "weaponMax": [
+    {
+     "weapons": [
+      "plasma pistol",
+      "meltagun",
+      "plasma gun"
+     ],
+     "max": 2,
+     "text": "Не больше двух оперативников с plasma pistol / meltagun / plasma gun"
+    }
+   ]
+  },
+  "CHAOS-NC": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "CHAOS-NC-VIS"
+     ]
+    },
+    {
+     "count": 5,
+     "ops": [
+      "CHAOS-NC-FRM",
+      "CHAOS-NC-GNR",
+      "CHAOS-NC-HGNR",
+      "CHAOS-NC-SCR",
+      "CHAOS-NC-SKT",
+      "CHAOS-NC-VEN",
+      "CHAOS-NC-WAR"
+     ]
+    }
+   ]
+  },
+  "CHAOS-PM": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "CHAOS-PM-CHAMP"
+     ]
+    },
+    {
+     "count": 5,
+     "ops": [
+      "CHAOS-PM-BOMB",
+      "CHAOS-PM-FTR",
+      "CHAOS-PM-HGNR",
+      "CHAOS-PM-IB",
+      "CHAOS-PM-MAL",
+      "CHAOS-PM-WAR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": []
+   }
+  },
+  "CHAOS-WC": {
+   "slots": [
+    {
+     "count": 5,
+     "ops": [
+      "CHAOS-WC-SOD",
+      "CHAOS-WC-SOT",
+      "CHAOS-WC-SOW",
+      "CHAOS-WC-GNR",
+      "CHAOS-WC-IB",
+      "CHAOS-WC-WAR",
+      "CHAOS-WC-TZC",
+      "CHAOS-WC-TZHB",
+      "CHAOS-WC-TZIB",
+      "CHAOS-WC-TZWAR"
+     ]
+    }
+   ],
+   "weights": {
+    "CHAOS-WC-TZC": 0.5,
+    "CHAOS-WC-TZHB": 0.5,
+    "CHAOS-WC-TZIB": 0.5,
+    "CHAOS-WC-TZWAR": 0.5
+   },
+   "unique": {
+    "except": [
+     "CHAOS-WC-WAR",
+     "CHAOS-WC-TZWAR"
+    ]
+   },
+   "requireAny": [
+    {
+     "ops": [
+      "CHAOS-WC-SOD",
+      "CHAOS-WC-SOT",
+      "CHAOS-WC-SOW"
+     ],
+     "text": "Нужен хотя бы один SORCERER"
+    }
+   ],
+   "weaponMax": [
+    {
+     "weapons": [
+      "warpflame pistol"
+     ],
+     "max": 1,
+     "text": "Не больше одного warpflame pistol"
+    },
+    {
+     "weapons": [
+      "soulreaper cannon"
+     ],
+     "max": 1,
+     "text": "Не больше одного soulreaper cannon"
+    }
+   ]
+  },
+  "IMP-AES": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-AES-PE"
+     ]
+    },
+    {
+     "count": 10,
+     "ops": [
+      "IMP-AES-CAST",
+      "IMP-AES-CHI",
+      "IMP-AES-LSH",
+      "IMP-AES-RVR",
+      "IMP-AES-MAL",
+      "IMP-AES-MRK",
+      "IMP-AES-REV",
+      "IMP-AES-SUB",
+      "IMP-AES-VIG",
+      "IMP-AES-VOX",
+      "IMP-AES-GNR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-AES-GNR",
+     "IMP-AES-SUB",
+     "IMP-AES-VIG"
+    ]
+   },
+   "maxPerOp": {
+    "IMP-AES-GNR": 2,
+    "IMP-AES-SUB": 4
+   },
+   "distinctLoadout": [
+    "IMP-AES-GNR"
+   ]
+  },
+  "IMP-AOD": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-AOD-ASGT",
+      "IMP-AOD-ISGT",
+      "IMP-AOD-CPT"
+     ]
+    },
+    {
+     "count": 5,
+     "ops": [
+      "IMP-AOD-GRN",
+      "IMP-AOD-AWAR",
+      "IMP-AOD-SNP",
+      "IMP-AOD-HGNR",
+      "IMP-AOD-GNR",
+      "IMP-AOD-WAR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-AOD-AWAR",
+     "IMP-AOD-WAR"
+    ]
+   }
+  },
+  "IMP-BC": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-BC-TA"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "IMP-BC-BSU"
+     ]
+    },
+    {
+     "count": 8,
+     "ops": [
+      "IMP-BC-APS",
+      "IMP-BC-BBS",
+      "IMP-BC-BCS",
+      "IMP-BC-BGS",
+      "IMP-BC-BTS"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-BC-BCS",
+     "IMP-BC-BGS"
+    ]
+   },
+   "maxPerOp": {
+    "IMP-BC-BGS": 2
+   },
+   "distinctLoadout": [
+    "IMP-BC-BGS"
+   ],
+   "weaponMax": [
+    {
+     "weapons": [
+      "meltagun"
+     ],
+     "max": 1,
+     "text": "Не больше одного Combat Servitor с meltagun"
+    },
+    {
+     "weapons": [
+      "incendine igniter"
+     ],
+     "max": 3,
+     "text": "Не больше трёх Combat Servitor с incendine igniter"
+    }
+   ]
+  },
+  "IMP-CI": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-CI-SUP"
+     ]
+    },
+    {
+     "count": 8,
+     "ops": [
+      "IMP-CI-ABJ",
+      "IMP-CI-CEN",
+      "IMP-CI-CRE",
+      "IMP-CI-DEN",
+      "IMP-CI-MOR",
+      "IMP-CI-REL",
+      "IMP-CI-WAR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-CI-CRE",
+     "IMP-CI-WAR"
+    ]
+   },
+   "maxPerOp": {
+    "IMP-CI-CRE": 2
+   }
+  },
+  "IMP-DKK": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-DKK-WM"
+     ]
+    },
+    {
+     "label": "Trooper (можно заменить ploy за 0 CP)",
+     "count": 4,
+     "ops": [
+      "IMP-DKK-TRP"
+     ],
+     "flexible": true
+    },
+    {
+     "count": 9,
+     "ops": [
+      "IMP-DKK-BRU",
+      "IMP-DKK-CON",
+      "IMP-DKK-GNR",
+      "IMP-DKK-MDC",
+      "IMP-DKK-SAP",
+      "IMP-DKK-SNP",
+      "IMP-DKK-SPT",
+      "IMP-DKK-TRP",
+      "IMP-DKK-VET",
+      "IMP-DKK-VOX",
+      "IMP-DKK-ZLT"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-DKK-TRP",
+     "IMP-DKK-GNR"
+    ]
+   },
+   "maxPerOp": {
+    "IMP-DKK-GNR": 4
+   },
+   "distinctLoadout": [
+    "IMP-DKK-GNR"
+   ]
+  },
+  "IMP-DW": {
+   "slots": [
+    {
+     "count": 5,
+     "ops": [
+      "IMP-DW-SGT",
+      "IMP-DW-AEG",
+      "IMP-DW-BLM",
+      "IMP-DW-BOM",
+      "IMP-DW-BRC",
+      "IMP-DW-DEM",
+      "IMP-DW-DIS",
+      "IMP-DW-GNR",
+      "IMP-DW-HTK",
+      "IMP-DW-HSL",
+      "IMP-DW-MRK"
+     ]
+    }
+   ],
+   "unique": {
+    "except": []
+   },
+   "keywordMax": [
+    {
+     "keyword": "GRAVIS",
+     "max": 1,
+     "text": "Не больше одного GRAVIS"
+    }
+   ]
+  },
+  "IMP-ESS": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-ESS-EV"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "IMP-ESS-CAN"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "IMP-ESS-DCE"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "IMP-ESS-LM"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "IMP-ESS-REJAD"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "IMP-ESS-VMST"
+     ]
+    },
+    {
+     "count": 4,
+     "ops": [
+      "IMP-ESS-VM"
+     ]
+    }
+   ],
+   "weaponMax": [
+    {
+     "weapons": [
+      "rotor cannon"
+     ],
+     "max": 1,
+     "text": "Только один Voidsman с rotor cannon"
+    }
+   ],
+   "note": "Состав фиксированный: все оперативники списка (Voidsman — 3 с lasgun и 1 с rotor cannon)"
+  },
+  "IMP-HC": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-HC-SIP",
+      "IMP-HC-SRSP",
+      "IMP-HC-SRGA",
+      "IMP-HC-SVA"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "IMP-HC-SIW",
+      "IMP-HC-SRSW",
+      "IMP-HC-SRGD",
+      "IMP-HC-SRGG",
+      "IMP-HC-SRGS",
+      "IMP-HC-SRGW",
+      "IMP-HC-SVD",
+      "IMP-HC-SVG",
+      "IMP-HC-SVS",
+      "IMP-HC-SVW"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-HC-SRGG",
+     "IMP-HC-SVG",
+     "IMP-HC-SRGW",
+     "IMP-HC-SVW",
+     "IMP-HC-SIW",
+     "IMP-HC-SRSW"
+    ]
+   },
+   "groupMax": [
+    {
+     "ops": [
+      "IMP-HC-SIW",
+      "IMP-HC-SRSW",
+      "IMP-HC-SRGG",
+      "IMP-HC-SVG"
+     ],
+     "max": 7,
+     "text": "Не больше семи Sicarian и Gunner вместе"
+    },
+    {
+     "ops": [
+      "IMP-HC-SRGD",
+      "IMP-HC-SVD"
+     ],
+     "max": 1,
+     "text": "Не больше одного DIKTAT"
+    },
+    {
+     "ops": [
+      "IMP-HC-SRGS",
+      "IMP-HC-SVS"
+     ],
+     "max": 1,
+     "text": "Не больше одного SURVEYOR"
+    },
+    {
+     "ops": [
+      "IMP-HC-SIW",
+      "IMP-HC-SRSW",
+      "IMP-HC-SIP",
+      "IMP-HC-SRSP"
+     ],
+     "max": 5,
+     "text": "Не больше пяти SICARIAN"
+    }
+   ],
+   "weaponMax": [
+    {
+     "weapons": [
+      "arc rifle"
+     ],
+     "max": 1,
+     "text": "Не больше одного arc rifle"
+    },
+    {
+     "weapons": [
+      "plasma caliver"
+     ],
+     "max": 1,
+     "text": "Не больше одного plasma caliver"
+    },
+    {
+     "weapons": [
+      "transuranic arquebus"
+     ],
+     "max": 1,
+     "text": "Не больше одного transuranic arquebus"
+    }
+   ]
+  },
+  "IMP-INB": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-INB-SGT"
+     ]
+    },
+    {
+     "count": 10,
+     "ops": [
+      "IMP-INB-ARM",
+      "IMP-INB-AXE",
+      "IMP-INB-CAT",
+      "IMP-INB-END",
+      "IMP-INB-GS",
+      "IMP-INB-GRN",
+      "IMP-INB-GNR",
+      "IMP-INB-HC",
+      "IMP-INB-SRV",
+      "IMP-INB-VJ"
+     ]
+    }
+   ],
+   "weights": {
+    "IMP-INB-GS": 0.5,
+    "IMP-INB-CAT": 0.5
+   },
+   "unique": {
+    "except": [
+     "IMP-INB-ARM",
+     "IMP-INB-GNR"
+    ]
+   },
+   "maxPerOp": {
+    "IMP-INB-GNR": 2
+   },
+   "distinctLoadout": [
+    "IMP-INB-GNR"
+   ],
+   "requires": [
+    {
+     "op": "IMP-INB-GS",
+     "needs": [
+      "IMP-INB-VJ"
+     ],
+     "text": "Gheistskull — только вместе с Void-Jammer"
+    },
+    {
+     "op": "IMP-INB-CAT",
+     "needs": [
+      "IMP-INB-SRV"
+     ],
+     "text": "C.A.T. Unit — только вместе с Surveyor"
+    }
+   ]
+  },
+  "IMP-INQ": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-INQ-INQ24-INT"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "IMP-INQ-INQ24-TS"
+     ]
+    },
+    {
+     "count": 5,
+     "ops": [
+      "IMP-INQ-INQ24-AS",
+      "IMP-INQ-INQ24-QK",
+      "IMP-INQ-INQ24-VET",
+      "IMP-INQ-INQ24-ENL",
+      "IMP-INQ-INQ24-GUNS",
+      "IMP-INQ-INQ24-HEX",
+      "IMP-INQ-INQ24-MYS",
+      "IMP-INQ-INQ24-PEN",
+      "IMP-INQ-INQ24-PST"
+     ]
+    },
+    {
+     "label": "Агенты или реквизиция (одна группа)",
+     "count": 5,
+     "loose": true,
+     "ops": [
+      "*"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-INQ-INQ24-GUNS",
+     "IMP-INQ-DKK24-TRP",
+     "IMP-INQ-DKK24-GNR",
+     "IMP-INQ-AES24-SUB",
+     "IMP-INQ-AES24-VIG",
+     "IMP-INQ-AES24-GNR",
+     "IMP-INQ-INB24-ARM",
+     "IMP-INQ-INB24-GNR",
+     "IMP-INQ-KAS24-TRP",
+     "IMP-INQ-KAS24-GNR",
+     "IMP-INQ-SOS24-SOSPRO",
+     "IMP-INQ-SOS24-SOSVIG",
+     "IMP-INQ-SOS24-SOSWSK",
+     "IMP-INQ-TS24-TSTRP",
+     "IMP-INQ-TS24-TSGUN"
+    ]
+   },
+   "maxPerOp": {
+    "IMP-INQ-INQ24-GUNS": 2
+   },
+   "distinctLoadout": [
+    "IMP-INQ-INQ24-GUNS"
+   ],
+   "oneGroup": [
+    {
+     "name": "Death Korps",
+     "prefix": "IMP-INQ-DKK24-"
+    },
+    {
+     "name": "Exaction Squad",
+     "prefix": "IMP-INQ-AES24-"
+    },
+    {
+     "name": "Imperial Navy Breachers",
+     "prefix": "IMP-INQ-INB24-"
+    },
+    {
+     "name": "Kasrkin",
+     "prefix": "IMP-INQ-KAS24-"
+    },
+    {
+     "name": "Sisters of Silence",
+     "prefix": "IMP-INQ-SOS24-"
+    },
+    {
+     "name": "Tempestus Scions",
+     "prefix": "IMP-INQ-TS24-"
+    }
+   ],
+   "note": "Реквизиция проверяется упрощённо: только одна группа и лимиты агентов. Число оперативников группы (Death Korps — 6, остальные — 5) и её собственные лимиты сверяйте с карточкой «Inquisitorial Requisition»"
+  },
+  "IMP-KAS": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-KAS-SGT"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "IMP-KAS-MDC",
+      "IMP-KAS-DT",
+      "IMP-KAS-GNR",
+      "IMP-KAS-RT",
+      "IMP-KAS-SS",
+      "IMP-KAS-TRP",
+      "IMP-KAS-VOX"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-KAS-TRP",
+     "IMP-KAS-GNR"
+    ]
+   },
+   "maxPerOp": {
+    "IMP-KAS-GNR": 4
+   },
+   "distinctLoadout": [
+    "IMP-KAS-GNR"
+   ],
+   "groupMax": [
+    {
+     "ops": [
+      "IMP-KAS-GNR",
+      "IMP-KAS-SS"
+     ],
+     "max": 4,
+     "text": "Не больше четырёх Gunner и Sharpshooter вместе"
+    }
+   ]
+  },
+  "IMP-NOV": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-NOV-SUP"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "IMP-NOV-CON",
+      "IMP-NOV-DIA",
+      "IMP-NOV-DUE",
+      "IMP-NOV-EXA",
+      "IMP-NOV-HOS",
+      "IMP-NOV-PEN",
+      "IMP-NOV-PRE",
+      "IMP-NOV-PRO",
+      "IMP-NOV-PUR",
+      "IMP-NOV-REL",
+      "IMP-NOV-MIL"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-NOV-MIL",
+     "IMP-NOV-PUR"
+    ]
+   },
+   "maxPerOp": {
+    "IMP-NOV-PUR": 2
+   }
+  },
+  "IMP-PHO": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-PHO-INFSGT",
+      "IMP-PHO-INCSGT",
+      "IMP-PHO-RVRSGT"
+     ]
+    },
+    {
+     "count": 5,
+     "ops": [
+      "IMP-PHO-INFCOM",
+      "IMP-PHO-INFHEL",
+      "IMP-PHO-INFSAB",
+      "IMP-PHO-INFVET",
+      "IMP-PHO-INFVOX",
+      "IMP-PHO-INFWAR",
+      "IMP-PHO-INCMARK",
+      "IMP-PHO-INCML",
+      "IMP-PHO-INCWAR",
+      "IMP-PHO-RVRWAR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-PHO-INFWAR",
+     "IMP-PHO-INCWAR",
+     "IMP-PHO-RVRWAR"
+    ]
+   }
+  },
+  "IMP-RAT": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-RAT-FIX"
+     ]
+    },
+    {
+     "count": 10,
+     "ops": [
+      "IMP-RAT-MUTT",
+      "IMP-RAT-BULL",
+      "IMP-RAT-OGR",
+      "IMP-RAT-BIG",
+      "IMP-RAT-BOMB",
+      "IMP-RAT-HARD",
+      "IMP-RAT-RAID",
+      "IMP-RAT-SNK",
+      "IMP-RAT-SNP",
+      "IMP-RAT-SPOT",
+      "IMP-RAT-STASH",
+      "IMP-RAT-VOX"
+     ],
+     "flexible": true
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-RAT-BULL",
+     "IMP-RAT-OGR",
+     "IMP-RAT-SNP"
+    ]
+   },
+   "groupMax": [
+    {
+     "ops": [
+      "IMP-RAT-BULL",
+      "IMP-RAT-OGR"
+     ],
+     "max": 3,
+     "text": "Не больше трёх Bullgryn и Ogryn вместе"
+    }
+   ],
+   "note": "До трёх раз вместо оперативника можно взять ploy Ratling за 0 CP — тогда оперативников меньше"
+  },
+  "IMP-SANC": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-SANC-CFS"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "IMP-SANC-CRB"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "IMP-SANC-CFG",
+      "IMP-SANC-ASS",
+      "IMP-SANC-ABB",
+      "IMP-SANC-MIR",
+      "IMP-SANC-MIS",
+      "IMP-SANC-PER",
+      "IMP-SANC-PRC",
+      "IMP-SANC-REL",
+      "IMP-SANC-SAL"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-SANC-PRC",
+     "IMP-SANC-MIS"
+    ]
+   },
+   "maxPerOp": {
+    "IMP-SANC-PRC": 4,
+    "IMP-SANC-MIS": 2
+   },
+   "distinctLoadout": [
+    "IMP-SANC-MIS"
+   ]
+  },
+  "IMP-SCT": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-SCT-SGT"
+     ]
+    },
+    {
+     "count": 8,
+     "ops": [
+      "IMP-SCT-HGNR",
+      "IMP-SCT-HNT",
+      "IMP-SCT-SNP",
+      "IMP-SCT-TRK",
+      "IMP-SCT-WAR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-SCT-WAR",
+     "IMP-SCT-HGNR"
+    ]
+   },
+   "maxPerOp": {
+    "IMP-SCT-HGNR": 2
+   },
+   "distinctLoadout": [
+    "IMP-SCT-HGNR"
+   ]
+  },
+  "IMP-SFV": {
+   "slots": [
+    {
+     "count": 6,
+     "ops": [
+      "IMP-SFV-VAR",
+      "IMP-SFV-RAM",
+      "IMP-SFV-BEL",
+      "IMP-SFV-NAH",
+      "IMP-SFV-MAP",
+      "IMP-SFV-ZER",
+      "IMP-SFV-HAR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": []
+   }
+  },
+  "IMP-SPECT": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-SPECT-SGT"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "IMP-SPECT-BCN"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "IMP-SPECT-MED",
+      "IMP-SPECT-GRN",
+      "IMP-SPECT-GDE",
+      "IMP-SPECT-GNR",
+      "IMP-SPECT-HGNR",
+      "IMP-SPECT-LDR",
+      "IMP-SPECT-SS",
+      "IMP-SPECT-STUB",
+      "IMP-SPECT-TRP",
+      "IMP-SPECT-VOX"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-SPECT-TRP"
+    ]
+   }
+  },
+  "IMP-TEMPAQ": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "IMP-TEMPAQ-TEMP"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "IMP-TEMPAQ-SS"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "IMP-TEMPAQ-GRN",
+      "IMP-TEMPAQ-GF",
+      "IMP-TEMPAQ-GNR",
+      "IMP-TEMPAQ-MRK",
+      "IMP-TEMPAQ-PRE",
+      "IMP-TEMPAQ-TRP"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-TEMPAQ-TRP",
+     "IMP-TEMPAQ-GNR"
+    ]
+   },
+   "maxPerOp": {
+    "IMP-TEMPAQ-GNR": 2
+   },
+   "distinctLoadout": [
+    "IMP-TEMPAQ-GNR"
+   ]
+  },
+  "IMP-WS": {
+   "slots": [
+    {
+     "count": 1,
+     "ops": [
+      "IMP-WS-WLF"
+     ]
+    },
+    {
+     "count": 5,
+     "ops": [
+      "IMP-WS-LDR",
+      "IMP-WS-FB",
+      "IMP-WS-FE",
+      "IMP-WS-GNR",
+      "IMP-WS-TM",
+      "IMP-WS-RP",
+      "IMP-WS-HNT"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "IMP-WS-HNT"
+    ]
+   }
+  },
+  "NEC-CAN": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "NEC-CAN-GEO"
+     ]
+    },
+    {
+     "count": 2,
+     "ops": [
+      "NEC-CAN-TC"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "NEC-CAN-ACC"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "NEC-CAN-REA"
+     ]
+    },
+    {
+     "count": 3,
+     "ops": [
+      "NEC-CAN-WAR"
+     ]
+    }
+   ],
+   "weaponMax": [
+    {
+     "weapons": [
+      "transdimensional isolator"
+     ],
+     "max": 1,
+     "text": "Не больше одного transdimensional isolator"
+    }
+   ]
+  },
+  "NEC-HIER": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "NEC-HIER-CHRON",
+      "NEC-HIER-PSYCH",
+      "NEC-HIER-TECH"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "NEC-HIER-PA"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "NEC-HIER-PR"
+     ]
+    },
+    {
+     "count": 5,
+     "ops": [
+      "NEC-HIER-APP",
+      "NEC-HIER-DM",
+      "NEC-HIER-ID",
+      "NEC-HIER-IG"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "NEC-HIER-DM",
+     "NEC-HIER-IG"
+    ]
+   }
+  },
+  "ORK-KOM": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "ORK-KOM-NOB"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "ORK-KOM-SQUIG",
+      "ORK-KOM-BOY",
+      "ORK-KOM-BRC",
+      "ORK-KOM-BRN",
+      "ORK-KOM-COMMS",
+      "ORK-KOM-DAK",
+      "ORK-KOM-GROT",
+      "ORK-KOM-RKT",
+      "ORK-KOM-SLS",
+      "ORK-KOM-SNP"
+     ]
+    }
+   ],
+   "weights": {
+    "ORK-KOM-SQUIG": 0.5,
+    "ORK-KOM-GROT": 0.5
+   },
+   "unique": {
+    "except": [
+     "ORK-KOM-BOY"
+    ]
+   }
+  },
+  "ORK-WK": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "ORK-WK-NOB"
+     ]
+    },
+    {
+     "count": 2,
+     "ops": [
+      "ORK-WK-SQUIG"
+     ]
+    },
+    {
+     "count": 5,
+     "ops": [
+      "ORK-WK-BBDEMO",
+      "ORK-WK-BBFTR",
+      "ORK-WK-BBKRU",
+      "ORK-WK-TBGNR",
+      "ORK-WK-TBROK"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "ORK-WK-SQUIG",
+     "ORK-WK-BBFTR",
+     "ORK-WK-TBGNR"
+    ]
+   }
+  },
+  "TAU-FSKB": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "TAU-FSKB-KB"
+     ]
+    },
+    {
+     "count": 11,
+     "ops": [
+      "TAU-FSKB-BH",
+      "TAU-FSKB-CB",
+      "TAU-FSKB-CS",
+      "TAU-FSKB-HND",
+      "TAU-FSKB-LS",
+      "TAU-FSKB-PST",
+      "TAU-FSKB-STK",
+      "TAU-FSKB-TRK",
+      "TAU-FSKB-HGNR",
+      "TAU-FSKB-WAR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "TAU-FSKB-HND",
+     "TAU-FSKB-WAR"
+    ]
+   },
+   "maxPerOp": {
+    "TAU-FSKB-HND": 2
+   }
+  },
+  "TAU-PF": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "TAU-PF-SU"
+     ]
+    },
+    {
+     "count": 11,
+     "ops": [
+      "TAU-PF-AG",
+      "TAU-PF-BL",
+      "TAU-PF-COMMS",
+      "TAU-PF-DC",
+      "TAU-PF-MARKS",
+      "TAU-PF-MDC",
+      "TAU-PF-SL",
+      "TAU-PF-TSI",
+      "TAU-PF-MB3",
+      "TAU-PF-MV31",
+      "TAU-PF-MV33",
+      "TAU-PF-MV1",
+      "TAU-PF-MV4",
+      "TAU-PF-MV7",
+      "TAU-PF-WE"
+     ]
+    }
+   ],
+   "weights": {
+    "TAU-PF-MB3": 2
+   },
+   "unique": {
+    "except": [
+     "TAU-PF-SL",
+     "TAU-PF-WE"
+    ]
+   },
+   "maxPerOp": {
+    "TAU-PF-WE": 2
+   }
+  },
+  "TAU-VESP": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "TAU-VESP-VSL"
+     ]
+    },
+    {
+     "count": 1,
+     "ops": [
+      "TAU-VESP-OSD"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "TAU-VESP-VLS",
+      "TAU-VESP-VSS",
+      "TAU-VESP-VSB",
+      "TAU-VESP-VSG",
+      "TAU-VESP-WAR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "TAU-VESP-WAR"
+    ]
+   }
+  },
+  "TAU-XV26": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "TAU-XV26-SV"
+     ]
+    },
+    {
+     "label": "MV75 Marker Drone",
+     "count": 1,
+     "ops": [
+      "TAU-XV26-MV75"
+     ]
+    },
+    {
+     "label": "MV15 Gun Drone",
+     "count": 1,
+     "ops": [
+      "TAU-XV26-MV15"
+     ]
+    },
+    {
+     "count": 4,
+     "ops": [
+      "TAU-XV26-DES",
+      "TAU-XV26-INF",
+      "TAU-XV26-LIB",
+      "TAU-XV26-LS",
+      "TAU-XV26-NEU"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "TAU-XV26-INF"
+    ]
+   },
+   "weaponMax": [
+    {
+     "weapons": [
+      "fusion blaster"
+     ],
+     "max": 2,
+     "text": "Не больше двух fusion blaster"
+    }
+   ]
+  },
+  "TYR-BBRO": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "TYR-BBRO-CMDR"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "TYR-BBRO-AGIT",
+      "TYR-BBRO-GNR",
+      "TYR-BBRO-IW",
+      "TYR-BBRO-KF",
+      "TYR-BBRO-MED",
+      "TYR-BBRO-SAP",
+      "TYR-BBRO-SNP",
+      "TYR-BBRO-TRP",
+      "TYR-BBRO-VET",
+      "TYR-BBRO-VOX"
+     ]
+    },
+    {
+     "label": "Broodcoven или Trooper (можно заменить ploy за 0 CP)",
+     "count": 3,
+     "flexible": true,
+     "ops": [
+      "TYR-BBRO-FAM",
+      "TYR-BBRO-MAG",
+      "TYR-BBRO-PAT",
+      "TYR-BBRO-PRIM",
+      "TYR-BBRO-TRP"
+     ]
+    }
+   ],
+   "weights": {
+    "TYR-BBRO-FAM": 0.5,
+    "TYR-BBRO-MAG": 2,
+    "TYR-BBRO-PAT": 3,
+    "TYR-BBRO-PRIM": 2
+   },
+   "unique": {
+    "except": [
+     "TYR-BBRO-TRP",
+     "TYR-BBRO-GNR",
+     "TYR-BBRO-FAM"
+    ]
+   },
+   "maxPerOp": {
+    "TYR-BBRO-GNR": 3,
+    "TYR-BBRO-FAM": 2
+   },
+   "distinctLoadout": [
+    "TYR-BBRO-GNR"
+   ],
+   "groupMax": [
+    {
+     "ops": [
+      "TYR-BBRO-GNR",
+      "TYR-BBRO-SNP"
+     ],
+     "max": 3,
+     "text": "Не больше трёх Gunner и Sniper вместе"
+    },
+    {
+     "ops": [
+      "TYR-BBRO-MAG",
+      "TYR-BBRO-PAT",
+      "TYR-BBRO-PRIM"
+     ],
+     "max": 1,
+     "text": "Только один BROODCOVEN (Magus, Patriarch или Primus)"
+    }
+   ]
+  },
+  "TYR-RAV": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "TYR-RAV-PRM"
+     ]
+    },
+    {
+     "count": 4,
+     "ops": [
+      "TYR-RAV-FTL",
+      "TYR-RAV-TRS",
+      "TYR-RAV-VSP",
+      "TYR-RAV-WAR",
+      "TYR-RAV-WRK"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "TYR-RAV-WAR"
+    ]
+   }
+  },
+  "TYR-WB": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "TYR-WB-LDR"
+     ]
+    },
+    {
+     "count": 13,
+     "ops": [
+      "TYR-WB-KLM",
+      "TYR-WB-LOC",
+      "TYR-WB-GNR",
+      "TYR-WB-HGNR",
+      "TYR-WB-IB",
+      "TYR-WB-SNP",
+      "TYR-WB-TAL",
+      "TYR-WB-WAR"
+     ]
+    }
+   ],
+   "weights": {
+    "TYR-WB-KLM": 2,
+    "TYR-WB-LOC": 2,
+    "TYR-WB-SNP": 2,
+    "TYR-WB-TAL": 2
+   },
+   "unique": {
+    "except": [
+     "TYR-WB-WAR",
+     "TYR-WB-GNR",
+     "TYR-WB-HGNR"
+    ]
+   },
+   "maxPerOp": {
+    "TYR-WB-GNR": 2,
+    "TYR-WB-HGNR": 2
+   },
+   "distinctLoadout": [
+    "TYR-WB-GNR",
+    "TYR-WB-HGNR"
+   ],
+   "groupMax": [
+    {
+     "ops": [
+      "TYR-WB-KLM",
+      "TYR-WB-LOC",
+      "TYR-WB-SNP",
+      "TYR-WB-TAL"
+     ],
+     "max": 2,
+     "text": "Не больше двух CULT AGENT (Kelermorph, Locus, Sanctus)"
+    }
+   ]
+  },
+  "VOT-HKS": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "VOT-HKS-TH"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "VOT-HKS-DO",
+      "VOT-HKS-MDC",
+      "VOT-HKS-GRN",
+      "VOT-HKS-JMP",
+      "VOT-HKS-KL",
+      "VOT-HKS-KOG",
+      "VOT-HKS-LOK",
+      "VOT-HKS-LUG",
+      "VOT-HKS-WAR",
+      "VOT-HKS-GNR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "VOT-HKS-GNR",
+     "VOT-HKS-WAR"
+    ]
+   },
+   "maxPerOp": {
+    "VOT-HKS-GNR": 3
+   },
+   "distinctLoadout": [
+    "VOT-HKS-GNR"
+   ]
+  },
+  "VOT-HKY": {
+   "slots": [
+    {
+     "label": "Лидер",
+     "count": 1,
+     "ops": [
+      "VOT-HKY-THEYN"
+     ]
+    },
+    {
+     "count": 9,
+     "ops": [
+      "VOT-HKY-BLD",
+      "VOT-HKY-BOMB",
+      "VOT-HKY-GNR",
+      "VOT-HKY-IRN",
+      "VOT-HKY-RFL",
+      "VOT-HKY-TRK",
+      "VOT-HKY-WAR"
+     ]
+    }
+   ],
+   "unique": {
+    "except": [
+     "VOT-HKY-WAR"
+    ]
+   }
+  }
+ }
+}

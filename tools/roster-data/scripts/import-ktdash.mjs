@@ -168,6 +168,12 @@ const index = {
 report.info.push(`ktdash ${commit} (${date}): фракций ${index.factions.length}, команд ${teams.length}, оперативников ${teams.reduce((s, t) => s + t.operatives, 0)}`);
 report.info.push('универсального снаряжения в источнике нет — только снаряжение команд');
 
+// состав команды по слотам (21.11.2026): разобран вручную из текста composition — tools/roster-data/kt/composition.json
+const COMPOSITION = JSON.parse(fs.readFileSync(path.join(path.dirname(new URL(import.meta.url).pathname), '..', 'kt', 'composition.json'), 'utf8')).teams;
+for (const [id, t] of Object.entries(files)) {
+  t.structure = COMPOSITION[id] ?? null;
+  if (!t.special && !COMPOSITION[id]) report.warnings.push(`нет разобранного состава для ${id} — счётчик по тексту`);
+}
 const out = new Map([[path.join(OUT, 'index.json'), index], ...Object.entries(files).map(([id, t]) => [path.join(OUT, 't', `${id}.json`), t])]);
 if (process.argv.includes('--check')) {
   const stale = [...out].filter(([f, v]) => !fs.existsSync(f) || fs.readFileSync(f, 'utf8') !== JSON.stringify(v) + '\n').map(([f]) => path.basename(f));
