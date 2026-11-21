@@ -1,4 +1,5 @@
 import { formatReservationDateTime } from "@/utils/reservationDisplay";
+import { SheetClose } from "@/components/ui/ds/SheetClose";
 import { Clock } from "lucide-react";
 import { EXTEND_HOUR_OPTIONS } from "../constants";
 import { addHoursToEndsAt } from "../utils";
@@ -43,10 +44,11 @@ export function ExtendReservationDialog({
       <div
         role="dialog"
         aria-modal="true"
-        className="ds-sheet w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated"
+        className="ds-sheet relative w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="border-b border-white/10 px-5 py-5">
+        <SheetClose onClose={onClose} />
+        <div className="border-b border-white/10 px-5 py-5 pr-14">
           <div className="mb-3 flex size-12 items-center justify-center rounded-full bg-blue-400/15 text-blue-300">
             <Clock className="size-6" />
           </div>

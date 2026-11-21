@@ -1,4 +1,5 @@
 import { redeemRosterCode } from "@/apiUtils/roster";
+import { SheetClose } from "@/components/ui/ds/SheetClose";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { KeyRound, LoaderCircle } from "lucide-react";
@@ -53,9 +54,10 @@ export function AccessCodeDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="access-code-title"
-        className="ds-sheet w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated px-5 pb-5 pt-6 text-center shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
+        className="ds-sheet relative w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated px-5 pb-5 pt-6 text-center shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
         onClick={(event) => event.stopPropagation()}
       >
+        <SheetClose onClose={onClose} />
         <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-accent/15 text-accent">
           <KeyRound className="size-6" />
         </div>
