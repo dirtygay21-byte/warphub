@@ -67,6 +67,13 @@ def walk(v, old, new):
         return [walk(x, old, new) for x in v]
     return v
 
+def clamp(v):
+    if isinstance(v, list) and len(v) == 2 and all(isinstance(c, (int, float)) for c in v):
+        return [min(max(v[0], 0), 30), min(max(v[1], 0), 22)]
+    if isinstance(v, list):
+        return [clamp(x) for x in v]
+    return v
+
 def drop_depth(a, fr, edge):
     """Depth in px of the drop-zone colour strip along `edge`, from 19 scanlines.
 
@@ -121,6 +128,8 @@ def main():
                 m[key] = walk(m[key], old, new)
             for o in m['objectives']:
                 o['x'], o['y'] = reproject([o['x'], o['y']], old, new)
+        for key in ('territories', 'terrain', 'walls', 'doors'):  # lines drawn on the border land a hair outside
+            m[key] = clamp(m[key])
         l, t, r, b = new
         guides, owner = [], {}
         for g in m['guides']:
