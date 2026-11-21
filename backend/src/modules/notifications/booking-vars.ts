@@ -73,7 +73,7 @@ export function detailVars(details: ReservationDetails | null | undefined) {
 export function playerLine(user: Brief, details: ReservationDetails | null | undefined): string {
   const name = escapeHtml(formatUserName({ firstName: user.firstName, lastName: user.lastName ?? null, username: user.username ?? null }));
   if (details?.kind !== 'wh_player') return name;
-  const parts = [details.army, details.points != null && gameHasPoints(details.game) ? `${details.points} очков` : '', experienceLabel(details.experienceLevel)].filter((p) => p && p !== '—');
+  const parts = [details.army || (details.comment ? `хочет: ${details.comment}` : ''), details.points != null && gameHasPoints(details.game) ? `${details.points} очков` : '', experienceLabel(details.experienceLevel)].filter((p) => p && p !== '—');
   return `${name} — ${escapeHtml(parts.join(', '))}`;
 }
 

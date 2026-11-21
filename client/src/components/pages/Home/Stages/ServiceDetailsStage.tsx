@@ -149,7 +149,7 @@ export default function ServiceDetailsStage() {
 
   const formError =
     detailsKind === "wh_player"
-      ? (validatePlayerForm(player, options.maxPoints) ?? clubArmyError)
+      ? (validatePlayerForm(player, options.maxPoints, isTraining) ?? clubArmyError)
       : detailsKind === "painting"
         ? validatePaintingForm(painting)
         : null;
@@ -169,7 +169,7 @@ export default function ServiceDetailsStage() {
         seatClubArmyOptions: detailsKind === "wh_player" ? [clubArmy] : undefined,
         details:
           detailsKind === "wh_player"
-            ? { ...playerFormToDetails(player), ...(clubArmy && hasPoints ? { clubArmyPoints } : {}) }
+            ? { ...playerFormToDetails(player, isTraining), ...(clubArmy && hasPoints ? { clubArmyPoints } : {}) }
             : detailsKind === "painting"
               ? paintingFormToDetails(painting)
               : undefined,
@@ -310,6 +310,7 @@ export default function ServiceDetailsStage() {
             lockedGame={lockedGame}
             options={options}
             games={gamesForSlot}
+            training={isTraining}
             playerName={user ? [user.firstName, user.lastName].filter(Boolean).join(" ") : undefined}
           />
           <ToggleRow

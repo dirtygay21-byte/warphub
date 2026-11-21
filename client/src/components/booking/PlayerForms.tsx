@@ -92,12 +92,15 @@ export function PlayerInfoForm({
   playerName,
   lockedGame,
   games,
+  training = false,
 }: {
   value: PlayerFormValue;
   onChange: (value: PlayerFormValue) => void;
   options: BookingOptions;
   playerName?: string;
   lockedGame?: string | null;
+  /** тренировка (21.11.2026): без выбора армии и очков — пожелание текстом; ростер из WarpBuilder — по желанию */
+  training?: boolean;
   /** игры, доступные за выбранным столом (категория стола); по умолчанию — все */
   games?: BookingOptions["games"];
 }) {
@@ -152,6 +155,37 @@ export function PlayerInfoForm({
         }}
       />
 
+      {training ? (
+        <>
+          {value.army && (
+            <div className="flex items-center gap-3 rounded-xl border border-[#6CF0E6]/35 bg-[#6CF0E6]/10 px-3.5 py-2.5">
+              <span className="min-w-0 flex-1 text-[15px]">
+                <span className="text-fg-2">Ростер: </span>
+                <b>{value.army}</b>
+                {value.points && gameHasPoints(value.game) ? <span className="text-fg-2"> · {value.points} очков</span> : null}
+              </span>
+              <button
+                type="button"
+                onClick={() => set({ army: "", points: "" })}
+                className="min-h-11 shrink-0 px-2 text-[13px] font-semibold text-fg-2 hover:text-fg"
+              >
+                Убрать
+              </button>
+            </div>
+          )}
+          <Field label="Пожелания" hint="Необязательно">
+            <textarea
+              value={value.comment}
+              onChange={(event) => set({ comment: event.target.value.slice(0, 300) })}
+              rows={3}
+              placeholder={kt ? "Например: хочу поиграть за Kasrkin или Pathfinders" : wc ? "Например: хочу поиграть за Splintered Fang" : "Например: хочу поиграть за Orks или Necrons"}
+              className="w-full resize-none rounded-xl border border-white/10 bg-field px-3.5 py-3 text-base text-fg outline-none placeholder:text-fg-3 focus:border-accent/60"
+            />
+            <p className="mt-1.5 text-[13px] leading-snug text-fg-3">Армию на обучение подберёт тренер. Своя армия есть в WarpBuilder — приложите ростер выше.</p>
+          </Field>
+        </>
+      ) : (
+        <>
       <Field label={kt ? "Команда (kill team)" : wc ? "Варбанда (фракция)" : "Армия"}>
         <FactionInput
           key={`${value.game}-${picked}`}
@@ -198,6 +232,9 @@ export function PlayerInfoForm({
           />
         </div>
       </Field>
+      )}
+
+        </>
       )}
 
       <Field label="Уровень опыта">

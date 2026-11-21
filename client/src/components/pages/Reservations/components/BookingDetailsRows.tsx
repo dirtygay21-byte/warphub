@@ -21,12 +21,15 @@ export function BookingDetailsRows({
           value={gameLabelOf(options, game)}
           isLoading={false}
         />
-        <DetailRow
-          icon={<Shield className="size-4" />}
-          label={game === "kt" ? "Команда" : game === "warcry" ? "Варбанда" : "Армия"}
-          value={game === "kt" ? killTeamWithFaction(options, details.army) : details.army}
-          isLoading={false}
-        />
+        {details.army ? (
+          <DetailRow
+            icon={<Shield className="size-4" />}
+            label={game === "kt" ? "Команда" : game === "warcry" ? "Варбанда" : "Армия"}
+            value={game === "kt" ? killTeamWithFaction(options, details.army) : details.army}
+            isLoading={false}
+          />
+        ) : null}
+        {details.comment ? <DetailRow icon={<HelpCircle className="size-4" />} label="Пожелание" value={details.comment} isLoading={false} /> : null}
         {details.points != null && gameHasPoints(game) && (
           <DetailRow
             icon={<Swords className="size-4" />}

@@ -32,6 +32,8 @@ export function EditDetailsDialog({
   const options = useBookingOptions();
   const queryClient = useQueryClient();
   const kind = detailsKindForSlug(reservation.serviceSlug);
+  // тренировки (21.11.2026): без выбора армии — пожелание и ростер из WarpBuilder
+  const training = reservation.serviceSlug === "wh_group_training" || reservation.serviceSlug === "wh_solo_training";
   const [player, setPlayer] = useState(() =>
     playerFormFromDetails(
       isWhPlayerDetails(reservation.details) ? reservation.details : null,
@@ -46,7 +48,7 @@ export function EditDetailsDialog({
 
   const validationError =
     kind === "wh_player"
-      ? validatePlayerForm(player, options.maxPoints)
+      ? validatePlayerForm(player, options.maxPoints, training)
       : kind === "painting"
         ? validatePaintingForm(painting)
         : null;
@@ -56,7 +58,7 @@ export function EditDetailsDialog({
       updateBookingDetails(
         reservation.id,
         kind === "wh_player"
-          ? playerFormToDetails(player)
+          ? playerFormToDetails(player, training)
           : paintingFormToDetails(painting),
       ),
     onSuccess: () => {
@@ -90,7 +92,7 @@ export function EditDetailsDialog({
         </h2>
 
         {kind === "wh_player" && (
-          <PlayerInfoForm value={player} onChange={setPlayer} options={options} lockedGame={player.game} />
+          <PlayerInfoForm value={player} onChange={setPlayer} options={options} lockedGame={player.game} training={training} />
         )}
         {kind === "painting" && (
           <PaintingForm value={painting} onChange={setPainting} options={options} />
