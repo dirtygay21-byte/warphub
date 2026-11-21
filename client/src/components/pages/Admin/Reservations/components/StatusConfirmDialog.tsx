@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { SheetClose } from "@/components/ui/ds/SheetClose";
 import { useDialogExit } from "@/components/ui/ds/useDialogExit";
 
 export function StatusConfirmDialog({
@@ -34,10 +35,11 @@ export function StatusConfirmDialog({
       <div
         role="dialog"
         aria-modal="true"
-        className="ds-sheet w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated"
+        className="ds-sheet relative w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-app-elevated"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="border-b border-white/10 px-5 py-5">
+        <SheetClose onClose={onClose} />
+        <div className="border-b border-white/10 px-5 py-5 pr-14">
           <h2 className="text-lg font-semibold">
             {isConfirm ? "Подтвердить запись?" : "Отклонить запись?"}
           </h2>

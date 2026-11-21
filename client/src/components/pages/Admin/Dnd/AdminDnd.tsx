@@ -1,4 +1,5 @@
 import { useNow } from "@/hooks/useNow";
+import { SheetClose } from "@/components/ui/ds/SheetClose";
 import {
   deleteAdminDndGame,
   DND_GAME_STATUS_LABELS,
@@ -480,9 +481,10 @@ function TrialsTab() {
           <div
             role="dialog"
             aria-modal="true"
-            className="ds-sheet max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/10 bg-app-elevated p-5 text-white"
+            className="ds-sheet relative max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/10 bg-app-elevated p-5 text-white"
             onClick={(event) => event.stopPropagation()}
           >
+        <SheetClose onClose={() => setGrouping(false)} disabled={groupMutation.isPending} />
             <h2 className="text-lg font-semibold">Объединить в игру</h2>
             <p className="mt-1 text-sm text-fg-2">
               Заявок: {selected.length}, игроков: {selectedPlayers}

@@ -11,6 +11,7 @@ import clsx from "clsx";
 import { BadgePercent, Gamepad2, GraduationCap, LoaderCircle, ReceiptText, UsersRound, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 
 const rub = (n: number) => `${new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(n)} ₽`;
 
@@ -53,7 +54,8 @@ export function BillSheet({ reservationId, title, onClose }: { reservationId: st
   }, [onClose]);
 
   const data = bill.data;
-  return (
+  // окно — в body: карточка записи (анимация, overflow-hidden) иначе обрезает его и прячет выход (21.11.2026)
+  return createPortal(
     <div className={`ds-fade fixed inset-0 z-50 flex items-end justify-center bg-overlay/70 px-3 pb-3 pt-10${leaving ? " ds-leaving" : ""}`} onClick={onClose}>
       <div
         role="dialog"
@@ -159,7 +161,8 @@ export function BillSheet({ reservationId, title, onClose }: { reservationId: st
           <p className="text-xs leading-5 text-fg-3">Цены — по прайсу клуба. Оплата — в клубе, администратору.</p>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

@@ -1,3 +1,4 @@
+import { SheetClose } from "@/components/ui/ds/SheetClose";
 import {
   detailsKindForSlug,
   isPaintingDetails,
@@ -80,12 +81,13 @@ export function EditDetailsDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="edit-details-title"
-        className="ds-sheet max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/10 bg-app-elevated p-5 text-white shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
+        className="ds-sheet relative max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/10 bg-app-elevated p-5 text-white shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
         onClick={(event) => event.stopPropagation()}
       >
+        <SheetClose onClose={onClose} disabled={mutation.isPending} />
         <h2
           id="edit-details-title"
-          className="mb-4 flex items-center gap-2 text-lg font-semibold"
+          className="pr-10 mb-4 flex items-center gap-2 text-lg font-semibold"
         >
           <PencilLine className="size-5 text-accent" />
           Изменить данные записи
