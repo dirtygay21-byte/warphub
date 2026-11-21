@@ -73,6 +73,7 @@ export function bookingNoticeText(n: BookingNotice): string {
     lines.push(
       `Игра: ${escapeHtml(gameLabel(d.game))}`,
       escapeHtml(armyLine(d.game, d.army)),
+      d.comment ? `Хочет поиграть: ${escapeHtml(d.comment)}` : '',
       d.points != null && gameHasPoints(d.game) ? `Очки: ${d.points}` : '',
       `Опыт: ${escapeHtml(experienceLabel(d.experienceLevel))}`,
     );

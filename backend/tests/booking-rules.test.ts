@@ -436,3 +436,14 @@ describe('армия клуба: очки только у 40K и AoS (решен
     expect(clubArmyPointsFor('wh_game', { ...base, game: 'warcry', points: null }, true)).toBeNull();
   });
 });
+
+describe('тренировки без выбора армии (21.11.2026)', () => {
+  test('армия и очки необязательны, пожелание сохраняется; без training — армия обязательна', () => {
+    expect(validateDetails('wh_player', { game: '40k', experienceLevel: 'beginner', comment: '  хочу  за Orks ' }, { training: true })).toEqual({
+      kind: 'wh_player', game: '40k', army: '', points: null, experienceLevel: 'beginner', comment: 'хочу за Orks',
+    });
+    // ростер из WarpBuilder на тренировке — армия и очки сохраняются
+    expect(validateDetails('wh_player', { game: '40k', army: 'Necrons', points: 1000, experienceLevel: 'player' }, { training: true })).toMatchObject({ army: 'Necrons', points: 1000 });
+    expect(() => validateDetails('wh_player', { game: '40k', experienceLevel: 'player', points: 1000 })).toThrow();
+  });
+});

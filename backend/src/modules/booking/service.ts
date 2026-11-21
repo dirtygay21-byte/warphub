@@ -79,6 +79,7 @@ import {
   tableGameKey,
   parseCategories,
   clubArmyPointsFor,
+  TRAINING_SLUGS,
   WH_PLAYER_SERVICE_SLUGS,
 } from './rules';
 import { GAME_AREAS, reservationArea, type AdminArea } from '../../config/admin-areas';
@@ -814,7 +815,7 @@ function resolveBuyArmyOptions(
 
 function parseDetails(slug: string, raw: unknown): ReservationDetails | null {
   try {
-    return validateDetails(detailsKindForSlug(slug), raw);
+    return validateDetails(detailsKindForSlug(slug), raw, { training: TRAINING_SLUGS.has(slug) });
   } catch (error) {
     if (error instanceof DetailsValidationError) {
       throw new BookingError('INVALID_DETAILS', error.message);

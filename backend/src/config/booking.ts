@@ -191,6 +191,8 @@ export const killTeams: string[] = bookingOptions.killTeamGroups.flatMap((g) => 
 
 /** «Армия: Orks» / «Команда: Pathfinders (T'au Empire)» — строка уведомления (без HTML-экранирования). */
 export function armyLine(game: string | null | undefined, army: string): string {
+  // тренировка без ростера — армии нет (21.11.2026)
+  if (!army) return '';
   if (game === 'warcry') return `Варбанда: ${army}`;
   if (game !== 'kt') return `Армия: ${army}`;
   const f = killTeamFaction(army);

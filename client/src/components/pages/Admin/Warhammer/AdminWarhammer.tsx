@@ -396,7 +396,7 @@ function PlayerRow({
           </p>
           {details ? (
             <p className="mt-1 text-xs text-fg-2">
-              {details.game === "kt" ? "Kill Team" : details.game === "warcry" ? "Warcry" : details.game === "aos" ? "Age of Sigmar" : "Warhammer 40,000"} · {details.army}
+              {details.game === "kt" ? "Kill Team" : details.game === "warcry" ? "Warcry" : details.game === "aos" ? "Age of Sigmar" : "Warhammer 40,000"} · {details.army || (details.comment ? `хочет: ${details.comment}` : "армию подберёт тренер")}
               {details.points != null && gameHasPoints(details.game) ? ` · ${details.points} очков` : ""} · {experienceLabel(details.experienceLevel)}
               {clubArmy ? ` · ${clubArmyLabel(details.game).toLowerCase()}` : ""}
             </p>

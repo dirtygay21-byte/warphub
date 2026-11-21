@@ -87,6 +87,8 @@ export type WhPlayerDetails = {
   experienceLevel: string;
   /** очки армии клуба: обучающие игры — 1000, игра — выбор игрока (14.11.2026) */
   clubArmyPoints?: number | null;
+  /** тренировка (21.11.2026): за кого хочет поиграть — вместо выбора армии */
+  comment?: string | null;
 };
 
 /** «Pathfinders (T'au Empire)»; команды нет в списке — как есть */

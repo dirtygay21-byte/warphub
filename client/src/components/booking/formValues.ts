@@ -6,6 +6,8 @@ export type PlayerFormValue = {
   army: string;
   points: string;
   experienceLevel: string;
+  /** тренировка: «хочу поиграть за…» (21.11.2026) */
+  comment: string;
 };
 
 export const emptyPlayerForm = (game: WhGame = "40k"): PlayerFormValue => ({
@@ -13,6 +15,7 @@ export const emptyPlayerForm = (game: WhGame = "40k"): PlayerFormValue => ({
   army: "",
   points: "",
   experienceLevel: "",
+  comment: "",
 });
 
 export const playerFormFromDetails = (
@@ -24,13 +27,20 @@ export const playerFormFromDetails = (
         army: details.army,
         points: details.points != null ? String(details.points) : "",
         experienceLevel: details.experienceLevel,
+        comment: details.comment ?? "",
       }
     : emptyPlayerForm();
 
 export const validatePlayerForm = (
   value: PlayerFormValue,
   maxPoints: number,
+  /** тренировка (21.11.2026): армию не выбирают — только опыт; ростер из WarpBuilder — по желанию */
+  training = false,
 ): string | null => {
+  if (training) {
+    if (value.comment.length > 300) return "Пожелание — не длиннее 300 символов";
+    return value.experienceLevel ? null : "Выберите уровень опыта";
+  }
   if (!value.army.trim()) return value.game === "kt" ? "Укажите команду" : value.game === "warcry" ? "Укажите варбанду" : "Укажите армию";
   // у Kill Team и Warcry очков нет (15.11.2026)
   if (gameHasPoints(value.game)) {
@@ -44,11 +54,12 @@ export const validatePlayerForm = (
   return null;
 };
 
-export const playerFormToDetails = (value: PlayerFormValue): WhPlayerDetails => ({
+export const playerFormToDetails = (value: PlayerFormValue, training = false): WhPlayerDetails => ({
   game: value.game,
   army: value.army.trim(),
-  points: gameHasPoints(value.game) ? Number(value.points) : null,
+  points: gameHasPoints(value.game) && (!training || value.points) ? Number(value.points) : null,
   experienceLevel: value.experienceLevel,
+  ...(training && value.comment.trim() ? { comment: value.comment.trim() } : {}),
 });
 
 export type PaintingFormValue = {

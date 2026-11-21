@@ -441,6 +441,11 @@ export type WhPlayerDetails = {
    * обычная игра — сколько выбрал игрок. Есть только при «Нужна армия клуба».
    */
   clubArmyPoints?: number | null;
+  /**
+   * Пожелание к обучению (21.11.2026, решение владельца): на тренировках армию не выбирают — пишут, за кого хотят
+   * поиграть («хочу за Orks или Necrons»); армия и очки — только если приложили ростер из WarpBuilder.
+   */
+  comment?: string | null;
 };
 
 /** Армия клуба на обучающих играх — 1000 очков (решение владельца 14.11.2026). */
@@ -512,6 +517,7 @@ function cleanText(value: unknown, field: string, maxLength: number): string {
 export function validateDetails(
   kind: DetailsKind | null,
   raw: unknown,
+  opts: { training?: boolean } = {},
 ): ReservationDetails | null {
   if (kind === null) {
     if (raw !== undefined && raw !== null) {
@@ -533,7 +539,9 @@ export function validateDetails(
     if (!isWhGame(game)) throw new DetailsValidationError('game must be 40k, aos, kt or warcry');
     // у Kill Team и Warcry очков нет — поле не нужно и не сохраняется (Warcry — решение владельца 15.11.2026)
     let points: number | null = null;
-    if (gameHasPoints(game)) {
+    // тренировки (21.11.2026): армия и очки необязательны — только из приложенного ростера
+    const trainingNoPoints = opts.training && (data.points === undefined || data.points === null || data.points === '');
+    if (gameHasPoints(game) && !trainingNoPoints) {
       points = Number(data.points);
       if (
         !Number.isInteger(points) ||
@@ -557,13 +565,16 @@ export function validateDetails(
       }
     }
 
+    const army = opts.training && (data.army === undefined || data.army === null || (typeof data.army === 'string' && !data.army.trim())) ? '' : cleanText(data.army, 'army', 80);
+    const comment = data.comment === undefined || data.comment === null || (typeof data.comment === 'string' && !data.comment.trim()) ? null : cleanText(data.comment, 'comment', 300);
     return {
       kind,
       game,
-      army: cleanText(data.army, 'army', 80),
+      army,
       points,
       experienceLevel: data.experienceLevel,
       ...(clubArmyPoints !== null ? { clubArmyPoints } : {}),
+      ...(comment ? { comment } : {}),
     };
   }
 
