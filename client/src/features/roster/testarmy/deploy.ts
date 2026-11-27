@@ -63,7 +63,11 @@ export function coherency(bases: readonly (Placed | null)[], rule: CoherencyRule
       left.delete(start);
       for (let k = 0; k < comp.length; k++) {
         const a = on.find((x) => x.i === comp[k])!;
-        for (const b of on) if (left.has(b.i) && near(a.b, b.b)) (left.delete(b.i), comp.push(b.i));
+        for (const b of on)
+          if (left.has(b.i) && near(a.b, b.b)) {
+            left.delete(b.i);
+            comp.push(b.i);
+          }
       }
       if (comp.length > best.length) best = comp;
     }
