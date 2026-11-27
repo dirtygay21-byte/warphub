@@ -85,7 +85,7 @@ test('Конец манёвра: обычный — не ближе 2″ к вр
 
 test('Стол: режим «Фазы» только с правилами; 40K передаёт правила, M/Ld и ближний бой', () => {
   const board = readFileSync(join(import.meta.dirname, '../../../client/src/features/roster/ui/testarmy/Board.tsx'), 'utf8');
-  for (const token of ['<PhaseBar', '<ActionPanel', '<MovePanel', '<ChargePanel', 'clampShift(active', 'checkMove(active']) assert.ok(board.includes(token), token);
+  for (const token of ['<PhaseBar', '<ActionPanel', '<MovePanel', '<ChargePanel', 'clampShift(am, from', 'checkMove(active']) assert.ok(board.includes(token), token);
   const screen = readFileSync(join(import.meta.dirname, '../../../client/src/features/roster/ui/testarmy/TestArmyScreen.tsx'), 'utf8');
   for (const token of ['rules={rules40k}', 'melee={c.melee}', 'parseInches(', 'parseTarget(']) assert.ok(screen.includes(token), token);
 });
