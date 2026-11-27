@@ -30,7 +30,8 @@ test('Бросок по распределению симулятора: зна�
 
 test('Стол: полоса армий, «Вне стола» обеих армий, баннеры; цвет передают все три экрана', () => {
   const board = ui('testarmy/Board.tsx');
-  for (const token of ['<ArmyBar', '<OffTable name={foe.name}', '<OffTable name={me.name}', '<Banner banner={banner}', 'plate={', 'fillOpacity={0.16}']) assert.ok(board.includes(token), token);
+  // вариант A: «Вне стола» — кнопка на поле (обе армии) и лист «Отряды»
+  for (const token of ['<ArmyBar', 'Вне стола: {offAll} ›', 'foe.units.filter((u) => !u.placed)', '<UnitsSheet', '<Banner banner={banner}', 'plate={', 'fillOpacity={0.16}']) assert.ok(board.includes(token), token);
   assert.ok(!board.includes('SIDE_COLOR'), 'цвета — только через armyColor');
   for (const p of ['testarmy/TestArmyScreen.tsx', 'testarmy/AosTestArmyScreen.tsx', 'skirmish/SkirmishTestArmyScreen.tsx']) assert.ok(ui(p).includes('onArmyColor={setArmyColor}'), p);
   assert.ok(ui('testarmy/TestArmyScreen.tsx').includes('onRoll='), 'бросок симулятора → баннер');

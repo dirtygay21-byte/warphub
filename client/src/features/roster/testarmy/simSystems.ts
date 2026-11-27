@@ -1,4 +1,5 @@
 import type { SimActionDef, SimContext, SimRules } from './sim';
+import { COHERENCY_AOS } from './deploy';
 
 /**
  * Симулятор игровых моментов (этап 3, 27.11.2026): Age of Sigmar 4, Kill Team (2024), Warcry.
@@ -62,6 +63,7 @@ export const rulesAos: SimRules = {
   engagement: AOS_COMBAT,
   bothArmies: ['combat'],
   actions: actionsAos,
+  coherency: COHERENCY_AOS,
   source: 'AoS 4, Quick Start Guide (Wahapedia): combat range 3″, Normal Move, Run, Retreat, Charge, Pile-in, Fight',
 };
 

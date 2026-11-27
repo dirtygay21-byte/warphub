@@ -75,6 +75,7 @@ export function ActionPanel({
   order,
   onOrder,
   onEnd,
+  embedded,
 }: {
   title: string;
   sub: string;
@@ -89,10 +90,16 @@ export function ActionPanel({
   onOrder?: (o: 'engage' | 'conceal') => void;
   /** активация начата — завершить раньше */
   onEnd?: () => void;
+  /** внутри карточки отряда (вариант A, 27.11.2026): без своей рамки и заголовка */
+  embedded?: boolean;
 }) {
   return (
-    <div className="sheet-enter absolute inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-10 rounded-2xl bg-[#0b0d12]/95 p-2.5 shadow-[0_12px_32px_rgba(0,0,0,0.6)]" style={{ boxShadow: `0 0 0 2px ${color}, 0 12px 32px rgba(0,0,0,0.6)` }} onPointerDown={(e) => e.stopPropagation()}>
-      <div className="mb-1.5 flex items-start gap-2">
+    <div
+      className={embedded ? '' : 'sheet-enter absolute inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-10 rounded-2xl bg-[#0b0d12]/95 p-2.5 shadow-[0_12px_32px_rgba(0,0,0,0.6)]'}
+      style={embedded ? undefined : { boxShadow: `0 0 0 2px ${color}, 0 12px 32px rgba(0,0,0,0.6)` }}
+      onPointerDown={(e) => e.stopPropagation()}
+    >
+      {!embedded && <div className="mb-1.5 flex items-start gap-2">
         <div className="min-w-0 flex-1">
           <p className="font-display truncate text-[15px] font-bold uppercase leading-tight text-white">{title}</p>
           <p className="truncate text-[11.5px] text-white/60">{sub}</p>
@@ -100,7 +107,7 @@ export function ActionPanel({
         <button type="button" onClick={onClose} className="rounded-md px-2 py-1 text-[12px] text-white/60" aria-label="Закрыть">
           ✕
         </button>
-      </div>
+      </div>}
       {(budget || order) && (
         <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
           {budget && (

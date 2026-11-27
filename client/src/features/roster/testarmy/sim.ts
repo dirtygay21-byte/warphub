@@ -1,4 +1,5 @@
 import { dist, unitToUnit, type Placed, type Pt } from './geometry';
+import { COHERENCY_40K, type CoherencyRule } from './deploy';
 import type { TAUnit } from './state';
 
 /**
@@ -92,6 +93,8 @@ export type SimRules = {
   source: string;
   /** активации по одному отряду, игроки по очереди (Kill Team, Warcry): фаза и бюджет AP / действий */
   activation?: { phase: string; budget: (ctx: SimContext) => number; unit: string };
+  /** правило строя отряда (40K, AoS); нет — у отрядов одна модель (Kill Team, Warcry) */
+  coherency?: CoherencyRule;
 };
 
 // ---------- кубы ----------
@@ -291,4 +294,5 @@ export const rules40k: SimRules = {
   bothArmies: ['fight'],
   actions: actions40k,
   source: CORE,
+  coherency: COHERENCY_40K,
 };
