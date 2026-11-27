@@ -5,6 +5,7 @@
  * Правила — 11-я редакция, Core Rules (Wahapedia, 08.11.2026) и способности оружия из глоссария wh-rules.ru 995:
  *  05.01 бросок на попадание: немодифицированная 1 — промах, 6 — критическое попадание; иначе результат с
  *        модификаторами ≥ BS/WS — попадание. BS/WS после модификаторов не лучше 2+ и не хуже 6+ (02.02.06).
+ *  02.02.01 сумма модификаторов броска на попадание и на ранение — не больше ±1 (27.11.2026).
  *        Укрытие (13.08) ухудшает BS дальнобойной атаки на 1.
  *  05.02 бросок на ранение: немодифицированная 1 — неудача, 6 — критическое ранение; таблица S против T:
  *        S ≥ 2T — 2+, S > T — 3+, S = T — 4+, S < T — 5+, S ≤ T/2 — 6+.
@@ -97,6 +98,8 @@ export type WeaponInput = {
   count: number;
   /** цель в пределах половины дальности именно этого оружия (S2, со стола); не задано — Situation.halfRange */
   halfRange?: boolean;
+  /** модификатор попадания этого оружия от обстановки на столе (40K 10.06, 17.03: −1) */
+  hitMod?: number;
 };
 
 export type Situation = {
@@ -332,8 +335,12 @@ function weaponGroup(w: WeaponInput, target: Target, sit: Situation, start: Stat
   const torrent = kw.torrent || !Number.isFinite(base);
   const skillMod = psychic ? Math.min(0, sit.skillMod ?? 0) : (sit.skillMod ?? 0);
   const skill = torrent ? null : Math.min(6, Math.max(2, base + skillMod + (cover ? 1 : 0)));
-  const hitMod0 = (sit.hitMod ?? 0) + (kw.heavy && sit.heavy && !w.melee ? 1 : 0);
-  const hitMod = psychic ? Math.max(0, hitMod0) : hitMod0;
+  const hitMod0 = (sit.hitMod ?? 0) + (w.hitMod ?? 0) + (kw.heavy && sit.heavy && !w.melee ? 1 : 0);
+  // 02.02.01: броски на попадание и ранение не изменяются больше чем на ±1 (после сложения всех модификаторов)
+  const hitMod1 = psychic ? Math.max(0, hitMod0) : hitMod0;
+  const hitMod = Math.max(-1, Math.min(1, hitMod1));
+  if (hitMod !== hitMod1) notes.push(`модификаторы попадания ${hitMod1 > 0 ? '+' : ''}${hitMod1} → ${hitMod > 0 ? '+' : ''}${hitMod} (не больше ±1, 02.02.01)`);
+  if (w.hitMod && !w.melee) notes.push(`−${-w.hitMod} к попаданию: стрельба по/из ближнего боя (10.06, 17.03)`);
   const snap = !!sit.snap && !w.melee;
   const critOn = Math.min(6, Math.max(2, sit.critHit ?? 6));
   const failBelow = indirect ? (sit.indirectStationaryVisible ? 4 : 6) : 2; // 10.07: немодифицированные 1-5 (или 1-3) — промах
@@ -350,7 +357,9 @@ function weaponGroup(w: WeaponInput, target: Target, sit: Situation, start: Stat
 
   // ранение
   const woundOn = woundTarget(S, num(String(target.T)));
-  const woundMod = (sit.woundMod ?? 0) + (kw.lance && sit.charged ? 1 : 0);
+  const woundMod0 = (sit.woundMod ?? 0) + (kw.lance && sit.charged ? 1 : 0);
+  const woundMod = Math.max(-1, Math.min(1, woundMod0));
+  if (woundMod !== woundMod0) notes.push(`модификаторы ранения ${woundMod0 > 0 ? '+' : ''}${woundMod0} → ${woundMod > 0 ? '+' : ''}${woundMod} (не больше ±1, 02.02.01)`);
   const critW = Math.min(kw.anti ?? 6, Math.min(6, Math.max(2, sit.critWound ?? 6)));
   type Wd = 'fail' | 'wound' | 'crit';
   const woundOutcome = (f: number): Wd => (f === 1 ? 'fail' : f >= critW ? 'crit' : f + woundMod >= woundOn ? 'wound' : 'fail');

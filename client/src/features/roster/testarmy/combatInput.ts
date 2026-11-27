@@ -6,6 +6,7 @@
 import type { ComputedRoster, ComputedUnit } from '../engine/compute';
 import type { Datasheet, WeaponProfile } from '../engine/types';
 import type { Target, WeaponInput } from './combat';
+import { shootProfile, type ShootProfile } from './shooting40k';
 
 export type AttackRow = {
   id: string;
@@ -55,7 +56,7 @@ export const inRange = (r: AttackRow, distance: number | null) => r.melee || dis
 /** Половина дальности (RAPID FIRE, MELTA): дистанция известна и не больше половины. */
 export const inHalfRange = (r: AttackRow, distance: number | null) => !r.melee && distance != null && r.range != null && distance <= r.range / 2;
 
-export const toWeaponInput = (r: AttackRow, distance: number | null = null): WeaponInput => ({
+export const toWeaponInput = (r: AttackRow, distance: number | null = null, hitMod = 0): WeaponInput => ({
   name: r.profile.name || r.weapon,
   melee: r.melee,
   A: r.profile.A,
@@ -66,7 +67,18 @@ export const toWeaponInput = (r: AttackRow, distance: number | null = null): Wea
   keywords: r.profile.keywords,
   count: r.count,
   halfRange: inHalfRange(r, distance),
+  ...(hitMod ? { hitMod } : {}),
 });
+
+/** Профиль стрельбы отряда (40K, shooting40k.ts): дальнобойное снаряжение, ключевые слова и способности отряда и лидеров. */
+export function shootProfileOf(cr: ComputedRoster, uid: string): ShootProfile | null {
+  const [main, ...leaders] = unitParts(cr, uid);
+  if (!main?.ds) return null;
+  return shootProfile(
+    [{ ds: main.ds, leader: false }, ...leaders.map((l) => ({ ds: l.ds!, leader: true }))],
+    attackRows(cr, uid, false).map((r) => r.profile.keywords),
+  );
+}
 
 const fnpOf = (ds: Datasheet) => {
   const a = ds.abilities.find((x) => x.type === 'core' && x.name.toLowerCase() === 'feel no pain');

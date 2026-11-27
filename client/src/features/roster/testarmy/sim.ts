@@ -1,5 +1,6 @@
 import { dist, unitToUnit, type Placed, type Pt } from './geometry';
-import { COHERENCY_40K, type CoherencyRule } from './deploy';
+import { coherency, COHERENCY_40K, type CoherencyRule } from './deploy';
+import type { ShootProfile } from './shooting40k';
 import type { TAUnit } from './state';
 
 /**
@@ -12,7 +13,7 @@ import type { TAUnit } from './state';
 export type SimPhase = { id: string; label: string; en: string };
 
 /** Что игрок может выбрать для отряда в фазе. */
-export type SimActionKind = 'stationary' | 'move' | 'charge' | 'shoot' | 'fight' | 'test' | 'wait';
+export type SimActionKind = 'stationary' | 'move' | 'charge' | 'shoot' | 'fight' | 'test' | 'wait' | 'toggle';
 export type SimActionDef = {
   id: string;
   label: string;
@@ -32,6 +33,12 @@ export type SimActionDef = {
   endNear?: number;
   /** не по правилам — можно завершить как неудачу (нападение «не удалось») */
   failable?: boolean;
+  /** после манёвра отряд должен быть связан боем (40K: сближение, консолидация) */
+  endEngaged?: boolean;
+  /** каждый враг, связанный с отрядом в начале манёвра, остаётся связанным (40K 12.03, 12.08) */
+  keepEngaged?: boolean;
+  /** закончить в досягаемости цели и не связанным боем (40K: консолидация на цели, 12.08) */
+  endObjective?: boolean;
   /** стоимость в AP / действиях активации (Kill Team, Warcry) */
   ap?: number;
   /** при начале: бросок D3 смертельных ран (AoS Retreat) */
@@ -60,6 +67,10 @@ export type UnitFlags = {
   order?: 'engage' | 'conceal';
   /** Warcry: Wait первым действием — можно активировать ещё раз с 1 действием */
   waiting?: boolean;
+  /** больше всего прошла модель отряда в этом ходу, ″ (40K [HEAVY]) */
+  dist?: number;
+  /** игрок отметил: правило армии (стратагема, аура) разрешает стрелять и нападать после продвижения / отступления */
+  ruleAllows?: boolean;
 };
 
 export type SimContext = {
@@ -79,6 +90,10 @@ export type SimContext = {
   canShoot?: boolean;
   /** Kill Team: APL оперативника */
   apl?: number | null;
+  /** 40K: оружие, ключевые слова и исключения отряда для стрельбы (нет — неизвестно, только подсказки) */
+  shooting?: ShootProfile | null;
+  /** до ближайшей цели (маркера), ″ — 40K консолидация на цели */
+  objective?: number | null;
 };
 
 export type SimRules = {
@@ -126,6 +141,8 @@ export type ActiveMove = {
   targets?: string[];
   /** снимок отряда до манёвра — для «Отменить» */
   before: TAUnit;
+  /** враги, связанные с отрядом в начале манёвра (uid) — для keepEngaged */
+  startEngaged?: string[];
 };
 
 export function startMove(unit: TAUnit, action: SimActionDef, moves: (number | null)[], roll?: number[]): ActiveMove | null {
@@ -183,6 +200,8 @@ export function checkMove(
   rules: SimRules,
   unitBases: readonly Placed[],
   enemies: readonly { uid: string; name: string; bases: readonly Placed[] }[],
+  /** ближайшая цель (маркер) после манёвра — для консолидации на цели */
+  objective?: { inRange: boolean } | null,
 ): string[] {
   const out: string[] = [];
   const er = rules.engagement;
@@ -197,6 +216,17 @@ export function checkMove(
       return d != null && d <= am.action.endNear! + 1e-6;
     });
     if (!near) out.push(`нужно закончить в пределах ${String(am.action.endNear).replace('0.5', '½')}″ от врага`);
+  }
+  if (am.action.endEngaged && !engagedWith.length) out.push(`нужно закончить связанным боем (в ${er}″ от врага)`);
+  if (am.action.keepEngaged) {
+    const lost = enemies.filter((e) => am.startEngaged?.includes(e.uid) && !engagedWith.includes(e));
+    if (lost.length) out.push(`нужно остаться в бою с: ${lost.map((e) => e.name).join(', ')}`);
+  }
+  if (am.action.endObjective && !objective?.inRange) out.push('нужно закончить в досягаемости цели');
+  // строй (40K 03, AoS 15.1): отряд из нескольких моделей заканчивает манёвр в боевом построении
+  if (rules.coherency && unitBases.length > 1) {
+    const c = coherency(unitBases, rules.coherency);
+    if (!c.ok) out.push(`строй разорван: ${c.bad.length === 1 ? 'модель' : 'модели'} ${c.bad.map((i) => i + 1).join(', ')} — нужно ${String(rules.coherency.range).replace('0.5', '½').replace('.', ',')}″${rules.coherency.all ? ` и до каждой ${rules.coherency.all}″` : ''}`);
   }
   if (am.action.chargeTargets) {
     const targets = am.targets ?? [];
@@ -221,6 +251,12 @@ const PHASES_40K: SimPhase[] = [
   { id: 'fight', label: 'Бой', en: 'Fight' },
 ];
 
+/** Переключатель: правило армии с условием (стратагема, аура, способность) разрешает стрелять и нападать после продвижения / отступления. */
+function allowToggle(f: UnitFlags, sh: ShootProfile | null | undefined): SimActionDef {
+  const names = sh?.conditional.length ? `: ${sh.conditional.join(', ')}` : ' (стратагема, аура)';
+  return { id: 'rule-allows', label: f.ruleAllows ? 'Правило армии: да ✓' : 'Правило армии разрешает', en: 'Rule allows', kind: 'toggle', hint: `стрелять и нападать после ${f.moved === 'advance' ? 'продвижения' : 'отступления'}${names}`, rule: '09.06, 09.07 «unless stated otherwise»' };
+}
+
 function actions40k(c: SimContext): SimActionDef[] {
   const f = c.flags;
   const notPlaced = c.placed ? undefined : 'отряд не на столе';
@@ -235,50 +271,83 @@ function actions40k(c: SimContext): SimActionDef[] {
           en: 'Battle-shock roll',
           kind: 'test',
           blocked: first(notActive, c.leadership == null && 'нет характеристики Ld'),
-          hint: c.leadership != null ? `2D6 ≥ Ld ${c.leadership}+ — пройдено${f.shocked ? ' · сейчас под боевым шоком' : ''}` : undefined,
+          // 08.03: проверку делают отряды под боевым шоком и на половине численности или ниже; потери Test Army не считает
+          hint: c.leadership != null ? `2D6 ≥ Ld ${c.leadership}+${f.shocked ? ' · сейчас под боевым шоком' : ' · только если отряд на половине численности или ниже (08.03)'}` : undefined,
           rule: '08.03 Battle-shock; 01.07',
         },
       ];
     case 'movement': {
       const done = f.moved ? 'отряд уже выбран для движения в этой фазе' : undefined;
       const m = c.move != null ? `${c.move}″` : 'M';
+      const sh = c.shooting;
+      const advShoot = sh ? (sh.afterAdvance.shoot ? `стрелять можно (${sh.afterAdvance.shoot})` : sh.assault ? 'стрелять — только [ASSAULT]' : 'стрелять нельзя: нет [ASSAULT]') : 'стрелять — только [ASSAULT]';
       return [
         { id: 'normal', label: 'Обычный манёвр', en: 'Normal move', kind: 'move', distance: { move: true }, endUnengaged: true, mark: 'moved', blocked: first(notPlaced, notActive, done, c.engaged && 'отряд связан боем — только отступление', c.move == null && 'нет характеристики M'), hint: `до ${m}, закончить не ближе ${ER_40K}″ к врагу`, rule: '09.05 Normal Move' },
-        { id: 'advance', label: 'Продвижение', en: 'Advance move', kind: 'move', distance: { move: true, dice: 1 }, endUnengaged: true, mark: 'moved', blocked: first(notPlaced, notActive, done, c.engaged && 'отряд связан боем', c.move == null && 'нет характеристики M'), hint: `до ${m} + D6; потом нельзя нападать (и обычно стрелять)`, rule: '09.06 Advance Move' },
-        { id: 'fallback', label: 'Отступление', en: 'Fall-back move', kind: 'move', distance: { move: true }, endUnengaged: true, mark: 'moved', blocked: first(notPlaced, notActive, done, !c.engaged && 'только для отряда, связанного боем', c.move == null && 'нет характеристики M'), hint: `до ${m}; потом нельзя стрелять и нападать${f.shocked ? '; под боевым шоком — Desperate Escape (бросок опасности за каждую модель)' : ''}`, rule: '09.07 Fall-back Move' },
+        { id: 'advance', label: 'Продвижение', en: 'Advance move', kind: 'move', distance: { move: true, dice: 1 }, endUnengaged: true, mark: 'moved', blocked: first(notPlaced, notActive, done, c.engaged && 'отряд связан боем', c.move == null && 'нет характеристики M'), hint: `до ${m} + D6; потом ${sh?.afterAdvance.charge ? 'нападать можно' : 'нельзя нападать'}, ${advShoot} (10.05)`, rule: '09.06 Advance Move; 10.05' },
+        { id: 'fallback', label: 'Отступление', en: 'Fall-back move', kind: 'move', distance: { move: true }, endUnengaged: true, mark: 'moved', blocked: first(notPlaced, notActive, done, !c.engaged && 'только для отряда, связанного боем', c.move == null && 'нет характеристики M'), hint: `до ${m}; потом ${sh?.afterFallBack.shoot ? `стрелять можно (${sh.afterFallBack.shoot})` : 'стрелять нельзя'}, ${sh?.afterFallBack.charge ? `нападать можно (${sh.afterFallBack.charge})` : 'нападать нельзя'}${f.shocked ? '; под боевым шоком — Desperate Escape: проверка опасности за каждую модель' : ''}`, rule: '09.07 Fall-back Move' },
         { id: 'stationary', label: 'Остаться на месте', en: 'Remain stationary', kind: 'stationary', mark: 'moved', blocked: first(notPlaced, notActive, done), rule: '09.04 Remain Stationary' },
       ];
     }
     case 'shooting': {
+      const sh = c.shooting;
+      const rule = f.ruleAllows;
+      const advanced = f.moved === 'advance' && !sh?.afterAdvance.shoot && !rule;
+      const fell = f.moved === 'fallback' && !sh?.afterFallBack.shoot && !rule;
       const why = first(
         notPlaced,
         notActive,
         f.shot && 'отряд уже стрелял в этой фазе',
-        f.moved === 'fallback' && 'после отступления стрелять нельзя',
+        fell && 'после отступления стрелять нельзя (09.07)',
+        advanced && c.engaged && 'продвигался и связан боем — стрелять нельзя (10.05, 10.06)',
+        advanced && !!sh && !sh.assault && 'после продвижения — только штурмовая стрельба, а у отряда нет [ASSAULT] (10.05)',
+        !advanced && c.engaged && !!sh && !sh.closeQuarters && !sh.monsterVehicle && 'связан боем — нужна стрельба в ближнем бою: нет [CLOSE-QUARTERS] / [PISTOL] (10.06)',
       );
-      const note = f.moved === 'advance' ? 'после продвижения — только оружие [ASSAULT]' : c.engaged ? 'связан боем — только [CLOSE-QUARTERS] (MONSTER/VEHICLE — с −1 к попаданию)' : 'выберите цель на столе';
-      return [{ id: 'shoot', label: 'Стрелять', en: 'Shoot', kind: 'shoot', mark: 'shot', blocked: why, hint: note, rule: '10.02–10.06 Shooting' }];
+      const note = advanced
+        ? 'штурмовая стрельба — только оружие [ASSAULT] (10.05)'
+        : c.engaged
+          ? sh?.monsterVehicle
+            ? 'стрельба в ближнем бою: MONSTER/VEHICLE — −1 к попаданию, кроме [CLOSE-QUARTERS] по своим противникам (10.06)'
+            : 'стрельба в ближнем бою: только [CLOSE-QUARTERS] / [PISTOL] и только по противникам в бою (10.06)'
+          : f.moved === 'advance' || f.moved === 'fallback'
+            ? `обычная стрельба по правилу «${(f.moved === 'advance' ? sh?.afterAdvance.shoot : sh?.afterFallBack.shoot) ?? 'армии'}»`
+            : 'выберите цель на столе';
+      const out: SimActionDef[] = [{ id: 'shoot', label: 'Стрелять', en: 'Shoot', kind: 'shoot', mark: 'shot', blocked: why, hint: note, rule: '10.02–10.06 Shooting' }];
+      if ((f.moved === 'advance' || f.moved === 'fallback') && !f.shot) out.push(allowToggle(f, sh));
+      return out;
     }
     case 'charge': {
+      const sh = c.shooting;
       const why = first(
         notPlaced,
         notActive,
         f.charged && 'отряд уже нападал в этой фазе',
         c.engaged && 'отряд связан боем',
-        f.moved === 'advance' && 'после продвижения нападать нельзя',
-        f.moved === 'fallback' && 'после отступления нападать нельзя',
+        f.moved === 'advance' && !sh?.afterAdvance.charge && !f.ruleAllows && 'после продвижения нападать нельзя (09.06)',
+        f.moved === 'fallback' && !sh?.afterFallBack.charge && !f.ruleAllows && 'после отступления нападать нельзя (09.07)',
         (c.nearestEnemy == null || c.nearestEnemy > 12) && 'нет врага в пределах 12″',
       );
-      return [
-        { id: 'charge', label: 'Нападение', en: 'Charge', kind: 'charge', distance: { dice: 2 }, chargeTargets: true, failable: true, mark: 'charged', blocked: why, hint: 'выберите цели в пределах 12″, бросок 2D6 — дистанция; закончить в 2″ от всех целей', rule: '11.02 Charge; 11.04 Charge Move' },
+      const out: SimActionDef[] = [
+        { id: 'charge', label: 'Нападение', en: 'Charge', kind: 'charge', distance: { dice: 2 }, chargeTargets: true, failable: true, mark: 'charged', blocked: why, hint: 'выберите цели в пределах 12″, бросок 2D6 — дистанция; закончить в бою со всеми целями (11.04)', rule: '11.02 Charge; 11.04 Charge Move' },
       ];
+      if ((f.moved === 'advance' || f.moved === 'fallback') && !f.charged) out.push(allowToggle(f, sh));
+      return out;
     }
     case 'fight': {
       const canFight = c.engaged || f.charged;
+      // 12.08: режим консолидации — по обстановке в её начале
+      const er3 = c.nearestEnemy != null && c.nearestEnemy <= 3;
+      const obj3 = c.objective != null && c.objective <= 3;
+      const cons: Pick<SimActionDef, 'endEngaged' | 'keepEngaged' | 'endObjective' | 'endUnengaged' | 'hint'> = c.engaged
+        ? { endEngaged: true, keepEngaged: true, hint: 'продолжающаяся: до 3″, остаться в бою со всеми противниками' }
+        : er3
+          ? { endEngaged: true, hint: 'боевая: до 3″, закончить в бою с врагом в 3″' }
+          : obj3
+            ? { endObjective: true, endUnengaged: true, hint: 'на цели: до 3″, закончить в досягаемости цели, не в бою' }
+            : { hint: 'нет врага и цели в пределах 3″' };
       return [
-        { id: 'pilein', label: 'Сближение', en: 'Pile-in move', kind: 'move', distance: { fixed: 3 }, mark: 'pileIn', blocked: first(notPlaced, f.pileIn && 'уже было сближение', !canFight && 'только связанный боем или нападавший отряд'), hint: 'до 3″ к ближайшей цели; после — связан боем', rule: '12.03 Pile-In Move' },
+        { id: 'pilein', label: 'Сближение', en: 'Pile-in move', kind: 'move', distance: { fixed: 3 }, mark: 'pileIn', endEngaged: true, keepEngaged: true, blocked: first(notPlaced, f.pileIn && 'уже было сближение', !canFight && 'только связанный боем или нападавший отряд'), hint: c.engaged ? 'до 3″ к ближайшей цели; остаться в бою со всеми' : 'до 3″ к врагу в 5″; закончить связанным боем', rule: '12.03 Pile-In Move' },
         { id: 'fight', label: 'Сражаться', en: 'Fight', kind: 'fight', mark: 'fought', blocked: first(notPlaced, f.fought && 'отряд уже сражался', !canFight && 'отряд не связан боем'), hint: f.charged ? 'нападал в этом ходу — Fights First' : 'выберите цель рядом', rule: '12.04–12.06 Fight' },
-        { id: 'consolidate', label: 'Консолидация', en: 'Consolidation move', kind: 'move', distance: { fixed: 3 }, mark: 'consolidated', blocked: first(notPlaced, f.consolidated && 'уже была консолидация', !(canFight || f.fought) && 'только отряд, который мог сражаться'), hint: 'до 3″ к ближайшему врагу или к цели', rule: '12.08 Consolidation Move' },
+        { id: 'consolidate', label: 'Консолидация', en: 'Consolidation move', kind: 'move', distance: { fixed: 3 }, mark: 'consolidated', ...cons, blocked: first(notPlaced, f.consolidated && 'уже была консолидация', !(canFight || f.fought) && 'только отряд, который мог сражаться', !c.engaged && !er3 && !obj3 && 'нет врага и цели в пределах 3″ — консолидация невозможна (12.08)'), rule: '12.08 Consolidation Move' },
       ];
     }
     default:

@@ -11,6 +11,7 @@ import { cx, fmtPts } from '../util';
 import { Board, type BoardArmy as BoardArmyView, type BoardField } from './Board';
 import { UnitInfo } from './UnitInfo';
 import { CombatSheet } from './CombatSheet';
+import { shootProfileOf } from '../../testarmy/combatInput';
 
 const LETTERS = ['A', 'B', 'C'];
 
@@ -61,6 +62,8 @@ const view40k = (a: BoardArmy): BoardArmyView => ({
       const lds = (c?.ds?.stats ?? []).map((st) => parseTarget(st.Ld)).filter((x): x is number => x != null);
       return lds.length ? Math.max(...lds) : null;
     },
+    // 40K: оружие в снаряжении и исключения отряда (shooting40k.ts)
+    shooting: (u) => shootProfileOf(a.cr, u.uid.startsWith(FOE_PREFIX) ? u.uid.slice(FOE_PREFIX.length) : u.uid),
   },
 });
 
@@ -210,6 +213,7 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
             target={side(c.targetArmy.key, c.target)}
             distance={c.distance}
             melee={c.melee}
+            shot={c.shot}
             onClose={onClose}
             onRoll={(killed, models) =>
               c.onBanner(
