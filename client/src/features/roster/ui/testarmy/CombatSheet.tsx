@@ -5,7 +5,7 @@
  */
 import { useMemo, useState, type ReactNode } from 'react';
 import type { ComputedRoster } from '../../engine/compute';
-import { fmtInches, sampleDist } from '../../testarmy';
+import { fmtInches, isCloseQuarters, sampleDist, weaponRule, type ShotContext } from '../../testarmy';
 import { simulate, type Situation } from '../../testarmy/combat';
 import { attackRows, inHalfRange, inRange, targetFrom, toWeaponInput } from '../../testarmy/combatInput';
 import { Button, Segmented, Sheet } from '../kit';
@@ -20,15 +20,18 @@ const fix = (v: number) => (Math.round(v * 10) / 10).toFixed(1).replace('.', ','
  * onRoll (27.11.2026): «Бросить» — одно случайное значение из рассчитанного распределения убитых моделей;
  * лист закрывается, результат — баннером на столе.
  */
-export function CombatSheet({ attacker, target, distance, onClose, onRoll, melee: meleeAtStart }: { attacker: Side; target: Side; distance: number | null; onClose: () => void; onRoll?: (killed: number, models: number) => void; melee?: boolean }) {
+export function CombatSheet({ attacker, target, distance, onClose, onRoll, melee: meleeAtStart, shot }: { attacker: Side; target: Side; distance: number | null; onClose: () => void; onRoll?: (killed: number, models: number) => void; melee?: boolean; shot?: ShotContext }) {
   const [melee, setMelee] = useState(!!meleeAtStart);
   const rows = useMemo(() => attackRows(attacker.cr, attacker.uid, melee), [attacker.cr, attacker.uid, melee]);
+  // 40K со стола (27.11.2026): какое оружие можно выбрать в этой стрельбе и −1 к попаданию (shooting40k.ts)
+  const ruleOf = (r: (typeof rows)[number]) => (shot ? weaponRule({ keywords: r.profile.keywords, melee: r.melee }, shot) : { allowed: true, hitMod: 0 });
   // выбор оружия: по умолчанию — первый профиль каждого оружия, которое достаёт до цели
   const [pick, setPick] = useState<Record<string, boolean>>({});
   const isOn = (id: string, primary: boolean, reach: boolean) => pick[id] ?? (primary && reach);
   const tgt0 = useMemo(() => targetFrom(target.cr, target.uid), [target.cr, target.uid]);
   // Stealth цели — укрытие включено сразу (можно выключить)
-  const [sit, setSit] = useState<Situation>(() => (tgt0?.stealth ? { cover: true } : {}));
+  // HEAVY и LANCE — по режиму «Игра», если он знает, как отряд двигался (можно переключить)
+  const [sit, setSit] = useState<Situation>(() => ({ ...(tgt0?.stealth ? { cover: true } : {}), ...(shot?.heavy ? { heavy: true } : {}), ...(shot?.charged ? { charged: true } : {}) }));
   // правки цели (13.11.2026): модификаторы от правил цели и оставшиеся модели
   const [tm, setTm] = useState<{ hit: number; inv: number | null; fnp: number | null; models: number | null }>({ hit: 0, inv: null, fnp: null, models: null });
   const tgt = useMemo(() => {
@@ -39,11 +42,13 @@ export function CombatSheet({ attacker, target, distance, onClose, onRoll, melee
   }, [tgt0, tm]);
   const sitAll = useMemo<Situation>(() => ({ ...sit, hitMod: (sit.hitMod ?? 0) + tm.hit }), [sit, tm.hit]);
   const changed = (o: object) => Object.values(o).filter((v) => v !== undefined && v !== null && v !== false && v !== 0 && v !== 'none' && v !== 6).length;
-  const chosen = rows.filter((r) => isOn(r.id, r.primary, inRange(r, distance)));
+  const chosen = rows.filter((r) => ruleOf(r).allowed && isOn(r.id, r.primary, inRange(r, distance)));
+  // 24.07: при обычной/штурмовой стрельбе модель (не MONSTER/VEHICLE) — либо [CLOSE-QUARTERS], либо остальное оружие
+  const mixCQ = !melee && shot && shot.mode !== 'close' && !shot.attackerMV && chosen.some((r) => isCloseQuarters(r.profile.keywords)) && chosen.some((r) => !isCloseQuarters(r.profile.keywords));
   const key = chosen.map((r) => r.id).join('|');
   // половина дальности — у каждого оружия своя (RAPID FIRE, MELTA)
   const result = useMemo(
-    () => (tgt && chosen.length ? simulate(chosen.map((r) => toWeaponInput(r, distance)), tgt.target, sitAll) : null),
+    () => (tgt && chosen.length ? simulate(chosen.map((r) => toWeaponInput(r, distance, ruleOf(r).hitMod)), tgt.target, sitAll) : null),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- chosen меняется вместе с key
     [key, tgt, sitAll, distance],
   );
@@ -57,6 +62,11 @@ export function CombatSheet({ attacker, target, distance, onClose, onRoll, melee
         <p className="text-sm leading-snug">
           <b>{attacker.name}</b> → <b>{target.name}</b>
           <span className="block text-[12px] text-fg-3">{distance != null ? `Дистанция: ${fmtInches(distance)} (ближайшие базы)` : 'Отряды не на столе — дистанция не учитывается'}</span>
+          {shot && !melee && shot.mode !== 'normal' && (
+            <span className="block text-[12px] text-warn">{shot.mode === 'assault' ? 'Штурмовая стрельба (10.05): после продвижения — только оружие [ASSAULT].' : shot.attackerMV ? 'Стрельба в ближнем бою (10.06): MONSTER/VEHICLE — −1 к попаданию, кроме [CLOSE-QUARTERS] по противнику в бою.' : 'Стрельба в ближнем бою (10.06): только [CLOSE-QUARTERS] / [PISTOL].'}</span>
+          )}
+          {shot && !melee && shot.mode === 'normal' && shot.ruleNote && <span className="block text-[12px] text-fg-3">Продвигался — обычная стрельба по правилу «{shot.ruleNote}».</span>}
+          {shot && !melee && shot.engagedMV && <span className="block text-[12px] text-warn">Цель — MONSTER/VEHICLE в бою (17.03): −1 к попаданию, [BLAST] нельзя.</span>}
         </p>
         <Segmented value={melee ? 'melee' : 'ranged'} onChange={(v) => (setMelee(v === 'melee'), setPick({}))} options={[{ value: 'ranged', label: 'Стрельба' }, { value: 'melee', label: 'Ближний бой' }]} />
 
@@ -65,12 +75,13 @@ export function CombatSheet({ attacker, target, distance, onClose, onRoll, melee
           {rows.length ? (
             <ul className="overflow-hidden rounded-xl border border-white/10">
               {rows.map((r) => {
+                const rule = ruleOf(r);
                 const reach = inRange(r, distance);
-                const checked = isOn(r.id, r.primary, reach);
+                const checked = rule.allowed && isOn(r.id, r.primary, reach);
                 const p = r.profile;
                 return (
                   <li key={r.id} className="border-b border-white/[0.06] last:border-b-0">
-                    <button type="button" role="checkbox" aria-checked={checked} onClick={() => flip(r.id, checked)} className={cx('flex w-full items-start gap-2 px-3 py-2 text-left', !reach && 'opacity-50')}>
+                    <button type="button" role="checkbox" aria-checked={checked} disabled={!rule.allowed} onClick={() => flip(r.id, checked)} className={cx('flex w-full items-start gap-2 px-3 py-2 text-left', (!reach || !rule.allowed) && 'opacity-50')}>
                       <span className={cx('mt-0.5 grid size-4 shrink-0 place-items-center rounded border text-[10px]', checked ? 'border-accent bg-accent text-accent-foreground' : 'border-white/30')}>{checked ? '✓' : ''}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block text-[13px] font-semibold leading-snug">
@@ -80,6 +91,8 @@ export function CombatSheet({ attacker, target, distance, onClose, onRoll, melee
                         <span className="block text-[11.5px] tabular-nums text-fg-3">
                           {[r.melee ? 'Melee' : `${p.range}″`, `A${p.A}`, `${r.melee ? 'WS' : 'BS'} ${p.skill === 'N/A' ? 'N/A' : p.skill.replace(/\+?$/, '+')}`, `S${p.S}`, `AP${p.AP}`, `D${p.D}`].join(' · ')}
                           {p.keywords ? ` · ${p.keywords}` : ''}
+                          {!rule.allowed && ` · ${rule.why}`}
+                          {rule.allowed && rule.hitMod < 0 && ' · −1 к попаданию'}
                           {!reach && ' · не достаёт'}
                           {inHalfRange(r, distance) && ' · половина дальности'}
                         </span>
@@ -92,17 +105,18 @@ export function CombatSheet({ attacker, target, distance, onClose, onRoll, melee
           ) : (
             <p className="text-sm text-fg-3">{melee ? 'Нет оружия ближнего боя в снаряжении.' : 'Нет дальнобойного оружия в снаряжении.'}</p>
           )}
+          {mixCQ && <p className="mt-1 text-[12px] text-warn">24.07: каждая модель (кроме MONSTER/VEHICLE) стреляет либо [CLOSE-QUARTERS] / [PISTOL], либо остальным оружием — выберите одно.</p>}
         </section>
 
         <section className="space-y-2">
           <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-3">Обстановка</p>
           <div className="flex flex-wrap gap-1.5">
             {!melee && <Chip on={!!sit.cover} onClick={() => toggle('cover')}>Цель в укрытии</Chip>}
-            {!melee && <Chip on={!!sit.heavy} onClick={() => toggle('heavy')}>Стоял (Heavy)</Chip>}
+            {!melee && <Chip on={!!sit.heavy} onClick={() => toggle('heavy')}>Heavy: не в бою, никто не прошёл больше 3″</Chip>}
             {!melee && <Chip on={!!sit.snap} onClick={() => toggle('snap')}>Навскидку (Overwatch)</Chip>}
             {!melee && <Chip on={!!sit.indirect} onClick={() => toggle('indirect')}>Непрямая стрельба</Chip>}
             {!melee && sit.indirect && <Chip on={!!sit.indirectStationaryVisible} onClick={() => toggle('indirectStationaryVisible')}>Стоял, цель видна своим</Chip>}
-            {melee && <Chip on={!!sit.charged} onClick={() => toggle('charged')}>Атаковал в этом ходу (Lance)</Chip>}
+            {melee && <Chip on={!!sit.charged} onClick={() => toggle('charged')}>Нападал в этом ходу (Lance)</Chip>}
           </div>
 
           {/* модификаторы от правил детачмента, стратагем и способностей — вручную (13.11.2026) */}

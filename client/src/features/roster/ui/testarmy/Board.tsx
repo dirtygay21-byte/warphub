@@ -46,6 +46,9 @@ import {
   type SimActionDef,
   type SimContext,
   type SimRules,
+  targetRule,
+  type ShootProfile,
+  type ShotContext,
   type UnitFlags,
   autoDeploy,
   coherency,
@@ -89,6 +92,8 @@ export type BoardArmy = TAArmy & {
     apl?: (u: TAUnit) => number | null;
     /** дальность оружия (″) для проверки цели без симулятора атаки: min — минимальная дальность (Warcry) */
     ranges?: (u: TAUnit) => { name: string; min?: number; max: number }[];
+    /** 40K: оружие и исключения отряда для стрельбы (shooting40k.ts) */
+    shooting?: (u: TAUnit) => ShootProfile | null;
   };
 };
 /**
@@ -133,7 +138,7 @@ type Gesture = {
  */
 /** Симулятор боя (S2, 08.11.2026): лист атаки отряда по цели; только 40K (передаёт TestArmyScreen). */
 export type CombatRender = (
-  a: { attacker: TAUnit; attackerArmy: BoardArmy; target: TAUnit; targetArmy: BoardArmy; distance: number | null; onBanner: (b: Omit<BannerSpec, 'id'>) => void; melee?: boolean },
+  a: { attacker: TAUnit; attackerArmy: BoardArmy; target: TAUnit; targetArmy: BoardArmy; distance: number | null; onBanner: (b: Omit<BannerSpec, 'id'>) => void; melee?: boolean; shot?: ShotContext },
   onClose: () => void,
 ) => ReactNode;
 
@@ -219,7 +224,7 @@ function BoardInner({
   const [infoFor, setInfoFor] = useState<string | null>(null);
   // атака: выбран атакующий отряд — следующее нажатие на отряд другой армии выбирает цель
   const [attackFrom, setAttackFrom] = useState<string | null>(null);
-  const [attack, setAttack] = useState<{ from: string; to: string; melee?: boolean } | null>(null);
+  const [attack, setAttack] = useState<{ from: string; to: string; melee?: boolean; shot?: ShotContext } | null>(null);
   // ---------- симулятор фаз (этап 2, 27.11.2026) ----------
   const [game, setGame] = useState(false);
   const [turn, setTurn] = useState<{ army: ArmyKey; phase: number; round: number; first: ArmyKey; flags: Record<string, UnitFlags> }>({ army: 'me', phase: 0, round: 1, first: 'me', flags: {} });
@@ -407,6 +412,8 @@ function BoardInner({
       move: moves.length ? Math.min(...moves) : null,
       leadership: a.sim?.leadership(u) ?? null,
       apl: a.sim?.apl?.(u) ?? null,
+      shooting: a.sim?.shooting?.(u) ?? null,
+      objective: bases.length && field.objectives.length ? nearestObjective(bases, field.objectives, field.objectiveRange ?? OBJECTIVE_RANGE)?.d ?? null : null,
     };
   };
   // активации (Kill Team, Warcry): бюджет AP / действий, одна активация за раз, игроки по очереди
@@ -489,6 +496,11 @@ function BoardInner({
       }
       return;
     }
+    if (a.kind === 'toggle') {
+      snapshot();
+      setFlags(u.uid, { ruleAllows: !flagsOf(u.uid).ruleAllows });
+      return;
+    }
     if (a.kind === 'stationary') {
       snapshot();
       complete(u.uid, a);
@@ -525,8 +537,11 @@ function BoardInner({
   };
   /** Начать манёвр: снимок для «Отменить», зона дистанции, ограничение перетаскивания. */
   const beginMove = (u: TAUnit, a: SimActionDef, roll?: number[]): ActiveMove | null => {
-    const am = startMove(u, a, armyOf(u.uid).sim?.moves(u) ?? [], roll);
-    if (!am) return null;
+    const am0 = startMove(u, a, armyOf(u.uid).sim?.moves(u) ?? [], roll);
+    if (!am0) return null;
+    // враги в бою с отрядом в начале манёвра — для «остаться в бою» (40K 12.03, 12.08)
+    const ub = unitsOf(u.uid);
+    const am: ActiveMove = { ...am0, startEngaged: enemiesOf(u.uid).filter((e) => (unitGap(ub, e.bases) ?? Infinity) <= (rules?.engagement ?? 0) + 1e-6).map((e) => e.uid) };
     snapshot();
     setActive(am);
     setSelected(u.uid);
@@ -568,7 +583,11 @@ function BoardInner({
     showBanner({ kicker: u.name, title: `Нападение: ${d}″`, sub: 'двигайте отряд к целям', color, tone: 'event', dice: r });
   };
   const activeUnit = active ? units.find((u) => u.uid === active.uid) ?? null : null;
-  const activeProblems = active && rules && activeUnit ? checkMove(active, rules, unitsOf(active.uid), enemiesOf(active.uid)) : [];
+  const activeProblems = active && rules && activeUnit
+    ? checkMove(active, rules, unitsOf(active.uid), enemiesOf(active.uid), field.objectives.length && unitsOf(active.uid).length ? nearestObjective(unitsOf(active.uid), field.objectives, field.objectiveRange ?? OBJECTIVE_RANGE) : null)
+    : [];
+  // сколько прошла модель отряда в этом ходу (40K [HEAVY]: не больше 3″)
+  const movedDist = () => (active && activeUnit ? Math.max(0, ...activeUnit.models.map((m) => moved(active, m.id, m.at))) : 0);
   const finishMove = () => {
     if (!active || !activeUnit) return;
     const army = armyOf(activeUnit.uid);
@@ -583,7 +602,7 @@ function BoardInner({
       showBanner({ kicker: activeUnit.name, title: 'Нападение не удалось', sub: activeProblems[0], color, tone: 'bad' });
       return;
     }
-    complete(activeUnit.uid, a);
+    complete(activeUnit.uid, a, { dist: Math.max(flagsOf(activeUnit.uid).dist ?? 0, movedDist()) });
     setActive(null);
     haptic.ok();
     if (a.chargeTargets || a.failable) showBanner({ kicker: army.name, title: 'Нападение удалось!', sub: `${activeUnit.name} · Fights First до конца хода`, color, tone: 'good' });
@@ -668,6 +687,32 @@ function BoardInner({
       if (armyOf(unit.uid).key !== armyOf(attackFrom).key) {
         const from = units.find((u) => u.uid === attackFrom);
         const melee = attackKind === 'fight';
+        // 40K (есть профиль стрельбы): кого можно выбрать целью и какая стрельба (04.02, 10.04–10.06, 17.03)
+        let shot: ShotContext | undefined;
+        const prof = from ? armyOf(from.uid).sim?.shooting?.(from) : undefined;
+        if (from && prof !== undefined) {
+          const er = rules?.engagement ?? 2;
+          const eng = (a: string, b: string) => (unitGap(unitsOf(a), unitsOf(b)) ?? Infinity) <= er + 1e-6;
+          const tProf = armyOf(unit.uid).sim?.shooting?.(unit) ?? null;
+          const attackerEngaged = enemiesOf(from.uid).some((e) => eng(from.uid, e.uid));
+          const engagedWithAttacker = eng(from.uid, unit.uid);
+          const targetEngagedWithMine = armyOf(from.uid).units.some((x) => x.uid !== from.uid && x.placed && eng(x.uid, unit.uid));
+          const why = melee ? null : targetRule({ attackerEngaged, attackerMV: !!prof?.monsterVehicle, engagedWithAttacker, targetEngagedWithMine, targetMV: !!tProf?.monsterVehicle });
+          if (why) {
+            showBanner({ kicker: `${from.name} → ${unit.name}`, title: 'Нельзя выбрать цель', sub: why, color: colorOf(from.uid), tone: 'bad' });
+            return;
+          }
+          const f = flagsOf(from.uid);
+          const advanced = f.moved === 'advance' && !prof?.afterAdvance.shoot && !f.ruleAllows;
+          shot = {
+            mode: attackerEngaged ? 'close' : advanced ? 'assault' : 'normal',
+            attackerMV: !!prof?.monsterVehicle,
+            engagedWithAttacker,
+            engagedMV: !engagedWithAttacker && targetEngagedWithMine && !!tProf?.monsterVehicle,
+            ...(game ? { heavy: !attackerEngaged && (f.dist ?? 0) <= 3 + 1e-6, charged: !!f.charged } : {}),
+            ...(f.moved === 'advance' && !advanced ? { ruleNote: prof?.afterAdvance.shoot ?? 'правило армии' } : {}),
+          };
+        }
         if (from) showBanner({ kicker: melee ? 'Бой' : game ? 'Стрельба' : 'Атака', title: from.name, sub: `→ ${unit.name}`, color: colorOf(from.uid), tone: 'event' });
         if (game && from && rules) {
           snapshot();
@@ -693,7 +738,7 @@ function BoardInner({
           setAttackFrom(null);
           return;
         }
-        setAttack({ from: attackFrom, to: unit.uid, melee });
+        setAttack({ from: attackFrom, to: unit.uid, melee, shot });
         setAttackKind(null);
         setAttackFrom(null);
         haptic.select();
@@ -1069,7 +1114,7 @@ function BoardInner({
         const ab = unitsOf(a.uid);
         const tb = unitsOf(t.uid);
         const distance = ab.length && tb.length ? unitToUnit(ab, tb).d : null;
-        return combat({ attacker: a, attackerArmy: armyOf(a.uid), target: t, targetArmy: armyOf(t.uid), distance, onBanner: showBanner, melee: attack.melee }, () => setAttack(null));
+        return combat({ attacker: a, attackerArmy: armyOf(a.uid), target: t, targetArmy: armyOf(t.uid), distance, onBanner: showBanner, melee: attack.melee, shot: attack.shot }, () => setAttack(null));
       })()}
 
       <div className="flex items-stretch bg-[#0b0d12]">
