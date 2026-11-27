@@ -8,3 +8,4 @@ export * from './measure';
 export * from './aos';
 export * from './skirmish';
 export * from './look';
+export * from './sim';

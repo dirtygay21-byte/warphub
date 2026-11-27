@@ -4,7 +4,7 @@ import { computeRoster, makeLookup, type ComputedRoster, type DataLookup } from 
 import { decodeRoster } from '../../engine/roster';
 import type { DataIndex, Roster } from '../../engine/types';
 import { pushOverlay, tg } from '../../telegram';
-import { buildUnits, FOE_PREFIX, OBJECTIVE_RULE_SOURCE, otherSide, parseSave, restoreUnits, type ArmyKey, type Pt, type Side, type TAArmy, type TASave, type TAUnit } from '../../testarmy';
+import { buildUnits, FOE_PREFIX, OBJECTIVE_RULE_SOURCE, otherSide, parseInches, parseSave, parseTarget, restoreUnits, rules40k, type ArmyKey, type Pt, type Side, type TAArmy, type TASave, type TAUnit } from '../../testarmy';
 import { BattleMap } from '../Battlefield';
 import { Button, IconButton, Segmented, FullscreenButton } from '../kit';
 import { cx, fmtPts } from '../util';
@@ -45,6 +45,23 @@ const view40k = (a: BoardArmy): BoardArmyView => ({
     return st ? `M ${st.M} · T ${st.T} · Sv ${st.Sv}${st.inv ? ` (${st.inv.replace(/\+/g, '')}++)` : ''} · W ${st.W} · Ld ${st.Ld} · OC ${st.OC}` : null;
   },
   info: (u, onClose) => <UnitInfo unit={u} cr={a.cr} roster={a.roster} L={a.L} onClose={onClose} />,
+  sim: {
+    // M каждой модели: профиль модели в инфолисте отряда или присоединённого персонажа (по имени профиля), иначе первый профиль
+    moves: (u) => {
+      const uid = u.uid.startsWith(FOE_PREFIX) ? u.uid.slice(FOE_PREFIX.length) : u.uid;
+      const c = a.cr.byUid.get(uid);
+      const parts = [...(c?.attached ?? []).map((x) => a.cr.byUid.get(x.uid)), c].filter((x): x is NonNullable<typeof x> => !!x?.ds);
+      const all = parts.flatMap((p) => p.ds!.stats);
+      return u.models.map((m) => parseInches((all.find((st) => st.name === m.profile) ?? all[0])?.M));
+    },
+    // Ld отряда: худшее (наибольшее) значение среди профилей
+    leadership: (u) => {
+      const uid = u.uid.startsWith(FOE_PREFIX) ? u.uid.slice(FOE_PREFIX.length) : u.uid;
+      const c = a.cr.byUid.get(uid);
+      const lds = (c?.ds?.stats ?? []).map((st) => parseTarget(st.Ld)).filter((x): x is number => x != null);
+      return lds.length ? Math.max(...lds) : null;
+    },
+  },
 });
 
 const dropSave = (rosterId: string) => {
@@ -185,12 +202,14 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
         field={field}
         onArmy={setArmyUnits}
         onArmyColor={setArmyColor}
+        rules={rules40k}
         onBack={() => setStep('field')}
         combat={(c, onClose) => (
           <CombatSheet
             attacker={side(c.attackerArmy.key, c.attacker)}
             target={side(c.targetArmy.key, c.target)}
             distance={c.distance}
+            melee={c.melee}
             onClose={onClose}
             onRoll={(killed, models) =>
               c.onBanner(
