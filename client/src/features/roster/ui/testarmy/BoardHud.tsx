@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ARMY_COLORS, type TAUnit } from '../../testarmy';
+import { ARMY_COLORS } from '../../testarmy';
 import { cx } from '../util';
 import { Dice } from './GamePanel';
 
 /**
- * Оформление стола Test Army в стиле battle report (27.11.2026): верхняя полоса армий, полосы «Вне стола»
- * (отряды, которые ещё не выставлены) и крупные баннеры событий поверх поля.
+ * Оформление стола Test Army в стиле battle report (27.11.2026): верхняя полоса армий и крупные баннеры событий поверх поля.
+ * «Вне стола» (вариант A, 27.11.2026) — кнопка на поле и лист «Отряды» (BoardSheets).
  */
 
 export type HudArmy = { key: string; name: string; color: string; placed: number; total: number };
@@ -50,41 +50,6 @@ export function ArmyBar({ armies, onColor }: { armies: HudArmy[]; onColor?: (key
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-/** «Вне стола»: отряды армии, которые ещё не выставлены; нажатие выбирает отряд, следующее нажатие на поле ставит его. */
-export function OffTable({ name, color, units, label, selected, onPick }: { name: string; color: string; units: TAUnit[]; label: (u: TAUnit) => string; selected: string | null; onPick: (uid: string) => void }) {
-  if (!units.length) return null;
-  return (
-    <div className="flex items-stretch gap-1.5 border-white/10 bg-[#0b0d12] px-2 py-1.5" style={{ borderTop: `2px solid ${color}` }}>
-      <div className="flex w-14 shrink-0 flex-col justify-center">
-        <span className="font-display text-[11px] font-bold uppercase leading-none text-[#f5c542]">Вне стола</span>
-        <span className="mt-0.5 truncate text-[9.5px] font-semibold uppercase leading-none" style={{ color }}>
-          {name}
-        </span>
-      </div>
-      <div className="flex min-w-0 flex-1 gap-1.5 overflow-x-auto overscroll-contain">
-        {units.map((u) => (
-          <button
-            key={u.uid}
-            type="button"
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => onPick(u.uid)}
-            className={cx('flex h-11 w-[5.5rem] shrink-0 flex-col justify-between rounded-md px-1.5 py-1 text-left', selected === u.uid && 'ring-2 ring-[#f5c542]')}
-            style={{ background: `${color}33`, boxShadow: `inset 0 0 0 1px ${color}aa` }}
-          >
-            <span className="flex items-center gap-1">
-              <b className="grid size-4 shrink-0 place-items-center rounded-full text-[9.5px] text-white" style={{ background: color }}>
-                {label(u)}
-              </b>
-              <span className="truncate text-[9.5px] text-white/60">{u.models.length} мод.</span>
-            </span>
-            <span className="line-clamp-1 text-[11px] font-semibold leading-tight text-white">{u.name}</span>
-          </button>
-        ))}
-      </div>
     </div>
   );
 }
