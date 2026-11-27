@@ -198,7 +198,8 @@ function viewAos(a: AosArmy): BoardArmy {
       // AoS: Move варскролла у всех моделей юнита; Ld нет; дальность — стрелковое оружие варскролла
       moves: (u) => u.models.map(() => parseInches(wsOf(u)?.stats.move)),
       leadership: () => null,
-      ranges: (u) => (wsOf(u)?.weapons ?? []).filter((w) => w.type === 'ranged' && parseInches(w.range) != null).map((w) => ({ name: w.name, max: parseInches(w.range)! })),
+      // inCombat — способность оружия Shoot in Combat (AoS 20.0)
+      ranges: (u) => (wsOf(u)?.weapons ?? []).filter((w) => w.type === 'ranged' && parseInches(w.range) != null).map((w) => ({ name: w.name, max: parseInches(w.range)!, inCombat: /shoot in combat/i.test(w.abilities ?? '') })),
     },
     info: (u, onClose) => {
       const ws = wsOf(u);

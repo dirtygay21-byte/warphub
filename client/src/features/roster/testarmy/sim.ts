@@ -94,6 +94,8 @@ export type SimContext = {
   shooting?: ShootProfile | null;
   /** до ближайшей цели (маркера), ″ — 40K консолидация на цели */
   objective?: number | null;
+  /** AoS: у отряда есть оружие Shoot in Combat (нет — неизвестно) */
+  shootInCombat?: boolean;
 };
 
 export type SimRules = {
