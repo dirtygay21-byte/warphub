@@ -85,7 +85,7 @@ test('Конец манёвра: обычный — не ближе 2″ к вр
 
 test('Стол: режим «Фазы» только с правилами; 40K передаёт правила, M/Ld и ближний бой', () => {
   const board = readFileSync(join(import.meta.dirname, '../../../client/src/features/roster/ui/testarmy/Board.tsx'), 'utf8');
-  for (const token of ['<PhaseBar', '<ActionPanel', '<MovePanel', '<ChargePanel', 'clampShift(active', 'checkMove(active']) assert.ok(board.includes(token), token);
+  for (const token of ['<PhaseBar', '<ActionPanel', '<MovePanel', '<ChargePanel', 'clampShift(am, from', 'checkMove(active']) assert.ok(board.includes(token), token);
   const screen = readFileSync(join(import.meta.dirname, '../../../client/src/features/roster/ui/testarmy/TestArmyScreen.tsx'), 'utf8');
   for (const token of ['rules={rules40k}', 'melee={c.melee}', 'parseInches(', 'parseTarget(']) assert.ok(screen.includes(token), token);
 });
@@ -145,4 +145,24 @@ test('Экраны AoS, Kill Team, Warcry передают правила и х�
   for (const t of ['apl: (u) =>', 'ranges: (u) =>', 'moves: (u) =>']) assert.ok(sk.includes(t), t);
   const board = ui('testarmy/Board.tsx');
   for (const t of ['endActivation(', 'actionsFor(', 'атаку бросайте вручную']) assert.ok(board.includes(t), t);
+});
+
+test('Фазы: нажатие не телепортирует отряд, одна зона дистанции, манёвр по умолчанию с первого касания', () => {
+  const board = readFileSync(join(import.meta.dirname, '../../../client/src/features/roster/ui/testarmy/Board.tsx'), 'utf8');
+  const tap = board.slice(board.indexOf('const onTap = '), board.indexOf('// допуск касания базы'));
+  // в режиме фаз нажатие по полю ограничено дистанцией и стоит раньше свободной постановки
+  assert.ok(tap.indexOf('if (game && sel.placed)') > 0 && tap.indexOf('if (game && sel.placed)') < tap.indexOf('placeUnit(sel'), 'ветка фаз до placeUnit');
+  assert.ok(tap.includes('clampShift(am, from'));
+  assert.ok(board.includes('const zoneMove'), 'зона дистанции');
+  assert.ok(!board.includes('activeUnit.models.map((m) => {\n                const st = active.start'), 'кольца по моделям убраны');
+  assert.ok(board.includes("a.kind === 'move' && !a.blocked && !a.distance?.dice"), 'манёвр по умолчанию — без броска');
+  assert.ok(board.includes('const am = activeRef.current;'), 'ограничение с первого кадра перетаскивания');
+});
+
+test('Нажатие к далёкой точке: сдвиг урезан до дистанции', () => {
+  const u = unit('t', [[10, 10], [11.5, 10]]);
+  const am = startMove(u, act({}, 'normal'), [6, 6])!;
+  const from = { 't.0': [10, 10] as [number, number], 't.1': [11.5, 10] as [number, number] };
+  const k = clampShift(am, from, Object.keys(from), 0, 30);
+  assert.ok(Math.abs(30 * k - 6) < 1e-3);
 });
