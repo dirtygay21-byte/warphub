@@ -630,7 +630,7 @@ function AddSheet({
                         {roles.map((role) => {
                           const why = addBlockReason(roster, data, src.id, f, role);
                           return (
-                            <Button key={role} className="h-8 px-3 text-xs" disabled={!!why} title={why ?? undefined} onClick={() => onAdd(addFighter(roster, src.id, f, role))}>
+                            <Button key={role} className="h-8 px-3 text-xs" disabled={!!why} onClick={() => onAdd(addFighter(roster, src.id, f, role))}>
                               <Icon name="plus" className="size-3.5" /> {role === 'warband' ? 'Добавить' : ROLE_LABEL[role]}
                             </Button>
                           );
@@ -638,7 +638,7 @@ function AddSheet({
                       </div>
                       {(() => {
                         const why = roles.map((role) => addBlockReason(roster, data, src.id, f, role)).find(Boolean);
-                        return why && roles.every((role) => addBlockReason(roster, data, src.id, f, role)) ? <p className="mt-1 text-[12px] text-warn">{why}</p> : null;
+                        return why ? <p className="mt-1 text-[12px] text-warn">{why}</p> : null;
                       })()}
                     </li>
                   );
