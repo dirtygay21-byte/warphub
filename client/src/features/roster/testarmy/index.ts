@@ -12,3 +12,4 @@ export * from './sim';
 export * from './simSystems';
 export * from './deploy';
 export * from './shooting40k';
+export * from './visibility';

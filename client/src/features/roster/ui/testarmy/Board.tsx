@@ -49,6 +49,8 @@ import {
   targetRule,
   type ShootProfile,
   type ShotContext,
+  targetSight,
+  type TerrainMap,
   type UnitFlags,
   autoDeploy,
   coherency,
@@ -115,6 +117,8 @@ export type BoardField = {
   objectiveRange?: number;
   /** Официальные skirmish-карты показываются в landscape без поворота подписей. */
   orientation?: 'portrait' | 'landscape';
+  /** 40K: области и элементы укрытий карты — видимость, укрытие, скрытность (visibility.ts) */
+  terrain?: TerrainMap;
 };
 
 type Tool = 'move' | 'ruler' | 'units';
@@ -227,7 +231,8 @@ function BoardInner({
   const [attack, setAttack] = useState<{ from: string; to: string; melee?: boolean; shot?: ShotContext } | null>(null);
   // ---------- симулятор фаз (этап 2, 27.11.2026) ----------
   const [game, setGame] = useState(false);
-  const [turn, setTurn] = useState<{ army: ArmyKey; phase: number; round: number; first: ArmyKey; flags: Record<string, UnitFlags> }>({ army: 'me', phase: 0, round: 1, first: 'me', flags: {} });
+  // shotPrev — отряды, стрелявшие в предыдущем ходу (40K скрытность, 13.09)
+  const [turn, setTurn] = useState<{ army: ArmyKey; phase: number; round: number; first: ArmyKey; flags: Record<string, UnitFlags>; shotPrev?: string[] }>({ army: 'me', phase: 0, round: 1, first: 'me', flags: {} });
   const [active, setActiveState] = useState<ActiveMove | null>(null);
   // зеркало для обработчиков жеста: манёвр, начатый первым касанием, ограничивает уже следующий кадр перетаскивания
   const activeRef = useRef<ActiveMove | null>(null);
@@ -473,10 +478,11 @@ function BoardInner({
       if (t.phase < rules.phases.length - 1) return { ...t, phase: t.phase + 1 };
       // конец хода: ход другой армии; новый раунд — когда снова ходит первая армия. Боевой шок остаётся до проверки.
       const flags = Object.fromEntries(Object.entries(t.flags).filter(([, f]) => f.shocked).map(([k]) => [k, { shocked: true }]));
+      const shotPrev = Object.entries(t.flags).filter(([, f]) => f.shot).map(([k]) => k);
       // активации (Kill Team, Warcry): обе армии действуют в одном раунде — следующий раунд, все снова готовы
-      if (rules.activation) return { ...t, army: t.first, phase: 0, round: t.round + 1, flags };
+      if (rules.activation) return { ...t, army: t.first, phase: 0, round: t.round + 1, flags, shotPrev };
       const army: ArmyKey = foe ? (t.army === 'me' ? 'foe' : 'me') : t.army;
-      return { ...t, army, phase: 0, round: army === t.first ? t.round + 1 : t.round, flags };
+      return { ...t, army, phase: 0, round: army === t.first ? t.round + 1 : t.round, flags, shotPrev };
     });
   };
   const doAction = (u: TAUnit, a: SimActionDef) => {
@@ -702,6 +708,16 @@ function BoardInner({
             showBanner({ kicker: `${from.name} → ${unit.name}`, title: 'Нельзя выбрать цель', sub: why, color: colorOf(from.uid), tone: 'bad' });
             return;
           }
+          // видимость и укрытие по террейну карты (13.08–13.10, 24.24); скрытность — если цель не стреляла в этом и прошлом ходу
+          let sight: ReturnType<typeof targetSight> | null = null;
+          if (!melee && field.terrain && !engagedWithAttacker) {
+            const tf = flagsOf(unit.uid);
+            sight = targetSight(unitsOf(from.uid), unitsOf(unit.uid), field.terrain, { ibs: !!tProf?.ibs, hiddenOk: !tf.shot && !turn.shotPrev?.includes(unit.uid), loneOperative: tProf?.loneOperative ?? null });
+            if (!sight.visible && (sight.lone || !prof?.indirect)) {
+              showBanner({ kicker: `${from.name} → ${unit.name}`, title: 'Цель не видна', sub: sight.notes.join(' · ') || 'нет линии обзора', color: colorOf(from.uid), tone: 'bad' });
+              return;
+            }
+          }
           const f = flagsOf(from.uid);
           const advanced = f.moved === 'advance' && !prof?.afterAdvance.shoot && !f.ruleAllows;
           shot = {
@@ -711,6 +727,7 @@ function BoardInner({
             engagedMV: !engagedWithAttacker && targetEngagedWithMine && !!tProf?.monsterVehicle,
             ...(game ? { heavy: !attackerEngaged && (f.dist ?? 0) <= 3 + 1e-6, charged: !!f.charged } : {}),
             ...(f.moved === 'advance' && !advanced ? { ruleNote: prof?.afterAdvance.shoot ?? 'правило армии' } : {}),
+            ...(sight ? { notVisible: !sight.visible, cover: sight.cover, sightNotes: sight.notes } : {}),
           };
         }
         if (from) showBanner({ kicker: melee ? 'Бой' : game ? 'Стрельба' : 'Атака', title: from.name, sub: `→ ${unit.name}`, color: colorOf(from.uid), tone: 'event' });

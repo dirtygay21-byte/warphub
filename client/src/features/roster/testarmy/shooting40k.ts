@@ -24,6 +24,12 @@ export type ShootProfile = {
   assault: boolean;
   closeQuarters: boolean;
   monsterVehicle: boolean;
+  /** есть оружие [INDIRECT FIRE] — может стрелять по невидимой цели (10.07) */
+  indirect: boolean;
+  /** все части отряда — INFANTRY/BEASTS/SWARM (укрытие и скрытность, 13.08, 13.09) */
+  ibs: boolean;
+  /** Lone Operative X″ (отряд не объединённый), иначе null (24.24) */
+  loneOperative: number | null;
   /** правило инфолиста, разрешающее стрелять / нападать после продвижения или отступления (название) */
   afterAdvance: { shoot?: string; charge?: string };
   afterFallBack: { shoot?: string; charge?: string };
@@ -39,6 +45,15 @@ export function shootProfile(parts: { ds: Datasheet; leader: boolean }[], ranged
     assault: rangedKeywords.some((k) => hasKeyword(k, 'assault')),
     closeQuarters: rangedKeywords.some(isCloseQuarters),
     monsterVehicle: parts.some(({ ds }) => ds.keywords.some((k) => /^(MONSTER|VEHICLE)$/i.test(k))),
+    indirect: rangedKeywords.some((k) => hasKeyword(k, 'indirect fire')),
+    ibs: parts.length > 0 && parts.every(({ ds }) => ds.keywords.some((k) => /^(INFANTRY|BEASTS|SWARM)$/i.test(k))),
+    loneOperative: (() => {
+      if (parts.length !== 1) return null;
+      const a = parts[0]!.ds.abilities.find((x) => x.type === 'core' && /^lone operative/i.test(x.name));
+      if (!a) return null;
+      const n = /(\d+)/.exec(`${a.param} ${a.name}`);
+      return n ? Number(n[1]) : 12;
+    })(),
     afterAdvance: {},
     afterFallBack: {},
     conditional: [],
@@ -82,11 +97,18 @@ export type ShotContext = {
   charged?: boolean;
   /** правило отряда разрешило стрелять после продвижения — обычная стрельба */
   ruleNote?: string;
+  /** цель не видна — стрелять можно только [INDIRECT FIRE] (10.07) */
+  notVisible?: boolean;
+  /** преимущество укрытия по террейну карты (13.08) */
+  cover?: boolean;
+  /** подписи видимости и укрытия */
+  sightNotes?: string[];
 };
 
 /** Можно ли выбрать оружие для этой стрельбы и модификатор попадания (до ограничения ±1). */
 export function weaponRule(w: { keywords: string; melee: boolean }, s: ShotContext): { allowed: boolean; why?: string; hitMod: number } {
   if (w.melee) return { allowed: true, hitMod: 0 };
+  if (s.notVisible && !hasKeyword(w.keywords, 'indirect fire')) return { allowed: false, why: 'цель не видна — только [INDIRECT FIRE] (10.07)', hitMod: 0 };
   const cq = isCloseQuarters(w.keywords);
   const blast = hasKeyword(w.keywords, 'blast');
   let hitMod = 0;
