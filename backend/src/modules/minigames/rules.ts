@@ -273,6 +273,17 @@ export function pickRandom<T>(items: readonly T[], rng: Rng): T {
 }
 
 /** Противники с HP>5 получают суммарно 15% выпадения, остальные — 85% равномерно. */
+/** Боец игрока: случайный с учётом веса (weight, по умолчанию 1) — сильные выпадают реже */
+export function pickPlayerFighter(items: readonly Fighter[], rng: Rng): Fighter {
+  const total = items.reduce((sum, fighter) => sum + (fighter.weight ?? 1), 0);
+  let roll = rng() * total;
+  for (const fighter of items) {
+    roll -= fighter.weight ?? 1;
+    if (roll < 0) return fighter;
+  }
+  return items[items.length - 1]!;
+}
+
 export function pickBattleEnemy(items: readonly Fighter[], rng: Rng): Fighter {
   const high = items.filter((fighter) => fighter.wounds > 5);
   const low = items.filter((fighter) => fighter.wounds <= 5);
@@ -291,7 +302,7 @@ export function startDiceBattle(
   enemies: Fighter[],
   rng: Rng,
 ): DiceBattleState {
-  const player = pickRandom(players, rng);
+  const player = pickPlayerFighter(players, rng);
   const opponent = pickBattleEnemy(enemies, rng);
   return {
     playerId: player.id,

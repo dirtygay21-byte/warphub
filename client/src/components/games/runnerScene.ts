@@ -60,25 +60,47 @@ export const newWorld = (): World => ({
   rng: seeded(Date.now()),
 });
 
-const IMAGE_OBSTACLES: Record<ImageObstacleKind, { src: string; w: number; h: number }> = {
-  enemy_marine: { src: "/games/runner/space-marine.png", w: 28, h: 30 },
-  enemy_eldar: { src: "/games/runner/eldar.png", w: 28, h: 30 },
-  enemy_warboss: { src: "/games/runner/warboss.png", w: 28, h: 30 },
-  enemy_tyranid: { src: "/games/runner/tyranid.png", w: 28, h: 30 },
-  enemy_commissar: { src: "/games/runner/commissar.png", w: 28, h: 30 },
-  enemy_black_marine: { src: "/games/runner/black-marine.png", w: 28, h: 30 },
+/**
+ * Враги-картинки: исходник 28×30 с прозрачными полями сверху. Рисуем уменьшенными (scale) и
+ * считаем столкновение по видимой фигуре (bbox исходника), а не по всему квадрату картинки:
+ * раньше невидимый верх делал врага выше, чем он выглядит, и его почти нельзя было перепрыгнуть.
+ */
+const IMAGE_OBSTACLES: Record<ImageObstacleKind, { src: string; scale: number; bbox: [number, number, number, number] }> = {
+  enemy_marine: { src: "/games/runner/space-marine.png", scale: 0.8, bbox: [1, 7, 27, 29] },
+  enemy_eldar: { src: "/games/runner/eldar.png", scale: 0.75, bbox: [2, 4, 27, 29] },
+  enemy_warboss: { src: "/games/runner/warboss.png", scale: 0.9, bbox: [1, 9, 27, 29] },
+  enemy_tyranid: { src: "/games/runner/tyranid.png", scale: 1, bbox: [1, 15, 27, 29] },
+  enemy_commissar: { src: "/games/runner/commissar.png", scale: 0.8, bbox: [1, 7, 27, 29] },
+  enemy_black_marine: { src: "/games/runner/black-marine.png", scale: 0.75, bbox: [1, 4, 27, 29] },
 };
+const SRC_W = 28;
+const SRC_H = 30;
 const isImageObstacle = (kind: ObstacleKind): kind is ImageObstacleKind => kind.startsWith("enemy_");
 
-type ObstacleVisual = { sprite: Sprite | null; image: string | null; w: number; h: number };
-const obstacleVisual = (o: Obstacle, t: number): ObstacleVisual => {
+/** w/h — размер отрисовки; hit — прямоугольник столкновения относительно левого верхнего угла */
+type ObstacleVisual = { sprite: Sprite | null; image: string | null; w: number; h: number; hit: { l: number; t: number; r: number; b: number } };
+export const obstacleVisual = (o: Obstacle, t: number): ObstacleVisual => {
   if (isImageObstacle(o.kind)) {
     const image = IMAGE_OBSTACLES[o.kind];
-    return { sprite: null, image: image.src, w: image.w, h: image.h };
+    const k = image.scale;
+    const [l, top, r, b] = image.bbox;
+    return {
+      sprite: null, image: image.src, w: Math.round(SRC_W * k), h: Math.round(SRC_H * k),
+      hit: { l: l * k + 2, t: top * k, r: r * k - 2, b: b * k },
+    };
   }
   const sprite = o.kind === "barrel" ? OBSTACLE_SPRITES.barrel[Math.floor(t * 8) % 2]! : OBSTACLE_SPRITES[o.kind];
-  return { sprite, image: null, w: sprite.w, h: sprite.h };
+  return { sprite, image: null, w: sprite.w, h: sprite.h, hit: { l: 2, t: o.kind === "barrel" ? 4 : 0, r: sprite.w - 2, b: sprite.h } };
 };
+
+/**
+ * Промежуток до следующего препятствия (в пикселях): то плотно, то обычно, то передышка.
+ * Нижняя граница — время полного прыжка (≈0,59 с) с запасом, чтобы любая серия проходилась.
+ */
+export function nextGapPx(speedPx: number, roll: number, roll2: number) {
+  const factor = roll < 0.25 ? 0.7 + roll2 * 0.15 : roll < 0.8 ? 0.9 + roll2 * 0.6 : 1.7 + roll2 * 1.0;
+  return speedPx * factor + 46;
+}
 
 const obstacleY = (o: Obstacle, visual: ObstacleVisual) =>
   o.kind === "air_bat" ? GROUND - 26 : o.kind === "air_mine" ? GROUND - 62 : GROUND - visual.h + 1;
@@ -134,7 +156,7 @@ export function step(world: World, dt: number) {
         : ["trap", "bags", "skulls", "barrel", "pillar", "air_bat", "air_mine", "enemy_marine", "enemy_eldar", "enemy_warboss", "enemy_tyranid", "enemy_commissar", "enemy_black_marine"];
     world.obstacles.push({ x: W + 4, kind: kinds[Math.floor(world.rng() * kinds.length)]! });
     world.sinceLast = 0;
-    world.nextGap = speedPx * (0.75 + world.rng() * 0.95) + 46;
+    world.nextGap = nextGapPx(speedPx, world.rng(), world.rng());
   }
 
   // бег поднимает пыль, в воздухе летят угли
@@ -159,10 +181,11 @@ export function step(world: World, dt: number) {
   const hy2 = world.heroY + HERO_H - 3;
   for (const o of world.obstacles) {
     const visual = obstacleVisual(o, world.t);
-    const top = obstacleY(o, visual) + (o.kind === "barrel" ? 4 : 0);
-    const bottom = top + visual.h;
+    const y = obstacleY(o, visual);
+    const top = y + visual.hit.t;
+    const bottom = y + visual.hit.b;
     const heroTop = world.heroY + 3;
-    if (hx2 > o.x + 2 && hx1 < o.x + visual.w - 2 && hy2 > top && heroTop < bottom) {
+    if (hx2 > o.x + visual.hit.l && hx1 < o.x + visual.hit.r && hy2 > top && heroTop < bottom) {
       world.dead = true;
       for (let i = 0; i < 18; i++) {
         world.particles.push({
