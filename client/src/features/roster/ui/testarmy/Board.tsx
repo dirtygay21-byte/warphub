@@ -89,7 +89,14 @@ export type BoardArmy = TAArmy & {
   stats: (u: TAUnit) => string | null;
   info: (u: TAUnit, onClose: () => void) => ReactNode;
   /** симулятор (этап 2): характеристика M каждой модели (″) и Ld отряда; нет — действия с M недоступны */
-  sim?: { moves: (u: TAUnit) => (number | null)[]; leadership: (u: TAUnit) => number | null };
+  sim?: {
+    moves: (u: TAUnit) => (number | null)[];
+    leadership: (u: TAUnit) => number | null;
+    /** Kill Team: APL */
+    apl?: (u: TAUnit) => number | null;
+    /** дальность оружия (″) для проверки цели без симулятора атаки: min — минимальная дальность (Warcry) */
+    ranges?: (u: TAUnit) => { name: string; min?: number; max: number }[];
+  };
 };
 /**
  * Поле: картинка (svg с тем же viewBox «-1.5 -1.5 47 63», поле повёрнуто как в BattleMap), цели, точки привязки линейки,
@@ -392,7 +399,42 @@ function BoardInner({
       nearestEnemy: nearest,
       move: moves.length ? Math.min(...moves) : null,
       leadership: a.sim?.leadership(u) ?? null,
+      apl: a.sim?.apl?.(u) ?? null,
     };
+  };
+  // активации (Kill Team, Warcry): бюджет AP / действий, одна активация за раз, игроки по очереди
+  const inActivation = !!rules?.activation && phase?.id === rules.activation.phase;
+  const activating = inActivation ? Object.entries(turn.flags).find(([, f]) => (f.spent ?? 0) > 0 && !f.expended)?.[0] ?? null : null;
+  const budgetOf = (u: TAUnit) => (rules?.activation ? rules.activation.budget(ctxFor(u)) : 0);
+  const actionsFor = (u: TAUnit): SimActionDef[] => {
+    if (!rules) return [];
+    const list = rules.actions(ctxFor(u));
+    if (!inActivation) return list;
+    const left = budgetOf(u) - (flagsOf(u.uid).spent ?? 0);
+    const other = activating && activating !== u.uid ? units.find((x) => x.uid === activating) : null;
+    return list.map((a) => (a.blocked ? a : other ? { ...a, blocked: `сейчас активация: ${other.name}` } : (a.ap ?? 1) > left ? { ...a, blocked: `не хватает ${rules.activation!.unit} (осталось ${left})` } : a));
+  };
+  /** Конец активации: оперативник/боец израсходован, активирует другой игрок. wait — Warcry Wait первым действием. */
+  const endActivation = (uid: string, wait = false) => {
+    setTurn((t) => ({
+      ...t,
+      army: foe ? (armyOf(uid).key === 'me' ? 'foe' : 'me') : t.army,
+      flags: { ...t.flags, [uid]: { ...t.flags[uid], spent: 0, did: [], expended: !wait, waiting: wait } },
+    }));
+  };
+  /** Действие выполнено: отметка + расход AP / действия (в фазе активаций). */
+  const complete = (uid: string, a: SimActionDef, patch: UnitFlags = {}) => {
+    const f = flagsOf(uid);
+    const markPatch: UnitFlags = a.mark === 'moved' ? { moved: a.id as UnitFlags['moved'] } : a.mark ? { [a.mark]: true } : {};
+    if (!inActivation) {
+      setFlags(uid, { ...markPatch, ...patch });
+      return;
+    }
+    const u = units.find((x) => x.uid === uid);
+    const spent = (f.spent ?? 0) + (a.ap ?? 1);
+    const budget = u ? budgetOf(u) : 2;
+    setFlags(uid, { ...markPatch, ...patch, spent, did: [...(f.did ?? []), a.id], waiting: false });
+    if (spent >= budget) endActivation(uid);
   };
   const cancelSim = () => {
     if (active) {
@@ -416,8 +458,10 @@ function BoardInner({
     setTurn((t) => {
       if (t.phase < rules.phases.length - 1) return { ...t, phase: t.phase + 1 };
       // конец хода: ход другой армии; новый раунд — когда снова ходит первая армия. Боевой шок остаётся до проверки.
-      const army: ArmyKey = foe ? (t.army === 'me' ? 'foe' : 'me') : t.army;
       const flags = Object.fromEntries(Object.entries(t.flags).filter(([, f]) => f.shocked).map(([k]) => [k, { shocked: true }]));
+      // активации (Kill Team, Warcry): обе армии действуют в одном раунде — следующий раунд, все снова готовы
+      if (rules.activation) return { ...t, army: t.first, phase: 0, round: t.round + 1, flags };
+      const army: ArmyKey = foe ? (t.army === 'me' ? 'foe' : 'me') : t.army;
       return { ...t, army, phase: 0, round: army === t.first ? t.round + 1 : t.round, flags };
     });
   };
@@ -425,9 +469,22 @@ function BoardInner({
     haptic.select();
     const army = armyOf(u.uid);
     const color = colorOfArmy(army);
+    if (a.kind === 'wait') {
+      snapshot();
+      const f = flagsOf(u.uid);
+      if ((f.spent ?? 0) === 0 && !f.waiting) {
+        setFlags(u.uid, { did: [] });
+        endActivation(u.uid, true);
+        showBanner({ kicker: army.name, title: 'Wait', sub: `${u.name} · активировать ещё раз позже (1 действие)`, color, tone: 'event' });
+      } else {
+        endActivation(u.uid);
+        showBanner({ kicker: army.name, title: 'Активация окончена', sub: u.name, color, tone: 'event' });
+      }
+      return;
+    }
     if (a.kind === 'stationary') {
       snapshot();
-      setFlags(u.uid, { moved: 'stationary' });
+      complete(u.uid, a);
       showBanner({ kicker: army.name, title: 'На месте', sub: `${u.name} · Remain stationary`, color, tone: 'event' });
       return;
     }
@@ -448,7 +505,10 @@ function BoardInner({
       snapshot();
       setActive(am);
       setSelected(u.uid);
-      if (roll) showBanner({ kicker: u.name, title: `${a.label}: +${diceSum(roll)}″`, sub: `до ${Math.max(...Object.values(am.max)).toString().replace('.', ',')}″`, color, tone: 'event', dice: roll });
+      if (a.mortalD3) {
+        const d3 = Math.ceil(rollDice(1)[0]! / 2);
+        showBanner({ kicker: u.name, title: `${a.label}: ${d3} ран`, sub: `D3 смертельных ран (mortal damage) — снимите вручную`, color, tone: 'bad' });
+      } else if (roll) showBanner({ kicker: u.name, title: `${a.label}: +${diceSum(roll)}″`, sub: `до ${Math.max(...Object.values(am.max)).toString().replace('.', ',')}″`, color, tone: 'event', dice: roll });
       return;
     }
     if (a.kind === 'charge') {
@@ -490,19 +550,20 @@ function BoardInner({
     if (!active || !activeUnit) return;
     const army = armyOf(activeUnit.uid);
     const color = colorOfArmy(army);
+    const a = active.action;
     if (activeProblems.length) {
+      if (!a.failable) return;
       // нападение не удалось: отряд остаётся на исходной позиции
       update(active.before);
       setActive(null);
+      complete(activeUnit.uid, a);
       showBanner({ kicker: activeUnit.name, title: 'Нападение не удалось', sub: activeProblems[0], color, tone: 'bad' });
       return;
     }
-    const a = active.action;
-    if (a.mark === 'moved') setFlags(activeUnit.uid, { moved: a.id as UnitFlags['moved'] });
-    else if (a.mark) setFlags(activeUnit.uid, { [a.mark]: true });
+    complete(activeUnit.uid, a);
     setActive(null);
     haptic.ok();
-    if (a.chargeTargets) showBanner({ kicker: army.name, title: 'Нападение удалось!', sub: `${activeUnit.name} · Fights First до конца хода`, color, tone: 'good' });
+    if (a.chargeTargets || a.failable) showBanner({ kicker: army.name, title: 'Нападение удалось!', sub: `${activeUnit.name} · Fights First до конца хода`, color, tone: 'good' });
   };
   const moveProgress = (() => {
     if (!active || !activeUnit) return '';
@@ -560,9 +621,29 @@ function BoardInner({
         const from = units.find((u) => u.uid === attackFrom);
         const melee = attackKind === 'fight';
         if (from) showBanner({ kicker: melee ? 'Бой' : game ? 'Стрельба' : 'Атака', title: from.name, sub: `→ ${unit.name}`, color: colorOf(from.uid), tone: 'event' });
-        if (game && from) {
+        if (game && from && rules) {
           snapshot();
-          setFlags(from.uid, melee ? { fought: true } : { shot: true });
+          const def = actionsFor(from).find((x) => x.kind === (melee ? 'fight' : 'shoot'));
+          if (def) complete(from.uid, def);
+          else setFlags(from.uid, melee ? { fought: true } : { shot: true });
+        }
+        if (!combat && from) {
+          // без симулятора атаки (AoS, Kill Team, Warcry): проверка дистанции до цели
+          const d = unitGap(unitsOf(from.uid), unitsOf(unit.uid));
+          const er = rules?.engagement ?? 1;
+          const ranges = armyOf(from.uid).sim?.ranges?.(from) ?? [];
+          const inRange = ranges.filter((r) => d != null && d <= r.max + 1e-6 && (r.min == null || d >= r.min));
+          const ok = d != null && (melee ? d <= er + 1e-6 : ranges.length ? inRange.length > 0 : true);
+          showBanner({
+            kicker: `${from.name} → ${unit.name}`,
+            title: d == null ? 'Нет на столе' : ok ? (melee ? 'В бою' : 'Цель в дальности') : melee ? 'Не в бою' : 'Вне дальности',
+            sub: d == null ? '' : `${fmtInches(d)}${melee ? ` · нужно не дальше ${er}″` : inRange.length ? ` · ${inRange.map((r) => r.name).join(', ')}` : ranges.length ? ` · дальность до ${Math.max(...ranges.map((r) => r.max))}″` : ''} · атаку бросайте вручную`,
+            color: colorOf(from.uid),
+            tone: ok ? 'good' : 'bad',
+          });
+          setAttackKind(null);
+          setAttackFrom(null);
+          return;
         }
         setAttack({ from: attackFrom, to: unit.uid, melee });
         setAttackKind(null);
@@ -911,7 +992,7 @@ function BoardInner({
             targets={active.targets?.map((t) => units.find((u) => u.uid === t)?.name ?? t).join(', ')}
             onDone={finishMove}
             onCancel={cancelSim}
-            failLabel={active.action.chargeTargets ? 'Нападение не удалось' : undefined}
+            failLabel={active.action.failable ? 'Нападение не удалось' : undefined}
           />
         ) : game && rules && charging ? (
           <ChargePanel
@@ -925,8 +1006,12 @@ function BoardInner({
             title={`${label(sel)}. ${sel.name}`}
             sub={`${armyOf(sel.uid).name}${flagsOf(sel.uid).shocked ? ' · под боевым шоком' : ''}${selArmy.stats(sel) ? ` · ${selArmy.stats(sel)}` : ''}`}
             color={colorOf(sel.uid)}
-            actions={rules.actions(ctxFor(sel))}
+            actions={actionsFor(sel)}
             onAction={(a) => doAction(sel, a)}
+            budget={inActivation && rules.activation ? { left: budgetOf(sel) - (flagsOf(sel.uid).spent ?? 0), of: budgetOf(sel), unit: rules.activation.unit } : undefined}
+            order={rules.system === 'kt' && inActivation ? flagsOf(sel.uid).order ?? 'conceal' : undefined}
+            onOrder={(o) => setFlags(sel.uid, { order: o })}
+            onEnd={activating === sel.uid ? () => (snapshot(), endActivation(sel.uid)) : undefined}
             onClose={() => setSelected(null)}
           />
         ) : null}

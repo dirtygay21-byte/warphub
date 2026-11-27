@@ -4,7 +4,7 @@ import { AOS_CODE_PREFIX, decodeAosRoster } from '../../aos/roster';
 import type { AosBattlepack, AosBattleplanMap, AosIndex, AosRoster, AosTerritory } from '../../aos/types';
 import { loadAosBattlepack, loadAosFaction } from '../../data';
 import { pushOverlay, tg } from '../../telegram';
-import { buildAosUnits, FOE_PREFIX, objectiveRadius, otherSide, parseSave, rectsUnionPolys, restoreUnits, type ArmyKey, type Pt, type Side, type TAArmy, type TASave, type TAUnit } from '../../testarmy';
+import { buildAosUnits, FOE_PREFIX, objectiveRadius, otherSide, parseInches, parseSave, rectsUnionPolys, restoreUnits, rulesAos, type ArmyKey, type Pt, type Side, type TAArmy, type TASave, type TAUnit } from '../../testarmy';
 import { Warscroll } from '../aos/AosUnitCard';
 import { BattleplanMap } from '../aosgame/BattleplanMap';
 import { Button, IconButton, Segmented, Sheet, FullscreenButton } from '../kit';
@@ -151,7 +151,8 @@ export function AosTestArmyScreen({ onBack, rosters, index, initialRosterId }: {
   if (step === 'board' && roster && bplan?.map) {
     if (!armies) return <Spinner full />;
     return <Board armies={armies.map(viewAos)} field={aosField(bp, bplan.name, bplan.map, territory)} onArmy={setArmyUnits}
-        onArmyColor={setArmyColor} onBack={() => setStep('field')} />;
+        onArmyColor={setArmyColor}
+        rules={rulesAos} onBack={() => setStep('field')} />;
   }
 
   if (step === 'field' && roster)
@@ -192,6 +193,12 @@ function viewAos(a: AosArmy): BoardArmy {
     stats: (u) => {
       const st = wsOf(u)?.stats;
       return st ? `Move ${st.move || '—'} · Health ${st.health || '—'} · Save ${st.save || '—'}${st.ward ? ` · Ward ${st.ward}` : ''} · Control ${st.control || '—'}` : null;
+    },
+    sim: {
+      // AoS: Move варскролла у всех моделей юнита; Ld нет; дальность — стрелковое оружие варскролла
+      moves: (u) => u.models.map(() => parseInches(wsOf(u)?.stats.move)),
+      leadership: () => null,
+      ranges: (u) => (wsOf(u)?.weapons ?? []).filter((w) => w.type === 'ranged' && parseInches(w.range) != null).map((w) => ({ name: w.name, max: parseInches(w.range)! })),
     },
     info: (u, onClose) => {
       const ws = wsOf(u);

@@ -5,19 +5,19 @@ import type { KtIndex } from '../../kt/types';
 import type { SkirmishGameData, SkirmishSystem } from '../../skirmish/types';
 import { initialWarcryDeploymentPoints } from '../../skirmish/deployment';
 import type { WarcryTerrainSetup as TerrainSetupState } from '../../skirmish/terrain';
-import { buildKtUnits, buildWarcryUnits, FOE_PREFIX, otherSide, parseSave, restoreUnits, skirmishUid, type ArmyKey, type Pt, type Side, type TAArmy, type TASave, type TAUnit } from '../../testarmy';
+import { buildKtUnits, buildWarcryUnits, FOE_PREFIX, otherSide, parseInches, parseSave, restoreUnits, rulesKt, rulesWarcry, skirmishUid, type ArmyKey, type Pt, type Side, type TAArmy, type TASave, type TAUnit } from '../../testarmy';
 import { pushOverlay, tg, openExternal } from '../../telegram';
 import { decodeWarcryRoster, neededFactions, type WarcryRoster } from '../../warcry/roster';
 import type { WarcryIndex } from '../../warcry/types';
 import { Button, IconButton, Segmented, Sheet, FullscreenButton } from '../kit';
 import { cx } from '../util';
-import { Board, type BoardField } from '../testarmy/Board';
+import { Board, type BoardArmy, type BoardField } from '../testarmy/Board';
 import { KtMapPanel, WarcryDeploymentPanel } from './SkirmishMaps';
 import { WarcryTerrainBackground, WarcryTerrainSetup as TerrainSetupView } from './WarcryTerrainSetup';
 import type { SkirmishRoster } from './SkirmishGameScreen';
 
 type FoeSpec = { kind: 'none' } | { kind: 'own'; rosterId: string } | { kind: 'code'; code: string };
-type Loaded<R extends SkirmishRoster> = { roster: R; units: TAUnit[]; stats: (u: TAUnit) => string | null; info: (u: TAUnit, onClose: () => void) => ReactNode };
+type Loaded<R extends SkirmishRoster> = { roster: R; units: TAUnit[]; stats: (u: TAUnit) => string | null; info: (u: TAUnit, onClose: () => void) => ReactNode; sim: NonNullable<BoardArmy['sim']> };
 type Army<R extends SkirmishRoster> = TAArmy & Loaded<R>;
 type Loader<R extends SkirmishRoster> = (roster: R, prefix?: string) => Promise<Loaded<R>>;
 
@@ -43,6 +43,21 @@ async function loadKtArmy(roster: KtRoster, prefix = ''): Promise<Loaded<KtRoste
       const { op } = opOf(u);
       return op ? `Move ${op.stats.move} · APL ${op.stats.apl} · Save ${op.stats.save} · Wounds ${op.stats.wounds}` : null;
     },
+    sim: {
+      moves: (u) => [parseInches(opOf(u).op?.stats.move)],
+      leadership: () => null,
+      apl: (u) => opOf(u).op?.stats.apl ?? null,
+      // дальность из правил оружия («Range 6"»); без неё — без ограничения дальности
+      ranges: (u) => {
+        const { selected, op } = opOf(u);
+        return (op?.weapons ?? [])
+          .filter((w) => w.type === 'ranged' && selected?.weapons.includes(w.id))
+          .map((w) => {
+            const r = /Range\s*(\d+)/i.exec(w.profiles.map((p) => p.rules).join(' '));
+            return { name: w.name, max: r ? Number(r[1]) : 999 };
+          });
+      },
+    },
     info: (u, onClose) => {
       const { selected, op } = opOf(u);
       const weapons = op?.weapons.filter((w) => selected?.weapons.includes(w.id)) ?? [];
@@ -65,6 +80,11 @@ async function loadWarcryArmy(roster: WarcryRoster, prefix = ''): Promise<Loaded
     stats: (u) => {
       const f = fighterOf(u);
       return f ? `Move ${f.movement} · Toughness ${f.toughness} · Wounds ${f.wounds} · ${f.points} очк.` : null;
+    },
+    sim: {
+      moves: (u) => [fighterOf(u)?.movement ?? null],
+      leadership: () => null,
+      ranges: (u) => (fighterOf(u)?.weapons ?? []).map((w) => ({ name: w.runemark || 'Оружие', min: w.minRange || undefined, max: w.maxRange })),
     },
     info: (u, onClose) => {
       const f = fighterOf(u);
@@ -146,7 +166,7 @@ function SkirmishTestArmyScreen<R extends SkirmishRoster>({ system, onBack, rost
   if (step === 'board' && roster) {
     if (!armies) return <Spinner full />;
     return <Board armies={armies.map((a) => ({ ...a, name: a.roster.name }))} field={makeField(data, layoutId, terrain)} onArmy={setArmyUnits}
-        onArmyColor={setArmyColor} onBack={() => setStep(data.system === 'warcry' ? 'terrain' : 'field')} />;
+        onArmyColor={setArmyColor} rules={data.system === 'warcry' ? rulesWarcry : rulesKt} onBack={() => setStep(data.system === 'warcry' ? 'terrain' : 'field')} />;
   }
   if (step === 'terrain' && roster) {
     return (

@@ -64,7 +64,32 @@ export function PhaseBar({
 }
 
 /** Действия выбранного отряда в текущей фазе. */
-export function ActionPanel({ title, sub, color, actions, onAction, onClose }: { title: string; sub: string; color: string; actions: SimActionDef[]; onAction: (a: SimActionDef) => void; onClose: () => void }) {
+export function ActionPanel({
+  title,
+  sub,
+  color,
+  actions,
+  onAction,
+  onClose,
+  budget,
+  order,
+  onOrder,
+  onEnd,
+}: {
+  title: string;
+  sub: string;
+  color: string;
+  actions: SimActionDef[];
+  onAction: (a: SimActionDef) => void;
+  onClose: () => void;
+  /** активация: сколько AP / действий осталось */
+  budget?: { left: number; of: number; unit: string };
+  /** Kill Team: приказ оперативника */
+  order?: 'engage' | 'conceal';
+  onOrder?: (o: 'engage' | 'conceal') => void;
+  /** активация начата — завершить раньше */
+  onEnd?: () => void;
+}) {
   return (
     <div className="sheet-enter absolute inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-10 rounded-2xl bg-[#0b0d12]/95 p-2.5 shadow-[0_12px_32px_rgba(0,0,0,0.6)]" style={{ boxShadow: `0 0 0 2px ${color}, 0 12px 32px rgba(0,0,0,0.6)` }} onPointerDown={(e) => e.stopPropagation()}>
       <div className="mb-1.5 flex items-start gap-2">
@@ -76,6 +101,29 @@ export function ActionPanel({ title, sub, color, actions, onAction, onClose }: {
           ✕
         </button>
       </div>
+      {(budget || order) && (
+        <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+          {budget && (
+            <span className="rounded-md bg-[#f5c542]/15 px-2 py-1 text-[12px] font-bold text-[#f5c542]">
+              {budget.unit}: {budget.left} из {budget.of}
+            </span>
+          )}
+          {order && onOrder && (
+            <span className="flex overflow-hidden rounded-md border border-white/15 text-[12px] font-semibold">
+              {(['engage', 'conceal'] as const).map((o) => (
+                <button key={o} type="button" onClick={() => onOrder(o)} className={cx('px-2 py-1', order === o ? 'bg-white text-[#0b0d12]' : 'text-white/60')}>
+                  {o === 'engage' ? 'Engage' : 'Conceal'}
+                </button>
+              ))}
+            </span>
+          )}
+          {onEnd && (
+            <button type="button" onClick={onEnd} className="ml-auto rounded-md bg-white/10 px-2 py-1 text-[12px] font-semibold text-white">
+              Завершить активацию
+            </button>
+          )}
+        </div>
+      )}
       {actions.length === 0 ? (
         <p className="text-[12px] text-white/60">В этой фазе у отряда нет действий.</p>
       ) : (
@@ -89,7 +137,10 @@ export function ActionPanel({ title, sub, color, actions, onAction, onClose }: {
               className={cx('rounded-xl px-2.5 py-2 text-left', a.blocked ? 'bg-white/[0.04] opacity-55' : 'bg-white/10 active:bg-white/20')}
               style={a.blocked ? undefined : { boxShadow: `inset 0 0 0 1.5px ${color}` }}
             >
-              <span className="block text-[13px] font-semibold leading-tight text-white">{a.label}</span>
+              <span className="block text-[13px] font-semibold leading-tight text-white">
+                {a.label}
+                {a.ap != null && budget && <span className="ml-1 text-[11px] font-normal text-[#f5c542]">{a.ap}{budget.unit === 'AP' ? 'AP' : ''}</span>}
+              </span>
               <span className="mt-0.5 block text-[10.5px] leading-snug text-white/55">{a.blocked ?? a.hint ?? a.en}</span>
             </button>
           ))}
