@@ -54,7 +54,6 @@ import {
 import { ActionPanel, ChargePanel, MovePanel, PhaseBar } from './GamePanel';
 import { ArmyBar, Banner, type BannerSpec } from './BoardHud';
 import { BottomBar, FormTab, MoreMenu, PlaceTab, ProfileTab, QuickBar, UnitCard, UnitsSheet, type CardTab, type UnitsFilter, type UnitsRow } from './BoardSheets';
-import { cx } from '../util';
 
 const ACCENT = '#eaff44';
 const OUTSIDE = '#ff3b3b';
@@ -1219,43 +1218,40 @@ function BoardInner({
         </p>
       </div>
 
-      {/* карточка выбранного отряда, строка строя и быстрая панель (вариант A) */}
+      {/* карточка выбранного отряда: строка строя и быстрые кнопки — внутри неё, поле не закрыто (27.11.2026) */}
       {cardVisible && sel && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex flex-col gap-1.5">
-          <div className="flex flex-col gap-1.5 px-2.5 [&>*]:pointer-events-auto">
-            {!game && sel.placed && !cardOpen && (
-              <QuickBar
-                formation={FORMATIONS.find((f) => f.id === sel.formation)?.label ?? 'Строй'}
-                perModel={perModel}
-                onFormation={() => (setCardTab('form'), setCardOpen(true))}
-                onPerModel={() => (haptic.select(), setPerModel((v) => !v))}
-                onRotate={rotate}
-                onDone={() => selectUnit(null)}
-              />
-            )}
-            {statusLine.length > 0 && (
-              <p className={cx('self-start rounded-[10px] bg-[#0b0d12]/90 px-2.5 py-1 text-[12px] font-bold', statusBad ? 'text-[#F87171]' : 'text-[#6fe0a0]')}>{statusLine.join(' · ')}</p>
-            )}
-          </div>
-          <div className="pointer-events-auto">
-            <UnitCard
-              n={label(sel)}
-              name={sel.name}
-              sub={
-                game
-                  ? `${selArmy.name}${flagsOf(sel.uid).shocked ? ' · под боевым шоком' : ''}${selArmy.stats(sel) ? ` · ${selArmy.stats(sel)}` : ''}`
+        <div className="absolute inset-x-0 bottom-0 z-10">
+          <UnitCard
+            n={label(sel)}
+            name={sel.name}
+            sub={
+              game
+                ? `${selArmy.name}${flagsOf(sel.uid).shocked ? ' · под боевым шоком' : ''}${selArmy.stats(sel) ? ` · ${selArmy.stats(sel)}` : ''}`
+                : statusLine.length
+                  ? statusLine.join(' · ')
                   : `${selArmy.name} · ${sel.placed ? (perModel ? 'тяните модель' : 'тяните отряд или нажмите, куда поставить') : 'нажмите на поле, чтобы поставить'}`
-              }
-              color={colorOf(sel.uid)}
-              open={cardOpen}
-              tab={cardTab}
-              onTab={(t) => (haptic.select(), setCardTab(t))}
-              onToggle={() => setCardOpen((v) => !v)}
-              onClose={() => selectUnit(null)}
-            >
-              {cardBody}
-            </UnitCard>
-          </div>
+            }
+            subTone={!game && statusLine.length ? (statusBad ? 'bad' : 'good') : undefined}
+            color={colorOf(sel.uid)}
+            open={cardOpen}
+            tab={cardTab}
+            onTab={(t) => (haptic.select(), setCardTab(t))}
+            onToggle={() => setCardOpen((v) => !v)}
+            onClose={() => selectUnit(null)}
+            tools={
+              !game && sel.placed ? (
+                <QuickBar
+                  formation={FORMATIONS.find((f) => f.id === sel.formation)?.label ?? 'Строй'}
+                  perModel={perModel}
+                  onFormation={() => (setCardTab('form'), setCardOpen(true))}
+                  onPerModel={() => (haptic.select(), setPerModel((v) => !v))}
+                  onRotate={rotate}
+                />
+              ) : undefined
+            }
+          >
+            {cardBody}
+          </UnitCard>
         </div>
       )}
       {!cardVisible && !sheet && offAll > 0 && tool === 'move' && !active && !charging && (

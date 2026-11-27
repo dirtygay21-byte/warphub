@@ -104,3 +104,13 @@ test('интерфейс варианта A: нижняя панель вмес�
   for (const t of ['Повернуть влево', 'Повернуть вправо', 'Действия', 'Строй', 'Профиль', 'Поставить всех в зону', 'Вне стола', 'На столе', 'Модели по одной', 'Убрать со стола', 'из ростера']) assert.ok(sheets.includes(t), t);
   assert.ok(ui('testarmy/GamePanel.tsx').includes('embedded?: boolean'));
 });
+
+test('быстрые кнопки и строка строя — внутри карточки, над полем ничего не висит (27.11.2026)', () => {
+  const board = ui('testarmy/Board.tsx');
+  const sheets = ui('testarmy/BoardSheets.tsx');
+  assert.ok(board.includes('tools={'), 'QuickBar передаётся в карточку');
+  assert.ok(board.includes('subTone='), 'строка зоны/строя — подпись карточки');
+  assert.ok(!board.includes('pointer-events-none absolute inset-x-0 bottom-0'), 'нет плавающего слоя над полем');
+  assert.ok(sheets.includes('{!open && tools}'));
+  assert.ok(!sheets.includes('aria-label="Готово"'), '✓ убрана — закрывает ✕');
+});
