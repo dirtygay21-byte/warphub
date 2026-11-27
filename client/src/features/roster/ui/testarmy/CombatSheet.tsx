@@ -31,7 +31,7 @@ export function CombatSheet({ attacker, target, distance, onClose, onRoll, melee
   const tgt0 = useMemo(() => targetFrom(target.cr, target.uid), [target.cr, target.uid]);
   // Stealth цели — укрытие включено сразу (можно выключить)
   // HEAVY и LANCE — по режиму «Игра», если он знает, как отряд двигался (можно переключить)
-  const [sit, setSit] = useState<Situation>(() => ({ ...(tgt0?.stealth ? { cover: true } : {}), ...(shot?.heavy ? { heavy: true } : {}), ...(shot?.charged ? { charged: true } : {}) }));
+  const [sit, setSit] = useState<Situation>(() => ({ ...(tgt0?.stealth || shot?.cover ? { cover: true } : {}), ...(shot?.notVisible ? { indirect: true } : {}), ...(shot?.heavy ? { heavy: true } : {}), ...(shot?.charged ? { charged: true } : {}) }));
   // правки цели (13.11.2026): модификаторы от правил цели и оставшиеся модели
   const [tm, setTm] = useState<{ hit: number; inv: number | null; fnp: number | null; models: number | null }>({ hit: 0, inv: null, fnp: null, models: null });
   const tgt = useMemo(() => {
@@ -66,6 +66,8 @@ export function CombatSheet({ attacker, target, distance, onClose, onRoll, melee
             <span className="block text-[12px] text-warn">{shot.mode === 'assault' ? 'Штурмовая стрельба (10.05): после продвижения — только оружие [ASSAULT].' : shot.attackerMV ? 'Стрельба в ближнем бою (10.06): MONSTER/VEHICLE — −1 к попаданию, кроме [CLOSE-QUARTERS] по противнику в бою.' : 'Стрельба в ближнем бою (10.06): только [CLOSE-QUARTERS] / [PISTOL].'}</span>
           )}
           {shot && !melee && shot.mode === 'normal' && shot.ruleNote && <span className="block text-[12px] text-fg-3">Продвигался — обычная стрельба по правилу «{shot.ruleNote}».</span>}
+          {shot && !melee && shot.notVisible && <span className="block text-[12px] text-warn">Цель не видна — стреляет только оружие [INDIRECT FIRE] (10.07).</span>}
+          {shot && !melee && shot.sightNotes?.length ? <span className="block text-[12px] text-fg-3">По карте: {shot.sightNotes.join(' · ')}. Высота и окна не учитываются — укрытие можно переключить.</span> : null}
           {shot && !melee && shot.engagedMV && <span className="block text-[12px] text-warn">Цель — MONSTER/VEHICLE в бою (17.03): −1 к попаданию, [BLAST] нельзя.</span>}
         </p>
         <Segmented value={melee ? 'melee' : 'ranged'} onChange={(v) => (setMelee(v === 'melee'), setPick({}))} options={[{ value: 'ranged', label: 'Стрельба' }, { value: 'melee', label: 'Ближний бой' }]} />
