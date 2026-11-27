@@ -127,12 +127,54 @@ describe('dice combat', () => {
       winsHistogram[Math.min(state.wins, 5)] = (winsHistogram[Math.min(state.wins, 5)] ?? 0) + 1;
     }
     const firstWinRate = firstWins / N;
-    // Первая победа — вполне достижима, 5 побед подряд — редкость
-    // ≈ 3 из 4 игроков выигрывают первый бой, 5 побед подряд — около 3%
+    // Старый режим «обмена ударами» (playDiceExchange) в игре больше не используется — здесь только
+    // проверка, что бой всегда завершается. Баланс проверяется в режиме пулов кубов (тест ниже).
     expect(firstWinRate).toBeGreaterThan(0.6);
-    expect(firstWinRate).toBeLessThan(0.9);
-    expect((winsHistogram[5] ?? 0) / N).toBeLessThan(0.08);
-    console.log('dice balance: P(≥1 win)=', firstWinRate.toFixed(2), 'histogram', winsHistogram);
+    expect(firstWinRate).toBeLessThan(0.95);
+    console.log('legacy dice: P(≥1 win)=', firstWinRate.toFixed(2), 'histogram', winsHistogram);
+  });
+
+  test('режим пулов кубов (как в игре): разброс бойцов небольшой, 5 побед — редкость', async () => {
+    const { createDicePools, playDicePoolTurn, resolveDiceInitiative, chooseEnemyPoolAction } = await import('../src/modules/minigames/rules');
+    const p = S.games.dice.params;
+    const rng = seededRandom(321);
+    const avg: number[] = [];
+    let five = 0;
+    let total = 0;
+    for (const fighter of PLAYER_FIGHTERS) {
+      let wins = 0;
+      const N = 800;
+      for (let i = 0; i < N; i++) {
+        let state = resolveDiceInitiative(startDiceBattle([fighter], ENEMY_FIGHTERS, rng), rng() < 0.5 ? 'even' : 'odd', rng).state;
+        state.pools = createDicePools(state, PLAYER_FIGHTERS, ENEMY_FIGHTERS, p, rng);
+        let guard = 0;
+        while (!state.finished && guard++ < 2000) {
+          let action: 'ult' | 'critical' | 'attack' | 'defend';
+          if (state.turn === 'enemy') action = chooseEnemyPoolAction(state, PLAYER_FIGHTERS, ENEMY_FIGHTERS, p);
+          else {
+            const pool = state.pools?.player ?? [];
+            action = !state.usedUlt ? 'ult'
+              : pool.some((e) => !e.used && e.value === 6) ? 'critical'
+              : pool.some((e) => !e.used && e.value !== 6 && e.value >= fighter.skill) ? 'attack' : 'defend';
+          }
+          try {
+            state = playDicePoolTurn(state, action, PLAYER_FIGHTERS, ENEMY_FIGHTERS, p, rng).state;
+          } catch {
+            state = playDicePoolTurn(state, 'defend', PLAYER_FIGHTERS, ENEMY_FIGHTERS, p, rng).state;
+          }
+          if (!state.finished && state.pools === null) state.pools = createDicePools(state, PLAYER_FIGHTERS, ENEMY_FIGHTERS, p, rng);
+        }
+        expect(state.finished).toBe(true);
+        wins += state.wins;
+        if (state.wins >= 5) five++;
+        total++;
+      }
+      avg.push(wins / N);
+    }
+    // до баланса 28.11.2026: 0,64–2,49 средних побед; теперь ≈1,15–1,9
+    expect(Math.max(...avg) - Math.min(...avg)).toBeLessThan(1.1);
+    expect(Math.min(...avg)).toBeGreaterThan(0.8);
+    expect(five / total).toBeLessThan(0.05);
   });
 });
 
@@ -204,5 +246,25 @@ describe('card packs', () => {
     expect(() => validateSettings({ games: { cards: { params: { cardsPerPack: 50 } } } })).toThrow(SettingsValidationError);
     const allZero = Object.fromEntries(CARD_RARITIES.map((r) => [r, { weight: 0 }]));
     expect(() => validateSettings({ games: { cards: { params: { rarities: allZero } } } })).toThrow(SettingsValidationError);
+  });
+});
+
+describe('Кости войны: выбор бойца игрока по весу', () => {
+  test('сильные бойцы (weight < 1) выпадают реже', async () => {
+    const { pickPlayerFighter, seededRandom } = await import('../src/modules/minigames/rules');
+    const { PLAYER_FIGHTERS } = await import('../src/config/minigames');
+    const rng = seededRandom(7);
+    const counts = new Map<string, number>();
+    const N = 60000;
+    for (let i = 0; i < N; i++) {
+      const f = pickPlayerFighter(PLAYER_FIGHTERS, rng);
+      counts.set(f.id, (counts.get(f.id) ?? 0) + 1);
+    }
+    const total = PLAYER_FIGHTERS.reduce((s, f) => s + (f.weight ?? 1), 0);
+    for (const f of PLAYER_FIGHTERS) {
+      const share = (counts.get(f.id) ?? 0) / N;
+      expect(Math.abs(share - (f.weight ?? 1) / total)).toBeLessThan(0.01);
+    }
+    expect((counts.get('iron_captain') ?? 0) / N).toBeLessThan(0.1);
   });
 });
