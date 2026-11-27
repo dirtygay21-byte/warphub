@@ -941,12 +941,7 @@ function BoardInner({
   const selCoh = sel ? cohOf(sel) : null;
   const selOutside = !!sel?.placed && sel.models.some((m) => outside.has(m.id));
   // красная обводка: вне зоны деплоя и (у выбранного отряда) вне строя
-  const flagged = useMemo(() => {
-    if (!selCoh || selCoh.ok || !sel) return outside;
-    const set = new Set(outside);
-    for (const i of selCoh.bad) set.add(sel.models[i]!.id);
-    return set;
-  }, [outside, selCoh, sel]);
+  const flagged = !selCoh || selCoh.ok || !sel ? outside : new Set([...outside, ...selCoh.bad.map((i) => sel.models[i]!.id)]);
   const cohText = (c: ReturnType<typeof coherency> | null) =>
     !c || !cohRule ? null : c.ok ? `✓ строй цел (${fmtInches(cohRule.range)})` : `✗ вне строя: ${c.bad.length === 1 ? 'модель' : 'модели'} ${c.bad.map((i) => i + 1).join(', ')} — нужно ${fmtInches(cohRule.range)}${cohRule.all ? `, до каждой ${fmtInches(cohRule.all)}` : ''}${cohRule.twoFrom && sel && sel.models.length >= cohRule.twoFrom ? ', от 2 моделей' : ''}`;
   const selZoneText = sel?.placed && !game && ownZone ? (selOutside ? '✗ вне зоны деплоя' : '✓ в зоне деплоя') : null;
