@@ -17,6 +17,8 @@ export type CoherencyRule = {
   all?: number;
   /** при стольких моделях и больше — нужно 2 соседа (AoS: 7) */
   twoFrom?: number;
+  /** отряд — одна группа: модели связаны цепочкой соседей в пределах range (AoS 15.1) */
+  group?: boolean;
   source: string;
 };
 
@@ -28,7 +30,8 @@ export const COHERENCY_40K: CoherencyRule = {
 export const COHERENCY_AOS: CoherencyRule = {
   range: 0.5,
   twoFrom: 7,
-  source: 'Wahapedia AoS 4, Core Rules 15.1: coherency range 1/2″ (у некоторых отрядов больше — см. варскролл), при 7+ моделях — 2 соседа',
+  group: true,
+  source: 'Wahapedia AoS 4, Core Rules 15.1: одна группа, coherency range 1/2″ (у некоторых отрядов больше — см. варскролл), при 7+ моделях — 2 соседа',
 };
 
 const EPS = 1e-6;
@@ -48,6 +51,24 @@ export function coherency(bases: readonly (Placed | null)[], rule: CoherencyRule
       bad.push(a.i);
       worst = Math.max(worst, nth - rule.range);
     }
+  }
+  // одна группа (AoS 15.1): модели вне самой большой связной группы — вне строя
+  if (rule.group) {
+    const near = (a: Placed, b: Placed) => baseToBase(a, b) <= rule.range + EPS;
+    const left = new Set(on.map((x) => x.i));
+    let best: number[] = [];
+    while (left.size) {
+      const start = [...left][0]!;
+      const comp = [start];
+      left.delete(start);
+      for (let k = 0; k < comp.length; k++) {
+        const a = on.find((x) => x.i === comp[k])!;
+        for (const b of on) if (left.has(b.i) && near(a.b, b.b)) (left.delete(b.i), comp.push(b.i));
+      }
+      if (comp.length > best.length) best = comp;
+    }
+    for (const x of on) if (!best.includes(x.i) && !bad.includes(x.i)) bad.push(x.i);
+    bad.sort((a, b) => a - b);
   }
   return { ok: bad.length === 0, bad, worst };
 }

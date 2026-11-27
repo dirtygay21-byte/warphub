@@ -50,6 +50,7 @@ import {
   type ShootProfile,
   type ShotContext,
   targetSight,
+  skirmishTargetRule,
   type TerrainMap,
   type UnitFlags,
   autoDeploy,
@@ -93,7 +94,7 @@ export type BoardArmy = TAArmy & {
     /** Kill Team: APL */
     apl?: (u: TAUnit) => number | null;
     /** дальность оружия (″) для проверки цели без симулятора атаки: min — минимальная дальность (Warcry) */
-    ranges?: (u: TAUnit) => { name: string; min?: number; max: number }[];
+    ranges?: (u: TAUnit) => { name: string; min?: number; max: number; inCombat?: boolean }[];
     /** 40K: оружие и исключения отряда для стрельбы (shooting40k.ts) */
     shooting?: (u: TAUnit) => ShootProfile | null;
   };
@@ -418,6 +419,7 @@ function BoardInner({
       leadership: a.sim?.leadership(u) ?? null,
       apl: a.sim?.apl?.(u) ?? null,
       shooting: a.sim?.shooting?.(u) ?? null,
+      shootInCombat: rules?.system === 'aos' && a.sim?.ranges ? a.sim.ranges(u).some((r) => r.inCombat) : undefined,
       objective: bases.length && field.objectives.length ? nearestObjective(bases, field.objectives, field.objectiveRange ?? OBJECTIVE_RANGE)?.d ?? null : null,
     };
   };
@@ -730,6 +732,31 @@ function BoardInner({
             ...(sight ? { notVisible: !sight.visible, cover: sight.cover, sightNotes: sight.notes } : {}),
           };
         }
+        // без симулятора боя (AoS, Kill Team, Warcry): допустима ли цель — до отметки «стрелял» (16.0, Shoot, Attack)
+        let skirmish: { ranges: { name: string; min?: number; max: number; inCombat?: boolean }[] } | null = null;
+        if (!combat && from) {
+          const er = rules?.engagement ?? 1;
+          const d = unitGap(unitsOf(from.uid), unitsOf(unit.uid));
+          const near = (x: string, y: string) => (unitGap(unitsOf(x), unitsOf(y)) ?? Infinity) <= er + 1e-6;
+          const attackerEngaged = enemiesOf(from.uid).some((e) => near(from.uid, e.uid));
+          // AoS 16.0: в бою стреляет только оружие Shoot in Combat
+          const ranges = (armyOf(from.uid).sim?.ranges?.(from) ?? []).filter((r) => !(rules?.system === 'aos' && attackerEngaged) || r.inCombat);
+          const why = rules
+            ? skirmishTargetRule(rules.system, {
+                melee,
+                attackerEngaged,
+                targetEngagedWithAttacker: near(from.uid, unit.uid),
+                friendlyNearTarget: armyOf(from.uid).units.some((x) => x.uid !== from.uid && x.placed && near(x.uid, unit.uid)),
+                gap: d,
+                ranges,
+              })
+            : null;
+          if (why) {
+            showBanner({ kicker: `${from.name} → ${unit.name}`, title: 'Нельзя выбрать цель', sub: why, color: colorOf(from.uid), tone: 'bad' });
+            return;
+          }
+          skirmish = { ranges };
+        }
         if (from) showBanner({ kicker: melee ? 'Бой' : game ? 'Стрельба' : 'Атака', title: from.name, sub: `→ ${unit.name}`, color: colorOf(from.uid), tone: 'event' });
         if (game && from && rules) {
           snapshot();
@@ -741,7 +768,7 @@ function BoardInner({
           // без симулятора атаки (AoS, Kill Team, Warcry): проверка дистанции до цели
           const d = unitGap(unitsOf(from.uid), unitsOf(unit.uid));
           const er = rules?.engagement ?? 1;
-          const ranges = armyOf(from.uid).sim?.ranges?.(from) ?? [];
+          const ranges = skirmish?.ranges ?? [];
           const inRange = ranges.filter((r) => d != null && d <= r.max + 1e-6 && (r.min == null || d >= r.min));
           const ok = d != null && (melee ? d <= er + 1e-6 : ranges.length ? inRange.length > 0 : true);
           showBanner({
