@@ -146,6 +146,7 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
       });
   }, [step, roster, layoutId, side, armies]);
   const setArmyUnits = (key: ArmyKey, units: TAUnit[]) => setArmies((list) => list && list.map((a) => (a.key === key ? { ...a, units } : a)));
+  const setArmyColor = (key: ArmyKey, color: string) => setArmies((list) => list && list.map((a) => (a.key === key ? { ...a, color } : a)));
 
   if (error)
     return (
@@ -183,8 +184,25 @@ export function TestArmyScreen({ onBack, rosters, index, initialRosterId }: { on
         armies={armies.map(view40k)}
         field={field}
         onArmy={setArmyUnits}
+        onArmyColor={setArmyColor}
         onBack={() => setStep('field')}
-        combat={(c, onClose) => <CombatSheet attacker={side(c.attackerArmy.key, c.attacker)} target={side(c.targetArmy.key, c.target)} distance={c.distance} onClose={onClose} />}
+        combat={(c, onClose) => (
+          <CombatSheet
+            attacker={side(c.attackerArmy.key, c.attacker)}
+            target={side(c.targetArmy.key, c.target)}
+            distance={c.distance}
+            onClose={onClose}
+            onRoll={(killed, models) =>
+              c.onBanner(
+                killed === 0
+                  ? { kicker: c.attacker.name, title: 'Промах!', sub: `${c.target.name}: никто не убит`, tone: 'bad' }
+                  : killed >= models
+                    ? { kicker: c.attacker.name, title: 'Отряд уничтожен!', sub: `${c.target.name}: убито ${killed} из ${models}`, tone: 'good' }
+                    : { kicker: c.attacker.name, title: `Убито ${killed}`, sub: `${c.target.name}: из ${models} моделей`, tone: 'good' },
+              )
+            }
+          />
+        )}
       />
     );
   }

@@ -139,12 +139,14 @@ function SkirmishTestArmyScreen<R extends SkirmishRoster>({ system, onBack, rost
     } catch (e) { setError(String(e instanceof Error ? e.message : e)); }
   };
   const setArmyUnits = (key: ArmyKey, units: TAUnit[]) => setArmies((list) => list && list.map((a) => (a.key === key ? { ...a, units } : a)));
+  const setArmyColor = (key: ArmyKey, color: string) => setArmies((list) => list && list.map((a) => (a.key === key ? { ...a, color } : a)));
 
   if (error) return <Shell onBack={onBack} system={system}><p className="mt-10 text-center text-sm text-fg-3">{error}</p></Shell>;
   if (!data) return <Shell onBack={onBack} system={system}><Spinner /></Shell>;
   if (step === 'board' && roster) {
     if (!armies) return <Spinner full />;
-    return <Board armies={armies.map((a) => ({ ...a, name: a.roster.name }))} field={makeField(data, layoutId, terrain)} onArmy={setArmyUnits} onBack={() => setStep(data.system === 'warcry' ? 'terrain' : 'field')} />;
+    return <Board armies={armies.map((a) => ({ ...a, name: a.roster.name }))} field={makeField(data, layoutId, terrain)} onArmy={setArmyUnits}
+        onArmyColor={setArmyColor} onBack={() => setStep(data.system === 'warcry' ? 'terrain' : 'field')} />;
   }
   if (step === 'terrain' && roster) {
     return (

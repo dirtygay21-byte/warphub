@@ -52,7 +52,8 @@ export type Side = 'attacker' | 'defender';
 
 /** Армия на столе: своя (me) или соперника (foe, 30.10.2026); ростер — свой по id или по коду (WH1.…). */
 export type ArmyKey = 'me' | 'foe';
-export type TAArmy = { key: ArmyKey; side: Side; rosterId?: string; code?: string; units: TAUnit[] };
+/** color — цвет армии на столе (27.11.2026, hex из ARMY_COLORS); нет — цвет стороны. */
+export type TAArmy = { key: ArmyKey; side: Side; rosterId?: string; code?: string; units: TAUnit[]; color?: string };
 
 /** Префикс id отрядов соперника: один и тот же ростер может стоять за обе стороны. */
 export const FOE_PREFIX = 'foe:';

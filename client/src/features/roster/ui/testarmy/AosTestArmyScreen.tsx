@@ -132,6 +132,7 @@ export function AosTestArmyScreen({ onBack, rosters, index, initialRosterId }: {
       });
   }, [step, roster, plan, territory, side, armies]);
   const setArmyUnits = (key: ArmyKey, units: TAUnit[]) => setArmies((list) => list && list.map((a) => (a.key === key ? { ...a, units } : a)));
+  const setArmyColor = (key: ArmyKey, color: string) => setArmies((list) => list && list.map((a) => (a.key === key ? { ...a, color } : a)));
 
   if (error)
     return (
@@ -149,7 +150,8 @@ export function AosTestArmyScreen({ onBack, rosters, index, initialRosterId }: {
   const bplan = bp.battleplans.find((b) => b.n === plan);
   if (step === 'board' && roster && bplan?.map) {
     if (!armies) return <Spinner full />;
-    return <Board armies={armies.map(viewAos)} field={aosField(bp, bplan.name, bplan.map, territory)} onArmy={setArmyUnits} onBack={() => setStep('field')} />;
+    return <Board armies={armies.map(viewAos)} field={aosField(bp, bplan.name, bplan.map, territory)} onArmy={setArmyUnits}
+        onArmyColor={setArmyColor} onBack={() => setStep('field')} />;
   }
 
   if (step === 'field' && roster)
