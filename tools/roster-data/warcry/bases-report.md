@@ -1,0 +1,334 @@
+# Warcry: размеры баз — отчёт сопоставления
+
+Источник: варскроллы AoS 4 (Wahapedia, выгрузка 2026-10-22 18:12:05), сопоставление по названию в том же альянсе. Генерирует `scripts/warcry-bases.mjs`.
+
+Бойцов: 1345. С базой: 499 (точно 230, без снаряжения 27, мн. число 242). Неоднозначно: 0. Нет данных: 846.
+
+## Проверить: совпадение по множественному числу (242)
+
+- chaos — Chaos Warhound → Chaos Warhounds (Beasts of Chaos): 60 × 35mm
+- Beasts of Chaos — Gor with Pair of Gor Blades → Gors (Beasts of Chaos): 32mm
+- Beasts of Chaos — Ungor with Ungor Blade and Half-shield → Ungors (Beasts of Chaos): 25mm
+- Beasts of Chaos — Ungor with Gnarled Shortspear and Half-shield → Ungors (Beasts of Chaos): 25mm
+- Beasts of Chaos — Gor with Gor Blade and Beastshield → Gors (Beasts of Chaos): 32mm
+- Beasts of Chaos — Ungor Raider → Ungor Raiders (Beasts of Chaos): 25mm
+- Beasts of Chaos — Bestigor → Bestigors (Beasts of Chaos): 32mm
+- Beasts of Chaos — Centigor → Centigors (Beasts of Chaos): 60 × 35mm
+- Beasts of Chaos — Bullgor with Axe and Bullshield → Bullgors (Beasts of Chaos): 50mm
+- Beasts of Chaos — Bullgor with Paired Bullgor Axes → Bullgors (Beasts of Chaos): 50mm
+- Beasts of Chaos — Bullgor with Bullgor Great Axe → Bullgors (Beasts of Chaos): 50mm
+- Beasts of Chaos — Dragon Ogor with Draconic Crusher → Dragon Ogors (Beasts of Chaos): 90 × 52mm
+- Beasts of Chaos — Dragon Ogor with Draconic War-glaive → Dragon Ogors (Beasts of Chaos): 90 × 52mm
+- Beasts of Chaos — Dragon Ogor with Paired Ancient Weapons → Dragon Ogors (Beasts of Chaos): 90 × 52mm
+- Blades of Khorne: Bloodbound — Bloodreaver with Meatripper Axe → Bloodreavers (Blades of Khorne): 32mm
+- Blades of Khorne: Bloodbound — Bloodreaver with Reaver Blades → Bloodreavers (Blades of Khorne): 32mm
+- Blades of Khorne: Bloodbound — Blood Warrior with Goreaxe and Gorefist → Blood Warriors (Blades of Khorne): 32mm
+- Blades of Khorne: Bloodbound — Blood Warrior with Goreglaive → Blood Warriors (Blades of Khorne): 32mm
+- Blades of Khorne: Bloodbound — Blood Warrior with Pair of Goreaxes → Blood Warriors (Blades of Khorne): 32mm
+- Blades of Khorne: Bloodbound — Skullreaper → Skullreapers (Blades of Khorne): 40mm
+- Blades of Khorne: Bloodbound — Wrathmonger → Wrathmongers (Blades of Khorne): 40mm
+- Blades of Khorne: Bloodbound — Flesh Hound → Flesh Hounds (Blades of Khorne): 60 × 35mm
+- Blades of Khorne: Bloodbound — Mighty Skullcrusher with Bloodglaive → Mighty Skullcrushers (Blades of Khorne): 90 × 52mm
+- Blades of Khorne: Bloodbound — Mighty Skullcrusher with Ensorcelled Axe → Mighty Skullcrushers (Blades of Khorne): 90 × 52mm
+- Blades of Khorne: Daemons — Bloodletter → Bloodletters (Blades of Khorne): 32mm
+- Blades of Khorne: Daemons — Bloodcrusher → Bloodcrushers (Blades of Khorne): 90 × 52mm
+- Blades of Khorne: Daemons — Flesh Hound → Flesh Hounds (Blades of Khorne): 60 × 35mm
+- Darkoath — Darkoath Fellrider With Javelin → Darkoath Fellriders (Slaves to Darkness): 60 × 35mm
+- Darkoath — Darkoath Marauder → Darkoath Marauders (Slaves to Darkness): 28.5mm
+- Darkoath — Darkoath Marauder With Spear → Darkoath Marauders (Slaves to Darkness): 28.5mm
+- Darkoath — Darkoath Fellrider → Darkoath Fellriders (Slaves to Darkness): 60 × 35mm
+- Disciples of Tzeentch: Arcanites — Tzaangor with Pair of Savage Blades → Tzaangors (Disciples of Tzeentch): 32mm
+- Disciples of Tzeentch: Arcanites — Tzaangor with Savage Blade and Arcanite Shield → Tzaangors (Disciples of Tzeentch): 32mm
+- Disciples of Tzeentch: Arcanites — Kairic Acolyte with Paired Cursed Blades → Kairic Acolytes (Disciples of Tzeentch): 32mm
+- Disciples of Tzeentch: Arcanites — Kairic Acolyte with Vulcharc → Kairic Acolytes (Disciples of Tzeentch): 32mm
+- Disciples of Tzeentch: Arcanites — Kairic Acolyte with Cursed Blade and Arcanite Shield → Kairic Acolytes (Disciples of Tzeentch): 32mm
+- Disciples of Tzeentch: Arcanites — Kairic Acolyte with Cursed Glaive and Arcanite Shield → Kairic Acolytes (Disciples of Tzeentch): 32mm
+- Disciples of Tzeentch: Arcanites — Kairic Acolyte with Scroll of Dark Arts → Kairic Acolytes (Disciples of Tzeentch): 32mm
+- Disciples of Tzeentch: Arcanites — Tzaangor with Savage Greatblade → Tzaangors (Disciples of Tzeentch): 32mm
+- Disciples of Tzeentch: Arcanites — Tzaangor Skyfire → Tzaangor Skyfires (Disciples of Tzeentch): 40mm
+- Disciples of Tzeentch: Daemons — Pink Horror → Pink Horrors (Disciples of Tzeentch): 32mm
+- Hedonites of Slaanesh: Daemons — Daemonette → Daemonettes (Hedonites of Slaanesh): 25mm
+- Hedonites of Slaanesh: Daemons — Hellstrider with Claw-spear → Hellstriders (Hedonites of Slaanesh): 60 × 35mm
+- Hedonites of Slaanesh: Daemons — Hellstrider with Hellscourge → Hellstriders (Hedonites of Slaanesh): 60 × 35mm
+- Hedonites of Slaanesh: Daemons — Fiend → Fiends (Hedonites of Slaanesh): 75 × 42mm
+- Hedonites of Slaanesh: Sybarites — Blissbarb Archer → Blissbarb Archers (Hedonites of Slaanesh): 28.5mm
+- Hedonites of Slaanesh: Sybarites — Myrmidesh Painbringer → Myrmidesh Painbringers (Hedonites of Slaanesh): 32mm
+- Hedonites of Slaanesh: Sybarites — Symbaresh Twinsoul with Excruciator Lash → Symbaresh Twinsouls (Hedonites of Slaanesh): 32mm
+- Hedonites of Slaanesh: Sybarites — Symbaresh Twinsoul with Merciless Blades → Symbaresh Twinsouls (Hedonites of Slaanesh): 32mm
+- Hedonites of Slaanesh: Sybarites — Symbaresh Twinsoul with Sinful Cleaver → Symbaresh Twinsouls (Hedonites of Slaanesh): 32mm
+- Hedonites of Slaanesh: Sybarites — Hellstrider with Claw-spear → Hellstriders (Hedonites of Slaanesh): 60 × 35mm
+- Hedonites of Slaanesh: Sybarites — Hellstrider with Hellscourge → Hellstriders (Hedonites of Slaanesh): 60 × 35mm
+- Hedonites of Slaanesh: Sybarites — Blissbarb Seeker → Blissbarb Seekers (Hedonites of Slaanesh): 75 × 42mm
+- Hedonites of Slaanesh: Sybarites — Slickblade Seeker → Slickblade Seekers (Hedonites of Slaanesh): 75 × 42mm
+- Hedonites of Slaanesh: Sybarites — Slaangor Fiendblood → Slaangor Fiendbloods (Hedonites of Slaanesh): 40mm
+- Helsmiths of Hashut — Bull Centaur → Bull Centaurs (Helsmiths of Hashut): 75 × 42mm
+- Helsmiths of Hashut — Anointed Sentinel → Anointed Sentinels (Helsmiths of Hashut): 75 × 42mm
+- Maggotkin of Nurgle: Daemons — Plaguebearer → Plaguebearers (Maggotkin of Nurgle): 32mm
+- Maggotkin of Nurgle: Daemons — Plague Drone → Plague Drones (Maggotkin of Nurgle): 60mm
+- Maggotkin of Nurgle: Rotbringers — Putrid Blightking with Blighted Weapon → Putrid Blightkings (Maggotkin of Nurgle): 40mm
+- Maggotkin of Nurgle: Rotbringers — Putrid Blightking with Filth-encrusted Shield → Putrid Blightkings (Maggotkin of Nurgle): 40mm
+- Maggotkin of Nurgle: Rotbringers — Putrid Blightking with Sonorous Tocsin → Putrid Blightkings (Maggotkin of Nurgle): 40mm
+- Maggotkin of Nurgle: Rotbringers — Pusgoyle Blightlord → Pusgoyle Blightlords (Maggotkin of Nurgle): 60mm
+- Skaven — Clanrat with Rusty Blade → Clanrats (Skaven): 25mm
+- Skaven — Clanrat with Rusty Spear → Clanrats (Skaven): 25mm
+- Skaven — Night Runner → Night Runners (Skaven): 28.5mm
+- Skaven — Plague Monk with Pair of Foetid Blades → Plague Monks (Skaven): 25mm
+- Skaven — Plague Monk with Foetid Blade and Woe-stave → Plague Monks (Skaven): 25mm
+- Skaven — Gutter Runner → Gutter Runners (Skaven): 32mm, 28.5mm
+- Skaven — Warpfire Thrower → Warpfire Throwers (Skaven): 60 × 35mm
+- Skaven — Warplock Jezzail → Warplock Jezzails (Skaven): 60 × 35mm
+- Skaven — Doom-Flayer → Doom-Flayers (Skaven): 50mm
+- Skaven — Rat Ogor with Warpfire Gun [retired] → Rat Ogors (Skaven): 50mm
+- Skaven — Stormfiend with Warpfire projectors → Stormfiends (Skaven): 60mm
+- Skaven — Stormfiend with Windlaunchers → Stormfiends (Skaven): 60mm
+- Skaven — Stormfiend with Ratling cannons → Stormfiends (Skaven): 60mm
+- Skaven — Stormfiend with Doomflayer gauntlets → Stormfiends (Skaven): 60mm
+- Skaven — Stormfiend with Grinderfists → Stormfiends (Skaven): 60mm
+- Skaven — Stormfiend with Shock Gauntlets → Stormfiends (Skaven): 60mm
+- Skaven — Rat Ogor → Rat Ogors (Skaven): 50mm
+- Skaven — Rat Ogor With Warpfire Gun → Rat Ogors (Skaven): 50mm
+- Slaves to Darkness — Chaos Warrior with Chaos Halberd and Chaos Runeshield → Chaos Warriors (Slaves to Darkness): 32mm
+- Slaves to Darkness — Chaos Warrior with Chaos Hand Weapon and Chaos Runeshield → Chaos Warriors (Slaves to Darkness): 32mm
+- Slaves to Darkness — Chaos Warrior with Chaos Greatblade → Chaos Warriors (Slaves to Darkness): 32mm
+- Slaves to Darkness — Chaos Warrior with Pair of Chaos Hand Weapons → Chaos Warriors (Slaves to Darkness): 32mm
+- Slaves to Darkness — Chaos Knight with Cursed Lance and Chaos Runeshield → Chaos Knights (Slaves to Darkness): 75 × 42mm
+- Slaves to Darkness — Chaos Knight with Ensorcelled Weapon and Chaos Runeshield → Chaos Knights (Slaves to Darkness): 75 × 42mm
+- Slaves to Darkness — Ogroid Theridon with Goroan Falchion and Shield → Ogroid Theridons (Slaves to Darkness): 50mm
+- Slaves to Darkness — Ogroid Theridon with Goroan Great Axe → Ogroid Theridons (Slaves to Darkness): 50mm
+- death — Dire Wolf → Dire Wolves (Soulblight Gravelords): 60 × 35mm
+- death — Fell Bat → Fell Bats (Soulblight Gravelords): 40mm
+- Flesh-eater Courts — Crypt Ghoul → Crypt Ghouls (Flesh-eater Courts): 25mm
+- Flesh-eater Courts — Crypt Horror → Crypt Horrors (Flesh-eater Courts): 50mm
+- Flesh-eater Courts — Crypt Flayer → Crypt Flayers (Flesh-eater Courts): 50mm
+- Flesh-eater Courts — Morbheg Knight → Morbheg Knights (Flesh-eater Courts): 75 × 42mm
+- Nighthaunt — Chainrasp → Chainrasps (Nighthaunt): 25mm
+- Nighthaunt — Glaivewraith Stalker → Glaivewraith Stalkers (Nighthaunt): 32mm
+- Nighthaunt — Bladegheist Revenant → Bladegheist Revenants (Nighthaunt): 32mm
+- Nighthaunt — Dreadscythe Harridan → Dreadscythe Harridans (Nighthaunt): 32mm
+- Nighthaunt — Grimghast Reaper → Grimghast Reapers (Nighthaunt): 32mm
+- Nighthaunt — Myrmourn Banshee → Myrmourn Banshees (Nighthaunt): 32mm
+- Nighthaunt — Chainghast → Chainghasts (Nighthaunt): 32mm
+- Nighthaunt — Hexwraith → Hexwraiths (Nighthaunt): 60 × 35mm
+- Nighthaunt — Spirit Host → Spirit Hosts (Nighthaunt): 50mm
+- Nighthaunt — Dreadblade Harrow → Dreadblade Harrows (Nighthaunt): 60 × 35mm
+- Ossiarch Bonereapers — Kavalos Deathrider with Nadirite Blade → Kavalos Deathriders (Ossiarch Bonereapers): 60 × 35mm
+- Ossiarch Bonereapers — Kavalos Deathrider with Nadirite Spear → Kavalos Deathriders (Ossiarch Bonereapers): 60 × 35mm
+- Ossiarch Bonereapers — Necropolis Stalker with Dread Falchions → Necropolis Stalkers (Ossiarch Bonereapers): 50mm
+- Ossiarch Bonereapers — Necropolis Stalker with Spirit Blades → Necropolis Stalkers (Ossiarch Bonereapers): 50mm
+- Ossiarch Bonereapers — Morghast Harbinger with Spirit Swords → Morghast Harbingers (Ossiarch Bonereapers): 60mm
+- Ossiarch Bonereapers — Morghast Harbinger with Spirit Halberd → Morghast Harbingers (Ossiarch Bonereapers): 60mm
+- Soulblight Gravelords — Deadwalker Zombie → Deadwalker Zombies (Soulblight Gravelords): 25mm
+- Soulblight Gravelords — Vargheist → Vargheists (Soulblight Gravelords): 50mm
+- Soulblight Gravelords — Blood Knight with Templar Lance → Blood Knights (Soulblight Gravelords): 75 × 42mm
+- Soulblight Gravelords — Blood Knight with Templar Blade → Blood Knights (Soulblight Gravelords): 75 × 42mm
+- destruction — Fellwater Troggoth → Fellwater Troggoths (Gloomspite Gitz): 50mm
+- destruction — Rockgut Troggoth → Rockgut Troggoths (Gloomspite Gitz): 50mm
+- Bonesplitterz — Savage Orruk with Chompa and Bone Shield → Savage Orruks (Bonesplitterz): 32mm
+- Bonesplitterz — Savage Orruk with Savage Stikka and Bone Shield → Savage Orruks (Bonesplitterz): 32mm
+- Bonesplitterz — Savage Orruk Morboy → Savage Orruk Morboys (Bonesplitterz): 32mm
+- Bonesplitterz — Savage Orruk Arrowboy → Savage Orruk Arrowboys (Bonesplitterz): 32mm
+- Bonesplitterz — Savage Boarboy with Chompa → Savage Boarboys (Bonesplitterz): 60 × 35mm
+- Bonesplitterz — Savage Boarboy with Savage Stikka → Savage Boarboys (Bonesplitterz): 60 × 35mm
+- Bonesplitterz — Savage Boarboy Maniak → Savage Boarboy Maniaks (Bonesplitterz): 60 × 35mm
+- Gloomspite Gitz — Sneaky Snuffler → Sneaky Snufflers (Gloomspite Gitz): 32mm
+- Gloomspite Gitz — Sporesplatta Fanatic → Sporesplatta Fanatics (Gloomspite Gitz): 32mm
+- Gloomspite Gitz — Loonsmasha Fanatic → Loonsmasha Fanatics (Gloomspite Gitz): 32mm
+- Gloomspite Gitz — Spider Rider → Spider Riders (Gloomspite Gitz): 60 × 35mm
+- Gloomspite Gitz — Squig Hopper → Squig Hoppers (Gloomspite Gitz): 32mm
+- Gloomspite Gitz — Snarlfang Rider → Snarlfang Riders (Gloomspite Gitz): 60 × 35mm
+- Ogor Mawtribes — Gnoblar → Gnoblars (Ogor Mawtribes): 25mm
+- Ogor Mawtribes — Frost Sabre → Frost Sabres (Ogor Mawtribes): 60 × 35mm
+- Ogor Mawtribes — Leadbelcher → Leadbelchers (Ogor Mawtribes): 40mm
+- Ogor Mawtribes — Icefall Yhetee → Icefall Yhetees (Ogor Mawtribes): 50mm
+- Ogor Mawtribes — Maneater → Maneaters (Ogor Mawtribes): 50mm
+- Ogor Mawtribes — Irongut → Ironguts (Ogor Mawtribes): 40mm
+- Cities of Sigmar: Castelite Hosts — Flagellant → Flagellants (Cities of Sigmar): 25mm
+- Cities of Sigmar: Castelite Hosts — Freeguild Steelhelm → Freeguild Steelhelms (Cities of Sigmar): 25mm
+- Cities of Sigmar: Castelite Hosts — Freeguild Fusilier → Freeguild Fusiliers (Cities of Sigmar): 28.5mm
+- Cities of Sigmar: Castelite Hosts — Freeguild Cavalier → Freeguild Cavaliers (Cities of Sigmar): 60 × 35mm
+- Cities of Sigmar: Darkling Covens — Dreadspear → Dreadspears (Cities of Sigmar): 25mm
+- Cities of Sigmar: Darkling Covens — Bleaksword → Bleakswords (Cities of Sigmar): 25mm
+- Cities of Sigmar: Darkling Covens — Black Ark Corsair with Vicious Blade and Wicked Cutlass → Black Ark Corsairs (Cities of Sigmar): 25mm
+- Cities of Sigmar: Darkling Covens — Black Ark Corsair with Vicious Blade and Repeater Crossbow → Black Ark Corsairs (Cities of Sigmar): 25mm
+- Cities of Sigmar: Darkling Covens — Darkshard → Darkshards (Cities of Sigmar): 25mm
+- Cities of Sigmar: Darkling Covens — Executioner → Executioners (Cities of Sigmar): 25mm
+- Cities of Sigmar: Darkling Covens — Dark Rider → Dark Riders (Cities of Sigmar): 60 × 35mm
+- Cities of Sigmar: Darkling Covens — Drakespawn Knight → Drakespawn Knights (Cities of Sigmar): 60 × 35mm
+- Cities of Sigmar: Dispossessed — Ironbreaker → Ironbreakers (Cities of Sigmar): 25mm
+- Cities of Sigmar: Dispossessed — Longbeard with Ancestral Weapon and Gromril Shield → Longbeards (Cities of Sigmar): 25mm
+- Cities of Sigmar: Dispossessed — Hammerer → Hammerers (Cities of Sigmar): 25mm
+- Cities of Sigmar: Dispossessed — Longbeard with Ancestral Great Axe → Longbeards (Cities of Sigmar): 25mm
+- Cities of Sigmar: Dispossessed — Irondrake → Irondrakes (Cities of Sigmar): 25mm
+- Daughters of Khaine — Witch Aelf with Paired Sciansá → Witch Aelves (Daughters of Khaine): 25mm
+- Daughters of Khaine — Witch Aelf with Sciansá and Bladed Buckler → Witch Aelves (Daughters of Khaine): 25mm
+- Daughters of Khaine — Doomfire Warlock → Doomfire Warlocks (Daughters of Khaine): 60 × 35mm
+- Daughters of Khaine — Khinerai Heartrender → Khinerai Heartrenders (Daughters of Khaine): 40mm
+- Daughters of Khaine — Khinerai Lifetaker → Khinerai Lifetakers (Daughters of Khaine): 40mm
+- Daughters of Khaine — Blood Sister → Blood Sisters (Daughters of Khaine): 40mm
+- Daughters of Khaine — Blood Stalker → Blood Stalkers (Daughters of Khaine): 40mm
+- Hunters of Huanchi — Terrawing → Terrawings (Seraphon): 32mm
+- Idoneth Deepkin — Namarti Thrall → Namarti Thralls (Idoneth Deepkin): 32mm
+- Idoneth Deepkin — Namarti Reaver → Namarti Reavers (Idoneth Deepkin): 32mm
+- Kharadron Overlords — Grundstok Thunderer with Aethershot Rifle → Grundstok Thunderers (Kharadron Overlords): 32mm
+- Kharadron Overlords — Grundstok Thunderer with Decksweeper → Grundstok Thunderers (Kharadron Overlords): 32mm
+- Kharadron Overlords — Grundstok Thunderer with Aetheric Fumigator → Grundstok Thunderers (Kharadron Overlords): 32mm
+- Kharadron Overlords — Grundstok Thunderer with Aethercannon → Grundstok Thunderers (Kharadron Overlords): 32mm
+- Kharadron Overlords — Grundstok Thunderer with Grundstok Mortar → Grundstok Thunderers (Kharadron Overlords): 32mm
+- Kharadron Overlords — Endrinrigger with Aethermatic Volley Gun → Endrinriggers (Kharadron Overlords): 32mm
+- Kharadron Overlords — Skywarden with Aethermatic Volley Gun → Skywardens (Kharadron Overlords): 32mm
+- Kharadron Overlords — Skywarden with Vulcaniser Pistol and Skypike → Skywardens (Kharadron Overlords): 32mm
+- Kharadron Overlords — Endrinrigger with Grapnel Launcher → Endrinriggers (Kharadron Overlords): 32mm
+- Kharadron Overlords — Endrinrigger with Rapid-fire Rivet Gun and Aethermatic Saw → Endrinriggers (Kharadron Overlords): 32mm
+- Kharadron Overlords — Skywarden with Grapnel Launcher → Skywardens (Kharadron Overlords): 32mm
+- Kharadron Overlords — Endrinrigger with Drill Launcher → Endrinriggers (Kharadron Overlords): 32mm
+- Kharadron Overlords — Skywarden with Drill Launcher → Skywardens (Kharadron Overlords): 32mm
+- Kharadron Overlords — Endrinrigger with Skyhook → Endrinriggers (Kharadron Overlords): 32mm
+- Kharadron Overlords — Skywarden with Skyhook → Skywardens (Kharadron Overlords): 32mm
+- Kharadron Overlords — Vongrim Salvager → Vongrim Salvagers (Kharadron Overlords): 32mm
+- Lumineth Realm-lords — Vanari Auralan Warden → Vanari Auralan Wardens (Lumineth Realm-lords): 32mm
+- Lumineth Realm-lords — Vanari Auralan Sentinel → Vanari Auralan Sentinels (Lumineth Realm-lords): 32mm
+- Lumineth Realm-lords — Vanari Bladelord → Vanari Bladelords (Lumineth Realm-lords): 32mm
+- Lumineth Realm-lords — Hurakan Windcharger → Hurakan Windchargers (Lumineth Realm-lords): 60 × 35mm
+- Lumineth Realm-lords — Vanari Dawnrider → Vanari Dawnriders (Lumineth Realm-lords): 60 × 35mm
+- Seraphon — Skink with Moonstone Club and Star-buckler → Skinks (Seraphon): 25mm
+- Seraphon — Skink with Boltspitter and Moonstone Club → Skinks (Seraphon): 25mm
+- Seraphon — Skink with Meteoric Javelin and Star-buckler → Skinks (Seraphon): 25mm
+- Seraphon — Saurus Warrior with Celestite Club → Saurus Warriors (Seraphon): 32mm
+- Seraphon — Saurus Warrior with Celestite Spear → Saurus Warriors (Seraphon): 32mm
+- Seraphon — Aggradon Lancer with Celestite Club → Aggradon Lancers (Seraphon): 75 × 42mm
+- Seraphon — Aggradon Lancer with Celestite Spear → Aggradon Lancers (Seraphon): 75 × 42mm
+- Seraphon — Raptadon Charger → Raptadon Chargers (Seraphon): 60 × 35mm
+- Seraphon — Raptadon Hunter → Raptadon Hunters (Seraphon): 60 × 35mm
+- Seraphon — Ripperdactyl Rider → Ripperdactyl Riders (Seraphon): 50mm
+- Seraphon — Terradon Rider with Sunleech Bolas → Terradon Riders (Seraphon): 50mm
+- Seraphon — Terradon Rider with Starstrike Javelin → Terradon Riders (Seraphon): 50mm
+- Stormcast Eternals Ruination Chamber — Prosecutor → Prosecutors (Stormcast Eternals): 40mm
+- Stormcast Eternals Ruination Chamber — Reclusian → Reclusians (Stormcast Eternals): 40mm
+- Stormcast Eternals Sacrosanct Chamber — Gryph-Hound → Gryph-hounds (Stormcast Eternals): 40mm
+- Stormcast Eternals Sacrosanct Chamber — Sequitor with Stormsmite Maul and Soulshield → Sequitors (Stormcast Eternals): 40mm
+- Stormcast Eternals Sacrosanct Chamber — Sequitor with Tempest Blade and Soulshield → Sequitors (Stormcast Eternals): 40mm
+- Stormcast Eternals Sacrosanct Chamber — Evocator with Grandstave → Evocators (Stormcast Eternals): 40mm
+- Stormcast Eternals Sacrosanct Chamber — Evocator with Tempest Blade and Stormstave → Evocators (Stormcast Eternals): 40mm
+- Stormcast Eternals Sacrosanct Chamber — Sequitor with Stormsmite Greatmace → Sequitors (Stormcast Eternals): 40mm
+- Stormcast Eternals Sacrosanct Chamber — Castigator → Castigators (Stormcast Eternals): 40mm
+- Stormcast Eternals Thunderstrike Stormcast — Gryph-Hound → Gryph-hounds (Stormcast Eternals): 40mm
+- Stormcast Eternals Thunderstrike Stormcast — Annihilator with Meteoric Hammer → Annihilators (Stormcast Eternals): 40mm
+- Stormcast Eternals Thunderstrike Stormcast — Vindictor → Vindictors (Stormcast Eternals): 40mm
+- Stormcast Eternals Thunderstrike Stormcast — Vanquisher → Vanquishers (Stormcast Eternals): 40mm
+- Stormcast Eternals Thunderstrike Stormcast — Annihilator with Grandhammer → Annihilators (Stormcast Eternals): 40mm
+- Stormcast Eternals Thunderstrike Stormcast — Praetor → Praetors (Stormcast Eternals): 40mm
+- Stormcast Eternals Thunderstrike Stormcast — Vigilor → Vigilors (Stormcast Eternals): 40mm
+- Stormcast Eternals Thunderstrike Stormcast — Liberator With Dual Sigmarite Weapons → Liberators (Stormcast Eternals): 40mm
+- Stormcast Eternals Thunderstrike Stormcast — Liberator With Sigmarite Weapon and Shield → Liberators (Stormcast Eternals): 40mm
+- Stormcast Eternals Thunderstrike Stormcast — Liberator With Grandhammer → Liberators (Stormcast Eternals): 40mm
+- Stormcast Eternals Thunderstrike Stormcast — Stormstrike Pallador → Stormstrike Palladors (Stormcast Eternals): 90 × 52mm
+- Stormcast Eternals Vanguard Auxiliary Chamber — Aetherwing → Aetherwings (Stormcast Eternals): 32mm
+- Stormcast Eternals Vanguard Auxiliary Chamber — Gryph-Hound → Gryph-hounds (Stormcast Eternals): 40mm
+- Stormcast Eternals Vanguard Auxiliary Chamber — Vanguard-Hunter → Vanguard-Hunters (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Gryph-Hound → Gryph-hounds (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Liberator with Warhammer and Sigmarite Shield → Liberators (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Liberator with Warblade and Sigmarite Shield → Liberators (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Retributor → Retributors (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Decimator → Decimators (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Liberator with Paired Warhammers → Liberators (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Liberator with Paired Warblades → Liberators (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Protector → Protectors (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Liberator with Grandhammer → Liberators (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Liberator with Grandblade → Liberators (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Prosecutor with Celestial Hammer and Sigmarite Shield → Prosecutors (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Prosecutor with Stormcall Javelin and Sigmarite Shield → Prosecutors (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Prosecutor with Paired Celestial Hammers → Prosecutors (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Prosecutor with Grandaxe → Prosecutors (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Prosecutor with Stormsurge Trident and Sigmarite Shield → Prosecutors (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Prosecutor with Grandhammer → Prosecutors (Stormcast Eternals): 40mm
+- Stormcast Eternals Warrior Chamber — Prosecutor with Grandblade → Prosecutors (Stormcast Eternals): 40mm
+- Sylvaneth — Tree-Revenant → Tree-Revenants (Sylvaneth): 32mm
+- Sylvaneth — Dryad → Dryads (Sylvaneth): 32mm
+- Sylvaneth — Spite-Revenant → Spite-Revenants (Sylvaneth): 32mm
+- Sylvaneth — Gossamid Archer → Gossamid Archers (Sylvaneth): 32mm
+- Sylvaneth — Revenant Seeker → Revenant Seekers (Sylvaneth): 60mm
+- Sylvaneth — Spiterider Lancer → Spiterider Lancers (Sylvaneth): 60mm
+
+## Взята база самой модели (6)
+
+- Flesh-eater Courts — High Falconer Felgryn → High Falconer Felgryn: 32mm (спутники/жетоны не учтены: «32mm, Grype: 28.5mm»)
+- Ogor Mawtribes — Gorlok Blackpowder → Gorlok Blackpowder: 50mm (спутники/жетоны не учтены: «50mm, Peggz, Kagey, Mange and Shreek (tokens): 25mm»)
+- Ogor Mawtribes — Hrothgorn Mantrapper → Hrothgorn Mantrapper: 40mm (спутники/жетоны не учтены: «40mm, Thrafnir: 25 × 50mm, Gnoblar tokens: 25mm»)
+- Seraphon — Spawn of Chotec → Spawn of Chotec: 90 × 52mm (спутники/жетоны не учтены: «90 × 52mm, 3 x Sun Acolytes: 25mm»)
+- Stormcast Eternals Ruination Chamber — Lord-Terminos → Lord-Terminos: 40mm (спутники/жетоны не учтены: «40mm, Memorian: 25mm»)
+- Stormcast Eternals Thunderstrike Stormcast — Lord-Imperatant → Lord-Imperatant: 40mm (спутники/жетоны не учтены: «40mm, Gryph-hound: 32mm»)
+
+## Неоднозначно — база не задана (0)
+
+
+## Нет данных (846)
+
+- **chaos** (1): Fury
+- **Beasts of Chaos** (14): Ungor Halfhorn, Ungor Raider Halfhorn, Foe-render, Gouge-horn, Gorehoof, Bloodkine with Bullgor Axe and Bullshield, Bloodkine with Bullgor Great Axe, Bloodkine with Paired Bullgor Axes, Korsh 'the Sneak', Murghoth Half-Horn, Gnarl, Ushkor, Draknar, Grashrak Fellhoof
+- **Blades of Khorne: Bloodbound** (26): Bloodreaver Chieftain, Chaos Champion, Skullseeker, Aspiring Deathbringer, Exalted Deathbringer with Impaling Spear, Exalted Deathbringer with Ruinous Axe, Wrathmaster, Skullhunter, Mighty Lord of Khorne on Juggernaut, Arnulf, Targor, Karsus the Chained, Blooded Saek, Garrek Gorebeard, Skullgrinder Herax, Dromm, Wounder of Worlds, The Gorehulk, Ghartok Flayskull, Zharkus the Bloodsighted, Magore Redhand, Riptooth, Kamandora, Throkk, Ghalista, Antro Krast, Kannat
+- **Blades of Khorne: Daemons** (3): Bloodreaper, Bloodhunter, Gore Hound
+- **Chaos Legionnaires** (7): Hornshield with Axe, Hornshield with Sword, Hornshield with Mace, Hornhelm with Darkiron Mace, Hornhelm with Steelbite Axe, Mutandor, Decuriarch
+- **Claws of Karanak** (6): Blood Whelp with Barb-Spear, Blood Whelp with Claw-Flail, Brutaliser with Shredder Blade and Meat Hook, Brutaliser with Shredder Blades, Hound of Wrath, Packlord
+- **Corvus Cabal** (6): Cabalist, Cabalist with Familiar, Cabalist with Spear, Spire Stalker, Shadow Piercer, Shrike Talon
+- **Cypher Lords** (6): Mindbound, Mindbound with Double-bladed Sword, Mirrorblade with Duelling Swords, Mirrorblade with Glaive, Luminate, Thrallmaster
+- **Darkoath** (7): Marauder Champion, Marauder Champion With Spear, Fellrider Champion With Javelin, Fellrider Champion With Axe, Warqueen Tanari, Broken Nadja, Dendrel Direbrand
+- **Darkoath Savagers** (12): Gloryseeker with Greataxe, Gloryseeker with Paired Weapons, Gloryseeker with Shield, Gloryseeker with Spear, God-speaker, Wrathtouched, Proven with Greatblade, Proven with Greatflail, Proven with Greatspear, Proven with Greataxe, Slaughterborn with Greataxe, Slaughterborn with Greatblade
+- **Disciples of Tzeentch: Arcanites** (14): Tzaangor Mutant, Kairic Adept, Twistbray, Gaunt Summoner of Tzeentch, Enlightened Aviarch, Tzaangor Enlightened on Disc of Tzeentch, Enlightened Aviarch on Disc of Tzeentch, Skyfire Aviarch, Eyes of the Nine Brimstone Horrors, Eyes of the Nine Blue Horror, Narvia, Turosh, K'Charik, Vortemis the All-seeing
+- **Disciples of Tzeentch: Daemons** (15): Brimstone Horrors, Blue Horror, Changecaster with Ritual Dagger, Changecaster with Staff of Change, Flamer of Tzeentch, Iridescent Horror, Pyrocaster, Screamer of Tzeentch, Fluxmaster with Ritual Dagger, Fluxmaster with Staff of Change, Kindlefinger, Apo'trax, the Starefysh, Flamespooler, Spawnmaw, Ephilim The Unknowable
+- **Hedonites of Slaanesh: Daemons** (11): Allurer, Seeker of Slaanesh, Viceleader, Infernal Enrapturess, Hellreaver with Claw-spear, Heartseeker, Blissbringer, The Contorted Epitome, Vexmor, Vashtiss the Coiled, Lascivyr, the Bladed Blessing
+- **Hedonites of Slaanesh: Sybarites** (13): Blissbrew Homonculus, Shardspeaker, Blissbarb Archer High Tempter, Myrmidesh Painmaster, Symbaresh Egopomp, Hellreaver with Claw-spear, Blissbarb Seeker High Tempter, Slickblade Hunter-seeker, Slaangor Slake-horn, Glissete, Hadzu, Slakeslash, Vasillac the Gifted
+- **Helsmiths of Hashut** (12): Infernal Cohort with Hashutite Spear, Infernal Cohort Musician, Infernal Razer with Blunderbuss, Infernal Razer with Flamehurler, Hobgrot Vandal, Dominator Engine with Immolation Cannon, Infernal Cohort with Hashutite Blade, Zuldrakka, Imnidrin, Morudok, Tokkor, Grisk
+- **Horns of Hashut** (7): Shatterer, Demolisher with Crushing Weapon and Shield, Demolisher with Crushing Weapons, Demolisher with Flamehurler, Ruinator, Ruinator Alpha with Heavy Flail, Ruinator Alpha with War Bident
+- **Iron Golems** (9): Iron Legionary, Iron Legionary with Bolas, Iron Legionary with Twin Hammers, Armator, Signifer, Prefector, Drillmaster, Dominar, Ogor Breacher
+- **Jade Obelisk** (7): Defacer with Antithete Bow, Defacer with Stonecutter Tools, Desecrator with Iconoclast Warpick, Desecrator with Statue-Smasher Hammer, Idolarc, Nephrite Priestess, Obelisk Bearer
+- **Maggotkin of Nurgle: Daemons** (10): Plagueridden, Poxbringer, Sloppity Bilepiper, Spoilpox Scrivener, Plaguebringer, Phleghmus Potbelly, Bug-eye Dripterus, Slunge, Maggoty Strewg, Squort
+- **Maggotkin of Nurgle: Rotbringers** (5): Putrid Blightking Icon Bearer, Putrid Blightking Blightlord, Sepsimus the Plaguesworn, Ghulgoch the Butcher, Fecula Flyblown
+- **Rotmire Creed** (7): Mirefolk Outcast with Bilewood Weapons, Mirefolk Outcast with Bilewood Weapon and Shield, Carrion Catcher with Snatcher-hook, Carrion Catcher with Impaler, Bloated one with Raker-claw and Hooked Net, Bloated One with Raker-claws, Witherlord
+- **Scions of the Flame** (11): Initiate with Flameburst Pot, Initiate with Morning Star, Initiate with Brazier Weapon, Initiate with Hooked Axe, Fireborn with Sunblade and Kris, Fireborn with Sunblade and Brazier Axe, Fireborn, Inferno Priest, Immolator, Brazen Champion, Blazing Lord
+- **Skaven** (29): Giant Rat, Packmaster, Skryre Acolyte, Clawleader, Nightleader, Bringer of the Word, Fangleader, Rat Ogor [retired], Skritter, Poxlix, Rikkit, Itchitt, Rabidius Skench, Skabbik Plagueseeker, Krowch't, Skulck, Kreep Kinwhisper, Snyp Padpaw, Slynk Skittershank, Festering Skaven, Hungering Skaven, Krrk the Almost-trusted, Lurking Skaven, Skritch Spiteclaw, Zikkit Rockgnaw, Rittak Verm, Krittatok, Nitch Singe-Snout, Tik Tik
+- **Slaves to Darkness** (26): Chaos Marauder with Barbarian Flail, Chaos Marauder with Barbarian Axe and Darkwood Shield, Marauder Chieftain, Chaos Marauder Horseman with Barbarian Axe and Darkwood Shield, Chaos Marauder Horseman with Marauder Flail, Chaos Marauder Horseman with Marauder Javelin and Darkwood Shield, Aspiring Champion, Horsemaster, Doom Knight, Chaos Chosen Exalted Champion, Thorakon with Goroan Falchion and Shield, Thorakon with Goroan Great Axe, Crimson Kheira, Lupan Longcut, Gorl Spinehammer, Sarrakkar Blackwing, Grawl, Jagathra, Grundann Blood-eye, Shond Head-claimer, Ollo, Theddra Skull-scryer, Dour Cragan, Zarshia Bittersoul, Razek Godblessed, Khagra the Usurper
+- **Spire Tyrants** (9): Pit Fighter with Net, Pit Fighter with Punch Dagger, Pit Fighter with Spear, Frenzied Rager, Pit Veteran with Shield, Pit Veteran with Dual Weapons, Headclaimer, Bestigor Destroyer, Pit Champion
+- **Splintered Fang** (10): Clearblood, Clearblood with Shield, Serpents, Venomblood with Blade and Barbed Whip, Venomblood with Duelling Blades, Venomblood with Barbed Whip, Venomblood with Spear and Shield, Pureblood, Serpent Caller, Trueblood
+- **Tarantulos Brood** (7): Spider Swarm, Broodkin with Scythe and Spider Claw, Broodkin, Broodkin with Sai, Doomweaver with Flail and Goad, Doomweaver with Trident and Net, Broodmaster
+- **The Unmade** (5): Awakened One with Brutal Polearm, Awakened One with Flail, Ascended One, Joyous One, Blissful One
+- **Untamed Beasts** (7): Plains-runner, Preytaker with Fanged Axe, Preytaker with Sawtooth Blade, Beastspeaker, First Fang, Rocktusk Prowler, Heart-Eater
+- **death** (1): Zombie Dragon
+- **Askurgan Trueblades** (7): Askurgan Acolyte with Bonehilt Falchion, Askurgan Acolyte with Throat-Taker, Askurgan Pariah, Askurgan Ascetic with Charnel Mace, Askurgan Ascetic with Howling Glaive, Curseblood, Askurgan Exemplar
+- **Flesh-eater Courts** (18): Crypt Ghast, Crypt Haunter, Crypt Infernal, Champion of Morbheg, Crypt Captain with Cursed Blade, Crypt Captain with Cursed Halberd, Valreek The Tracker, Night's Herald, Royal Butcher, Duke's Harriers, Master Talon, Gristlewel, Greatsword, Duke Crakmarrow, Gristla Tenderhooke, Young Master Kretch, Flensemaster Pewdrig, Seddrik the Chain, The Carnskyr
+- **Nighthaunt** (13): Dreadwarden, Craven Huntmaster, Extoller of Shyish, Slasher Crone, Hellwraith, Sharpener of the Blade, Scriptor of the Sentence, Bearer of the Block, Wielder of the Blade, Thorns of the Briar Queen Chainrasp, The Ever-hanged, Varclav the Cruel, Briar Queen
+- **Ossiarch Bonereapers** (8): Mortek Hekatos, Kavalos Deathrider Mortek Hekatos, Senha, Karu, Nohem, Hakor, Binar Khenta, Mir Kainan
+- **Pyregheists** (7): Deacon of Flames with Brazier Staff, Deacon of Flames with Pyrekeeper's Tongs, Balefire Guard with Scorch Flail, Balefire Guard with Flaming Halberd, Torchwraith, Flamewraith with Brazier-staff, Flamewraith with Balefire Torches
+- **Royal Beastflayers** (5): Ghoul Tracker, Ghoul Gore-Squire, Beastflayer Baron, Offal Hound, Royal Flaymaster
+- **Soulblight Gravelords** (40): Skeleton with Ancient Blade, Skeleton with Ancient Spear, Skeleton Champion with Mace, Skeleton Champion with Halberd, Seneschal, Black Knight, Hell Knight, Kastellan, Vargoyle, Wight King on Skeletal Steed, Helmar the Hewer, Marshal Faulk Velmorn, Thain Fourth-and-Last, Sir Jedran Falseborn, King Morlak Velmorn, Vellas Von Faine, Ennias Curse-Born, Gorath the Enforcer, Prince Duvalle, Regulus, Bault, Ione, Vlash, Coyl, Prentice Marcov, Deintalos the Exile, Petitioner with Sword, The Harvester, Petitioner with Sword and shield, The Champion, The Prince of Dust, The Sepulchral Warden, Zondara Rivenheart, Lost Ferlain, Toyle, Cracktomb, Pikk, Cado Ezechiar, Sissendra, Aurelias
+- **Teratic Cohort** (5): Kavalos Centari, Mortek Cykloptian with Dread Glaive, Mortek Cykloptian with Nadirite Bident, Teratic Prowler, Aviarch Harpy
+- **Bonesplitterz** (11): Savage Orruk Morboy Bone Totem Bearer, Savage Arrow Boss, Savage Orruk Boss with Chompa and Bone Shield, Savage Orruk Morboy Boss, Savage Boarboy Bone Totem Bearer, Savage Boarboy Boss, Savage Boss Maniak, Toofdagga, Dakko Sharp-stikka, Wollop da Skul, Hedkrakka, Gob of Gork
+- **Gloomspite Gitz** (42): Squig Herder, Stabba with Barbed Net, Stabba with Pokin' Spear and Moon Shield, Stabba with Stabba and Moon Shield, Boggleye, Brewgit, Shoota, Spiker, Cave Squig, Shroomancer, Scaremonger, Moonclan Boss, Spider Rider Boss, Boingrot Bounder, Bounder Boss, Scuttleboss, Squig Hopper Boss, Snarlfang Rider Gitboss, Moonface Naggz, Pointy Burk, Snorbo da Spore, Pokin' Snark, Skolko and Pronk, Grinkrak the Great, Grib Da Wonky Lance, Bat Squig, Mollog the Mighty, Stabbit, Mean-eye, Rippa Narkbad, Prog Da Netter, Zarbag's Gitz Shoota, Drizgit da Squig Herder, Snirk Sourtongue, Zarbag, Zarbag's Gitz Squig, Borgit Wolf-Killa, Uglug, Rigg and Shamm, Snagz, Hobblin' Dreg, Snarlpack Boss
+- **Gorger Mawpack** (5): Gorger with Club, Gorger, Gorger with Great Club, Cave Howler, Clawback
+- **Ironjawz** (29): Orruk Ardboy with Ardboy Big Choppa [retired], Orruk Ardboy with Choppas [retired], Orruk Ardboy with Ardboy Choppa and Orruk-forged Shield [retired], Ardboy Boss with Ardboy Choppas [retired], Orruk Brute with pair of Brute Choppas, Orruk Brute with Jagged Gore-hacka, Orruk Weirdnob Shaman, Orruk Brute with Gore-Choppa, Orruk Warchanter, Brute Boss with Boss Choppa, Brute Boss with Boss Klaw and Brute Smasha, Orruk Megaboss, Orruk Gore-Grunta with Jagged Gore-Hacka, Orruk Gore-Grunta with Pig-iron Choppa, Gore-grunta Boss with Jagged Gore-hacka, Gore-Grunta Boss with Pig-iron Choppa, Basha, Hakka, Bonekutta, Gurzag Ironskull, Thugg, 'Ardskull, Morgok, Ardboy With Choppa, Ardboy With Stikka, Ardboy Boss With Choppa, Ardboy Boss With Stikka, Brute Rager, Brute Wrekka
+- **Kruleboyz** (22): Pot-grot, Stab-grot, Hobgrot Slitta, Gutrippa with Wicked Hacka, Gutrippa with Wicked Stikka, Hobgrot Boss, Man-skewer Boltboy, Gutrippa Boss with Mace and Sword, Gutrippa Boss with Wicked Stikka, Swampcalla Shaman, Boltboy Boss, Killaboss with Boss-Hacka and Skareshield, Killaboss with Boss-Hacka and Rusting Flail, Gikkit, Shank, Krookgrin, Torka Tuffskul, Mannok Da Kunnin', Daggok Finksteala, Jagz da Bleeda, Hurrk da Howla, Grakk da Hook
+- **Kruleboyz Monsta-killaz** (8): Klutcha-grot, Neckslicer with Smasha, Bawla Boy with Stabba, Bawla Boy with Flogga, Neckslicer with Beaststikka Harpoon, Neckslicer with Bonehakka, Gnarlwood Howla, Beastnob
+- **Ogor Mawtribes** (17): Ogor Glutton with Ironfist, Gorger, Ogor Glutton with Clubs, Thunderfist, Crusher, Gutlord, Mournfang Rider with Culling Club and Ironfist, Mournfang Rider with Gargant Hacker, Skalg, Peggz, Mange, Kagey, Shreek, Bushwakka, Quiv, Luggit & Thwak, Thrafnir
+- **Blacktalons** (3): Hendrick, The Silver Wolf, Shakana Goldenblade, Rostus Oxenhammer
+- **Cities of Sigmar: Castelite Hosts** (18): Freeguild Command Corps Mascot Gargoylian, Freeguild Command Corps War Surgeon, Battle Priest, Freeguild Command Corps Soul Shepherd, Prophet, Sergeant at Arms, Freeguild Command Corps Great Herald, Freeguild Command Corps Arch-Knight, Fusil-Sergeant, Freeguild Marshal with Duelling Pistols, Freeguild Marshal with Shield, Freeguild Marshal with Heirloom Weapon, Freeguild Cavalier Arch-Knight, Pater Filius, Friar Galvic, Soror Tazat, Acolyte Arcus, Scorched Yakob
+- **Cities of Sigmar: Darkling Covens** (7): Lordling, Guardmaster, Black Ark Reaver, Captain of the Black Guard, Draich Master, Dark Rider Herald, Dread Knight
+- **Cities of Sigmar: Dispossessed** (4): Ironbeard with Drakefire Pistol and Cinderblast Bomb, Old Guard with Ancestral Weapon and Gromril Shield, Keeper of the Gate, Ironwarden with Grudgehammer Torpedo
+- **Daughters of Khaine** (27): Sister of Slaughter with Kruiplash and Bladed Buckler, Sister of Slaughter with Kruiplash and Sacrificial Knife, Witch Aelf Hag, Handmaiden, Master of Warlocks, Harridynn, Shryke, Krone, Gorgai, Thrialla, the Lash, Retaria the Entangler, Traxyaa, the Aegis, Kalexis the Silvered Blur, Gryselle the Slaughterer, Khamyss, Kyrssa, Lethyr, Morgwaeth the Bloodied, Kyrae, Sylarc Greyblood, Valyssa Umbrael, Drusylla Vyserax, Slythael Shadestalker, Kaerna Vix, Krieta, Wing of the Crone, Tazari, Azphel, the Hag's Eye
+- **Fyreslayers** (12): Vulkite Berzerker with Fyresteel Weapon and Bladed Slingshield, Vulkite Berzerker with Pair of Fyresteel Handaxes, Hearthguard Berzerker with Flamestrike Poleaxe, Hearthguard Berzerker with Berzerker Broadaxe, Vulkite Berzerker Karl, Auric Hearthguard Karl, Hearthguard Berzerker Karl with Berzerker Broadaxe, Hearthguard Berzerker Karl with Flamestrike Poleaxe, Mad Maegrim, Tefk Flamebearer, Vol Orrukbane, Fjul-Grimnir
+- **Hunters of Huanchi** (7): Chameleon Skink with Dartpipe, Chameleon Skink with Moonstone Club, Chameleon Skink Hornblower with Moonstone Club, Chameleon Skink Hornblower with Dartpipe, Huanchi's Claw, Chameleon Skink Alpha with Dartpipe, Chameleon Skink Alpha with Moonstone Club
+- **Idoneth Deepkin** (11): Akhelian Ishlaen Guard Lochian Prince, Akhelian Morrsarr Guard Lochian Prince, Spinefin, Tammael, Fuirann, Duinclaw, Elathain Ill-fated, Cyreni of the Abyss, Alathyrr, Renglaith, Cephanyr
+- **Khainite Shadowstalkers** (7): Shroudblade with Cursed Swords, Shroudblade with Umbral Spear, Darkflame Warlock with Repeater Crossbows, Darkflame Warlock with Doomfire Ring, Slaughtershade with Umbral Spears, Slaughtershade with Shadow Whip, Shroud Queen
+- **Kharadron Overlords** (13): Arkanaut Company Privateer with Privateer Pistol and Arkanaut Cutter, Arkanaut Company Privateer with Skypike, Arkanaut Company Privateer with Aethermatic Volley Gun, Company Captain, Arkanaut Company Privateer with Light Skyhook, Gunnery Sergeant, Custodian, Mizzenmaster, Garodd Alensen, Enrik Ironhail, Dead-eye Lund, Bjorgen Thundrik, Khazgan Drakkskewer
+- **Lumineth Realm-lords** (11): High Sentinel, High Warden, Truestone Seneschal, Bladelord Seneschal with Sunmetal Dual Blades, Bladelord Seneschal with Sunmetal Greatblade, Windspeaker Seneschal, Steedmaster, Senaela, Ailenn the Mind's Edge, Bahannar, Myari Lightcaller
+- **Order of Azyr** (15): Grotbiter, Ratspike, Brydget Axwold, Aemos Duncarrow, Haskel Hexbane, Quiet Pock, Hanniver Toll, Armand Callis, Valius, The Keeper Aqshian, Mistress Verentia, Lyssa Revenya, Balthus, Galen ven Denst, Doralia ven Denst, Jelsen Darrock
+- **Seraphon** (30): Skink Handler, Skink Alpha with Moonstone Club and Star-buckler, Skink Alpha with Boltspitter and Moonstone Club, Skink Priest, Salamander, Saurus Warrior Alpha, Razordon, Aggradon Lancer Alpha with Celestite Club, Aggradon Lancer Alpha with Celestite Spear, Raptadon Hunter Alpha, Raptadon Charger Alpha, Saurus Knight with Celestite Blade, Saurus Knight with Celestite Warspear, Saurus Guard Alpha, Saurus Sunblood, Saurus Eternity Warden, Saurus Knight Alpha, Terradon Rider Alpha with Starstrike Javelin, Terradon Rider Alpha with Sunleech Bolas, Saurus Scar-Veteran on Cold One, Ripperdactyl Rider Alpha, Xepic, Otapatl, Tok, Huachi, Kixi-Taka, The Diviner, Klaq-Trok, Kro-Jax, the Aegis, So-Kar, Ro-Tak, the Guardian
+- **Stormcast Eternals Questor Soulsworn** (7): Errant-Questor Duelist with Twinblades, Errant-Questor with Grandblade, Errant-Questor with Grandaxe, Errant-Questor with Grandhammer, Soulsworn Knight-Relictor, Questor-Prime, Errant-Questor with Grandspear
+- **Stormcast Eternals Ruination Chamber** (3): Prosecutor-Prime, Reclusian-Prime, Gryph-Crow
+- **Stormcast Eternals Sacrosanct Chamber** (13): Sequitor-Prime with Stormsmite Maul and Soulshield, Sequitor-Prime with Redemption Cache, Sequitor-Prime with Tempest Blade and Soulshield, Evocator-Prime with Tempest Blade and Stormstave, Evocator-Prime with Grandstave, Castigator-Prime, Evocator on Celestial Dracoline with Grandstave, Evocator on Celestial Dracoline with Tempest Blade and Stormstave, Evocator-Prime on Celestial Dracoline with Grandstave, Evocator-Prime on Celestial Dracoline with Tempest Blade and Stave, Ammis Dawnguard, Rastus the Charmed, Averon Stormsire
+- **Stormcast Eternals Thunderstrike Stormcast** (24): Vindictor-Prime, Annihilator-Prime with Meteoric Hammer, Vanquisher-Prime, Annihilator-Prime with Grandhammer, Praetor-Prime, Vigilor-Prime, Knight-Judicator, Sarpon, the Cyclone, Domitan, Eye of the Storm, Leona Stratosi, Taros, Dhoraz Giant-fell, Luxa Stormrider, Calthia Xandire, Liberator-Prime With Dual Sigmarite Weapons, Liberator-Prime With Sigmarite Weapon and Shield, Numara Falconis, Goltan the Relentless, Tenya Thrice-trusted, Valantin Harvestblade, Printis Verna, Axactus Krane, Zhea Galdara, Stormstrike Pallador-Prime
+- **Stormcast Eternals Vanguard Auxiliary Chamber** (15): Hunter-Prime, Vanguard-Raptor with Longstrike Crossbow, Vanguard-Raptor with Hurricane Crossbow, Vanguard Pallador with Starstrike Javelin, Raptor-Prime with Longstrike Bow, Vanguard Pallador with Shock Hand-Axe, Raptor-Prime with Hurricane Crossbow, Pallador-Prime with Starstrike Javelin, Pallador-Prime with Shock Hand-axe, Almeric Eagle-eye, Elias Swiftblade, Ardorn Flamerunner, Farasa Twice-Risen, Yurik Velzaine, Sanson Farstrider
+- **Stormcast Eternals Warrior Chamber** (21): Paladin with Starsoul Mace, Liberator-Prime with Warhammer and Sigmarite Shield, Liberator-Prime with Warblade and Sigmarite Shield, Retributor-Prime, Decimator-Prime, Liberator-Prime with Paired Warblades, Liberator-Prime with Paired Warhammers, Judicator with Boltstorm Crossbow, Protector-Prime, Judicator with Skybolt Bow, Lord- Celestant, Judicator-Prime with Boltstorm Crossbow, Judicator with Shockbolt Bow, Judicator-Prime with Skybolt Bow, Judicator with Thunderbolt Crossbow, Prosecutor-Prime with Celestial Hammer and Sigmarite Shield, Prosecutor-Prime with Stormcall Javelin and Sigmarite Shield, Prosecutor-Prime with Paired Celestial Hammers, Angharad Brightshield, Obryn the Bold, Severin Steelheart
+- **Sylvaneth** (26): Tree-Revenant Scion with Enchanted Blade, Tree-Revenant Scion with Protector Glaive, Branch Nymph, Shadestalker, Branchwraith, Flitwing Scion, Kurnoth Hunter with Kurnoth Greatsword, Kurnoth Hunter with Kurnoth Scythe, Kurnoth Hunter with Kurnoth Greatbow, Revenant Soulwarden, Kurnoth Huntmaster with Kurnoth Greatsword, Spiterider Scion, Kurnoth Huntmaster with Kurnoth Scythe, Kurnoth Huntmaster with Kurnoth Greatbow, Lighaen, Sheoch, Althaen, Karthaen, Skaeth the Huntsman, Ahnslaine, Revenant Archer, Skhathael, Gallanghann of the Glade, Ylthari, Ylarin, Master of the Paths, Cullon, Axe of Kurnoth, Lenwythe, Eye of the Forest
+- **Twistweald** (7): Twistroot Warden with Spitespear, Twistroot Revenant with Harvester Blade, Twistroot Spite-revenant with Briarlash, Swarmsage, Twistroot Warden with Guardian Bow, Twistroot Dryad, Twistroot Warden with Guardian Halberd
+- **Vulkyn Flameseekers** (7): Scalebreaker with Fyresteel Splitaxe, Scalebreaker with Bokaz, Kyndledroth, Drothmaster, Drothblood Thane, Vulkyn Runefather with Drothvault Greataxe, Vulkyn Runefather with Mastercrafted Bokaz
+- **Wildercorps Hunters** (11): Trailhound, Wildercorps Scout with Hunting Crossbow, Wildercorps Scout with Paired Hatchets, Trailblazer with Duelling Sabre, Trailblazer with Twin Crossbows, Wildercorps Leatherhide with Troggslayer Spear, Wildercorps Leatherhide with Hunting Crossbow, Wildercorps Warden with Double-bitted Axe, Wildercorps Warden with Grizzled Trailhound, Wildercorps Warden with Hunting Crossbow, Arbalester
+- **Ydrilan Riverblades** (7): Pureflood Seneschal with Ydrilan Warglaive, Pureflood Seneschal with Master's Blades, Pureflood Seneschal with Ythara Darts, Crestdancer with Twin-spear, Crestdancer with Roped Sickle, Stream-runner with Crestblades, Stream-runner with Riversteel Weapons

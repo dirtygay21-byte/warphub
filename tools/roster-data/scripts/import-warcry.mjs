@@ -26,6 +26,9 @@ const report = { errors: [], warnings: [], info: [] };
 const ALLIANCES = ['chaos', 'death', 'destruction', 'order'];
 const COSTS = new Set(['battletrait', 'passive', 'reaction', 'double', 'triple', 'quad']);
 const seenIds = new Set();
+// размеры баз — кураторский файл scripts/warcry-bases.mjs (из варскроллов AoS 4; в warcry_data базы нет)
+const BASES_FILE = path.join(HERE, '../warcry/bases.json');
+const BASES = fs.existsSync(BASES_FILE) ? JSON.parse(fs.readFileSync(BASES_FILE, 'utf8')).fighters : {};
 const uniq = (id, where) => {
   if (!/^[0-9a-z]{8}$/.test(id)) report.errors.push(`${where}: неверный _id ${id}`);
   if (seenIds.has(id)) report.errors.push(`${where}: повтор _id ${id}`);
@@ -63,6 +66,7 @@ const fighter = (f, where, subs) => {
       for (const k of ['attacks', 'strength', 'dmg_hit', 'dmg_crit', 'max_range', 'min_range']) if (!Number.isInteger(w[k])) report.errors.push(`${where}: ${f._id} — оружие ${k}=${w[k]}`);
       return { runemark: str(w.runemark), minRange: w.min_range, maxRange: w.max_range, attacks: w.attacks, strength: w.strength, dmgHit: w.dmg_hit, dmgCrit: w.dmg_crit };
     }),
+    ...(BASES[f._id] ? { base: BASES[f._id].base, baseFrom: BASES[f._id].from } : {}),
   };
 };
 
