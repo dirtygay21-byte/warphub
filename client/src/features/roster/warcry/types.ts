@@ -39,6 +39,10 @@ export interface WarcryFighter {
   /** hero, ally, thrall, monster… (без рунмарки фракции) */
   runemarks: string[];
   weapons: WarcryWeapon[];
+  /** база из варскролла AoS 4 с тем же названием (tools/roster-data/warcry/bases.json); нет — «нет данных» */
+  base?: string;
+  /** название варскролла AoS, из которого взята база */
+  baseFrom?: string;
 }
 
 export interface WarcrySubfaction {

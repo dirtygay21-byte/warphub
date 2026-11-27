@@ -42,7 +42,7 @@ test('Kill Team Test Army: каждый оперативник — модель 
   assert.notEqual(mine[0]!.models[0]!.id, foe[0]!.models[0]!.id);
 });
 
-test('Warcry Test Army: бойцы и очки из ростера; неизвестная база явно требует ручного размера', () => {
+test('Warcry Test Army: бойцы и очки из ростера; база известна только из данных (fighter.base)', () => {
   const faction = read<WarcryFaction>('warcry/f/blacktalons.json');
   const data = new Map([[faction.id, faction]]);
   let roster = newWarcryRoster(faction, 'test');
@@ -52,7 +52,7 @@ test('Warcry Test Army: бойцы и очки из ростера; неизве
   assert.equal(units.length, 2);
   assert.equal(units[0]!.points, faction.fighters[0]!.points);
   assert.ok(units[0]!.tags?.includes('Лидер'));
-  assert.ok(units.every((u) => !modelBase(u.models[0]!).known));
+  units.forEach((u, i) => assert.equal(modelBase(u.models[0]!).known, !!faction.fighters[i]!.base));
 });
 
 test('board clamp: skirmish 30×22 не влияет на стандартное поле 60×44', () => {

@@ -615,6 +615,23 @@ tools/roster-data/tests/warcry-data.test.ts                              стр�
 - 0 очков в источнике (Brimstone Horrors — появляются по ходу боя) сохраняются как есть и отмечены в отчёте.
 - Сервер: `GET /roster/data/warcry/:name` (`index` или id фракции), только с доступом к WarpBuilder.
 
+### Базы Warcry — 27.11.2026
+
+В `warcry_data` размера базы нет. Решение владельца 27.11.2026: база берётся из варскролла AoS 4 (данные приложения
+`backend/roster-data/aos`, выгрузка Wahapedia) с тем же названием модели в том же альянсе — точно, без снаряжения
+(«… with …») или по множественному числу варскролла («Crypt Ghoul» → «Crypt Ghouls»). Подписанные части базы: часть
+с названием бойца; «40mm, Memorian: 25mm» — база самой модели (спутники и жетоны не учитываются). Остальное — «нет данных»,
+размер задаёт игрок в Test Army.
+
+```
+tools/roster-data/scripts/warcry-bases.mjs [--apply | --check]  → tools/roster-data/warcry/bases.json (кураторский файл) и bases-report.md
+                                                                 --apply пишет base/baseFrom в backend/roster-data/warcry/f/*.json
+tools/roster-data/tests/warcry-bases.test.ts                     актуальность, ссылки на варскроллы, известные бойцы
+```
+
+`import-warcry.mjs` читает `bases.json`, так что повторный импорт базы не теряет. После обновления данных AoS —
+`bun scripts/warcry-bases.mjs --apply`. Совпадения по множественному числу (242) перечислены в отчёте для проверки.
+
 ### Варбанда Warcry — W5, 30.10.2026
 
 Модель и проверки — `client/src/features/roster/warcry/roster.ts`, экраны — `client/src/features/roster/ui/warcry/`,
@@ -657,6 +674,6 @@ Monsters; Bladeborn; страницы фракций): 3–15 бойцов, ≤1
   игра на двух телефонах по общему roster-games API (`ui/skirmish/useSkirmishOnline`), миграция ранней локальной версии
   как новой подготовки без фабрикации прежнего ручного счёта.
 - Test Army использует общий `Board`: 30×22″ для этих систем, прежние 60×44″ для 40K/AoS. Каждый оперативник/боец —
-  отдельная модель; базы Kill Team — из datacard KTDash. В `warcry_data` размера базы нет, поэтому игрок задаёт её вручную.
+  отдельная модель; базы Kill Team — из datacard KTDash. В `warcry_data` размера базы нет — см. «Базы Warcry» ниже.
   Kill Team — все 36 официальных карт; Warcry — все 24 deployment maps с точками групп и зонами 3″. Соперник — второй
   сохранённый ростер или код KT1./WC1.; расстановка сохраняется отдельно для системы, аккаунта и ростера.

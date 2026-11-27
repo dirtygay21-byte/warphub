@@ -5,8 +5,8 @@ import type { WarcryFaction } from '../warcry/types';
 import { parseBase } from './bases';
 import { DEFAULT_ANGLE, DEFAULT_GAP, FOE_PREFIX, type TAUnit } from './state';
 
-function oneModel(uid: string, name: string, baseMm: number | null, points: number, tags: string[], datasheetId: string): TAUnit {
-  const base = parseBase(baseMm ? `${baseMm}mm` : '');
+function oneModel(uid: string, name: string, base0: number | string | null | undefined, points: number, tags: string[], datasheetId: string): TAUnit {
+  const base = parseBase(typeof base0 === 'number' ? `${base0}mm` : base0);
   return {
     uid,
     name,
@@ -32,13 +32,13 @@ export function buildKtUnits(roster: KtRoster, team: KtTeam, prefix = ''): TAUni
   });
 }
 
-/** Каждый боец Warcry — отдельная модель. В warcry_data размера базы нет: игрок задаёт её в Board. */
+/** Каждый боец Warcry — отдельная модель. База — из варскролла AoS (fighter.base); нет — игрок задаёт её в Board. */
 export function buildWarcryUnits(roster: WarcryRoster, data: Map<string, WarcryFaction>, prefix = ''): TAUnit[] {
   return roster.fighters.flatMap((x, index) => {
     const fighter = fighterOf(data, x);
     if (!fighter) return [];
     const tags = [index === 0 ? 'Лидер' : '', x.role !== 'warband' ? x.role : '', x.group ?? ''].filter(Boolean);
-    return [oneModel(prefix + x.uid, x.name || fighter.name, null, fighter.points, tags, fighter.id)];
+    return [oneModel(prefix + x.uid, x.name || fighter.name, fighter.base, fighter.points, tags, fighter.id)];
   });
 }
 

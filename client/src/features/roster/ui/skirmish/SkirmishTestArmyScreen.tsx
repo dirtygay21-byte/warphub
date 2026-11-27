@@ -88,7 +88,7 @@ async function loadWarcryArmy(roster: WarcryRoster, prefix = ''): Promise<Loaded
     },
     info: (u, onClose) => {
       const f = fighterOf(u);
-      return <InfoSheet title={u.name} onClose={onClose} lines={f ? [`Move ${f.movement} · Toughness ${f.toughness} · Wounds ${f.wounds}`, 'Размер базы отсутствует в warcry_data — задайте его вручную.'] : []} weapons={f?.weapons.map((w) => `${w.runemark || 'Оружие'} · Range ${w.minRange ? `${w.minRange}-` : ''}${w.maxRange}" · A ${w.attacks} · S ${w.strength} · D ${w.dmgHit}/${w.dmgCrit}`) ?? []} />;
+      return <InfoSheet title={u.name} onClose={onClose} lines={f ? [`Move ${f.movement} · Toughness ${f.toughness} · Wounds ${f.wounds}`, f.base ? `База: ${f.base.replace(/mm/g, ' мм')} (варскролл AoS «${f.baseFrom}»)` : 'База: нет данных — задайте размер вручную.'] : []} weapons={f?.weapons.map((w) => `${w.runemark || 'Оружие'} · Range ${w.minRange ? `${w.minRange}-` : ''}${w.maxRange}" · A ${w.attacks} · S ${w.strength} · D ${w.dmgHit}/${w.dmgCrit}`) ?? []} />;
     },
   };
 }

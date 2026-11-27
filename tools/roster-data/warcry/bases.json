@@ -1,0 +1,4010 @@
+{
+ "note": "Размеры баз бойцов Warcry из варскроллов AoS 4 (сопоставление по названию, тот же альянс). Генерирует scripts/warcry-bases.mjs; правки — точечно с пояснением.",
+ "source": {
+  "name": "Wahapedia AoS 4 (данные приложения backend/roster-data/aos)",
+  "lastUpdate": "2026-10-22 18:12:05",
+  "decision": "решение владельца 27.11.2026"
+ },
+ "stats": {
+  "fighters": 1345,
+  "exact": 230,
+  "base": 27,
+  "plural": 242,
+  "problem": 0,
+  "none": 846
+ },
+ "fighters": {
+  "20090195": {
+   "name": "Freeguild Command Corps Whisperblade",
+   "base": "28.5mm",
+   "from": "Freeguild Command Corps Whisperblade",
+   "fromId": "000003553",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "20123322": {
+   "name": "Vampire Lord",
+   "base": "40mm",
+   "from": "Vampire Lord",
+   "fromId": "000000990",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "exact"
+  },
+  "23768752": {
+   "name": "Chaos Gargant",
+   "base": "90 × 52mm",
+   "from": "Chaos Gargant",
+   "fromId": "000000606",
+   "fromFaction": "Beasts of Chaos",
+   "match": "exact"
+  },
+  "24608845": {
+   "name": "Gryph-Hound",
+   "base": "40mm",
+   "from": "Gryph-hounds",
+   "fromId": "000000123",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "37834833": {
+   "name": "Icefall Yhetee",
+   "base": "50mm",
+   "from": "Icefall Yhetees",
+   "fromId": "000000504",
+   "fromFaction": "Ogor Mawtribes",
+   "match": "plural"
+  },
+  "66574123": {
+   "name": "Crypt Ghoul",
+   "base": "25mm",
+   "from": "Crypt Ghouls",
+   "fromId": "000000356",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "plural"
+  },
+  "71177574": {
+   "name": "Varghulf Courtier",
+   "base": "90 × 52mm",
+   "from": "Varghulf Courtier",
+   "fromId": "000000364",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "exact"
+  },
+  "73362482": {
+   "name": "Fatemaster",
+   "base": "40mm",
+   "from": "Fatemaster",
+   "fromId": "000000649",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "exact"
+  },
+  "74604216": {
+   "name": "Endrinrigger with Drill Launcher",
+   "base": "32mm",
+   "from": "Endrinriggers",
+   "fromId": "000000696",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "78231166": {
+   "name": "Slaughterpriest with Wrath-hammer and Hackblade",
+   "base": "40mm",
+   "from": "Slaughterpriest",
+   "fromId": "000000153",
+   "fromFaction": "Blades of Khorne",
+   "match": "base"
+  },
+  "86380319": {
+   "name": "Black Ark Corsair with Vicious Blade and Repeater Crossbow",
+   "base": "25mm",
+   "from": "Black Ark Corsairs",
+   "fromId": "000000451",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "87153906": {
+   "name": "Blood Warrior with Pair of Goreaxes",
+   "base": "32mm",
+   "from": "Blood Warriors",
+   "fromId": "000000138",
+   "fromFaction": "Blades of Khorne",
+   "match": "plural"
+  },
+  "87939494": {
+   "name": "Cogsmith",
+   "base": "25mm",
+   "from": "Cogsmith",
+   "fromId": "000000436",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "94483481": {
+   "name": "Lord-Exorcist",
+   "base": "40mm",
+   "from": "Lord-Exorcist",
+   "fromId": "000000081",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "99047314": {
+   "name": "Warp-Grinder",
+   "base": "90 × 52mm",
+   "from": "Warp-Grinder",
+   "fromId": "000000286",
+   "fromFaction": "Skaven",
+   "match": "exact"
+  },
+  "5c13b735": {
+   "name": "Chaos Warhound",
+   "base": "60 × 35mm",
+   "from": "Chaos Warhounds",
+   "fromId": "000000620",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "42cd09a1": {
+   "name": "Raptoryx",
+   "base": "60 × 35mm",
+   "from": "Raptoryx",
+   "fromId": "000000598",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "3062e7a9": {
+   "name": "Chaos Spawn",
+   "base": "50mm",
+   "from": "Chaos Spawn",
+   "fromId": "000000592",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "ee042882": {
+   "name": "Razorgor",
+   "base": "75 × 42mm",
+   "from": "Razorgor",
+   "fromId": "000001761",
+   "fromFaction": "Beasts of Chaos",
+   "match": "exact"
+  },
+  "0014b0b1": {
+   "name": "Fomoroid Crusher",
+   "base": "60mm",
+   "from": "Fomoroid Crusher",
+   "fromId": "000000593",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "10fcdb0b": {
+   "name": "Mindstealer Sphiranx",
+   "base": "90 × 52mm",
+   "from": "Mindstealer Sphiranx",
+   "fromId": "000000597",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "f2e9c403": {
+   "name": "Ogroid Myrmidon",
+   "base": "50mm",
+   "from": "Ogroid Myrmidon",
+   "fromId": "000000571",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "2137fdcf": {
+   "name": "Centaurion Marshal",
+   "base": "80mm",
+   "from": "Centaurion Marshal",
+   "fromId": "000001529",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "d695c03d": {
+   "name": "Cygor",
+   "base": "120 × 92mm",
+   "from": "Cygor",
+   "fromId": "000000608",
+   "fromFaction": "Beasts of Chaos",
+   "match": "exact"
+  },
+  "858b966f": {
+   "name": "Mutalith Vortex Beast",
+   "base": "120 × 92mm",
+   "from": "Mutalith Vortex Beast",
+   "fromId": "000000555",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "6d84da35": {
+   "name": "Ghorgon",
+   "base": "120 × 92mm",
+   "from": "Ghorgon",
+   "fromId": "000000609",
+   "fromFaction": "Beasts of Chaos",
+   "match": "exact"
+  },
+  "718e4ffe": {
+   "name": "Hell Pit Abomination",
+   "base": "120 × 92mm",
+   "from": "Hell Pit Abomination",
+   "fromId": "000000253",
+   "fromFaction": "Skaven",
+   "match": "exact"
+  },
+  "c01737a3": {
+   "name": "Slaughterbrute",
+   "base": "120 × 92mm",
+   "from": "Slaughterbrute",
+   "fromId": "000000556",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "4ddf17fb": {
+   "name": "Chimera",
+   "base": "120 × 92mm",
+   "from": "Chimera",
+   "fromId": "000000607",
+   "fromFaction": "Beasts of Chaos",
+   "match": "exact"
+  },
+  "1655db3c": {
+   "name": "Gor with Pair of Gor Blades",
+   "base": "32mm",
+   "from": "Gors",
+   "fromId": "000000604",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "d669a472": {
+   "name": "Ungor with Ungor Blade and Half-shield",
+   "base": "25mm",
+   "from": "Ungors",
+   "fromId": "000000605",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "c116073a": {
+   "name": "Ungor with Gnarled Shortspear and Half-shield",
+   "base": "25mm",
+   "from": "Ungors",
+   "fromId": "000000605",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "b8f9a8a2": {
+   "name": "Gor with Gor Blade and Beastshield",
+   "base": "32mm",
+   "from": "Gors",
+   "fromId": "000000604",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "8c7144ee": {
+   "name": "Ungor Raider",
+   "base": "25mm",
+   "from": "Ungor Raiders",
+   "fromId": "000000629",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "92cac2c6": {
+   "name": "Bestigor",
+   "base": "32mm",
+   "from": "Bestigors",
+   "fromId": "000000616",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "bb4c44db": {
+   "name": "Centigor",
+   "base": "60 × 35mm",
+   "from": "Centigors",
+   "fromId": "000000618",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "63978f39": {
+   "name": "Great Bray-Shaman",
+   "base": "32mm",
+   "from": "Great Bray-Shaman",
+   "fromId": "000000614",
+   "fromFaction": "Beasts of Chaos",
+   "match": "exact"
+  },
+  "f59c732e": {
+   "name": "Bullgor with Axe and Bullshield",
+   "base": "50mm",
+   "from": "Bullgors",
+   "fromId": "000000617",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "9562ae71": {
+   "name": "Beastlord",
+   "base": "40mm",
+   "from": "Beastlord",
+   "fromId": "000000611",
+   "fromFaction": "Beasts of Chaos",
+   "match": "exact"
+  },
+  "9f759b99": {
+   "name": "Bullgor with Paired Bullgor Axes",
+   "base": "50mm",
+   "from": "Bullgors",
+   "fromId": "000000617",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "17e0e811": {
+   "name": "Bullgor with Bullgor Great Axe",
+   "base": "50mm",
+   "from": "Bullgors",
+   "fromId": "000000617",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "95403f6b": {
+   "name": "Dragon Ogor with Draconic Crusher",
+   "base": "90 × 52mm",
+   "from": "Dragon Ogors",
+   "fromId": "000000622",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "5bf4ceb8": {
+   "name": "Dragon Ogor with Draconic War-glaive",
+   "base": "90 × 52mm",
+   "from": "Dragon Ogors",
+   "fromId": "000000622",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "c02e9e9b": {
+   "name": "Dragon Ogor with Paired Ancient Weapons",
+   "base": "90 × 52mm",
+   "from": "Dragon Ogors",
+   "fromId": "000000622",
+   "fromFaction": "Beasts of Chaos",
+   "match": "plural"
+  },
+  "109c933d": {
+   "name": "Cockatrice",
+   "base": "60mm",
+   "from": "Cockatrice",
+   "fromId": "000000621",
+   "fromFaction": "Beasts of Chaos",
+   "match": "exact"
+  },
+  "f8397db2": {
+   "name": "Dragon Ogor Shaggoth",
+   "base": "90 × 52mm",
+   "from": "Dragon Ogor Shaggoth",
+   "fromId": "000000613",
+   "fromFaction": "Beasts of Chaos",
+   "match": "exact"
+  },
+  "c610c60b": {
+   "name": "Doombull",
+   "base": "50mm",
+   "from": "Doombull",
+   "fromId": "000000612",
+   "fromFaction": "Beasts of Chaos",
+   "match": "exact"
+  },
+  "d32fb6ba": {
+   "name": "Bloodreaver with Meatripper Axe",
+   "base": "32mm",
+   "from": "Bloodreavers",
+   "fromId": "000000137",
+   "fromFaction": "Blades of Khorne",
+   "match": "plural"
+  },
+  "6fa3829c": {
+   "name": "Bloodreaver with Reaver Blades",
+   "base": "32mm",
+   "from": "Bloodreavers",
+   "fromId": "000000137",
+   "fromFaction": "Blades of Khorne",
+   "match": "plural"
+  },
+  "3af7fec3": {
+   "name": "Blood Warrior with Goreaxe and Gorefist",
+   "base": "32mm",
+   "from": "Blood Warriors",
+   "fromId": "000000138",
+   "fromFaction": "Blades of Khorne",
+   "match": "plural"
+  },
+  "fb322974": {
+   "name": "Blood Warrior with Goreglaive",
+   "base": "32mm",
+   "from": "Blood Warriors",
+   "fromId": "000000138",
+   "fromFaction": "Blades of Khorne",
+   "match": "plural"
+  },
+  "05a4c6b4": {
+   "name": "Skullreaper",
+   "base": "40mm",
+   "from": "Skullreapers",
+   "fromId": "000000187",
+   "fromFaction": "Blades of Khorne",
+   "match": "plural"
+  },
+  "98435f2d": {
+   "name": "Wrathmonger",
+   "base": "40mm",
+   "from": "Wrathmongers",
+   "fromId": "000000188",
+   "fromFaction": "Blades of Khorne",
+   "match": "plural"
+  },
+  "559f286c": {
+   "name": "Bloodsecrator",
+   "base": "32mm",
+   "from": "Bloodsecrator",
+   "fromId": "000000141",
+   "fromFaction": "Blades of Khorne",
+   "match": "exact"
+  },
+  "95cd6182": {
+   "name": "Bloodstoker",
+   "base": "40mm",
+   "from": "Bloodstoker",
+   "fromId": "000000142",
+   "fromFaction": "Blades of Khorne",
+   "match": "exact"
+  },
+  "13f5bb8d": {
+   "name": "Flesh Hound",
+   "base": "60 × 35mm",
+   "from": "Flesh Hounds",
+   "fromId": "000000184",
+   "fromFaction": "Blades of Khorne",
+   "match": "plural"
+  },
+  "55ff1296": {
+   "name": "Skullgrinder",
+   "base": "40mm",
+   "from": "Skullgrinder",
+   "fromId": "000000150",
+   "fromFaction": "Blades of Khorne",
+   "match": "exact"
+  },
+  "fc268557": {
+   "name": "Slaughterpriest with Bloodbathed Axe",
+   "base": "40mm",
+   "from": "Slaughterpriest",
+   "fromId": "000000153",
+   "fromFaction": "Blades of Khorne",
+   "match": "base"
+  },
+  "743cfea8": {
+   "name": "Khorgorath",
+   "base": "90 × 52mm",
+   "from": "Khorgorath",
+   "fromId": "000000185",
+   "fromFaction": "Blades of Khorne",
+   "match": "exact"
+  },
+  "8ac2e833": {
+   "name": "Mighty Skullcrusher with Bloodglaive",
+   "base": "90 × 52mm",
+   "from": "Mighty Skullcrushers",
+   "fromId": "000000186",
+   "fromFaction": "Blades of Khorne",
+   "match": "plural"
+  },
+  "12d7cc73": {
+   "name": "Mighty Skullcrusher with Ensorcelled Axe",
+   "base": "90 × 52mm",
+   "from": "Mighty Skullcrushers",
+   "fromId": "000000186",
+   "fromFaction": "Blades of Khorne",
+   "match": "plural"
+  },
+  "191f2f84": {
+   "name": "Mighty Lord of Khorne",
+   "base": "60mm",
+   "from": "Mighty Lord of Khorne",
+   "fromId": "000000147",
+   "fromFaction": "Blades of Khorne",
+   "match": "exact"
+  },
+  "gi2vc1re": {
+   "name": "Deathbringer",
+   "base": "40mm",
+   "from": "Deathbringer",
+   "fromId": "000002453",
+   "fromFaction": "Blades of Khorne",
+   "match": "exact"
+  },
+  "64mdxku6": {
+   "name": "Realmgore Ritualist",
+   "base": "32mm",
+   "from": "Realmgore Ritualist",
+   "fromId": "000001617",
+   "fromFaction": "Blades of Khorne",
+   "match": "exact"
+  },
+  "fac7b907": {
+   "name": "Bloodletter",
+   "base": "32mm",
+   "from": "Bloodletters",
+   "fromId": "000000136",
+   "fromFaction": "Blades of Khorne",
+   "match": "plural"
+  },
+  "9e03d4aa": {
+   "name": "Bloodmaster, Herald of Khorne",
+   "base": "40mm",
+   "from": "Bloodmaster, Herald of Khorne",
+   "fromId": "000000140",
+   "fromFaction": "Blades of Khorne",
+   "match": "exact"
+  },
+  "bea960c8": {
+   "name": "Bloodcrusher",
+   "base": "90 × 52mm",
+   "from": "Bloodcrushers",
+   "fromId": "000000183",
+   "fromFaction": "Blades of Khorne",
+   "match": "plural"
+  },
+  "4b927149": {
+   "name": "Flesh Hound",
+   "base": "60 × 35mm",
+   "from": "Flesh Hounds",
+   "fromId": "000000184",
+   "fromFaction": "Blades of Khorne",
+   "match": "plural"
+  },
+  "a23403fa": {
+   "name": "Skullmaster, Herald of Khorne",
+   "base": "90 × 52mm",
+   "from": "Skullmaster, Herald of Khorne",
+   "fromId": "000000151",
+   "fromFaction": "Blades of Khorne",
+   "match": "exact"
+  },
+  "2925e2c8": {
+   "name": "Darkoath Chieftain",
+   "base": "32mm",
+   "from": "Darkoath Chieftain",
+   "fromId": "000000567",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "d84ac50b": {
+   "name": "Darkoath Warqueen",
+   "base": "32mm",
+   "from": "Darkoath Warqueen",
+   "fromId": "000000568",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "9fe9a6ef": {
+   "name": "Darkoath Chieftain on Warsteed",
+   "base": "75 × 42mm",
+   "from": "Darkoath Chieftain on Warsteed",
+   "fromId": "000001742",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "1893ed13": {
+   "name": "Darkoath Fellrider With Javelin",
+   "base": "60 × 35mm",
+   "from": "Darkoath Fellriders",
+   "fromId": "000001745",
+   "fromFaction": "Slaves to Darkness",
+   "match": "plural"
+  },
+  "4541799a": {
+   "name": "Darkoath Marauder",
+   "base": "28.5mm",
+   "from": "Darkoath Marauders",
+   "fromId": "000001744",
+   "fromFaction": "Slaves to Darkness",
+   "match": "plural"
+  },
+  "55db755d": {
+   "name": "Darkoath Marauder With Spear",
+   "base": "28.5mm",
+   "from": "Darkoath Marauders",
+   "fromId": "000001744",
+   "fromFaction": "Slaves to Darkness",
+   "match": "plural"
+  },
+  "bc47956a": {
+   "name": "Darkoath Fellrider",
+   "base": "60 × 35mm",
+   "from": "Darkoath Fellriders",
+   "fromId": "000001745",
+   "fromFaction": "Slaves to Darkness",
+   "match": "plural"
+  },
+  "77ca7f82": {
+   "name": "Darkoath Wilderfiend",
+   "base": "60mm",
+   "from": "Darkoath Wilderfiend",
+   "fromId": "000001743",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "c01ecd2d": {
+   "name": "Gunnar Brand",
+   "base": "32mm",
+   "from": "Gunnar Brand",
+   "fromId": "000001749",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "5a7fe109": {
+   "name": "Singri Brand",
+   "base": "63 × 33mm sculpted",
+   "from": "Singri Brand",
+   "fromId": "000001751",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "1e1133a3": {
+   "name": "Tzaangor with Pair of Savage Blades",
+   "base": "32mm",
+   "from": "Tzaangors",
+   "fromId": "000000644",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "plural"
+  },
+  "fb90f3c9": {
+   "name": "Tzaangor with Savage Blade and Arcanite Shield",
+   "base": "32mm",
+   "from": "Tzaangors",
+   "fromId": "000000644",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "plural"
+  },
+  "3118b3bc": {
+   "name": "Kairic Acolyte with Paired Cursed Blades",
+   "base": "32mm",
+   "from": "Kairic Acolytes",
+   "fromId": "000000643",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "plural"
+  },
+  "1aa0e428": {
+   "name": "Kairic Acolyte with Vulcharc",
+   "base": "32mm",
+   "from": "Kairic Acolytes",
+   "fromId": "000000643",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "plural"
+  },
+  "0caa98da": {
+   "name": "Kairic Acolyte with Cursed Blade and Arcanite Shield",
+   "base": "32mm",
+   "from": "Kairic Acolytes",
+   "fromId": "000000643",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "plural"
+  },
+  "4679f5e6": {
+   "name": "Kairic Acolyte with Cursed Glaive and Arcanite Shield",
+   "base": "32mm",
+   "from": "Kairic Acolytes",
+   "fromId": "000000643",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "plural"
+  },
+  "d6bf7d5d": {
+   "name": "Kairic Acolyte with Scroll of Dark Arts",
+   "base": "32mm",
+   "from": "Kairic Acolytes",
+   "fromId": "000000643",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "plural"
+  },
+  "b248c71f": {
+   "name": "Tzaangor with Savage Greatblade",
+   "base": "32mm",
+   "from": "Tzaangors",
+   "fromId": "000000644",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "plural"
+  },
+  "756b4c29": {
+   "name": "Tzaangor Enlightened",
+   "base": "40mm",
+   "from": "Tzaangor Enlightened",
+   "fromId": "000000665",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "exact"
+  },
+  "55b01f5d": {
+   "name": "Magister",
+   "base": "32mm",
+   "from": "Magister",
+   "fromId": "000000653",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "exact"
+  },
+  "55f89eac": {
+   "name": "Curseling, Eye of Tzeentch",
+   "base": "32mm",
+   "from": "Curseling, Eye of Tzeentch",
+   "fromId": "000000648",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "exact"
+  },
+  "5e8e7454": {
+   "name": "Ogroid Thaumaturge",
+   "base": "50mm",
+   "from": "Ogroid Thaumaturge",
+   "fromId": "000000655",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "exact"
+  },
+  "31b7fbbf": {
+   "name": "Tzaangor Skyfire",
+   "base": "40mm",
+   "from": "Tzaangor Skyfires",
+   "fromId": "000000667",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "plural"
+  },
+  "6ee0e3d3": {
+   "name": "Magister on Disc of Tzeentch",
+   "base": "50mm",
+   "from": "Magister on Disc of Tzeentch",
+   "fromId": "000000654",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "exact"
+  },
+  "8513f27f": {
+   "name": "Tzaangor Shaman",
+   "base": "40mm",
+   "from": "Tzaangor Shaman",
+   "fromId": "000000656",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "exact"
+  },
+  "45571dd4": {
+   "name": "Gaunt Summoner on Disc of Tzeentch",
+   "base": "40mm",
+   "from": "Gaunt Summoner on Disc of Tzeentch",
+   "fromId": "000001544",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "exact"
+  },
+  "dbd31de4": {
+   "name": "Pink Horror",
+   "base": "32mm",
+   "from": "Pink Horrors",
+   "fromId": "000001909",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "plural"
+  },
+  "e7af09fd": {
+   "name": "Exalted Flamer of Tzeentch",
+   "base": "75 × 42mm",
+   "from": "Exalted Flamer of Tzeentch",
+   "fromId": "000001907",
+   "fromFaction": "Disciples of Tzeentch",
+   "match": "exact"
+  },
+  "4ef0a642": {
+   "name": "Daemonette",
+   "base": "25mm",
+   "from": "Daemonettes",
+   "fromId": "000000330",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "fc8f5205": {
+   "name": "Hellstrider with Claw-spear",
+   "base": "60 × 35mm",
+   "from": "Hellstriders",
+   "fromId": "000001914",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "b3ecbae3": {
+   "name": "Hellstrider with Hellscourge",
+   "base": "60 × 35mm",
+   "from": "Hellstriders",
+   "fromId": "000001914",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "fd9087c8": {
+   "name": "Fiend",
+   "base": "75 × 42mm",
+   "from": "Fiends",
+   "fromId": "000000342",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "168a6cb0": {
+   "name": "Blissbarb Archer",
+   "base": "28.5mm",
+   "from": "Blissbarb Archers",
+   "fromId": "000001031",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "2dba4b10": {
+   "name": "Myrmidesh Painbringer",
+   "base": "32mm",
+   "from": "Myrmidesh Painbringers",
+   "fromId": "000001034",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "bf86fea4": {
+   "name": "Symbaresh Twinsoul with Excruciator Lash",
+   "base": "32mm",
+   "from": "Symbaresh Twinsouls",
+   "fromId": "000001037",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "ea1c2b1f": {
+   "name": "Symbaresh Twinsoul with Merciless Blades",
+   "base": "32mm",
+   "from": "Symbaresh Twinsouls",
+   "fromId": "000001037",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "c51bcc25": {
+   "name": "Symbaresh Twinsoul with Sinful Cleaver",
+   "base": "32mm",
+   "from": "Symbaresh Twinsouls",
+   "fromId": "000001037",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "79dc3dd7": {
+   "name": "Hellstrider with Claw-spear",
+   "base": "60 × 35mm",
+   "from": "Hellstriders",
+   "fromId": "000001914",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "9b0d02db": {
+   "name": "Hellstrider with Hellscourge",
+   "base": "60 × 35mm",
+   "from": "Hellstriders",
+   "fromId": "000001914",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "555286c1": {
+   "name": "Blissbarb Seeker",
+   "base": "75 × 42mm",
+   "from": "Blissbarb Seekers",
+   "fromId": "000001032",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "bb2686c1": {
+   "name": "Slickblade Seeker",
+   "base": "75 × 42mm",
+   "from": "Slickblade Seekers",
+   "fromId": "000001036",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "04f47524": {
+   "name": "Slaangor Fiendblood",
+   "base": "40mm",
+   "from": "Slaangor Fiendbloods",
+   "fromId": "000001035",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "plural"
+  },
+  "d5e2d41f": {
+   "name": "Lord of Pain",
+   "base": "40mm",
+   "from": "Lord of Pain",
+   "fromId": "000001028",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "exact"
+  },
+  "282ca0b9": {
+   "name": "Lord of Hubris",
+   "base": "40mm",
+   "from": "Lord of Hubris",
+   "fromId": "000001628",
+   "fromFaction": "Hedonites of Slaanesh",
+   "match": "exact"
+  },
+  "133ee416": {
+   "name": "War Despot",
+   "base": "32mm",
+   "from": "War Despot",
+   "fromId": "000002620",
+   "fromFaction": "Helsmiths of Hashut",
+   "match": "exact"
+  },
+  "573590bd": {
+   "name": "Daemonsmith",
+   "base": "32mm",
+   "from": "Daemonsmith",
+   "fromId": "000002617",
+   "fromFaction": "Helsmiths of Hashut",
+   "match": "exact"
+  },
+  "fbdefebf": {
+   "name": "Ashen Elder",
+   "base": "32mm",
+   "from": "Ashen Elder",
+   "fromId": "000002621",
+   "fromFaction": "Helsmiths of Hashut",
+   "match": "exact"
+  },
+  "011c2971": {
+   "name": "Bull Centaur",
+   "base": "75 × 42mm",
+   "from": "Bull Centaurs",
+   "fromId": "000002615",
+   "fromFaction": "Helsmiths of Hashut",
+   "match": "plural"
+  },
+  "43c1ca00": {
+   "name": "Anointed Sentinel",
+   "base": "75 × 42mm",
+   "from": "Anointed Sentinels",
+   "fromId": "000002624",
+   "fromFaction": "Helsmiths of Hashut",
+   "match": "plural"
+  },
+  "8025a155": {
+   "name": "Dominator Engine with Bane Maces",
+   "base": "80mm",
+   "from": "Dominator Engine with Bane Maces",
+   "fromId": "000002625",
+   "fromFaction": "Helsmiths of Hashut",
+   "match": "exact"
+  },
+  "bb658018": {
+   "name": "Plaguebearer",
+   "base": "32mm",
+   "from": "Plaguebearers",
+   "fromId": "000000927",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "plural"
+  },
+  "64aee8cd": {
+   "name": "Nurglings",
+   "base": "40mm",
+   "from": "Nurglings",
+   "fromId": "000000949",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "exact"
+  },
+  "872ffe2e": {
+   "name": "Beast of Nurgle",
+   "base": "60mm",
+   "from": "Beast of Nurgle",
+   "fromId": "000002729",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "exact"
+  },
+  "67ae7666": {
+   "name": "Plague Drone",
+   "base": "60mm",
+   "from": "Plague Drones",
+   "fromId": "000000950",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "plural"
+  },
+  "a0c7c03d": {
+   "name": "Putrid Blightking with Blighted Weapon",
+   "base": "40mm",
+   "from": "Putrid Blightkings",
+   "fromId": "000000952",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "plural"
+  },
+  "5e06958f": {
+   "name": "Putrid Blightking with Filth-encrusted Shield",
+   "base": "40mm",
+   "from": "Putrid Blightkings",
+   "fromId": "000000952",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "plural"
+  },
+  "c4653f51": {
+   "name": "Putrid Blightking with Sonorous Tocsin",
+   "base": "40mm",
+   "from": "Putrid Blightkings",
+   "fromId": "000000952",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "plural"
+  },
+  "b5374eef": {
+   "name": "Rotbringer Sorcerer",
+   "base": "32mm",
+   "from": "Rotbringer Sorcerer",
+   "fromId": "000001394",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "exact"
+  },
+  "8ad9b33a": {
+   "name": "Lord of Blights",
+   "base": "40mm",
+   "from": "Lord of Blights",
+   "fromId": "000000936",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "exact"
+  },
+  "167f9948": {
+   "name": "Lord of Plagues",
+   "base": "40mm",
+   "from": "Lord of Plagues",
+   "fromId": "000000937",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "exact"
+  },
+  "f1437afa": {
+   "name": "Harbinger of Decay",
+   "base": "90 × 52mm",
+   "from": "Harbinger of Decay",
+   "fromId": "000000933",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "exact"
+  },
+  "537fc489": {
+   "name": "Pusgoyle Blightlord",
+   "base": "60mm",
+   "from": "Pusgoyle Blightlords",
+   "fromId": "000000951",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "plural"
+  },
+  "cfb33ba1": {
+   "name": "Lord of Afflictions",
+   "base": "60mm",
+   "from": "Lord of Afflictions",
+   "fromId": "000000935",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "exact"
+  },
+  "75a035fc": {
+   "name": "Harbinger of Decay with Doom Bell",
+   "base": "90 × 52mm",
+   "from": "Harbinger of Decay",
+   "fromId": "000000933",
+   "fromFaction": "Maggotkin of Nurgle",
+   "match": "base"
+  },
+  "f728815d": {
+   "name": "Clanrat with Rusty Blade",
+   "base": "25mm",
+   "from": "Clanrats",
+   "fromId": "000000251",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "80f86a7a": {
+   "name": "Clanrat with Rusty Spear",
+   "base": "25mm",
+   "from": "Clanrats",
+   "fromId": "000000251",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "df8f7c83": {
+   "name": "Night Runner",
+   "base": "28.5mm",
+   "from": "Night Runners",
+   "fromId": "000000275",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "84cedf20": {
+   "name": "Plague Monk with Pair of Foetid Blades",
+   "base": "25mm",
+   "from": "Plague Monks",
+   "fromId": "000000278",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "8f86d542": {
+   "name": "Plague Monk with Foetid Blade and Woe-stave",
+   "base": "25mm",
+   "from": "Plague Monks",
+   "fromId": "000000278",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "d391a8ce": {
+   "name": "Stormvermin with Rusty Halberd and Clanshield",
+   "base": "28.5mm",
+   "from": "Stormvermin",
+   "fromId": "000000284",
+   "fromFaction": "Skaven",
+   "match": "base"
+  },
+  "15f03e41": {
+   "name": "Gutter Runner",
+   "base": "32mm, 28.5mm",
+   "from": "Gutter Runners",
+   "fromId": "000003178",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "daff26cb": {
+   "name": "Stormvermin with Rusty Halberd",
+   "base": "28.5mm",
+   "from": "Stormvermin",
+   "fromId": "000000284",
+   "fromFaction": "Skaven",
+   "match": "base"
+  },
+  "0fd4eed6": {
+   "name": "Plague Censer Bearer",
+   "base": "32mm",
+   "from": "Plague Censer Bearer",
+   "fromId": "000001821",
+   "fromFaction": "Skaven",
+   "match": "exact"
+  },
+  "c7735c8b": {
+   "name": "Warpfire Thrower",
+   "base": "60 × 35mm",
+   "from": "Warpfire Throwers",
+   "fromId": "000000285",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "7c4a6a31": {
+   "name": "Master Moulder",
+   "base": "32mm",
+   "from": "Master Moulder",
+   "fromId": "000000258",
+   "fromFaction": "Skaven",
+   "match": "exact"
+  },
+  "8aa49881": {
+   "name": "Warlock Engineer",
+   "base": "32mm",
+   "from": "Warlock Engineer",
+   "fromId": "000000263",
+   "fromFaction": "Skaven",
+   "match": "exact"
+  },
+  "5020dd5c": {
+   "name": "Grey Seer",
+   "base": "32mm",
+   "from": "Grey Seer",
+   "fromId": "000000257",
+   "fromFaction": "Skaven",
+   "match": "exact"
+  },
+  "4d4a5839": {
+   "name": "Plague Priest",
+   "base": "32mm",
+   "from": "Plague Priest",
+   "fromId": "000000259",
+   "fromFaction": "Skaven",
+   "match": "exact"
+  },
+  "747431b9": {
+   "name": "Warplock Jezzail",
+   "base": "60 × 35mm",
+   "from": "Warplock Jezzails",
+   "fromId": "000000250",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "5de3e496": {
+   "name": "Arch-Warlock",
+   "base": "32mm",
+   "from": "Arch-Warlock",
+   "fromId": "000000254",
+   "fromFaction": "Skaven",
+   "match": "exact"
+  },
+  "dfaaf88f": {
+   "name": "Warlock Bombardier",
+   "base": "32mm",
+   "from": "Warlock Bombardier",
+   "fromId": "000000262",
+   "fromFaction": "Skaven",
+   "match": "exact"
+  },
+  "0da61b10": {
+   "name": "Clawlord",
+   "base": "32mm",
+   "from": "Clawlord",
+   "fromId": "000000255",
+   "fromFaction": "Skaven",
+   "match": "exact"
+  },
+  "6493724a": {
+   "name": "Deathmaster",
+   "base": "32mm",
+   "from": "Deathmaster",
+   "fromId": "000000256",
+   "fromFaction": "Skaven",
+   "match": "exact"
+  },
+  "4d8fc458": {
+   "name": "Doom-Flayer",
+   "base": "50mm",
+   "from": "Doom-Flayers",
+   "fromId": "000001818",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "bf8a98c6": {
+   "name": "Rat Ogor with Warpfire Gun [retired]",
+   "base": "50mm",
+   "from": "Rat Ogors",
+   "fromId": "000000279",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "692838fa": {
+   "name": "Stormfiend with Warpfire projectors",
+   "base": "60mm",
+   "from": "Stormfiends",
+   "fromId": "000000283",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "7371a259": {
+   "name": "Stormfiend with Windlaunchers",
+   "base": "60mm",
+   "from": "Stormfiends",
+   "fromId": "000000283",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "d1320795": {
+   "name": "Stormfiend with Ratling cannons",
+   "base": "60mm",
+   "from": "Stormfiends",
+   "fromId": "000000283",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "b3a86075": {
+   "name": "Stormfiend with Doomflayer gauntlets",
+   "base": "60mm",
+   "from": "Stormfiends",
+   "fromId": "000000283",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "40d13b03": {
+   "name": "Stormfiend with Grinderfists",
+   "base": "60mm",
+   "from": "Stormfiends",
+   "fromId": "000000283",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "b3b9dd85": {
+   "name": "Stormfiend with Shock Gauntlets",
+   "base": "60mm",
+   "from": "Stormfiends",
+   "fromId": "000000283",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "e98eb612": {
+   "name": "Clawlord on Gnaw-Beast",
+   "base": "75 × 42mm",
+   "from": "Clawlord on Gnaw-beast",
+   "fromId": "000001820",
+   "fromFaction": "Skaven",
+   "match": "exact"
+  },
+  "4ecf8dc1": {
+   "name": "Warlock Engineer With Warplock Jezzail",
+   "base": "32mm",
+   "from": "Warlock Engineer",
+   "fromId": "000000263",
+   "fromFaction": "Skaven",
+   "match": "base"
+  },
+  "5cf6d806": {
+   "name": "Rat Ogor",
+   "base": "50mm",
+   "from": "Rat Ogors",
+   "fromId": "000000279",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "1d57af33": {
+   "name": "Rat Ogor With Warpfire Gun",
+   "base": "50mm",
+   "from": "Rat Ogors",
+   "fromId": "000000279",
+   "fromFaction": "Skaven",
+   "match": "plural"
+  },
+  "6f800d34": {
+   "name": "Chaos Warrior with Chaos Halberd and Chaos Runeshield",
+   "base": "32mm",
+   "from": "Chaos Warriors",
+   "fromId": "000000553",
+   "fromFaction": "Slaves to Darkness",
+   "match": "plural"
+  },
+  "3610764e": {
+   "name": "Chaos Warrior with Chaos Hand Weapon and Chaos Runeshield",
+   "base": "32mm",
+   "from": "Chaos Warriors",
+   "fromId": "000000553",
+   "fromFaction": "Slaves to Darkness",
+   "match": "plural"
+  },
+  "4833f2b4": {
+   "name": "Chaos Warrior with Chaos Greatblade",
+   "base": "32mm",
+   "from": "Chaos Warriors",
+   "fromId": "000000553",
+   "fromFaction": "Slaves to Darkness",
+   "match": "plural"
+  },
+  "3fbb7d06": {
+   "name": "Chaos Warrior with Pair of Chaos Hand Weapons",
+   "base": "32mm",
+   "from": "Chaos Warriors",
+   "fromId": "000000553",
+   "fromFaction": "Slaves to Darkness",
+   "match": "plural"
+  },
+  "8036bff4": {
+   "name": "Chaos Sorcerer Lord",
+   "base": "40mm",
+   "from": "Chaos Sorcerer Lord",
+   "fromId": "000000565",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "5de83880": {
+   "name": "Darkoath Chieftain",
+   "base": "32mm",
+   "from": "Darkoath Chieftain",
+   "fromId": "000000567",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "01a3f1f8": {
+   "name": "Darkoath Warqueen",
+   "base": "32mm",
+   "from": "Darkoath Warqueen",
+   "fromId": "000000568",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "7ed88e20": {
+   "name": "Exalted Hero of Chaos",
+   "base": "40mm",
+   "from": "Exalted Hero of Chaos",
+   "fromId": "000000569",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "920598c8": {
+   "name": "Chaos Knight with Cursed Lance and Chaos Runeshield",
+   "base": "75 × 42mm",
+   "from": "Chaos Knights",
+   "fromId": "000000588",
+   "fromFaction": "Slaves to Darkness",
+   "match": "plural"
+  },
+  "96d53b93": {
+   "name": "Chaos Knight with Ensorcelled Weapon and Chaos Runeshield",
+   "base": "75 × 42mm",
+   "from": "Chaos Knights",
+   "fromId": "000000588",
+   "fromFaction": "Slaves to Darkness",
+   "match": "plural"
+  },
+  "8f999f26": {
+   "name": "Chaos Lord",
+   "base": "40mm",
+   "from": "Chaos Lord",
+   "fromId": "000000562",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "30bcd88b": {
+   "name": "Varanguard with Fellspear",
+   "base": "75 × 42mm",
+   "from": "Varanguard",
+   "fromId": "000000603",
+   "fromFaction": "Slaves to Darkness",
+   "match": "base"
+  },
+  "c4c394e4": {
+   "name": "Chaos Lord on Daemonic Mount",
+   "base": "90 × 52mm",
+   "from": "Chaos Lord on Daemonic Mount",
+   "fromId": "000000563",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "bc727cbe": {
+   "name": "Varanguard with Daemonforged Blade",
+   "base": "75 × 42mm",
+   "from": "Varanguard",
+   "fromId": "000000603",
+   "fromFaction": "Slaves to Darkness",
+   "match": "base"
+  },
+  "5edfa7b4": {
+   "name": "Varanguard with Ensorcelled weapon",
+   "base": "75 × 42mm",
+   "from": "Varanguard",
+   "fromId": "000000603",
+   "fromFaction": "Slaves to Darkness",
+   "match": "base"
+  },
+  "f08f6892": {
+   "name": "Chaos Lord on Karkadrak",
+   "base": "90 × 52mm",
+   "from": "Chaos Lord on Karkadrak",
+   "fromId": "000000564",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "ac1ef533": {
+   "name": "Chaos Chosen",
+   "base": "40mm",
+   "from": "Chaos Chosen",
+   "fromId": "000000587",
+   "fromFaction": "Slaves to Darkness",
+   "match": "exact"
+  },
+  "09dc4fa3": {
+   "name": "Ogroid Theridon with Goroan Falchion and Shield",
+   "base": "50mm",
+   "from": "Ogroid Theridons",
+   "fromId": "000001551",
+   "fromFaction": "Slaves to Darkness",
+   "match": "plural"
+  },
+  "c69e2171": {
+   "name": "Ogroid Theridon with Goroan Great Axe",
+   "base": "50mm",
+   "from": "Ogroid Theridons",
+   "fromId": "000001551",
+   "fromFaction": "Slaves to Darkness",
+   "match": "plural"
+  },
+  "58c57168": {
+   "name": "Dire Wolf",
+   "base": "60 × 35mm",
+   "from": "Dire Wolves",
+   "fromId": "000000981",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "plural"
+  },
+  "61bbb21b": {
+   "name": "Fell Bat",
+   "base": "40mm",
+   "from": "Fell Bats",
+   "fromId": "000001006",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "plural"
+  },
+  "cc01fb56": {
+   "name": "Terrorgheist",
+   "base": "130mm",
+   "from": "Terrorgheist",
+   "fromId": "000000985",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "exact"
+  },
+  "a988d751": {
+   "name": "Crypt Ghast Courtier",
+   "base": "32mm",
+   "from": "Crypt Ghast Courtier",
+   "fromId": "000000361",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "exact"
+  },
+  "ea1a6684": {
+   "name": "Abhorrant Ghoul King",
+   "base": "32mm",
+   "from": "Abhorrant Ghoul King",
+   "fromId": "000000360",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "exact"
+  },
+  "de97906c": {
+   "name": "Crypt Horror",
+   "base": "50mm",
+   "from": "Crypt Horrors",
+   "fromId": "000000368",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "plural"
+  },
+  "e449cafa": {
+   "name": "Abhorrant Archregent",
+   "base": "40mm",
+   "from": "Abhorrant Archregent",
+   "fromId": "000000359",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "exact"
+  },
+  "0fee8245": {
+   "name": "Crypt Flayer",
+   "base": "50mm",
+   "from": "Crypt Flayers",
+   "fromId": "000000367",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "plural"
+  },
+  "3d8e97d4": {
+   "name": "Crypt Haunter Courtier",
+   "base": "50mm",
+   "from": "Crypt Haunter Courtier",
+   "fromId": "000000362",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "exact"
+  },
+  "3aa35d63": {
+   "name": "Crypt Infernal Courtier",
+   "base": "50mm",
+   "from": "Crypt Infernal Courtier",
+   "fromId": "000000363",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "exact"
+  },
+  "6fdd0e19": {
+   "name": "Abhorrant Gorewarden",
+   "base": "40mm",
+   "from": "Abhorrant Gorewarden",
+   "fromId": "000001722",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "exact"
+  },
+  "d90931c1": {
+   "name": "Marrowscroll Herald",
+   "base": "32mm",
+   "from": "Marrowscroll Herald",
+   "fromId": "000001648",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "exact"
+  },
+  "109ef3fa": {
+   "name": "Royal Decapitator",
+   "base": "32mm",
+   "from": "Royal Decapitator",
+   "fromId": "000001724",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "exact"
+  },
+  "9305b756": {
+   "name": "Cryptguard with Cursed Blade",
+   "base": "25mm",
+   "from": "Cryptguard",
+   "fromId": "000001725",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "base"
+  },
+  "f1999f34": {
+   "name": "Cryptguard with Cursed Halberd",
+   "base": "25mm",
+   "from": "Cryptguard",
+   "fromId": "000001725",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "base"
+  },
+  "169ae3b2": {
+   "name": "Morbheg Knight",
+   "base": "75 × 42mm",
+   "from": "Morbheg Knights",
+   "fromId": "000001726",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "plural"
+  },
+  "0dcac829": {
+   "name": "Abhorrant Cardinal",
+   "base": "32mm",
+   "from": "Abhorrant Cardinal",
+   "fromId": "000001721",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "exact"
+  },
+  "o5iro0e3": {
+   "name": "High Falconer Felgryn",
+   "base": "32mm",
+   "from": "High Falconer Felgryn",
+   "fromId": "000002564",
+   "fromFaction": "Flesh-eater Courts",
+   "match": "exact"
+  },
+  "fb7ec24d": {
+   "name": "Chainrasp",
+   "base": "25mm",
+   "from": "Chainrasps",
+   "fromId": "000000192",
+   "fromFaction": "Nighthaunt",
+   "match": "plural"
+  },
+  "930b26af": {
+   "name": "Glaivewraith Stalker",
+   "base": "32mm",
+   "from": "Glaivewraith Stalkers",
+   "fromId": "000000208",
+   "fromFaction": "Nighthaunt",
+   "match": "plural"
+  },
+  "e5997176": {
+   "name": "Bladegheist Revenant",
+   "base": "32mm",
+   "from": "Bladegheist Revenants",
+   "fromId": "000000205",
+   "fromFaction": "Nighthaunt",
+   "match": "plural"
+  },
+  "da7c1f99": {
+   "name": "Craventhrone Guard",
+   "base": "32mm",
+   "from": "Craventhrone Guard",
+   "fromId": "000001408",
+   "fromFaction": "Nighthaunt",
+   "match": "exact"
+  },
+  "831614b6": {
+   "name": "Dreadscythe Harridan",
+   "base": "32mm",
+   "from": "Dreadscythe Harridans",
+   "fromId": "000000207",
+   "fromFaction": "Nighthaunt",
+   "match": "plural"
+  },
+  "7efeabb6": {
+   "name": "Grimghast Reaper",
+   "base": "32mm",
+   "from": "Grimghast Reapers",
+   "fromId": "000000209",
+   "fromFaction": "Nighthaunt",
+   "match": "plural"
+  },
+  "6ef3ac48": {
+   "name": "Myrmourn Banshee",
+   "base": "32mm",
+   "from": "Myrmourn Banshees",
+   "fromId": "000000211",
+   "fromFaction": "Nighthaunt",
+   "match": "plural"
+  },
+  "f2987e70": {
+   "name": "Chainghast",
+   "base": "32mm",
+   "from": "Chainghasts",
+   "fromId": "000000206",
+   "fromFaction": "Nighthaunt",
+   "match": "plural"
+  },
+  "968b9396": {
+   "name": "Scriptor Mortis",
+   "base": "40mm",
+   "from": "Scriptor Mortis",
+   "fromId": "000001407",
+   "fromFaction": "Nighthaunt",
+   "match": "exact"
+  },
+  "a6051678": {
+   "name": "Hexwraith",
+   "base": "60 × 35mm",
+   "from": "Hexwraiths",
+   "fromId": "000000210",
+   "fromFaction": "Nighthaunt",
+   "match": "plural"
+  },
+  "93d04ab5": {
+   "name": "Spirit Host",
+   "base": "50mm",
+   "from": "Spirit Hosts",
+   "fromId": "000000212",
+   "fromFaction": "Nighthaunt",
+   "match": "plural"
+  },
+  "55721d23": {
+   "name": "Guardian of Souls",
+   "base": "32mm",
+   "from": "Guardian of Souls",
+   "fromId": "000001406",
+   "fromFaction": "Nighthaunt",
+   "match": "exact"
+  },
+  "1731bf20": {
+   "name": "Lord Executioner",
+   "base": "40mm",
+   "from": "Lord Executioner",
+   "fromId": "000000200",
+   "fromFaction": "Nighthaunt",
+   "match": "exact"
+  },
+  "b27da0c3": {
+   "name": "Tomb Banshee",
+   "base": "25mm",
+   "from": "Tomb Banshee",
+   "fromId": "000000203",
+   "fromFaction": "Nighthaunt",
+   "match": "exact"
+  },
+  "81c3e8e6": {
+   "name": "Cairn Wraith",
+   "base": "25mm",
+   "from": "Cairn Wraith",
+   "fromId": "000000193",
+   "fromFaction": "Nighthaunt",
+   "match": "exact"
+  },
+  "d5f876bf": {
+   "name": "Knight of Shrouds",
+   "base": "32mm",
+   "from": "Knight of Shrouds",
+   "fromId": "000000196",
+   "fromFaction": "Nighthaunt",
+   "match": "exact"
+  },
+  "4b15e827": {
+   "name": "Spirit Torment",
+   "base": "40mm",
+   "from": "Spirit Torment",
+   "fromId": "000000202",
+   "fromFaction": "Nighthaunt",
+   "match": "exact"
+  },
+  "dd5caf24": {
+   "name": "Krulghast Cruciator",
+   "base": "40mm",
+   "from": "Krulghast Cruciator",
+   "fromId": "000001072",
+   "fromFaction": "Nighthaunt",
+   "match": "exact"
+  },
+  "6930e3c5": {
+   "name": "Dreadblade Harrow",
+   "base": "60 × 35mm",
+   "from": "Dreadblade Harrows",
+   "fromId": "000001873",
+   "fromFaction": "Nighthaunt",
+   "match": "plural"
+  },
+  "2112939a": {
+   "name": "Knight of Shrouds on Ethereal Steed",
+   "base": "75 × 42mm",
+   "from": "Knight of Shrouds on Ethereal Steed",
+   "fromId": "000000197",
+   "fromFaction": "Nighthaunt",
+   "match": "exact"
+  },
+  "yhgkppek": {
+   "name": "Lord Vitriolic",
+   "base": "40mm",
+   "from": "Lord Vitriolic",
+   "fromId": "000002544",
+   "fromFaction": "Nighthaunt",
+   "match": "exact"
+  },
+  "1d309fb7": {
+   "name": "Mortek Guard with Soulcleaver Greatblade",
+   "base": "25mm",
+   "from": "Mortek Guard",
+   "fromId": "000000521",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "base"
+  },
+  "275aca2c": {
+   "name": "Mortek Guard with Nadirite Blade",
+   "base": "25mm",
+   "from": "Mortek Guard",
+   "fromId": "000000521",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "base"
+  },
+  "45e89e81": {
+   "name": "Mortek Guard with Nadirite Spear",
+   "base": "25mm",
+   "from": "Mortek Guard",
+   "fromId": "000000521",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "base"
+  },
+  "d28bc38b": {
+   "name": "Kavalos Deathrider with Nadirite Blade",
+   "base": "60 × 35mm",
+   "from": "Kavalos Deathriders",
+   "fromId": "000000520",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "plural"
+  },
+  "695d1bb4": {
+   "name": "Kavalos Deathrider with Nadirite Spear",
+   "base": "60 × 35mm",
+   "from": "Kavalos Deathriders",
+   "fromId": "000000520",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "plural"
+  },
+  "3700c1a1": {
+   "name": "Mortisan Boneshaper",
+   "base": "32mm",
+   "from": "Mortisan Boneshaper",
+   "fromId": "000000527",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "exact"
+  },
+  "7735959e": {
+   "name": "Mortisan Soulreaper",
+   "base": "32mm",
+   "from": "Mortisan Soulreaper",
+   "fromId": "000000529",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "exact"
+  },
+  "922f9c6f": {
+   "name": "Immortis Guard",
+   "base": "50mm",
+   "from": "Immortis Guard",
+   "fromId": "000000533",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "exact"
+  },
+  "7aa77f42": {
+   "name": "Mortisan Soulmason",
+   "base": "40mm",
+   "from": "Mortisan Soulmason",
+   "fromId": "000000528",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "exact"
+  },
+  "185fd94f": {
+   "name": "Necropolis Stalker with Dread Falchions",
+   "base": "50mm",
+   "from": "Necropolis Stalkers",
+   "fromId": "000000536",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "plural"
+  },
+  "4b6b872f": {
+   "name": "Necropolis Stalker with Spirit Blades",
+   "base": "50mm",
+   "from": "Necropolis Stalkers",
+   "fromId": "000000536",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "plural"
+  },
+  "21c2d19e": {
+   "name": "Morghast Harbinger with Spirit Swords",
+   "base": "60mm",
+   "from": "Morghast Harbingers",
+   "fromId": "000000535",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "plural"
+  },
+  "1901fcb4": {
+   "name": "Liege-Kavalos",
+   "base": "80mm",
+   "from": "Liege-Kavalos",
+   "fromId": "000000526",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "exact"
+  },
+  "19b3b63f": {
+   "name": "Morghast Harbinger with Spirit Halberd",
+   "base": "60mm",
+   "from": "Morghast Harbingers",
+   "fromId": "000000535",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "plural"
+  },
+  "5f6e5f3d": {
+   "name": "Morghast Archai with Spirit Swords",
+   "base": "60mm",
+   "from": "Morghast Archai",
+   "fromId": "000000534",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "base"
+  },
+  "8f9c65ce": {
+   "name": "Morghast Archai with Spirit Halberd",
+   "base": "60mm",
+   "from": "Morghast Archai",
+   "fromId": "000000534",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "base"
+  },
+  "6ac50bd5": {
+   "name": "Mortisan Ossifector",
+   "base": "32mm",
+   "from": "Mortisan Ossifector",
+   "fromId": "000001622",
+   "fromFaction": "Ossiarch Bonereapers",
+   "match": "exact"
+  },
+  "eff9a586": {
+   "name": "Deadwalker Zombie",
+   "base": "25mm",
+   "from": "Deadwalker Zombies",
+   "fromId": "000001110",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "plural"
+  },
+  "e2cce99f": {
+   "name": "Barrow Guard with Wight Blade and Crypt Shield",
+   "base": "28.5mm",
+   "from": "Barrow Guard",
+   "fromId": "000002345",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "base"
+  },
+  "8f27f188": {
+   "name": "Barrow Guard with Great Wight Blade",
+   "base": "28.5mm",
+   "from": "Barrow Guard",
+   "fromId": "000002345",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "base"
+  },
+  "96c2aeac": {
+   "name": "Vyrkos Blood-born",
+   "base": "32mm",
+   "from": "Vyrkos Blood-born",
+   "fromId": "000001095",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "exact"
+  },
+  "749b2ad5": {
+   "name": "Kosargi Nightguard",
+   "base": "40mm",
+   "from": "Kosargi Nightguard",
+   "fromId": "000001094",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "exact"
+  },
+  "d6099ed3": {
+   "name": "Necromancer",
+   "base": "32mm",
+   "from": "Necromancer",
+   "fromId": "000000988",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "exact"
+  },
+  "4825c68e": {
+   "name": "Wight King",
+   "base": "32mm",
+   "from": "Wight King",
+   "fromId": "000001107",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "exact"
+  },
+  "d4b9ecfb": {
+   "name": "Vargskyr",
+   "base": "50mm",
+   "from": "Vargskyr",
+   "fromId": "000001096",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "exact"
+  },
+  "9c09305d": {
+   "name": "Vargheist",
+   "base": "50mm",
+   "from": "Vargheists",
+   "fromId": "000001014",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "plural"
+  },
+  "027fb3e0": {
+   "name": "Blood Knight with Templar Lance",
+   "base": "75 × 42mm",
+   "from": "Blood Knights",
+   "fromId": "000001003",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "plural"
+  },
+  "0c7def03": {
+   "name": "Blood Knight with Templar Blade",
+   "base": "75 × 42mm",
+   "from": "Blood Knights",
+   "fromId": "000001003",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "plural"
+  },
+  "zaw0flmt": {
+   "name": "Wight Lord on Skeletal Steed",
+   "base": "80mm",
+   "from": "Wight Lord on Skeletal Steed",
+   "fromId": "000002347",
+   "fromFaction": "Soulblight Gravelords",
+   "match": "exact"
+  },
+  "b7da3ff4": {
+   "name": "Fellwater Troggoth",
+   "base": "50mm",
+   "from": "Fellwater Troggoths",
+   "fromId": "000000037",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "plural"
+  },
+  "a47621f5": {
+   "name": "Rockgut Troggoth",
+   "base": "50mm",
+   "from": "Rockgut Troggoths",
+   "fromId": "000000039",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "plural"
+  },
+  "b616e449": {
+   "name": "Dankhold Troggoth",
+   "base": "60mm",
+   "from": "Dankhold Troggoth",
+   "fromId": "000002003",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "exact"
+  },
+  "2c7b4722": {
+   "name": "Aleguzzler Gargant",
+   "base": "90 × 52mm",
+   "from": "Aleguzzler Gargant",
+   "fromId": "000000025",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "exact"
+  },
+  "483abb24": {
+   "name": "Skitterstrand Arachnarok",
+   "base": "160mm",
+   "from": "Skitterstrand Arachnarok",
+   "fromId": "000000029",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "exact"
+  },
+  "6e918c6c": {
+   "name": "Savage Orruk with Chompa and Bone Shield",
+   "base": "32mm",
+   "from": "Savage Orruks",
+   "fromId": "000001996",
+   "fromFaction": "Bonesplitterz",
+   "match": "plural"
+  },
+  "b05d0854": {
+   "name": "Savage Orruk with Savage Stikka and Bone Shield",
+   "base": "32mm",
+   "from": "Savage Orruks",
+   "fromId": "000001996",
+   "fromFaction": "Bonesplitterz",
+   "match": "plural"
+  },
+  "67ac0006": {
+   "name": "Savage Orruk Morboy",
+   "base": "32mm",
+   "from": "Savage Orruk Morboys",
+   "fromId": "000001993",
+   "fromFaction": "Bonesplitterz",
+   "match": "plural"
+  },
+  "c0fadcc5": {
+   "name": "Savage Orruk Arrowboy",
+   "base": "32mm",
+   "from": "Savage Orruk Arrowboys",
+   "fromId": "000001995",
+   "fromFaction": "Bonesplitterz",
+   "match": "plural"
+  },
+  "af631173": {
+   "name": "Savage Boarboy with Chompa",
+   "base": "60 × 35mm",
+   "from": "Savage Boarboys",
+   "fromId": "000001992",
+   "fromFaction": "Bonesplitterz",
+   "match": "plural"
+  },
+  "da496c2a": {
+   "name": "Savage Boarboy with Savage Stikka",
+   "base": "60 × 35mm",
+   "from": "Savage Boarboys",
+   "fromId": "000001992",
+   "fromFaction": "Bonesplitterz",
+   "match": "plural"
+  },
+  "3cc597c4": {
+   "name": "Wardokk",
+   "base": "32mm",
+   "from": "Wardokk",
+   "fromId": "000001991",
+   "fromFaction": "Bonesplitterz",
+   "match": "exact"
+  },
+  "88ec1e85": {
+   "name": "Wurrgog Prophet",
+   "base": "32mm",
+   "from": "Wurrgog Prophet",
+   "fromId": "000001990",
+   "fromFaction": "Bonesplitterz",
+   "match": "exact"
+  },
+  "eb79df6b": {
+   "name": "Savage Big Stabbas",
+   "base": "60 × 35mm",
+   "from": "Savage Big Stabbas",
+   "fromId": "000001997",
+   "fromFaction": "Bonesplitterz",
+   "match": "exact"
+  },
+  "8825dd0e": {
+   "name": "Savage Big Boss",
+   "base": "32mm",
+   "from": "Savage Big Boss",
+   "fromId": "000001998",
+   "fromFaction": "Bonesplitterz",
+   "match": "exact"
+  },
+  "fca1a47c": {
+   "name": "Savage Boarboy Maniak",
+   "base": "60 × 35mm",
+   "from": "Savage Boarboy Maniaks",
+   "fromId": "000001994",
+   "fromFaction": "Bonesplitterz",
+   "match": "plural"
+  },
+  "92d74ec2": {
+   "name": "Maniak Weirdnob",
+   "base": "60 × 35mm",
+   "from": "Maniak Weirdnob",
+   "fromId": "000001989",
+   "fromFaction": "Bonesplitterz",
+   "match": "exact"
+  },
+  "0b7a7d3c": {
+   "name": "Sneaky Snuffler",
+   "base": "32mm",
+   "from": "Sneaky Snufflers",
+   "fromId": "000000040",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "plural"
+  },
+  "6e3049bf": {
+   "name": "Sporesplatta Fanatic",
+   "base": "32mm",
+   "from": "Sporesplatta Fanatics",
+   "fromId": "000000042",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "plural"
+  },
+  "058bed50": {
+   "name": "Loonsmasha Fanatic",
+   "base": "32mm",
+   "from": "Loonsmasha Fanatics",
+   "fromId": "000000038",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "plural"
+  },
+  "2bf8f664": {
+   "name": "Fungoid Cave-Shaman",
+   "base": "32mm",
+   "from": "Fungoid Cave-Shaman",
+   "fromId": "000000012",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "exact"
+  },
+  "5ee7cd6d": {
+   "name": "Webspinner Shaman",
+   "base": "25mm",
+   "from": "Webspinner Shaman",
+   "fromId": "000000020",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "exact"
+  },
+  "55d50942": {
+   "name": "Loonboss",
+   "base": "32mm",
+   "from": "Loonboss",
+   "fromId": "000000023",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "exact"
+  },
+  "4bd7d1ce": {
+   "name": "Spider Rider",
+   "base": "60 × 35mm",
+   "from": "Spider Riders",
+   "fromId": "000000041",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "plural"
+  },
+  "f0e68c6e": {
+   "name": "Squig Hopper",
+   "base": "32mm",
+   "from": "Squig Hoppers",
+   "fromId": "000000044",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "plural"
+  },
+  "e08454b0": {
+   "name": "Loonboss on Giant Cave Squig",
+   "base": "40mm",
+   "from": "Loonboss on Giant Cave Squig",
+   "fromId": "000000014",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "exact"
+  },
+  "1565a04c": {
+   "name": "Rabble-Rowza",
+   "base": "32mm",
+   "from": "Rabble-Rowza",
+   "fromId": "000001650",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "exact"
+  },
+  "9dd13a32": {
+   "name": "Squigboss with Gnasha-Squig",
+   "base": "32mm",
+   "from": "Squigboss with Gnasha-Squig",
+   "fromId": "000001562",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "exact"
+  },
+  "a12b0b25": {
+   "name": "Snarlfang Rider",
+   "base": "60 × 35mm",
+   "from": "Snarlfang Riders",
+   "fromId": "000001563",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "plural"
+  },
+  "ff9e7687": {
+   "name": "Snarlpack Cavalry",
+   "base": "75 × 42mm",
+   "from": "Snarlpack Cavalry",
+   "fromId": "000002288",
+   "fromFaction": "Gloomspite Gitz",
+   "match": "exact"
+  },
+  "9bc8ac77": {
+   "name": "Ardboy Big Boss",
+   "base": "40mm",
+   "from": "Ardboy Big Boss",
+   "fromId": "000001699",
+   "fromFaction": "Ironjawz",
+   "match": "exact"
+  },
+  "757c2767": {
+   "name": "Murknob with Belcha-banna",
+   "base": "40mm",
+   "from": "Murknob with Belcha-banna",
+   "fromId": "000001147",
+   "fromFaction": "Kruleboyz",
+   "match": "exact"
+  },
+  "ed4c54f2": {
+   "name": "Killaboss on Great Gnashtoof",
+   "base": "105 × 70mm",
+   "from": "Killaboss on Great Gnashtoof",
+   "fromId": "000001145",
+   "fromFaction": "Kruleboyz",
+   "match": "exact"
+  },
+  "3f9a8c2e": {
+   "name": "Hobgrot Slittaboss",
+   "base": "32mm",
+   "from": "Hobgrot Slittaboss",
+   "fromId": "000002228",
+   "fromFaction": "Kruleboyz",
+   "match": "exact"
+  },
+  "eb92f059": {
+   "name": "Gnoblar",
+   "base": "25mm",
+   "from": "Gnoblars",
+   "fromId": "000000503",
+   "fromFaction": "Ogor Mawtribes",
+   "match": "plural"
+  },
+  "1e24e8d2": {
+   "name": "Frost Sabre",
+   "base": "60 × 35mm",
+   "from": "Frost Sabres",
+   "fromId": "000000501",
+   "fromFaction": "Ogor Mawtribes",
+   "match": "plural"
+  },
+  "cf6687da": {
+   "name": "Leadbelcher",
+   "base": "40mm",
+   "from": "Leadbelchers",
+   "fromId": "000000506",
+   "fromFaction": "Ogor Mawtribes",
+   "match": "plural"
+  },
+  "c4237531": {
+   "name": "Maneater",
+   "base": "50mm",
+   "from": "Maneaters",
+   "fromId": "000000507",
+   "fromFaction": "Ogor Mawtribes",
+   "match": "plural"
+  },
+  "77988e63": {
+   "name": "Butcher",
+   "base": "50mm",
+   "from": "Butcher",
+   "fromId": "000000492",
+   "fromFaction": "Ogor Mawtribes",
+   "match": "exact"
+  },
+  "f2cc1f80": {
+   "name": "Firebelly",
+   "base": "50mm",
+   "from": "Firebelly",
+   "fromId": "000000493",
+   "fromFaction": "Ogor Mawtribes",
+   "match": "exact"
+  },
+  "25ae1b9a": {
+   "name": "Irongut",
+   "base": "40mm",
+   "from": "Ironguts",
+   "fromId": "000000505",
+   "fromFaction": "Ogor Mawtribes",
+   "match": "plural"
+  },
+  "79fc7799": {
+   "name": "Icebrow Hunter",
+   "base": "50mm",
+   "from": "Icebrow Hunter",
+   "fromId": "000000494",
+   "fromFaction": "Ogor Mawtribes",
+   "match": "exact"
+  },
+  "13c9ffda": {
+   "name": "Tyrant",
+   "base": "50mm",
+   "from": "Tyrant",
+   "fromId": "000000496",
+   "fromFaction": "Ogor Mawtribes",
+   "match": "exact"
+  },
+  "6be53983": {
+   "name": "Bloodpelt Hunter",
+   "base": "40mm",
+   "from": "Bloodpelt Hunter",
+   "fromId": "000001546",
+   "fromFaction": "Ogor Mawtribes",
+   "match": "exact"
+  },
+  "e10c8d32": {
+   "name": "Gorlok Blackpowder",
+   "base": "50mm",
+   "from": "Gorlok Blackpowder",
+   "fromId": "000001768",
+   "fromFaction": "Ogor Mawtribes",
+   "match": "exact"
+  },
+  "2dda62e2": {
+   "name": "Hrothgorn Mantrapper",
+   "base": "40mm",
+   "from": "Hrothgorn Mantrapper",
+   "fromId": "000000860",
+   "fromFaction": "Ogor Mawtribes",
+   "match": "exact"
+  },
+  "15bedde9": {
+   "name": "War Hydra",
+   "base": "120 × 92mm",
+   "from": "War Hydra",
+   "fromId": "000000431",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "69f4a22a": {
+   "name": "Kharibdyss",
+   "base": "120 × 92mm",
+   "from": "Kharibdyss",
+   "fromId": "000000428",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "bc293e96": {
+   "name": "Grombrindal, the White Dwarf",
+   "base": "40mm",
+   "from": "Grombrindal, The White Dwarf",
+   "fromId": "000002685",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "5feaf59c": {
+   "name": "Lorai, Child of the Abyss",
+   "base": "40mm",
+   "from": "Lorai, Child of the Abyss",
+   "fromId": "000001708",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "41cc2020": {
+   "name": "Neave Blacktalon",
+   "base": "40mm",
+   "from": "Neave Blacktalon",
+   "fromId": "000000085",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "e1b3c0d5": {
+   "name": "Flagellant",
+   "base": "25mm",
+   "from": "Flagellants",
+   "fromId": "000000458",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "8c569252": {
+   "name": "Freeguild Steelhelm",
+   "base": "25mm",
+   "from": "Freeguild Steelhelms",
+   "fromId": "000001676",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "e2b99289": {
+   "name": "Battlemage",
+   "base": "25mm",
+   "from": "Battlemage",
+   "fromId": "000000434",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "d8bd3ecb": {
+   "name": "Freeguild Fusilier",
+   "base": "28.5mm",
+   "from": "Freeguild Fusiliers",
+   "fromId": "000001687",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "d565d395": {
+   "name": "Alchemite Warforger",
+   "base": "32mm",
+   "from": "Alchemite Warforger",
+   "fromId": "000001677",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "fc246066": {
+   "name": "Freeguild Cavalier",
+   "base": "60 × 35mm",
+   "from": "Freeguild Cavaliers",
+   "fromId": "000001688",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "12ae35bc": {
+   "name": "Fusil-Major on Ogor Warhulk",
+   "base": "50mm",
+   "from": "Fusil-Major on Ogor Warhulk",
+   "fromId": "000001680",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "cf0d60d4": {
+   "name": "Freeguild Cavalier-Marshal",
+   "base": "75 × 42mm",
+   "from": "Freeguild Cavalier-Marshal",
+   "fromId": "000001679",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "1921c507": {
+   "name": "Dreadspear",
+   "base": "25mm",
+   "from": "Dreadspears",
+   "fromId": "000000418",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "820f3f99": {
+   "name": "Bleaksword",
+   "base": "25mm",
+   "from": "Bleakswords",
+   "fromId": "000000416",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "dd601a1f": {
+   "name": "Black Ark Corsair with Vicious Blade and Wicked Cutlass",
+   "base": "25mm",
+   "from": "Black Ark Corsairs",
+   "fromId": "000000451",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "986b8f6e": {
+   "name": "Darkshard",
+   "base": "25mm",
+   "from": "Darkshards",
+   "fromId": "000000417",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "4be81271": {
+   "name": "Black Guard",
+   "base": "25mm",
+   "from": "Black Guard",
+   "fromId": "000000452",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "45ab5bd5": {
+   "name": "Executioner",
+   "base": "25mm",
+   "from": "Executioners",
+   "fromId": "000000457",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "e1ff4687": {
+   "name": "Sorceress",
+   "base": "25mm",
+   "from": "Sorceress",
+   "fromId": "000000440",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "f25d7854": {
+   "name": "Black Ark Fleetmaster",
+   "base": "25mm",
+   "from": "Black Ark Fleetmaster",
+   "fromId": "000000435",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "40d6d734": {
+   "name": "Dark Rider",
+   "base": "60 × 35mm",
+   "from": "Dark Riders",
+   "fromId": "000000453",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "0575da5a": {
+   "name": "Drakespawn Knight",
+   "base": "60 × 35mm",
+   "from": "Drakespawn Knights",
+   "fromId": "000000456",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "db14c72d": {
+   "name": "Assassin",
+   "base": "25mm",
+   "from": "Assassin",
+   "fromId": "000000433",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "eaec58a2": {
+   "name": "Ironbreaker",
+   "base": "25mm",
+   "from": "Ironbreakers",
+   "fromId": "000000423",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "f86feaaf": {
+   "name": "Longbeard with Ancestral Weapon and Gromril Shield",
+   "base": "25mm",
+   "from": "Longbeards",
+   "fromId": "000000424",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "353ccf7c": {
+   "name": "Hammerer",
+   "base": "25mm",
+   "from": "Hammerers",
+   "fromId": "000000464",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "7eb24003": {
+   "name": "Longbeard with Ancestral Great Axe",
+   "base": "25mm",
+   "from": "Longbeards",
+   "fromId": "000000424",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "17bfdc39": {
+   "name": "Irondrake",
+   "base": "25mm",
+   "from": "Irondrakes",
+   "fromId": "000000465",
+   "fromFaction": "Cities of Sigmar",
+   "match": "plural"
+  },
+  "46f24f9a": {
+   "name": "Runelord",
+   "base": "25mm",
+   "from": "Runelord",
+   "fromId": "000000439",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "4de3176c": {
+   "name": "Warden King",
+   "base": "25mm",
+   "from": "Warden King",
+   "fromId": "000000441",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "9bb7b4e4": {
+   "name": "Gyrocopter",
+   "base": "50mm",
+   "from": "Gyrocopter",
+   "fromId": "000001764",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "2d7e63f1": {
+   "name": "Gyrobomber",
+   "base": "50mm",
+   "from": "Gyrobomber",
+   "fromId": "000000462",
+   "fromFaction": "Cities of Sigmar",
+   "match": "exact"
+  },
+  "6bb3286e": {
+   "name": "Witch Aelf with Paired Sciansá",
+   "base": "25mm",
+   "from": "Witch Aelves",
+   "fromId": "000000871",
+   "fromFaction": "Daughters of Khaine",
+   "match": "plural"
+  },
+  "1aeda80d": {
+   "name": "Witch Aelf with Sciansá and Bladed Buckler",
+   "base": "25mm",
+   "from": "Witch Aelves",
+   "fromId": "000000871",
+   "fromFaction": "Daughters of Khaine",
+   "match": "plural"
+  },
+  "8d0b3924": {
+   "name": "Hag Queen",
+   "base": "25mm",
+   "from": "Hag Queen",
+   "fromId": "000000874",
+   "fromFaction": "Daughters of Khaine",
+   "match": "exact"
+  },
+  "c63f9100": {
+   "name": "Doomfire Warlock",
+   "base": "60 × 35mm",
+   "from": "Doomfire Warlocks",
+   "fromId": "000000882",
+   "fromFaction": "Daughters of Khaine",
+   "match": "plural"
+  },
+  "5c1485b3": {
+   "name": "Khinerai Heartrender",
+   "base": "40mm",
+   "from": "Khinerai Heartrenders",
+   "fromId": "000000885",
+   "fromFaction": "Daughters of Khaine",
+   "match": "plural"
+  },
+  "f3d4d037": {
+   "name": "Khinerai Lifetaker",
+   "base": "40mm",
+   "from": "Khinerai Lifetakers",
+   "fromId": "000000886",
+   "fromFaction": "Daughters of Khaine",
+   "match": "plural"
+  },
+  "48b81a14": {
+   "name": "Blood Sister",
+   "base": "40mm",
+   "from": "Blood Sisters",
+   "fromId": "000000883",
+   "fromFaction": "Daughters of Khaine",
+   "match": "plural"
+  },
+  "654f02cd": {
+   "name": "Slaughter Queen",
+   "base": "25mm",
+   "from": "Slaughter Queen",
+   "fromId": "000000878",
+   "fromFaction": "Daughters of Khaine",
+   "match": "exact"
+  },
+  "c4c57995": {
+   "name": "Blood Stalker",
+   "base": "40mm",
+   "from": "Blood Stalkers",
+   "fromId": "000000884",
+   "fromFaction": "Daughters of Khaine",
+   "match": "plural"
+  },
+  "b4768d9e": {
+   "name": "High Gladiatrix",
+   "base": "32mm",
+   "from": "High Gladiatrix",
+   "fromId": "000001412",
+   "fromFaction": "Daughters of Khaine",
+   "match": "exact"
+  },
+  "b9380fcb": {
+   "name": "Melusai Ironscale",
+   "base": "40mm",
+   "from": "Melusai Ironscale",
+   "fromId": "000000923",
+   "fromFaction": "Daughters of Khaine",
+   "match": "exact"
+  },
+  "be4abc6c": {
+   "name": "Bloodwrack Medusa",
+   "base": "40mm",
+   "from": "Bloodwrack Medusa",
+   "fromId": "000000873",
+   "fromFaction": "Daughters of Khaine",
+   "match": "exact"
+  },
+  "d56f9da0": {
+   "name": "Auric Flamekeeper",
+   "base": "32mm",
+   "from": "Auric Flamekeeper",
+   "fromId": "000001411",
+   "fromFaction": "Fyreslayers",
+   "match": "exact"
+  },
+  "bff8e66d": {
+   "name": "Auric Runesmiter",
+   "base": "32mm",
+   "from": "Auric Runesmiter",
+   "fromId": "000000228",
+   "fromFaction": "Fyreslayers",
+   "match": "exact"
+  },
+  "a599a3f6": {
+   "name": "Auric Hearthguard",
+   "base": "32mm",
+   "from": "Auric Hearthguard",
+   "fromId": "000000236",
+   "fromFaction": "Fyreslayers",
+   "match": "exact"
+  },
+  "2bf4bd02": {
+   "name": "Auric Runemaster",
+   "base": "32mm",
+   "from": "Auric Runemaster",
+   "fromId": "000000227",
+   "fromFaction": "Fyreslayers",
+   "match": "exact"
+  },
+  "6ad97821": {
+   "name": "Battlesmith",
+   "base": "32mm",
+   "from": "Battlesmith",
+   "fromId": "000000230",
+   "fromFaction": "Fyreslayers",
+   "match": "exact"
+  },
+  "556ec979": {
+   "name": "Auric Runeson with Wyrmslayer Javelin",
+   "base": "32mm",
+   "from": "Auric Runeson",
+   "fromId": "000000229",
+   "fromFaction": "Fyreslayers",
+   "match": "base"
+  },
+  "18cf031a": {
+   "name": "Auric Runeson with Ancestral War-Axe",
+   "base": "32mm",
+   "from": "Auric Runeson",
+   "fromId": "000000229",
+   "fromFaction": "Fyreslayers",
+   "match": "base"
+  },
+  "cd1ea539": {
+   "name": "Doomseeker",
+   "base": "32mm",
+   "from": "Doomseeker",
+   "fromId": "000000237",
+   "fromFaction": "Fyreslayers",
+   "match": "exact"
+  },
+  "8b2cb606": {
+   "name": "Grimwrath Berzerker",
+   "base": "32mm",
+   "from": "Grimwrath Berzerker",
+   "fromId": "000000238",
+   "fromFaction": "Fyreslayers",
+   "match": "exact"
+  },
+  "0c480fe0": {
+   "name": "Auric Runefather",
+   "base": "32mm",
+   "from": "Auric Runefather",
+   "fromId": "000000226",
+   "fromFaction": "Fyreslayers",
+   "match": "exact"
+  },
+  "4e68aa26": {
+   "name": "Grimhold Exile",
+   "base": "32mm",
+   "from": "Grimhold Exile",
+   "fromId": "000001649",
+   "fromFaction": "Fyreslayers",
+   "match": "exact"
+  },
+  "1f36c1e8": {
+   "name": "Terrawing",
+   "base": "32mm",
+   "from": "Terrawings",
+   "fromId": "000001560",
+   "fromFaction": "Seraphon",
+   "match": "plural"
+  },
+  "435555ec": {
+   "name": "Namarti Thrall",
+   "base": "32mm",
+   "from": "Namarti Thralls",
+   "fromId": "000000897",
+   "fromFaction": "Idoneth Deepkin",
+   "match": "plural"
+  },
+  "c150c15b": {
+   "name": "Namarti Reaver",
+   "base": "32mm",
+   "from": "Namarti Reavers",
+   "fromId": "000000910",
+   "fromFaction": "Idoneth Deepkin",
+   "match": "plural"
+  },
+  "221c9420": {
+   "name": "Isharann Tidecaster",
+   "base": "32mm",
+   "from": "Isharann Tidecaster",
+   "fromId": "000000904",
+   "fromFaction": "Idoneth Deepkin",
+   "match": "exact"
+  },
+  "38ec346f": {
+   "name": "Isharann Soulscryer",
+   "base": "32mm",
+   "from": "Isharann Soulscryer",
+   "fromId": "000000903",
+   "fromFaction": "Idoneth Deepkin",
+   "match": "exact"
+  },
+  "56e6c850": {
+   "name": "Akhelian Thrallmaster",
+   "base": "32mm",
+   "from": "Akhelian Thrallmaster",
+   "fromId": "000001403",
+   "fromFaction": "Idoneth Deepkin",
+   "match": "exact"
+  },
+  "6b637ace": {
+   "name": "Akhelian Ishlaen Guard",
+   "base": "60 × 35mm",
+   "from": "Akhelian Ishlaen Guard",
+   "fromId": "000000908",
+   "fromFaction": "Idoneth Deepkin",
+   "match": "exact"
+  },
+  "2e85defe": {
+   "name": "Isharann Soulrender",
+   "base": "40mm",
+   "from": "Isharann Soulrender",
+   "fromId": "000000902",
+   "fromFaction": "Idoneth Deepkin",
+   "match": "exact"
+  },
+  "250f1616": {
+   "name": "Akhelian Morrsarr Guard",
+   "base": "60 × 35mm",
+   "from": "Akhelian Morrsarr Guard",
+   "fromId": "000000909",
+   "fromFaction": "Idoneth Deepkin",
+   "match": "exact"
+  },
+  "7787d280": {
+   "name": "Akhelian King with Greatsword",
+   "base": "60mm",
+   "from": "Akhelian King",
+   "fromId": "000000899",
+   "fromFaction": "Idoneth Deepkin",
+   "match": "base"
+  },
+  "7bcf3997": {
+   "name": "Akhelian King with Bladed Polearm",
+   "base": "60mm",
+   "from": "Akhelian King",
+   "fromId": "000000899",
+   "fromFaction": "Idoneth Deepkin",
+   "match": "base"
+  },
+  "d3xtb8hb": {
+   "name": "Ikon of the Sea",
+   "base": "40mm",
+   "from": "Ikon of the Sea",
+   "fromId": "000002468",
+   "fromFaction": "Idoneth Deepkin",
+   "match": "exact"
+  },
+  "972o3kry": {
+   "name": "Ikon of the Storm",
+   "base": "40mm",
+   "from": "Ikon of the Storm",
+   "fromId": "000002470",
+   "fromFaction": "Idoneth Deepkin",
+   "match": "exact"
+  },
+  "349aba3b": {
+   "name": "Grundstok Thunderer with Aethershot Rifle",
+   "base": "32mm",
+   "from": "Grundstok Thunderers",
+   "fromId": "000000698",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "60c75c84": {
+   "name": "Grundstok Thunderer with Decksweeper",
+   "base": "32mm",
+   "from": "Grundstok Thunderers",
+   "fromId": "000000698",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "f0608a76": {
+   "name": "Grundstok Thunderer with Aetheric Fumigator",
+   "base": "32mm",
+   "from": "Grundstok Thunderers",
+   "fromId": "000000698",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "eced05ff": {
+   "name": "Grundstok Thunderer with Aethercannon",
+   "base": "32mm",
+   "from": "Grundstok Thunderers",
+   "fromId": "000000698",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "1a02e8b8": {
+   "name": "Aetheric Navigator",
+   "base": "32mm",
+   "from": "Aetheric Navigator",
+   "fromId": "000000689",
+   "fromFaction": "Kharadron Overlords",
+   "match": "exact"
+  },
+  "d16ca6c1": {
+   "name": "Grundstok Thunderer with Grundstok Mortar",
+   "base": "32mm",
+   "from": "Grundstok Thunderers",
+   "fromId": "000000698",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "0f0676da": {
+   "name": "Endrinmaster with Endrinharness",
+   "base": "32mm",
+   "from": "Endrinmaster with Endrinharness",
+   "fromId": "000000693",
+   "fromFaction": "Kharadron Overlords",
+   "match": "exact"
+  },
+  "cdc54cb8": {
+   "name": "Arkanaut Admiral",
+   "base": "32mm",
+   "from": "Arkanaut Admiral",
+   "fromId": "000000690",
+   "fromFaction": "Kharadron Overlords",
+   "match": "exact"
+  },
+  "e5a59966": {
+   "name": "Aether-khemist",
+   "base": "32mm",
+   "from": "Aether-Khemist",
+   "fromId": "000000688",
+   "fromFaction": "Kharadron Overlords",
+   "match": "exact"
+  },
+  "7e8f4932": {
+   "name": "Endrinrigger with Aethermatic Volley Gun",
+   "base": "32mm",
+   "from": "Endrinriggers",
+   "fromId": "000000696",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "0f301ca5": {
+   "name": "Skywarden with Aethermatic Volley Gun",
+   "base": "32mm",
+   "from": "Skywardens",
+   "fromId": "000000699",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "6d96d4da": {
+   "name": "Skywarden with Vulcaniser Pistol and Skypike",
+   "base": "32mm",
+   "from": "Skywardens",
+   "fromId": "000000699",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "fa7d34f2": {
+   "name": "Endrinrigger with Grapnel Launcher",
+   "base": "32mm",
+   "from": "Endrinriggers",
+   "fromId": "000000696",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "c7591b05": {
+   "name": "Endrinrigger with Rapid-fire Rivet Gun and Aethermatic Saw",
+   "base": "32mm",
+   "from": "Endrinriggers",
+   "fromId": "000000696",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "9b7abae6": {
+   "name": "Skywarden with Grapnel Launcher",
+   "base": "32mm",
+   "from": "Skywardens",
+   "fromId": "000000699",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "f7b036d0": {
+   "name": "Skywarden with Drill Launcher",
+   "base": "32mm",
+   "from": "Skywardens",
+   "fromId": "000000699",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "6dca67c5": {
+   "name": "Endrinrigger with Skyhook",
+   "base": "32mm",
+   "from": "Endrinriggers",
+   "fromId": "000000696",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "75db5d9d": {
+   "name": "Skywarden with Skyhook",
+   "base": "32mm",
+   "from": "Skywardens",
+   "fromId": "000000699",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "73be6480": {
+   "name": "Endrinmaster with Dirigible Suit",
+   "base": "40mm",
+   "from": "Endrinmaster with Dirigible Suit",
+   "fromId": "000000692",
+   "fromFaction": "Kharadron Overlords",
+   "match": "exact"
+  },
+  "311fd049": {
+   "name": "Codewright",
+   "base": "32mm",
+   "from": "Codewright",
+   "fromId": "000001616",
+   "fromFaction": "Kharadron Overlords",
+   "match": "exact"
+  },
+  "ab53faae": {
+   "name": "Null-Khemist",
+   "base": "40mm",
+   "from": "Null-Khemist",
+   "fromId": "000002428",
+   "fromFaction": "Kharadron Overlords",
+   "match": "exact"
+  },
+  "f1c7be0e": {
+   "name": "Vongrim Harpoon Crew",
+   "base": "32mm",
+   "from": "Vongrim Harpoon Crew",
+   "fromId": "000002424",
+   "fromFaction": "Kharadron Overlords",
+   "match": "exact"
+  },
+  "634ea06d": {
+   "name": "Vongrim Salvager",
+   "base": "32mm",
+   "from": "Vongrim Salvagers",
+   "fromId": "000002429",
+   "fromFaction": "Kharadron Overlords",
+   "match": "plural"
+  },
+  "0e863d75": {
+   "name": "Vanari Auralan Warden",
+   "base": "32mm",
+   "from": "Vanari Auralan Wardens",
+   "fromId": "000000835",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "plural"
+  },
+  "54e95d67": {
+   "name": "Alarith Stoneguard with Stone Mallet",
+   "base": "32mm",
+   "from": "Alarith Stoneguard",
+   "fromId": "000000842",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "base"
+  },
+  "0f16f044": {
+   "name": "Alarith Stoneguard with Diamondpick Hammer",
+   "base": "32mm",
+   "from": "Alarith Stoneguard",
+   "fromId": "000000842",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "base"
+  },
+  "f2d3c2e1": {
+   "name": "Vanari Auralan Sentinel",
+   "base": "32mm",
+   "from": "Vanari Auralan Sentinels",
+   "fromId": "000000843",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "plural"
+  },
+  "eeba329c": {
+   "name": "Scinari Cathallar",
+   "base": "32mm",
+   "from": "Scinari Cathallar",
+   "fromId": "000000838",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "exact"
+  },
+  "a0146a89": {
+   "name": "Vanari Bladelord",
+   "base": "32mm",
+   "from": "Vanari Bladelords",
+   "fromId": "000001061",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "plural"
+  },
+  "62b10a27": {
+   "name": "Scinari Calligrave",
+   "base": "32mm",
+   "from": "Scinari Calligrave",
+   "fromId": "000001054",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "exact"
+  },
+  "d54f7484": {
+   "name": "Scinari Loreseeker",
+   "base": "32mm",
+   "from": "Scinari Loreseeker",
+   "fromId": "000001055",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "exact"
+  },
+  "2bafb07a": {
+   "name": "Scinari Enlightener",
+   "base": "32mm",
+   "from": "Scinari Enlightener",
+   "fromId": "000001535",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "exact"
+  },
+  "7c2e6569": {
+   "name": "Hurakan Windcharger",
+   "base": "60 × 35mm",
+   "from": "Hurakan Windchargers",
+   "fromId": "000001060",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "plural"
+  },
+  "da1e2690": {
+   "name": "Alarith Stonemage",
+   "base": "40mm",
+   "from": "Alarith Stonemage",
+   "fromId": "000000837",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "exact"
+  },
+  "67b97055": {
+   "name": "Vanari Dawnrider",
+   "base": "60 × 35mm",
+   "from": "Vanari Dawnriders",
+   "fromId": "000000844",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "plural"
+  },
+  "9b03a8f2": {
+   "name": "Hurakan Windmage",
+   "base": "60 × 35mm",
+   "from": "Hurakan Windmage",
+   "fromId": "000001050",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "exact"
+  },
+  "6f24b3ed": {
+   "name": "Vanari Lord Regent",
+   "base": "32mm",
+   "from": "Vanari Lord Regent",
+   "fromId": "000001058",
+   "fromFaction": "Lumineth Realm-lords",
+   "match": "exact"
+  },
+  "a9714107": {
+   "name": "Skink with Moonstone Club and Star-buckler",
+   "base": "25mm",
+   "from": "Skinks",
+   "fromId": "000000731",
+   "fromFaction": "Seraphon",
+   "match": "plural"
+  },
+  "92d950bd": {
+   "name": "Skink with Boltspitter and Moonstone Club",
+   "base": "25mm",
+   "from": "Skinks",
+   "fromId": "000000731",
+   "fromFaction": "Seraphon",
+   "match": "plural"
+  },
+  "1e674f31": {
+   "name": "Skink with Meteoric Javelin and Star-buckler",
+   "base": "25mm",
+   "from": "Skinks",
+   "fromId": "000000731",
+   "fromFaction": "Seraphon",
+   "match": "plural"
+  },
+  "f240ce35": {
+   "name": "Saurus Warrior with Celestite Club",
+   "base": "32mm",
+   "from": "Saurus Warriors",
+   "fromId": "000000705",
+   "fromFaction": "Seraphon",
+   "match": "plural"
+  },
+  "c7032f04": {
+   "name": "Saurus Warrior with Celestite Spear",
+   "base": "32mm",
+   "from": "Saurus Warriors",
+   "fromId": "000000705",
+   "fromFaction": "Seraphon",
+   "match": "plural"
+  },
+  "fde45ce6": {
+   "name": "Saurus Guard",
+   "base": "32mm",
+   "from": "Saurus Guard",
+   "fromId": "000000729",
+   "fromFaction": "Seraphon",
+   "match": "exact"
+  },
+  "ebfc0cf2": {
+   "name": "Saurus Scar-Veteran on Aggradon",
+   "base": "90 × 52mm",
+   "from": "Saurus Scar-Veteran on Aggradon",
+   "fromId": "000001630",
+   "fromFaction": "Seraphon",
+   "match": "exact"
+  },
+  "26043eca": {
+   "name": "Aggradon Lancer with Celestite Club",
+   "base": "75 × 42mm",
+   "from": "Aggradon Lancers",
+   "fromId": "000001632",
+   "fromFaction": "Seraphon",
+   "match": "plural"
+  },
+  "9f1e68b5": {
+   "name": "Aggradon Lancer with Celestite Spear",
+   "base": "75 × 42mm",
+   "from": "Aggradon Lancers",
+   "fromId": "000001632",
+   "fromFaction": "Seraphon",
+   "match": "plural"
+  },
+  "1545eb4d": {
+   "name": "Raptadon Charger",
+   "base": "60 × 35mm",
+   "from": "Raptadon Chargers",
+   "fromId": "000001634",
+   "fromFaction": "Seraphon",
+   "match": "plural"
+  },
+  "5b66f32a": {
+   "name": "Raptadon Hunter",
+   "base": "60 × 35mm",
+   "from": "Raptadon Hunters",
+   "fromId": "000001635",
+   "fromFaction": "Seraphon",
+   "match": "plural"
+  },
+  "ddbd41e4": {
+   "name": "Spawn of Chotec",
+   "base": "90 × 52mm",
+   "from": "Spawn of Chotec",
+   "fromId": "000001629",
+   "fromFaction": "Seraphon",
+   "match": "exact"
+  },
+  "9bc16a41": {
+   "name": "Kroxigor",
+   "base": "50mm",
+   "from": "Kroxigor",
+   "fromId": "000000725",
+   "fromFaction": "Seraphon",
+   "match": "exact"
+  },
+  "c95ad268": {
+   "name": "Kroxigor Warspawned",
+   "base": "50mm",
+   "from": "Kroxigor Warspawned",
+   "fromId": "000001633",
+   "fromFaction": "Seraphon",
+   "match": "exact"
+  },
+  "97071a01": {
+   "name": "Skink Starpriest",
+   "base": "25mm",
+   "from": "Skink Starpriest",
+   "fromId": "000000716",
+   "fromFaction": "Seraphon",
+   "match": "exact"
+  },
+  "6c790e4b": {
+   "name": "Saurus Astrolith Bearer",
+   "base": "40mm",
+   "from": "Saurus Astrolith Bearer",
+   "fromId": "000000710",
+   "fromFaction": "Seraphon",
+   "match": "exact"
+  },
+  "a17f32e9": {
+   "name": "Ripperdactyl Rider",
+   "base": "50mm",
+   "from": "Ripperdactyl Riders",
+   "fromId": "000000727",
+   "fromFaction": "Seraphon",
+   "match": "plural"
+  },
+  "73828e4c": {
+   "name": "Terradon Rider with Sunleech Bolas",
+   "base": "50mm",
+   "from": "Terradon Riders",
+   "fromId": "000000732",
+   "fromFaction": "Seraphon",
+   "match": "plural"
+  },
+  "ad0c18b7": {
+   "name": "Terradon Rider with Starstrike Javelin",
+   "base": "50mm",
+   "from": "Terradon Riders",
+   "fromId": "000000732",
+   "fromFaction": "Seraphon",
+   "match": "plural"
+  },
+  "cfdb15bd": {
+   "name": "Saurus Oldblood",
+   "base": "32mm",
+   "from": "Saurus Oldblood",
+   "fromId": "000000712",
+   "fromFaction": "Seraphon",
+   "match": "exact"
+  },
+  "d25dc24f": {
+   "name": "Skink Starseer",
+   "base": "50mm",
+   "from": "Skink Starseer",
+   "fromId": "000000717",
+   "fromFaction": "Seraphon",
+   "match": "exact"
+  },
+  "e86b81b0": {
+   "name": "Terradon Chief",
+   "base": "50mm",
+   "from": "Terradon Chief",
+   "fromId": "000000719",
+   "fromFaction": "Seraphon",
+   "match": "exact"
+  },
+  "6bd9512b": {
+   "name": "Ripperdactyl Chief",
+   "base": "50mm",
+   "from": "Ripperdactyl Chief",
+   "fromId": "000000709",
+   "fromFaction": "Seraphon",
+   "match": "exact"
+  },
+  "74f71987": {
+   "name": "Slann Starmaster",
+   "base": "80mm",
+   "from": "Slann Starmaster",
+   "fromId": "000000718",
+   "fromFaction": "Seraphon",
+   "match": "exact"
+  },
+  "dc3af7bb": {
+   "name": "Prosecutor",
+   "base": "40mm",
+   "from": "Prosecutors",
+   "fromId": "000001827",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "614719d2": {
+   "name": "Reclusian",
+   "base": "40mm",
+   "from": "Reclusians",
+   "fromId": "000001834",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "09eadea6": {
+   "name": "Lord-Veritant",
+   "base": "40mm",
+   "from": "Lord-Veritant",
+   "fromId": "000000084",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "557afa14": {
+   "name": "Knight-Azyros",
+   "base": "50mm",
+   "from": "Knight-Azyros",
+   "fromId": "000000066",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "2dfe9f6e": {
+   "name": "Lord-Vigilant on Gryph-Stalker",
+   "base": "90 × 52mm",
+   "from": "Lord-Vigilant on Gryph-Stalker",
+   "fromId": "000001833",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "9683def2": {
+   "name": "Lord-Terminos",
+   "base": "40mm",
+   "from": "Lord-Terminos",
+   "fromId": "000001832",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "0a2d1530": {
+   "name": "Sequitor with Stormsmite Maul and Soulshield",
+   "base": "40mm",
+   "from": "Sequitors",
+   "fromId": "000000128",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "ad900d23": {
+   "name": "Sequitor with Tempest Blade and Soulshield",
+   "base": "40mm",
+   "from": "Sequitors",
+   "fromId": "000000128",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "8cb0966e": {
+   "name": "Evocator with Grandstave",
+   "base": "40mm",
+   "from": "Evocators",
+   "fromId": "000000119",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "2843fb51": {
+   "name": "Evocator with Tempest Blade and Stormstave",
+   "base": "40mm",
+   "from": "Evocators",
+   "fromId": "000000119",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "d80a1ee9": {
+   "name": "Sequitor with Stormsmite Greatmace",
+   "base": "40mm",
+   "from": "Sequitors",
+   "fromId": "000000128",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "0565c5a3": {
+   "name": "Knight-Incantor",
+   "base": "40mm",
+   "from": "Knight-Incantor",
+   "fromId": "000000068",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "c913785c": {
+   "name": "Castigator",
+   "base": "40mm",
+   "from": "Castigators",
+   "fromId": "000000115",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "66b2c53c": {
+   "name": "Lord-Arcanum",
+   "base": "40mm",
+   "from": "Lord-Arcanum",
+   "fromId": "000000074",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "2c84b33d": {
+   "name": "Lord-Ordinator with Paired Astral Hammers",
+   "base": "40mm",
+   "from": "Lord-Ordinator",
+   "fromId": "000000082",
+   "fromFaction": "Stormcast Eternals",
+   "match": "base"
+  },
+  "f894aa33": {
+   "name": "Lord-Ordinator with Astral Grandhammer",
+   "base": "40mm",
+   "from": "Lord-Ordinator",
+   "fromId": "000000082",
+   "fromFaction": "Stormcast Eternals",
+   "match": "base"
+  },
+  "ac46dccc": {
+   "name": "Lord-Arcanum on Gryph-Charger",
+   "base": "90 × 52mm",
+   "from": "Lord-Arcanum on Gryph-charger",
+   "fromId": "000000077",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "2f6859a4": {
+   "name": "Lord-Arcanum on Celestial Dracoline",
+   "base": "90 × 52mm",
+   "from": "Lord-Arcanum on Celestial Dracoline",
+   "fromId": "000000076",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "7843829e": {
+   "name": "Gryph-Hound",
+   "base": "40mm",
+   "from": "Gryph-hounds",
+   "fromId": "000000123",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "4a0c43b8": {
+   "name": "Annihilator with Meteoric Hammer",
+   "base": "40mm",
+   "from": "Annihilators",
+   "fromId": "000001139",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "ea2ed0a3": {
+   "name": "Vindictor",
+   "base": "40mm",
+   "from": "Vindictors",
+   "fromId": "000001134",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "c3228aef": {
+   "name": "Vanquisher",
+   "base": "40mm",
+   "from": "Vanquishers",
+   "fromId": "000001349",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "349b9eb3": {
+   "name": "Annihilator with Grandhammer",
+   "base": "40mm",
+   "from": "Annihilators",
+   "fromId": "000001139",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "48186a41": {
+   "name": "Praetor",
+   "base": "40mm",
+   "from": "Praetors",
+   "fromId": "000001140",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "cc438629": {
+   "name": "Vigilor",
+   "base": "40mm",
+   "from": "Vigilors",
+   "fromId": "000001366",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "126a9d19": {
+   "name": "Knight-Vexillor with Banner of Apotheosis",
+   "base": "40mm",
+   "from": "Knight-Vexillor",
+   "fromId": "000000071",
+   "fromFaction": "Stormcast Eternals",
+   "match": "base"
+  },
+  "8927d3fc": {
+   "name": "Knight-Relictor",
+   "base": "40mm",
+   "from": "Knight-Relictor",
+   "fromId": "000001353",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "040095bd": {
+   "name": "Knight-Arcanum",
+   "base": "40mm",
+   "from": "Knight-Arcanum",
+   "fromId": "000001135",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "f3fb309d": {
+   "name": "Lord-Imperatant",
+   "base": "40mm",
+   "from": "Lord-Imperatant",
+   "fromId": "000001137",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "b1186552": {
+   "name": "Knight-Questor",
+   "base": "40mm",
+   "from": "Knight-Questor",
+   "fromId": "000000069",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "dceff888": {
+   "name": "Liberator With Dual Sigmarite Weapons",
+   "base": "40mm",
+   "from": "Liberators",
+   "fromId": "000000061",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "9002c62d": {
+   "name": "Liberator With Sigmarite Weapon and Shield",
+   "base": "40mm",
+   "from": "Liberators",
+   "fromId": "000000061",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "2134ed36": {
+   "name": "Liberator With Grandhammer",
+   "base": "40mm",
+   "from": "Liberators",
+   "fromId": "000000061",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "7a3dcfca": {
+   "name": "Stormstrike Pallador",
+   "base": "90 × 52mm",
+   "from": "Stormstrike Palladors",
+   "fromId": "000001882",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "5597b674": {
+   "name": "Aetherwing",
+   "base": "32mm",
+   "from": "Aetherwings",
+   "fromId": "000000114",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "871dd186": {
+   "name": "Gryph-Hound",
+   "base": "40mm",
+   "from": "Gryph-hounds",
+   "fromId": "000000123",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "17a5c7c3": {
+   "name": "Vanguard-Hunter",
+   "base": "40mm",
+   "from": "Vanguard-Hunters",
+   "fromId": "000000131",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "05435287": {
+   "name": "Knight-Zephyros",
+   "base": "40mm",
+   "from": "Knight-Zephyros",
+   "fromId": "000000072",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "15417f0c": {
+   "name": "Knight-Azyros",
+   "base": "50mm",
+   "from": "Knight-Azyros",
+   "fromId": "000000066",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "5fc20860": {
+   "name": "Lord-Aquilor",
+   "base": "90 × 52mm",
+   "from": "Lord-Aquilor",
+   "fromId": "000000073",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "91a6fdeb": {
+   "name": "Knight-Venator",
+   "base": "50mm",
+   "from": "Knight-Venator",
+   "fromId": "000000070",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "e11a4980": {
+   "name": "Gryph-Hound",
+   "base": "40mm",
+   "from": "Gryph-hounds",
+   "fromId": "000000123",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "9e3266e3": {
+   "name": "Liberator with Warhammer and Sigmarite Shield",
+   "base": "40mm",
+   "from": "Liberators",
+   "fromId": "000000061",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "52ad2067": {
+   "name": "Liberator with Warblade and Sigmarite Shield",
+   "base": "40mm",
+   "from": "Liberators",
+   "fromId": "000000061",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "c6d21fa6": {
+   "name": "Retributor",
+   "base": "40mm",
+   "from": "Retributors",
+   "fromId": "000000127",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "c2e43d33": {
+   "name": "Decimator",
+   "base": "40mm",
+   "from": "Decimators",
+   "fromId": "000000117",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "0115e4c3": {
+   "name": "Liberator with Paired Warhammers",
+   "base": "40mm",
+   "from": "Liberators",
+   "fromId": "000000061",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "38faad84": {
+   "name": "Liberator with Paired Warblades",
+   "base": "40mm",
+   "from": "Liberators",
+   "fromId": "000000061",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "db773aee": {
+   "name": "Protector",
+   "base": "40mm",
+   "from": "Protectors",
+   "fromId": "000000126",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "a1b60d21": {
+   "name": "Liberator with Grandhammer",
+   "base": "40mm",
+   "from": "Liberators",
+   "fromId": "000000061",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "686009b5": {
+   "name": "Liberator with Grandblade",
+   "base": "40mm",
+   "from": "Liberators",
+   "fromId": "000000061",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "0253436b": {
+   "name": "Knight-Vexillor",
+   "base": "40mm",
+   "from": "Knight-Vexillor",
+   "fromId": "000000071",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "9331bd6b": {
+   "name": "Lord-Relictor",
+   "base": "40mm",
+   "from": "Lord-Relictor",
+   "fromId": "000000083",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "a1cff21c": {
+   "name": "Lord-Veritant",
+   "base": "40mm",
+   "from": "Lord-Veritant",
+   "fromId": "000000084",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "c860a56e": {
+   "name": "Knight-Heraldor",
+   "base": "40mm",
+   "from": "Knight-Heraldor",
+   "fromId": "000000067",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "a9f1ae21": {
+   "name": "Knight-Questor",
+   "base": "40mm",
+   "from": "Knight-Questor",
+   "fromId": "000000069",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "5a7a0b1a": {
+   "name": "Lord-Castellant",
+   "base": "40mm",
+   "from": "Lord-Castellant",
+   "fromId": "000000078",
+   "fromFaction": "Stormcast Eternals",
+   "match": "exact"
+  },
+  "14d68eb5": {
+   "name": "Prosecutor with Celestial Hammer and Sigmarite Shield",
+   "base": "40mm",
+   "from": "Prosecutors",
+   "fromId": "000001827",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "f4c9c4de": {
+   "name": "Prosecutor with Stormcall Javelin and Sigmarite Shield",
+   "base": "40mm",
+   "from": "Prosecutors",
+   "fromId": "000001827",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "7a6c8efd": {
+   "name": "Prosecutor with Paired Celestial Hammers",
+   "base": "40mm",
+   "from": "Prosecutors",
+   "fromId": "000001827",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "c293a2c7": {
+   "name": "Prosecutor with Grandaxe",
+   "base": "40mm",
+   "from": "Prosecutors",
+   "fromId": "000001827",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "28209a80": {
+   "name": "Prosecutor with Stormsurge Trident and Sigmarite Shield",
+   "base": "40mm",
+   "from": "Prosecutors",
+   "fromId": "000001827",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "4ad46e0d": {
+   "name": "Prosecutor with Grandhammer",
+   "base": "40mm",
+   "from": "Prosecutors",
+   "fromId": "000001827",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "95209c99": {
+   "name": "Prosecutor with Grandblade",
+   "base": "40mm",
+   "from": "Prosecutors",
+   "fromId": "000001827",
+   "fromFaction": "Stormcast Eternals",
+   "match": "plural"
+  },
+  "4c8c3f46": {
+   "name": "Tree-Revenant",
+   "base": "32mm",
+   "from": "Tree-Revenants",
+   "fromId": "000000319",
+   "fromFaction": "Sylvaneth",
+   "match": "plural"
+  },
+  "d24e0a5c": {
+   "name": "Dryad",
+   "base": "32mm",
+   "from": "Dryads",
+   "fromId": "000000304",
+   "fromFaction": "Sylvaneth",
+   "match": "plural"
+  },
+  "9722eb47": {
+   "name": "Spite-Revenant",
+   "base": "32mm",
+   "from": "Spite-Revenants",
+   "fromId": "000000318",
+   "fromFaction": "Sylvaneth",
+   "match": "plural"
+  },
+  "3a6af4aa": {
+   "name": "Gossamid Archer",
+   "base": "32mm",
+   "from": "Gossamid Archers",
+   "fromId": "000001422",
+   "fromFaction": "Sylvaneth",
+   "match": "plural"
+  },
+  "ec06b688": {
+   "name": "Branchwych",
+   "base": "32mm",
+   "from": "Branchwych",
+   "fromId": "000000308",
+   "fromFaction": "Sylvaneth",
+   "match": "exact"
+  },
+  "8a4d5f1a": {
+   "name": "Revenant Seeker",
+   "base": "60mm",
+   "from": "Revenant Seekers",
+   "fromId": "000001423",
+   "fromFaction": "Sylvaneth",
+   "match": "plural"
+  },
+  "0766a660": {
+   "name": "Spiterider Lancer",
+   "base": "60mm",
+   "from": "Spiterider Lancers",
+   "fromId": "000001424",
+   "fromFaction": "Sylvaneth",
+   "match": "plural"
+  },
+  "c459d500": {
+   "name": "Arch-Revenant",
+   "base": "40mm",
+   "from": "Arch-Revenant",
+   "fromId": "000000306",
+   "fromFaction": "Sylvaneth",
+   "match": "exact"
+  }
+ }
+}
