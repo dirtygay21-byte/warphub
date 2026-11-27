@@ -5,10 +5,10 @@
  */
 import { useMemo, useState, type ReactNode } from 'react';
 import type { ComputedRoster } from '../../engine/compute';
-import { fmtInches } from '../../testarmy';
+import { fmtInches, sampleDist } from '../../testarmy';
 import { simulate, type Situation } from '../../testarmy/combat';
 import { attackRows, inHalfRange, inRange, targetFrom, toWeaponInput } from '../../testarmy/combatInput';
-import { Segmented, Sheet } from '../kit';
+import { Button, Segmented, Sheet } from '../kit';
 import { cx } from '../util';
 import { haptic } from '../../telegram';
 
@@ -16,7 +16,11 @@ type Side = { name: string; cr: ComputedRoster; uid: string };
 const pct = (p: number) => (p >= 0.995 && p < 1 ? '>99' : p > 0 && p < 0.005 ? '<1' : String(Math.round(p * 100)));
 const fix = (v: number) => (Math.round(v * 10) / 10).toFixed(1).replace('.', ',');
 
-export function CombatSheet({ attacker, target, distance, onClose }: { attacker: Side; target: Side; distance: number | null; onClose: () => void }) {
+/**
+ * onRoll (27.11.2026): «Бросить» — одно случайное значение из рассчитанного распределения убитых моделей;
+ * лист закрывается, результат — баннером на столе.
+ */
+export function CombatSheet({ attacker, target, distance, onClose, onRoll }: { attacker: Side; target: Side; distance: number | null; onClose: () => void; onRoll?: (killed: number, models: number) => void }) {
   const [melee, setMelee] = useState(false);
   const rows = useMemo(() => attackRows(attacker.cr, attacker.uid, melee), [attacker.cr, attacker.uid, melee]);
   // выбор оружия: по умолчанию — первый профиль каждого оружия, которое достаёт до цели
@@ -183,6 +187,11 @@ export function CombatSheet({ attacker, target, distance, onClose }: { attacker:
           <p className="text-sm text-fg-3">{result.error}</p>
         ) : (
           <section className="space-y-2.5">
+            {onRoll && (
+              <Button className="w-full" onClick={() => (haptic.select(), onRoll(sampleDist(result.slain), tgt.target.models), onClose())}>
+                Бросить кубы — результат на столе
+              </Button>
+            )}
             <div className="grid grid-cols-3 gap-1.5 text-center">
               <Big label="Уничтожить" value={`${pct(result.wipe)}%`} />
               <Big label={`Убито из ${tgt.target.models}`} value={fix(result.expectedSlain)} />

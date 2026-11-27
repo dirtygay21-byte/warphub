@@ -42,11 +42,12 @@ import {
   type Side,
   type TAArmy,
   type TAUnit,
+  armyColor,
 } from '../../testarmy';
+import { ArmyBar, Banner, OffTable, type BannerSpec } from './BoardHud';
 import { Button, Icon, IconButton, Segmented } from '../kit';
 import { cx } from '../util';
 
-const SIDE_COLOR: Record<Side, string> = { attacker: '#f87171', defender: '#60a5fa' };
 const ACCENT = '#eaff44';
 const OUTSIDE = '#ff3b3b';
 const GAPS = [0, 0.5, 1, 2];
@@ -117,7 +118,10 @@ type Gesture = {
  * панель справа (закрывается, когда нужно нажать на поле).
  */
 /** Симулятор боя (S2, 08.11.2026): лист атаки отряда по цели; только 40K (передаёт TestArmyScreen). */
-export type CombatRender = (a: { attacker: TAUnit; attackerArmy: BoardArmy; target: TAUnit; targetArmy: BoardArmy; distance: number | null }, onClose: () => void) => ReactNode;
+export type CombatRender = (
+  a: { attacker: TAUnit; attackerArmy: BoardArmy; target: TAUnit; targetArmy: BoardArmy; distance: number | null; onBanner: (b: Omit<BannerSpec, 'id'>) => void },
+  onClose: () => void,
+) => ReactNode;
 
 export function Board(props: {
   armies: BoardArmy[];
@@ -125,6 +129,8 @@ export function Board(props: {
   onArmy: (key: ArmyKey, units: TAUnit[]) => void;
   onBack: () => void;
   combat?: CombatRender;
+  /** выбор цвета армии (27.11.2026); нет — цвет не меняется */
+  onArmyColor?: (key: ArmyKey, hex: string) => void;
 }) {
   const width = props.field.width ?? 60;
   const height = props.field.height ?? 44;
@@ -142,6 +148,7 @@ function BoardInner({
   onArmy,
   onBack,
   combat,
+  onArmyColor,
 }: {
   /** своя армия (me) и, если выбрана, армия соперника (foe) — за другую сторону */
   armies: BoardArmy[];
@@ -149,6 +156,7 @@ function BoardInner({
   onArmy: (key: ArmyKey, units: TAUnit[]) => void;
   onBack: () => void;
   combat?: CombatRender;
+  onArmyColor?: (key: ArmyKey, hex: string) => void;
 }) {
   const { width, height, orientation } = useContext(BoardDimensions);
   const disp = useDisp();
@@ -167,6 +175,13 @@ function BoardInner({
     const i = a.units.findIndex((x) => x.uid === u.uid) + 1;
     return a.key === 'foe' ? `С${i}` : String(i);
   };
+  // цвет армии: свой выбор или цвет стороны; у двух армий одного цвета — разные (look.ts)
+  const colorOfArmy = (a: BoardArmy) => armyColor(a, armies.find((x) => x.key !== a.key) ?? null);
+  const colorOf = (uid: string) => colorOfArmy(armyOf(uid));
+  const [banner, setBanner] = useState<BannerSpec | null>(null);
+  // id — новый баннер того же текста тоже показывается заново
+  const showBanner = useCallback((b: Omit<BannerSpec, 'id'>) => setBanner((prev) => ({ ...b, id: (prev?.id ?? 0) + 1 + Math.random() })), []);
+  const hideBanner = useCallback(() => setBanner(null), []);
   const [tab, setTab] = useState<ArmyKey>('me');
   const [selected, setSelected] = useState<string | null>(null);
   const [panel, setPanel] = useState(false);
@@ -321,6 +336,10 @@ function BoardInner({
       return;
     }
     if (tool === 'units' || !sel) return;
+    if (!sel.placed) {
+      const a = armyOf(sel.uid);
+      showBanner({ kicker: a.name, title: sel.name, sub: `на столе · моделей: ${sel.models.length}`, color: colorOfArmy(a), tone: 'event' });
+    }
     update(placeUnit(sel, clamp(p)));
     haptic.select();
   };
@@ -332,6 +351,8 @@ function BoardInner({
   const startModel = (e: PointerEvent, unit: TAUnit, modelId: string) => {
     if (attackFrom) {
       if (armyOf(unit.uid).key !== armyOf(attackFrom).key) {
+        const from = units.find((u) => u.uid === attackFrom);
+        if (from) showBanner({ kicker: 'Атака', title: from.name, sub: `→ ${unit.name}`, color: colorOf(from.uid), tone: 'event' });
         setAttack({ from: attackFrom, to: unit.uid });
         setAttackFrom(null);
         haptic.select();
@@ -469,6 +490,15 @@ function BoardInner({
     if (tap) onTap(e.clientX, e.clientY);
   };
 
+  // «Вне стола»: выбрать отряд — следующее нажатие на поле ставит его
+  const pickOffTable = (uid: string) => {
+    haptic.select();
+    setSelected(uid);
+    setTool('move');
+    setAttackFrom(null);
+    setPanel(false);
+  };
+
   const setFormation = (f: Formation) => {
     if (!sel) return;
     const c = unitCenter(sel);
@@ -540,9 +570,15 @@ function BoardInner({
         const ab = unitsOf(a.uid);
         const tb = unitsOf(t.uid);
         const distance = ab.length && tb.length ? unitToUnit(ab, tb).d : null;
-        return combat({ attacker: a, attackerArmy: armyOf(a.uid), target: t, targetArmy: armyOf(t.uid), distance }, () => setAttack(null));
+        return combat({ attacker: a, attackerArmy: armyOf(a.uid), target: t, targetArmy: armyOf(t.uid), distance, onBanner: showBanner }, () => setAttack(null));
       })()}
 
+      <div className="flex min-w-0 flex-1 flex-col pt-[env(safe-area-inset-top)]">
+      <ArmyBar
+        armies={armies.map((a) => ({ key: a.key, name: a.name, color: colorOfArmy(a), placed: a.units.filter((u) => u.placed).length, total: a.units.length }))}
+        onColor={onArmyColor ? (key, hex) => onArmyColor(key as ArmyKey, hex) : undefined}
+      />
+      {foe && <OffTable name={foe.name} color={colorOfArmy(foe)} units={foe.units.filter((u) => !u.placed)} label={label} selected={selected} onPick={pickOffTable} />}
       {/* поле: жесты — свои (touch-action: none), браузер ничего не прокручивает */}
       <div
         ref={viewport}
@@ -555,6 +591,20 @@ function BoardInner({
         <div ref={content} className="absolute left-0 top-0 origin-top-left" style={{ width: base.w, height: base.h }}>
           {field.background}
           <svg ref={svg} viewBox={viewBox} className="absolute inset-0 h-full w-full">
+            {armies.map((a) =>
+              (field.zones[a.side] ?? []).map((poly, i) => (
+                <polygon
+                  key={`${a.key}${i}`}
+                  points={poly.map((pt) => disp(pt).join(',')).join(' ')}
+                  fill={colorOfArmy(a)}
+                  fillOpacity={0.16}
+                  stroke={colorOfArmy(a)}
+                  strokeOpacity={0.85}
+                  strokeWidth={0.14}
+                  pointerEvents="none"
+                />
+              )),
+            )}
             {ranges &&
               field.objectives.map((o, i) => {
                 const [x, y] = disp([o.x, o.y]);
@@ -565,33 +615,27 @@ function BoardInner({
                 key={u.uid}
                 unit={u}
                 n={label(u)}
-                color={SIDE_COLOR[armyOf(u.uid).side]}
+                color={colorOf(u.uid)}
                 active={tool === 'units' ? pair.includes(u.uid) : u.uid === selected}
+                plate={u.uid === selected || u.uid === attackFrom ? armyOf(u.uid).name : null}
                 single={single}
                 outside={outside}
               />
             ))}
             {tool === 'move' && info?.objective && <Measure from={info.objective.from} to={info.objective.to} d={info.objective.d} color={info.objective.inRange ? '#4ade80' : ACCENT} dashed />}
-            {tool === 'move' && info?.enemy && info.enemy.d > 0 && !info.foe && <Measure from={info.enemy.from} to={info.enemy.to} d={info.enemy.d} color={selArmy.side === 'attacker' ? SIDE_COLOR.defender : SIDE_COLOR.attacker} dashed />}
+            {tool === 'move' && info?.enemy && info.enemy.d > 0 && !info.foe && <Measure from={info.enemy.from} to={info.enemy.to} d={info.enemy.d} color={enemyArmy ? colorOfArmy(enemyArmy) : '#fff'} dashed />}
             {tool === 'move' && info?.foe && <Measure from={info.foe.from} to={info.foe.to} d={info.foe.d} color="#ffffff" dashed />}
             {tool === 'units' && pairLine && <Measure from={pairLine.from} to={pairLine.to} d={pairLine.d} color="#fff" />}
             {tool === 'ruler' && rulerLine && <Measure from={rulerLine.from} to={rulerLine.to} d={rulerLine.d} color="#fff" handles onHandle={onEndDown} />}
             {tool === 'ruler' && !rulerLine && rulerA && <circle cx={disp(rulerA)[0]} cy={disp(rulerA)[1]} r={0.35} fill="#fff" pointerEvents="none" />}
           </svg>
         </div>
-        <p className="pointer-events-none absolute left-2 right-2 top-[max(0.5rem,env(safe-area-inset-top))] line-clamp-2 rounded-lg bg-black/75 px-2.5 py-1.5 text-[13px] leading-snug text-white/85">
+        <Banner banner={banner} onDone={hideBanner} />
+        <p className="pointer-events-none absolute left-2 right-2 top-2 line-clamp-2 rounded-lg bg-black/75 px-2.5 py-1.5 text-[13px] leading-snug text-white/85">
           {status}
         </p>
-        {!panel && !sel && tool === 'move' && placedCount < me.units.length && (
-          <button
-            type="button"
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => (haptic.select(), setPanel(true))}
-            className="absolute bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground shadow-[0_6px_20px_rgba(0,0,0,0.5)] active:opacity-80"
-          >
-            Выставить отряды · {placedCount}/{me.units.length}
-          </button>
-        )}
+      </div>
+      <OffTable name={me.name} color={colorOfArmy(me)} units={me.units.filter((u) => !u.placed)} label={label} selected={selected} onPick={pickOffTable} />
       </div>
 
       {/* колонка инструментов справа */}
@@ -669,7 +713,7 @@ function BoardInner({
                 <UnitList
                   units={(tab === 'foe' && foe ? foe : me).units}
                   label={label}
-                  color={SIDE_COLOR[(tab === 'foe' && foe ? foe : me).side]}
+                  color={colorOfArmy(tab === 'foe' && foe ? foe : me)}
                   onSelect={(uid) => (haptic.select(), setSelected(uid), setTool('move'))}
                 />
               </>
@@ -700,7 +744,10 @@ function RailButton({ icon, label, active, onClick }: { icon: string; label: str
   );
 }
 
-/** Базы отряда на столе и номер отряда в центре; красная обводка — база не целиком в своей зоне деплоя. */
+/**
+ * Базы отряда на столе и номер отряда в центре (жетон цвета армии); красная обводка — база не целиком в своей зоне деплоя.
+ * Выбранный отряд (plate — название армии): кольцо подсветки и табличка «название отряда / армия», как в battle report.
+ */
 function UnitShapes({
   unit,
   n,
@@ -708,6 +755,7 @@ function UnitShapes({
   active,
   single,
   outside,
+  plate,
 }: {
   unit: TAUnit;
   n: string;
@@ -715,6 +763,7 @@ function UnitShapes({
   active: boolean;
   single: string | null;
   outside: Set<string>;
+  plate?: string | null;
 }) {
   const disp = useDisp();
   const bases = placedBases(unit);
@@ -744,7 +793,30 @@ function UnitShapes({
           <ellipse key={m.id} cx={x} cy={y} rx={b.rx} ry={b.ry} {...common} />
         );
       })}
-      <text x={cx0} y={cy0 + 0.32} textAnchor="middle" fontSize={0.95} fontWeight={700} fill="#fff" pointerEvents="none" style={{ paintOrder: 'stroke' }} stroke="rgba(0,0,0,0.7)" strokeWidth={0.18}>
+      {plate && (() => {
+        // кольцо вокруг всех баз отряда
+        const pts = bases.flatMap((b) => (b ? [{ p: disp([b.x, b.y]), r: Math.max(b.rx, b.ry) }] : []));
+        const ring = Math.max(1, ...pts.map(({ p, r }) => Math.hypot(p[0] - cx0, p[1] - cy0) + r)) + 0.5;
+        const name = unit.name.length > 28 ? `${unit.name.slice(0, 27)}…` : unit.name;
+        const w = Math.max(name.length * 0.52, plate.length * 0.36) + 1.4;
+        const top = cy0 - ring - 2.6;
+        const y = top < -1 ? cy0 + ring + 0.4 : top;
+        return (
+          <g pointerEvents="none">
+            <circle cx={cx0} cy={cy0} r={ring} fill="none" stroke="#f5c542" strokeWidth={0.18} strokeDasharray="0.6 0.35" />
+            <rect x={cx0 - w / 2} y={y} width={w} height={2.2} rx={0.3} fill="rgba(8,10,14,0.92)" stroke={color} strokeWidth={0.12} />
+            <rect x={cx0 - w / 2} y={y} width={w} height={0.22} fill={color} />
+            <text x={cx0} y={y + 1.15} textAnchor="middle" fontSize={0.95} fontWeight={800} fill="#fff" style={{ textTransform: 'uppercase' }}>
+              {name}
+            </text>
+            <text x={cx0} y={y + 1.9} textAnchor="middle" fontSize={0.6} fontWeight={700} fill={color} style={{ textTransform: 'uppercase' }}>
+              {plate}
+            </text>
+          </g>
+        );
+      })()}
+      <circle cx={cx0} cy={cy0} r={0.62} fill={color} stroke="#fff" strokeWidth={0.1} pointerEvents="none" />
+      <text x={cx0} y={cy0 + 0.27} textAnchor="middle" fontSize={n.length > 2 ? 0.6 : 0.78} fontWeight={800} fill="#fff" pointerEvents="none">
         {n}
       </text>
     </g>
