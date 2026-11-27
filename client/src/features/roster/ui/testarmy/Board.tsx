@@ -231,7 +231,13 @@ function BoardInner({
   // ---------- симулятор фаз (этап 2, 27.11.2026) ----------
   const [game, setGame] = useState(false);
   const [turn, setTurn] = useState<{ army: ArmyKey; phase: number; round: number; first: ArmyKey; flags: Record<string, UnitFlags> }>({ army: 'me', phase: 0, round: 1, first: 'me', flags: {} });
-  const [active, setActive] = useState<ActiveMove | null>(null);
+  const [active, setActiveState] = useState<ActiveMove | null>(null);
+  // зеркало для обработчиков жеста: манёвр, начатый первым касанием, ограничивает уже следующий кадр перетаскивания
+  const activeRef = useRef<ActiveMove | null>(null);
+  const setActive = (am: ActiveMove | null) => {
+    activeRef.current = am;
+    setActiveState(am);
+  };
   const [charging, setCharging] = useState<{ uid: string; targets: string[] } | null>(null);
   const [attackKind, setAttackKind] = useState<'shoot' | 'fight' | null>(null);
   const [history, setHistory] = useState<{ units: Partial<Record<ArmyKey, TAUnit[]>>; flags: Record<string, UnitFlags> }[]>([]);
@@ -500,11 +506,8 @@ function BoardInner({
     }
     if (a.kind === 'move') {
       const roll = a.distance?.dice ? rollDice(a.distance.dice) : undefined;
-      const am = startMove(u, a, army.sim?.moves(u) ?? [], roll);
+      const am = beginMove(u, a, roll);
       if (!am) return;
-      snapshot();
-      setActive(am);
-      setSelected(u.uid);
       if (a.mortalD3) {
         const d3 = Math.ceil(rollDice(1)[0]! / 2);
         showBanner({ kicker: u.name, title: `${a.label}: ${d3} ран`, sub: `D3 смертельных ран (mortal damage) — снимите вручную`, color, tone: 'bad' });
@@ -519,6 +522,25 @@ function BoardInner({
     setAttackKind(a.kind === 'fight' ? 'fight' : 'shoot');
     setAttackFrom(u.uid);
   };
+  /** Начать манёвр: снимок для «Отменить», зона дистанции, ограничение перетаскивания. */
+  const beginMove = (u: TAUnit, a: SimActionDef, roll?: number[]): ActiveMove | null => {
+    const am = startMove(u, a, armyOf(u.uid).sim?.moves(u) ?? [], roll);
+    if (!am) return null;
+    snapshot();
+    setActive(am);
+    setSelected(u.uid);
+    return am;
+  };
+  /** Манёвр по умолчанию для выбранного отряда (без броска): Normal Move / Reposition / Move / сближение — первый доступный. */
+  const defaultMove = (u: TAUnit): SimActionDef | null => (game && rules && phase ? actionsFor(u).find((a) => a.kind === 'move' && !a.blocked && !a.distance?.dice) ?? null : null);
+  /** Зона манёвра для показа: идущий манёвр или (до первого касания) манёвр по умолчанию выбранного отряда. */
+  const zoneMove: ActiveMove | null = (() => {
+    if (!game) return null;
+    if (active) return active;
+    if (!sel?.placed || charging || attackFrom) return null;
+    const def = defaultMove(sel);
+    return def ? startMove(sel, def, armyOf(sel.uid).sim?.moves(sel) ?? []) : null;
+  })();
   const rollCharge = () => {
     if (!charging || !rules) return;
     const u = units.find((x) => x.uid === charging.uid);
@@ -592,6 +614,27 @@ function BoardInner({
       return;
     }
     if (tool === 'units' || !sel) return;
+    if (game && sel.placed) {
+      // режим фаз: нажатие двигает отряд к точке, но не дальше его дистанции (выставленный отряд не «телепортируется»)
+      let am = activeRef.current;
+      if (am && am.uid !== sel.uid) return;
+      if (!am) {
+        const def = defaultMove(sel);
+        am = def ? beginMove(sel, def) : null;
+      }
+      if (!am) return;
+      const placedNow = sel.models.filter((m) => m.at);
+      if (!placedNow.length) return;
+      const cx0 = placedNow.reduce((t, m) => t + m.at![0], 0) / placedNow.length;
+      const cy0 = placedNow.reduce((t, m) => t + m.at![1], 0) / placedNow.length;
+      const from: Record<string, Pt> = {};
+      for (const m of placedNow) from[m.id] = m.at!;
+      const [tx, ty] = clamp(p);
+      const k = clampShift(am, from, Object.keys(from), tx - cx0, ty - cy0);
+      update(moveUnit(sel, (tx - cx0) * k, (ty - cy0) * k));
+      haptic.select();
+      return;
+    }
     if (!sel.placed) {
       const a = armyOf(sel.uid);
       showBanner({ kicker: a.name, title: sel.name, sub: `на столе · моделей: ${sel.models.length}`, color: colorOfArmy(a), tone: 'event' });
@@ -660,10 +703,17 @@ function BoardInner({
     const p = toBoard(e.clientX, e.clientY);
     if (!p) return;
     setSelected(unit.uid);
-    // режим фаз: двигать можно только отряд, который сейчас совершает манёвр
-    if (game && !(active && active.uid === unit.uid)) {
-      haptic.select();
-      return;
+    // режим фаз: двигать можно только отряд, который совершает манёвр; первое касание выбранного отряда
+    // начинает манёвр по умолчанию (Normal Move / Reposition / Move), если другого нет
+    if (game) {
+      const cur = activeRef.current;
+      if (!(cur && cur.uid === unit.uid)) {
+        const def = !cur && unit.uid === selected ? defaultMove(unit) : null;
+        if (!def || !beginMove(unit, def)) {
+          haptic.select();
+          return;
+        }
+      }
     }
     const d: Drag = { uid: unit.uid, modelId: null, start: p, orig: unit, moved: false, timer: undefined, pointerId: e.pointerId };
     d.timer = window.setTimeout(() => {
@@ -732,7 +782,8 @@ function BoardInner({
       // манёвр симулятора: сдвиг урезается до максимальной дистанции каждой модели (от начала манёвра)
       const from: Record<string, Pt> = {};
       for (const m of d.orig.models) if (m.at) from[m.id] = m.at;
-      const k = game && active && active.uid === d.orig.uid ? clampShift(active, from, d.modelId ? [d.modelId] : Object.keys(from), dx, dy) : 1;
+      const am = activeRef.current;
+      const k = game && am && am.uid === d.orig.uid ? clampShift(am, from, d.modelId ? [d.modelId] : Object.keys(from), dx, dy) : 1;
       if (d.modelId) {
         const m = d.orig.models.find((x) => x.id === d.modelId);
         if (m?.at) update(moveModel(d.orig, d.modelId, clamp([m.at[0] + dx * k, m.at[1] + dy * k])));
@@ -946,21 +997,42 @@ function BoardInner({
                   return <ellipse key={`${e.uid}${i}`} cx={x} cy={y} rx={b.rx + rules.engagement} ry={b.ry + rules.engagement} transform={`rotate(${(b.angle * 180) / Math.PI + 90} ${x} ${y})`} fill="#ff3b3b" fillOpacity={0.05} stroke="#ff3b3b" strokeOpacity={0.45} strokeWidth={0.06} strokeDasharray="0.3 0.25" pointerEvents="none" />;
                 }),
               )}
-            {game && active && activeUnit &&
-              activeUnit.models.map((m) => {
-                const st = active.start[m.id];
-                const mx = active.max[m.id];
-                if (!st || mx == null) return null;
+            {zoneMove && (() => {
+              // одна зона дистанции: объединение досягаемости моделей (центр модели + её максимум + радиус базы), без колец по моделям
+              const zu = units.find((u) => u.uid === zoneMove.uid);
+              if (!zu) return null;
+              const col = colorOf(zu.uid);
+              const circles = zu.models.flatMap((m) => {
+                const st = zoneMove.start[m.id];
+                const mx = zoneMove.max[m.id];
+                if (!st || mx == null) return [];
+                const b = placedBases({ ...zu, models: [{ ...m, at: st }] })[0];
                 const [x, y] = disp(st);
-                const b = placedBases({ ...activeUnit, models: [m] })[0];
-                const r = mx + (b ? Math.max(b.rx, b.ry) : 0);
-                return (
-                  <g key={m.id} pointerEvents="none">
-                    <circle cx={x} cy={y} r={r} fill={colorOf(activeUnit.uid)} fillOpacity={0.05} stroke={colorOf(activeUnit.uid)} strokeOpacity={0.8} strokeWidth={0.08} strokeDasharray="0.4 0.3" />
-                    <circle cx={x} cy={y} r={0.18} fill="#fff" fillOpacity={0.7} />
+                return [{ id: m.id, x, y, r: mx + (b ? Math.max(b.rx, b.ry) : 0) }];
+              });
+              if (!circles.length) return null;
+              const maxD = Math.max(...Object.values(zoneMove.max));
+              const top = circles.reduce((t, c) => (c.y - c.r < t.y - t.r ? c : t));
+              const mask = `zone-${zu.uid.replace(/[^a-z0-9]/gi, '')}`;
+              return (
+                <g pointerEvents="none">
+                  <defs>
+                    <mask id={mask}>
+                      <rect x={-100} y={-100} width={400} height={400} fill="#fff" />
+                      {circles.map((c) => <circle key={c.id} cx={c.x} cy={c.y} r={c.r} fill="#000" />)}
+                    </mask>
+                  </defs>
+                  <g opacity={0.16}>{circles.map((c) => <circle key={c.id} cx={c.x} cy={c.y} r={c.r} fill={col} />)}</g>
+                  <g mask={`url(#${mask})`}>{circles.map((c) => <circle key={c.id} cx={c.x} cy={c.y} r={c.r + 0.14} fill={col} />)}</g>
+                  <g transform={`translate(${top.x} ${top.y - top.r - 0.35})`}>
+                    <rect x={-1.4} y={-0.95} width={2.8} height={1.15} rx={0.3} fill={col} />
+                    <text y={-0.08} textAnchor="middle" fontSize={0.85} fontWeight={800} fill="#fff">
+                      {fmtInches(maxD)}
+                    </text>
                   </g>
-                );
-              })}
+                </g>
+              );
+            })()}
             {units.map((u) => (
               <UnitShapes
                 key={u.uid}
