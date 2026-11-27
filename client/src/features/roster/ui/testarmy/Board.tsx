@@ -179,8 +179,8 @@ function BoardInner({
   const colorOfArmy = (a: BoardArmy) => armyColor(a, armies.find((x) => x.key !== a.key) ?? null);
   const colorOf = (uid: string) => colorOfArmy(armyOf(uid));
   const [banner, setBanner] = useState<BannerSpec | null>(null);
-  const bannerSeq = useRef(0);
-  const showBanner = useCallback((b: Omit<BannerSpec, 'id'>) => setBanner({ ...b, id: ++bannerSeq.current }), []);
+  // id — новый баннер того же текста тоже показывается заново
+  const showBanner = useCallback((b: Omit<BannerSpec, 'id'>) => setBanner((prev) => ({ ...b, id: (prev?.id ?? 0) + 1 + Math.random() })), []);
   const hideBanner = useCallback(() => setBanner(null), []);
   const [tab, setTab] = useState<ArmyKey>('me');
   const [selected, setSelected] = useState<string | null>(null);
