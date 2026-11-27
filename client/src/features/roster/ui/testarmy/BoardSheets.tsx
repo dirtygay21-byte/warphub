@@ -179,25 +179,22 @@ export function UnitsSheet({
   );
 }
 
-/** Быстрая панель над картой (U2): строй, «По одной», поворот, «Готово». */
-export function QuickBar({ formation, perModel, onFormation, onPerModel, onRotate, onDone }: { formation: string; perModel: boolean; onFormation: () => void; onPerModel: () => void; onRotate: (deg: number) => void; onDone: () => void }) {
-  const btn = 'h-10 rounded-[10px] bg-[#23262c] px-2.5 text-[12.5px] text-white';
+/** Быстрые кнопки выбранного отряда (U2) — строка в свёрнутой карточке: строй, «По одной», поворот. */
+export function QuickBar({ formation, perModel, onFormation, onPerModel, onRotate }: { formation: string; perModel: boolean; onFormation: () => void; onPerModel: () => void; onRotate: (deg: number) => void }) {
+  const btn = 'h-10 rounded-[10px] bg-white/10 px-2.5 text-[13px] text-white';
   return (
-    <div className="flex items-center gap-1 self-start rounded-[14px] bg-[#0b0d12]/95 p-1 shadow-[0_8px_20px_rgba(0,0,0,0.5)]" onPointerDown={stop}>
-      <button type="button" onClick={onFormation} className={btn}>
+    <div className="mt-2 flex items-center gap-1.5">
+      <button type="button" onClick={onFormation} className={cx(btn, 'min-w-0 flex-1 truncate')}>
         {formation} ▾
       </button>
-      <button type="button" aria-pressed={perModel} onClick={onPerModel} className={cx(btn, perModel && '!bg-accent font-bold !text-[#0b0d12]')}>
+      <button type="button" aria-pressed={perModel} onClick={onPerModel} className={cx(btn, 'min-w-0 flex-1 truncate', perModel && '!bg-accent font-bold !text-[#0b0d12]')}>
         По одной
       </button>
-      <button type="button" aria-label="Повернуть влево" onClick={() => onRotate(-15)} className={cx(btn, 'w-10 px-0 text-lg')}>
+      <button type="button" aria-label="Повернуть влево" onClick={() => onRotate(-15)} className={cx(btn, 'w-12 shrink-0 px-0 text-lg')}>
         ↺
       </button>
-      <button type="button" aria-label="Повернуть вправо" onClick={() => onRotate(15)} className={cx(btn, 'w-10 px-0 text-lg')}>
+      <button type="button" aria-label="Повернуть вправо" onClick={() => onRotate(15)} className={cx(btn, 'w-12 shrink-0 px-0 text-lg')}>
         ↻
-      </button>
-      <button type="button" aria-label="Готово" onClick={onDone} className="h-10 w-10 rounded-[10px] bg-[#f5c542] font-extrabold text-[#0b0d12]">
-        ✓
       </button>
     </div>
   );
@@ -214,11 +211,17 @@ export function UnitCard({
   onTab,
   onToggle,
   onClose,
+  tools,
+  subTone,
   children,
 }: {
   n: string;
   name: string;
   sub: string;
+  /** зелёная / красная подпись (зона деплоя, строй) */
+  subTone?: 'good' | 'bad';
+  /** быстрые кнопки свёрнутой карточки */
+  tools?: ReactNode;
   color: string;
   open: boolean;
   tab: CardTab;
@@ -236,7 +239,7 @@ export function UnitCard({
         </span>
         <div className="min-w-0 flex-1">
           <p className="font-display truncate text-[16px] font-semibold uppercase leading-tight">{name}</p>
-          <p className="truncate text-[11.5px] text-fg-3">{sub}</p>
+          <p className={cx('truncate text-[11.5px]', subTone === 'bad' ? 'font-bold text-[#F87171]' : subTone === 'good' ? 'font-bold text-[#6fe0a0]' : 'text-fg-3')}>{sub}</p>
         </div>
         {!open && (
           <button type="button" onClick={onToggle} className="h-10 shrink-0 rounded-[10px] bg-white/10 px-3 text-[13px]">
@@ -247,6 +250,7 @@ export function UnitCard({
           ✕
         </button>
       </div>
+      {!open && tools}
       {open && (
         <>
           <div className="mt-2 flex gap-1 rounded-xl bg-[#0b0d12] p-[3px]">
