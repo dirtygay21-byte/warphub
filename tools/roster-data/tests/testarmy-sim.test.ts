@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { checkMove, clampShift, parseInches, parseTarget, rollDice, rules40k, startMove, type SimContext } from '../../../client/src/features/roster/testarmy/sim';
 import type { TAUnit } from '../../../client/src/features/roster/testarmy/state';
+import { rulesAos, rulesKt, rulesWarcry } from '../../../client/src/features/roster/testarmy/simSystems';
 
 // Test Army, этап 2 (27.11.2026): фазы и действия 40K по основным правилам 11-й ред. (wh-rules.ru, данные 995).
 const unit = (uid: string, pts: [number, number][]): TAUnit => ({
@@ -87,4 +88,61 @@ test('Стол: режим «Фазы» только с правилами; 40K 
   for (const token of ['<PhaseBar', '<ActionPanel', '<MovePanel', '<ChargePanel', 'clampShift(active', 'checkMove(active']) assert.ok(board.includes(token), token);
   const screen = readFileSync(join(import.meta.dirname, '../../../client/src/features/roster/ui/testarmy/TestArmyScreen.tsx'), 'utf8');
   for (const token of ['rules={rules40k}', 'melee={c.melee}', 'parseInches(', 'parseTarget(']) assert.ok(screen.includes(token), token);
+});
+
+// ---------- этап 3: AoS, Kill Team, Warcry ----------
+const pick = (r: typeof rulesAos, c: Partial<SimContext>, id: string) => r.actions(ctx(c)).find((a) => a.id === id)!;
+
+test('AoS 4: combat range 3″, Run = Move + D6, Retreat только из боя с D3, после Run/Retreat нет стрельбы и нападения', () => {
+  assert.equal(rulesAos.engagement, 3);
+  assert.deepEqual(pick(rulesAos, {}, 'advance').distance, { move: true, dice: 1 });
+  assert.match(pick(rulesAos, {}, 'fallback').blocked!, /в бою/);
+  assert.equal(pick(rulesAos, { engaged: true }, 'fallback').mortalD3, true);
+  assert.match(pick(rulesAos, { phase: 'shooting', flags: { moved: 'advance' } }, 'shoot').blocked!, /Run/);
+  assert.match(pick(rulesAos, { phase: 'charge', flags: { moved: 'fallback' } }, 'charge').blocked!, /Retreat/);
+  const ch = pick(rulesAos, { phase: 'charge' }, 'charge');
+  assert.equal(ch.endNear, 0.5);
+  assert.equal(ch.failable, true);
+  assert.deepEqual(ch.distance, { dice: 2 });
+  // combat: обе армии
+  assert.deepEqual(rulesAos.bothArmies, ['combat']);
+});
+
+test('Kill Team: control range 1″, APL, Reposition/Dash/Fall Back/Charge по правилам', () => {
+  const ff = { phase: 'firefight', apl: 3 };
+  assert.equal(rulesKt.engagement, 1);
+  assert.equal(rulesKt.activation!.budget(ctx(ff)), 3);
+  assert.equal(pick(rulesKt, ff, 'fallback').ap, 2);
+  assert.match(pick(rulesKt, ff, 'fallback').blocked!, /control range/);
+  assert.match(pick(rulesKt, { ...ff, engaged: true }, 'reposition').blocked!, /control range/);
+  assert.deepEqual(pick(rulesKt, ff, 'charge').distance, { move: true, plus: 2 });
+  assert.match(pick(rulesKt, ff, 'charge').blocked!, /Conceal/, 'приказ по умолчанию Conceal');
+  assert.equal(pick(rulesKt, { ...ff, flags: { order: 'engage' } }, 'charge').blocked, undefined);
+  assert.match(pick(rulesKt, { ...ff, flags: { order: 'engage', did: ['charge'] } }, 'dash').blocked!, /Charge/);
+  assert.match(pick(rulesKt, { ...ff, flags: { expended: true } }, 'dash').blocked!, /уже активирован/);
+  assert.deepEqual(rulesKt.actions(ctx({ phase: 'strategy' })), []);
+  const u = unit('k', [[5, 5]]);
+  assert.equal(startMove(u, pick(rulesKt, { ...ff, flags: { order: 'engage' } }, 'charge'), [6])!.max['k.0'], 8);
+});
+
+test('Warcry: 2 действия, Move не из 1″, Disengage 3″ и дальше 1″ от врагов, Wait первым — 1 действие потом', () => {
+  const c = { phase: 'combat' };
+  assert.equal(rulesWarcry.activation!.budget(ctx(c)), 2);
+  assert.equal(rulesWarcry.activation!.budget(ctx({ ...c, flags: { waiting: true } })), 1);
+  assert.match(pick(rulesWarcry, { ...c, engaged: true }, 'move').blocked!, /Disengage/);
+  assert.match(pick(rulesWarcry, c, 'disengage').blocked!, /1″/);
+  const dis = pick(rulesWarcry, { ...c, engaged: true }, 'disengage');
+  assert.equal(dis.distance?.fixed, 3);
+  assert.equal(dis.endUnengaged, true);
+  assert.equal(pick(rulesWarcry, c, 'move').endUnengaged, undefined, 'Move может закончиться рядом с врагом');
+});
+
+test('Экраны AoS, Kill Team, Warcry передают правила и характеристики симулятора', () => {
+  const ui = (p: string) => readFileSync(join(import.meta.dirname, '../../../client/src/features/roster/ui', p), 'utf8');
+  assert.ok(ui('testarmy/AosTestArmyScreen.tsx').includes('rules={rulesAos}'));
+  const sk = ui('skirmish/SkirmishTestArmyScreen.tsx');
+  assert.ok(sk.includes("rules={data.system === 'warcry' ? rulesWarcry : rulesKt}"));
+  for (const t of ['apl: (u) =>', 'ranges: (u) =>', 'moves: (u) =>']) assert.ok(sk.includes(t), t);
+  const board = ui('testarmy/Board.tsx');
+  for (const t of ['endActivation(', 'actionsFor(', 'атаку бросайте вручную']) assert.ok(board.includes(t), t);
 });

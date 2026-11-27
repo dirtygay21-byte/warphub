@@ -11,7 +11,7 @@ import type { TAUnit } from './state';
 export type SimPhase = { id: string; label: string; en: string };
 
 /** Что игрок может выбрать для отряда в фазе. */
-export type SimActionKind = 'stationary' | 'move' | 'charge' | 'shoot' | 'fight' | 'test';
+export type SimActionKind = 'stationary' | 'move' | 'charge' | 'shoot' | 'fight' | 'test' | 'wait';
 export type SimActionDef = {
   id: string;
   label: string;
@@ -22,11 +22,19 @@ export type SimActionDef = {
   /** подсказка под кнопкой */
   hint?: string;
   /** move: максимальная дистанция — фиксированная (″), или характеристика M (+ бросок) */
-  distance?: { fixed?: number; move?: boolean; dice?: number };
+  distance?: { fixed?: number; move?: boolean; dice?: number; plus?: number };
   /** после манёвра юнит не должен быть связан боем */
   endUnengaged?: boolean;
   /** манёвр нападения: цели в пределах 12″, после — связан со всеми целями и ни с кем больше */
   chargeTargets?: boolean;
+  /** манёвр должен закончиться в пределах этого расстояния от врага (AoS нападение ½″, KT Charge — 1″) */
+  endNear?: number;
+  /** не по правилам — можно завершить как неудачу (нападение «не удалось») */
+  failable?: boolean;
+  /** стоимость в AP / действиях активации (Kill Team, Warcry) */
+  ap?: number;
+  /** при начале: бросок D3 смертельных ран (AoS Retreat) */
+  mortalD3?: boolean;
   /** что отметить у отряда, когда действие выполнено */
   mark?: keyof UnitFlags;
   /** источник правила (раздел основных правил) */
@@ -43,6 +51,14 @@ export type UnitFlags = {
   consolidated?: boolean;
   /** под боевым шоком (до успешной проверки) */
   shocked?: boolean;
+  /** активации (Kill Team, Warcry): потрачено AP / действий, действия этой активации, активация завершена */
+  spent?: number;
+  did?: string[];
+  expended?: boolean;
+  /** Kill Team: приказ */
+  order?: 'engage' | 'conceal';
+  /** Warcry: Wait первым действием — можно активировать ещё раз с 1 действием */
+  waiting?: boolean;
 };
 
 export type SimContext = {
@@ -60,6 +76,8 @@ export type SimContext = {
   leadership: number | null;
   /** есть ли у отряда оружие ближнего боя / дальнего (для «Атаковать») — по умолчанию да */
   canShoot?: boolean;
+  /** Kill Team: APL оперативника */
+  apl?: number | null;
 };
 
 export type SimRules = {
@@ -72,6 +90,8 @@ export type SimRules = {
   bothArmies?: string[];
   actions: (ctx: SimContext) => SimActionDef[];
   source: string;
+  /** активации по одному отряду, игроки по очереди (Kill Team, Warcry): фаза и бюджет AP / действий */
+  activation?: { phase: string; budget: (ctx: SimContext) => number; unit: string };
 };
 
 // ---------- кубы ----------
@@ -117,7 +137,7 @@ export function startMove(unit: TAUnit, action: SimActionDef, moves: (number | n
     if (d.fixed != null) max[m.id] = d.fixed;
     else if (d.move) {
       const mv = moves[i] ?? fallback;
-      if (mv != null) max[m.id] = mv + extra;
+      if (mv != null) max[m.id] = mv + extra + (d.plus ?? 0);
     } else if (d.dice) max[m.id] = extra;
   });
   if (!Object.keys(start).length) return null;
@@ -168,6 +188,13 @@ export function checkMove(
     return d != null && d <= er + 1e-6;
   });
   if (am.action.endUnengaged && engagedWith.length) out.push(`ближе ${er}″ к врагу (${engagedWith.map((e) => e.name).join(', ')}) — нельзя закончить связанным боем`);
+  if (am.action.endNear != null) {
+    const near = enemies.some((e) => {
+      const d = unitGap(unitBases, e.bases);
+      return d != null && d <= am.action.endNear! + 1e-6;
+    });
+    if (!near) out.push(`нужно закончить в пределах ${String(am.action.endNear).replace('0.5', '½')}″ от врага`);
+  }
   if (am.action.chargeTargets) {
     const targets = am.targets ?? [];
     const missing = enemies.filter((e) => targets.includes(e.uid) && !engagedWith.includes(e));
@@ -240,7 +267,7 @@ function actions40k(c: SimContext): SimActionDef[] {
         (c.nearestEnemy == null || c.nearestEnemy > 12) && 'нет врага в пределах 12″',
       );
       return [
-        { id: 'charge', label: 'Нападение', en: 'Charge', kind: 'charge', distance: { dice: 2 }, chargeTargets: true, mark: 'charged', blocked: why, hint: 'выберите цели в пределах 12″, бросок 2D6 — дистанция; закончить в 2″ от всех целей', rule: '11.02 Charge; 11.04 Charge Move' },
+        { id: 'charge', label: 'Нападение', en: 'Charge', kind: 'charge', distance: { dice: 2 }, chargeTargets: true, failable: true, mark: 'charged', blocked: why, hint: 'выберите цели в пределах 12″, бросок 2D6 — дистанция; закончить в 2″ от всех целей', rule: '11.02 Charge; 11.04 Charge Move' },
       ];
     }
     case 'fight': {
