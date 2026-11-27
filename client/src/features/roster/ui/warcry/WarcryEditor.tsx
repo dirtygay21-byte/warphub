@@ -6,6 +6,7 @@ import { loadWarcryFaction } from '../../data';
 import { uid } from '../../engine/roster';
 import {
   abilitiesFor,
+  addBlockReason,
   addFighter,
   autoGroups,
   checkWarcryRoster,
@@ -574,6 +575,15 @@ function AddSheet({
   return (
     <Sheet open={open} onClose={onClose} title="Боец" tall>
       <div className="space-y-3">
+        <p className="flex flex-wrap gap-1.5 text-[12px]">
+          <Tag tone={roster.fighters.length >= WARCRY_LIMITS.maxFighters ? 'warn' : 'muted'}>
+            Бойцов {roster.fighters.length}/{WARCRY_LIMITS.maxFighters}
+          </Tag>
+          <Tag tone={warcryPoints(roster, data) > WARCRY_LIMITS.points ? 'warn' : 'muted'}>
+            Очков {warcryPoints(roster, data)}/{WARCRY_LIMITS.points}
+          </Tag>
+          <Tag>Героев {roster.fighters.filter((x) => fighterOf(data, x)?.runemarks.includes('hero')).length}/{WARCRY_LIMITS.heroes}</Tag>
+        </p>
         <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
           {[{ id: own.id, name: own.name, generic: false }, ...sources].map((s) => (
             <button
@@ -617,12 +627,19 @@ function AddSheet({
                       </div>
                       {f.runemarks.length > 0 && <p className="mt-1 truncate text-[12px] capitalize text-fg-3">{f.runemarks.join(' · ')}</p>}
                       <div className="mt-2 flex flex-wrap gap-1.5">
-                        {roles.map((role) => (
-                          <Button key={role} className="h-8 px-3 text-xs" onClick={() => onAdd(addFighter(roster, src.id, f, role))}>
-                            <Icon name="plus" className="size-3.5" /> {role === 'warband' ? 'Добавить' : ROLE_LABEL[role]}
-                          </Button>
-                        ))}
+                        {roles.map((role) => {
+                          const why = addBlockReason(roster, data, src.id, f, role);
+                          return (
+                            <Button key={role} className="h-8 px-3 text-xs" disabled={!!why} title={why ?? undefined} onClick={() => onAdd(addFighter(roster, src.id, f, role))}>
+                              <Icon name="plus" className="size-3.5" /> {role === 'warband' ? 'Добавить' : ROLE_LABEL[role]}
+                            </Button>
+                          );
+                        })}
                       </div>
+                      {(() => {
+                        const why = roles.map((role) => addBlockReason(roster, data, src.id, f, role)).find(Boolean);
+                        return why && roles.every((role) => addBlockReason(roster, data, src.id, f, role)) ? <p className="mt-1 text-[12px] text-warn">{why}</p> : null;
+                      })()}
                     </li>
                   );
                 })}
