@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ARMY_COLORS, type TAUnit } from '../../testarmy';
 import { cx } from '../util';
+import { Dice } from './GamePanel';
 
 /**
  * Оформление стола Test Army в стиле battle report (27.11.2026): верхняя полоса армий, полосы «Вне стола»
@@ -88,13 +89,13 @@ export function OffTable({ name, color, units, label, selected, onPick }: { name
   );
 }
 
-export type BannerSpec = { id: number; title: string; kicker?: string; sub?: string; color?: string; tone?: 'event' | 'good' | 'bad' };
+export type BannerSpec = { id: number; title: string; kicker?: string; sub?: string; color?: string; tone?: 'event' | 'good' | 'bad'; dice?: number[] };
 
 /** Крупный баннер события поверх поля (как в battle report); исчезает сам, нажатие закрывает раньше. */
 export function Banner({ banner, onDone }: { banner: BannerSpec | null; onDone: () => void }) {
   useEffect(() => {
     if (!banner) return;
-    const t = window.setTimeout(onDone, banner.tone === 'event' ? 1700 : 2600);
+    const t = window.setTimeout(onDone, banner.dice ? 3200 : banner.tone === 'event' ? 1700 : 2600);
     return () => window.clearTimeout(t);
   }, [banner, onDone]);
   if (!banner) return null;
@@ -112,6 +113,11 @@ export function Banner({ banner, onDone }: { banner: BannerSpec | null; onDone: 
       {banner.kicker && (
         <span className="block px-3 py-1 text-[12px] font-bold uppercase tracking-wider text-white" style={{ background: banner.color ?? '#1e3a8a' }}>
           {banner.kicker}
+        </span>
+      )}
+      {banner.dice && (
+        <span className="flex justify-center pt-2.5">
+          <Dice values={banner.dice} color={banner.color ?? '#2f7cf6'} />
         </span>
       )}
       <span className="font-display block px-3 pt-2 text-[30px] font-extrabold uppercase leading-none tracking-wide" style={{ color: edge }}>

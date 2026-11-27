@@ -20,8 +20,8 @@ const fix = (v: number) => (Math.round(v * 10) / 10).toFixed(1).replace('.', ','
  * onRoll (27.11.2026): «Бросить» — одно случайное значение из рассчитанного распределения убитых моделей;
  * лист закрывается, результат — баннером на столе.
  */
-export function CombatSheet({ attacker, target, distance, onClose, onRoll }: { attacker: Side; target: Side; distance: number | null; onClose: () => void; onRoll?: (killed: number, models: number) => void }) {
-  const [melee, setMelee] = useState(false);
+export function CombatSheet({ attacker, target, distance, onClose, onRoll, melee: meleeAtStart }: { attacker: Side; target: Side; distance: number | null; onClose: () => void; onRoll?: (killed: number, models: number) => void; melee?: boolean }) {
+  const [melee, setMelee] = useState(!!meleeAtStart);
   const rows = useMemo(() => attackRows(attacker.cr, attacker.uid, melee), [attacker.cr, attacker.uid, melee]);
   // выбор оружия: по умолчанию — первый профиль каждого оружия, которое достаёт до цели
   const [pick, setPick] = useState<Record<string, boolean>>({});

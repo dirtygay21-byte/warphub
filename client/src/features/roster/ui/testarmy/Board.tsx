@@ -43,7 +43,20 @@ import {
   type TAArmy,
   type TAUnit,
   armyColor,
+  checkMove,
+  clampShift,
+  diceSum,
+  moved,
+  rollDice,
+  startMove,
+  unitGap,
+  type ActiveMove,
+  type SimActionDef,
+  type SimContext,
+  type SimRules,
+  type UnitFlags,
 } from '../../testarmy';
+import { ActionPanel, ChargePanel, MovePanel, PhaseBar } from './GamePanel';
 import { ArmyBar, Banner, OffTable, type BannerSpec } from './BoardHud';
 import { Button, Icon, IconButton, Segmented } from '../kit';
 import { cx } from '../util';
@@ -71,7 +84,13 @@ const useDisp = () => {
  * Армия на столе для Board — без привязки к игровой системе (40K / AoS, 30.10.2026): имя ростера, строка характеристик
  * отряда и карточка отряда даёт экран своей системы.
  */
-export type BoardArmy = TAArmy & { name: string; stats: (u: TAUnit) => string | null; info: (u: TAUnit, onClose: () => void) => ReactNode };
+export type BoardArmy = TAArmy & {
+  name: string;
+  stats: (u: TAUnit) => string | null;
+  info: (u: TAUnit, onClose: () => void) => ReactNode;
+  /** симулятор (этап 2): характеристика M каждой модели (″) и Ld отряда; нет — действия с M недоступны */
+  sim?: { moves: (u: TAUnit) => (number | null)[]; leadership: (u: TAUnit) => number | null };
+};
 /**
  * Поле: картинка (svg с тем же viewBox «-1.5 -1.5 47 63», поле повёрнуто как в BattleMap), цели, точки привязки линейки,
  * зоны деплоя / территории сторон (многоугольники в дюймах поля 60×44) и подпись правила целей.
@@ -119,7 +138,7 @@ type Gesture = {
  */
 /** Симулятор боя (S2, 08.11.2026): лист атаки отряда по цели; только 40K (передаёт TestArmyScreen). */
 export type CombatRender = (
-  a: { attacker: TAUnit; attackerArmy: BoardArmy; target: TAUnit; targetArmy: BoardArmy; distance: number | null; onBanner: (b: Omit<BannerSpec, 'id'>) => void },
+  a: { attacker: TAUnit; attackerArmy: BoardArmy; target: TAUnit; targetArmy: BoardArmy; distance: number | null; onBanner: (b: Omit<BannerSpec, 'id'>) => void; melee?: boolean },
   onClose: () => void,
 ) => ReactNode;
 
@@ -131,6 +150,8 @@ export function Board(props: {
   combat?: CombatRender;
   /** выбор цвета армии (27.11.2026); нет — цвет не меняется */
   onArmyColor?: (key: ArmyKey, hex: string) => void;
+  /** правила симулятора фаз (этап 2); нет — только свободный режим */
+  rules?: SimRules;
 }) {
   const width = props.field.width ?? 60;
   const height = props.field.height ?? 44;
@@ -149,6 +170,7 @@ function BoardInner({
   onBack,
   combat,
   onArmyColor,
+  rules,
 }: {
   /** своя армия (me) и, если выбрана, армия соперника (foe) — за другую сторону */
   armies: BoardArmy[];
@@ -157,6 +179,7 @@ function BoardInner({
   onBack: () => void;
   combat?: CombatRender;
   onArmyColor?: (key: ArmyKey, hex: string) => void;
+  rules?: SimRules;
 }) {
   const { width, height, orientation } = useContext(BoardDimensions);
   const disp = useDisp();
@@ -197,7 +220,14 @@ function BoardInner({
   const [infoFor, setInfoFor] = useState<string | null>(null);
   // атака: выбран атакующий отряд — следующее нажатие на отряд другой армии выбирает цель
   const [attackFrom, setAttackFrom] = useState<string | null>(null);
-  const [attack, setAttack] = useState<{ from: string; to: string } | null>(null);
+  const [attack, setAttack] = useState<{ from: string; to: string; melee?: boolean } | null>(null);
+  // ---------- симулятор фаз (этап 2, 27.11.2026) ----------
+  const [game, setGame] = useState(false);
+  const [turn, setTurn] = useState<{ army: ArmyKey; phase: number; round: number; first: ArmyKey; flags: Record<string, UnitFlags> }>({ army: 'me', phase: 0, round: 1, first: 'me', flags: {} });
+  const [active, setActive] = useState<ActiveMove | null>(null);
+  const [charging, setCharging] = useState<{ uid: string; targets: string[] } | null>(null);
+  const [attackKind, setAttackKind] = useState<'shoot' | 'fight' | null>(null);
+  const [history, setHistory] = useState<{ units: Partial<Record<ArmyKey, TAUnit[]>>; flags: Record<string, UnitFlags> }[]>([]);
   const infoUnit = units.find((u) => u.uid === infoFor) ?? null;
   const endDrag = useRef<{ which: 'a' | 'b'; pointerId: number } | null>(null);
   const sel = units.find((u) => u.uid === selected) ?? null;
@@ -325,6 +355,171 @@ function BoardInner({
       }
     : null;
 
+  // ---------- симулятор фаз: состояние хода, действия, манёвры ----------
+  const phase = rules?.phases[turn.phase] ?? null;
+  const flagsOf = (uid: string): UnitFlags => turn.flags[uid] ?? {};
+  const setFlags = (uid: string, patch: UnitFlags) => setTurn((t) => ({ ...t, flags: { ...t.flags, [uid]: { ...t.flags[uid], ...patch } } }));
+  const snapshot = () => setHistory((h) => [...h.slice(-30), { units: Object.fromEntries(armies.map((a) => [a.key, a.units])), flags: turn.flags }]);
+  const undo = () => {
+    const last = history[history.length - 1];
+    if (!last) return;
+    haptic.select();
+    for (const a of armies) {
+      const u = last.units[a.key];
+      if (u) onArmy(a.key, u);
+    }
+    setTurn((t) => ({ ...t, flags: last.flags }));
+    setHistory((h) => h.slice(0, -1));
+    setActive(null);
+    setCharging(null);
+  };
+  const enemiesOf = (uid: string) => {
+    const mine = armyOf(uid).key;
+    return units.filter((u) => armyOf(u.uid).key !== mine && u.placed).map((u) => ({ uid: u.uid, name: u.name, bases: unitsOf(u.uid) }));
+  };
+  const ctxFor = (u: TAUnit): SimContext => {
+    const a = armyOf(u.uid);
+    const bases = unitsOf(u.uid);
+    const gaps = enemiesOf(u.uid).map((e) => unitGap(bases, e.bases)).filter((d): d is number => d != null);
+    const nearest = gaps.length ? Math.min(...gaps) : null;
+    const moves = (a.sim?.moves(u) ?? []).filter((x): x is number => x != null);
+    return {
+      phase: phase?.id ?? '',
+      active: !!phase && (a.key === turn.army || !!rules?.bothArmies?.includes(phase.id)),
+      placed: u.placed,
+      flags: flagsOf(u.uid),
+      engaged: nearest != null && nearest <= (rules?.engagement ?? 0) + 1e-6,
+      nearestEnemy: nearest,
+      move: moves.length ? Math.min(...moves) : null,
+      leadership: a.sim?.leadership(u) ?? null,
+    };
+  };
+  const cancelSim = () => {
+    if (active) {
+      update(active.before);
+      setHistory((h) => h.slice(0, -1));
+    }
+    setActive(null);
+    setCharging(null);
+    setAttackFrom(null);
+    setAttackKind(null);
+  };
+  const goPhase = (i: number) => {
+    cancelSim();
+    haptic.select();
+    setTurn((t) => ({ ...t, phase: i }));
+  };
+  const nextPhase = () => {
+    if (!rules) return;
+    cancelSim();
+    haptic.select();
+    setTurn((t) => {
+      if (t.phase < rules.phases.length - 1) return { ...t, phase: t.phase + 1 };
+      // конец хода: ход другой армии; новый раунд — когда снова ходит первая армия. Боевой шок остаётся до проверки.
+      const army: ArmyKey = foe ? (t.army === 'me' ? 'foe' : 'me') : t.army;
+      const flags = Object.fromEntries(Object.entries(t.flags).filter(([, f]) => f.shocked).map(([k]) => [k, { shocked: true }]));
+      return { ...t, army, phase: 0, round: army === t.first ? t.round + 1 : t.round, flags };
+    });
+  };
+  const doAction = (u: TAUnit, a: SimActionDef) => {
+    haptic.select();
+    const army = armyOf(u.uid);
+    const color = colorOfArmy(army);
+    if (a.kind === 'stationary') {
+      snapshot();
+      setFlags(u.uid, { moved: 'stationary' });
+      showBanner({ kicker: army.name, title: 'На месте', sub: `${u.name} · Remain stationary`, color, tone: 'event' });
+      return;
+    }
+    if (a.kind === 'test') {
+      const ld = army.sim?.leadership(u);
+      if (ld == null) return;
+      const r = rollDice(2);
+      const ok = diceSum(r) >= ld;
+      snapshot();
+      setFlags(u.uid, { shocked: !ok });
+      showBanner({ kicker: u.name, title: ok ? 'Выдержал!' : 'Боевой шок!', sub: `2D6 = ${diceSum(r)} · нужно ${ld}+`, color, tone: ok ? 'good' : 'bad', dice: r });
+      return;
+    }
+    if (a.kind === 'move') {
+      const roll = a.distance?.dice ? rollDice(a.distance.dice) : undefined;
+      const am = startMove(u, a, army.sim?.moves(u) ?? [], roll);
+      if (!am) return;
+      snapshot();
+      setActive(am);
+      setSelected(u.uid);
+      if (roll) showBanner({ kicker: u.name, title: `${a.label}: +${diceSum(roll)}″`, sub: `до ${Math.max(...Object.values(am.max)).toString().replace('.', ',')}″`, color, tone: 'event', dice: roll });
+      return;
+    }
+    if (a.kind === 'charge') {
+      setCharging({ uid: u.uid, targets: [] });
+      return;
+    }
+    // стрельба / бой: следующее нажатие на вражеский отряд — цель (лист атаки)
+    setAttackKind(a.kind === 'fight' ? 'fight' : 'shoot');
+    setAttackFrom(u.uid);
+  };
+  const rollCharge = () => {
+    if (!charging || !rules) return;
+    const u = units.find((x) => x.uid === charging.uid);
+    if (!u || !charging.targets.length) return;
+    const army = armyOf(u.uid);
+    const color = colorOfArmy(army);
+    const def = rules.actions(ctxFor(u)).find((a) => a.kind === 'charge');
+    if (!def) return;
+    const r = rollDice(2);
+    const d = diceSum(r);
+    const ub = unitsOf(u.uid);
+    // самая дальняя цель: от края до края минус радиус связывания
+    const need = Math.max(...charging.targets.map((t) => (unitGap(ub, unitsOf(t)) ?? 99) - rules.engagement));
+    snapshot();
+    setFlags(u.uid, { charged: true });
+    setCharging(null);
+    if (d < need) {
+      showBanner({ kicker: u.name, title: 'Не долетел!', sub: `2D6 = ${d}″ · нужно ${Math.max(0, Math.ceil(need * 10) / 10).toString().replace('.', ',')}″ — нападение не удалось`, color, tone: 'bad', dice: r });
+      return;
+    }
+    const am = startMove(u, def, army.sim?.moves(u) ?? [], r);
+    if (!am) return;
+    setActive({ ...am, targets: charging.targets });
+    showBanner({ kicker: u.name, title: `Нападение: ${d}″`, sub: 'двигайте отряд к целям', color, tone: 'event', dice: r });
+  };
+  const activeUnit = active ? units.find((u) => u.uid === active.uid) ?? null : null;
+  const activeProblems = active && rules && activeUnit ? checkMove(active, rules, unitsOf(active.uid), enemiesOf(active.uid)) : [];
+  const finishMove = () => {
+    if (!active || !activeUnit) return;
+    const army = armyOf(activeUnit.uid);
+    const color = colorOfArmy(army);
+    if (activeProblems.length) {
+      // нападение не удалось: отряд остаётся на исходной позиции
+      update(active.before);
+      setActive(null);
+      showBanner({ kicker: activeUnit.name, title: 'Нападение не удалось', sub: activeProblems[0], color, tone: 'bad' });
+      return;
+    }
+    const a = active.action;
+    if (a.mark === 'moved') setFlags(activeUnit.uid, { moved: a.id as UnitFlags['moved'] });
+    else if (a.mark) setFlags(activeUnit.uid, { [a.mark]: true });
+    setActive(null);
+    haptic.ok();
+    if (a.chargeTargets) showBanner({ kicker: army.name, title: 'Нападение удалось!', sub: `${activeUnit.name} · Fights First до конца хода`, color, tone: 'good' });
+  };
+  const moveProgress = (() => {
+    if (!active || !activeUnit) return '';
+    let worst = 0;
+    let limit = 0;
+    for (const m of activeUnit.models) {
+      const mx = active.max[m.id];
+      if (mx == null) continue;
+      const d = moved(active, m.id, m.at);
+      if (d / (mx || 1) >= worst / (limit || 1)) {
+        worst = d;
+        limit = mx;
+      }
+    }
+    return `пройдено ${fmtInches(worst)} из ${fmtInches(limit)} · тяните отряд или (удержанием) модель`;
+  })();
+
   // короткое нажатие на поле: линейка — точка; иначе выбранный отряд встаёт центром сюда
   const onTap = (clientX: number, clientY: number) => {
     const p = toBoard(clientX, clientY);
@@ -349,11 +544,28 @@ function BoardInner({
 
   // палец на базе (или рядом, до TOUCH_PX): весь отряд; удержание без движения — одна модель. Поле в это время не двигается.
   const startModel = (e: PointerEvent, unit: TAUnit, modelId: string) => {
+    if (charging) {
+      // нападение: нажатие на вражеский отряд в пределах 12″ — цель (ещё раз — снять)
+      if (armyOf(unit.uid).key !== armyOf(charging.uid).key) {
+        const d = unitGap(unitsOf(charging.uid), unitsOf(unit.uid));
+        if (d != null && d <= 12) {
+          haptic.select();
+          setCharging((c) => c && { ...c, targets: c.targets.includes(unit.uid) ? c.targets.filter((x) => x !== unit.uid) : [...c.targets, unit.uid] });
+        } else showBanner({ title: 'Дальше 12″', sub: `${unit.name}: ${d != null ? fmtInches(d) : 'не на столе'} — не цель нападения`, tone: 'bad' });
+      }
+      return;
+    }
     if (attackFrom) {
       if (armyOf(unit.uid).key !== armyOf(attackFrom).key) {
         const from = units.find((u) => u.uid === attackFrom);
-        if (from) showBanner({ kicker: 'Атака', title: from.name, sub: `→ ${unit.name}`, color: colorOf(from.uid), tone: 'event' });
-        setAttack({ from: attackFrom, to: unit.uid });
+        const melee = attackKind === 'fight';
+        if (from) showBanner({ kicker: melee ? 'Бой' : game ? 'Стрельба' : 'Атака', title: from.name, sub: `→ ${unit.name}`, color: colorOf(from.uid), tone: 'event' });
+        if (game && from) {
+          snapshot();
+          setFlags(from.uid, melee ? { fought: true } : { shot: true });
+        }
+        setAttack({ from: attackFrom, to: unit.uid, melee });
+        setAttackKind(null);
         setAttackFrom(null);
         haptic.select();
       }
@@ -367,6 +579,11 @@ function BoardInner({
     const p = toBoard(e.clientX, e.clientY);
     if (!p) return;
     setSelected(unit.uid);
+    // режим фаз: двигать можно только отряд, который сейчас совершает манёвр
+    if (game && !(active && active.uid === unit.uid)) {
+      haptic.select();
+      return;
+    }
     const d: Drag = { uid: unit.uid, modelId: null, start: p, orig: unit, moved: false, timer: undefined, pointerId: e.pointerId };
     d.timer = window.setTimeout(() => {
       if (drag.current === d && !d.moved) {
@@ -431,10 +648,14 @@ function BoardInner({
       if (!d.moved && Math.hypot(dx, dy) < DRAG_START / view.current.s) return;
       if (!d.moved) window.clearTimeout(d.timer);
       d.moved = true;
+      // манёвр симулятора: сдвиг урезается до максимальной дистанции каждой модели (от начала манёвра)
+      const from: Record<string, Pt> = {};
+      for (const m of d.orig.models) if (m.at) from[m.id] = m.at;
+      const k = game && active && active.uid === d.orig.uid ? clampShift(active, from, d.modelId ? [d.modelId] : Object.keys(from), dx, dy) : 1;
       if (d.modelId) {
         const m = d.orig.models.find((x) => x.id === d.modelId);
-        if (m?.at) update(moveModel(d.orig, d.modelId, clamp([m.at[0] + dx, m.at[1] + dy])));
-      } else update(moveUnit(d.orig, dx, dy));
+        if (m?.at) update(moveModel(d.orig, d.modelId, clamp([m.at[0] + dx * k, m.at[1] + dy * k])));
+      } else update(moveUnit(d.orig, dx * k, dy * k));
       return;
     }
     const g = gesture.current;
@@ -515,7 +736,20 @@ function BoardInner({
 
   // строка состояния поверх карты: что сейчас делать и результат измерения
   const attacker = attackFrom ? units.find((u) => u.uid === attackFrom) : null;
-  const status: ReactNode = attacker ? (
+  const gameStatus: ReactNode = !game || !phase ? null : active && activeUnit ? (
+    <>
+      <b className="text-white">{active.action.label}</b> · {moveProgress}
+    </>
+  ) : charging ? (
+    <>
+      <b className="text-white">Нападение</b> · нажмите на вражеские отряды в пределах 12″ (выбрано {charging.targets.length}), затем «Бросить 2D6»
+    </>
+  ) : attacker ? null : (
+    <>
+      <b className="text-white">{phase.label}</b> · ход: {(armies.find((a) => a.key === turn.army) ?? me).name} · нажмите на отряд — его действия в этой фазе
+    </>
+  );
+  const status: ReactNode = gameStatus ?? (attacker ? (
     <>
       <b className="text-white">⚔ {label(attacker)}. {attacker.name}</b> · нажмите на отряд соперника ·{' '}
       <button type="button" className="pointer-events-auto font-semibold text-accent underline" onClick={() => setAttackFrom(null)}>
@@ -558,7 +792,7 @@ function BoardInner({
         {foe && ` · соперник ${foePlaced} из ${foe.units.length}`}
         {outside.size > 0 && <span className="text-[#ff6b6b]"> · вне зоны: {outside.size}</span>} · «Отряды» справа
       </>
-    );
+    ));
 
   return (
     <div className="fixed inset-0 z-40 flex bg-app">
@@ -570,7 +804,7 @@ function BoardInner({
         const ab = unitsOf(a.uid);
         const tb = unitsOf(t.uid);
         const distance = ab.length && tb.length ? unitToUnit(ab, tb).d : null;
-        return combat({ attacker: a, attackerArmy: armyOf(a.uid), target: t, targetArmy: armyOf(t.uid), distance, onBanner: showBanner }, () => setAttack(null));
+        return combat({ attacker: a, attackerArmy: armyOf(a.uid), target: t, targetArmy: armyOf(t.uid), distance, onBanner: showBanner, melee: attack.melee }, () => setAttack(null));
       })()}
 
       <div className="flex min-w-0 flex-1 flex-col pt-[env(safe-area-inset-top)]">
@@ -578,6 +812,20 @@ function BoardInner({
         armies={armies.map((a) => ({ key: a.key, name: a.name, color: colorOfArmy(a), placed: a.units.filter((u) => u.placed).length, total: a.units.length }))}
         onColor={onArmyColor ? (key, hex) => onArmyColor(key as ArmyKey, hex) : undefined}
       />
+      {game && rules && phase && (
+        <PhaseBar
+          phases={rules.phases}
+          phase={turn.phase}
+          round={turn.round}
+          army={(armies.find((a) => a.key === turn.army) ?? me).name}
+          color={colorOfArmy(armies.find((a) => a.key === turn.army) ?? me)}
+          onPhase={goPhase}
+          onNext={nextPhase}
+          onSwitchArmy={foe ? () => (cancelSim(), setTurn((t) => ({ ...t, army: t.army === 'me' ? 'foe' : 'me', phase: 0, flags: {} }))) : undefined}
+          onUndo={undo}
+          canUndo={history.length > 0 && !active}
+        />
+      )}
       {foe && <OffTable name={foe.name} color={colorOfArmy(foe)} units={foe.units.filter((u) => !u.placed)} label={label} selected={selected} onPick={pickOffTable} />}
       {/* поле: жесты — свои (touch-action: none), браузер ничего не прокручивает */}
       <div
@@ -610,13 +858,35 @@ function BoardInner({
                 const [x, y] = disp([o.x, o.y]);
                 return <circle key={i} cx={x} cy={y} r={objectiveRadius + (field.objectiveRange ?? OBJECTIVE_RANGE)} fill="#eaff44" fillOpacity={0.06} stroke="#eaff44" strokeOpacity={0.7} strokeWidth={0.1} strokeDasharray="0.5 0.35" pointerEvents="none" />;
               })}
+            {game && (active?.action.endUnengaged || active?.action.chargeTargets || charging) && rules &&
+              enemiesOf(active?.uid ?? charging!.uid).flatMap((e) =>
+                e.bases.map((b, i) => {
+                  const [x, y] = disp([b.x, b.y]);
+                  return <ellipse key={`${e.uid}${i}`} cx={x} cy={y} rx={b.rx + rules.engagement} ry={b.ry + rules.engagement} transform={`rotate(${(b.angle * 180) / Math.PI + 90} ${x} ${y})`} fill="#ff3b3b" fillOpacity={0.05} stroke="#ff3b3b" strokeOpacity={0.45} strokeWidth={0.06} strokeDasharray="0.3 0.25" pointerEvents="none" />;
+                }),
+              )}
+            {game && active && activeUnit &&
+              activeUnit.models.map((m) => {
+                const st = active.start[m.id];
+                const mx = active.max[m.id];
+                if (!st || mx == null) return null;
+                const [x, y] = disp(st);
+                const b = placedBases({ ...activeUnit, models: [m] })[0];
+                const r = mx + (b ? Math.max(b.rx, b.ry) : 0);
+                return (
+                  <g key={m.id} pointerEvents="none">
+                    <circle cx={x} cy={y} r={r} fill={colorOf(activeUnit.uid)} fillOpacity={0.05} stroke={colorOf(activeUnit.uid)} strokeOpacity={0.8} strokeWidth={0.08} strokeDasharray="0.4 0.3" />
+                    <circle cx={x} cy={y} r={0.18} fill="#fff" fillOpacity={0.7} />
+                  </g>
+                );
+              })}
             {units.map((u) => (
               <UnitShapes
                 key={u.uid}
                 unit={u}
                 n={label(u)}
                 color={colorOf(u.uid)}
-                active={tool === 'units' ? pair.includes(u.uid) : u.uid === selected}
+                active={tool === 'units' ? pair.includes(u.uid) : u.uid === selected || !!charging?.targets.includes(u.uid) || u.uid === active?.uid}
                 plate={u.uid === selected || u.uid === attackFrom ? armyOf(u.uid).name : null}
                 single={single}
                 outside={outside}
@@ -631,6 +901,35 @@ function BoardInner({
           </svg>
         </div>
         <Banner banner={banner} onDone={hideBanner} />
+        {game && rules && active && activeUnit ? (
+          <MovePanel
+            title={`${activeUnit.name} · ${active.action.label}`}
+            color={colorOf(activeUnit.uid)}
+            progress={moveProgress}
+            roll={active.roll}
+            problems={activeProblems}
+            targets={active.targets?.map((t) => units.find((u) => u.uid === t)?.name ?? t).join(', ')}
+            onDone={finishMove}
+            onCancel={cancelSim}
+            failLabel={active.action.chargeTargets ? 'Нападение не удалось' : undefined}
+          />
+        ) : game && rules && charging ? (
+          <ChargePanel
+            color={colorOf(charging.uid)}
+            targets={charging.targets.map((t) => units.find((u) => u.uid === t)?.name ?? t)}
+            onRoll={rollCharge}
+            onCancel={cancelSim}
+          />
+        ) : game && rules && sel && !panel && !attackFrom ? (
+          <ActionPanel
+            title={`${label(sel)}. ${sel.name}`}
+            sub={`${armyOf(sel.uid).name}${flagsOf(sel.uid).shocked ? ' · под боевым шоком' : ''}${selArmy.stats(sel) ? ` · ${selArmy.stats(sel)}` : ''}`}
+            color={colorOf(sel.uid)}
+            actions={rules.actions(ctxFor(sel))}
+            onAction={(a) => doAction(sel, a)}
+            onClose={() => setSelected(null)}
+          />
+        ) : null}
         <p className="pointer-events-none absolute left-2 right-2 top-2 line-clamp-2 rounded-lg bg-black/75 px-2.5 py-1.5 text-[13px] leading-snug text-white/85">
           {status}
         </p>
@@ -642,6 +941,20 @@ function BoardInner({
       <nav className="flex w-14 shrink-0 flex-col items-center gap-1 overflow-y-auto border-l border-white/10 bg-app-elevated py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">
         <RailButton icon="back" label="Назад" onClick={onBack} />
         <RailButton icon="list" label="Отряды" active={panel} onClick={() => (haptic.select(), setPanel((v) => !v))} />
+        {rules && (
+          <RailButton
+            icon="play"
+            label={game ? 'Фазы ✓' : 'Фазы'}
+            active={game}
+            onClick={() => {
+              haptic.select();
+              cancelSim();
+              setTool('move');
+              setPanel(false);
+              setGame((v) => !v);
+            }}
+          />
+        )}
         <span className="my-0.5 h-px w-8 bg-white/10" />
         {TOOLS.map((t) => (
           <RailButton key={t.id} icon={t.icon} label={t.label} active={tool === t.id} onClick={() => chooseTool(t.id)} />
