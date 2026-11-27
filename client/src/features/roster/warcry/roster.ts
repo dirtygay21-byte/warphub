@@ -182,6 +182,27 @@ export function checkWarcryRoster(r: WarcryRoster, data: Data): WarcryIssue[] {
   return out;
 }
 
+/**
+ * Почему бойца нельзя добавить в этой роли (27.11.2026): та же проверка checkWarcryRoster на варбанде с этим бойцом,
+ * но блокируют только лимиты, которые добавление нарушает (бойцов > 15, очков > 1000, героев, союзников, траллов, монстров,
+ * «только один раз», лидер — первым герой своей фракции). Нехватка бойцов (< 3) и группы добавление не блокируют.
+ * null — можно добавить.
+ */
+export function addBlockReason(r: WarcryRoster, data: Data, factionId: string, f: WarcryFighter, role: WarcryRole): string | null {
+  const next = addFighter(r, factionId, f, role);
+  const L = WARCRY_LIMITS;
+  for (const e of checkWarcryRoster(next, data)) {
+    if (e.level !== 'error') continue;
+    const m = e.message;
+    if (/^Бойцов/.test(m) && next.fighters.length > L.maxFighters) return `Бойцов уже ${r.fighters.length} — не больше ${L.maxFighters}`;
+    if (/^Очков/.test(m)) return `${m.replace(/^Очков (\d+) — больше (\d+)$/, 'Будет $1 очков из $2')}`;
+    if (/^Героев|^Союзников|^Траллов|^Монстров/.test(m)) return m.replace(/^(\S+) (\d+) —/, (_, w: string, n: string) => `${w} будет ${n} —`);
+    if (/только один раз/.test(m) && e.uids?.some((u) => !r.fighters.some((x) => x.uid === u))) return `${f.name}: можно взять только один раз`;
+    if (/^Лидер/.test(m) && r.fighters.length === 0) return 'Первым добавьте героя своей фракции — он лидер';
+  }
+  return null;
+}
+
 export const ROLE_LABEL: Record<WarcryRole, string> = { warband: 'Боец', ally: 'Союзник', thrall: 'Тралл', monster: 'Монстр' };
 export const GROUP_LABEL: Record<WarcryGroup, string> = { dagger: 'Dagger', shield: 'Shield', hammer: 'Hammer' };
 
