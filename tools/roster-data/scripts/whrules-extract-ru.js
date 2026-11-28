@@ -28,6 +28,40 @@
   const app = await read(index.match(/(app-[A-Za-z0-9_-]+\.js)/)[1]);
   const mods = [...new Set([...app.matchAll(/import\(`?\.\/([A-Za-z0-9_-]+\.js)/g)].map((m) => m[1]))];
 
+  // с версии приложения 2.12 (ноябрь 2026) модули данных перечислены в builtinSource-*.js: «../data/<раздел>/<фракция>.js»
+  const bsFile = [index, app].map((x) => x.match(/(builtinSource-[A-Za-z0-9_-]+\.js)/)?.[1]).find(Boolean);
+  const factions = {};
+  if (bsFile) {
+    const bs = await read(bsFile);
+    const dataMap = Object.fromEntries([...bs.matchAll(/"\.\.\/data\/([^"]+)":\(\)=>[^(]*\(\(\)=>import\(`\.\/([A-Za-z0-9._-]+\.js)`/g)].map((m) => [m[1], m[2]]));
+    const slugs = Object.keys(dataMap).filter((k) => /^datasheets\/ru\/[a-z-]+\.js$/.test(k)).map((k) => k.slice(14, -3)).sort();
+    for (const slug of slugs) {
+      const dsFile = dataMap[`datasheets/ru/${slug}.js`];
+      await read(dsFile);
+      const ds = await import('/assets/' + dsFile);
+      let faction = null;
+      const fruFile = dataMap[`factions/ru/${slug}.js`];
+      if (fruFile) {
+        await read(fruFile);
+        const m = await import('/assets/' + fruFile);
+        faction = strip({ ...m.default, ...Object.fromEntries(Object.entries(m).filter(([k]) => k !== 'default')) });
+      }
+      let en = null;
+      const fenFile = dataMap[`factions/${slug}.js`];
+      if (fenFile) {
+        await read(fenFile);
+        const m = await import('/assets/' + fenFile);
+        const e = Object.values(m).map((v) => v?.en ?? v).find((v) => v && v.slug === slug && Array.isArray(v.detachments));
+        if (e) {
+          en = {
+            armyRule: e.armyRule ? { id: e.armyRule.id ?? null, name: e.armyRule.name } : null,
+            detachments: e.detachments.map((d) => ({ id: d.id, name: d.name, rule: d.rule?.name ?? null, stratagems: (d.stratagems ?? []).map((x) => x.name), enhancements: (d.enhancements ?? []).map((x) => x.name) })),
+          };
+        }
+      }
+      factions[slug] = { faction, en, datasheets: strip(ds?.default ?? {}), abilityNamesRu: ds?.abilityNamesRu ?? {} };
+    }
+  } else {
   // загрузчик русских инфолистов сайта (ru-*.js): карта «./<slug>.js» → модуль и функция, которую вызывает страница инфолиста
   const ruFile = mods.find((m) => /^ru-[A-Za-z0-9_-]+\.js$/.test(m));
   const ruText = await read(ruFile);
@@ -37,7 +71,6 @@
   const slugs = [...ruText.matchAll(/"\.\/([a-z-]+)\.js":\(\)=>\w+\(\(\)=>import\(`\.\/([A-Za-z0-9_-]+\.js)`\)/g)].map((m) => ({ slug: m[1], file: m[2] }));
   for (const s of slugs) await read(s.file);
 
-  const factions = {};
   for (const { slug } of slugs) {
     const ds = await load(slug);
     // модуль фракции на русском: среди модулей «<slug>-*.js» тот, что экспортирует detNamesRu
@@ -61,6 +94,8 @@
       }
     }
     factions[slug] = { faction, en, datasheets: strip(ds?.default ?? {}), abilityNamesRu: ds?.abilityNamesRu ?? {} };
+  }
+
   }
 
   const pv = await read([index, app].map((s) => s.match(/(PatchesView-[A-Za-z0-9_-]+\.js)/)?.[1]).find(Boolean));

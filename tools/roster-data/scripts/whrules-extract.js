@@ -33,14 +33,22 @@
   const html = await (await fetch('/ru/patches')).text();
   const index = await read(html.match(/assets\/(index-[A-Za-z0-9_-]+\.js)/)[1]);
   const app = await read(index.match(/(app-[A-Za-z0-9_-]+\.js)/)[1]);
-  const onSite = [...new Set([...app.matchAll(/"\.\/([a-z-]+)\.js":\(\)=>[^(]*\(\(\)=>import\(`\.\/\1-[A-Za-z0-9_-]+\.js`/g)].map((m) => m[1]))].sort();
+  // с версии приложения 2.12 (ноябрь 2026) карта модулей данных лежит в builtinSource-*.js с ключами «../data/<раздел>/<фракция>.js»
+  const bsFile = [index, app].map((x) => x.match(/(builtinSource-[A-Za-z0-9_-]+\.js)/)?.[1]).find(Boolean);
+  const bs = bsFile ? await read(bsFile) : '';
+  const dataMap = Object.fromEntries([...bs.matchAll(/"\.\.\/data\/([^"]+)":\(\)=>[^(]*\(\(\)=>import\(`\.\/([A-Za-z0-9._-]+\.js)`/g)].map((m) => [m[1], m[2]]));
+  const onSite = bsFile
+    ? Object.keys(dataMap).filter((k) => /^datasheets\/[a-z-]+\.js$/.test(k)).map((k) => k.slice(11, -3)).sort()
+    : [...new Set([...app.matchAll(/"\.\/([a-z-]+)\.js":\(\)=>[^(]*\(\(\)=>import\(`\.\/\1-[A-Za-z0-9_-]+\.js`/g)].map((m) => m[1]))].sort();
   const FACTIONS = window.__whrulesFactions ?? onSite;
   const unknown = FACTIONS.filter((f) => !onSite.includes(f));
   if (unknown.length) throw new Error(`нет на сайте: ${unknown.join(', ')}`);
   // «./<фракция>.js» встречается в нескольких картах (описание фракции, переводы, инфолисты)
-  const modulesOf = (slug) => [...app.matchAll(new RegExp(`"\\./${slug}\\.js":\\(\\)=>[^(]*\\(\\(\\)=>import\\(\`\\./(${slug}-[A-Za-z0-9_-]+\\.js)\``, 'g'))].map((x) => x[1]);
+  const modulesOf = (slug) => bsFile
+    ? [`datasheets/${slug}.js`, `factions/${slug}.js`].map((k) => dataMap[k]).filter(Boolean)
+    : [...app.matchAll(new RegExp(`"\\./${slug}\\.js":\\(\\)=>[^(]*\\(\\(\\)=>import\\(\`\\./(${slug}-[A-Za-z0-9_-]+\\.js)\``, 'g'))].map((x) => x[1]);
   // таблица переименований инфолистов (сайт по ней открывает старые ростеры)
-  const renAsset = [index, app].map((s) => s.match(/(datasheetRenames-[A-Za-z0-9_-]+\.js)/)?.[1]).find(Boolean);
+  const renAsset = [index, app, bs].map((s) => s.match(/(datasheetRenames-[A-Za-z0-9_-]+\.js)/)?.[1]).find(Boolean);
   if (!renAsset) throw new Error('нет модуля datasheetRenames');
   await read(renAsset);
   const renames = (await import('/assets/' + renAsset)).default ?? {};

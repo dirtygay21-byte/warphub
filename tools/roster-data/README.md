@@ -70,6 +70,16 @@ npm test             # движок и правила формирования �
 С 23.10.2026 выгрузка Wahapedia для 40K приостановлена (`CLAUDE.md`): основной датированный источник — wh-rules.ru.
 Подробности по каждому шагу — в разделах ниже.
 
+**Сверка 28.11.2026.** wh-rules.ru: последняя версия данных по-прежнему 995 (MFM 1.6, 16.10.2026); очки и детачменты всех 30
+фракций совпадают со снимком `whrules-995.json` (у CSM изменилось только тире в трёх названиях оружия). Сайт перешёл на приложение 2.12:
+карта модулей данных теперь в `builtinSource-*.js` (ключи `../data/<раздел>/<фракция>.js`) — `whrules-extract.js` и
+`whrules-extract-ru.js` поддерживают обе схемы. Русские тексты сайта поправлены (78 строк в 27 фракциях, формулировки
+«перебросьте бросок на попадание с результатом 1…») — снимок `whrules-995-ru.json` обновлён (fingerprint f2cb4580…), оверлеи
+`ru/` пересобраны. Warmind (данные от 19.11.2026, MFM 1.6): очки и цены не изменились; в снимке `warmind-11e.json` обновлены
+17 юнитов (Aquila / Decimus / Deathwatch Kill Team, Kasrkin, Chaos Lord и др.); у Warmind добавлены детачменты Combat Patrol
+(в приложении их нет) и непробиваемые сейвы `InvSv` (не снимались). Три связи Leader, добавленные раньше только по Warmind, убраны — Warmind их больше не даёт, на сайте их
+нет: Inquisitor Karamazov и Inquisitor Kroyle → Sanctifiers, Deffkilla Wartrike → Warbuggies.
+
 1. **Снимки** в браузере на wh-rules.ru: очки — `scripts/whrules-extract.js`, конструктор ростеров —
    `scripts/whrules-extract-roster.js`; полный снимок (`scripts/whrules-extract-full.js`) — только для армий, у которых
    меняются инфолисты. Сохранить с проверкой схемы и fingerprint: `node scripts/whrules-save.mjs <файл>`,
