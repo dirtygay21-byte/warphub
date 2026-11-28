@@ -2,13 +2,14 @@
  "schema": "warmind-compare/1",
  "snapshot": {
   "file": "40k/warmind-11e.json",
-  "fingerprint": "adfa402cb0b52a72155ee8508b8dce91bc9b9fb424c72a5bdbbc81d493ef649f",
+  "fingerprint": "025b66c9966835189384327aba7b4aa6f74e690c23e0fffe3d26cbb903fc1304",
   "source": {
    "site": "https://warmind.online/app/",
-   "bundle": "entry-d07c2982a65fce6092674ce3fb6c7ce0.js",
+   "bundle": "entry-06b46c18d4df7bf828532be35904d32f.js + data-11e-0a761ba4e0da869b77b158d17089e390.js",
    "dataSource": "BSData wh40k-11e-mfm · Munitorum Field Manual",
    "label": "11th Edition",
-   "extractedAt": "2026-11-07T16:32:30.726Z"
+   "extractedAt": "2026-11-28T05:40:00.000Z",
+   "note": "28.11.2026: обновлены 17 юнитов, изменившихся у Warmind после данных от 19.11.2026 (сверка по хешам всех юнитов; остальные совпадают). InvSv/base и детачменты Combat Patrol не снимались."
   }
  },
  "armies": [
@@ -205,41 +206,10 @@
      "unit": "Aquila Kill Team",
      "profile": "Kill Team Sergeant",
      "ours": "M6 T5 Sv3+ W2 Ld6+ OC2",
-     "warmind": "M6 T4 Sv3+ W2 Ld6+ OC2"
+     "warmind": "M6 T6 Sv3+ W3 Ld6+ OC2"
     }
    ],
-   "weapons": [
-    {
-     "unit": "Aquila Kill Team",
-     "weapon": "Bolt Pistol",
-     "ours": "12/1/3/5/-1/1",
-     "warmind": "12/1/3/4/0/1"
-    },
-    {
-     "unit": "Aquila Kill Team",
-     "weapon": "Special-issue Bolt Pistol",
-     "ours": "18/1/3/5/-1/1",
-     "warmind": "18/1/3/4/-1/1"
-    },
-    {
-     "unit": "Aquila Kill Team",
-     "weapon": "Plasma Incinerator – standard",
-     "ours": "24/2/3/7/-2/2",
-     "warmind": "24/2/3/7/-2/1"
-    },
-    {
-     "unit": "Aquila Kill Team",
-     "weapon": "Frag Cannon",
-     "ours": "18/2/3/7/-2/2",
-     "warmind": "18/d3/3/7/-2/2"
-    },
-    {
-     "unit": "Aquila Kill Team",
-     "weapon": "Power Weapon",
-     "ours": "melee/4/3/5/-2/1",
-     "warmind": "melee/4/3/5/-2/2"
-    }
-   ],
+   "weapons": [],
    "leads": [],
    "leadsExtra": [
     {
@@ -340,6 +310,12 @@
      "profile": "Thunderhawk Gunship",
      "ours": "M14 T12 Sv2+ W30 Ld6+ OC0",
      "warmind": "M20 T12 Sv2+ W30 Ld6+ OC0"
+    },
+    {
+     "unit": "Decimus Kill Team",
+     "profile": "Kill Team Sergeant",
+     "ours": "M6 T5 Sv3+ W2 Ld6+ OC2",
+     "warmind": "M6 T6 Sv3+ W3 Ld6+ OC2"
     }
    ],
    "weapons": [
